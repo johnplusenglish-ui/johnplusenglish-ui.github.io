@@ -360,6 +360,27 @@ h4{font-family:'DM Serif Display',serif;font-size:1.15rem;font-weight:400;margin
 .dl-banner-btn:hover{transform:translateY(-2px);box-shadow:0 5px 16px rgba(0,0,0,.15)}
 @media(max-width:640px){.download-banner{padding:0 1.2rem}.download-banner-inner{padding:1.2rem;flex-direction:column;align-items:flex-start}}
 
+/* Quick Drill */
+.drill-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem}
+.drill-stats{display:flex;gap:1.5rem}
+.drill-stat{font-family:'JetBrains Mono',monospace;font-size:.8rem;color:var(--muted)}
+.drill-score{color:var(--sea)}
+.drill-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:2.5rem;text-align:center;min-height:250px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.drill-type{font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem}
+.drill-prompt{font-family:'DM Serif Display',serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:400;margin-bottom:1.5rem;line-height:1.3}
+.drill-prompt b{color:var(--sky)}
+.drill-input-row{display:flex;gap:.5rem;align-items:center;width:100%;max-width:320px}
+.drill-answer{font-family:'Nunito',sans-serif;font-size:1.1rem;font-weight:700;padding:.7rem 1rem;border:2px solid var(--border);border-radius:10px;flex:1;text-align:center;outline:none;transition:border-color .2s}
+.drill-answer:focus{border-color:var(--sky)}
+.drill-answer.correct{border-color:#16a34a;background:#dcfce7;color:#16a34a}
+.drill-answer.wrong{border-color:#dc2626;background:#fee2e2;color:#dc2626}
+.drill-input-row .btn{padding:.7rem 1.2rem;font-size:1.1rem;border-radius:10px}
+.drill-feedback{margin-top:1rem;font-size:.95rem;font-weight:700;min-height:1.5rem}
+.drill-feedback.ok{color:#16a34a}
+.drill-feedback.no{color:#dc2626}
+.drill-result{margin-top:2rem}
+@media(max-width:640px){.drill-card{padding:1.5rem}}
+
 footer{text-align:center;padding:3rem 2rem;font-size:.8rem;color:var(--muted);border-top:1.5px solid var(--border);max-width:960px;margin:2rem auto 0;position:relative;z-index:1}
 
 @media(max-width:600px){
@@ -396,8 +417,9 @@ footer{text-align:center;padding:3rem 2rem;font-size:.8rem;color:var(--muted);bo
     <button class="tab active" data-tab="guide">Guide</button>
     <button class="tab" data-tab="dependent">Dependent Prepositions</button>
     <button class="tab" data-tab="phrases">Prepositional Phrases</button>
+    <button class="tab" data-tab="drill">Quick Drill</button>
     <button class="tab" data-tab="errors">Common Mistakes</button>
-    <button class="tab" data-tab="cloze">Open Cloze Tests</button>
+    <button class="tab" data-tab="cloze">Open Cloze</button>
   </div>
 
   
@@ -452,6 +474,7 @@ footer{text-align:center;padding:3rem 2rem;font-size:.8rem;color:var(--muted);bo
     <div class="ex-study-view active" id="dep_study_view">
       <div class="controls">
         <button class="view-btn on" onclick="depSetView('alpha',this)">Alphabetical</button>
+        <button class="view-btn" onclick="printStudyView('dep')" style="margin-left:auto;border-color:var(--muted);color:var(--muted)">🖨 Print</button>
         <button class="view-btn" onclick="depSetView('cat',this)">By Category</button>
       </div>
       <div id="dep_alphaView">
@@ -523,6 +546,7 @@ footer{text-align:center;padding:3rem 2rem;font-size:.8rem;color:var(--muted);bo
     </div>
     <div class="ex-study-view active" id="pp_study_view">
       
+      <div style="display:flex;justify-content:flex-end;margin-bottom:.5rem"><button class="view-btn" onclick="printStudyView('pp')" style="border-color:var(--muted);color:var(--muted)">🖨 Print</button></div>
       <input class="search-box" type="text" id="pp_searchBox" placeholder="Search phrases, definitions, or examples…" oninput="ppDoSearch()">
       <div class="search-count" id="pp_searchCount"></div>
       <div id="pp_studyContent"></div>
@@ -581,6 +605,74 @@ footer{text-align:center;padding:3rem 2rem;font-size:.8rem;color:var(--muted);bo
         <button class="btn" onclick="clozeCheck()" id="clozeCheckBtn">Check Answers</button>
       </div>
       <div class="cloze-results" id="clozeResults"></div>
+    </div>
+  </div>
+
+
+  <div class="tab-panel" id="panel-drill">
+    <div class="drill-setup" id="drillSetup">
+      <h2 class="pt">Quick Drill</h2>
+      <p class="pd">Rapid-fire preposition practice. Just the word and a blank — how fast can you go?</p>
+      
+      <h2 class="pt" style="font-size:1.1rem">What to practise</h2>
+      <div class="mr" id="drillSourceRow">
+        <button class="mb on" onclick="drillSetSource('dep',this)">Dependent Prepositions</button>
+        <button class="mb" onclick="drillSetSource('pp',this)">Prepositional Phrases</button>
+        <button class="mb" onclick="drillSetSource('both',this)">Both</button>
+      </div>
+      
+      <div id="drillTypeFilters">
+        <h2 class="pt" style="font-size:1.1rem">Filter by type</h2>
+        <div class="mr">
+          <button class="mb on" onclick="drillSetType('all',this)">All</button>
+          <button class="mb" onclick="drillSetType('V',this)">Verbs</button>
+          <button class="mb" onclick="drillSetType('N',this)">Nouns</button>
+          <button class="mb" onclick="drillSetType('Adj',this)">Adjectives</button>
+        </div>
+      </div>
+      
+      <h2 class="pt" style="font-size:1.1rem">How many?</h2>
+      <div class="mr">
+        <button class="mb" onclick="drillSetCount(10,this)">10</button>
+        <button class="mb on" onclick="drillSetCount(20,this)">20</button>
+        <button class="mb" onclick="drillSetCount(50,this)">50</button>
+        <button class="mb" onclick="drillSetCount(100,this)">100</button>
+      </div>
+      
+      <button class="btn" style="margin-top:1.5rem" onclick="drillStart()">Start Drill →</button>
+    </div>
+    
+    <div class="drill-active" id="drillActive" style="display:none">
+      <div class="drill-header">
+        <button class="btn sec" onclick="drillBack()" style="border-radius:20px;font-size:.8rem;padding:.4rem 1rem">← Back</button>
+        <div class="drill-stats">
+          <span class="drill-stat" id="drillCounter">0 / 0</span>
+          <span class="drill-stat drill-score" id="drillScore">0 correct</span>
+        </div>
+      </div>
+      <div class="bar" style="margin-bottom:1.5rem"><div class="fill" id="drillBar"></div></div>
+      
+      <div class="drill-card" id="drillCard">
+        <div class="drill-type" id="drillType"></div>
+        <div class="drill-prompt" id="drillPrompt"></div>
+        <div class="drill-input-row">
+          <input type="text" class="drill-answer" id="drillInput" placeholder="Type here…" autocomplete="off" autocapitalize="off">
+          <button class="btn" onclick="drillCheck()" id="drillCheckBtn">→</button>
+        </div>
+        <div class="drill-feedback" id="drillFeedback"></div>
+      </div>
+      
+      <div class="drill-result" id="drillResult" style="display:none">
+        <div class="cloze-score-card">
+          <h3>Drill Complete</h3>
+          <div class="cloze-score-pct" id="drillFinalScore">0%</div>
+          <div class="cloze-score-msg" id="drillFinalMsg"></div>
+          <div style="margin-top:1.5rem;display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap">
+            <button class="btn sec" onclick="drillBack()" style="border-radius:20px">← New Drill</button>
+            <button class="btn" onclick="drillReviewMistakes()" id="drillReviewBtn" style="display:none">Review Mistakes →</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -672,7 +764,23 @@ function dep_go(){if(dep_S.mode==='flash'){dep_startFlash();return;}
 function dep_chkT(i){var q=dep_S.qs[i];var ip=document.getElementById('dep_ip_'+i);if(ip.disabled)return;var v=ip.value.trim().toLowerCase();if(!v)return;var ok=v===q.an.toLowerCase();ip.disabled=true;var bt=ip.parentElement.querySelector('.btn');if(bt)bt.disabled=true;var c=document.getElementById('dep_qc_'+i);var f=document.getElementById('dep_fb_'+i);var g=document.getElementById('dep_g_'+i);if(ok){c.classList.add('ok');f.className='fb show ok';f.textContent='✓ Correct!';g.textContent=q.an;dep_S.cor++}else{c.classList.add('no');f.className='fb show no';f.textContent='✗ The answer is: '+q.an;g.textContent=q.an}dep_S.ans++;dep_upP()}
 function dep_chkM(i,oi,pk){var q=dep_S.qs[i];var c=document.getElementById('dep_qc_'+i);if(c.classList.contains('ok')||c.classList.contains('no'))return;var ans=q.an.toLowerCase();var ok=pk===ans;var f=document.getElementById('dep_fb_'+i);var g=document.getElementById('dep_g_'+i);c.querySelectorAll('.mo').forEach(function(b){b.classList.add('dis');if(b.textContent.trim()===ans)b.classList.add('rt')});if(!ok)document.getElementById('dep_mc_'+i+'_'+oi).classList.add('wr');if(ok){c.classList.add('ok');f.className='fb show ok';f.textContent='✓ Correct!';dep_S.cor++}else{c.classList.add('no');f.className='fb show no';f.textContent='✗ The answer is: '+q.an}g.textContent=q.an;dep_S.ans++;dep_upP()}
 function dep_upP(){var t=dep_S.qs.length;var p=t>0?Math.round(dep_S.ans/t*100):0;document.getElementById('dep_pF').style.width=p+'%';document.getElementById('dep_pT').textContent=dep_S.ans+' / '+t+' · '+dep_S.cor+' correct';if(dep_S.ans===t&&t>0)dep_showR()}
-function dep_showR(){var p=Math.round(dep_S.cor/dep_S.qs.length*100);var e=document.getElementById('dep_results');document.getElementById('dep_fS').textContent=p+'%';document.getElementById('dep_fS').className='sc'+(p>=70?' great':'');var m=document.getElementById('dep_fM');if(p===100)m.textContent='Perfect! Outstanding work.';else if(p>=80)m.textContent='Great job! Just a few to review.';else if(p>=60)m.textContent='Good effort — review the red items.';else m.textContent="Keep practising — you'll get there!";e.classList.add('show')}
+function dep_showR(){var p=Math.round(dep_S.cor/dep_S.qs.length*100);var e=document.getElementById('dep_results');document.getElementById('dep_fS').textContent=p+'%';document.getElementById('dep_fS').className='sc'+(p>=70?' great':'');var m=document.getElementById('dep_fM');if(p===100)m.textContent='Perfect! Outstanding work.';else if(p>=80)m.textContent='Great job! Just a few to review.';else if(p>=60)m.textContent='Good effort — review the red items.';else m.textContent="Keep practising — you'll get there!";e.classList.add('show');
+  // Review mistakes button
+  if(dep_S.qs.length-dep_S.cor>0){var rb=document.createElement('button');rb.className='btn';rb.style.marginTop='1rem';rb.textContent='Review '+( dep_S.qs.length-dep_S.cor)+' Mistakes \u2192';rb.onclick=function(){dep_reviewMistakes()};e.appendChild(rb)}}
+
+function dep_reviewMistakes(){
+  var wrong=[];
+  document.querySelectorAll('#dep_qC .qc.no').forEach(function(card){
+    var idx=parseInt(card.id.replace('dep_qc_',''));
+    wrong.push(dep_S.qs[idx]);
+  });
+  if(wrong.length===0)return;
+  dep_S.qs=wrong;dep_S.ans=0;dep_S.cor=0;
+  document.getElementById('dep_results').classList.remove('show');
+  var c=document.getElementById('dep_qC');c.innerHTML='';
+  dep_go_render(wrong);
+  window.scrollTo({top:0});
+}
 function dep_reset(){document.getElementById('dep_sP').style.display='block';document.getElementById('dep_qP').style.display='none';window.scrollTo({top:0})}
 
 function dep_toggleHint(i,btn){var el=document.getElementById('dep_ht_'+i);if(el.classList.contains('show')){el.classList.remove('show');btn.classList.remove('open');btn.textContent='Definition'}else{el.classList.add('show');btn.classList.add('open');btn.textContent='Hide'}}
@@ -764,7 +872,22 @@ function pp_go(){if(pp_S.mode==='flash'){pp_startFlash();return;}
 function pp_chkT(i){var q=pp_S.qs[i];var ip=document.getElementById('pp_ip_'+i);if(ip.disabled)return;var v=ip.value.trim().toLowerCase();if(!v)return;var ok=v===q.an.toLowerCase();ip.disabled=true;var bt=ip.parentElement.querySelector('.btn');if(bt)bt.disabled=true;var c=document.getElementById('pp_qc_'+i);var f=document.getElementById('pp_fb_'+i);var g=document.getElementById('pp_g_'+i);if(ok){c.classList.add('ok');f.className='fb show ok';f.textContent='✓ Correct!';g.textContent=q.an;pp_S.cor++}else{c.classList.add('no');f.className='fb show no';f.textContent='✗ The answer is: '+q.an;g.textContent=q.an}pp_S.ans++;pp_upP()}
 function pp_chkM(i,oi,pk){var q=pp_S.qs[i];var c=document.getElementById('pp_qc_'+i);if(c.classList.contains('ok')||c.classList.contains('no'))return;var ans=q.an.toLowerCase();var ok=pk===ans;var f=document.getElementById('pp_fb_'+i);var g=document.getElementById('pp_g_'+i);c.querySelectorAll('.mo').forEach(function(b){b.classList.add('dis');if(b.textContent.trim()===ans)b.classList.add('rt')});if(!ok)document.getElementById('pp_mc_'+i+'_'+oi).classList.add('wr');if(ok){c.classList.add('ok');f.className='fb show ok';f.textContent='✓ Correct!';pp_S.cor++}else{c.classList.add('no');f.className='fb show no';f.textContent='✗ The answer is: '+q.an}g.textContent=q.an;pp_S.ans++;pp_upP()}
 function pp_upP(){var t=pp_S.qs.length;var p=t>0?Math.round(pp_S.ans/t*100):0;document.getElementById('pp_pF').style.width=p+'%';document.getElementById('pp_pT').textContent=pp_S.ans+' / '+t+' · '+pp_S.cor+' correct';if(pp_S.ans===t&&t>0)pp_showR()}
-function pp_showR(){var p=Math.round(pp_S.cor/pp_S.qs.length*100);var e=document.getElementById('pp_results');document.getElementById('pp_fS').textContent=p+'%';document.getElementById('pp_fS').className='sc'+(p>=70?' great':'');var m=document.getElementById('pp_fM');if(p===100)m.textContent='Perfect! Outstanding work.';else if(p>=80)m.textContent='Great job! Just a few to review.';else if(p>=60)m.textContent='Good effort — review the red items.';else m.textContent="Keep practising — you'll get there!";e.classList.add('show')}
+function pp_showR(){var p=Math.round(pp_S.cor/pp_S.qs.length*100);var e=document.getElementById('pp_results');document.getElementById('pp_fS').textContent=p+'%';document.getElementById('pp_fS').className='sc'+(p>=70?' great':'');var m=document.getElementById('pp_fM');if(p===100)m.textContent='Perfect! Outstanding work.';else if(p>=80)m.textContent='Great job! Just a few to review.';else if(p>=60)m.textContent='Good effort — review the red items.';else m.textContent="Keep practising — you'll get there!";e.classList.add('show');
+  if(pp_S.qs.length-pp_S.cor>0){var rb=document.createElement('button');rb.className='btn';rb.style.marginTop='1rem';rb.textContent='Review '+(pp_S.qs.length-pp_S.cor)+' Mistakes \u2192';rb.onclick=function(){pp_reviewMistakes()};e.appendChild(rb)}}
+
+function pp_reviewMistakes(){
+  var wrong=[];
+  document.querySelectorAll('#pp_qC .qc.no').forEach(function(card){
+    var idx=parseInt(card.id.replace('pp_qc_',''));
+    wrong.push(pp_S.qs[idx]);
+  });
+  if(wrong.length===0)return;
+  pp_S.qs=wrong;pp_S.ans=0;pp_S.cor=0;
+  document.getElementById('pp_results').classList.remove('show');
+  var c=document.getElementById('pp_qC');c.innerHTML='';
+  pp_go_render(wrong);
+  window.scrollTo({top:0});
+}
 function pp_reset(){document.getElementById('pp_sP').style.display='block';document.getElementById('pp_qP').style.display='none';window.scrollTo({top:0})}
 
 function pp_toggleHint(i,btn){var el=document.getElementById('pp_ht_'+i);if(el.classList.contains('show')){el.classList.remove('show');btn.classList.remove('open');btn.textContent='Definition'}else{el.classList.add('show');btn.classList.add('open');btn.textContent='Hide'}}
@@ -2049,6 +2172,222 @@ function updateErrProgress(){
     bar.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem"><span style="font-weight:700;font-size:.85rem">Your Progress</span><span style="font-family:JetBrains Mono,monospace;font-size:.75rem;color:var(--muted)">'+done+'/'+total+' sets · '+avg+'% avg score</span></div><div class="bar"><div class="fill" style="width:'+pct+'%"></div></div>';
     el.after(bar);
   }
+}
+
+
+
+// Quick Drill
+var drillState={source:'dep',type:'all',count:20,questions:[],idx:0,correct:0,mistakes:[]};
+
+function drillSetSource(src,btn){
+  drillState.source=src;
+  btn.parentElement.querySelectorAll('.mb').forEach(function(b){b.classList.remove('on')});
+  btn.classList.add('on');
+  var tf=document.getElementById('drillTypeFilters');
+  tf.style.display=(src==='pp')?'none':'block';
+}
+function drillSetType(t,btn){
+  drillState.type=t;
+  btn.parentElement.querySelectorAll('.mb').forEach(function(b){b.classList.remove('on')});
+  btn.classList.add('on');
+}
+function drillSetCount(n,btn){
+  drillState.count=n;
+  btn.parentElement.querySelectorAll('.mb').forEach(function(b){b.classList.remove('on')});
+  btn.classList.add('on');
+}
+
+function drillBuildPool(){
+  var pool=[];
+  if(drillState.source==='dep'||drillState.source==='both'){
+    Object.keys(dep_D).forEach(function(cat){
+      dep_D[cat].forEach(function(e){
+        if(e[4]&&e[4].length>0){
+          if(drillState.type==='all'||e[1]===drillState.type){
+            var combo=e[0].replace(/\s*\(sb\)/g,'');
+            pool.push({prompt:combo.replace(/\s+\w+$/,''),full:combo,answer:e[4],type:e[1],source:'dep'});
+          }
+        }
+      });
+    });
+  }
+  if(drillState.source==='pp'||drillState.source==='both'){
+    Object.keys(pp_D).forEach(function(group){
+      pp_D[group].forEach(function(e){
+        if(e[4]&&e[4].length>0){
+          pool.push({prompt:'___ '+e[0].replace(/^\w+\s*/,''),full:e[0],answer:e[4],type:'Phrase',source:'pp'});
+        }
+      });
+    });
+  }
+  return pool;
+}
+
+function drillShuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+
+function drillStart(){
+  var pool=drillBuildPool();
+  drillShuffle(pool);
+  if(pool.length>drillState.count) pool=pool.slice(0,drillState.count);
+  drillState.questions=pool;
+  drillState.idx=0;
+  drillState.correct=0;
+  drillState.mistakes=[];
+  
+  document.getElementById('drillSetup').style.display='none';
+  document.getElementById('drillActive').style.display='block';
+  document.getElementById('drillResult').style.display='none';
+  drillShowQuestion();
+}
+
+function drillShowQuestion(){
+  if(drillState.idx>=drillState.questions.length){drillFinish();return}
+  var q=drillState.questions[drillState.idx];
+  var total=drillState.questions.length;
+  
+  document.getElementById('drillCounter').textContent=(drillState.idx+1)+' / '+total;
+  document.getElementById('drillScore').textContent=drillState.correct+' correct';
+  document.getElementById('drillBar').style.width=Math.round(drillState.idx/total*100)+'%';
+  
+  // Build prompt
+  var promptHTML;
+  if(q.source==='dep'){
+    // Show "word ___" 
+    var parts=q.full.split(/\s+/);
+    var word=parts.slice(0,-1).join(' ');
+    promptHTML='<b>'+word+'</b> ___';
+  }else{
+    // Show "___ phrase"
+    var phrase=q.full.replace(/^\S+\s*/,'');
+    promptHTML='___ <b>'+phrase+'</b>';
+  }
+  
+  document.getElementById('drillType').textContent=q.type+(q.source==='pp'?' (phrase)':'');
+  document.getElementById('drillPrompt').innerHTML=promptHTML;
+  
+  var input=document.getElementById('drillInput');
+  input.value='';
+  input.disabled=false;
+  input.className='drill-answer';
+  input.focus();
+  
+  document.getElementById('drillCheckBtn').disabled=false;
+  document.getElementById('drillFeedback').textContent='';
+  document.getElementById('drillFeedback').className='drill-feedback';
+}
+
+function drillCheck(){
+  var q=drillState.questions[drillState.idx];
+  var input=document.getElementById('drillInput');
+  var fb=document.getElementById('drillFeedback');
+  var userAns=input.value.trim().toLowerCase();
+  
+  if(!userAns) return;
+  
+  input.disabled=true;
+  document.getElementById('drillCheckBtn').disabled=true;
+  
+  if(userAns===q.answer.toLowerCase()){
+    input.classList.add('correct');
+    fb.textContent='\u2713 Correct!';
+    fb.className='drill-feedback ok';
+    drillState.correct++;
+  }else{
+    input.classList.add('wrong');
+    fb.textContent='\u2717 '+q.answer;
+    fb.className='drill-feedback no';
+    drillState.mistakes.push(q);
+  }
+  
+  document.getElementById('drillScore').textContent=drillState.correct+' correct';
+  
+  setTimeout(function(){
+    drillState.idx++;
+    drillShowQuestion();
+  },800);
+}
+
+// Enter key to submit
+document.addEventListener('keydown',function(e){
+  if(e.key==='Enter'){
+    var input=document.getElementById('drillInput');
+    if(input&&document.activeElement===input&&!input.disabled){
+      drillCheck();
+    }
+  }
+});
+
+function drillFinish(){
+  var total=drillState.questions.length;
+  var pct=Math.round(drillState.correct/total*100);
+  
+  document.getElementById('drillBar').style.width='100%';
+  document.getElementById('drillCard').style.display='none';
+  document.getElementById('drillResult').style.display='block';
+  
+  var el=document.getElementById('drillFinalScore');
+  el.textContent=pct+'%';
+  el.className='cloze-score-pct'+(pct>=75?' great':'');
+  
+  var msg=pct===100?'Perfect! Outstanding work.':pct>=80?'Great job!':pct>=60?'Good effort — keep drilling!':'Keep practising!';
+  document.getElementById('drillFinalMsg').textContent=drillState.correct+'/'+total+' correct. '+msg;
+  
+  var reviewBtn=document.getElementById('drillReviewBtn');
+  if(drillState.mistakes.length>0){
+    reviewBtn.style.display='inline-block';
+    reviewBtn.textContent='Review '+drillState.mistakes.length+' Mistakes \u2192';
+  }else{
+    reviewBtn.style.display='none';
+  }
+}
+
+function drillReviewMistakes(){
+  drillState.questions=drillShuffle(drillState.mistakes.slice());
+  drillState.idx=0;
+  drillState.correct=0;
+  drillState.mistakes=[];
+  
+  document.getElementById('drillCard').style.display='flex';
+  document.getElementById('drillResult').style.display='none';
+  drillShowQuestion();
+}
+
+function drillBack(){
+  document.getElementById('drillActive').style.display='none';
+  document.getElementById('drillSetup').style.display='block';
+  document.getElementById('drillCard').style.display='flex';
+  document.getElementById('drillResult').style.display='none';
+}
+
+
+// Print study view
+function printStudyView(prefix){
+  var contentEl=document.getElementById(prefix==='dep'?'dep_studyContent':'pp_studyContent');
+  if(prefix==='dep'&&document.getElementById('dep_catView').style.display!=='none'){
+    contentEl=document.getElementById('dep_sidebarContent');
+  }
+  if(prefix==='pp'&&document.getElementById('pp_sidebarContent')){
+    contentEl=document.getElementById('pp_sidebarContent');
+  }
+  
+  var printWin=window.open('','_blank');
+  printWin.document.write('<html><head><title>John + English — Prepositions</title>');
+  printWin.document.write('<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Nunito:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">');
+  printWin.document.write('<style>');
+  printWin.document.write('body{font-family:Nunito,sans-serif;color:#2D3047;padding:2rem;max-width:800px;margin:0 auto}');
+  printWin.document.write('h3{font-family:DM Serif Display,serif;font-size:1.5rem;margin-bottom:1rem}');
+  printWin.document.write('.entry{display:grid;grid-template-columns:160px 45px 1fr;gap:.6rem;padding:.5rem .3rem;border-bottom:1px solid #eee;font-size:.85rem}');
+  printWin.document.write('.e-combo{font-weight:700}.e-type{font-family:JetBrains Mono,monospace;font-size:.65rem;text-align:center;padding:.1rem .3rem;border-radius:4px;background:#f0f0f0}');
+  printWin.document.write('.e-def{color:#7A7D8E;font-style:italic;font-size:.82rem}.e-ex{font-weight:600;font-size:.85rem}');
+  printWin.document.write('.e-ex b,.e-ex b{color:#4A90D9}');
+  printWin.document.write('.alpha-header{font-family:DM Serif Display,serif;font-size:1.4rem;margin:1.5rem 0 .6rem;padding-bottom:.3rem;border-bottom:2px solid #4A90D9}');
+  printWin.document.write('.study-content-count{font-family:JetBrains Mono,monospace;font-size:.75rem;color:#7A7D8E;margin-bottom:1rem}');
+  printWin.document.write('@media print{body{padding:1rem}}</style></head><body>');
+  printWin.document.write('<div style="text-align:center;margin-bottom:2rem;padding-bottom:1rem;border-bottom:2px solid #2D3047"><div style="font-family:DM Serif Display,serif;font-size:1.8rem">john+english</div><div style="color:#7A7D8E;font-size:.85rem;margin-top:.3rem">Prepositions Reference</div></div>');
+  printWin.document.write(contentEl.innerHTML);
+  printWin.document.write('</body></html>');
+  printWin.document.close();
+  setTimeout(function(){printWin.print()},500);
 }
 
 </script>
