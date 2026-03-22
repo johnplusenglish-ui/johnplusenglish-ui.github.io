@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Phrasal Verbs — Study & Practice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Source+Sans+3:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #FAF8F5;
+    --bg-card: #FFFFFF;
+    --text-primary: #1B2A4A;
+    --text-secondary: #5A6A7E;
+    --text-muted: #8E99A8;
+    --accent-teal: #3AAFA9;
+    --accent-coral: #E8636A;
+    --accent-amber: #F0A844;
+    --accent-violet: #8B6FC0;
+    --accent-green: #5BBE7B;
+    --accent-blue: #4A90D9;
+    --accent-pink: #D96BA0;
+    --accent-navy: #2C3E6B;
+    --border: #E8E4DF;
+    --highlight-bg: #EBF5F5;
+    --tab-active: #3AAFA9;
+    --sidebar-active-bg: #3AAFA9;
+    --sidebar-active-text: #FFFFFF;
+    --radius: 10px;
+    --shadow-sm: 0 1px 3px rgba(27,42,74,0.06);
+    --shadow-md: 0 4px 12px rgba(27,42,74,0.08);
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body: 'Source Sans 3', 'Segoe UI', sans-serif;
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text-primary);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page-wrapper {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 40px 32px 80px;
+  }
+
+  /* Back link */
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.92rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+    margin-bottom: 28px;
+  }
+  .back-link:hover { color: var(--text-primary); }
+  .back-link svg { width: 16px; height: 16px; }
+
+  /* Category label */
+  .category-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent-teal);
+    margin-bottom: 10px;
+  }
+
+  /* Page title */
+  .page-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.4rem, 5vw, 3.4rem);
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1.1;
+    margin-bottom: 12px;
+  }
+
+  /* Subtitle */
+  .page-subtitle {
+    font-size: 1.05rem;
+    color: var(--text-secondary);
+    font-weight: 400;
+    margin-bottom: 36px;
+    max-width: 640px;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 2px solid var(--border);
+    margin-bottom: 36px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    padding: 12px 22px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-bottom: 2.5px solid transparent;
+    margin-bottom: -2px;
+    white-space: nowrap;
+    transition: color 0.2s, border-color 0.2s;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    font-family: var(--font-body);
+  }
+  .tab:hover { color: var(--text-primary); }
+  .tab.active {
+    color: var(--tab-active);
+    border-bottom-color: var(--tab-active);
+  }
+
+  /* Main layout */
+  .content-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 32px;
+    align-items: start;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px;
+    position: sticky;
+    top: 24px;
+    box-shadow: var(--shadow-sm);
+  }
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: background 0.2s, color 0.15s;
+    text-decoration: none;
+  }
+  .sidebar-item:hover {
+    background: rgba(58,175,169,0.06);
+    color: var(--text-primary);
+  }
+  .sidebar-item.active {
+    background: var(--sidebar-active-bg);
+    color: var(--sidebar-active-text);
+    font-weight: 600;
+  }
+  .sidebar-dot {
+    width: 5px;
+    min-width: 5px;
+    height: 22px;
+    border-radius: 3px;
+  }
+  .sidebar-item.active .sidebar-dot { background: rgba(255,255,255,0.5); }
+
+  /* Content panel */
+  .content-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 44px 48px 56px;
+    box-shadow: var(--shadow-sm);
+    min-height: 600px;
+  }
+
+  .content-panel h2 {
+    font-family: var(--font-display);
+    font-size: 1.65rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+    line-height: 1.25;
+  }
+  .content-panel h3 {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-top: 36px;
+    margin-bottom: 12px;
+    line-height: 1.3;
+  }
+  .content-panel p {
+    font-size: 1.01rem;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+    line-height: 1.72;
+  }
+  .content-panel p strong {
+    color: var(--text-primary);
+    font-weight: 700;
+  }
+
+  /* Example box */
+  .example-box {
+    background: var(--highlight-bg);
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin: 20px 0 28px;
+  }
+  .example-box p {
+    font-size: 0.98rem;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    line-height: 1.75;
+  }
+  .example-box p:last-child { margin-bottom: 0; }
+  .example-box .highlight {
+    font-weight: 700;
+    color: var(--accent-teal);
+  }
+  .example-box .highlight-coral {
+    font-weight: 700;
+    color: var(--accent-coral);
+  }
+
+  /* Inline list */
+  .inline-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 12px 0 20px;
+  }
+  .inline-list span {
+    display: inline-block;
+    padding: 5px 14px;
+    background: rgba(58,175,169,0.09);
+    border-radius: 6px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--accent-teal);
+  }
+
+  /* Type grid */
+  .type-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 20px 0 28px;
+  }
+  .type-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 22px;
+    background: var(--bg-card);
+    transition: box-shadow 0.2s;
+  }
+  .type-card:hover { box-shadow: var(--shadow-md); }
+  .type-card-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+  .type-card p {
+    font-size: 0.93rem;
+    margin-bottom: 6px;
+    color: var(--text-secondary);
+  }
+  .type-card .example-sentence {
+    font-size: 0.91rem;
+    color: var(--text-primary);
+    font-style: italic;
+    margin-top: 8px;
+    margin-bottom: 0;
+  }
+
+  /* Tip callout */
+  .tip-callout {
+    display: flex;
+    gap: 14px;
+    background: #FEF9F0;
+    border-left: 4px solid var(--accent-amber);
+    border-radius: 0 10px 10px 0;
+    padding: 18px 22px;
+    margin: 24px 0;
+  }
+  .tip-callout .tip-icon {
+    font-size: 1.2rem;
+    line-height: 1.5;
+  }
+  .tip-callout p {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    margin-bottom: 0;
+  }
+
+  /* Section content visibility */
+  .section-content { display: none; }
+  .section-content.active { display: block; }
+
+  /* Tab content visibility */
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* Responsive */
+  @media (max-width: 800px) {
+    .content-layout {
+      grid-template-columns: 1fr;
+    }
+    .sidebar {
+      position: static;
+      display: flex;
+      overflow-x: auto;
+      gap: 4px;
+      padding: 8px;
+    }
+    .sidebar-item { white-space: nowrap; font-size: 0.85rem; padding: 8px 12px; }
+    .content-panel { padding: 28px 24px 40px; }
+    .type-grid { grid-template-columns: 1fr; }
+    .page-wrapper { padding: 24px 16px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-wrapper">
+  <!-- Back link -->
+  <a href="#" class="back-link">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    Back to home
+  </a>
+
+  <!-- Category label -->
+  <div class="category-label">Study &amp; Practice</div>
+
+  <!-- Title -->
+  <h1 class="page-title">Phrasal Verbs</h1>
+
+  <!-- Subtitle -->
+  <p class="page-subtitle">Learn how phrasal verbs work, explore common combinations, and practise with interactive exercises.</p>
+
+  <!-- Tabs -->
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-tab="guide" role="tab">Guide</button>
+    <button class="tab" data-tab="common-phrasal-verbs" role="tab">Common Phrasal Verbs</button>
+    <button class="tab" data-tab="phrasal-verb-pairs" role="tab">Easily Confused Pairs</button>
+    <button class="tab" data-tab="quick-drill" role="tab">Quick Drill</button>
+    <button class="tab" data-tab="common-mistakes" role="tab">Common Mistakes</button>
+    <button class="tab" data-tab="open-cloze" role="tab">Open Cloze</button>
+  </div>
+
+  <!-- GUIDE TAB -->
+  <div class="tab-content active" id="tab-guide">
+    <div class="content-layout">
+      <!-- Sidebar -->
+      <nav class="sidebar" role="navigation" aria-label="Guide sections">
+        <a class="sidebar-item active" data-section="what-are-phrasal-verbs">
+          <span class="sidebar-dot" style="background: var(--accent-teal);"></span>
+          What Are Phrasal Verbs?
+        </a>
+        <a class="sidebar-item" data-section="types">
+          <span class="sidebar-dot" style="background: var(--accent-coral);"></span>
+          Types of Phrasal Verbs
+        </a>
+        <a class="sidebar-item" data-section="separable-inseparable">
+          <span class="sidebar-dot" style="background: var(--accent-amber);"></span>
+          Separable vs Inseparable
+        </a>
+        <a class="sidebar-item" data-section="three-part">
+          <span class="sidebar-dot" style="background: var(--accent-violet);"></span>
+          Three-Part Phrasal Verbs
+        </a>
+        <a class="sidebar-item" data-section="literal-vs-idiomatic">
+          <span class="sidebar-dot" style="background: var(--accent-green);"></span>
+          Literal vs Idiomatic Meaning
+        </a>
+        <a class="sidebar-item" data-section="formality">
+          <span class="sidebar-dot" style="background: var(--accent-blue);"></span>
+          Phrasal Verbs &amp; Formality
+        </a>
+        <a class="sidebar-item" data-section="multiple-meanings">
+          <span class="sidebar-dot" style="background: var(--accent-pink);"></span>
+          Multiple Meanings
+        </a>
+        <a class="sidebar-item" data-section="tips">
+          <span class="sidebar-dot" style="background: var(--accent-navy);"></span>
+          Common Mistakes &amp; Tips
+        </a>
+      </nav>
+
+      <!-- Content -->
+      <div class="content-panel">
+
+        <!-- Section: What Are Phrasal Verbs? -->
+        <div class="section-content active" id="what-are-phrasal-verbs">
+          <h2>What Are Phrasal Verbs?</h2>
+          <p>A phrasal verb is a combination of a <strong>verb</strong> and one or more <strong>particles</strong> (an adverb, a preposition, or both) that together create a meaning different from the individual words. Words like <strong>up, out, on, off, in, down, away, over, through</strong>, and <strong>back</strong> are all common particles.</p>
+
+          <div class="example-box">
+            <p>She <span class="highlight">picked up</span> the phone.</p>
+            <p>I need to <span class="highlight">look into</span> this problem.</p>
+            <p>He <span class="highlight">gave up</span> smoking last year.</p>
+            <p>We <span class="highlight">ran out of</span> milk.</p>
+          </div>
+
+          <h3>Why are they difficult?</h3>
+          <p>Phrasal verbs are one of the trickiest parts of English because the particle often completely changes the meaning of the verb. <strong>Look</strong> means to use your eyes, but <strong>look after</strong> means to take care of, <strong>look up</strong> means to search for information, and <strong>look down on</strong> means to consider inferior. The same verb can pair with many different particles, each producing a different meaning, and there is no reliable pattern to predict what the combination will mean.</p>
+
+          <p>Additionally, many phrasal verbs have both a <strong>literal</strong> meaning and an <strong>idiomatic</strong> meaning, and learners often need context to tell them apart.</p>
+        </div>
+
+        <!-- Section: Types -->
+        <div class="section-content" id="types">
+          <h2>Types of Phrasal Verbs</h2>
+          <p>Phrasal verbs can be grouped by whether they take an object and by the number of particles they contain.</p>
+
+          <div class="type-grid">
+            <div class="type-card">
+              <div class="type-card-label" style="color: var(--accent-teal);">Intransitive</div>
+              <p>No object is needed.</p>
+              <p class="example-sentence">The plane <strong>took off</strong> on time.</p>
+            </div>
+            <div class="type-card">
+              <div class="type-card-label" style="color: var(--accent-coral);">Transitive</div>
+              <p>An object is required.</p>
+              <p class="example-sentence">Please <strong>turn off</strong> the lights.</p>
+            </div>
+            <div class="type-card">
+              <div class="type-card-label" style="color: var(--accent-amber);">Two-Part</div>
+              <p>Verb + one particle.</p>
+              <p class="example-sentence">She <strong>brought up</strong> an interesting point.</p>
+            </div>
+            <div class="type-card">
+              <div class="type-card-label" style="color: var(--accent-violet);">Three-Part</div>
+              <p>Verb + adverb + preposition.</p>
+              <p class="example-sentence">I <strong>look forward to</strong> meeting you.</p>
+            </div>
+          </div>
+
+          <div class="tip-callout">
+            <span class="tip-icon">💡</span>
+            <p>Some phrasal verbs can be both transitive and intransitive with different meanings. For example: <strong>break down</strong> can mean "stop working" (intransitive) or "analyse into parts" (transitive).</p>
+          </div>
+        </div>
+
+        <!-- Section: Separable vs Inseparable -->
+        <div class="section-content" id="separable-inseparable">
+          <h2>Separable vs Inseparable</h2>
+          <p>This is one of the most important distinctions to master. With <strong>separable</strong> phrasal verbs, the object can go between the verb and the particle or after the particle. With <strong>inseparable</strong> phrasal verbs, the object must always come after the particle.</p>
+
+          <h3>Separable</h3>
+          <div class="example-box">
+            <p>She <span class="highlight">turned</span> the music <span class="highlight">down</span>. ✓</p>
+            <p>She <span class="highlight">turned down</span> the music. ✓</p>
+          </div>
+          <p><strong>Pronoun rule:</strong> When the object is a pronoun (me, it, him, them, etc.), it <em>must</em> go between the verb and the particle. You cannot place it after the particle.</p>
+          <div class="example-box">
+            <p>She <span class="highlight">turned</span> it <span class="highlight">down</span>. ✓</p>
+            <p>She <span class="highlight-coral">turned down</span> it. ✗</p>
+          </div>
+
+          <h3>Inseparable</h3>
+          <div class="example-box">
+            <p>She <span class="highlight">looks after</span> her grandmother. ✓</p>
+            <p>She <span class="highlight-coral">looks</span> her grandmother <span class="highlight-coral">after</span>. ✗</p>
+          </div>
+
+          <div class="tip-callout">
+            <span class="tip-icon">💡</span>
+            <p>There is no simple rule to know which phrasal verbs are separable and which are inseparable — you need to learn them case by case. A good learner's dictionary will always tell you.</p>
+          </div>
+        </div>
+
+        <!-- Section: Three-Part -->
+        <div class="section-content" id="three-part">
+          <h2>Three-Part Phrasal Verbs</h2>
+          <p>These consist of a verb plus an adverb plus a preposition. They are always <strong>inseparable</strong> — the three parts must stay together, and the object comes after all of them.</p>
+
+          <div class="example-box">
+            <p>I <span class="highlight">look forward to</span> your reply.</p>
+            <p>We need to <span class="highlight">cut down on</span> expenses.</p>
+            <p>He <span class="highlight">came up with</span> a brilliant idea.</p>
+            <p>She <span class="highlight">looks up to</span> her older sister.</p>
+          </div>
+
+          <h3>Common three-part phrasal verbs</h3>
+          <div class="inline-list">
+            <span>put up with</span>
+            <span>get on with</span>
+            <span>look forward to</span>
+            <span>come up with</span>
+            <span>run out of</span>
+            <span>look up to</span>
+            <span>look down on</span>
+            <span>cut down on</span>
+            <span>get away with</span>
+            <span>keep up with</span>
+            <span>make up for</span>
+            <span>get along with</span>
+          </div>
+        </div>
+
+        <!-- Section: Literal vs Idiomatic -->
+        <div class="section-content" id="literal-vs-idiomatic">
+          <h2>Literal vs Idiomatic Meaning</h2>
+          <p>Some phrasal verbs can be understood from the individual words — these have a <strong>literal</strong> meaning. Others have an <strong>idiomatic</strong> meaning that cannot be guessed from the parts.</p>
+
+          <div class="type-grid">
+            <div class="type-card">
+              <div class="type-card-label" style="color: var(--accent-green);">Literal</div>
+              <p>Meaning is predictable from the words.</p>
+              <p class="example-sentence">She <strong>stood up</strong> from her chair.</p>
+              <p class="example-sentence">He <strong>walked out</strong> of the room.</p>
+            </div>
+            <div class="type-card">
+              <div class="type-card-label" style="color: var(--accent-coral);">Idiomatic</div>
+              <p>Meaning cannot be guessed.</p>
+              <p class="example-sentence">She <strong>stood up for</strong> her rights. (= defended)</p>
+              <p class="example-sentence">He <strong>walked out on</strong> his family. (= abandoned)</p>
+            </div>
+          </div>
+
+          <div class="tip-callout">
+            <span class="tip-icon">💡</span>
+            <p>Context is key. The sentence "He <strong>turned up</strong> at the party" doesn't mean he physically rotated upward — it means he arrived. Always read the full sentence before deciding the meaning.</p>
+          </div>
+        </div>
+
+        <!-- Section: Formality -->
+        <div class="section-content" id="formality">
+          <h2>Phrasal Verbs &amp; Formality</h2>
+          <p>Phrasal verbs are generally more <strong>informal</strong> than their single-word equivalents. In formal writing and academic contexts, it is often preferable to use the Latin- or Greek-origin synonym instead.</p>
+
+          <div class="example-box">
+            <p><span class="highlight">find out</span> → discover / ascertain</p>
+            <p><span class="highlight">put off</span> → postpone / defer</p>
+            <p><span class="highlight">bring up</span> → raise / mention</p>
+            <p><span class="highlight">make up</span> → constitute / fabricate</p>
+            <p><span class="highlight">set up</span> → establish</p>
+            <p><span class="highlight">carry out</span> → conduct / perform</p>
+          </div>
+
+          <p>However, in spoken English and everyday writing, phrasal verbs sound <strong>more natural</strong> than their formal equivalents. Saying "I need to find out" is much more natural in conversation than "I need to ascertain."</p>
+
+          <div class="tip-callout">
+            <span class="tip-icon">💡</span>
+            <p>For exams like Cambridge C1/C2 and IELTS, show you know both. Use a formal synonym in your essay, and a phrasal verb in the speaking test to sound natural.</p>
+          </div>
+        </div>
+
+        <!-- Section: Multiple Meanings -->
+        <div class="section-content" id="multiple-meanings">
+          <h2>Multiple Meanings</h2>
+          <p>Many phrasal verbs have more than one meaning. The correct interpretation depends entirely on context.</p>
+
+          <h3>Take off</h3>
+          <div class="example-box">
+            <p>The plane <span class="highlight">took off</span> at noon. <em>(= left the ground)</em></p>
+            <p>She <span class="highlight">took off</span> her coat. <em>(= removed)</em></p>
+            <p>His career really <span class="highlight">took off</span> after the film. <em>(= became successful)</em></p>
+          </div>
+
+          <h3>Make up</h3>
+          <div class="example-box">
+            <p>She <span class="highlight">made up</span> a story. <em>(= invented)</em></p>
+            <p>They argued but <span class="highlight">made up</span> quickly. <em>(= reconciled)</em></p>
+            <p>Women <span class="highlight">make up</span> 60% of the workforce. <em>(= constitute)</em></p>
+          </div>
+
+          <h3>Put on</h3>
+          <div class="example-box">
+            <p>He <span class="highlight">put on</span> his jacket. <em>(= dressed in)</em></p>
+            <p>She <span class="highlight">put on</span> a brave face. <em>(= pretended)</em></p>
+            <p>I've <span class="highlight">put on</span> weight. <em>(= gained)</em></p>
+          </div>
+        </div>
+
+        <!-- Section: Tips -->
+        <div class="section-content" id="tips">
+          <h2>Common Mistakes &amp; Tips</h2>
+
+          <h3>1. Forgetting the pronoun rule</h3>
+          <div class="example-box">
+            <p><span class="highlight-coral">Turn off it.</span> ✗</p>
+            <p><span class="highlight">Turn it off.</span> ✓</p>
+          </div>
+          <p>With separable phrasal verbs, pronoun objects <strong>must</strong> go between the verb and the particle.</p>
+
+          <h3>2. Confusing similar phrasal verbs</h3>
+          <div class="example-box">
+            <p><span class="highlight">look for</span> = search for something</p>
+            <p><span class="highlight">look after</span> = take care of</p>
+            <p><span class="highlight">look up</span> = search for information</p>
+            <p><span class="highlight">look into</span> = investigate</p>
+          </div>
+
+          <h3>3. Using the wrong particle</h3>
+          <div class="example-box">
+            <p><span class="highlight-coral">I'm looking forward for the trip.</span> ✗</p>
+            <p><span class="highlight">I'm looking forward to the trip.</span> ✓</p>
+          </div>
+
+          <h3>4. Using a phrasal verb in the wrong register</h3>
+          <p>Avoid phrasal verbs in formal academic essays where a single-word synonym exists. For example, use <strong>investigate</strong> rather than <strong>look into</strong> in a research paper.</p>
+
+          <div class="tip-callout">
+            <span class="tip-icon">💡</span>
+            <p><strong>Best strategy:</strong> Learn phrasal verbs in context, not from isolated lists. Read widely, note examples in real sentences, and practise using them in your own writing and speech.</p>
+          </div>
+        </div>
+
+      </div><!-- /.content-panel -->
+    </div><!-- /.content-layout -->
+  </div><!-- /#tab-guide -->
+
+  <!-- PLACEHOLDER TABS -->
+  <div class="tab-content" id="tab-common-phrasal-verbs">
+    <div class="content-panel" style="text-align:center; padding: 80px 48px;">
+      <h2 style="margin-bottom: 12px;">Common Phrasal Verbs</h2>
+      <p>Browse phrasal verbs by particle or topic — coming soon.</p>
+    </div>
+  </div>
+  <div class="tab-content" id="tab-phrasal-verb-pairs">
+    <div class="content-panel" style="text-align:center; padding: 80px 48px;">
+      <h2 style="margin-bottom: 12px;">Easily Confused Pairs</h2>
+      <p>Compare and contrast similar phrasal verbs — coming soon.</p>
+    </div>
+  </div>
+  <div class="tab-content" id="tab-quick-drill">
+    <div class="content-panel" style="text-align:center; padding: 80px 48px;">
+      <h2 style="margin-bottom: 12px;">Quick Drill</h2>
+      <p>Timed practice exercises — coming soon.</p>
+    </div>
+  </div>
+  <div class="tab-content" id="tab-common-mistakes">
+    <div class="content-panel" style="text-align:center; padding: 80px 48px;">
+      <h2 style="margin-bottom: 12px;">Common Mistakes</h2>
+      <p>Spot and fix typical errors — coming soon.</p>
+    </div>
+  </div>
+  <div class="tab-content" id="tab-open-cloze">
+    <div class="content-panel" style="text-align:center; padding: 80px 48px;">
+      <h2 style="margin-bottom: 12px;">Open Cloze</h2>
+      <p>Fill-in-the-gap exercises — coming soon.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Tab switching
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+    });
+  });
+
+  // Sidebar section switching
+  document.querySelectorAll('.sidebar-item').forEach(item => {
+    item.addEventListener('click', () => {
+      document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+      document.querySelectorAll('.section-content').forEach(s => s.classList.remove('active'));
+      item.classList.add('active');
+      document.getElementById(item.dataset.section).classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>
