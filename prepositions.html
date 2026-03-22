@@ -1353,7 +1353,8 @@ function clozeCheck(){
   var pct=Math.round(correct/8*100);
   var res=document.getElementById('clozeResults');
   var msg=pct===100?'Perfect! Outstanding work.':pct>=75?'Great job! Just a few to review.':pct>=50?'Good effort — review the highlighted gaps.':'Keep practising — you\'ll get there!';
-  res.innerHTML='<div class="cloze-score-card"><h3>Results</h3><div class="cloze-score-pct'+(pct>=75?' great':'')+'">'+correct+' / 8</div><div class="cloze-score-msg">'+msg+'</div></div>';
+  var retryHtml=correct<8?'<div style="margin-top:1rem"><button class="btn" onclick="clozeStart('+idx+')">Try Again \u2192</button></div>':'';
+  res.innerHTML='<div class="cloze-score-card"><h3>Results</h3><div class="cloze-score-pct'+(pct>=75?' great':'')+'">'+correct+' / 8</div><div class="cloze-score-msg">'+msg+'</div>'+retryHtml+'</div>';
   res.className='cloze-results show';
   
   // Replace check button with next/back buttons
@@ -1522,7 +1523,9 @@ function errCheck(){
   var pct=Math.round(correct/items.length*100);
   var res=document.getElementById('errResults');
   var msg=pct===100?'Perfect! Outstanding work.':pct>=75?'Great job! Just a few to review.':pct>=50?'Good effort \u2014 review the red sentences.':'Keep practising!';
-  res.innerHTML='<div class="cloze-score-card"><h3>Results</h3><div class="cloze-score-pct'+(pct>=75?' great':'')+'">'+correct+' / '+items.length+'</div><div class="cloze-score-msg">'+msg+'</div></div>';
+  var wrongCount=items.length-correct;
+  var reviewHtml=wrongCount>0?'<div style="margin-top:1rem"><button class="btn" onclick="errReviewMistakes()">Review '+wrongCount+' Mistakes \u2192</button></div>':'';
+  res.innerHTML='<div class="cloze-score-card"><h3>Results</h3><div class="cloze-score-pct'+(pct>=75?' great':'')+'">'+correct+' / '+items.length+'</div><div class="cloze-score-msg">'+msg+'</div>'+reviewHtml+'</div>';
   res.className='err-results show';
   
   document.getElementById('errCheckBtn').disabled=true;
@@ -1564,6 +1567,23 @@ function errReveal(){
   }
 }
 
+
+function errReviewMistakes(){
+  var ex=document.getElementById('errExercise');
+  var cat=ex.dataset.cat;
+  var items=errData[cat];
+  var wrong=[];
+  items.forEach(function(item,i){
+    var card=document.getElementById('eq_'+i);
+    if(card&&card.classList.contains('wrong')) wrong.push(item);
+  });
+  if(wrong.length===0) return;
+  // Temporarily replace the category data and restart
+  var origData=errData[cat];
+  errData[cat]=wrong;
+  errStart(cat);
+  errData[cat]=origData;
+}
 function errBack(){
   document.getElementById('errExercise').style.display='none';updateErrProgress();
   document.getElementById('errCategories').style.display='grid';
