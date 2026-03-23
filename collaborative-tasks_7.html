@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Collaborative Tasks — John + English</title>
+<meta name="description" content="Collaborative speaking tasks for English classes. Information gaps, problem-solving, and group decision-making. B1 to C2.">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Nunito:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--sun:#FFB347;--sky:#4A90D9;--sky-light:#E8F2FD;--sea:#2EC4B6;--coral:#FF6B6B;--lavender:#9B72CF;--mint:#5DDEA0;--sand:#FFF5E6;--cream:#FFFCF7;--ink:#2D3047;--muted:#7A7D8E;--border:#E8E5DF;--card:#fff;--radius:14px;
+--b1:#2d6a4f;--b1-bg:#e9f5ee;--b2:#b5651d;--b2-bg:#fdf3e7;--c1:#922b3e;--c1-bg:#fce8ec;--c2:#4a3580;--c2-bg:#f0ecf8;
+--s1:#1B4B7A;--s1-bg:#EBF1F8;--s2:#8B3A3A;--s2-bg:#F8EBEB;--s3:#5B6B2A;--s3-bg:#F2F5E8;--s4:#7A4B8A;--s4-bg:#F3ECF6}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
+body{font-family:'Nunito',sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,var(--border) 1px,transparent 1px);background-size:28px 28px;opacity:.4;pointer-events:none;z-index:0}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,252,247,.88);backdrop-filter:blur(16px);border-bottom:1.5px solid var(--border);padding:.85rem 2rem;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-family:'DM Serif Display',serif;font-size:1.3rem;color:var(--ink);text-decoration:none}
+.nav-logo span{color:var(--sky)}
+.nav-links{display:flex;gap:1.8rem}
+.nav-links a{font-size:.85rem;font-weight:600;color:var(--muted);text-decoration:none;transition:color .2s}
+.nav-links a:hover{color:var(--sky)}
+
+.page-header{padding:6.5rem 2rem 1rem;max-width:960px;margin:0 auto}
+.back-link{display:inline-flex;align-items:center;gap:.4rem;font-size:.85rem;font-weight:600;color:var(--muted);text-decoration:none;margin-bottom:1.2rem;transition:color .2s}
+.back-link:hover{color:var(--sky)}
+.section-label{font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--sun);margin-bottom:.5rem;font-weight:500}
+.page-title{font-family:'DM Serif Display',serif;font-size:clamp(2rem,5vw,3rem);margin-bottom:.8rem;font-weight:400}
+.page-desc{color:var(--muted);font-size:1.05rem;max-width:600px;line-height:1.7}
+
+/* Filters */
+.filters{max-width:960px;margin:0 auto;padding:1.2rem 2rem .5rem;position:relative;z-index:2}
+.filters-top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.8rem;margin-bottom:1rem}
+.view-toggle{display:flex;border:1.5px solid var(--border);border-radius:8px;overflow:hidden}
+.view-btn{font-family:'Nunito',sans-serif;font-size:.8rem;font-weight:700;padding:.5rem 1.2rem;border:none;background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.view-btn.on{background:var(--ink);color:#fff}
+.filters-actions{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+.action-btn{font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:700;padding:.45rem 1rem;border:1.5px solid var(--border);border-radius:8px;background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.action-btn:hover{border-color:var(--sky);color:var(--sky)}
+
+.filters-bar{display:flex;gap:2rem;align-items:center;flex-wrap:wrap}
+.filter-group{display:flex;align-items:center;gap:.6rem}
+.filter-label{font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.filter-pills{display:flex;gap:.35rem}
+.pill{font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:700;padding:.35rem .9rem;border:1.5px solid var(--border);border-radius:20px;background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.pill:hover{border-color:var(--sky);color:var(--sky)}
+.pill.on{color:#fff;border-color:transparent}
+.pill[data-v="all"].on{background:var(--ink)}
+.pill[data-v="B1"].on{background:var(--b1)}
+.pill[data-v="B2"].on{background:var(--b2)}
+.pill[data-v="C1"].on{background:var(--c1)}
+.pill[data-v="C2"].on{background:var(--c2)}
+
+.filter-select{font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:600;padding:.4rem 1rem;border:1.5px solid var(--border);border-radius:8px;background:var(--card);color:var(--ink);cursor:pointer}
+
+/* Group size selector */
+.group-size{display:flex;align-items:center;gap:.6rem}
+.group-pill{font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:700;padding:.35rem .8rem;border:1.5px solid var(--border);border-radius:20px;background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.group-pill:hover{border-color:var(--sea);color:var(--sea)}
+.group-pill.on{background:var(--sea);color:#fff;border-color:var(--sea)}
+
+.stats-bar{max-width:960px;margin:0 auto;padding:.3rem 2rem .8rem;font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--muted);letter-spacing:.03em;position:relative;z-index:1}
+
+/* Card area */
+.card-area{max-width:960px;margin:0 auto;padding:0 2rem 3rem;position:relative;z-index:1;min-height:300px}
+.card-nav{display:flex;align-items:center;justify-content:center;gap:1rem;margin-bottom:1.2rem}
+.card-nav button{font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:700;padding:.5rem 1.2rem;border:1.5px solid var(--border);border-radius:8px;background:var(--card);color:var(--ink);cursor:pointer;transition:all .2s}
+.card-nav button:hover{border-color:var(--sky);color:var(--sky)}
+.card-nav span{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--muted)}
+
+/* Task card */
+.task-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;max-width:800px;margin:0 auto}
+.task-header{padding:1.5rem 2rem 1.2rem;border-bottom:1px solid var(--border)}
+.task-badges{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.6rem}
+.task-level{font-family:'JetBrains Mono',monospace;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.25rem .7rem;border-radius:12px;display:inline-block}
+.task-level.B1{background:var(--b1-bg);color:var(--b1)}
+.task-level.B2{background:var(--b2-bg);color:var(--b2)}
+.task-level.C1{background:var(--c1-bg);color:var(--c1)}
+.task-level.C2{background:var(--c2-bg);color:var(--c2)}
+.task-type-badge{font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--cream);padding:.2rem .6rem;border-radius:10px;border:1px solid var(--border)}
+.task-group-badge{font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.06em;color:var(--sea);background:rgba(46,196,182,.1);padding:.2rem .6rem;border-radius:10px}
+.task-title{font-family:'DM Serif Display',serif;font-size:1.4rem;font-weight:400;margin-bottom:.4rem}
+.task-scenario{font-size:.9rem;color:var(--muted);line-height:1.65}
+
+/* Shared brief — single panel */
+.task-body-shared{padding:1.5rem 2rem}
+.task-goal{margin-bottom:1rem}
+.task-goal-label{font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--sea);font-weight:600;margin-bottom:.5rem;display:flex;align-items:center;gap:.4rem}
+.task-goal p{font-size:.9rem;color:var(--ink);line-height:1.65}
+.task-details{margin-bottom:.5rem}
+.task-details li{font-size:.88rem;line-height:1.65;margin-bottom:.35rem;margin-left:1.2rem;color:var(--ink)}
+.task-details li strong{font-weight:700}
+
+/* Info gap — student panels */
+.student-panels{display:grid;gap:0}
+.student-panels.cols-2{grid-template-columns:1fr 1fr}
+.student-panels.cols-3{grid-template-columns:1fr 1fr 1fr}
+.student-panels.cols-4{grid-template-columns:1fr 1fr 1fr 1fr}
+.student-panel{padding:1.3rem 1.5rem;border-right:1px solid var(--border)}
+.student-panel:last-child{border-right:none}
+.s-panel-1{background:var(--s1-bg)}
+.s-panel-2{background:var(--s2-bg)}
+.s-panel-3{background:var(--s3-bg)}
+.s-panel-4{background:var(--s4-bg)}
+.student-label{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.7rem;display:flex;align-items:center;gap:.4rem}
+.s-label-1{color:var(--s1)}.s-label-2{color:var(--s2)}.s-label-3{color:var(--s3)}.s-label-4{color:var(--s4)}
+.student-label::before{content:'';width:7px;height:7px;border-radius:50%}
+.s-label-1::before{background:var(--s1)}.s-label-2::before{background:var(--s2)}.s-label-3::before{background:var(--s3)}.s-label-4::before{background:var(--s4)}
+.info-item{font-size:.85rem;line-height:1.6;margin-bottom:.5rem;color:var(--ink)}
+.info-item strong{font-weight:700}
+
+/* Shared goal (appears below panels for info gaps too) */
+.task-shared{padding:1.2rem 2rem 1.3rem;border-top:1px solid var(--border);background:var(--cream)}
+.task-shared-label{font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--sea);font-weight:600;margin-bottom:.5rem}
+.task-shared p{font-size:.88rem;color:var(--ink);line-height:1.65}
+
+/* Steps */
+.task-steps{padding:1.2rem 2rem;border-top:1px solid var(--border);background:rgba(74,144,217,.03)}
+.task-steps-label{font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--sky);font-weight:600;margin-bottom:.6rem;display:flex;align-items:center;gap:.4rem}
+.step-list{counter-reset:steps}
+.step-item{counter-increment:steps;display:flex;gap:.7rem;margin-bottom:.5rem;font-size:.88rem;line-height:1.6;color:var(--ink)}
+.step-item:last-child{margin-bottom:0}
+.step-num{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:700;color:var(--sky);background:var(--sky-light);width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+
+/* Roles */
+.task-roles{padding:1.2rem 2rem;border-top:1px solid var(--border)}
+.task-roles-label{font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--lavender);font-weight:600;margin-bottom:.6rem;display:flex;align-items:center;gap:.4rem}
+.role-grid{display:grid;gap:.5rem}
+.role-grid.cols-2{grid-template-columns:1fr 1fr}
+.role-grid.cols-3{grid-template-columns:1fr 1fr 1fr}
+.role-grid.cols-4{grid-template-columns:1fr 1fr 1fr 1fr}
+.role-card{background:var(--cream);border:1px solid var(--border);border-radius:10px;padding:.8rem 1rem}
+.role-card-name{font-family:'JetBrains Mono',monospace;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.3rem}
+.rc-1 .role-card-name{color:var(--s1)}.rc-2 .role-card-name{color:var(--s2)}.rc-3 .role-card-name{color:var(--s3)}.rc-4 .role-card-name{color:var(--s4)}
+.role-card-desc{font-size:.84rem;color:var(--ink);line-height:1.55}
+
+/* Phrases */
+.phrases-toggle{display:block;width:100%;text-align:left;font-family:'Nunito',sans-serif;font-size:.85rem;font-weight:700;color:var(--sky);padding:1rem 2rem;border:none;border-top:1px solid var(--border);background:transparent;cursor:pointer;transition:color .2s}
+.phrases-toggle:hover{color:var(--coral)}
+.phrases-panel{display:none;padding:0 2rem 1.5rem}
+.phrases-panel.open{display:block}
+.phrase-list{display:flex;flex-wrap:wrap;gap:.4rem}
+.phrase-chip{font-size:.8rem;padding:.35rem .8rem;background:var(--sky-light);color:var(--sky);border-radius:6px;font-weight:600}
+
+/* Timer */
+.timer-row{display:flex;align-items:center;gap:.5rem;justify-content:center;margin-top:.8rem;flex-wrap:wrap}
+.timer-pill{font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:700;padding:.35rem .7rem;border:1.5px solid var(--border);border-radius:20px;background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s}
+.timer-pill:hover{border-color:var(--sea);color:var(--sea)}
+.timer-pill.active{border-color:var(--sea);background:var(--sea);color:#fff}
+.timer-pill.paused{border-color:var(--sun);background:var(--sun);color:#fff}
+.timer-display{font-family:'JetBrains Mono',monospace;font-size:1.5rem;font-weight:700;color:var(--ink);min-width:60px;text-align:center;transition:color .3s}
+.timer-display.warn{color:var(--coral)}
+.timer-display.done{color:var(--sea)}
+.timer-restart{font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:700;padding:.35rem .7rem;border:1.5px solid var(--border);border-radius:20px;background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s;display:none}
+.timer-restart:hover{border-color:var(--ink);color:var(--ink)}
+.timer-restart.show{display:inline-block}
+.timer-hint{width:100%;text-align:center;font-size:.75rem;color:var(--muted);margin-top:.2rem}
+
+/* Grid view */
+.grid-view{display:none;grid-template-columns:1fr 1fr;gap:.8rem}
+.grid-view.active{display:grid}
+.grid-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:1.2rem 1.4rem;cursor:pointer;transition:all .2s}
+.grid-card:hover{border-color:var(--sky);transform:translateY(-2px);box-shadow:0 4px 14px rgba(45,48,71,.06)}
+.grid-card-level{font-family:'JetBrains Mono',monospace;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.2rem .5rem;border-radius:10px;display:inline-block;margin-bottom:.3rem}
+.grid-card-level.B1{background:var(--b1-bg);color:var(--b1)}
+.grid-card-level.B2{background:var(--b2-bg);color:var(--b2)}
+.grid-card-level.C1{background:var(--c1-bg);color:var(--c1)}
+.grid-card-level.C2{background:var(--c2-bg);color:var(--c2)}
+.grid-card-title{font-family:'DM Serif Display',serif;font-size:1rem;font-weight:400;margin-bottom:.2rem}
+.grid-card-meta{font-size:.73rem;color:var(--muted)}
+
+.single-view{display:block}
+.single-view.hidden{display:none}
+
+footer{text-align:center;padding:3rem 2rem;font-size:.8rem;color:var(--muted);border-top:1.5px solid var(--border);max-width:960px;margin:2rem auto 0;position:relative;z-index:1}
+
+@media(max-width:768px){
+.student-panels.cols-3,.student-panels.cols-4{grid-template-columns:1fr 1fr}
+.student-panel{border-right:none;border-bottom:1px solid var(--border)}
+.student-panel:last-child{border-bottom:none}
+.role-grid.cols-3,.role-grid.cols-4{grid-template-columns:1fr 1fr}
+}
+@media(max-width:640px){
+nav{padding:.75rem 1.2rem}.nav-links{gap:1rem}.nav-links a{font-size:.78rem}
+.page-header{padding:5.5rem 1.2rem 1rem}
+.filters{padding:1rem 1.2rem .5rem}
+.filters-top{flex-direction:column;align-items:flex-start}
+.filters-bar{gap:1rem}
+.card-area{padding:0 1.2rem 3rem}
+.student-panels.cols-2,.student-panels.cols-3,.student-panels.cols-4{grid-template-columns:1fr}
+.role-grid.cols-2,.role-grid.cols-3,.role-grid.cols-4{grid-template-columns:1fr}
+.grid-view{grid-template-columns:1fr}
+.task-header{padding:1.2rem 1.4rem .8rem}
+.task-body-shared{padding:1.2rem 1.4rem}
+.task-shared{padding:1rem 1.4rem 1.2rem}
+}
+@media print{
+nav,.filters,.card-nav,.timer-row,.phrases-toggle,.view-toggle,.filters-actions,.back-link,.group-size{display:none!important}
+.page-header{padding-top:1rem}
+.task-card{border:1px solid #ccc;break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<nav>
+<a href="index.html" class="nav-logo">john<span>+</span>english</a>
+<div class="nav-links">
+<a href="class-activities.html">Activities</a>
+<a href="index.html#contact">Contact</a>
+</div>
+</nav>
+
+<div class="page-header">
+<a href="class-activities.html" class="back-link">&larr; Back to Class Activities</a>
+<div class="section-label">Class Activities</div>
+<h1 class="page-title">Collaborative Tasks</h1>
+<p class="page-desc">Problem-solving, decision-making, and information-gap tasks. Students work together in pairs or small groups to reach a shared goal.</p>
+</div>
+
+<div class="filters">
+<div class="filters-top">
+<div style="display:flex;gap:.8rem;align-items:center;flex-wrap:wrap">
+<div class="view-toggle">
+<button class="view-btn on" onclick="setView('single',this)">Card View</button>
+<button class="view-btn" onclick="setView('grid',this)">Browse All</button>
+</div>
+<div class="group-size">
+<span class="filter-label">Group</span>
+<span class="group-pill on" data-g="2" onclick="setGroup(2,this)">Pairs</span>
+<span class="group-pill" data-g="3" onclick="setGroup(3,this)">3</span>
+<span class="group-pill" data-g="4" onclick="setGroup(4,this)">4</span>
+</div>
+</div>
+<div class="filters-actions">
+<button class="action-btn" onclick="shuffleTasks()">&#8635; Shuffle</button>
+<button class="action-btn" onclick="window.print()">&#128424; Print</button>
+</div>
+</div>
+<div class="filters-bar">
+<div class="filter-group">
+<span class="filter-label">Level</span>
+<div class="filter-pills" id="levelPills"></div>
+</div>
+<div class="filter-group">
+<span class="filter-label">Type</span>
+<select class="filter-select" id="typeSelect" onchange="applyFilters()">
+<option value="all">All types</option>
+</select>
+</div>
+</div>
+</div>
+<div class="stats-bar" id="statsBar"></div>
+
+<div class="card-area">
+<div class="single-view" id="singleView">
+<div class="card-nav">
+<button onclick="prevTask()">&larr; Prev</button>
+<span id="cardCounter">1 / 1</span>
+<button onclick="nextTask()">Next &rarr;</button>
+</div>
+<div id="taskCard"></div>
+<div class="timer-row">
+<span class="timer-pill" data-secs="120" onclick="timerTap(120,this)">2 min</span>
+<span class="timer-pill" data-secs="300" onclick="timerTap(300,this)">5 min</span>
+<span class="timer-pill" data-secs="600" onclick="timerTap(600,this)">10 min</span>
+<span class="timer-pill" data-secs="900" onclick="timerTap(900,this)">15 min</span>
+<span class="timer-display" id="timerDisplay">0:00</span>
+<button class="timer-restart" id="timerRestart" onclick="restartTimer()">Restart</button>
+<div class="timer-hint">tap to start · tap again to pause</div>
+</div>
+</div>
+<div class="grid-view" id="gridView"></div>
+</div>
+
+<footer>&copy; 2026 John + English. All rights reserved.</footer>
+
+<script>
+// ============================================================
+// TASK DATA
+// format: "shared" — one brief for everyone
+//         "info-gap" — different info per student (provide students array with up to 4 entries)
+//
+// Shared tasks:  { id, level, format:"shared", type, title, scenario, details:[], goal, phrases:[] }
+// Info-gap tasks: { id, level, format:"info-gap", type, title, scenario,
+//                   students:[ [...items], [...items], [...items], [...items] ],
+//                   goal, phrases:[] }
+//   - students[0] = Student A, students[1] = Student B, etc.
+//   - If teacher picks 3 but task only has 2 student sets, Student C gets "You have the same information as Student A."
+// ============================================================
+var TASKS = [
+
+  // ---- B1 ----
+  {
+    id:1, level:"B1", format:"shared", type:"problem-solving",
+    title:"Planning a Class Trip",
+    scenario:"Your English class wants to organise a day trip. You have a budget of €150 and need to agree on everything together.",
+    details:[
+      "You must choose a <strong>destination</strong> (beach, city centre, theme park, or countryside walk).",
+      "You need to decide on <strong>transport</strong> (bus, train, or carpool).",
+      "You have to plan <strong>food</strong> — eat out or bring packed lunches?",
+      "The trip must work for everyone, including one person who <strong>can't walk long distances</strong>."
+    ],
+    goal:"Agree on a destination, transport, food plan, and schedule that fits the budget and works for the whole group.",
+    steps:["Read the scenario and options silently (1 min).","Each person says which destination they prefer and why.","Discuss transport and food — consider the budget.","Agree on a final plan that works for everyone, including the person who can't walk far."],
+    roles:["You <strong>love the beach</strong> and want a relaxing day. You think packed lunches save money.","You prefer the <strong>city centre</strong> because there's more to do. You'd rather eat out.","You want the <strong>theme park</strong> but are flexible. You're the one who <strong>can't walk long distances</strong>.","You like the <strong>countryside walk</strong> but you're worried about the weather. You want to keep costs low."],
+    phrases:["How about going to…?","I'd prefer… because…","That's a good idea, but what about…?","We could save money by…","Does everyone agree?"]
+  },
+  {
+    id:2, level:"B1", format:"info-gap", type:"information-gap",
+    title:"The Missing Tourist",
+    scenario:"A tourist has gone missing in your town. The police have asked locals for help. Each of you saw the tourist at a different time and place.",
+    students:[
+      ["You saw the tourist at <strong>9am outside the train station</strong>. They were wearing a <strong>red jacket</strong> and carrying a <strong>large backpack</strong>. They asked you for <strong>directions to the museum</strong>."],
+      ["You saw the tourist at <strong>11am in the museum café</strong>. They were <strong>talking on their phone</strong> and looked <strong>worried</strong>. They left in a hurry and <strong>forgot their scarf</strong>."],
+      ["You saw the tourist at <strong>1pm near the river</strong>. They were <strong>looking at a map</strong> and seemed <strong>lost</strong>. They asked you how to get to the <strong>bus station</strong>."],
+      ["You saw the tourist at <strong>3pm at the bus station</strong>. They were <strong>sitting on a bench</strong> and looked <strong>tired</strong>. A <strong>woman came to pick them up</strong> in a blue car."]
+    ],
+    goal:"Share your information and build a complete timeline of the tourist's day. What happened? Are they safe?",
+    steps:["Each person reads their own information silently — don't show it to anyone else.","Take turns describing what you saw. The others should ask follow-up questions.","Together, build a timeline on paper or verbally: what happened at 9am, 11am, 1pm, 3pm?","Discuss: is the tourist safe? What do you think happened?"],
+    phrases:["I saw them at… around…","What were they doing when you saw them?","That must have been before/after…","So it sounds like they…","Do you think they…?"]
+  },
+
+  // ---- B2 ----
+  {
+    id:3, level:"B2", format:"shared", type:"ranking",
+    title:"The Charity Budget",
+    scenario:"You work for a small charity that has received a €10,000 donation. The board must decide how to spend it. There are more good options than you can afford.",
+    details:[
+      "<strong>Option A:</strong> New website and social media campaign — €4,000",
+      "<strong>Option B:</strong> Training course for 5 volunteers — €3,000",
+      "<strong>Option C:</strong> Equipment for a community garden project — €5,000",
+      "<strong>Option D:</strong> Emergency fund for families in need — €10,000 (uses entire budget)",
+      "<strong>Option E:</strong> Part-time coordinator for 6 months — €6,000"
+    ],
+    goal:"Decide how to spend the €10,000. You can combine options if they fit the budget. Rank your choices and justify your decision.",
+    steps:["Read all the options silently (1 min).","Each person picks the option they think is most important and explains why.","Discuss which options to combine — check the maths.","Agree on a final budget plan and prepare a short explanation."],
+    roles:["You care most about <strong>long-term growth</strong>. You think the website and social media (Option A) will bring in more donations over time.","You believe in <strong>investing in people</strong>. Training volunteers (Option B) will have the biggest impact.","You think the charity should <strong>help people directly</strong>. The emergency fund (Option D) is the priority, even if it uses the whole budget.","You want <strong>visible community impact</strong>. The garden project (Option C) would attract local support and media attention."],
+    phrases:["I think we should prioritise… because…","If we combine A and B, that leaves…","In the long run, … would have more impact.","I see your point, but…","Can we compromise?"]
+  },
+  {
+    id:4, level:"B2", format:"info-gap", type:"information-gap",
+    title:"The Restaurant Review",
+    scenario:"You all went to the same new restaurant last week, but on different nights. A friend wants to know if it's worth visiting.",
+    students:[
+      ["You went on <strong>Monday</strong>. The restaurant was <strong>almost empty</strong>. The food arrived <strong>quickly</strong> and was <strong>excellent</strong> — you had the pasta. The bill was <strong>€22 per person</strong>. The waiter was <strong>friendly but forgot your drinks order</strong>."],
+      ["You went on <strong>Friday</strong>. It was <strong>packed</strong> and you waited <strong>25 minutes</strong> for a table. The food was <strong>good but portions were small</strong>. The bill was <strong>€35 per person</strong>. The atmosphere was <strong>lively with live music</strong>."],
+      ["You went on <strong>Saturday</strong>. You booked in advance. The food was <strong>beautifully presented but average in taste</strong>. The dessert was <strong>incredible</strong>. The bill was <strong>€40 per person</strong>. The manager <strong>gave you a free drink</strong> because of a mix-up with your order."],
+      ["You went on <strong>Wednesday</strong>. You sat outside on the terrace. The menu had <strong>good vegetarian options</strong>. The food was <strong>tasty and well-priced</strong> — €20 per person. Service was <strong>slow</strong> but the staff were <strong>apologetic</strong>."]
+    ],
+    goal:"Compare your experiences and write a short group review: would you recommend the restaurant? What's good, what could be better, and what should your friend expect?",
+    steps:["Each person describes their visit: when they went, what they ate, what it cost, and what stood out.","Ask each other questions — look for patterns (is it always expensive? is service always slow?).","Together, agree on a verdict: recommend, avoid, or 'it depends'.","Write or present a short group review (3–4 sentences)."],
+    phrases:["When I went, the…","That's interesting — my experience was quite different.","On the whole, it seems like…","I'd say it depends on…","Based on all our visits…"]
+  },
+
+  // ---- C1 ----
+  {
+    id:5, level:"C1", format:"shared", type:"problem-solving",
+    title:"The Office Redesign",
+    scenario:"Your company is moving to a smaller office. You're on the committee deciding the new layout. There are more needs than space allows.",
+    details:[
+      "The new office has <strong>4 rooms</strong> plus a small kitchen area.",
+      "There are <strong>20 employees</strong>: 12 need desks, 4 work remotely, 4 are part-time.",
+      "The staff have requested: a <strong>quiet focus room</strong>, a <strong>meeting room with a screen</strong>, <strong>individual desks for everyone</strong>, a <strong>break/social area</strong>, and a <strong>phone booth for calls</strong>.",
+      "The CEO insists on keeping one room as a <strong>private office</strong>.",
+      "Budget allows for either <strong>standing desks OR new chairs</strong>, not both."
+    ],
+    goal:"Design the office layout: assign purposes to all 4 rooms, decide on the desk situation, and present your plan to the group. Be ready to justify every choice.",
+    steps:["Read the constraints silently (1 min).","Each person says which staff request they think is most important.","Sketch out a room-by-room plan together — assign each room a purpose.","Decide: standing desks or new chairs? Justify your choice.","Present your final plan in 1–2 minutes."],
+    roles:["You represent the <strong>remote/part-time workers</strong>. You want hot-desking so everyone gets a fair share of space.","You represent the <strong>developers</strong>. You desperately want a quiet focus room — noise is your biggest complaint.","You represent the <strong>sales team</strong>. You need the meeting room with a screen for client calls every day.","You represent the <strong>CEO</strong>. You want to keep your private office but are open to sharing it at certain times."],
+    phrases:["If we allocate this room to…, that frees up…","I think we need to weigh up… against…","One option would be to use hot-desking, which means…","The trade-off here is…","I'd push back on that because…"]
+  },
+  {
+    id:6, level:"C1", format:"info-gap", type:"information-gap",
+    title:"The Merger Decision",
+    scenario:"Your company is considering merging with a competitor. Each of you works in a different department and has seen different internal reports.",
+    students:[
+      ["<strong>Finance:</strong> The merger would <strong>save €2M annually</strong> in shared costs. However, the competitor has <strong>€800K in undisclosed debt</strong>. Share price is expected to <strong>rise 15%</strong> if the merger goes ahead."],
+      ["<strong>HR:</strong> The merger would mean <strong>30 redundancies</strong> across both companies. Staff morale is already <strong>low</strong> due to recent restructuring. The competitor's team has a reputation for being <strong>highly skilled but difficult to manage</strong>."],
+      ["<strong>Marketing:</strong> The combined brand would <strong>dominate the market</strong> with 40% share. However, the competitor's brand has recently had <strong>negative press</strong> over a product safety issue. Customer surveys show <strong>mixed reactions</strong> to the idea."],
+      ["<strong>Operations:</strong> Merging the two IT systems would take <strong>18 months and cost €1.2M</strong>. The competitor uses a <strong>completely different supplier network</strong>. There could be <strong>6 months of disruption</strong> during the transition."]
+    ],
+    goal:"Pool your information and make a joint recommendation to the board: merge, don't merge, or merge with conditions? Support your recommendation with evidence from all departments.",
+    steps:["Each person reads their department's briefing silently.","Go around the group: each person summarises their department's key findings (no reading aloud — use your own words).","Discuss: what are the biggest risks? What are the biggest opportunities?","Agree on a recommendation: merge, don't merge, or merge with conditions.","Prepare a 1-minute summary for the board."],
+    phrases:["From a financial perspective…","That raises a concern on the HR side because…","If we factor in the marketing implications…","Operationally, the main risk is…","On balance, I'd argue…"]
+  },
+
+  // ---- C2 ----
+  {
+    id:7, level:"C2", format:"shared", type:"problem-solving",
+    title:"The University Ethics Panel",
+    scenario:"You sit on a university ethics panel. A professor wants approval for a controversial research project and you must decide whether to approve, reject, or approve with conditions.",
+    details:[
+      "The research involves <strong>monitoring students' social media activity</strong> to study the link between screen time and academic performance.",
+      "Students would give <strong>consent</strong>, but the professor admits they probably <strong>won't read the full terms</strong>.",
+      "The study has strong <strong>potential public health value</strong> and a respected journal has already expressed interest.",
+      "A similar study at another university was <strong>criticised by the press</strong> for being invasive.",
+      "The university's reputation depends on being seen as both <strong>innovative and ethical</strong>."
+    ],
+    goal:"Decide: approve, reject, or approve with conditions. If conditional, specify exactly what must change. Write a short statement justifying your decision.",
+    steps:["Read all five facts silently (1 min).","Each person gives their initial reaction: approve, reject, or unsure.","Discuss the strongest argument for and against approval.","If going conditional, agree on the specific conditions.","Draft a 2–3 sentence joint statement."],
+    roles:["You are the <strong>student representative</strong>. You're concerned about privacy and whether 'consent' is truly informed.","You are the <strong>head of research</strong>. You want to protect academic freedom and the university's research reputation.","You are the <strong>legal advisor</strong>. You're focused on liability — what happens if something goes wrong?","You are the <strong>public relations officer</strong>. You're thinking about how this looks in the media."],
+    phrases:["The crux of the issue is…","I'd argue that informed consent in this case is…","We need to balance academic freedom against…","One safeguard we could impose is…","Our statement should acknowledge… while emphasising…"]
+  },
+  {
+    id:8, level:"C2", format:"info-gap", type:"information-gap",
+    title:"The Diplomatic Crisis",
+    scenario:"A diplomatic incident has occurred between two countries. Each of you represents a different stakeholder and has access to different intelligence briefings.",
+    students:[
+      ["<strong>Government A:</strong> Your fishing vessel was <strong>seized in disputed waters</strong>. You believe the waters are yours under a <strong>1994 treaty</strong>. Domestic pressure is <strong>high</strong> — elections are in 3 months. Your military has recommended a <strong>show of force</strong>."],
+      ["<strong>Government B:</strong> You seized the vessel because it was <strong>illegally fishing in your exclusive economic zone</strong>. The 1994 treaty is <strong>ambiguous</strong> on this stretch of water. You'd prefer a <strong>diplomatic solution</strong> but can't appear weak domestically."],
+      ["<strong>International mediator:</strong> Both sides have <strong>legitimate claims</strong>. The 1994 treaty was never <strong>ratified by Government B's parliament</strong>. Previous disputes in the region were resolved through <strong>joint resource-sharing agreements</strong>. Escalation would destabilise the <strong>entire region's economy</strong>."],
+      ["<strong>Press/public opinion:</strong> Social media in both countries is <strong>inflamed</strong>. A leaked video shows Government B's navy <strong>using aggressive tactics</strong> during the seizure. An opinion poll shows <strong>65% of Government A's citizens</strong> want military action, but <strong>only 20%</strong> if it risks a wider conflict."]
+    ],
+    goal:"Negotiate a resolution that all parties can accept. Draft a joint statement addressing the immediate crisis and proposing a framework for preventing future disputes.",
+    steps:["Each person reads their stakeholder briefing silently.","Go around the group: each person states their position and what they need from a resolution.","Identify common ground — what can everyone agree on?","Negotiate the difficult points. Try to find compromises.","Draft a joint statement together (3–4 sentences)."],
+    phrases:["Our position is that…","We're prepared to… on the condition that…","The optics of this are critical because…","A precedent was set in… when…","The statement needs to acknowledge… without conceding…"]
+  },
+
+  // ---- DECISION-MAKING ----
+  {
+    id:9, level:"B1", format:"shared", type:"decision-making",
+    title:"The Class Pet",
+    scenario:"Your school has said your class can have a pet. You need to choose one animal and explain your decision to the teacher.",
+    details:[
+      "<strong>Option A:</strong> A goldfish — cheap, quiet, low maintenance, but not very interactive.",
+      "<strong>Option B:</strong> A rabbit — friendly and fun, but needs daily cleaning and a large cage.",
+      "<strong>Option C:</strong> A hamster — small and entertaining, but nocturnal (sleeps during school hours)."
+    ],
+    goal:"Choose ONE pet for the class. Everyone must agree. Be ready to explain why you rejected the other two.",
+    steps:["Read the three options silently.","Each person says which pet they want and gives one reason.","Discuss the problems with each option.","Try to reach agreement. If you're stuck, think about what matters most to the class."],
+    roles:["You <strong>love animals</strong> and want something you can hold and play with.","You're <strong>practical</strong> — you want the easiest option because the class is already busy.","You're <strong>allergic to fur</strong>, which limits your options.","You think a pet should be <strong>educational</strong> — the class should learn something from it."],
+    phrases:["I think we should go with… because…","The problem with… is that…","Yes, but on the other hand…","Can we all agree on…?","Let's go with… then."]
+  },
+  {
+    id:10, level:"C1", format:"shared", type:"decision-making",
+    title:"The Redundancy",
+    scenario:"Your company must make one person redundant from a team of four. You are the management committee. All four are good employees.",
+    details:[
+      "<strong>Employee A:</strong> 15 years at the company, reliable but slow to adapt to new technology. Single parent.",
+      "<strong>Employee B:</strong> 2 years at the company, highly skilled, but frequently late and has had conflicts with colleagues.",
+      "<strong>Employee C:</strong> 5 years, average performer, but runs the company's popular social media accounts in their spare time.",
+      "<strong>Employee D:</strong> 8 years, strong performer, recently handed in a complaint about workplace culture."
+    ],
+    goal:"Decide who to let go. You must reach a unanimous decision and write a brief justification that would stand up to an employment tribunal.",
+    steps:["Read all four employee profiles silently (2 min).","Each person says who they would keep and who they would let go — with reasons.","Discuss the legal and ethical risks of each choice.","Agree on one person and draft a 2-sentence justification."],
+    roles:["You think decisions should be based purely on <strong>performance data</strong>. Personal circumstances shouldn't factor in.","You're concerned about <strong>legal risk</strong>. Letting go of Employee D after their complaint could look like retaliation.","You value <strong>company culture</strong> and loyalty. Long-serving employees deserve protection.","You're focused on the <strong>future</strong>. The company needs adaptable, tech-savvy people going forward."],
+    phrases:["From a purely performance-based standpoint…","We have to be careful not to…","If we factor in the legal implications of…","I'm uncomfortable with this, but…","The fairest criteria would be…"]
+  },
+
+  // ---- PRIORITISING ----
+  {
+    id:11, level:"B2", format:"shared", type:"prioritising",
+    title:"The Festival Line-up",
+    scenario:"You're organising a small music festival. You have space for 5 acts but 8 have applied. You need to cut 3.",
+    details:[
+      "<strong>1.</strong> A famous DJ — expensive (uses half your entertainment budget) but guaranteed to sell tickets.",
+      "<strong>2.</strong> A local folk band — cheap, popular with older audiences.",
+      "<strong>3.</strong> A teenage rapper — huge social media following, but controversial lyrics.",
+      "<strong>4.</strong> A jazz quartet — critically acclaimed, niche audience.",
+      "<strong>5.</strong> A tribute band (ABBA) — fun, wide appeal, affordable.",
+      "<strong>6.</strong> A classical pianist — elegant, but may not suit a festival atmosphere.",
+      "<strong>7.</strong> A children's entertainer — great for families, limits evening scheduling.",
+      "<strong>8.</strong> An up-and-coming indie band — unknown, but your friend recommended them."
+    ],
+    goal:"Choose exactly 5 acts. Consider budget, audience variety, ticket sales, and the overall atmosphere you want to create.",
+    steps:["Read all 8 acts silently (1 min).","Each person picks their top 3 and explains why.","Identify overlaps — which acts does everyone want?","Discuss the budget — the famous DJ costs half the entertainment budget.","Agree on your final 5 and the running order."],
+    roles:["You're the <strong>finance person</strong>. You want to maximise ticket sales and stay within budget.","You're in charge of <strong>programming</strong>. You want variety — no two acts should feel the same.","You represent the <strong>local community</strong>. You want acts that will appeal to families and older residents.","You're the <strong>marketing lead</strong>. You want acts that will generate social media buzz."],
+    phrases:["If we include… we won't have budget for…","We need a mix of…","I'd cut… because…","The priority should be…","We can't have too many… or it'll feel…"]
+  },
+  {
+    id:12, level:"C2", format:"shared", type:"prioritising",
+    title:"The Hospital Waiting List",
+    scenario:"You are a hospital ethics board. Five patients need the same rare surgery, but the surgeon can only perform three operations this month.",
+    details:[
+      "<strong>Patient A:</strong> 72 years old, retired teacher. Condition is painful but not life-threatening. Has been waiting the longest (14 months).",
+      "<strong>Patient B:</strong> 34 years old, single mother of two. Condition is worsening rapidly. Waited 4 months.",
+      "<strong>Patient C:</strong> 45 years old, CEO of a company that donates heavily to the hospital. Moderate urgency. Waited 6 months.",
+      "<strong>Patient D:</strong> 19 years old, university student and athlete. Surgery would restore full mobility. Waited 8 months.",
+      "<strong>Patient E:</strong> 58 years old, has other health complications that increase surgical risk. Condition is serious. Waited 11 months."
+    ],
+    goal:"Select three patients for surgery this month. Establish clear criteria for your decision and be prepared to defend it ethically.",
+    steps:["Read all five patient profiles silently (2 min).","Before discussing individuals, agree on the <strong>criteria</strong> you'll use (urgency? waiting time? age? likelihood of success?).","Apply your criteria to each patient. Discuss borderline cases.","Select your three patients and rank them.","Prepare a short ethical justification for your decision."],
+    roles:["You believe <strong>medical urgency</strong> should be the only criterion. The sickest patients go first.","You believe in <strong>fairness</strong> — those who have waited longest should be prioritised.","You think <strong>quality of life after surgery</strong> matters most. Younger patients with more years ahead should be prioritised.","You're the <strong>devil's advocate</strong>. Challenge every decision and ask: 'Could we justify this publicly?'"],
+    phrases:["The principle we should apply is…","If we prioritise urgency over waiting time…","We can't allow… to influence a medical decision.","The strongest case is… because…","This is uncomfortable, but the ethical framework demands…"]
+  },
+
+  // ---- MORAL DILEMMA ----
+  {
+    id:13, level:"B1", format:"shared", type:"moral-dilemma",
+    title:"The Found Phone",
+    scenario:"You found an expensive smartphone on a park bench. The screen is unlocked and you can see personal photos and messages.",
+    details:[
+      "There is <strong>no case or ID</strong> with the phone.",
+      "You can see the owner has received messages saying <strong>'Where are you? We're worried.'</strong>",
+      "The nearest police station is <strong>30 minutes away</strong> and you're already late for something.",
+      "A friend says: <strong>'Just keep it — they can buy a new one.'</strong>"
+    ],
+    goal:"Discuss: what is the right thing to do? Consider all the options (keep it, hand it in, try to contact the owner, leave it where it is). Agree on one course of action and explain why.",
+    steps:["Read the scenario silently.","Each person says what they would do and why.","Discuss: is there a difference between what's easy and what's right?","Agree on one course of action as a group."],
+    roles:["You think the <strong>honest thing</strong> is to try to return it, no matter how long it takes.","You're <strong>in a rush</strong> and think someone else will probably find it. It's not your responsibility.","You think you should <strong>use the phone to contact the owner</strong> directly — look at recent calls or messages.","You're worried about <strong>privacy</strong>. Looking through someone's phone feels wrong, even to help them."],
+    phrases:["I think the right thing to do is…","But what if…?","That's not fair because…","I would feel guilty if…","Put yourself in their shoes — …"]
+  },
+  {
+    id:14, level:"C1", format:"shared", type:"moral-dilemma",
+    title:"The Whistleblower",
+    scenario:"You work for a pharmaceutical company. You've discovered that a popular painkiller has a rare but serious side effect that wasn't reported in the clinical trials.",
+    details:[
+      "The side effect affects roughly <strong>1 in 10,000 users</strong> — serious but rare.",
+      "The drug generates <strong>€200 million in annual revenue</strong> and funds research into a cancer treatment.",
+      "Your manager says: <strong>'It's within acceptable margins. Don't rock the boat.'</strong>",
+      "If you go public, you'll almost certainly <strong>lose your job</strong> and may face legal action from the company.",
+      "If you stay quiet and someone is harmed, you could face <strong>personal criminal liability</strong>."
+    ],
+    goal:"What should the employee do? Discuss every option: stay quiet, report internally, go to regulators, or go to the press. Agree on a course of action and justify it.",
+    steps:["Read all five facts silently (1 min).","Each person says what they would do in this situation — be honest.","List the pros and cons of each option (stay quiet, report internally, regulators, press).","Discuss: does the rarity of the side effect change anything?","Agree on a course of action and prepare to explain your reasoning."],
+    roles:["You play the <strong>employee</strong> who discovered the problem. You're scared of losing your job.","You play a <strong>colleague</strong> who also knows. You think reporting internally is the safest first step.","You play the <strong>manager</strong> who said 'don't rock the boat.' You genuinely believe the risk is acceptable.","You play a <strong>journalist</strong> the employee is considering contacting. You want the story but know it could ruin lives."],
+    phrases:["There's a moral obligation to…","The consequences of speaking up would be…","But if someone gets hurt and we knew…","Is it worth sacrificing… for…?","Where do you draw the line between…?"]
+  },
+
+  // ---- CONSENSUS BUILDING ----
+  {
+    id:15, level:"B2", format:"shared", type:"consensus-building",
+    title:"The Office Rules",
+    scenario:"Your company is writing a new set of office rules. Every rule must be approved unanimously by the team — if one person disagrees, the rule doesn't pass.",
+    details:[
+      "<strong>Proposed rule 1:</strong> No personal phone calls during work hours.",
+      "<strong>Proposed rule 2:</strong> Everyone must eat lunch in the kitchen, not at their desk.",
+      "<strong>Proposed rule 3:</strong> Music is allowed in the office if everyone in the room agrees.",
+      "<strong>Proposed rule 4:</strong> No meetings on Fridays.",
+      "<strong>Proposed rule 5:</strong> Everyone must reply to emails within 2 hours."
+    ],
+    goal:"Go through each rule. For each one, discuss and vote: pass, reject, or modify. Every decision must be unanimous. If you can't agree, try to rewrite the rule until everyone accepts it.",
+    steps:["Read all 5 proposed rules silently.","Go through the rules one by one. For each rule: someone reads it aloud, then everyone gives a quick thumbs up or thumbs down.","If anyone disagrees, discuss why. Try to modify the rule until everyone can accept it.","If you still can't agree after 2 minutes, move on and come back to it.","At the end, present your final set of rules."],
+    roles:["You are <strong>very strict</strong>. You think clear rules make a better workplace. You support most of the rules.","You are <strong>easy-going</strong>. You think too many rules kill creativity. You'll push back on anything that feels controlling.","You are a <strong>parent</strong> with young children. You need flexibility for personal calls and lunch breaks.","You are the <strong>team leader</strong>. You want rules that are fair but also practical to enforce."],
+    phrases:["I can live with that.","I'd agree if we changed it to…","That's too strict — what about…?","I see why you'd want that, but for me…","Can we meet in the middle?"]
+  },
+  {
+    id:16, level:"C2", format:"shared", type:"consensus-building",
+    title:"The City of the Future",
+    scenario:"Your group is a citizens' panel designing policy for a new city. You must reach unanimous agreement on five key policies — majority voting is not allowed.",
+    details:[
+      "<strong>Transport:</strong> Ban all private cars, or allow electric vehicles only, or no restrictions?",
+      "<strong>Housing:</strong> Cap rent prices, or let the market decide, or provide universal social housing?",
+      "<strong>Education:</strong> Make university free, or abolish traditional schools in favour of apprenticeships, or maintain the current system?",
+      "<strong>Energy:</strong> 100% renewable by opening date (expensive), or a 10-year transition plan, or nuclear as a bridge?",
+      "<strong>AI &amp; Work:</strong> Tax companies that replace workers with AI, or offer universal basic income, or let the market adapt?"
+    ],
+    goal:"Agree on all five policies. Every member must genuinely support each decision — not just tolerate it. If you're stuck, propose a compromise that changes the terms.",
+    steps:["Read all five policy areas silently (2 min).","Take the policies one at a time. For each one, everyone states their preferred option.","If there's disagreement, explore why. What's the underlying concern?","Try to find a compromise or reframe the options. No majority voting — everyone must genuinely agree.","Once all five are settled, present your city's policy platform in 2 minutes."],
+    roles:["You are an <strong>environmentalist</strong>. Climate and sustainability come first in every decision.","You are a <strong>business owner</strong>. You want economic freedom, low regulation, and policies that attract investment.","You are a <strong>social worker</strong>. You prioritise equality, affordable housing, and support for vulnerable people.","You are a <strong>tech entrepreneur</strong>. You believe in innovation, AI, and disrupting outdated systems."],
+    phrases:["I fundamentally disagree because…","What would it take for you to accept…?","Could we reframe this as…?","I'm willing to concede on… if you'll move on…","The underlying concern here is actually…"]
+  },
+
+  // ---- 14 NEW TASKS (17–30) ----
+
+  // 17 — B1, shared, decision-making, FRIENDS
+  {
+    id:17, level:"B1", format:"shared", type:"decision-making",
+    title:"The Group Holiday",
+    scenario:"You and your friends want to go on holiday together for 5 days. You need to agree on everything — but you all want different things.",
+    details:[
+      "<strong>Budget:</strong> €500 per person maximum.",
+      "<strong>Option A:</strong> A beach resort in Spain — relaxing, cheap flights, but you went last year.",
+      "<strong>Option B:</strong> A city break in Prague — culture, nightlife, but cold in October.",
+      "<strong>Option C:</strong> A camping trip in the south of France — cheap, outdoors, but one of you hates camping."
+    ],
+    goal:"Choose a destination, set a budget, and agree on 3 activities everyone will do together.",
+    steps:["Each person says where they want to go and why.","Discuss the practical issues: budget, weather, everyone's preferences.","Vote — but if someone is really unhappy, try to find a compromise.","Plan 3 group activities for the trip."],
+    roles:["You want <strong>sun and relaxation</strong>. You hate the cold and don't want to walk too much.","You want <strong>adventure and nightlife</strong>. You're bored of beach holidays.","You're on a <strong>tight budget</strong>. You want the cheapest option possible.","You're <strong>easy-going</strong> but you absolutely hate camping. You'll agree to anything else."],
+    phrases:["I'd really love to…","That sounds fun, but what about…?","Could we do something in between?","I'm flexible, but I really don't want to…","OK, I can live with that."]
+  },
+
+  // 18 — B1, info-gap, information-gap, HOUSEMATES
+  {
+    id:18, level:"B1", format:"info-gap", type:"information-gap",
+    title:"The Messy Kitchen",
+    scenario:"You share a flat. This morning, the kitchen was a complete mess. Your landlord is visiting tomorrow. Each of you was home at a different time yesterday and saw different things.",
+    students:[
+      ["You were home from <strong>6pm to 8pm</strong>. When you arrived, the kitchen was <strong>clean</strong>. You made a sandwich and <strong>washed your plate</strong>. When you left at 8pm, the kitchen was still tidy."],
+      ["You got home at <strong>8:30pm</strong>. The kitchen was <strong>a bit messy</strong> — there were <strong>two pots on the stove</strong> and the bin was full. You didn't cook. You took the <strong>bin out</strong> but left the pots."],
+      ["You came home at <strong>10pm</strong>. The kitchen was <strong>very messy</strong> — pots, plates, and food on the counter. You were too tired to clean and went straight to bed."],
+      ["You were home <strong>all evening</strong> but stayed in your room. You ordered takeaway and <strong>didn't use the kitchen at all</strong>. You heard someone cooking around <strong>9pm</strong>."]
+    ],
+    goal:"Work out who made the mess. Build a timeline and agree on a cleaning plan before the landlord arrives.",
+    steps:["Each person describes what they saw and when — don't show your card.","Ask follow-up questions to fill in the gaps.","Build a timeline: who was in the kitchen and when?","Agree on who should clean what before the landlord's visit."],
+    phrases:["When I got home, the kitchen was…","Did you see anyone cooking?","It must have happened between… and…","I think it was…","That's not fair — I didn't even use the kitchen!"]
+  },
+
+  // 19 — B2, shared, moral-dilemma, WORKMATES
+  {
+    id:19, level:"B2", format:"shared", type:"moral-dilemma",
+    title:"The Colleague's Secret",
+    scenario:"A close colleague tells you they're planning to leave the company in 2 months. Your boss doesn't know yet. The next day, your boss asks you to recommend someone for an important 6-month project — and your colleague is the obvious choice.",
+    details:[
+      "Your colleague asked you to <strong>keep it confidential</strong>.",
+      "If you recommend them and they leave, the project will be <strong>seriously disrupted</strong>.",
+      "If you don't recommend them, your boss will wonder why — they're clearly the <strong>best person</strong> for the job.",
+      "Your colleague might <strong>change their mind</strong> about leaving.",
+      "If your boss finds out you knew, you could <strong>lose their trust</strong>."
+    ],
+    goal:"Decide: do you recommend your colleague for the project, stay quiet, or tell your boss the truth? Agree on one approach.",
+    steps:["Read the scenario silently.","Each person says what they'd do — recommend, stay quiet, or tell the boss.","Discuss the risks and consequences of each option.","Agree on one course of action and explain how you'd handle the conversation with your boss."],
+    roles:["You value <strong>loyalty to friends</strong> above everything. A promise is a promise.","You're a <strong>pragmatist</strong>. The company's interests come first — the project matters more than one person's feelings.","You think there's a <strong>middle ground</strong>. You'd try to convince the colleague to tell the boss themselves.","You've been in a <strong>similar situation before</strong> and it went badly. You're cautious about getting involved at all."],
+    phrases:["On one hand… but on the other…","I'd feel terrible if…","The safest thing to do is…","But what if they find out?","I think the real question is…"]
+  },
+
+  // 20 — B2, shared, problem-solving, STRANGERS
+  {
+    id:20, level:"B2", format:"shared", type:"problem-solving",
+    title:"Stranded at the Airport",
+    scenario:"Your flight has been cancelled. The next available flight is in 24 hours. The airline is offering limited help. You're four strangers who've started talking at the gate.",
+    details:[
+      "The airline offers: a <strong>€15 meal voucher</strong> or a <strong>hotel shuttle</strong> (but only 2 hotel rooms left).",
+      "There's a <strong>train</strong> to the destination but it takes 9 hours and costs €85.",
+      "One of you has an <strong>important meeting</strong> tomorrow morning.",
+      "One of you is <strong>travelling with a small child</strong> (not present in the group — with a partner nearby).",
+      "The airport shops close in <strong>2 hours</strong>."
+    ],
+    goal:"Work together to find the best solution for everyone. You don't have to do the same thing — but help each other figure out the options.",
+    steps:["Introduce yourselves briefly. What's your situation? Why are you travelling?","List all the options: wait, train, hotel, complain to airline, etc.","Discuss who needs what most urgently.","Agree on a plan — who does what?"],
+    roles:["You have the <strong>important meeting</strong>. You need to get there by tomorrow at 9am no matter what.","You're travelling with a <strong>small child</strong>. Comfort and a bed are your priority.","You're a <strong>student on a budget</strong>. You can't afford the train or a hotel.","You're a <strong>frequent flyer</strong>. You know your rights and have dealt with cancellations before."],
+    phrases:["What if we…?","I think the priority should be…","Has anyone tried asking the airline for…?","I don't mind waiting, but…","Let's think about this logically."]
+  },
+
+  // 21 — B1, shared, consensus-building, FAMILY
+  {
+    id:21, level:"B1", format:"shared", type:"consensus-building",
+    title:"The Family TV Night",
+    scenario:"It's Friday night. Your family wants to watch something together, but everyone wants something different. You only have one TV.",
+    details:[
+      "<strong>Option A:</strong> A new action film (2 hours).",
+      "<strong>Option B:</strong> A cooking competition show (1 hour).",
+      "<strong>Option C:</strong> A documentary about space (1.5 hours).",
+      "<strong>Option D:</strong> A classic comedy everyone's seen before (1.5 hours)."
+    ],
+    goal:"Choose ONE thing to watch. Everyone must be happy with the choice — no sulking! If you can't agree on one, propose a compromise (e.g. watch two shorter things).",
+    steps:["Each person says what they want to watch and why.","If there's disagreement, explain what you don't like about the other options.","Try to find something everyone can enjoy — or a compromise.","Make a final decision together."],
+    roles:["You're the <strong>teenager</strong>. You want the action film. Documentaries are boring.","You're the <strong>parent</strong>. You want something relaxing. You've had a long week.","You're the <strong>grandparent</strong>. You love the classic comedy — it reminds you of the old days.","You're the <strong>younger sibling</strong>. You love space and animals. The documentary is your dream."],
+    phrases:["Can we watch…? I really want to see it.","That sounds boring to me.","What if we watch… first and then…?","I don't mind, as long as it's not…","OK, fine, but next week I choose!"]
+  },
+
+  // 22 — C1, shared, decision-making, BUSINESS
+  {
+    id:22, level:"C1", format:"shared", type:"decision-making",
+    title:"The Company Rebrand",
+    scenario:"Your company's image is outdated. The board has approved a rebrand but can't agree on the direction. You're the creative committee.",
+    details:[
+      "<strong>Option A:</strong> A complete rebrand — new name, new logo, new colours. Bold but expensive (€500K) and risky.",
+      "<strong>Option B:</strong> A visual refresh — keep the name, modernise the logo and website. Safer (€120K).",
+      "<strong>Option C:</strong> A digital-first pivot — keep everything but invest heavily in social media, influencers, and online presence (€200K).",
+      "The company has a <strong>loyal older customer base</strong> who value tradition.",
+      "Competitors have <strong>recently rebranded successfully</strong>."
+    ],
+    goal:"Choose one direction and present a 1-minute pitch to the board explaining why.",
+    steps:["Read the options and context silently (1 min).","Each person argues for the option they think is best.","Discuss: what are the risks of each? What does the customer base want vs. what the company needs?","Agree on one direction.","Prepare a 1-minute pitch together."],
+    roles:["You're the <strong>CEO</strong>. You want something bold that signals change to investors.","You're the <strong>marketing director</strong>. You know the data — younger customers aren't engaging with the brand.","You're the <strong>CFO</strong>. You're cautious about spending. You want the cheapest option that works.","You're the <strong>customer service lead</strong>. You hear from loyal customers every day. They hate change."],
+    phrases:["The data suggests…","If we alienate our core customers…","A rebrand isn't just cosmetic — it's about…","The risk of doing nothing is…","I'd argue option… gives us the best of both worlds."]
+  },
+
+  // 23 — C1, info-gap, information-gap, COLLEAGUES
+  {
+    id:23, level:"C1", format:"info-gap", type:"information-gap",
+    title:"The Event Disaster",
+    scenario:"Your company's annual conference is in 3 days. Each of you is responsible for a different part of the event — and each of you has just discovered a serious problem.",
+    students:[
+      ["<strong>Venue:</strong> The venue has just called — there's been a <strong>double booking</strong>. They can offer a smaller room (capacity 80 instead of 150) or move you to a different building <strong>20 minutes away</strong>."],
+      ["<strong>Speakers:</strong> The keynote speaker has <strong>pulled out due to illness</strong>. You have a backup speaker but they're less well-known and only available in the <strong>afternoon slot</strong>."],
+      ["<strong>Catering:</strong> The caterer has <strong>gone out of business</strong>. You've found a replacement but they can only do <strong>cold buffet, not the sit-down dinner</strong> that was planned. Cost is similar."],
+      ["<strong>Tech:</strong> The AV company says the <strong>projector and microphone system</strong> won't arrive until the afternoon due to another booking. The morning sessions would have <strong>no tech support</strong>."]
+    ],
+    goal:"Share your problems, then work together to restructure the event so it still works. You may need to change the schedule, format, or expectations.",
+    steps:["Each person explains their problem — don't show your card.","List all four problems on paper or verbally.","Brainstorm solutions. Can any problems be solved together?","Agree on a revised event plan.","Decide who will handle each fix."],
+    phrases:["My issue is that…","Could we combine those two problems by…?","What if we moved the… to the afternoon?","It's not ideal, but…","Who's going to take responsibility for…?"]
+  },
+
+  // 24 — B1, shared, prioritising, HOUSEMATES
+  {
+    id:24, level:"B1", format:"shared", type:"prioritising",
+    title:"The Flat Shopping List",
+    scenario:"You and your housemates have €50 for the weekly food shop. You need to agree on what to buy — but you all eat differently.",
+    details:[
+      "You need to cover <strong>breakfast, lunch, and dinner</strong> for 5 days.",
+      "The basics (bread, rice, pasta, milk, eggs) cost about <strong>€15</strong>.",
+      "Fresh fruit and vegetables would add <strong>€12</strong>.",
+      "Meat and fish for the week would cost <strong>€18</strong>.",
+      "Snacks, drinks, and treats would be about <strong>€10</strong>.",
+      "That's <strong>€55 total</strong> — you're €5 over budget."
+    ],
+    goal:"Agree on a shopping list that stays within €50. Everyone needs to eat for the week.",
+    steps:["Read the costs silently.","Each person says what they consider essential.","Work out what you can cut or reduce.","Write your final shopping list and check it fits the budget."],
+    roles:["You're <strong>vegetarian</strong>. You don't want to pay for meat — spend it on better vegetables instead.","You're a <strong>big eater</strong>. You need protein. Meat is essential for you.","You have a <strong>sweet tooth</strong>. Snacks and treats keep you happy. You'll sacrifice elsewhere.","You're the <strong>health-conscious</strong> one. Fresh fruit and veg are non-negotiable."],
+    phrases:["I think we should cut…","But I need… for the week!","What if we buy less of…?","We could replace… with something cheaper.","That works for me."]
+  },
+
+  // 25 — B2, info-gap, information-gap, FRIENDS
+  {
+    id:25, level:"B2", format:"info-gap", type:"information-gap",
+    title:"The Surprise Party",
+    scenario:"You're planning a surprise birthday party for a mutual friend. Each of you has been in charge of a different part of the planning — but none of you have coordinated properly.",
+    students:[
+      ["You booked a <strong>restaurant for Saturday at 8pm</strong>. Table for 12. You told 6 people the party is at the restaurant. The deposit was <strong>€50 (non-refundable)</strong>."],
+      ["You booked the birthday person's <strong>favourite band</strong> to play at their house on <strong>Saturday at 7pm</strong>. They can't play at a restaurant — they need space and power sockets."],
+      ["You've been told the birthday person is <strong>going away for the weekend</strong> and won't be back until <strong>Sunday afternoon</strong>. They mentioned it yesterday."],
+      ["You've organised a <strong>treasure hunt</strong> around town that ends at a 'surprise location.' You've already given clues to 8 people who think the party starts at <strong>3pm on Saturday</strong>."]
+    ],
+    goal:"Sort out this mess! Agree on one plan that works for everyone. You might need to change dates, cancel something, or combine ideas.",
+    steps:["Each person explains what they've organised — don't show your card.","React honestly — identify the clashes and problems.","Brainstorm: can anything be salvaged? What needs to change?","Agree on a single plan and divide up the tasks to fix things."],
+    phrases:["Wait — that clashes with…","Can we move it to…?","We're going to lose the deposit, but…","What if we combine the… with the…?","OK, who's going to call and cancel?"]
+  },
+
+  // 26 — C2, shared, moral-dilemma, BUSINESS
+  {
+    id:26, level:"C2", format:"shared", type:"moral-dilemma",
+    title:"The AI Replacement",
+    scenario:"You're on the board of a tech company. Your AI tool can now do 80% of what your 50-person customer support team does — faster, cheaper, and with fewer errors.",
+    details:[
+      "Replacing the team with AI would <strong>save €2M per year</strong>.",
+      "You'd keep <strong>10 humans</strong> to handle complex cases. The other <strong>40 would be made redundant</strong>.",
+      "Customer satisfaction in AI trials was <strong>slightly higher</strong> than with the human team.",
+      "Your company has always marketed itself as <strong>'people-first'</strong>.",
+      "If you don't do it, your <strong>competitors will</strong> — and your investors are pressuring you."
+    ],
+    goal:"Decide: full AI replacement, partial replacement, or keep the human team. Consider business, ethical, and reputational factors.",
+    steps:["Read all the facts silently (1 min).","Each person states their initial position.","Discuss: what are the short-term vs long-term consequences of each option?","Consider: what would the press say? What would employees say? What would customers say?","Agree on a decision and draft a 2-sentence public statement."],
+    roles:["You're the <strong>CEO</strong>. The investors want this. You need to show growth.","You're the <strong>head of HR</strong>. You've worked with these people for years. Many have families.","You're the <strong>CTO</strong>. The AI genuinely works better. This is progress.","You're the <strong>PR director</strong>. The 'people-first' brand is worth millions. Layoffs could destroy it."],
+    phrases:["The bottom line is…","We can't ignore the human cost of…","If our competitors do it first…","Our brand promise is…","Is there a way to phase this in gradually?"]
+  },
+
+  // 27 — B2, shared, decision-making, FRIENDS
+  {
+    id:27, level:"B2", format:"shared", type:"decision-making",
+    title:"The Wedding Gift",
+    scenario:"A close friend is getting married. Your group of friends wants to buy one big joint gift instead of individual presents. You have €300 to spend.",
+    details:[
+      "<strong>Option A:</strong> A weekend away for the couple — romantic and memorable, but you'd need to guess dates.",
+      "<strong>Option B:</strong> A luxury kitchen appliance — practical, something they'd use every day.",
+      "<strong>Option C:</strong> A piece of original art — unique and personal, but what if they don't like it?",
+      "<strong>Option D:</strong> A donation to their honeymoon fund — safe, but feels impersonal."
+    ],
+    goal:"Choose one gift. Think about what the couple would actually want, not just what you'd want to give.",
+    steps:["Each person says which gift they prefer and why.","Discuss what you know about the couple — their tastes, their home, their plans.","Eliminate the weakest option first, then compare the remaining two.","Make a final decision."],
+    roles:["You're the <strong>sentimental one</strong>. You want something they'll remember forever.","You're the <strong>practical one</strong>. You think useful gifts are the best gifts.","You know the couple <strong>really well</strong>. You have inside knowledge about what they'd like.","You're the one <strong>collecting the money</strong>. You want something easy to organise."],
+    phrases:["I think they'd love…","But knowing them, they'd probably prefer…","The problem with… is…","Let's be honest — would you want…?","OK, I'm convinced. Let's go with…"]
+  },
+
+  // 28 — C1, shared, consensus-building, WORKMATES
+  {
+    id:28, level:"C1", format:"shared", type:"consensus-building",
+    title:"The Flexible Working Policy",
+    scenario:"Your company is writing a new flexible working policy. The CEO wants the team to draft it together — but everyone must agree on every point.",
+    details:[
+      "<strong>Point 1:</strong> How many days per week can people work from home? (0, 1, 2, 3, or unlimited)",
+      "<strong>Point 2:</strong> Should core hours exist? (e.g. everyone online 10am–3pm, or fully flexible)",
+      "<strong>Point 3:</strong> Can people work from abroad for up to 4 weeks per year?",
+      "<strong>Point 4:</strong> Should managers be required to work from the office more than their team?",
+      "<strong>Point 5:</strong> What happens if someone abuses the policy?"
+    ],
+    goal:"Agree on all 5 points unanimously. Write a one-paragraph policy summary.",
+    steps:["Read all 5 points silently.","Go through them one by one. Each person states their preference.","If there's disagreement, discuss the underlying concern — what are you really worried about?","Negotiate until everyone genuinely agrees (not just tolerates).","Write a short policy summary together."],
+    roles:["You're a <strong>parent</strong>. Flexibility is essential for school runs and childcare.","You're the <strong>office enthusiast</strong>. You think the team works better together in person.","You're a <strong>digital nomad at heart</strong>. You want maximum freedom — results matter, not location.","You're the <strong>manager</strong>. You need to balance fairness, productivity, and team cohesion."],
+    phrases:["I need flexibility for…","I understand, but the risk is…","What if we set a minimum of… but allow…?","I could agree to that if…","The policy needs to be fair for everyone, not just…"]
+  },
+
+  // 29 — B1, shared, problem-solving, STRANGERS
+  {
+    id:29, level:"B1", format:"shared", type:"problem-solving",
+    title:"The Broken Lift",
+    scenario:"You're stuck in a lift with three strangers. The emergency button has been pressed — help is coming in about 30 minutes. You need to pass the time and stay calm.",
+    details:[
+      "One person is <strong>claustrophobic</strong> and getting anxious.",
+      "One person has a <strong>phone with 8% battery</strong>.",
+      "One person has a <strong>bottle of water and some snacks</strong>.",
+      "The lift is small — there's <strong>no room to sit down comfortably</strong>."
+    ],
+    goal:"Work together to keep everyone calm and comfortable for 30 minutes. Decide: how do you use the phone? How do you share resources? How do you keep the anxious person calm?",
+    steps:["Introduce yourselves — you've never met before.","Identify the most urgent problem (the anxious person) and help them.","Discuss: should you use the phone battery to call someone, or save it?","Agree on how to share the water and snacks fairly.","Find a way to pass the time — tell stories, play a game, etc."],
+    roles:["You're the <strong>claustrophobic person</strong>. You're trying to stay calm but you need help.","You have the <strong>phone</strong>. You want to call your partner to say you'll be late, but the battery is low.","You have the <strong>water and snacks</strong>. You're happy to share but there's not much.","You're naturally <strong>calm and chatty</strong>. You've been in worse situations. You try to keep spirits up."],
+    phrases:["Don't worry — help is coming.","Should we save the battery or…?","Would you like some water?","Let's talk about something to take our minds off it.","Is everyone OK?"]
+  },
+
+  // 30 — C2, shared, prioritising, COLLEAGUES
+  {
+    id:30, level:"C2", format:"shared", type:"prioritising",
+    title:"The Crisis Communication Plan",
+    scenario:"Your company has just discovered a major data breach affecting 500,000 customers. You have 4 hours before the press finds out. You need to decide what to do first.",
+    details:[
+      "<strong>Action A:</strong> Notify affected customers by email (takes 2 hours to prepare and send).",
+      "<strong>Action B:</strong> Brief the CEO and prepare a public statement (takes 1 hour).",
+      "<strong>Action C:</strong> Investigate the breach and assess the damage (ongoing — needs a dedicated team).",
+      "<strong>Action D:</strong> Inform the data protection regulator (legally required within 72 hours, but doing it early shows good faith).",
+      "<strong>Action E:</strong> Shut down the affected system (stops the breach but takes your app offline).",
+      "<strong>Action F:</strong> Call an emergency board meeting (takes time to organise but keeps governance intact)."
+    ],
+    goal:"You can't do everything at once. Rank the actions by urgency, assign responsibilities, and create a 4-hour action plan.",
+    steps:["Read all 6 actions silently (1 min).","Each person picks the action they think should happen FIRST and explains why.","Discuss: what can happen simultaneously? What depends on something else being done first?","Create a timeline: what happens at hour 1, hour 2, hour 3, hour 4?","Assign each action to a team member."],
+    roles:["You're the <strong>head of IT security</strong>. You want to investigate and contain the breach before saying anything publicly.","You're the <strong>head of communications</strong>. You want to control the narrative before the press does.","You're the <strong>legal counsel</strong>. You're focused on regulatory compliance and liability.","You're the <strong>COO</strong>. You're thinking about operations — taking the app offline affects millions of users."],
+    phrases:["The first priority has to be…","We can't afford to wait on… because…","If the press gets this before we…","Legally, we're obligated to…","Let's be strategic — we can run… and… in parallel."]
+  }
+];
+
+// ============================================================
+// ENGINE
+// ============================================================
+var filtered=[], currentIdx=0, currentView='single', groupSize=2, timerInterval=null;
+var studentNames = ['Student A','Student B','Student C','Student D'];
+
+function init(){
+  var levels=['all','B1','B2','C1','C2'];
+  var h='';
+  levels.forEach(function(l){
+    h+='<span class="pill'+(l==='all'?' on':'')+'" data-v="'+l+'" onclick="setLevel(this)">'+(l==='all'?'All':l)+'</span>';
+  });
+  document.getElementById('levelPills').innerHTML=h;
+
+  var types=[];
+  TASKS.forEach(function(t){if(types.indexOf(t.type)===-1)types.push(t.type);});
+  var sel=document.getElementById('typeSelect');
+  types.forEach(function(tp){
+    var o=document.createElement('option');o.value=tp;
+    o.textContent=tp.replace(/-/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase();});
+    sel.appendChild(o);
+  });
+  applyFilters();
+}
+
+function setLevel(el){
+  document.querySelectorAll('#levelPills .pill').forEach(function(p){p.classList.remove('on');});
+  el.classList.add('on'); applyFilters();
+}
+function setGroup(n,el){
+  groupSize=n;
+  document.querySelectorAll('.group-pill').forEach(function(p){p.classList.remove('on');});
+  el.classList.add('on'); renderCurrent();
+}
+
+function applyFilters(){
+  var lv=document.querySelector('#levelPills .pill.on').dataset.v;
+  var tp=document.getElementById('typeSelect').value;
+  filtered=TASKS.filter(function(t){
+    if(lv!=='all'&&t.level!==lv)return false;
+    if(tp!=='all'&&t.type!==tp)return false;
+    return true;
+  });
+  currentIdx=0;
+  document.getElementById('statsBar').textContent=filtered.length+' task'+(filtered.length!==1?'s':'')+' found';
+  renderCurrent(); renderGrid();
+}
+
+function renderCurrent(){
+  if(!filtered.length){
+    document.getElementById('taskCard').innerHTML='<div style="text-align:center;padding:3rem;color:var(--muted)">No tasks match these filters.</div>';
+    document.getElementById('cardCounter').textContent='0 / 0'; return;
+  }
+  var t=filtered[currentIdx];
+  document.getElementById('cardCounter').textContent=(currentIdx+1)+' / '+filtered.length;
+
+  var groupLabel = groupSize===2?'Pairs':'Groups of '+groupSize;
+  var h='<div class="task-card">';
+  h+='<div class="task-header">';
+  h+='<div class="task-badges">';
+  h+='<span class="task-level '+t.level+'">'+t.level+'</span>';
+  h+='<span class="task-type-badge">'+t.type.replace(/-/g,' ')+'</span>';
+  h+='<span class="task-group-badge">'+groupLabel+'</span>';
+  h+='</div>';
+  h+='<div class="task-title">'+t.title+'</div>';
+  h+='<div class="task-scenario">'+t.scenario+'</div>';
+  h+='</div>';
+
+  if(t.format==='shared'){
+    h+='<div class="task-body-shared">';
+    if(t.details&&t.details.length){
+      h+='<div class="task-details"><ul>';
+      t.details.forEach(function(d){h+='<li>'+d+'</li>';});
+      h+='</ul></div>';
+    }
+    h+='<div class="task-goal"><div class="task-goal-label">&#127919; Your goal</div><p>'+t.goal+'</p></div>';
+    h+='</div>';
+    // Steps
+    if(t.steps&&t.steps.length){
+      h+='<div class="task-steps">';
+      h+='<div class="task-steps-label">&#128221; How to do this task</div>';
+      h+='<div class="step-list">';
+      t.steps.forEach(function(s,i){
+        h+='<div class="step-item"><span class="step-num">'+(i+1)+'</span><span>'+s+'</span></div>';
+      });
+      h+='</div></div>';
+    }
+    // Roles
+    if(t.roles&&t.roles.length){
+      var numRoles=Math.min(groupSize,t.roles.length);
+      h+='<div class="task-roles">';
+      h+='<div class="task-roles-label">&#128101; Student roles</div>';
+      h+='<div class="role-grid cols-'+numRoles+'">';
+      for(var r=0;r<numRoles;r++){
+        h+='<div class="role-card rc-'+(r+1)+'">';
+        h+='<div class="role-card-name">'+studentNames[r]+'</div>';
+        h+='<div class="role-card-desc">'+t.roles[r]+'</div>';
+        h+='</div>';
+      }
+      h+='</div></div>';
+    }
+  } else {
+    // info-gap — show panels based on groupSize
+    var numPanels = Math.min(groupSize, t.students.length);
+    h+='<div class="student-panels cols-'+numPanels+'">';
+    for(var i=0;i<numPanels;i++){
+      var panelNum=i+1;
+      h+='<div class="student-panel s-panel-'+panelNum+'">';
+      h+='<div class="student-label s-label-'+panelNum+'">'+studentNames[i]+'</div>';
+      if(i<t.students.length){
+        t.students[i].forEach(function(item){
+          h+='<div class="info-item">'+item+'</div>';
+        });
+      } else {
+        h+='<div class="info-item" style="font-style:italic;color:var(--muted)">You have the same information as Student A. Help the group piece everything together.</div>';
+      }
+      h+='</div>';
+    }
+    h+='</div>';
+    h+='<div class="task-shared"><div class="task-shared-label">&#127919; Your shared goal</div><p>'+t.goal+'</p></div>';
+    // Steps for info-gap
+    if(t.steps&&t.steps.length){
+      h+='<div class="task-steps">';
+      h+='<div class="task-steps-label">&#128221; How to do this task</div>';
+      h+='<div class="step-list">';
+      t.steps.forEach(function(s,i){
+        h+='<div class="step-item"><span class="step-num">'+(i+1)+'</span><span>'+s+'</span></div>';
+      });
+      h+='</div></div>';
+    }
+  }
+
+  if(t.phrases&&t.phrases.length){
+    h+='<button class="phrases-toggle" onclick="togglePhrases(this)">Useful phrases &#9662;</button>';
+    h+='<div class="phrases-panel"><div class="phrase-list">';
+    t.phrases.forEach(function(p){h+='<span class="phrase-chip">'+p+'</span>';});
+    h+='</div></div>';
+  }
+  h+='</div>';
+  document.getElementById('taskCard').innerHTML=h;
+}
+
+function renderGrid(){
+  var h='';
+  filtered.forEach(function(t,i){
+    h+='<div class="grid-card" onclick="goToTask('+i+')">';
+    h+='<span class="grid-card-level '+t.level+'">'+t.level+'</span>';
+    h+='<div class="grid-card-title">'+t.title+'</div>';
+    h+='<div class="grid-card-meta">'+t.type.replace(/-/g,' ')+' &middot; '+t.format.replace(/-/g,' ')+'</div>';
+    h+='</div>';
+  });
+  document.getElementById('gridView').innerHTML=h;
+}
+
+function goToTask(i){currentIdx=i;setView('single');renderCurrent();}
+function prevTask(){if(filtered.length){currentIdx=(currentIdx-1+filtered.length)%filtered.length;renderCurrent();}}
+function nextTask(){if(filtered.length){currentIdx=(currentIdx+1)%filtered.length;renderCurrent();}}
+
+function setView(v){
+  currentView=v;
+  document.querySelectorAll('.view-btn').forEach(function(b){b.classList.remove('on');});
+  if(v==='single'){
+    document.getElementById('singleView').classList.remove('hidden');
+    document.getElementById('gridView').classList.remove('active');
+    document.querySelectorAll('.view-btn')[0].classList.add('on');
+  } else {
+    document.getElementById('singleView').classList.add('hidden');
+    document.getElementById('gridView').classList.add('active');
+    document.querySelectorAll('.view-btn')[1].classList.add('on');
+  }
+}
+
+function shuffleTasks(){
+  for(var i=filtered.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=filtered[i];filtered[i]=filtered[j];filtered[j]=tmp;}
+  currentIdx=0;renderCurrent();renderGrid();
+}
+
+function togglePhrases(btn){
+  var p=btn.nextElementSibling;p.classList.toggle('open');
+  btn.innerHTML=p.classList.contains('open')?'Useful phrases &#9652;':'Useful phrases &#9662;';
+}
+
+// Timer — tap to start, tap to pause, Restart button
+var timerSeconds=0, timerTotal=0, timerRunning=false, timerPaused=false, timerActivePill=null;
+
+function timerTap(secs,pill){
+  // If tapping the already-active pill: toggle pause/resume
+  if(pill===timerActivePill && (timerRunning||timerPaused)){
+    if(timerRunning){
+      // Pause
+      clearInterval(timerInterval);timerInterval=null;
+      timerRunning=false;timerPaused=true;
+      pill.classList.remove('active');pill.classList.add('paused');
+    } else {
+      // Resume
+      timerPaused=false;timerRunning=true;
+      pill.classList.remove('paused');pill.classList.add('active');
+      runTimer();
+    }
+    return;
+  }
+  // Tapping a different pill or starting fresh
+  clearTimer();
+  timerTotal=secs;timerSeconds=secs;timerActivePill=pill;
+  document.querySelectorAll('.timer-pill').forEach(function(p){p.classList.remove('active','paused');});
+  pill.classList.add('active');
+  timerRunning=true;timerPaused=false;
+  document.getElementById('timerRestart').className='timer-restart show';
+  updateTimerDisplay();
+  runTimer();
+}
+
+function runTimer(){
+  var disp=document.getElementById('timerDisplay');
+  timerInterval=setInterval(function(){
+    timerSeconds--;
+    if(timerSeconds<=10&&timerSeconds>0)disp.className='timer-display warn';
+    if(timerSeconds<=0){
+      clearInterval(timerInterval);timerInterval=null;
+      timerRunning=false;
+      disp.className='timer-display done';
+      disp.textContent='0:00';
+      if(timerActivePill){timerActivePill.classList.remove('active','paused');}
+    } else {
+      updateTimerDisplay();
+    }
+  },1000);
+}
+
+function restartTimer(){
+  if(!timerTotal||!timerActivePill)return;
+  clearInterval(timerInterval);timerInterval=null;
+  timerSeconds=timerTotal;timerRunning=true;timerPaused=false;
+  document.querySelectorAll('.timer-pill').forEach(function(p){p.classList.remove('active','paused');});
+  timerActivePill.classList.add('active');
+  var disp=document.getElementById('timerDisplay');
+  disp.className='timer-display';
+  updateTimerDisplay();
+  runTimer();
+}
+
+function clearTimer(){
+  if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
+  timerRunning=false;timerPaused=false;timerActivePill=null;
+  document.getElementById('timerDisplay').textContent='0:00';
+  document.getElementById('timerDisplay').className='timer-display';
+  document.querySelectorAll('.timer-pill').forEach(function(p){p.classList.remove('active','paused');});
+  document.getElementById('timerRestart').className='timer-restart';
+}
+
+function updateTimerDisplay(){
+  var m=Math.floor(timerSeconds/60);
+  var s=timerSeconds%60;
+  document.getElementById('timerDisplay').textContent=m+':'+(s<10?'0':'')+s;
+}
+
+document.addEventListener('keydown',function(e){if(currentView==='single'){if(e.key==='ArrowLeft')prevTask();if(e.key==='ArrowRight')nextTask();}});
+init();
+</script>
+
+</body>
+</html>
