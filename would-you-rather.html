@@ -70,13 +70,20 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,252,247,
 .wyr-level.C2{background:var(--c2-bg);color:var(--c2)}
 .wyr-cat{font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--cream);padding:.2rem .6rem;border-radius:10px;border:1px solid var(--border)}
 
-.wyr-body{padding:1.5rem 2rem 1.5rem}
-.wyr-question{font-family:'DM Serif Display',serif;font-size:1.05rem;font-weight:400;color:var(--muted);margin-bottom:1rem}
-.wyr-option-text{font-size:1.1rem;font-weight:700;line-height:1.5;color:var(--ink)}
-.wyr-or{font-size:.9rem;font-style:italic;color:var(--muted);margin:.7rem 0}
+.wyr-body{padding:0}
+.wyr-options{display:grid;grid-template-columns:1fr 1fr;min-height:160px}
+.wyr-opt{padding:1.5rem 1.8rem;display:flex;flex-direction:column;justify-content:center}
+.wyr-opt-a{background:rgba(93,222,160,.08);border-right:1px solid var(--border)}
+.wyr-opt-b{background:var(--sand)}
+.wyr-opt-label{font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:.5rem}
+.wyr-opt-a .wyr-opt-label{color:var(--sea)}
+.wyr-opt-b .wyr-opt-label{color:var(--sun)}
+.wyr-option-text{font-family:'Nunito',sans-serif;font-size:1.08rem;font-weight:700;line-height:1.55;color:var(--ink)}
+.wyr-question{font-family:'Nunito',sans-serif;font-size:1.1rem;font-weight:700;font-style:italic;color:var(--muted);padding:1.2rem 1.8rem .6rem}
+.wyr-or{display:none}
 
 .wyr-follow-toggle{display:block;width:100%;text-align:left;font-family:'Nunito',sans-serif;font-size:.85rem;font-weight:700;color:var(--sea);padding:1rem 2rem;border:none;border-top:1px solid var(--border);background:transparent;cursor:pointer;transition:color .2s}
-.wyr-follow-toggle:hover{color:var(--coral)}
+.wyr-follow-toggle:hover{color:var(--sky)}
 .wyr-follow-panel{display:none;padding:0 2rem 1.5rem}
 .wyr-follow-panel.open{display:block}
 .wyr-follow-text{font-size:.88rem;color:var(--ink);line-height:1.6}
@@ -99,8 +106,19 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,252,247,
 .qf-play.paused{background:var(--sun);border-color:var(--sun)}
 .qf-score{font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--muted)}
 
-.quickfire-view{display:none}
-.quickfire-view.active{display:block}
+.grid-view{display:none}
+.grid-view.active{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:.8rem}
+.grid-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:1rem 1.2rem;cursor:pointer;transition:all .25s;position:relative;overflow:hidden}
+.grid-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.grid-card.b2::before{background:var(--sun)}
+.grid-card.c1::before{background:var(--coral)}
+.grid-card.c2::before{background:var(--lavender)}
+.grid-card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(45,48,71,.07);border-color:transparent}
+.gc-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem}
+.gc-num{font-family:'DM Serif Display',serif;font-size:.9rem;color:var(--sun)}
+.gc-title{font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:700;color:var(--ink);line-height:1.4;margin-bottom:.2rem}
+.gc-opt{font-size:.78rem;color:var(--muted);line-height:1.45}
+.gc-cat{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:.4rem}
 .card-view{display:block}
 .card-view.hidden{display:none}
 
@@ -133,10 +151,14 @@ nav{padding:.75rem 1.2rem}.nav-links{gap:1rem}.nav-links a{font-size:.78rem}
 .filters-bar{gap:1rem}
 .card-area{padding:0 1.2rem 3rem}
 .wyr-header{padding:1rem 1.4rem .6rem}
-.wyr-body{padding:1.2rem 1.4rem}
+.wyr-question{padding:1rem 1.4rem .6rem}
+.wyr-options{grid-template-columns:1fr}
+.wyr-opt-a{border-right:none;border-bottom:1px solid var(--border)}
+.wyr-opt{padding:1.2rem 1.4rem}
+.grid-view.active{grid-template-columns:1fr}
 }
 @media print{
-nav,.filters,.card-nav,.timer-section,.quickfire-bar,.back-link,.filters-actions{display:none!important}
+nav,.filters,.card-nav,.timer-section,.back-link,.filters-actions{display:none!important}
 .page-header{padding-top:1rem}
 .wyr-card{border:1px solid #ccc;break-inside:avoid}
 }
@@ -156,17 +178,17 @@ nav,.filters,.card-nav,.timer-section,.quickfire-bar,.back-link,.filters-actions
 <a href="class-activities.html" class="back-link">&larr; Back to Class Activities</a>
 <div class="section-label">Class Activities</div>
 <h1 class="page-title">Would You Rather...?</h1>
-<p class="page-desc">Two options, both interesting. Choose one and explain why. Use Card View for deeper discussion or Quick-Fire for fast-paced fluency practice.</p>
+<p class="page-desc">Two options, both interesting. Choose one and explain why. Browse all questions or use Card View for deeper discussion with follow-up questions and a timer.</p>
 </div>
 
 <div class="filters">
 <div class="filters-top">
 <div class="mode-toggle">
 <button class="mode-btn on" onclick="setMode('card')">Card View</button>
-<button class="mode-btn" onclick="setMode('quickfire')">Quick-Fire</button>
+<button class="mode-btn" onclick="setMode('grid')">Browse All</button>
 </div>
 <div class="filters-actions">
-<button class="action-btn" onclick="shuffleAll()">&#8635; Shuffle</button>
+<button class="action-btn" onclick="shuffleAll()">🎲 Random</button>
 <button class="action-btn" onclick="window.print()">&#128424; Print</button>
 </div>
 </div>
@@ -208,25 +230,8 @@ nav,.filters,.card-nav,.timer-section,.quickfire-bar,.back-link,.filters-actions
 </div>
 </div>
 
-<!-- Quick-Fire View -->
-<div class="quickfire-view" id="quickfireView">
-<div class="quickfire-bar">
-<div class="qf-controls">
-<span class="filter-label">Time per question</span>
-<div class="qf-time-select">
-<span class="qf-time-pill on" data-s="30" onclick="setQfTime(30,this)">30s</span>
-<span class="qf-time-pill" data-s="45" onclick="setQfTime(45,this)">45s</span>
-<span class="qf-time-pill" data-s="60" onclick="setQfTime(60,this)">60s</span>
-<span class="qf-time-pill" data-s="90" onclick="setQfTime(90,this)">90s</span>
-</div>
-<button class="qf-play" id="qfPlay" onclick="toggleQuickfire()">&#9654; Start</button>
-<span class="qf-timer" id="qfTimer">0:00</span>
-</div>
-<div class="qf-progress"><div class="qf-progress-fill" id="qfProgress"></div></div>
-<span class="qf-score" id="qfScore"></span>
-</div>
-<div id="qfCard"></div>
-</div>
+<!-- Grid View -->
+<div class="grid-view" id="gridView"></div>
 </div>
 
 <footer>&copy; 2026 John + English. All rights reserved.</footer>
@@ -302,7 +307,52 @@ var QS = [
 {id:57,level:"C2",cat:"work",a:"build something from scratch that might fail",b:"inherit something successful that someone else built",follow:"Is creation more fulfilling than stewardship? How does ownership affect motivation?"},
 {id:58,level:"C2",cat:"social",a:"be admired by strangers but misunderstood by your family",b:"be invisible to the world but deeply understood at home",follow:"Where does identity really live — in how others see you or how your closest people see you?"},
 {id:59,level:"C2",cat:"ethical",a:"make all drugs legal and regulate them",b:"keep drugs illegal and invest more in enforcement",follow:"Is prohibition effective or counterproductive? What does the evidence suggest?"},
-{id:60,level:"C2",cat:"fun",a:"wake up tomorrow as the opposite gender for one year",b:"wake up tomorrow as a different nationality for one year",follow:"What would you learn from the experience? What assumptions would be challenged?"}
+{id:60,level:"C2",cat:"fun",a:"wake up tomorrow as the opposite gender for one year",b:"wake up tomorrow as a different nationality for one year",follow:"What would you learn from the experience? What assumptions would be challenged?"},
+
+// ---- B2 (61-73) ----
+{id:61,level:"B2",cat:"fun",a:"have a rewind button for your life but only use it once",b:"have a pause button you can use as often as you like",follow:"When would you use the rewind? What would you do with paused time?"},
+{id:62,level:"B2",cat:"lifestyle",a:"live in a tiny flat in the centre of a big city",b:"live in a huge house in the middle of nowhere",follow:"What matters more to you — space or access? How would each affect your social life?"},
+{id:63,level:"B2",cat:"social",a:"have 3 close friends you see every week",b:"have 30 friends you see a few times a year",follow:"Which gives you more support? Which is more fun?"},
+{id:64,level:"B2",cat:"work",a:"have a boring job that pays very well",b:"have a dream job that barely pays the bills",follow:"At what point does money stop being motivating? Can passion pay the rent?"},
+{id:65,level:"B2",cat:"ethical",a:"tell a lie that protects someone's feelings",b:"tell a truth that hurts them but helps them grow",follow:"Is honesty always kind? When is a white lie justified?"},
+{id:66,level:"B2",cat:"fun",a:"be able to talk to animals but they're all really rude",b:"be able to speak every human language but never understand sarcasm",follow:"Which communication barrier would be harder to live with?"},
+{id:67,level:"B2",cat:"lifestyle",a:"never eat chocolate again",b:"never drink coffee or tea again",follow:"Which would be harder for you personally? How would it change your daily routine?"},
+{id:68,level:"B2",cat:"social",a:"always have to say exactly what you're thinking",b:"never be able to express your true opinion",follow:"Which would damage your relationships more?"},
+{id:69,level:"B2",cat:"work",a:"work a 4-day week but with longer hours",b:"work a 5-day week with shorter hours",follow:"Which pattern suits your energy levels? Does one lead to more free time in practice?"},
+{id:70,level:"B2",cat:"fun",a:"live in a world where it rains every day but it's warm",b:"live in a world where it's always sunny but freezing cold",follow:"How much does weather affect your happiness? Could you adapt?"},
+{id:71,level:"B2",cat:"ethical",a:"donate a large amount to one charity",b:"donate smaller amounts to many different charities",follow:"Is concentrated giving more impactful? Which approach helps more people?"},
+{id:72,level:"B2",cat:"lifestyle",a:"give up your phone for a year",b:"give up travelling for a year",follow:"Which connects you more to the world? Which would you miss first?"},
+{id:73,level:"B2",cat:"social",a:"be the funniest person in the room but never taken seriously",b:"be the most respected person in the room but never make anyone laugh",follow:"Can you be both funny and respected? Which gets you further in life?"},
+
+// ---- C1 (74-86) ----
+{id:74,level:"C1",cat:"ethical",a:"live in a world where everyone's income is public information",b:"live in a world where nobody knows what anyone earns",follow:"How would salary transparency change workplace dynamics and relationships?"},
+{id:75,level:"C1",cat:"work",a:"be a specialist who knows everything about one thing",b:"be a generalist who knows a bit about everything",follow:"Which is more valuable in the modern job market? Which leads to a more interesting life?"},
+{id:76,level:"C1",cat:"social",a:"reconnect with someone you lost touch with years ago",b:"let the relationship stay in the past where it belongs",follow:"Do old friendships deserve revival or do people grow apart for a reason?"},
+{id:77,level:"C1",cat:"fun",a:"have a personal chef but never choose the menu",b:"cook everything yourself with unlimited ingredients",follow:"Is convenience worth giving up control? What does food choice say about autonomy?"},
+{id:78,level:"C1",cat:"lifestyle",a:"live without mirrors for the rest of your life",b:"live without photographs for the rest of your life",follow:"How much of your identity is tied to how you look? What would you forget without photos?"},
+{id:79,level:"C1",cat:"ethical",a:"eliminate all fast fashion tomorrow",b:"let the industry continue but tax it heavily to fund environmental repair",follow:"Is abolition or regulation more realistic? Who bears the cost of ethical fashion?"},
+{id:80,level:"C1",cat:"work",a:"have a boss who micromanages but always has your back",b:"have a boss who gives you total freedom but offers no support",follow:"Which management style helps you grow more? Does it depend on your experience level?"},
+{id:81,level:"C1",cat:"social",a:"always be the host and never the guest",b:"always be the guest and never the host",follow:"Which role is more generous? Which is more exhausting?"},
+{id:82,level:"C1",cat:"fun",a:"only be able to listen to music from before you were born",b:"only be able to watch films made after you turn 60",follow:"How much does nostalgia shape taste? Could you discover new favourites within the constraint?"},
+{id:83,level:"C1",cat:"ethical",a:"ban all political advertising",b:"allow unrestricted political advertising but mandate fact-checking",follow:"Is information or restriction the better safeguard for democracy?"},
+{id:84,level:"C1",cat:"lifestyle",a:"always wake up at 5am feeling energised",b:"always stay up until 2am without getting tired",follow:"Which schedule would improve your life more? How would it change your relationships?"},
+{id:85,level:"C1",cat:"work",a:"receive honest feedback every single day from your colleagues",b:"never receive any feedback at all and judge your own performance",follow:"Is constant feedback motivating or crushing? Can you accurately self-assess?"},
+{id:86,level:"C1",cat:"social",a:"have every conversation you've ever had recorded and searchable",b:"have no record of any conversation ever",follow:"Would perfect recall improve or destroy trust? Is forgetting essential to forgiveness?"},
+
+// ---- C2 (87-99) ----
+{id:87,level:"C2",cat:"ethical",a:"live in a world where everyone must do two years of mandatory public service",b:"live in a world where public service is entirely voluntary but underfunded",follow:"Does compulsion create resentment or shared purpose? Can altruism be forced?"},
+{id:88,level:"C2",cat:"work",a:"achieve professional greatness at the cost of your personal relationships",b:"have a rich personal life but feel professionally unfulfilled",follow:"Is it possible to have both? At what age does the answer to this question change?"},
+{id:89,level:"C2",cat:"social",a:"be fluent in every language but unable to read or write",b:"be able to read and write in every language but unable to speak any except your own",follow:"Which form of communication is more powerful? How would each limitation shape your life?"},
+{id:90,level:"C2",cat:"fun",a:"live in a simulation where everything is perfect but nothing is real",b:"live in the real world with all its suffering and uncertainty",follow:"Is blissful ignorance preferable to painful reality? How do you define 'real'?"},
+{id:91,level:"C2",cat:"ethical",a:"give everyone on Earth access to a universal basic income",b:"invest the same money in education and healthcare infrastructure",follow:"Which addresses the root cause of poverty? Are they mutually exclusive?"},
+{id:92,level:"C2",cat:"lifestyle",a:"know the exact impact every decision you make has on others",b:"never know the impact and live in blissful ignorance",follow:"Would perfect moral awareness paralyse you or liberate you? Is ignorance a form of cruelty?"},
+{id:93,level:"C2",cat:"work",a:"work in a field where AI does 90% of the work and you supervise",b:"work in a field where AI cannot help at all and everything is manual",follow:"What is the value of human labour when machines can do it better? What remains uniquely human?"},
+{id:94,level:"C2",cat:"social",a:"be incapable of feeling jealousy",b:"be incapable of feeling guilt",follow:"Which emotion is more destructive? Which is more necessary for moral development?"},
+{id:95,level:"C2",cat:"ethical",a:"allow genetic editing to prevent inherited diseases",b:"ban all genetic editing to preserve natural human diversity",follow:"Where is the line between medicine and enhancement? Who decides what constitutes a 'disease'?"},
+{id:96,level:"C2",cat:"fun",a:"experience one perfect day on repeat forever",b:"experience a different unpredictable day every day, some wonderful, some terrible",follow:"Does perfection require contrast? Is boredom worse than suffering?"},
+{id:97,level:"C2",cat:"lifestyle",a:"live in a country where you agree with the politics but hate the climate",b:"live in a country where you love the climate but disagree with everything politically",follow:"Which shapes daily life more — governance or geography? Can you change one from within?"},
+{id:98,level:"C2",cat:"social",a:"be the person everyone turns to in a crisis but never in celebration",b:"be the person everyone invites to the party but nobody calls when things go wrong",follow:"Which version of being needed is more meaningful? Which is lonelier?"},
+{id:99,level:"C2",cat:"ethical",a:"have a justice system that prioritises rehabilitation over punishment",b:"have a justice system that prioritises punishment over rehabilitation",follow:"What is the purpose of criminal justice — to heal or to deter? Can it do both?"}
 ];
 
 // ============================================================
@@ -344,9 +394,10 @@ function applyFilters(){
     if(cat!=='all'&&q.cat!==cat)return false;
     return true;
   });
-  idx=0;qfIdx=0;
+  idx=0;
   document.getElementById('statsBar').textContent=filtered.length+' question'+(filtered.length!==1?'s':'')+' found';
-  renderCard();updateQfCard();
+  renderCard();
+  if(mode==='grid')renderGrid();
 }
 
 function renderCard(){
@@ -363,9 +414,10 @@ function renderCard(){
   h+='</div>';
   h+='<div class="wyr-body">';
   h+='<div class="wyr-question">Would you rather...</div>';
-  h+='<div class="wyr-option-text">...'+q.a+'</div>';
-  h+='<div class="wyr-or">or</div>';
-  h+='<div class="wyr-option-text">...'+q.b+'?</div>';
+  h+='<div class="wyr-options">';
+  h+='<div class="wyr-opt wyr-opt-a"><div class="wyr-opt-label">Option A</div><div class="wyr-option-text">...'+q.a+'?</div></div>';
+  h+='<div class="wyr-opt wyr-opt-b"><div class="wyr-opt-label">Option B</div><div class="wyr-option-text">...'+q.b+'?</div></div>';
+  h+='</div>';
   h+='</div>';
   if(q.follow){
     h+='<button class="wyr-follow-toggle" onclick="toggleFollow(this)">Follow-up question &#9662;</button>';
@@ -386,9 +438,10 @@ function updateQfCard(){
   h+='</div>';
   h+='<div class="wyr-body">';
   h+='<div class="wyr-question">Would you rather...</div>';
-  h+='<div class="wyr-option-text">...'+q.a+'</div>';
-  h+='<div class="wyr-or">or</div>';
-  h+='<div class="wyr-option-text">...'+q.b+'?</div>';
+  h+='<div class="wyr-options">';
+  h+='<div class="wyr-opt wyr-opt-a"><div class="wyr-opt-label">Option A</div><div class="wyr-option-text">...'+q.a+'?</div></div>';
+  h+='<div class="wyr-opt wyr-opt-b"><div class="wyr-opt-label">Option B</div><div class="wyr-option-text">...'+q.b+'?</div></div>';
+  h+='</div>';
   h+='</div>';
   h+='</div>';
   document.getElementById('qfCard').innerHTML=h;
@@ -402,20 +455,39 @@ function setMode(m){
   document.querySelectorAll('.mode-btn').forEach(function(b){b.classList.remove('on');});
   if(m==='card'){
     document.getElementById('cardView').classList.remove('hidden');
-    document.getElementById('quickfireView').classList.remove('active');
+    document.getElementById('gridView').className='grid-view';
     document.querySelectorAll('.mode-btn')[0].classList.add('on');
-    stopQf();
   } else {
     document.getElementById('cardView').classList.add('hidden');
-    document.getElementById('quickfireView').classList.add('active');
+    document.getElementById('gridView').className='grid-view active';
     document.querySelectorAll('.mode-btn')[1].classList.add('on');
-    qfIdx=0;updateQfCard();
+    renderGrid();
   }
+}
+
+function renderGrid(){
+  var h='';
+  filtered.forEach(function(q,i){
+    var cls=q.level.toLowerCase();
+    h+='<div class="grid-card '+cls+'" onclick="openFromGrid('+i+')">';
+    h+='<div class="gc-top"><span class="gc-num">#'+q.id+'</span><span class="wyr-level '+q.level+'" style="font-size:.6rem">'+q.level+'</span></div>';
+    h+='<div class="gc-title">...'+q.a+'</div>';
+    h+='<div class="gc-opt">or ...'+q.b+'?</div>';
+    h+='<div class="gc-cat">'+q.cat+'</div>';
+    h+='</div>';
+  });
+  document.getElementById('gridView').innerHTML=h;
+}
+
+function openFromGrid(i){
+  idx=i;
+  setMode('card');
+  renderCard();
 }
 
 function shuffleAll(){
   for(var i=filtered.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=filtered[i];filtered[i]=filtered[j];filtered[j]=t;}
-  idx=0;qfIdx=0;renderCard();updateQfCard();
+  idx=0;renderCard();if(mode==='grid')renderGrid();
 }
 
 function toggleFollow(btn){
