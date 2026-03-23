@@ -142,19 +142,24 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,252,247,
 .phrase-list{display:flex;flex-wrap:wrap;gap:.4rem}
 .phrase-chip{font-size:.8rem;padding:.35rem .8rem;background:var(--sky-light);color:var(--sky);border-radius:6px;font-weight:600}
 
-/* Timer */
-.timer-row{display:flex;align-items:center;gap:.5rem;justify-content:center;margin-top:.8rem;flex-wrap:wrap}
+/* Timer — unified design */
+.timer-section{max-width:800px;margin:.8rem auto 0}
+.timer-controls{display:flex;align-items:center;gap:.5rem;justify-content:center;flex-wrap:wrap;margin-bottom:.4rem}
 .timer-pill{font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:700;padding:.35rem .7rem;border:1.5px solid var(--border);border-radius:20px;background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s}
 .timer-pill:hover{border-color:var(--sea);color:var(--sea)}
 .timer-pill.active{border-color:var(--sea);background:var(--sea);color:#fff}
-.timer-pill.paused{border-color:var(--sun);background:var(--sun);color:#fff}
+.timer-play{font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:700;padding:.5rem 1.2rem;border:1.5px solid var(--sea);border-radius:8px;background:var(--sea);color:#fff;cursor:pointer;transition:all .15s}
+.timer-play:hover{opacity:.9}
+.timer-play.paused{background:var(--sun);border-color:var(--sun)}
 .timer-display{font-family:'JetBrains Mono',monospace;font-size:1.5rem;font-weight:700;color:var(--ink);min-width:60px;text-align:center;transition:color .3s}
 .timer-display.warn{color:var(--coral)}
 .timer-display.done{color:var(--sea)}
 .timer-restart{font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:700;padding:.35rem .7rem;border:1.5px solid var(--border);border-radius:20px;background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s;display:none}
 .timer-restart:hover{border-color:var(--ink);color:var(--ink)}
 .timer-restart.show{display:inline-block}
-.timer-hint{width:100%;text-align:center;font-size:.75rem;color:var(--muted);margin-top:.2rem}
+.timer-progress{width:100%;height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:.3rem}
+.timer-progress-fill{height:100%;background:var(--sea);border-radius:3px;transition:width .3s linear;width:0%}
+.timer-progress-fill.warn{background:var(--coral)}
 
 /* Grid view */
 .grid-view{display:none;grid-template-columns:1fr 1fr;gap:.8rem}
@@ -195,7 +200,7 @@ nav{padding:.75rem 1.2rem}.nav-links{gap:1rem}.nav-links a{font-size:.78rem}
 .task-shared{padding:1rem 1.4rem 1.2rem}
 }
 @media print{
-nav,.filters,.card-nav,.timer-row,.phrases-toggle,.view-toggle,.filters-actions,.back-link,.group-size{display:none!important}
+nav,.filters,.card-nav,.timer-section,.phrases-toggle,.view-toggle,.filters-actions,.back-link,.group-size{display:none!important}
 .page-header{padding-top:1rem}
 .task-card{border:1px solid #ccc;break-inside:avoid}
 }
@@ -260,14 +265,17 @@ nav,.filters,.card-nav,.timer-row,.phrases-toggle,.view-toggle,.filters-actions,
 <button onclick="nextTask()">Next &rarr;</button>
 </div>
 <div id="taskCard"></div>
-<div class="timer-row">
-<span class="timer-pill" data-secs="120" onclick="timerTap(120,this)">2 min</span>
-<span class="timer-pill" data-secs="300" onclick="timerTap(300,this)">5 min</span>
-<span class="timer-pill" data-secs="600" onclick="timerTap(600,this)">10 min</span>
-<span class="timer-pill" data-secs="900" onclick="timerTap(900,this)">15 min</span>
+<div class="timer-section">
+<div class="timer-controls">
+<span class="timer-pill" data-secs="120" onclick="selectTime(120,this)">2 min</span>
+<span class="timer-pill" data-secs="300" onclick="selectTime(300,this)">5 min</span>
+<span class="timer-pill" data-secs="600" onclick="selectTime(600,this)">10 min</span>
+<span class="timer-pill" data-secs="900" onclick="selectTime(900,this)">15 min</span>
+<button class="timer-play" id="timerPlay" onclick="toggleTimer()">&#9654; Start</button>
 <span class="timer-display" id="timerDisplay">0:00</span>
 <button class="timer-restart" id="timerRestart" onclick="restartTimer()">Restart</button>
-<div class="timer-hint">tap to start · tap again to pause</div>
+</div>
+<div class="timer-progress"><div class="timer-progress-fill" id="timerProgress"></div></div>
 </div>
 </div>
 <div class="grid-view" id="gridView"></div>
@@ -983,47 +991,58 @@ function togglePhrases(btn){
   btn.innerHTML=p.classList.contains('open')?'Useful phrases &#9652;':'Useful phrases &#9662;';
 }
 
-// Timer — tap to start, tap to pause, Restart button
-var timerSeconds=0, timerTotal=0, timerRunning=false, timerPaused=false, timerActivePill=null;
+// Timer — unified: select time, Start/Pause button, Restart, progress bar
+var timerSeconds=0, timerTotal=0, timerRunning=false, timerPaused=false;
 
-function timerTap(secs,pill){
-  // If tapping the already-active pill: toggle pause/resume
-  if(pill===timerActivePill && (timerRunning||timerPaused)){
-    if(timerRunning){
-      // Pause
-      clearInterval(timerInterval);timerInterval=null;
-      timerRunning=false;timerPaused=true;
-      pill.classList.remove('active');pill.classList.add('paused');
-    } else {
-      // Resume
-      timerPaused=false;timerRunning=true;
-      pill.classList.remove('paused');pill.classList.add('active');
-      runTimer();
-    }
-    return;
-  }
-  // Tapping a different pill or starting fresh
-  clearTimer();
-  timerTotal=secs;timerSeconds=secs;timerActivePill=pill;
-  document.querySelectorAll('.timer-pill').forEach(function(p){p.classList.remove('active','paused');});
+function selectTime(secs,pill){
+  // If timer is running, stop it first
+  if(timerRunning||timerPaused) resetTimer();
+  timerTotal=secs;timerSeconds=secs;
+  document.querySelectorAll('.timer-pill').forEach(function(p){p.classList.remove('active');});
   pill.classList.add('active');
-  timerRunning=true;timerPaused=false;
   document.getElementById('timerRestart').className='timer-restart show';
+  document.getElementById('timerPlay').textContent='\u25B6 Start';
+  document.getElementById('timerPlay').className='timer-play';
   updateTimerDisplay();
-  runTimer();
+  document.getElementById('timerProgress').style.width='0%';
+  document.getElementById('timerProgress').className='timer-progress-fill';
+}
+
+function toggleTimer(){
+  if(!timerTotal) return;
+  var btn=document.getElementById('timerPlay');
+  if(!timerRunning&&!timerPaused){
+    // Start
+    timerRunning=true;
+    btn.textContent='\u23F8 Pause';btn.className='timer-play';
+    runTimer();
+  } else if(timerRunning){
+    // Pause
+    clearInterval(timerInterval);timerInterval=null;
+    timerRunning=false;timerPaused=true;
+    btn.textContent='\u25B6 Resume';btn.className='timer-play paused';
+  } else {
+    // Resume
+    timerPaused=false;timerRunning=true;
+    btn.textContent='\u23F8 Pause';btn.className='timer-play';
+    runTimer();
+  }
 }
 
 function runTimer(){
   var disp=document.getElementById('timerDisplay');
+  var prog=document.getElementById('timerProgress');
   timerInterval=setInterval(function(){
     timerSeconds--;
-    if(timerSeconds<=10&&timerSeconds>0)disp.className='timer-display warn';
+    var pct=((timerTotal-timerSeconds)/timerTotal)*100;
+    prog.style.width=pct+'%';
+    if(timerSeconds<=10&&timerSeconds>0){disp.className='timer-display warn';prog.className='timer-progress-fill warn';}
     if(timerSeconds<=0){
-      clearInterval(timerInterval);timerInterval=null;
-      timerRunning=false;
-      disp.className='timer-display done';
-      disp.textContent='0:00';
-      if(timerActivePill){timerActivePill.classList.remove('active','paused');}
+      clearInterval(timerInterval);timerInterval=null;timerRunning=false;
+      disp.className='timer-display done';disp.textContent='0:00';
+      prog.style.width='100%';prog.className='timer-progress-fill warn';
+      document.getElementById('timerPlay').textContent='\u25B6 Start';
+      document.getElementById('timerPlay').className='timer-play';
     } else {
       updateTimerDisplay();
     }
@@ -1031,29 +1050,32 @@ function runTimer(){
 }
 
 function restartTimer(){
-  if(!timerTotal||!timerActivePill)return;
+  if(!timerTotal)return;
   clearInterval(timerInterval);timerInterval=null;
-  timerSeconds=timerTotal;timerRunning=true;timerPaused=false;
-  document.querySelectorAll('.timer-pill').forEach(function(p){p.classList.remove('active','paused');});
-  timerActivePill.classList.add('active');
-  var disp=document.getElementById('timerDisplay');
-  disp.className='timer-display';
+  timerSeconds=timerTotal;timerRunning=false;timerPaused=false;
+  document.getElementById('timerDisplay').className='timer-display';
+  document.getElementById('timerProgress').style.width='0%';
+  document.getElementById('timerProgress').className='timer-progress-fill';
+  document.getElementById('timerPlay').textContent='\u25B6 Start';
+  document.getElementById('timerPlay').className='timer-play';
   updateTimerDisplay();
-  runTimer();
 }
 
-function clearTimer(){
-  if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
-  timerRunning=false;timerPaused=false;timerActivePill=null;
+function resetTimer(){
+  clearInterval(timerInterval);timerInterval=null;
+  timerRunning=false;timerPaused=false;timerTotal=0;timerSeconds=0;
   document.getElementById('timerDisplay').textContent='0:00';
   document.getElementById('timerDisplay').className='timer-display';
-  document.querySelectorAll('.timer-pill').forEach(function(p){p.classList.remove('active','paused');});
+  document.getElementById('timerProgress').style.width='0%';
+  document.getElementById('timerProgress').className='timer-progress-fill';
+  document.querySelectorAll('.timer-pill').forEach(function(p){p.classList.remove('active');});
   document.getElementById('timerRestart').className='timer-restart';
+  document.getElementById('timerPlay').textContent='\u25B6 Start';
+  document.getElementById('timerPlay').className='timer-play';
 }
 
 function updateTimerDisplay(){
-  var m=Math.floor(timerSeconds/60);
-  var s=timerSeconds%60;
+  var m=Math.floor(timerSeconds/60),s=timerSeconds%60;
   document.getElementById('timerDisplay').textContent=m+':'+(s<10?'0':'')+s;
 }
 
