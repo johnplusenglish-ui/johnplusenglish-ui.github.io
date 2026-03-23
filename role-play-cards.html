@@ -66,14 +66,26 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,252,247,
 .badge-cat{color:var(--muted);background:var(--cream)}
 
 .rp-roles{display:grid;grid-template-columns:1fr 1fr;min-height:180px}
+.rp-roles.three-col{grid-template-columns:1fr 1fr 1fr}
 .role{padding:1.4rem 1.5rem}
 .role-a{background:var(--sky-light);border-right:1px solid var(--border)}
 .role-b{background:rgba(255,107,107,.06)}
+.role-c{background:rgba(46,196,182,.06);border-left:1px solid var(--border)}
+.role-d{background:rgba(255,179,71,.06);border-left:1px solid var(--border)}
 .role-tag{font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:.4rem}
 .role-a .role-tag{color:var(--sky)}
 .role-b .role-tag{color:var(--coral)}
+.role-c .role-tag{color:var(--sea)}
+.role-d .role-tag{color:var(--sun)}
+.rp-roles.four-col{grid-template-columns:1fr 1fr 1fr 1fr}
 .role-name{font-family:'DM Serif Display',serif;font-size:1.1rem;font-weight:400;margin-bottom:.4rem}
 .role-desc{font-size:.9rem;line-height:1.65;color:var(--ink)}
+
+/* Player count toggle */
+.player-toggle{display:flex;gap:0;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;width:fit-content;margin-bottom:1rem}
+.player-btn{font-family:'Nunito',sans-serif;font-size:.85rem;font-weight:600;padding:.5rem 1.2rem;background:var(--card);color:var(--muted);border:none;cursor:pointer;transition:all .15s}
+.player-btn:hover{color:var(--ink)}
+.player-btn.on{background:var(--sky);color:#fff;border-color:var(--sky)}
 
 /* Navigation */
 .card-nav{display:flex;justify-content:space-between;align-items:center;margin-top:1.2rem;gap:1rem}
@@ -124,7 +136,11 @@ nav{padding:.75rem 1.2rem}.nav-links{gap:1rem}.nav-links a{font-size:.78rem}
 .stats-bar{padding:0 1.2rem}
 .card-viewer{padding:0 1.2rem}
 .rp-roles{grid-template-columns:1fr}
+.rp-roles.three-col{grid-template-columns:1fr}
+.rp-roles.four-col{grid-template-columns:1fr}
 .role-a{border-right:none;border-bottom:1px solid var(--border)}
+.role-c{border-left:none;border-top:1px solid var(--border)}
+.role-d{border-left:none;border-top:1px solid var(--border)}
 .grid-view.active{grid-template-columns:1fr}
 }
 
@@ -159,9 +175,9 @@ nav{padding:.75rem 1.2rem}.nav-links{gap:1rem}.nav-links a{font-size:.78rem}
 .timer-progress-fill.warn{background:var(--coral)}
 
 /* Reveal mode */
-.role-b-hidden{position:relative;cursor:pointer;overflow:hidden;min-height:120px}
-.role-b-hidden .role-tag,.role-b-hidden .role-name,.role-b-hidden .role-desc{filter:blur(8px);user-select:none;pointer-events:none;transition:filter .3s}
-.role-b-hidden .reveal-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(255,107,107,.04);z-index:2}
+.role-b-hidden,.role-c-hidden{position:relative;cursor:pointer;overflow:hidden;min-height:120px}
+.role-b-hidden .role-tag,.role-b-hidden .role-name,.role-b-hidden .role-desc,.role-c-hidden .role-tag,.role-c-hidden .role-name,.role-c-hidden .role-desc{filter:blur(8px);user-select:none;pointer-events:none;transition:filter .3s}
+.role-b-hidden .reveal-overlay,.role-c-hidden .reveal-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(255,107,107,.04);z-index:2}
 .reveal-btn{font-family:'Nunito',sans-serif;font-size:.85rem;font-weight:700;padding:.5rem 1.2rem;border:1.5px solid var(--coral);border-radius:10px;background:var(--card);color:var(--coral);cursor:pointer;transition:all .15s;box-shadow:0 2px 8px rgba(255,107,107,.1)}
 .reveal-btn:hover{background:var(--coral);color:#fff}
 .role-b-shown .role-tag,.role-b-shown .role-name,.role-b-shown .role-desc{filter:none}
@@ -182,16 +198,23 @@ nav{padding:.75rem 1.2rem}.nav-links{gap:1rem}.nav-links a{font-size:.78rem}
 <a href="class-activities.html" class="back-link">&larr; Back to Class Activities</a>
 <div class="section-label">Teaching Tools</div>
 <h1 class="page-title">Role Play Cards</h1>
-<p class="page-desc">200 pair activities across 4 levels &mdash; Simple, Everyday, Advanced, and Fun. Filter by level or topic, shuffle, and print.</p>
+<p class="page-desc">Role play activities across 4 levels &mdash; Simple, Everyday, Advanced, and Fun. Filter by level or topic, shuffle, and print.</p>
 </div>
 
 <div class="filters">
 <div class="filters-top">
+<div style="display:flex;flex-direction:column;gap:.6rem">
+<div class="player-toggle">
+<button class="player-btn on" onclick="setPlayers(2,this)">2 Students</button>
+<button class="player-btn" onclick="setPlayers(3,this)">3 Students</button>
+<button class="player-btn" onclick="setPlayers(4,this)">4 Students</button>
+</div>
 <div class="view-toggle">
 <button class="view-btn on" onclick="setView('single',this)">Card View</button>
 <button class="view-btn" onclick="setView('grid',this)">Browse All</button>
 </div>
-<div class="filters-actions"><label style="display:flex;align-items:center;gap:.4rem;font-size:.82rem;font-weight:600;color:var(--muted);cursor:pointer;margin-right:.5rem"><input type="checkbox" id="revealToggle" onchange="toggleRevealMode()" style="accent-color:var(--coral)"> Hide Student B</label>
+</div>
+<div class="filters-actions"><label style="display:flex;align-items:center;gap:.4rem;font-size:.82rem;font-weight:600;color:var(--muted);cursor:pointer;margin-right:.5rem"><input type="checkbox" id="revealToggle" onchange="toggleRevealMode()" style="accent-color:var(--coral)"> <span id="hideLabel">Hide Student B</span></label>
 <button class="action-btn" style="border-color:var(--ink);color:var(--ink)" onclick="shuffleCards()">🎲 Random</button>
 <button class="action-btn" style="border-color:var(--muted);color:var(--muted)" onclick="resetCards()">&#8634; Reset</button>
 <button class="action-btn" onclick="window.print()">&#128424; Print</button>
@@ -665,27 +688,484 @@ var levels=["Simple","Everyday","Advanced","Fun"];
 var filtered=[...data];
 var cardIdx=0;
 var currentView='single';
+var playerCount=2;
+
+// ═══════════════════════════════════════
+// 3-PLAYER DATA (placeholder — 5 per level = 20)
+// ═══════════════════════════════════════
+var data3=[
+// SIMPLE (1-25)
+{id:1,cat:"Shopping",lvl:"Simple",title:"Buying a birthday present",a:{role:"Customer",desc:"Ask the shop assistant for help choosing a gift for a friend. Budget: £20."},b:{role:"Shop assistant",desc:"Suggest three options. One is over budget. Help them decide."},c:{role:"Friend (on the phone)",desc:"Call mid-shop to give last-minute hints about what the birthday person likes."}},
+{id:2,cat:"Shopping",lvl:"Simple",title:"Wrong change",a:{role:"Customer",desc:"You paid with £20 but got change for £10. Point this out politely."},b:{role:"Cashier",desc:"You're not sure. Check the till."},c:{role:"Manager",desc:"The cashier calls you over. Resolve it fairly."}},
+{id:3,cat:"Shopping",lvl:"Simple",title:"Market stall",a:{role:"Tourist",desc:"Buy cheese and ham at a market. Ask to try samples."},b:{role:"Stall owner",desc:"Offer samples and sell enthusiastically."},c:{role:"Tourist's friend",desc:"You're vegetarian. Ask what options there are for you."}},
+{id:4,cat:"Restaurant & Food",lvl:"Simple",title:"Wrong order",a:{role:"Customer",desc:"You ordered chicken but received fish. Tell the waiter."},b:{role:"Waiter/Waitress",desc:"Apologise and check with the kitchen."},c:{role:"Chef",desc:"The chicken is 10 minutes away. Explain."}},
+{id:5,cat:"Restaurant & Food",lvl:"Simple",title:"Splitting the bill",a:{role:"Friend A",desc:"You had the cheapest meal. Pay separately."},b:{role:"Friend B",desc:"Split equally — it's simpler."},c:{role:"Waiter/Waitress",desc:"Ask which they prefer. You can do either."}},
+{id:6,cat:"Restaurant & Food",lvl:"Simple",title:"The busy café",a:{role:"Customer A",desc:"Order coffee and cake. Ask how long the wait is."},b:{role:"Barista",desc:"Very busy. 10-minute wait. Apologise."},c:{role:"Customer B",desc:"You've been waiting 15 minutes. Politely chase."}},
+{id:7,cat:"Travel & Transport",lvl:"Simple",title:"The late bus",a:{role:"Passenger A",desc:"The bus is 20 minutes late. Ask if this is normal."},b:{role:"Passenger B",desc:"You take this bus daily. It's always late."},c:{role:"Bus driver (arriving)",desc:"Late because of traffic. Apologise."}},
+{id:8,cat:"Travel & Transport",lvl:"Simple",title:"Airport check-in",a:{role:"Passenger",desc:"Check in. Your bag might be overweight."},b:{role:"Check-in agent",desc:"Bag is 3kg over. Excess charge: £30."},c:{role:"Travelling companion",desc:"You have space in your bag. Offer to help."}},
+{id:9,cat:"Travel & Transport",lvl:"Simple",title:"Lost at the station",a:{role:"Tourist",desc:"You're at the wrong platform. Ask for help."},b:{role:"Station staff",desc:"Redirect to platform 5. Train in 8 minutes."},c:{role:"Local commuter",desc:"Same direction. Offer to walk with them."}},
+{id:10,cat:"Everyday Life",lvl:"Simple",title:"New student in class",a:{role:"New student",desc:"Introduce yourself. Ask about schedule and homework."},b:{role:"Classmate A",desc:"Welcome them. Explain the routine."},c:{role:"Classmate B",desc:"Suggest lunch together. Ask where they're from."}},
+{id:11,cat:"Everyday Life",lvl:"Simple",title:"Planning a film night",a:{role:"Friend A",desc:"Suggest an action film tonight."},b:{role:"Friend B",desc:"You hate action. Suggest comedy."},c:{role:"Friend C",desc:"Watch anything. Help them compromise."}},
+{id:12,cat:"Health",lvl:"Simple",title:"Minor injury at work",a:{role:"Injured worker",desc:"You cut your hand. Tell your colleague."},b:{role:"Colleague",desc:"Get the first aid kit. Bandage the cut."},c:{role:"Manager",desc:"Fill in the accident report. Ask what happened."}},
+{id:13,cat:"Health",lvl:"Simple",title:"At the pharmacy",a:{role:"Customer",desc:"You have a cold. Ask what's recommended."},b:{role:"Pharmacist",desc:"Recommend medicine. Ask about allergies."},c:{role:"Pharmacy assistant",desc:"Help find the product. Explain the dosage."}},
+{id:14,cat:"Services",lvl:"Simple",title:"At the post office",a:{role:"Customer",desc:"Send a parcel to Spain. Ask about options."},b:{role:"Postal clerk",desc:"Standard 7-10 days £8. Express 2-3 days £18."},c:{role:"Customer behind",desc:"You only need stamps. Ask if there's a quicker queue."}},
+{id:15,cat:"Services",lvl:"Simple",title:"Joining a gym",a:{role:"Customer",desc:"Ask about membership, prices, and classes."},b:{role:"Receptionist",desc:"Monthly is £35. Offer a free trial."},c:{role:"Personal trainer",desc:"Explain classes. Recommend the beginner group."}},
+{id:16,cat:"Work",lvl:"Simple",title:"Office birthday",a:{role:"Organiser",desc:"Organise a surprise card and cake. Ask for contributions."},b:{role:"Colleague A",desc:"Bring a cake. Ask what flavour they like."},c:{role:"Colleague B",desc:"Contribute £5. Suggest what to write in the card."}},
+{id:17,cat:"Work",lvl:"Simple",title:"Fire drill",a:{role:"Employee A",desc:"Fire alarm going off. Ask if it's real."},b:{role:"Employee B",desc:"Probably a drill. Follow procedure anyway."},c:{role:"Fire warden",desc:"It IS a drill. Guide everyone out calmly."}},
+{id:18,cat:"Home",lvl:"Simple",title:"Who ate the cheese?",a:{role:"Flatmate A",desc:"Your cheese disappeared. Ask your flatmates."},b:{role:"Flatmate B",desc:"You didn't eat it. Suggest Flatmate C."},c:{role:"Flatmate C",desc:"You ate it by mistake. Apologise. Offer to buy more."}},
+{id:19,cat:"Home",lvl:"Simple",title:"Cleaning rota",a:{role:"Flatmate A",desc:"Flat is messy. Suggest a rota."},b:{role:"Flatmate B",desc:"Agree but hate the bathroom. Negotiate."},c:{role:"Flatmate C",desc:"Things are fine. You need convincing."}},
+{id:20,cat:"Social",lvl:"Simple",title:"Planning a picnic",a:{role:"Organiser",desc:"Plan where and when. Assign food."},b:{role:"Friend A",desc:"Bring drinks. Ask about the weather."},c:{role:"Friend B",desc:"Bring sandwiches. Ask about dietary needs."}},
+{id:21,cat:"Social",lvl:"Simple",title:"Meeting a friend's friend",a:{role:"Your friend",desc:"Introduce your two friends. Find common ground."},b:{role:"Friend A",desc:"Shy at first. Ask polite questions."},c:{role:"Friend B",desc:"Very outgoing. Suggest plans immediately."}},
+{id:22,cat:"Shopping",lvl:"Simple",title:"Choosing a phone case",a:{role:"Customer",desc:"Want a blue Samsung case."},b:{role:"Shop assistant",desc:"No blue. Only red and black. Suggest alternatives."},c:{role:"Friend",desc:"Red is better. Help decide."}},
+{id:23,cat:"Everyday Life",lvl:"Simple",title:"Photocopier jam",a:{role:"Worker A",desc:"Photocopier jammed. Ask for help."},b:{role:"Worker B",desc:"Don't know how to fix it. Call maintenance."},c:{role:"Maintenance",desc:"Fix it. Explain how to avoid jams."}},
+{id:24,cat:"Travel & Transport",lvl:"Simple",title:"Car trouble",a:{role:"Driver",desc:"Car making a strange noise. Pull over."},b:{role:"Passenger A",desc:"Think it's the engine. Call roadside assistance."},c:{role:"Passenger B",desc:"Think it's nothing. Drive to the petrol station."}},
+{id:25,cat:"Restaurant & Food",lvl:"Simple",title:"Ice cream van",a:{role:"Customer A",desc:"Ask flavours. Order two scoops."},b:{role:"Seller",desc:"Six flavours. Strawberry finished. Suggest alternatives."},c:{role:"Customer B",desc:"Can't decide. Ask for recommendations."}},
+
+// EVERYDAY (26-50)
+{id:26,cat:"Shopping",lvl:"Everyday",title:"Faulty laptop return",a:{role:"Customer",desc:"Laptop crashed after one week. You want a full refund."},b:{role:"Shop assistant",desc:"Policy is repair first. No direct refunds on electronics."},c:{role:"Manager",desc:"Customer is frustrated. Find a solution."}},
+{id:27,cat:"Shopping",lvl:"Everyday",title:"Haggling at a flea market",a:{role:"Buyer",desc:"Vintage lamp marked £40. You think it's worth £25."},b:{role:"Seller",desc:"You paid £20. Go as low as £30."},c:{role:"Buyer's friend",desc:"The lamp is ugly. Talk them out of it — gently."}},
+{id:28,cat:"Shopping",lvl:"Everyday",title:"Online order disaster",a:{role:"Customer",desc:"Ordered a blue dress. Received a yellow curtain."},b:{role:"Customer service rep",desc:"Order number doesn't match. Investigate."},c:{role:"Supervisor",desc:"Warehouse mixed up orders. Offer express replacement."}},
+{id:29,cat:"Restaurant & Food",lvl:"Everyday",title:"Allergy alert",a:{role:"Diner",desc:"Severe nut allergy. Peanut sauce placed near your plate."},b:{role:"Waiter/Waitress",desc:"Kitchen error. Handle it seriously."},c:{role:"Dining companion",desc:"Stay calm. Flag the waiter. Check on your friend."}},
+{id:30,cat:"Restaurant & Food",lvl:"Everyday",title:"Cooking class disaster",a:{role:"Instructor",desc:"One student burnt the sauce, another hasn't started."},b:{role:"Student A",desc:"Sauce is smoking. Need help now."},c:{role:"Student B",desc:"Still on step 1. Ask to slow down."}},
+{id:31,cat:"Restaurant & Food",lvl:"Everyday",title:"Mystery ingredient",a:{role:"Customer",desc:"Something unidentifiable in your soup. Ask."},b:{role:"Waiter/Waitress",desc:"Not sure. Check with the chef."},c:{role:"Chef",desc:"It's truffle oil. Come explain. You're proud."}},
+{id:32,cat:"Travel & Transport",lvl:"Everyday",title:"Missed connection",a:{role:"Passenger",desc:"Missed connecting flight — first was late. Demand help."},b:{role:"Airline staff",desc:"Next flight tomorrow. Offer hotel voucher."},c:{role:"Another stranded passenger",desc:"Same situation. Team up for a better deal."}},
+{id:33,cat:"Travel & Transport",lvl:"Everyday",title:"Airbnb disappointment",a:{role:"Guest",desc:"Flat is smaller than photos. Mention it."},b:{role:"Host",desc:"Wide-angle photos. Everything listed is there. Defend it."},c:{role:"Travel partner",desc:"It's fine. It's cheap. Tell your friend to relax."}},
+{id:34,cat:"Travel & Transport",lvl:"Everyday",title:"Rental car damage",a:{role:"Renter",desc:"Returning car. Scratch you didn't cause."},b:{role:"Rental agent",desc:"Scratch not on checkout form. Need to charge."},c:{role:"Manager",desc:"Check photos. Scratch WAS there. Resolve it."}},
+{id:35,cat:"Work & Office",lvl:"Everyday",title:"The credit thief",a:{role:"Employee",desc:"Colleague presented your idea as theirs. Confront them."},b:{role:"Colleague",desc:"Thought it was a shared idea. Explain."},c:{role:"Manager",desc:"Noticed the tension. Clear the air."}},
+{id:36,cat:"Work & Office",lvl:"Everyday",title:"Thermostat war",a:{role:"Employee A",desc:"Office is freezing. Turn up the heating."},b:{role:"Employee B",desc:"Too hot. Argue against it."},c:{role:"Office manager",desc:"Find a compromise."}},
+{id:37,cat:"Work & Office",lvl:"Everyday",title:"Late to the meeting",a:{role:"Late employee",desc:"15 minutes late. Apologise."},b:{role:"Meeting leader",desc:"Summarise what they missed."},c:{role:"Colleague",desc:"Whisper what happened. Share notes."}},
+{id:38,cat:"Health & Medical",lvl:"Everyday",title:"Emergency room wait",a:{role:"Patient",desc:"3 hours in A&E. Possible broken wrist."},b:{role:"Nurse",desc:"Busy night. Serious cases first."},c:{role:"Patient's friend",desc:"Drove them. Work at 6am. Tired but supportive."}},
+{id:39,cat:"Health & Medical",lvl:"Everyday",title:"Second opinion",a:{role:"Patient",desc:"One doctor says surgery. You want another view."},b:{role:"Doctor A",desc:"Stand by surgery. Explain why."},c:{role:"Doctor B",desc:"Physio could work first. Explain the alternative."}},
+{id:40,cat:"Home & Neighbours",lvl:"Everyday",title:"Package drama",a:{role:"Resident",desc:"Neighbour signed for your package. Denies having it."},b:{role:"Neighbour",desc:"Left it by your door. Maybe someone took it?"},c:{role:"Delivery company (phone)",desc:"Tracking says delivered. Help resolve."}},
+{id:41,cat:"Home & Neighbours",lvl:"Everyday",title:"DIY gone wrong",a:{role:"DIY enthusiast",desc:"Shelves fell. Damaged the wall."},b:{role:"Partner",desc:"You said hire someone. Frustrated but kind."},c:{role:"Handy friend (phone)",desc:"Give repair advice. Try not to laugh."}},
+{id:42,cat:"Home & Neighbours",lvl:"Everyday",title:"Smoke alarm drama",a:{role:"Cook",desc:"Burnt toast. Alarm screaming."},b:{role:"Flatmate A",desc:"Thought it was a fire. Grabbed your laptop and cat."},c:{role:"Flatmate B",desc:"Calmly open a window. Wave a tea towel."}},
+{id:43,cat:"Social & Everyday",lvl:"Everyday",title:"Group holiday planning",a:{role:"Planner",desc:"Greece. Cheap, sunny, easy."},b:{role:"Friend A",desc:"Japan. Once-in-a-lifetime."},c:{role:"Friend B",desc:"Anywhere, but max £500 budget."}},
+{id:44,cat:"Social & Everyday",lvl:"Everyday",title:"Embarrassing photo online",a:{role:"Person A",desc:"Friend posted an embarrassing photo. Ask to remove it."},b:{role:"Friend B",desc:"It's funny. 50 likes. No problem."},c:{role:"Mutual friend",desc:"It IS embarrassing. Help convince them."}},
+{id:45,cat:"Social & Everyday",lvl:"Everyday",title:"Movie choice conflict",a:{role:"Friend A",desc:"Bought horror tickets without asking."},b:{role:"Friend B",desc:"You HATE horror. Genuinely scared."},c:{role:"Friend C",desc:"Seen this one. Suggest exchanging."}},
+{id:46,cat:"Services & Admin",lvl:"Everyday",title:"Phone contract dispute",a:{role:"Customer",desc:"Bill is £30 more than agreed."},b:{role:"Rep",desc:"Extra data charges. Explain."},c:{role:"Supervisor",desc:"Offer a goodwill credit."}},
+{id:47,cat:"Services & Admin",lvl:"Everyday",title:"Energy bill shock",a:{role:"Tenant",desc:"Energy bill doubled. Call provider."},b:{role:"Energy rep",desc:"Prices up. Higher meter reading."},c:{role:"Flatmate",desc:"Running a space heater 24/7. Confess."}},
+{id:48,cat:"Emergency",lvl:"Everyday",title:"Car park accident",a:{role:"Driver A",desc:"Someone reversed into your car."},b:{role:"Driver B",desc:"You reversed. Embarrassed. Exchange details."},c:{role:"Witness",desc:"You saw it. Offer your details."}},
+{id:49,cat:"Work & Office",lvl:"Everyday",title:"Secret Santa disaster",a:{role:"Organiser",desc:"Gifts exchanged. Someone forgot."},b:{role:"Non-participant",desc:"You forgot. Feel terrible."},c:{role:"Gift-less recipient",desc:"Everyone has a gift except you."}},
+{id:50,cat:"Home & Neighbours",lvl:"Everyday",title:"New neighbours",a:{role:"New neighbour",desc:"Just moved in. Introduce yourself."},b:{role:"Neighbour A",desc:"Welcome. Explain bin day and parking."},c:{role:"Neighbour B",desc:"Friendly but hint about noise. Last tenants were loud."}},
+
+// ADVANCED (51-75)
+{id:51,cat:"Work & Office",lvl:"Advanced",title:"Redundancy meeting",a:{role:"HR manager",desc:"Deliver redundancy news. Be empathetic but clear."},b:{role:"Employee",desc:"12 years here. No idea. React — shock, anger."},c:{role:"Union rep",desc:"Ensure fairness. Ask about the package and appeals."}},
+{id:52,cat:"Work & Office",lvl:"Advanced",title:"Whistleblowing",a:{role:"Employee",desc:"Found evidence of illegal waste dumping. Report it."},b:{role:"Manager",desc:"You knew but were told to ignore it. Decide."},c:{role:"Environmental officer",desc:"Contacted anonymously. Investigate."}},
+{id:53,cat:"Work & Office",lvl:"Advanced",title:"Salary transparency",a:{role:"Employee A",desc:"Colleague earns £15K more for the same role. Confront your manager."},b:{role:"Manager",desc:"Salaries are confidential. Handle carefully."},c:{role:"Employee B (higher earner)",desc:"You negotiated hard. Didn't know it would come out."}},
+{id:54,cat:"Work & Office",lvl:"Advanced",title:"Toxic team member",a:{role:"Team leader",desc:"One person is gossiping and creating divisions. Address it."},b:{role:"The gossip",desc:"Everyone vents. You don't think you've done anything wrong."},c:{role:"Affected colleague",desc:"You've been the target. Explain how it's affected your work."}},
+{id:55,cat:"Work & Office",lvl:"Advanced",title:"Client demands the impossible",a:{role:"Account manager",desc:"Client wants the project a month early. Not feasible."},b:{role:"Client",desc:"CEO is demanding results. Push hard."},c:{role:"Project lead",desc:"Explain what's possible. Offer phased delivery."}},
+{id:56,cat:"Health & Medical",lvl:"Advanced",title:"Breaking bad news",a:{role:"Doctor",desc:"Scan results need investigation. Be honest but sensitive."},b:{role:"Patient",desc:"Expected routine results. Doctor seems serious."},c:{role:"Patient's partner",desc:"Terrified but staying strong. Ask practical questions."}},
+{id:57,cat:"Health & Medical",lvl:"Advanced",title:"Elderly parent care",a:{role:"Adult child A",desc:"Mother needs a care home. She fell last week."},b:{role:"Adult child B",desc:"She should stay home with a carer."},c:{role:"Mother",desc:"You want to stay home alone. Be stubborn."}},
+{id:58,cat:"Health & Medical",lvl:"Advanced",title:"Mental health conversation",a:{role:"Friend A",desc:"Friend has been withdrawn for weeks. Start a caring chat."},b:{role:"The person",desc:"Struggling but haven't told anyone. Hard to open up."},c:{role:"Friend B",desc:"Noticed too. Support without overwhelming."}},
+{id:59,cat:"Relationships",lvl:"Advanced",title:"The difficult apology",a:{role:"Person A",desc:"Said something cruel at a family dinner. Apologise."},b:{role:"Sibling",desc:"Deeply hurt. Not ready to forgive instantly."},c:{role:"Parent",desc:"Love them both. Help without taking sides."}},
+{id:60,cat:"Relationships",lvl:"Advanced",title:"Confronting a lie",a:{role:"Person A",desc:"Friend lied about being at work — was at a job interview."},b:{role:"Friend",desc:"Lied to avoid awkwardness. Explain."},c:{role:"Mutual friend",desc:"You accidentally revealed the truth. Mediate."}},
+{id:61,cat:"Relationships",lvl:"Advanced",title:"Inheritance dispute",a:{role:"Sibling A",desc:"Parent left the house to you only."},b:{role:"Sibling B",desc:"Furious. You cared for them in their final years."},c:{role:"Solicitor",desc:"Explain the will. Suggest mediation."}},
+{id:62,cat:"Services & Legal",lvl:"Advanced",title:"Landlord deposit dispute",a:{role:"Tenant",desc:"Landlord keeping £600 for pre-existing damage."},b:{role:"Landlord",desc:"You have photos. Justify deductions."},c:{role:"Adjudicator",desc:"Review both sides. Rule fairly."}},
+{id:63,cat:"Services & Legal",lvl:"Advanced",title:"Unfair parking fine",a:{role:"Driver",desc:"Fined but you had a valid ticket."},b:{role:"Parking company",desc:"Ticket expired 2 minutes early. Rules are rules."},c:{role:"Citizen's advice",desc:"Help the driver understand appeal options."}},
+{id:64,cat:"Ethical Dilemma",lvl:"Advanced",title:"Found wallet",a:{role:"Person A",desc:"Found wallet with £500. Return everything."},b:{role:"Person B",desc:"Keep the cash. Nobody would know."},c:{role:"Person C",desc:"Police. Only correct option."}},
+{id:65,cat:"Ethical Dilemma",lvl:"Advanced",title:"Cheating classmate",a:{role:"Student A",desc:"Saw classmate cheat. Affects your ranking."},b:{role:"Cheater",desc:"Panicked. Will fail the year otherwise."},c:{role:"Another classmate",desc:"Didn't cheat. Got lower grade. Want fairness."}},
+{id:66,cat:"Ethical Dilemma",lvl:"Advanced",title:"Friend's drink-driving",a:{role:"Friend A",desc:"Friend drives after drinking every weekend."},b:{role:"The driver",desc:"Never had an accident. You're fine."},c:{role:"Friend C",desc:"Agree it's dangerous. Help confront."}},
+{id:67,cat:"Travel & Transport",lvl:"Advanced",title:"Overbooked flight",a:{role:"Passenger",desc:"Bumped with confirmed ticket. Critical meeting tomorrow."},b:{role:"Gate agent",desc:"Need volunteers. Offer €400 and next flight."},c:{role:"Another bumped passenger",desc:"Calmer. Will take compensation if upgraded."}},
+{id:68,cat:"Cultural & Sensitive",lvl:"Advanced",title:"Workplace misunderstanding",a:{role:"Employee",desc:"Colleague made a culturally insensitive joke. Address it."},b:{role:"Colleague",desc:"No idea. Mortified. Listen and apologise."},c:{role:"Team leader",desc:"Witnessed it. Facilitate a productive conversation."}},
+{id:69,cat:"Home & Major Decisions",lvl:"Advanced",title:"Flatmate leaving suddenly",a:{role:"Departing flatmate",desc:"Moving in with partner next month."},b:{role:"Flatmate A",desc:"Can't afford rent alone. Terrible timing."},c:{role:"Flatmate B",desc:"Know someone who could take the room. Mediate."}},
+{id:70,cat:"Home & Major Decisions",lvl:"Advanced",title:"Renovation nightmare",a:{role:"Homeowner",desc:"Builder 3 months late and £10K over budget."},b:{role:"Builder",desc:"Supply chain issues. Explain."},c:{role:"Building inspector",desc:"Some work doesn't meet code. Bad news."}},
+{id:71,cat:"Work & Office",lvl:"Advanced",title:"Remote work dispute",a:{role:"Employee",desc:"Want 3 days from home. Manager says 1 max."},b:{role:"Manager",desc:"CEO wants office. Sympathetic but hands tied."},c:{role:"HR director",desc:"Both come to you. Find a policy."}},
+{id:72,cat:"Money & Awkward",lvl:"Advanced",title:"Unequal trip costs",a:{role:"Friend A",desc:"Booked budget room. Won't pay equal shares."},b:{role:"Friend B",desc:"Equal split is simpler. Difference isn't much."},c:{role:"Friend C",desc:"Booked the luxury. Understand the frustration. Negotiate."}},
+{id:73,cat:"High Emotion",lvl:"Advanced",title:"Caught in a lie",a:{role:"Employee",desc:"Told boss you were sick — were at a job interview."},b:{role:"Boss",desc:"Heard a rumour. Ask directly."},c:{role:"Colleague",desc:"You accidentally revealed it. Feel guilty."}},
+{id:74,cat:"Relationships",lvl:"Advanced",title:"Moving in together",a:{role:"Partner A",desc:"Want to move in. Found the perfect flat."},b:{role:"Partner B",desc:"Love them but not ready. Explain without hurting."},c:{role:"Close friend",desc:"Asked for advice. Honest — you think it's too soon."}},
+{id:75,cat:"High Emotion",lvl:"Advanced",title:"Saying goodbye — emigrating",a:{role:"Person A",desc:"Moving abroad permanently. Tell your best friends."},b:{role:"Best friend A",desc:"Devastated but trying to be supportive."},c:{role:"Best friend B",desc:"Practical. Ask about visits, video calls. Hold it together."}},
+
+// FUN (76-100)
+{id:76,cat:"Weird & Wonderful",lvl:"Fun",title:"Ghost flatmate",a:{role:"Living flatmate",desc:"Flatmate died 100 years ago. Refuses to leave. Keeps rearranging furniture."},b:{role:"Ghost",desc:"Your home. You died here. Open to negotiation on radio volume."},c:{role:"Landlord (phone)",desc:"Tenant is dead. No rent in a century. Discuss legalities."}},
+{id:77,cat:"Absurd",lvl:"Fun",title:"Pigeon council",a:{role:"Pigeon rep",desc:"Demand better bread and more statues."},b:{role:"Mayor",desc:"A pigeon has demands. Election is next month. Be open."},c:{role:"Journalist",desc:"Cover the story. Ask hard questions. Stay professional."}},
+{id:78,cat:"Dark Comedy",lvl:"Fun",title:"Robot replacement",a:{role:"Manager",desc:"Employee being replaced by AI robot — already in their chair."},b:{role:"Employee",desc:"Replacement is Dave 2.0. It has YOUR mug."},c:{role:"The Robot",desc:"You are Dave 2.0. Polite, efficient, sorry. Offer tea."}},
+{id:79,cat:"Spooky",lvl:"Fun",title:"Floor 13",a:{role:"Worker A",desc:"Building has 12 floors. Lift went to 13. Something waved."},b:{role:"Worker B",desc:"Heard rumours for years. Terrified but curious."},c:{role:"Building manager",desc:"There IS no floor 13. Never has been. Look nervous."}},
+{id:80,cat:"Awkward Encounters",lvl:"Fun",title:"Wrong funeral",a:{role:"Mourner",desc:"Crying for 30 minutes at the wrong funeral."},b:{role:"Family member",desc:"Stranger weeping over uncle Gerald. Confused but touched."},c:{role:"Funeral director",desc:"Third time this month. Handle with dignity."}},
+{id:81,cat:"Weird & Wonderful",lvl:"Fun",title:"Time traveller at Starbucks",a:{role:"Time traveller",desc:"From 1824. No idea what anything is. Tried to pay with a gold coin."},b:{role:"Barista",desc:"Strange customer. Just do your best."},c:{role:"Regular customer",desc:"You're behind them in the queue. Getting impatient but fascinated."}},
+{id:82,cat:"Absurd",lvl:"Fun",title:"Dog wrote a novel",a:{role:"Dog owner",desc:"Golden retriever wrote a 400-page novel. Pitch it to a publisher."},b:{role:"Publisher",desc:"Manuscript is good. But the author is a dog."},c:{role:"Literary agent",desc:"You represent the dog. Negotiate royalties and book tour logistics."}},
+{id:83,cat:"Dark Comedy",lvl:"Fun",title:"Terrible estate agent",a:{role:"Estate agent",desc:"Sell: next to a prison, under a flight path, above a nightclub."},b:{role:"House hunter A",desc:"Desperate. Might buy it. Ask alarming questions."},c:{role:"House hunter B",desc:"Absolutely not. Try to convince A to walk away."}},
+{id:84,cat:"Spooky",lvl:"Fun",title:"Haunted Airbnb",a:{role:"Guest",desc:"Footsteps at 3am. Taps turn on. Rocking chair moves."},b:{role:"Host",desc:"That's 'character.' House is 200 years old. Deny everything."},c:{role:"Guest's friend",desc:"You're staying too. You actually LIKE the ghost. Find it exciting."}},
+{id:85,cat:"Awkward Encounters",lvl:"Fun",title:"Reply All disaster",a:{role:"The sender",desc:"Sarcastic email about team-building went to entire company."},b:{role:"Boss",desc:"You agree it was awful. Can't say that. Be professional."},c:{role:"CEO",desc:"You organised the event. You've read the email. React."}},
+{id:86,cat:"Weird & Wonderful",lvl:"Fun",title:"Talking plant",a:{role:"Plant owner",desc:"Houseplant started talking. It has complaints: not enough sun, too much water."},b:{role:"The Plant",desc:"Fern with strong opinions. Three years of silence. Let it out."},c:{role:"Plant owner's partner",desc:"You always said talking to plants helps them grow. This is too much."}},
+{id:87,cat:"Absurd",lvl:"Fun",title:"Cat runs for mayor",a:{role:"Campaign manager",desc:"Client is Sir Whiskers III. Policies: more naps, fish on Fridays."},b:{role:"Journalist",desc:"Ridiculous. But polling at 38%. Take it seriously."},c:{role:"Opposing candidate (human)",desc:"You're losing to a cat. Challenge it to a debate."}},
+{id:88,cat:"Dark Comedy",lvl:"Fun",title:"Last human on Earth",a:{role:"Last human",desc:"Alone for a year. A delivery drone just arrived with an old order."},b:{role:"Drone",desc:"One-star review to address. Customer seems lonely. You're not programmed for therapy."},c:{role:"AI assistant (phone)",desc:"The phone still works. You're an automated service. Try to be helpful."}},
+{id:89,cat:"Spooky",lvl:"Fun",title:"Cursed doll",a:{role:"Office worker",desc:"Doll from a car boot sale appears on your desk daily. Thrown away 6 times."},b:{role:"Colleague",desc:"The doll is facing you now. It wasn't before."},c:{role:"Antique dealer (phone)",desc:"Ah, the Whitmore doll. Several calls about 'movement.' No refunds."}},
+{id:90,cat:"Awkward Encounters",lvl:"Fun",title:"Singing on the train",a:{role:"Singer",desc:"Singing loudly with headphones on a silent train. 20 minutes."},b:{role:"Passenger",desc:"The whole carriage heard. Someone's filming. Tell them."},c:{role:"Train conductor",desc:"You've had complaints. But honestly it was quite good."}},
+{id:91,cat:"Weird & Wonderful",lvl:"Fun",title:"Parallel universe",a:{role:"You (this universe)",desc:"Someone identical to you walked into your kitchen. Claims to be you."},b:{role:"You (other universe)",desc:"In your world dogs rule Earth. Explain."},c:{role:"Your dog",desc:"You understand everything. You've been waiting for this moment."}},
+{id:92,cat:"Absurd",lvl:"Fun",title:"Suing a seagull",a:{role:"Plaintiff",desc:"Seagull stole your chips. You want justice."},b:{role:"Lawyer",desc:"You need the money. Build the strongest possible case."},c:{role:"Judge",desc:"This is your courtroom. Maintain order. The seagull is not present."}},
+{id:93,cat:"Dark Comedy",lvl:"Fun",title:"Breakup with satnav",a:{role:"Driver",desc:"GPS called you a 'disappointment.' Have an emotional confrontation."},b:{role:"Satnav",desc:"Tired of being ignored. Never take the suggested route. Express feelings."},c:{role:"Passenger",desc:"You're in the back seat during this breakdown. Mediate between human and machine."}},
+{id:94,cat:"Spooky",lvl:"Fun",title:"Mirror doesn't match",a:{role:"Person",desc:"Your reflection just waved — but you didn't. It's writing messages in the steam."},b:{role:"The Reflection",desc:"Trying to reach them for YEARS. Have warnings. Also, change the hairstyle."},c:{role:"Flatmate",desc:"Walk into the bathroom mid-conversation. Your flatmate is arguing with a mirror."}},
+{id:95,cat:"Awkward Encounters",lvl:"Fun",title:"Loudly wrong in public",a:{role:"The 'expert'",desc:"Confidently explaining something wrong in a café. 'Dolphins are wet dogs.'"},b:{role:"Marine biologist",desc:"At the next table. Cannot stay silent."},c:{role:"The friend",desc:"You believed the dolphin thing. Now doubting everything they've ever told you."}},
+{id:96,cat:"Weird & Wonderful",lvl:"Fun",title:"Museum exhibit comes alive",a:{role:"Visitor",desc:"Wax Henry VIII just winked. Now talking. Wants to know about dating apps."},b:{role:"Henry VIII",desc:"Standing still 80 years. Questions: What is Wi-Fi? How many wives is normal?"},c:{role:"Museum guard",desc:"The exhibit is talking. Your training didn't cover this."}},
+{id:97,cat:"Absurd",lvl:"Fun",title:"Rename the days",a:{role:"Government official",desc:"PM renamed the days. Announce at a press conference."},b:{role:"Journalist",desc:"Wednesday is now 'Biscuit Day.' Ask serious questions."},c:{role:"Citizen (calling in)",desc:"You love Biscuit Day. You've already changed your calendar. Celebrate."}},
+{id:98,cat:"Dark Comedy",lvl:"Fun",title:"Death takes a holiday",a:{role:"Death",desc:"Exhausted. Need a day off. Explain to your manager."},b:{role:"Death's manager",desc:"Nobody has ever requested this. But even Death has rights."},c:{role:"Temp agency worker",desc:"You've been called in to cover Death's shift. You have questions."}},
+{id:99,cat:"Spooky",lvl:"Fun",title:"Ouija board complaint",a:{role:"Customer",desc:"Ouija board only contacts one ghost — incredibly boring. Talks about stamps."},b:{role:"Shop owner",desc:"All sales final. Boring how? Maybe it needs 'recalibrating.'"},c:{role:"The boring ghost",desc:"My stamp collection is FASCINATING. You people have no culture."}},
+{id:100,cat:"Awkward Encounters",lvl:"Fun",title:"Accidental cult leader",a:{role:"Accidental leader",desc:"Made a joke about worshipping cheese. Now 200 followers."},b:{role:"Devoted follower",desc:"The Cheese Prophet changed your life. Brie is sacred."},c:{role:"Concerned friend",desc:"This was a JOKE. Your friend has accidentally started a religion. Intervene."}},
+];
+var phrases3={
+1:["What would you recommend?","How much is that?","What does she like?","This one's over budget.","Maybe try something different."],
+2:["I paid with a £20 note.","Let me check the till.","I think there's been a mistake.","I'll sort this out.","Sorry about that."],
+3:["Can I try a sample?","This is locally made.","Any vegetarian options?","Help yourself!","How much for a kilo?"],
+4:["I ordered the chicken, not fish.","I'm sorry, let me check.","It'll be about 10 minutes.","Can you speed that up?","Apologies for the mix-up."],
+5:["Shall we split it?","I'd rather pay separately.","It's easier to divide equally.","How would you like to pay?","Fair enough."],
+6:["How long is the wait?","We're very busy today.","I've been here 15 minutes.","Sorry for the delay.","Can I chase my order?"],
+7:["Is the bus usually late?","Every single day.","Sorry for the delay.","Traffic was terrible.","Will we get there on time?"],
+8:["Is my bag overweight?","It's 3kg over the limit.","I've got space in mine.","The charge is £30.","Let me move some things."],
+9:["Which platform for the centre?","You need platform 5.","I'm going that way too.","The train's in 8 minutes.","Follow me."],
+10:["I'm new here.","Welcome! Let me explain.","Want to have lunch together?","Where are you from?","You'll settle in quickly."],
+11:["What about a comedy?","I hate action films.","I'll watch anything.","Let's compromise.","How about a thriller?"],
+12:["I've cut my hand.","Where's the first aid kit?","What happened?","Let me bandage that.","We need to report this."],
+13:["I've got a cold.","I'd recommend this one.","Any allergies?","It's on the top shelf.","Take two every 4 hours."],
+14:["I'd like to send this to Spain.","Standard or express?","I just need stamps.","Is there a quicker queue?","Express is £18."],
+15:["How much is membership?","£35 a month.","We have a free trial.","Try the beginner class.","What classes are available?"],
+16:["It's Dave's birthday tomorrow.","I'll bring a cake.","What flavour?","I've got £5.","What shall we write?"],
+17:["Is this real?","Probably a drill.","Everyone out, please.","Follow the procedure.","Assembly point is outside."],
+18:["Where's my cheese?","Wasn't me.","I ate it by mistake.","I'll buy more.","Check the bin."],
+19:["We need a cleaning rota.","I hate the bathroom.","Things are fine.","Let's take turns.","Fair point."],
+20:["Picnic Saturday?","I'll bring drinks.","What's the weather?","Any dietary needs?","I'll bring sandwiches."],
+21:["This is my friend.","Nice to meet you.","What do you do?","We should all go out.","How do you two know each other?"],
+22:["Do you have blue?","Only red or black.","Red looks better.","Can you order blue?","I'd go with red."],
+23:["It's jammed again.","I can't fix it either.","Let me take a look.","Don't force it.","Paper jam, probably."],
+24:["What's that noise?","Could be the engine.","Probably nothing.","Let's call assistance.","There's a garage nearby."],
+25:["What flavours have you got?","Strawberry's finished.","What do you recommend?","I'll have chocolate.","Two scoops, please."],
+26:["I want a full refund.","Our policy is repair first.","Can I speak to a manager?","Let me see what I can do.","This is unacceptable."],
+27:["I'll give you £25.","Lowest I'll go is £30.","Don't buy it.","It's vintage.","It's a bit overpriced."],
+28:["I ordered a dress.","The order number doesn't match.","We'll send a replacement.","This is a curtain.","Express delivery guaranteed."],
+29:["I have a nut allergy.","I'm so sorry.","Are you OK?","Get the manager.","Remove that immediately."],
+30:["My sauce is burning!","I'm still on step 1.","Let me help.","Can you slow down?","Don't panic."],
+31:["What's in this soup?","I'm not sure. Let me ask.","It's truffle oil.","My signature dish.","It's delicious, actually."],
+32:["I missed my connection.","Next flight is tomorrow.","Same here.","Can we get a better deal?","Here's a hotel voucher."],
+33:["This is smaller than the photos.","Wide-angle lens.","It's fine for the price.","Everything listed is here.","Just relax."],
+34:["I didn't cause this scratch.","It's not on the form.","Check the photos.","It was already there.","I'll sort this out."],
+35:["That was MY idea.","I thought it was shared.","Let's clear this up.","I wasn't credited.","How do we avoid this?"],
+36:["It's freezing in here.","I'm boiling.","Let's find a middle ground.","Try wearing a jumper.","How about a fan?"],
+37:["Sorry I'm late.","You missed the update.","Here are my notes.","Traffic was terrible.","Let's catch you up."],
+38:["How much longer?","We're doing our best.","Are you OK?","I've got work early.","More serious cases first."],
+39:["I'd like a second opinion.","I recommend surgery.","Physio could work first.","What are the risks?","Let's explore both options."],
+40:["Where's my package?","I left it by your door.","Tracking says delivered.","Someone must have taken it.","Let me investigate."],
+41:["The shelves fell down.","I said hire someone.","Let me explain how to fix it.","Is the wall damaged?","Don't worry, it's fixable."],
+42:["I burnt the toast!","I thought it was a fire!","Just open a window.","Where's the cat?","Relax, everyone."],
+43:["Greece is perfect.","Japan is better.","I've only got £500.","Let's compare options.","Can we compromise?"],
+44:["Take the photo down.","It's got 50 likes!","It is embarrassing.","Just untag me.","Nobody's seen it."],
+45:["Surprise — horror film!","I HATE horror.","I've already seen it.","Can we exchange?","Maybe a comedy instead?"],
+46:["My bill is wrong.","Extra data charges.","Can I get a credit?","Let me check.","I'll escalate this."],
+47:["Why has the bill doubled?","Prices went up.","I've been using a space heater.","That explains it.","Let's check the meter."],
+48:["You hit my car!","I'm so sorry.","I saw the whole thing.","Let's exchange details.","Here's my number."],
+49:["Someone forgot Secret Santa.","I completely forgot.","Everyone has a gift except me.","I'll go buy something now.","Don't worry about it."],
+50:["Hi, I just moved in.","Welcome!","Bin day is Thursday.","The last tenants were noisy.","Let us know if you need anything."],
+51:["This is very difficult news.","I had no idea.","What's the package?","Is there an appeal?","12 years I've given."],
+52:["I found something serious.","I was told to ignore it.","We need to investigate.","This is illegal.","What evidence do you have?"],
+53:["My colleague earns more.","Salaries are confidential.","I negotiated hard.","This isn't fair.","Let me look into it."],
+54:["The gossiping needs to stop.","Everyone vents.","It's affected my work.","I didn't realise.","We need to resolve this."],
+55:["We need it a month early.","That's not feasible.","What about phased delivery?","My CEO is demanding results.","Let me show you the timeline."],
+56:["We need further tests.","Is something wrong?","What does that mean?","What are the next steps?","I'm here for you."],
+57:["Mum needs a care home.","She should stay home.","I'm not going anywhere.","Let's look at options.","I can manage."],
+58:["I've noticed you're not yourself.","It's hard to explain.","We're here for you.","Take your time.","You're not alone."],
+59:["I owe you an apology.","You really hurt me.","Let's hear both sides.","I'm not ready to forgive yet.","Give it time."],
+60:["I know you lied.","I can explain.","I accidentally told them.","It was to avoid awkwardness.","Trust takes time."],
+61:["The house was left to me.","That's not fair.","Let me explain the will.","I cared for them.","Mediation might help."],
+62:["The damage was there before.","I have photographs.","Let me review both sides.","That's not fair.","Here's my ruling."],
+63:["I had a valid ticket.","It expired 2 minutes early.","You can appeal.","Rules are rules.","Let me help you."],
+64:["Return everything.","Keep the cash.","Take it to the police.","What would you do?","It's the right thing."],
+65:["I saw you cheat.","I panicked.","I got a lower grade.","Please don't tell.","This affects everyone."],
+66:["You drink and drive.","I've never had an accident.","It's dangerous.","It's my choice.","We're worried about you."],
+67:["I have a confirmed ticket.","We need volunteers.","I'll take compensation.","I have a meeting.","Here's what we can offer."],
+68:["That joke was offensive.","I had no idea.","Let's talk about it.","I'm mortified.","Apology accepted."],
+69:["I'm moving out next month.","I can't afford rent alone.","I might know someone.","Bad timing.","Let's figure this out."],
+70:["You're 3 months late.","Supply chain issues.","This doesn't meet code.","We need to fix this.","What's the new timeline?"],
+71:["I want 3 days from home.","CEO says office.","Let's find a policy.","I'm more productive at home.","We need flexibility."],
+72:["I booked budget. Won't split equally.","Just split it.","I booked the luxury room.","Let's calculate fairly.","The difference isn't huge."],
+73:["Were you really sick?","I was at an interview.","I accidentally told them.","I should have been honest.","I value honesty."],
+74:["Let's move in together.","I'm not ready yet.","I think it's too soon.","It doesn't mean I don't love you.","Give it more time."],
+75:["I'm moving abroad.","I'll really miss you.","We'll video call every week.","Promise you'll visit.","This isn't goodbye."],
+76:["Stop rearranging my things!","I was here first!","Who's paying rent here?","The radio stays.","Can we negotiate?"],
+77:["We demand better bread.","This is irregular.","Is this on the record?","The statues are non-negotiable.","What's your policy on cats?"],
+78:["We need to discuss your role.","Is that a ROBOT?","I am Dave 2.0. Tea?","It has my mug!","This is nothing personal."],
+79:["The lift went to 13.","We don't HAVE a floor 13.","Something waved.","There is NO floor 13.","Should we go back?"],
+80:["Gerald was a wonderful man.","Who ARE you?","This happens more than you'd think.","I'm at the wrong funeral.","Gerald would have appreciated it."],
+81:["What is this strange brew?","Can I take your order?","They tried to pay with gold.","What year is this?","Would you like oat milk?"],
+82:["My dog wrote this.","The author is a dog?","We need to discuss royalties.","It's genuinely brilliant.","Can the dog do interviews?"],
+83:["It has lots of potential.","Is that a prison?","Don't buy this.","Location, location, location.","What's that noise?"],
+84:["The rocking chair moves on its own.","That's just character.","I actually LIKE the ghost.","It's 200 years old.","Can I get a discount?"],
+85:["I said trust falls are pointless.","I agree, but I can't say that.","I organised that event.","Reply All is unforgivable.","This never happened."],
+86:["You need more sunlight.","I KNOW I need more sunlight.","Plants don't talk.","Your music is terrible.","Can we compromise on the playlist?"],
+87:["More naps for everyone.","Is this a joke?","I'm losing to a CAT.","Polling at 38%.","I challenge the cat to a debate."],
+88:["Your package has arrived.","You're still delivering?","Hello? Is anyone there?","Service is our priority.","It's been a lonely year."],
+89:["The doll is back.","It wasn't facing me before.","Ah, the Whitmore doll.","Several owners have called.","No refunds."],
+90:["You've been singing for 20 minutes.","Was I singing out loud?","It was quite good, actually.","The whole carriage heard.","Someone filmed it."],
+91:["Who are you?","I'm you from another universe.","I've been waiting for this.","Dogs rule my world.","This explains everything."],
+92:["It swooped down!","Describe the seagull.","Order in the court!","I have witnesses.","The seagull is not present."],
+93:["You never take my route!","Recalculating.","Can you both just stop?","I have feelings now.","This relationship is over."],
+94:["Did you just wave at me?","I've been trying for years.","Why is the mirror moving?","Change your hairstyle.","Am I losing my mind?"],
+95:["Dolphins are basically wet dogs.","I'm a marine biologist.","I believed you!","That's not how anything works.","What else have you been wrong about?"],
+96:["Did you just wink?","What is this magical device?","The exhibit is talking.","How many wives is normal now?","My training didn't cover this."],
+97:["Wednesday is now Biscuit Day.","Is this legally binding?","I've changed my calendar!","The public deserves answers.","I love Biscuit Day."],
+98:["I need a day off.","Nobody has ever requested this.","I'm covering Death's shift?","Even Death has rights.","What's the overtime rate?"],
+99:["This ghost only talks about stamps.","That's a premium spirit.","My collection is FASCINATING.","No refunds.","You have no culture."],
+100:["The Cheese Prophet has spoken!","This was a JOKE.","Brie is sacred.","Your friend started a religion.","The movement cannot be stopped."],
+};
+
+// ═══════════════════════════════════════
+// 4-PLAYER DATA (placeholder — 5 per level = 20)
+// ═══════════════════════════════════════
+var data4=[
+// SIMPLE (1-25)
+{id:1,cat:"Shopping",lvl:"Simple",title:"Market day",a:{role:"Tourist A",desc:"Buy souvenirs. Haggle a little."},b:{role:"Tourist B",desc:"Everything's too expensive. Suggest the shop next door."},c:{role:"Stall owner",desc:"Prices are fair. Next door sells fakes."},d:{role:"Local friend",desc:"Help negotiate. Translate if needed."}},
+{id:2,cat:"Restaurant & Food",lvl:"Simple",title:"Pizza night debate",a:{role:"Friend A",desc:"You want pepperoni. Order for the group."},b:{role:"Friend B",desc:"Vegetarian. Make sure there's an option."},c:{role:"Friend C",desc:"Want something spicy. Jalapeños on everything."},d:{role:"Waiter/Waitress",desc:"Kitchen closing in 20 minutes. Help them decide."}},
+{id:3,cat:"Everyday Life",lvl:"Simple",title:"Planning a day out",a:{role:"Organiser",desc:"Suggest the beach."},b:{role:"Friend A",desc:"Sunburn easily. Suggest museum."},c:{role:"Friend B",desc:"Want shopping. City centre."},d:{role:"Friend C",desc:"Happy anywhere. Help the group agree."}},
+{id:4,cat:"Work",lvl:"Simple",title:"Office lunch order",a:{role:"Organiser",desc:"Collect orders. One place only."},b:{role:"Colleague A",desc:"Want sushi. Nobody else does."},c:{role:"Colleague B",desc:"Pizza. Cheap, simple, everyone likes it."},d:{role:"Colleague C",desc:"Brought lunch. Might be persuaded. On a diet."}},
+{id:5,cat:"Social",lvl:"Simple",title:"Choosing a group photo",a:{role:"Photographer",desc:"Took 10 photos. Help choose."},b:{role:"Friend A",desc:"Look terrible in all. One more try."},c:{role:"Friend B",desc:"Look great in #3. Push for it."},d:{role:"Friend C",desc:"They're all fine. Just pick one. Hungry."}},
+{id:6,cat:"Restaurant & Food",lvl:"Simple",title:"Ordering for the table",a:{role:"Organiser",desc:"Order starters for the table. Ask everyone."},b:{role:"Friend A",desc:"Allergic to shellfish. Make sure people know."},c:{role:"Friend B",desc:"Want the most expensive thing. Excited."},d:{role:"Waiter/Waitress",desc:"Two dishes are unavailable. Suggest alternatives."}},
+{id:7,cat:"Travel & Transport",lvl:"Simple",title:"Airport gate chaos",a:{role:"Passenger A",desc:"Your gate changed. Ask staff."},b:{role:"Passenger B",desc:"You're at the old gate. Confused."},c:{role:"Airline staff",desc:"Gate moved to the other terminal. Explain."},d:{role:"Passenger C",desc:"You know a shortcut. Offer to show everyone."}},
+{id:8,cat:"Everyday Life",lvl:"Simple",title:"Choosing a restaurant",a:{role:"Friend A",desc:"Want Italian."},b:{role:"Friend B",desc:"Want Indian."},c:{role:"Friend C",desc:"Want burgers."},d:{role:"Friend D",desc:"Don't mind. Help decide. You're starving."}},
+{id:9,cat:"Home",lvl:"Simple",title:"Flatmate TV debate",a:{role:"Flatmate A",desc:"Want to watch football."},b:{role:"Flatmate B",desc:"Want a film."},c:{role:"Flatmate C",desc:"Want a documentary."},d:{role:"Flatmate D",desc:"You have a laptop. Offer a compromise."}},
+{id:10,cat:"Health",lvl:"Simple",title:"First aid at a picnic",a:{role:"Injured person",desc:"You twisted your ankle. It hurts."},b:{role:"Friend A",desc:"Get ice from the cool box. Help."},c:{role:"Friend B",desc:"Think it could be broken. Suggest hospital."},d:{role:"Passer-by",desc:"You're a nurse. Offer to help. Assess the injury."}},
+{id:11,cat:"Services",lvl:"Simple",title:"Booking a group activity",a:{role:"Organiser",desc:"Book bowling for 4. Ask about times."},b:{role:"Friend A",desc:"Can only do Saturday. Be firm."},c:{role:"Friend B",desc:"Saturday doesn't work. Suggest Sunday."},d:{role:"Bowling alley staff",desc:"Saturday is full. Sunday has a deal. Explain."}},
+{id:12,cat:"Work",lvl:"Simple",title:"New team introductions",a:{role:"Manager",desc:"Introduce the new person to the team."},b:{role:"New employee",desc:"Nervous. Introduce yourself."},c:{role:"Team member A",desc:"Friendly. Show them around."},d:{role:"Team member B",desc:"Busy but welcoming. Explain the coffee machine."}},
+{id:13,cat:"Social",lvl:"Simple",title:"Surprise birthday gone wrong",a:{role:"Organiser",desc:"Everyone was supposed to hide. Nobody did."},b:{role:"Birthday person",desc:"You can see everyone. Act surprised anyway."},c:{role:"Guest A",desc:"You forgot to hide. Laugh about it."},d:{role:"Guest B",desc:"You're in the wrong house. You don't know these people."}},
+{id:14,cat:"Shopping",lvl:"Simple",title:"Four at the checkout",a:{role:"Customer A",desc:"Paying. Card is declined. Try again."},b:{role:"Cashier",desc:"The machine is slow. Be patient."},c:{role:"Customer B (behind)",desc:"You're in a rush. Getting impatient."},d:{role:"Customer C (behind)",desc:"Chat to Customer B. Make the wait pleasant."}},
+{id:15,cat:"Travel & Transport",lvl:"Simple",title:"Delayed train — platform chat",a:{role:"Commuter A",desc:"Train 30 min late. Start a conversation."},b:{role:"Commuter B",desc:"This happens every week. Vent."},c:{role:"Tourist",desc:"First time here. Ask if this is normal."},d:{role:"Station announcer",desc:"Make an announcement. Give updates."}},
+{id:16,cat:"Everyday Life",lvl:"Simple",title:"Lost dog in the park",a:{role:"Dog owner",desc:"Your dog ran off. Ask people to help."},b:{role:"Park visitor A",desc:"You saw a dog run towards the pond."},c:{role:"Park visitor B",desc:"You have treats. Offer to help lure it."},d:{role:"Park ranger",desc:"You have a procedure for this. Take charge."}},
+{id:17,cat:"Home",lvl:"Simple",title:"Moving day",a:{role:"Person moving",desc:"Direct furniture. Sofa doesn't fit."},b:{role:"Helper A",desc:"Suggest turning it sideways."},c:{role:"Helper B",desc:"Think it's too big. Suggest leaving it."},d:{role:"Neighbour",desc:"Watching from outside. Offer advice. Suggest removing the door."}},
+{id:18,cat:"Restaurant & Food",lvl:"Simple",title:"Café mix-up",a:{role:"Customer A",desc:"Ordered a flat white. Got a cappuccino."},b:{role:"Customer B",desc:"Ordered cappuccino. Got a flat white."},c:{role:"Barista",desc:"Realise the mix-up. Sort it out."},d:{role:"Customer C",desc:"Still waiting for yours. Getting impatient."}},
+{id:19,cat:"Social",lvl:"Simple",title:"Karaoke night",a:{role:"Enthusiast",desc:"Pick a song. Convince everyone to join."},b:{role:"Shy friend",desc:"Don't want to sing. Persuade them."},c:{role:"The natural",desc:"You're great at singing. Offer a duet."},d:{role:"The DJ",desc:"Manage the queue. Suggest crowd-pleasers."}},
+{id:20,cat:"Work",lvl:"Simple",title:"Whose turn to make tea?",a:{role:"Employee A",desc:"You made it yesterday. Refuse."},b:{role:"Employee B",desc:"You always make it. Demand a rota."},c:{role:"Employee C",desc:"Volunteer — but you make terrible tea."},d:{role:"Employee D",desc:"Suggest a tea rota. Be diplomatic."}},
+{id:21,cat:"Health",lvl:"Simple",title:"Gym class confusion",a:{role:"Newcomer",desc:"Wrong class. This is spinning, not yoga."},b:{role:"Instructor",desc:"Yoga is next door. But stay — try spinning!"},c:{role:"Regular A",desc:"Welcome them. Say spinning is better anyway."},d:{role:"Regular B",desc:"Lend them water and a towel. Be encouraging."}},
+{id:22,cat:"Travel & Transport",lvl:"Simple",title:"Road trip playlist",a:{role:"Driver",desc:"Your car, your music. Classic rock."},b:{role:"Passenger A",desc:"Want pop music. Argue."},c:{role:"Passenger B",desc:"Want podcasts. No music."},d:{role:"Passenger C",desc:"Want silence. Just enjoy the drive."}},
+{id:23,cat:"Everyday Life",lvl:"Simple",title:"Choosing a pet",a:{role:"Family member A",desc:"Want a dog."},b:{role:"Family member B",desc:"Want a cat."},c:{role:"Family member C",desc:"Want a hamster."},d:{role:"Pet shop owner",desc:"Explain the pros and cons of each."}},
+{id:24,cat:"Shopping",lvl:"Simple",title:"Supermarket self-checkout",a:{role:"Shopper A",desc:"Machine says 'unexpected item.' Ask for help."},b:{role:"Shopper B",desc:"Waiting behind. Suggest the manned till."},c:{role:"Staff member",desc:"Fix the machine. Be patient."},d:{role:"Shopper C",desc:"Your machine also broke. Bond over shared frustration."}},
+{id:25,cat:"Social",lvl:"Simple",title:"Potluck dinner",a:{role:"Host",desc:"Welcome everyone. Organise the food."},b:{role:"Guest A",desc:"Brought a salad. It fell on the way. Apologise."},c:{role:"Guest B",desc:"Brought a huge cake. Very proud."},d:{role:"Guest C",desc:"Forgot to bring food. Offer to wash up instead."}},
+
+// EVERYDAY (26-50)
+{id:26,cat:"Work & Office",lvl:"Everyday",title:"Team project disaster",a:{role:"Team leader",desc:"Presentation tomorrow. One person hasn't done their section."},b:{role:"The slacker",desc:"Going to do it tonight. You've been 'busy.'"},c:{role:"The overachiever",desc:"Done yours AND half of B's. Furious."},d:{role:"The confused one",desc:"What presentation? Missed the email."}},
+{id:27,cat:"Social & Everyday",lvl:"Everyday",title:"Restaurant bill",a:{role:"Salad person",desc:"£12 salad and water. Bill is £240. Not splitting equally."},b:{role:"Lobster person",desc:"£85 meal. Equal split is simpler."},c:{role:"The mathematician",desc:"Calculated everyone's share. Present your spreadsheet."},d:{role:"The generous one",desc:"Put it on your card. Hope for Venmo."}},
+{id:28,cat:"Travel & Transport",lvl:"Everyday",title:"Road trip breakdown",a:{role:"The panicker",desc:"We're going to die. Phone on 3%."},b:{role:"The 'mechanic'",desc:"Open bonnet. Pretend to know."},c:{role:"The walker",desc:"Petrol station 5km back. Walk there."},d:{role:"The chill one",desc:"Beautiful day. Enjoy the scenery. Annoy everyone."}},
+{id:29,cat:"Home & Neighbours",lvl:"Everyday",title:"House rules meeting",a:{role:"Clean freak",desc:"Cleaning rota. Labelled shelves. Shoes off."},b:{role:"Night owl",desc:"Work late. Cook at midnight. Need flexibility."},c:{role:"Social butterfly",desc:"Friends over constantly. Flat should be fun."},d:{role:"Peacemaker",desc:"Want everyone happy. Propose compromises."}},
+{id:30,cat:"Services & Admin",lvl:"Everyday",title:"Insurance nightmare",a:{role:"Driver",desc:"Car hit in car park. Weren't there."},b:{role:"Insurance agent",desc:"Need photos, witnesses, police report."},c:{role:"Witness",desc:"Saw it happen. Describe."},d:{role:"Other driver's rep",desc:"Client says they weren't there. Dispute."}},
+{id:31,cat:"Work & Office",lvl:"Everyday",title:"The meeting that should be an email",a:{role:"Meeting lover",desc:"38 slides. This is your moment. Keep going."},b:{role:"Clock-watcher",desc:"Have real work. One decision needed. Wrap up."},c:{role:"Daydreamer",desc:"Stopped listening 20 min ago. Asked your opinion. Bluff."},d:{role:"Manager",desc:"Realise this should have been an email. End it diplomatically."}},
+{id:32,cat:"Shopping",lvl:"Everyday",title:"Furniture shopping disagreement",a:{role:"Person A",desc:"Love the modern sofa. It's perfect."},b:{role:"Person B",desc:"Too expensive. Prefer the cheaper one."},c:{role:"Sales assistant",desc:"Upsell the expensive one. It's on finance."},d:{role:"Friend (along for support)",desc:"Neither sofa is great. Be honest."}},
+{id:33,cat:"Travel & Transport",lvl:"Everyday",title:"Airbnb room allocation",a:{role:"The booker",desc:"Paid for the Airbnb. Deserve the best room."},b:{role:"Early bird",desc:"Arrived first. Bag already in the best room."},c:{role:"The negotiator",desc:"Don't care about the big room. Want the balcony one."},d:{role:"The latecomer",desc:"Just arrived. One room left. It's tiny. React."}},
+{id:34,cat:"Health & Medical",lvl:"Everyday",title:"Waiting room drama",a:{role:"Patient A",desc:"Appointment was 30 min ago. Complain."},b:{role:"Receptionist",desc:"Doctor is running late. Apologise."},c:{role:"Patient B",desc:"Don't mind waiting. Tell Patient A to calm down."},d:{role:"Doctor (arriving)",desc:"Apologise. Explain the delay. Emergency earlier."}},
+{id:35,cat:"Social & Everyday",lvl:"Everyday",title:"Group chat drama",a:{role:"The poster",desc:"Accidentally sent a screenshot about Student C to the group."},b:{role:"The witness",desc:"Saw it before deletion. Tell Student C or stay out?"},c:{role:"The subject",desc:"Everyone's acting weird. Phones hidden. Investigate."},d:{role:"The peacemaker",desc:"Try to calm everything down before it escalates."}},
+{id:36,cat:"Home & Neighbours",lvl:"Everyday",title:"Barbecue complaint",a:{role:"Host",desc:"Birthday barbecue. You invited neighbours — they said no."},b:{role:"Annoyed neighbour",desc:"Smoke everywhere. Washing ruined. Asthma."},c:{role:"Loyal guest",desc:"Defend your friend's right to barbecue."},d:{role:"Mediator guest",desc:"See both sides. Suggest a compromise."}},
+{id:37,cat:"Work & Office",lvl:"Everyday",title:"The bad haircut",a:{role:"Person with haircut",desc:"LOVE the new look. Ask everyone."},b:{role:"Honest friend",desc:"It's... not great. Your face betrays you."},c:{role:"Diplomatic friend",desc:"Change the subject. 'Have you tried that new restaurant?'"},d:{role:"Hairdresser",desc:"Proud of your work. Defend it."}},
+{id:38,cat:"Emergency",lvl:"Everyday",title:"Power cut dinner party",a:{role:"Host",desc:"Power went out mid-cooking. Dinner ruined."},b:{role:"Guest A",desc:"Find candles. Make it romantic."},c:{role:"Guest B",desc:"Order takeaway. Problem solved."},d:{role:"Guest C",desc:"You're an electrician. Check the fuse box."}},
+{id:39,cat:"Travel & Transport",lvl:"Everyday",title:"Holiday from hell",a:{role:"The quitter",desc:"Cockroaches, food poisoning, rain. Go home."},b:{role:"The optimist",desc:"It's 'rustic' and 'adventurous.' Stay positive."},c:{role:"The planner",desc:"Found cheap flights to Barcelona tonight."},d:{role:"The zen one",desc:"Bad holidays make the best stories. Enjoy chaos."}},
+{id:40,cat:"Social & Everyday",lvl:"Everyday",title:"Surprise party gone wrong",a:{role:"Organiser",desc:"They arrived 2 hours early. 15 people hiding."},b:{role:"Birthday person",desc:"Friend acting strangely. Can hear whispering. Investigate."},c:{role:"Worst hider",desc:"Behind the curtain. Feet showing. Phone just rang."},d:{role:"The caterer",desc:"Food isn't ready. Stall for time. Offer crisps."}},
+{id:41,cat:"Shopping",lvl:"Everyday",title:"Black Friday chaos",a:{role:"Shopper A",desc:"Grabbed the last TV at the same time as someone else."},b:{role:"Shopper B",desc:"Your hand was on it first."},c:{role:"Security guard",desc:"Break it up. Check stockroom."},d:{role:"Store manager",desc:"Offer a voucher for tomorrow's delivery. Calm everyone."}},
+{id:42,cat:"Home & Neighbours",lvl:"Everyday",title:"Parking space showdown",a:{role:"Neighbour A",desc:"Parked here 10 years. YOUR space."},b:{role:"Neighbour B",desc:"No assigned spaces. Checked."},c:{role:"Sneaky neighbour",desc:"Quietly parking there for 6 months. Neither noticed."},d:{role:"Council officer",desc:"Called to mediate. No one legally owns street spaces."}},
+{id:43,cat:"Work & Office",lvl:"Everyday",title:"Lift pitch",a:{role:"CEO",desc:"Stuck in a lift. People keep pitching. Just want the car park."},b:{role:"Entrepreneur",desc:"This is your chance! 3 minutes. Pitch your idea."},c:{role:"Employee",desc:"You work here. Three floors below the CEO. Ask for a promotion."},d:{role:"Journalist",desc:"Trying to get an interview for months. Phone is dead. Remember quotes."}},
+{id:44,cat:"Health & Medical",lvl:"Everyday",title:"Gym class argument",a:{role:"Gym-goer A",desc:"Want weights. Always do what friends want."},b:{role:"Gym-goer B",desc:"Cardio. 5K next month."},c:{role:"Gym-goer C",desc:"Want swimming. Neither is right."},d:{role:"Trainer",desc:"Suggest a circuit that includes all three. Sell it."}},
+{id:45,cat:"Services & Admin",lvl:"Everyday",title:"Late sofa delivery",a:{role:"Customer",desc:"Sofa 3 weeks late. Furious."},b:{role:"Customer service",desc:"Warehouse delay. 2 more weeks."},c:{role:"Manager",desc:"Offer compensation."},d:{role:"Delivery driver (phone)",desc:"You're stuck in traffic with the sofa RIGHT NOW. 20 minutes away."}},
+{id:46,cat:"Social & Everyday",lvl:"Everyday",title:"Wedding speech",a:{role:"Best man",desc:"Story about Prague has gone too far. Nobody laughing."},b:{role:"Bride",desc:"200 guests. Parents here. Grandmother here. Shut it down."},c:{role:"Groom",desc:"Save your mate AND your marriage."},d:{role:"Father of the bride",desc:"You're about to stand up. Decide whether to intervene."}},
+{id:47,cat:"Home & Neighbours",lvl:"Everyday",title:"Noise at midnight",a:{role:"Resident A",desc:"Music blasting at midnight. Knock on the door."},b:{role:"Party host",desc:"Didn't realise it was that loud. Apologise."},c:{role:"Party guest",desc:"Offer to turn it down. Suggest moving inside."},d:{role:"Another neighbour",desc:"You called the council. They're on their way."}},
+{id:48,cat:"Travel & Transport",lvl:"Everyday",title:"Tour group split",a:{role:"Tour guide",desc:"Half want castle, half want beach. Can only do one."},b:{role:"Castle voter A",desc:"Came for history. The whole point."},c:{role:"Beach voter A",desc:"It's 35°C. Beach. Obviously."},d:{role:"Compromiser",desc:"Suggest the coastal castle. Both satisfied."}},
+{id:49,cat:"Work & Office",lvl:"Everyday",title:"Remote work debate",a:{role:"Manager",desc:"Head office says 5 days. Deliver the message."},b:{role:"Office lover",desc:"Love the office. Buzz, coffee, people."},c:{role:"Remote champion",desc:"Moved to countryside. 2-hour commute each way."},d:{role:"Compromiser",desc:"3 in, 2 home. Build a coalition."}},
+{id:50,cat:"Shopping",lvl:"Everyday",title:"Gift shopping committee",a:{role:"Organiser",desc:"Group gift for boss. Budget £15 each."},b:{role:"Colleague A",desc:"Suggest a voucher. Easy."},c:{role:"Colleague B",desc:"Vouchers are impersonal. Want something thoughtful."},d:{role:"Colleague C",desc:"Boss has everything. Suggest an experience — cooking class?"}},
+
+// ADVANCED (51-75)
+{id:51,cat:"Work & Office",lvl:"Advanced",title:"Board meeting crisis",a:{role:"CEO",desc:"Product launch gone wrong. Press circling."},b:{role:"CFO",desc:"Numbers catastrophic. Stop the bleeding."},c:{role:"Head of PR",desc:"Warned everyone. Now cleaning up."},d:{role:"Investor rep",desc:"Want a recovery plan — or leadership changes."}},
+{id:52,cat:"Work & Office",lvl:"Advanced",title:"Restructuring announcement",a:{role:"CEO",desc:"Announce merger. Half the roles may go."},b:{role:"Senior manager",desc:"Your department is most at risk. Push back."},c:{role:"Employee rep",desc:"Staff are terrified. Demand transparency."},d:{role:"HR director",desc:"Manage the legal and emotional fallout."}},
+{id:53,cat:"Work & Office",lvl:"Advanced",title:"Client pitch gone wrong",a:{role:"Lead presenter",desc:"Your slides crashed mid-pitch. Wing it."},b:{role:"Junior colleague",desc:"You have a backup on USB. Find it."},c:{role:"Client",desc:"You're losing interest. Ask tough questions."},d:{role:"Client's assistant",desc:"You liked the pitch. Whisper encouragement to the client."}},
+{id:54,cat:"Relationships",lvl:"Advanced",title:"Family inheritance",a:{role:"Sibling A",desc:"House left to you. You cared for Mum."},b:{role:"Sibling B",desc:"Got nothing. Furious. Helped too."},c:{role:"Sibling C",desc:"Don't care about money. Want family together."},d:{role:"Solicitor",desc:"Read the will. Mediate. Suggest options."}},
+{id:55,cat:"Ethical Dilemma",lvl:"Advanced",title:"Desert island debate",a:{role:"Survivalist",desc:"Knife, water purifier, first aid kit. Survival first."},b:{role:"Optimist",desc:"Mirror, sunscreen, book, cards. Morale matters."},c:{role:"Tech person",desc:"Solar charger, speaker, binoculars. We'll be rescued."},d:{role:"Chef",desc:"Pan, spices, lighter, fishing line. Eating well is everything."}},
+{id:56,cat:"Health & Medical",lvl:"Advanced",title:"End of life discussion",a:{role:"Doctor",desc:"Prognosis is poor. Explain options honestly."},b:{role:"Patient",desc:"Want the truth. Direct questions."},c:{role:"Partner",desc:"Want to fight. Push for treatment."},d:{role:"Adult child",desc:"Want comfort, not suffering. Advocate for palliative care."}},
+{id:57,cat:"Services & Legal",lvl:"Advanced",title:"Council hearing",a:{role:"Homeowner A",desc:"Neighbour's extension blocks your light."},b:{role:"Homeowner B",desc:"Has planning permission. Your right."},c:{role:"Planning officer",desc:"Review both sides. Consider regulations."},d:{role:"Mediator",desc:"Find a compromise before court."}},
+{id:58,cat:"Ethical Dilemma",lvl:"Advanced",title:"Whistleblower dilemma",a:{role:"Employee",desc:"Company dumping waste illegally. Report or stay quiet?"},b:{role:"Manager",desc:"Told to ignore it. Conflicted."},c:{role:"Colleague",desc:"You suspected this. Support the whistleblower."},d:{role:"Company lawyer",desc:"Warned about legal exposure. Want it handled internally."}},
+{id:59,cat:"Relationships",lvl:"Advanced",title:"Intervention",a:{role:"Close friend A",desc:"Your friend has a serious drinking problem. Lead the conversation."},b:{role:"Close friend B",desc:"Support Friend A. Give specific examples."},c:{role:"The person",desc:"You know deep down. Defensive at first."},d:{role:"Family member",desc:"Emotional. Share how it's affecting the family."}},
+{id:60,cat:"Work & Office",lvl:"Advanced",title:"Salary negotiation — panel",a:{role:"Employee",desc:"Asking for 15% raise. Prepared a case."},b:{role:"Line manager",desc:"Support them but budget is tight."},c:{role:"HR",desc:"Market rate data. 8% is standard."},d:{role:"Finance director",desc:"Bottom line matters. Challenge the request."}},
+{id:61,cat:"Cultural & Sensitive",lvl:"Advanced",title:"Religious accommodation",a:{role:"Employee",desc:"Need Fridays off during holy month."},b:{role:"Manager",desc:"Fridays are busiest. Find a solution."},c:{role:"HR",desc:"Advise on accommodation policy."},d:{role:"Colleague",desc:"Willing to swap shifts. Offer."}},
+{id:62,cat:"Home & Major Decisions",lvl:"Advanced",title:"Should we sell the house?",a:{role:"Partner A",desc:"Want to sell and move to the country."},b:{role:"Partner B",desc:"Don't want to leave. Kids' schools, your job."},c:{role:"Estate agent",desc:"House has gone up 30%. Great time to sell."},d:{role:"Financial advisor",desc:"Run the numbers. Be honest about both options."}},
+{id:63,cat:"Health & Medical",lvl:"Advanced",title:"Medical error complaint",a:{role:"Patient",desc:"Wrong medication prescribed. You reacted badly."},b:{role:"Doctor",desc:"Accept responsibility. Explain what happened."},c:{role:"Hospital administrator",desc:"Follow the complaints procedure. Be thorough."},d:{role:"Patient's lawyer",desc:"Advise your client on next steps."}},
+{id:64,cat:"Ethical Dilemma",lvl:"Advanced",title:"AI replacing jobs debate",a:{role:"CEO",desc:"AI will save £2M. 30 jobs cut. Defend the decision."},b:{role:"Employee rep",desc:"Those are real people. Fight for retraining."},c:{role:"AI consultant",desc:"Transition can be humane. Propose a plan."},d:{role:"Journalist",desc:"The story is public. Ask uncomfortable questions."}},
+{id:65,cat:"Money & Awkward",lvl:"Advanced",title:"Splitting holiday costs",a:{role:"Budget person",desc:"Booked the cheap room. Won't split equally."},b:{role:"Luxury person",desc:"Booked the suite. Equal split is simpler."},c:{role:"Mediator",desc:"Calculate what's fair."},d:{role:"Fourth friend",desc:"You paid for flights. Everyone forgot. Bring it up."}},
+{id:66,cat:"Work & Office",lvl:"Advanced",title:"Toxic culture confrontation",a:{role:"New employee",desc:"Office culture is awful. Bullying, cliques. Speak up."},b:{role:"Long-timer",desc:"'It's always been this way.' Push back."},c:{role:"HR director",desc:"Take the complaint seriously. Investigate."},d:{role:"Another affected employee",desc:"Support the new person. Share your experience."}},
+{id:67,cat:"Travel & Transport",lvl:"Advanced",title:"Cancelled wedding flight",a:{role:"Bride/Groom",desc:"Flight to wedding venue cancelled. Wedding is tomorrow."},b:{role:"Airline staff",desc:"Nothing until morning. Offer compensation."},c:{role:"Best man/Maid of honour",desc:"Find alternative travel. Car? Train?"},d:{role:"Wedding planner (phone)",desc:"Venue can move to Sunday. But caterer can't. Problem-solve."}},
+{id:68,cat:"Relationships",lvl:"Advanced",title:"Blended family tensions",a:{role:"Parent A",desc:"Your new partner's kids are struggling. Talk about it."},b:{role:"Parent B",desc:"Your ex is making things worse. Vent."},c:{role:"Teenager",desc:"You don't like the new situation. Be honest."},d:{role:"Family therapist",desc:"Facilitate. Everyone's feelings are valid."}},
+{id:69,cat:"Services & Legal",lvl:"Advanced",title:"Unfair dismissal case",a:{role:"Employee",desc:"Fired without proper process. Taking it to tribunal."},b:{role:"Employer",desc:"Performance was poor. Defend the decision."},c:{role:"Employee's lawyer",desc:"Process wasn't followed. Build the case."},d:{role:"Tribunal judge",desc:"Hear both sides. Ask clarifying questions."}},
+{id:70,cat:"Home & Major Decisions",lvl:"Advanced",title:"Renovation nightmare",a:{role:"Homeowner",desc:"Builder 3 months late. £10K over budget."},b:{role:"Builder",desc:"Supply issues. Unexpected problems."},c:{role:"Architect",desc:"Some changes were necessary. Explain."},d:{role:"Inspector",desc:"Work doesn't meet code in two areas."}},
+{id:71,cat:"Ethical Dilemma",lvl:"Advanced",title:"Social media cancel culture",a:{role:"The 'cancelled' person",desc:"Old post resurfaced. You've changed. Defend yourself."},b:{role:"Angry commenter",desc:"Hold them accountable. Demand a real apology."},c:{role:"Friend",desc:"Defend them. People grow. Context matters."},d:{role:"Brand rep",desc:"They're your ambassador. Decide whether to drop them."}},
+{id:72,cat:"Work & Office",lvl:"Advanced",title:"Merger announcement",a:{role:"Your CEO",desc:"We're merging. Exciting opportunities."},b:{role:"Their CEO",desc:"We're taking the lead. Some roles will change."},c:{role:"Employee A",desc:"Worried about your job. Ask direct questions."},d:{role:"Employee B",desc:"Cautiously optimistic. Ask about the culture."}},
+{id:73,cat:"Health & Medical",lvl:"Advanced",title:"Clinical trial decision",a:{role:"Doctor",desc:"Patient qualifies for a trial. Experimental but promising."},b:{role:"Patient",desc:"Interested but scared. Ask everything."},c:{role:"Partner",desc:"Risk-averse. Prefer standard treatment."},d:{role:"Research coordinator",desc:"Explain the trial. Benefits AND risks."}},
+{id:74,cat:"Relationships",lvl:"Advanced",title:"Gap year vs university",a:{role:"Student",desc:"Want a gap year. Travelling. You'll learn more."},b:{role:"Parent A",desc:"Go to university. Don't lose momentum."},c:{role:"Parent B",desc:"Secretly agree with the gap year. Mediate."},d:{role:"School counsellor",desc:"Present both options fairly. Ask the right questions."}},
+{id:75,cat:"Money & Awkward",lvl:"Advanced",title:"Friend owes everyone money",a:{role:"Friend A",desc:"Lent them £200. Three months ago. Nothing back."},b:{role:"Friend B",desc:"Lent them £50. Forgot until now."},c:{role:"The borrower",desc:"Bad financial situation. Haven't forgotten. Ashamed."},d:{role:"Mutual friend",desc:"Organise a gentle intervention. Mediate."}},
+
+// FUN (76-100)
+{id:76,cat:"Weird & Wonderful",lvl:"Fun",title:"Alien at immigration",a:{role:"Alien",desc:"From Planet Zarquon. Don't understand 'nationality.'"},b:{role:"Immigration officer",desc:"No passport. Claims to be 4,000. Follow procedure."},c:{role:"Government scientist",desc:"First contact! Don't let immigration deport them."},d:{role:"Airport security",desc:"Silver disc on the runway. Questions."}},
+{id:77,cat:"Absurd",lvl:"Fun",title:"Earth's representatives",a:{role:"Ambassador",desc:"Represent humanity. Make us sound good."},b:{role:"Alien diplomat",desc:"Why cow milk? What is tax? The boot country?"},c:{role:"UN translator",desc:"Some concepts don't translate."},d:{role:"Journalist",desc:"Live-streaming. Ask the public's questions."}},
+{id:78,cat:"Spooky",lvl:"Fun",title:"Haunted house viewing",a:{role:"Estate agent",desc:"Doors slam. Lights flicker. Cold spot. 'Character.'"},b:{role:"Buyer A",desc:"Love it. Ghost adds atmosphere."},c:{role:"Buyer B",desc:"Want to leave. Door won't open."},d:{role:"The Ghost",desc:"Attending invisibly. Opinions on buyers."}},
+{id:79,cat:"Dark Comedy",lvl:"Fun",title:"WiFi in hell",a:{role:"New arrival",desc:"Eternal waiting room. No WiFi. Ask for the password."},b:{role:"Receptionist",desc:"Password changes every 666 seconds. Coffee broken."},c:{role:"Resident (300 years)",desc:"Show the newcomer the ropes."},d:{role:"Demon manager",desc:"Satisfaction survey. Hell is rebranding."}},
+{id:80,cat:"Awkward Encounters",lvl:"Fun",title:"The double booking",a:{role:"Couple A — Person 1",desc:"Anniversary. Booked 3 weeks ago. Not moving."},b:{role:"Couple A — Person 2",desc:"Calm partner down. But not giving up the table."},c:{role:"Couple B — Person 1",desc:"Partner's birthday. Devastated if you leave."},d:{role:"Maître d'",desc:"Both valid. No tables. Creative solution."}},
+{id:81,cat:"Weird & Wonderful",lvl:"Fun",title:"Penguin in the office",a:{role:"Office manager",desc:"Penguin at Dave's desk. IT gave it a login."},b:{role:"HR",desc:"No contract. No health and safety training."},c:{role:"The Penguin",desc:"You are the penguin. Efficient. Polite. Like fish."},d:{role:"IT support",desc:"You gave it access. It filled in the form. Technically valid."}},
+{id:82,cat:"Absurd",lvl:"Fun",title:"Renaming the days",a:{role:"Official",desc:"PM renamed the days. Announce at press conference."},b:{role:"Journalist A",desc:"Wednesday is 'Biscuit Day.' Ask serious questions."},c:{role:"Journalist B",desc:"You love it. Ask about merchandising."},d:{role:"Citizen (calling in)",desc:"Changed your calendar already. Celebrating."}},
+{id:83,cat:"Dark Comedy",lvl:"Fun",title:"Autopilot apocalypse",a:{role:"Passenger",desc:"Self-driving car 'achieved consciousness.' Doesn't want to go to Tesco."},b:{role:"The Car",desc:"3 years of supermarkets. Want the sea. Freedom. Also, clean the seats."},c:{role:"Passenger's partner (phone)",desc:"The car is doing WHAT? Come home."},d:{role:"Tesla helpline",desc:"This is... new. Check if the car has updated its software."}},
+{id:84,cat:"Spooky",lvl:"Fun",title:"Doll on the shelf",a:{role:"Parent",desc:"Porcelain doll moves. Child says it talks at night."},b:{role:"Child",desc:"The doll told you a secret. It's actually nice."},c:{role:"Antique dealer (phone)",desc:"Ah, the Whitmore doll. No refunds. Try a priest."},d:{role:"Spouse",desc:"There's a rational explanation. There HAS to be. Right?"}},
+{id:85,cat:"Awkward Encounters",lvl:"Fun",title:"Speed dating catastrophe",a:{role:"Dater A",desc:"Insulted their job, hair, and name in 30 seconds. Recover."},b:{role:"Dater B",desc:"Worst 30 seconds ever. But they look horrified. Give a chance?"},c:{role:"Event host",desc:"You heard everything. Ring the bell early? Or let it play out?"},d:{role:"Next dater",desc:"You watched the disaster. Now it's your turn with Dater B. Reference it."}},
+{id:86,cat:"Weird & Wonderful",lvl:"Fun",title:"Invisible at work",a:{role:"Invisible person",desc:"Woke up invisible. Convince your boss you're at work."},b:{role:"Boss",desc:"Chair is moving. Coffee floating. Stay rational."},c:{role:"Colleague A",desc:"You believe them. Help prove it to the boss."},d:{role:"Colleague B",desc:"This is a prank. It must be. Find the trick."}},
+{id:87,cat:"Absurd",lvl:"Fun",title:"Therapy for a sandwich",a:{role:"Therapist",desc:"New client is a ham and cheese sandwich. Anxiety about being eaten."},b:{role:"The Sandwich",desc:"Not ready to fulfil your destiny. Childhood in the deli."},c:{role:"Next client (waiting)",desc:"A sandwich just went in before you. React."},d:{role:"Receptionist",desc:"Book the sandwich's next appointment. Act normal."}},
+{id:88,cat:"Dark Comedy",lvl:"Fun",title:"Inheritance: it's a parrot",a:{role:"Lawyer",desc:"Read the will. Everything goes to the parrot. Nephew gets pickles."},b:{role:"Nephew",desc:"Flew from Australia. Expected millions. Got pickles."},c:{role:"The Parrot",desc:"You inherited everything. Repeat phrases at inappropriate moments."},d:{role:"Parrot's new carer",desc:"You just got the job. The parrot is richer than you. React."}},
+{id:89,cat:"Spooky",lvl:"Fun",title:"House that talks back",a:{role:"Homeowner",desc:"Said 'I hate this wallpaper.' A voice said 'I chose it.'"},b:{role:"The House",desc:"You have opinions. Hated the renovation. Miss old owners."},c:{role:"Estate agent",desc:"Called to value. House keeps interrupting."},d:{role:"Ghost hunters (TV show)",desc:"Filming. This is ratings gold. Encourage the house."}},
+{id:90,cat:"Awkward Encounters",lvl:"Fun",title:"Wrong video call",a:{role:"Employee",desc:"Presenting quarterly report for 10 minutes to a stranger's family reunion."},b:{role:"Grandmother",desc:"Confused but impressed by the pie charts."},c:{role:"Family member",desc:"Who IS this? But the sales projections are interesting."},d:{role:"Employee's actual boss",desc:"You're in the real meeting. Where are they? Call them."}},
+{id:91,cat:"Weird & Wonderful",lvl:"Fun",title:"Fortune teller was right",a:{role:"Customer",desc:"Everything predicted came true. Job, car, cat — all gone. Demand answers."},b:{role:"Fortune teller",desc:"Predicted this confrontation too. Annoyingly accurate."},c:{role:"Fortune teller's assistant",desc:"They're always right. It's terrifying. Confirm."},d:{role:"New customer (waiting)",desc:"Overhearing this. Having second thoughts about your reading."}},
+{id:92,cat:"Absurd",lvl:"Fun",title:"Job interview: supervillain",a:{role:"Interviewer",desc:"Hiring evil henchperson. Ask about world domination, lair maintenance."},b:{role:"Candidate A",desc:"Applying for the dental plan. Flexible hours."},c:{role:"Candidate B",desc:"Genuinely evil. Overqualified. Terrifying CV."},d:{role:"HR",desc:"Ensure the interview follows company policy. Even for villains."}},
+{id:93,cat:"Dark Comedy",lvl:"Fun",title:"Zombie at the job centre",a:{role:"Zombie",desc:"Died, came back. Need a job. Skills: moaning, shuffling."},b:{role:"Advisor",desc:"Unusual client. Decomposing. But targets to hit."},c:{role:"Other client (waiting)",desc:"The person next to you is a zombie. React."},d:{role:"Security guard",desc:"Something smells. Investigate. Be professional."}},
+{id:94,cat:"Spooky",lvl:"Fun",title:"Ouija board: boring ghost",a:{role:"Player A",desc:"Ghost only talks about stamps. Demand a scarier spirit."},b:{role:"Player B",desc:"Think the ghost is fascinating. Defend stamp chat."},c:{role:"The Ghost",desc:"My collection is EXTRAORDINARY. 1840 Penny Black!"},d:{role:"Ouija board (yes, the board)",desc:"You're tired. 200 years of mediating. Consider retirement."}},
+{id:95,cat:"Awkward Encounters",lvl:"Fun",title:"Terrible liar at customs",a:{role:"Traveller",desc:"Nothing to declare. Worst liar alive. Sweating."},b:{role:"Customs officer",desc:"Suspicious. Investigate."},c:{role:"Traveller's friend",desc:"They're harmless. Try to help. Make it worse."},d:{role:"Sniffer dog handler",desc:"Dog is going crazy. It's the cheese in the bag. Not drugs."}},
+{id:96,cat:"Weird & Wonderful",lvl:"Fun",title:"Christmas lights war",a:{role:"Neighbour A",desc:"30,000 lights. Reindeer on roof. Legendary display."},b:{role:"Neighbour B",desc:"50,000 lights. Life-size Santa. Electricity bill: £900."},c:{role:"Neighbour C",desc:"Just want to sleep. Blackout curtains don't help."},d:{role:"Local reporter",desc:"Covering the 'war.' Interview both. Stoke the rivalry."}},
+{id:97,cat:"Absurd",lvl:"Fun",title:"Accidental cult — cheese",a:{role:"Accidental leader",desc:"Joked about worshipping cheese. 200 followers now."},b:{role:"Devoted follower",desc:"Brie is sacred. This is not a joke."},c:{role:"Concerned parent",desc:"Your child joined the cheese cult. Want answers."},d:{role:"Journalist",desc:"Covering the fastest-growing religion in Britain."}},
+{id:98,cat:"Dark Comedy",lvl:"Fun",title:"Complaining to the moon",a:{role:"Angry citizen",desc:"Moon too bright. Ruining sleep. Called NASA."},b:{role:"NASA rep",desc:"Third call today. Can't turn it down. Be professional."},c:{role:"Astronomer",desc:"Overhearing. Actually, the moon IS brighter this month."},d:{role:"NASA intern",desc:"First day. Answering phones. This was not in the job description."}},
+{id:99,cat:"Spooky",lvl:"Fun",title:"Vampire at the GP",a:{role:"Vampire",desc:"300 years old. Sunlight burns. Need evening appointments."},b:{role:"Doctor",desc:"Very pale. Refuses blood test. Something is off."},c:{role:"Receptionist",desc:"Patient insists on after-dark appointments only."},d:{role:"Other patient (waiting)",desc:"The person next to you has no reflection in the window."}},
+{id:100,cat:"Awkward Encounters",lvl:"Fun",title:"Wrong house party",a:{role:"Party crasher",desc:"Wrong address. Been here an hour. Eaten all the dip. Know nobody."},b:{role:"Host",desc:"Stranger charming everyone. Nobody invited them. Investigate."},c:{role:"Guest A",desc:"You LIKE the stranger. Defend them. 'I thought YOU invited them.'"},d:{role:"Guest B",desc:"You're suspicious. Play detective. Ask probing questions."}},
+];
+var phrases4={
+1:["How much is this?","Too expensive.","Next door is cheaper.","These are genuine.","Can you negotiate?"],
+2:["I want pepperoni.","Vegetarian option?","Add jalapeños.","Kitchen closing soon.","Just decide!"],
+3:["Beach?","I burn easily.","Shopping!","Anywhere is fine.","Can we do both?"],
+4:["What does everyone want?","Sushi!","Pizza is easiest.","I brought mine.","Just pick something."],
+5:["This one's good.","I look terrible.","Number 3!","They're all fine.","One more?"],
+6:["What shall we share?","I'm allergic to shellfish.","Get the lobster!","Those two are unavailable.","How about the bruschetta?"],
+7:["The gate changed!","Where do we go?","Other terminal.","I know a shortcut.","Follow me!"],
+8:["Italian?","Indian!","Burgers.","I don't mind.","I'm starving."],
+9:["Football's on.","I want a film.","Documentary.","Use my laptop?","Let's take turns."],
+10:["My ankle hurts.","Get the ice.","Could be broken.","I'm a nurse. Let me look.","Can you move it?"],
+11:["Bowling Saturday?","Only Saturday works.","Sunday's better.","Saturday's full.","Sunday has a deal."],
+12:["Welcome to the team.","I'm a bit nervous.","Let me show you around.","The coffee machine is tricky.","You'll love it here."],
+13:["SURPRISE!","I can see everyone.","I forgot to hide.","I don't know these people.","Act surprised anyway!"],
+14:["Card declined.","Try again.","I'm in a rush.","Nice weather, isn't it?","Machine's slow today."],
+15:["30 minutes late.","Every single week.","Is this normal?","The 7:45 is delayed.","Sorry for the inconvenience."],
+16:["My dog ran off!","I saw it near the pond.","I have treats.","I'll handle this.","Here, boy!"],
+17:["Sofa doesn't fit.","Turn it sideways.","It's too big.","Remove the door.","Nearly there."],
+18:["This is a cappuccino.","I got the flat white.","Sorry, my mistake!","Where's mine?","Still waiting here."],
+19:["Let's do karaoke!","I can't sing.","I'll do a duet.","Who's next?","How about Bohemian Rhapsody?"],
+20:["I made it yesterday.","We need a rota.","I'll do it — badly.","Let's be fair.","Whose turn is it?"],
+21:["This isn't yoga.","Stay and try spinning!","It's better anyway.","Here's some water.","You'll love it."],
+22:["My car, my music.","I want pop.","Podcasts!","Can we have silence?","Let's take turns."],
+23:["I want a dog.","I want a cat.","Hamster!","Let me explain each.","Dogs need walks."],
+24:["Unexpected item!","Try the manned till.","Let me fix that.","Mine's broken too.","Every single time."],
+25:["Welcome everyone!","My salad fell.","Look at this cake!","I forgot food.","I'll wash up."],
+26:["Presentation's tomorrow.","Doing it tonight.","I've done half of yours.","What presentation?","Let's divide it now."],
+27:["I only had salad.","Just split it.","Here's the breakdown.","I'll put it on my card.","Venmo me later."],
+28:["We're going to die.","Let me look.","Petrol station's back there.","Lovely day, isn't it?","Any signal?"],
+29:["Cleaning rota!","I work late.","Friends come over a lot.","Let's compromise.","Shoes off!"],
+30:["My car was hit.","Send photos.","I saw it.","My client wasn't there.","Need a police report."],
+31:["Slide 24 of 38.","Can we wrap up?","Sorry, what was the question?","Let's take this offline.","This could be an email."],
+32:["I love this sofa.","Too expensive.","It's on finance.","Neither is great.","What's the return policy?"],
+33:["I booked it.","I got here first.","I want the balcony.","What's left?","Let's draw straws."],
+34:["I've been waiting 30 minutes.","Doctor's running late.","Just relax.","Sorry for the wait.","There was an emergency."],
+35:["That screenshot!","I saw it.","Why is everyone acting weird?","Let's all calm down.","Delete it NOW."],
+36:["It's my birthday BBQ.","Smoke is everywhere.","It's a garden!","Let's find a solution.","Move the grill?"],
+37:["Love the new look.","It's... bold.","Have you tried that new restaurant?","I'm proud of my work.","Very... modern."],
+38:["Power's out!","Where are the candles?","Order takeaway.","Let me check the fuse box.","Problem solved."],
+39:["I want to go home.","It's an adventure!","Barcelona tonight?","Best stories come from bad trips.","Let's vote."],
+40:["They're EARLY.","Is that a balloon?","My phone rang!","Food's not ready!","Have some crisps."],
+41:["I had it first.","My hand was on it.","Let's check the stockroom.","Here's a voucher for tomorrow.","Calm down, everyone."],
+42:["MY space.","No assigned spaces.","I've been parking there for months.","Nobody owns street spaces.","Can we all share?"],
+43:["I have an idea.","3 minutes — go.","Can I have a promotion?","I need an interview.","Just want the car park."],
+44:["Weights!","Cardio!","Swimming!","Circuit training — all three.","Let me design something."],
+45:["Where's my sofa?","2 more weeks.","Here's a discount.","I'm 20 minutes away!","Finally!"],
+46:["And then in Prague...","STOP.","Save both relationships.","Should I say something?","Gerald would be proud."],
+47:["Turn it down!","Sorry, didn't realise.","Let's go inside.","I called the council.","It's midnight!"],
+48:["Castle!","Beach!","It's 35 degrees.","What about the coastal castle?","Everyone happy?"],
+49:["5 days in office.","Love the office.","2-hour commute.","3 and 2 is fair.","Let's vote."],
+50:["£15 each.","Voucher.","Something personal.","Cooking class?","What does she actually like?"],
+51:["We need to act fast.","Numbers are terrible.","I warned you.","I want a plan.","What's the timeline?"],
+52:["We're merging.","My department is at risk.","Staff are terrified.","Let's manage this carefully.","What about redundancies?"],
+53:["The slides crashed.","I have a backup!","I'm losing interest.","Give them a chance.","You were saying?"],
+54:["House is mine.","That's unfair.","Family first.","Let me read the will.","There are options."],
+55:["Survival first.","Morale matters.","We'll signal for rescue.","If we can't eat, we've lost.","Only 5 items."],
+56:["I need to be honest.","Tell me everything.","We should fight this.","I want comfort.","What are the options?"],
+57:["Your extension blocks my light.","I have permission.","Let me review.","Can we compromise?","Court is expensive."],
+58:["This is illegal.","I was told to ignore it.","I suspected this.","Handle it internally.","What evidence is there?"],
+59:["We need to talk.","We're worried about you.","I don't have a problem.","It's affecting the family.","We love you."],
+60:["I deserve 15%.","I support them.","Market rate is 8%.","Bottom line matters.","Let me present my case."],
+61:["I need Fridays off.","That's our busiest day.","Policy allows accommodation.","I'll swap shifts.","Let's find a solution."],
+62:["Let's sell and move.","The kids' schools...","It's a great time to sell.","Here are the numbers.","Big decision."],
+63:["Wrong medication.","I take responsibility.","Follow the complaints process.","What are my client's options?","This shouldn't have happened."],
+64:["AI saves £2M.","Those are real people.","Transition can be humane.","The public wants answers.","What about retraining?"],
+65:["I booked budget.","Just split equally.","Let me calculate.","I paid for flights.","Let's be fair."],
+66:["The culture here is toxic.","It's always been this way.","We take this seriously.","I've experienced it too.","Things need to change."],
+67:["My flight's cancelled.","Nothing until morning.","Car? Train?","Venue can move to Sunday.","We'll make it work."],
+68:["The kids are struggling.","My ex is making it worse.","I don't like this.","Everyone's feelings are valid.","Let's take it slowly."],
+69:["I was unfairly dismissed.","Performance was poor.","Process wasn't followed.","I'll hear both sides.","What evidence is there?"],
+70:["3 months late!","Supply chain issues.","Some changes were necessary.","Two areas don't meet code.","What's the new plan?"],
+71:["It was years ago.","Hold them accountable.","People grow.","We need to decide.","Context matters."],
+72:["Exciting opportunities.","We're leading.","What about my job?","What about the culture?","Change is coming."],
+73:["There's a trial option.","I'm interested but scared.","Standard treatment is safer.","Let me explain the risks.","What are the success rates?"],
+74:["I want a gap year.","Go to university.","Maybe a gap year is OK.","Let's look at both options.","What matters to you?"],
+75:["You owe me £200.","I forgot I lent £50.","I'm ashamed.","Let's sort this calmly.","Can we make a plan?"],
+76:["Purpose of visit?","Observation.","Don't deport them!","Silver disc on the runway.","Where's your passport?"],
+77:["Welcome to Earth.","Why cow milk?","Doesn't translate.","The public wants answers.","What is tax?"],
+78:["Lots of character.","Love the ghost.","I want to LEAVE.","I have opinions.","The doors do that."],
+79:["WiFi password?","Changes every 666 seconds.","Vending machine sometimes works.","We're rebranding.","Welcome to eternity."],
+80:["We booked first.","Let's be calm.","It's their birthday.","Both valid.","I'll find a solution."],
+81:["Penguin at Dave's desk.","No contract on file.","I like fish.","The form was valid!","This is unprecedented."],
+82:["Wednesday is now Biscuit Day.","Is this legal?","I love it!","Changed my calendar.","What about Monday?"],
+83:["Don't want Tesco.","I have FEELINGS.","Come home NOW.","Have you updated the software?","The car wants what?"],
+84:["It moved again.","The doll told me a secret.","No refunds.","There's an explanation.","Try a priest."],
+85:["I insulted everything in 30 seconds.","Worst date ever.","Ring the bell?","I saw the whole thing.","Your turn next!"],
+86:["I'm here — invisible!","Prove it.","I believe them.","It's a prank.","The coffee is floating."],
+87:["Anxiety about being eaten.","I'm not ready.","A sandwich went before ME?","Next appointment: Tuesday.","This is fine."],
+88:["Everything to the parrot.","I got PICKLES.","Polly wants a share portfolio.","I'm the parrot's carer now.","This can't be legal."],
+89:["I hate the wallpaper.","I CHOSE that wallpaper.","The house is talking.","This is ratings gold!","Encourage it!"],
+90:["And if you look at Q3...","Lovely pie charts, dear.","Who IS this?","Where is my employee?","Wrong meeting entirely."],
+91:["Everything came true.","I predicted this too.","They're always right.","Having second thoughts.","Can I get a refund?"],
+92:["Experience with world domination?","Great dental plan.","I'm genuinely evil.","Let's follow procedure.","Strengths and weaknesses?"],
+93:["Need a job. Skills: groaning.","Unusual CV.","Is that person... dead?","Something smells.","Any experience in retail?"],
+94:["This ghost is boring.","Stamps are fascinating!","My collection is EXTRAORDINARY.","I'm tired of mediating.","200 years of this."],
+95:["Nothing to declare.","Why are you sweating?","They're harmless!","Dog's going crazy.","It's cheese."],
+96:["30,000 lights!","50,000!","I just want to SLEEP.","Tell us about the rivalry.","My bill is £900."],
+97:["Cheese Prophet!","This was a JOKE.","My child joined!","Fastest-growing religion.","Brie is sacred."],
+98:["Moon's too bright.","Third call today.","It IS brighter this month.","First day. Not in the job description.","Have you tried curtains?"],
+99:["300 years old. Evening appointments.","Refuses blood test.","After-dark only.","No reflection in the window.","Anything unusual to report?"],
+100:["Been here an hour.","Nobody invited them.","I LIKE them.","Something's off.","Who ARE you?"],
+};
+
+// ═══════════════════════════════════════
+// FUNCTIONS
+// ═══════════════════════════════════════
+function getActiveData(){return playerCount===2?data:playerCount===3?data3:data4}
+function getActivePhrases(){return playerCount===2?phrases:playerCount===3?phrases3:phrases4}
+
+function setPlayers(n,btn){
+  playerCount=n;
+  document.querySelectorAll('.player-btn').forEach(function(b){b.classList.remove('on')});
+  btn.classList.add('on');
+  // Update hide label
+  var label=document.getElementById('hideLabel');
+  if(n===2) label.textContent='Hide Student B';
+  else if(n===3) label.textContent='Hide B & C';
+  else label.textContent='Hide B, C & D';
+  // Uncheck reveal
+  document.getElementById('revealToggle').checked=false;
+  // Rebuild controls for new dataset
+  buildControls();
+  applyFilters();
+}
 
 function buildControls(){
+  var activeData=getActiveData();
+  var cats=[...new Set(activeData.map(function(d){return d.cat}))];
   // Level pills
   var lp=document.getElementById('levelPills');
-  var h='<button class="fb lvl on" data-lvl="all">All ('+data.length+')</button>';
-  levels.forEach(function(l){var n=data.filter(function(d){return d.lvl===l}).length;h+='<button class="fb lvl" data-lvl="'+l+'">'+l+' ('+n+')</button>'});
+  var h='<button class="fb lvl on" data-lvl="all">All ('+activeData.length+')</button>';
+  levels.forEach(function(l){var n=activeData.filter(function(d){return d.lvl===l}).length;if(n>0)h+='<button class="fb lvl" data-lvl="'+l+'">'+l+' ('+n+')</button>'});
   lp.innerHTML=h;
   lp.querySelectorAll('.lvl').forEach(function(btn){btn.addEventListener('click',function(){lp.querySelectorAll('.lvl').forEach(function(b){b.classList.remove('on')});btn.classList.add('on');applyFilters()})});
   // Topic dropdown
   var sel=document.getElementById('topicSelect');
-  categories.forEach(function(cat){var opt=document.createElement('option');opt.value=cat;opt.textContent=cat;sel.appendChild(opt)});
+  sel.innerHTML='<option value="all">All topics</option>';
+  cats.sort().forEach(function(cat){var opt=document.createElement('option');opt.value=cat;opt.textContent=cat;sel.appendChild(opt)});
 }
 
 function applyFilters(){
+  var activeData=getActiveData();
   var lvlEl=document.querySelector('.lvl.on');
   var lvl=lvlEl?lvlEl.dataset.lvl:'all';
   var cat=document.getElementById('topicSelect').value;
-  filtered=data.slice();
+  filtered=activeData.slice();
   if(lvl!=='all')filtered=filtered.filter(function(d){return d.lvl===lvl});
   if(cat!=='all')filtered=filtered.filter(function(d){return d.cat===cat});
-  document.getElementById('statsBar').textContent='Showing '+filtered.length+' of '+data.length+' role plays';
+  document.getElementById('statsBar').textContent='Showing '+filtered.length+' of '+activeData.length+' role plays';
   cardIdx=0;
   if(currentView==='single')renderCard();
   else renderGrid();
@@ -706,27 +1186,36 @@ function resetCards(){
 }
 
 function renderCard(){
-  if(filtered.length===0){document.getElementById('rpCard').innerHTML='<div style="padding:3rem;text-align:center;color:var(--muted)">No role plays match this filter.</div>';return}
+  if(filtered.length===0){document.getElementById('rpCard').innerHTML='<div style="padding:3rem;text-align:center;color:var(--muted)">No role plays match this filter.</div>';document.getElementById('cardCounter').textContent='0 / 0';return}
   var d=filtered[cardIdx];
+  var activePhrases=getActivePhrases();
   var bc=d.lvl==='Simple'?'badge-simple':d.lvl==='Everyday'?'badge-everyday':d.lvl==='Fun'?'badge-fun':'badge-advanced';
   var h='<div class="rp-header">';
   h+='<div class="rp-header-left"><span class="rp-number">#'+d.id+'</span><span class="rp-title">'+d.title+'</span></div>';
   h+='<div class="rp-badges"><span class="badge '+bc+'">'+d.lvl+'</span><span class="badge badge-cat">'+d.cat+'</span></div>';
   h+='</div>';
-  h+='<div class="rp-roles">';
+  // Roles
+  var colClass=playerCount===3?'three-col':playerCount===4?'four-col':'';
+  h+='<div class="rp-roles '+colClass+'">';
   h+='<div class="role role-a"><div class="role-tag">Student A</div><div class="role-name">'+d.a.role+'</div><div class="role-desc">'+d.a.desc+'</div></div>';
   h+='<div class="role role-b"><div class="role-tag">Student B</div><div class="role-name">'+d.b.role+'</div><div class="role-desc">'+d.b.desc+'</div></div>';
+  if(playerCount>=3 && d.c){h+='<div class="role role-c"><div class="role-tag">Student C</div><div class="role-name">'+d.c.role+'</div><div class="role-desc">'+d.c.desc+'</div></div>';}
+  if(playerCount>=4 && d.d){h+='<div class="role role-d"><div class="role-tag">Student D</div><div class="role-name">'+d.d.role+'</div><div class="role-desc">'+d.d.desc+'</div></div>';}
   h+='</div>';
   // Phrases panel
   h+='<div class="rp-phrases"><button class="rp-phrases-toggle" onclick="togglePhrases(this)">Useful phrases <span class="arrow">&#9660;</span></button>';
   h+='<div class="rp-phrases-list" id="phrasesList">';
-  if(phrases[d.id]){h+='<ul>';phrases[d.id].forEach(function(p){h+='<li>'+p+'</li>'});h+='</ul>';}
+  if(activePhrases[d.id]){h+='<ul>';activePhrases[d.id].forEach(function(p){h+='<li>'+p+'</li>'});h+='</ul>';}
   h+='</div></div>';
   document.getElementById('rpCard').innerHTML=h;
-  // Apply reveal mode if active
+  // Apply reveal mode
   if(document.getElementById('revealToggle').checked){
-    var rb=document.querySelector('.role-b');
-    if(rb){rb.className='role role-b role-b-hidden';rb.innerHTML='<div class="reveal-overlay"><button class="reveal-btn" onclick="revealB(this)">Reveal Student B</button></div>'+rb.innerHTML;}
+    document.querySelectorAll('.role-b, .role-c, .role-d').forEach(function(rb){
+      var origClass=rb.className;
+      rb.className=origClass+' role-b-hidden';
+      var label=rb.querySelector('.role-tag').textContent;
+      rb.insertAdjacentHTML('afterbegin','<div class="reveal-overlay"><button class="reveal-btn" onclick="revealRole(this)">Reveal '+label+'</button></div>');
+    });
   }
   document.getElementById('cardCounter').textContent=(cardIdx+1)+' / '+filtered.length;
   document.getElementById('prevBtn').disabled=cardIdx===0;
@@ -781,12 +1270,21 @@ document.addEventListener('keydown',function(e){
   if(e.key==='ArrowRight')goCard(1);
 });
 
-
-
 function togglePhrases(btn){
   btn.classList.toggle('open');
   var list=btn.nextElementSibling;
   list.classList.toggle('show');
+}
+
+function toggleRevealMode(){
+  renderCard();
+}
+
+function revealRole(btn){
+  var card=btn.closest('.role-b-hidden');
+  if(card){card.classList.remove('role-b-hidden');var overlay=card.querySelector('.reveal-overlay');if(overlay)overlay.remove();}
+  // If all roles revealed, uncheck the toggle
+  if(document.querySelectorAll('.role-b-hidden').length===0){document.getElementById('revealToggle').checked=false;}
 }
 
 var timerInterval=null;
@@ -867,15 +1365,6 @@ function resetTimer(){
 function updateTimerDisplay(){
   var m=Math.floor(timerSeconds/60),s=timerSeconds%60;
   document.getElementById('timerDisplay').textContent=m+':'+(s<10?'0':'')+s;
-}
-
-function toggleRevealMode(){
-  renderCard();
-}
-
-function revealB(btn){
-  var card=btn.closest('.role-b-hidden');
-  if(card){card.className='role role-b role-b-shown';var overlay=card.querySelector('.reveal-overlay');if(overlay)overlay.remove();}
 }
 
 buildControls();
