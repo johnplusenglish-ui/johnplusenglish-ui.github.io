@@ -75,8 +75,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,252,247,
 .wyr-option-text{font-size:1.1rem;font-weight:700;line-height:1.5;color:var(--ink)}
 .wyr-or{font-size:.9rem;font-style:italic;color:var(--muted);margin:.7rem 0}
 
-.wyr-follow-up{padding:1rem 2rem 1.5rem;border-top:1px solid var(--border);background:var(--cream)}
-.wyr-follow-label{font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--sea);font-weight:600;margin-bottom:.4rem}
+.wyr-follow-toggle{display:block;width:100%;text-align:left;font-family:'Nunito',sans-serif;font-size:.85rem;font-weight:700;color:var(--sea);padding:1rem 2rem;border:none;border-top:1px solid var(--border);background:transparent;cursor:pointer;transition:color .2s}
+.wyr-follow-toggle:hover{color:var(--coral)}
+.wyr-follow-panel{display:none;padding:0 2rem 1.5rem}
+.wyr-follow-panel.open{display:block}
 .wyr-follow-text{font-size:.88rem;color:var(--ink);line-height:1.6}
 
 /* Quick-fire mode */
@@ -132,7 +134,6 @@ nav{padding:.75rem 1.2rem}.nav-links{gap:1rem}.nav-links a{font-size:.78rem}
 .card-area{padding:0 1.2rem 3rem}
 .wyr-header{padding:1rem 1.4rem .6rem}
 .wyr-body{padding:1.2rem 1.4rem}
-.wyr-follow-up{padding:.8rem 1.4rem 1rem}
 }
 @media print{
 nav,.filters,.card-nav,.timer-section,.quickfire-bar,.back-link,.filters-actions{display:none!important}
@@ -367,7 +368,8 @@ function renderCard(){
   h+='<div class="wyr-option-text">...'+q.b+'?</div>';
   h+='</div>';
   if(q.follow){
-    h+='<div class="wyr-follow-up"><div class="wyr-follow-label">&#128172; Follow-up</div><div class="wyr-follow-text">'+q.follow+'</div></div>';
+    h+='<button class="wyr-follow-toggle" onclick="toggleFollow(this)">Follow-up question &#9662;</button>';
+    h+='<div class="wyr-follow-panel"><div class="wyr-follow-text">'+q.follow+'</div></div>';
   }
   h+='</div>';
   document.getElementById('wyrCard').innerHTML=h;
@@ -414,6 +416,12 @@ function setMode(m){
 function shuffleAll(){
   for(var i=filtered.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=filtered[i];filtered[i]=filtered[j];filtered[j]=t;}
   idx=0;qfIdx=0;renderCard();updateQfCard();
+}
+
+function toggleFollow(btn){
+  var panel=btn.nextElementSibling;
+  panel.classList.toggle('open');
+  btn.innerHTML=panel.classList.contains('open')?'Follow-up question &#9652;':'Follow-up question &#9662;';
 }
 
 // ---- Card View Timer — unified: select time, Start/Pause, Restart, progress bar ----
