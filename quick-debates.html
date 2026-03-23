@@ -78,19 +78,23 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,252,247,
 .nav-btn.primary:hover{opacity:.85}
 .card-counter{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--muted)}
 
-.timer-row{display:flex;flex-direction:column;align-items:center;gap:0;margin-top:.8rem}
+.timer-section{max-width:800px;margin:.8rem auto 0}
+.timer-controls{display:flex;align-items:center;gap:.5rem;justify-content:center;flex-wrap:wrap;margin-bottom:.4rem}
 .timer-pill{font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:700;padding:.35rem .7rem;border:1.5px solid var(--border);border-radius:20px;background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s}
 .timer-pill:hover{border-color:var(--sea);color:var(--sea)}
 .timer-pill.active{border-color:var(--sea);background:var(--sea);color:#fff}
+.timer-play{font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:700;padding:.5rem 1.2rem;border:1.5px solid var(--sea);border-radius:8px;background:var(--sea);color:#fff;cursor:pointer;transition:all .15s}
+.timer-play:hover{opacity:.9}
+.timer-play.paused{background:var(--sun);border-color:var(--sun)}
 .timer-display{font-family:'JetBrains Mono',monospace;font-size:1.5rem;font-weight:700;color:var(--ink);min-width:60px;text-align:center;transition:color .3s}
 .timer-display.warn{color:var(--coral)}
 .timer-display.done{color:var(--sea)}
-.timer-restart{display:none}
+.timer-restart{font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:700;padding:.35rem .7rem;border:1.5px solid var(--border);border-radius:20px;background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s;display:none}
+.timer-restart:hover{border-color:var(--ink);color:var(--ink)}
 .timer-restart.show{display:inline-block}
-.timer-pills-row{display:flex;align-items:center;gap:.5rem;justify-content:center;flex-wrap:wrap}
-.timer-hint{font-family:'Nunito',sans-serif;font-size:.72rem;color:var(--muted);text-align:center;margin-top:.35rem;font-weight:500;opacity:.55}
-.timer-pill.playing{animation:pulse 1.5s ease infinite}
-.timer-pill.paused{border-color:var(--sun);background:var(--sun);color:#fff;animation:none}
+.timer-progress{width:100%;height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:.3rem}
+.timer-progress-fill{height:100%;background:var(--sea);border-radius:3px;transition:width .3s linear;width:0%}
+.timer-progress-fill.warn{background:var(--coral)}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(46,196,182,.3)}50%{box-shadow:0 0 0 6px rgba(46,196,182,0)}}
 
 /* Phrase bank */
@@ -115,7 +119,7 @@ footer{text-align:center;padding:3rem 2rem;font-size:.8rem;color:var(--muted);bo
 
 @media(max-width:768px){.debate-card{grid-template-columns:1fr}.debate-phrases{border-right:none;border-bottom:1.5px solid var(--border)}.bubble{width:120px;height:120px;font-size:.75rem}.pb-grid{grid-template-columns:1fr}}
 @media(max-width:640px){nav{padding:.75rem 1.2rem}.nav-links{gap:1rem}.page-header{padding:5.5rem 1.2rem .8rem}.controls{padding:0 1.2rem .5rem}.main{padding:0 1.2rem 2rem}.debate-content{padding:1.2rem}.bubble{width:100px;height:100px;font-size:.72rem}}
-@media print{nav,.page-header,.controls,.card-nav,.timer-row,.mode-toggle,footer{display:none}.main{padding:0;margin:0}.debate-card{box-shadow:none;border:1px solid #ccc}.phrase-item.crossed{text-decoration:none;opacity:1}.bubble.highlighted{background:#ddd;color:#000;border-color:#999}}
+@media print{nav,.page-header,.controls,.card-nav,.timer-section,.mode-toggle,footer{display:none}.main{padding:0;margin:0}.debate-card{box-shadow:none;border:1px solid #ccc}.phrase-item.crossed{text-decoration:none;opacity:1}.bubble.highlighted{background:#ddd;color:#000;border-color:#999}}
 
 /* Vocab panel - inline inside debate content */
 .vocab-section{border-top:1px solid var(--border);margin-top:1.2rem;width:100%}
@@ -203,17 +207,17 @@ footer{text-align:center;padding:3rem 2rem;font-size:.8rem;color:var(--muted);bo
 <span class="card-counter" id="counter"></span>
 <button class="nav-btn primary" id="nextBtn" onclick="go(1)">Next &rarr;</button>
 </div>
-<div class="timer-row">
-<div class="timer-pills-row">
-<span class="timer-pill" onclick="pillTap(60,this)">1 min</span>
-<span class="timer-pill" onclick="pillTap(120,this)">2 min</span>
-<span class="timer-pill" onclick="pillTap(180,this)">3 min</span>
-<span class="timer-pill" onclick="pillTap(300,this)">5 min</span>
-<span class="timer-pill" onclick="pillTap(600,this)">10 min</span>
+<div class="timer-section">
+<div class="timer-controls">
+<span class="timer-pill" onclick="selectTime(60,this)">1 min</span>
+<span class="timer-pill" onclick="selectTime(120,this)">2 min</span>
+<span class="timer-pill" onclick="selectTime(180,this)">3 min</span>
+<span class="timer-pill" onclick="selectTime(300,this)">5 min</span>
+<button class="timer-play" id="timerPlay" onclick="toggleTimer()">&#9654; Start</button>
 <span class="timer-display" id="timerDisplay">0:00</span>
-<span class="timer-pill timer-restart" id="timerRestartBtn" onclick="restartTimer()">Restart</span>
+<button class="timer-restart" id="timerRestart" onclick="restartTimer()">Restart</button>
 </div>
-<div class="timer-hint">tap to start · tap again to pause</div>
+<div class="timer-progress"><div class="timer-progress-fill" id="timerProgress"></div></div>
 </div>
 </div>
 
@@ -578,66 +582,51 @@ function renderPB() {
 }
 
 // Timer
-var timerInterval = null, timerSeconds = 0, timerPaused = false, lastTimerSecs = 0, activePill = null;
+var timerInterval = null, timerSeconds = 0, timerTotal = 0, timerRunning = false, timerPaused = false;
 
-function pillTap(secs, pill) {
-  if (activePill === pill && timerInterval) {
-    // Same pill tapped while running -> pause
-    clearInterval(timerInterval); timerInterval = null;
-    timerPaused = true;
-    pill.classList.remove('playing');
-    pill.classList.add('paused');
-    return;
-  }
-  if (activePill === pill && timerPaused && timerSeconds > 0) {
-    // Same pill tapped while paused -> resume
-    timerPaused = false;
-    pill.classList.remove('paused');
-    pill.classList.add('playing');
-    timerInterval = setInterval(tickTimer, 1000);
-    return;
-  }
-  // New pill or first tap -> start fresh
-  if (timerInterval) clearInterval(timerInterval);
-  document.querySelectorAll('.timer-pill').forEach(function(p){p.classList.remove('active');p.classList.remove('playing');p.classList.remove('paused')});
+function selectTime(secs,pill){
+  if(timerRunning||timerPaused) resetTimer();
+  timerTotal=secs;timerSeconds=secs;
+  document.querySelectorAll('.timer-pill').forEach(function(p){p.classList.remove('active');});
   pill.classList.add('active');
-  pill.classList.add('playing');
-  activePill = pill;
-  timerSeconds = secs;
-  lastTimerSecs = secs;
-  timerPaused = false;
-  document.getElementById('timerDisplay').className = 'timer-display';
-  document.getElementById('timerRestartBtn').className = 'timer-pill timer-restart show';
-  updateTimer();
-  timerInterval = setInterval(tickTimer, 1000);
+  document.getElementById('timerRestart').className='timer-restart show';
+  document.getElementById('timerPlay').textContent='\u25B6 Start';
+  document.getElementById('timerPlay').className='timer-play';
+  updateTimerDisplay();
+  document.getElementById('timerProgress').style.width='0%';
+  document.getElementById('timerProgress').className='timer-progress-fill';
 }
-
-function tickTimer() {
-  timerSeconds--;
-  if (timerSeconds <= 10 && timerSeconds > 0) document.getElementById('timerDisplay').className = 'timer-display warn';
-  if (timerSeconds <= 0) {
-    clearInterval(timerInterval); timerInterval = null;
-    document.getElementById('timerDisplay').className = 'timer-display done';
-    document.getElementById('timerDisplay').textContent = '0:00';
-    if (activePill) activePill.classList.remove('playing');
-  } else { updateTimer(); }
+function toggleTimer(){
+  if(!timerTotal) return;
+  var btn=document.getElementById('timerPlay');
+  if(!timerRunning&&!timerPaused){timerRunning=true;btn.textContent='\u23F8 Pause';btn.className='timer-play';runTimerTick();}
+  else if(timerRunning){clearInterval(timerInterval);timerInterval=null;timerRunning=false;timerPaused=true;btn.textContent='\u25B6 Resume';btn.className='timer-play paused';}
+  else{timerPaused=false;timerRunning=true;btn.textContent='\u23F8 Pause';btn.className='timer-play';runTimerTick();}
 }
-
-function restartTimer() {
-  if (!lastTimerSecs || !activePill) return;
-  if (timerInterval) clearInterval(timerInterval);
-  timerSeconds = lastTimerSecs;
-  timerPaused = false;
-  document.getElementById('timerDisplay').className = 'timer-display';
-  activePill.classList.remove('paused');
-  activePill.classList.add('playing');
-  updateTimer();
-  timerInterval = setInterval(tickTimer, 1000);
+function runTimerTick(){
+  var disp=document.getElementById('timerDisplay');var prog=document.getElementById('timerProgress');
+  timerInterval=setInterval(function(){
+    timerSeconds--;var pct=((timerTotal-timerSeconds)/timerTotal)*100;prog.style.width=pct+'%';
+    if(timerSeconds<=10&&timerSeconds>0){disp.className='timer-display warn';prog.className='timer-progress-fill warn';}
+    if(timerSeconds<=0){clearInterval(timerInterval);timerInterval=null;timerRunning=false;disp.className='timer-display done';disp.textContent='0:00';prog.style.width='100%';prog.className='timer-progress-fill warn';document.getElementById('timerPlay').textContent='\u25B6 Start';document.getElementById('timerPlay').className='timer-play';}
+    else{updateTimerDisplay();}
+  },1000);
 }
-
-function updateTimer() {
-  var m = Math.floor(timerSeconds/60), s = timerSeconds%60;
-  document.getElementById('timerDisplay').textContent = m+':'+(s<10?'0':'')+s;
+function restartTimer(){
+  if(!timerTotal)return;clearInterval(timerInterval);timerInterval=null;timerSeconds=timerTotal;timerRunning=false;timerPaused=false;
+  document.getElementById('timerDisplay').className='timer-display';document.getElementById('timerProgress').style.width='0%';document.getElementById('timerProgress').className='timer-progress-fill';
+  document.getElementById('timerPlay').textContent='\u25B6 Start';document.getElementById('timerPlay').className='timer-play';updateTimerDisplay();
+}
+function resetTimer(){
+  clearInterval(timerInterval);timerInterval=null;timerRunning=false;timerPaused=false;timerTotal=0;timerSeconds=0;
+  document.getElementById('timerDisplay').textContent='0:00';document.getElementById('timerDisplay').className='timer-display';
+  document.getElementById('timerProgress').style.width='0%';document.getElementById('timerProgress').className='timer-progress-fill';
+  document.querySelectorAll('.timer-pill').forEach(function(p){p.classList.remove('active');});
+  document.getElementById('timerRestart').className='timer-restart';document.getElementById('timerPlay').textContent='\u25B6 Start';document.getElementById('timerPlay').className='timer-play';
+}
+function updateTimerDisplay(){
+  var m=Math.floor(timerSeconds/60),s=timerSeconds%60;
+  document.getElementById('timerDisplay').textContent=m+':'+(s<10?'0':'')+s;
 }
 
 document.addEventListener('keydown', function(e) { if (e.key === 'ArrowLeft') go(-1); if (e.key === 'ArrowRight') go(1); });
