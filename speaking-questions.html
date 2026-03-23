@@ -68,16 +68,23 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,252,247,
 .q-item.thought .q-num{color:var(--lavender)}
 
 /* Timer */
-.timer-row{display:flex;align-items:center;gap:.5rem;justify-content:center;margin-top:1rem}
+.timer-section{max-width:800px;margin:1rem auto 0}
+.timer-controls{display:flex;align-items:center;gap:.5rem;justify-content:center;flex-wrap:wrap;margin-bottom:.4rem}
 .timer-pill{font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:700;padding:.35rem .7rem;border:1.5px solid var(--border);border-radius:20px;background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s}
 .timer-pill:hover{border-color:var(--sea);color:var(--sea)}
 .timer-pill.active{border-color:var(--sea);background:var(--sea);color:#fff}
+.timer-play{font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:700;padding:.5rem 1.2rem;border:1.5px solid var(--sea);border-radius:8px;background:var(--sea);color:#fff;cursor:pointer;transition:all .15s}
+.timer-play:hover{opacity:.9}
+.timer-play.paused{background:var(--sun);border-color:var(--sun)}
 .timer-display{font-family:'JetBrains Mono',monospace;font-size:1.5rem;font-weight:700;color:var(--ink);min-width:60px;text-align:center;transition:color .3s}
 .timer-display.warn{color:var(--coral)}
 .timer-display.done{color:var(--sea)}
-.timer-stop{font-family:'Nunito',sans-serif;font-size:.75rem;font-weight:700;padding:.3rem .6rem;border:1.5px solid var(--coral);border-radius:20px;background:transparent;color:var(--coral);cursor:pointer;transition:all .15s;display:none}
-.timer-stop:hover{background:var(--coral);color:#fff}
-.timer-stop.show{display:inline-block}
+.timer-restart{font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:700;padding:.35rem .7rem;border:1.5px solid var(--border);border-radius:20px;background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s;display:none}
+.timer-restart:hover{border-color:var(--ink);color:var(--ink)}
+.timer-restart.show{display:inline-block}
+.timer-progress{width:100%;height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:.3rem}
+.timer-progress-fill{height:100%;background:var(--sea);border-radius:3px;transition:width .3s linear;width:0%}
+.timer-progress-fill.warn{background:var(--coral)}
 
 /* Nav between topics */
 .deck-nav{display:flex;justify-content:space-between;align-items:center;margin-top:1rem;gap:1rem}
@@ -102,7 +109,7 @@ nav{padding:.75rem 1.2rem}.nav-links{gap:1rem}.nav-links a{font-size:.78rem}
 }
 
 @media print{
-nav,.page-header,.controls,.deck-nav,.timer-row,footer{display:none}
+nav,.page-header,.controls,.deck-nav,.timer-section,footer{display:none}
 .main{padding:0;margin:0}
 .deck{box-shadow:none;border:1px solid #ccc}
 }
@@ -145,13 +152,17 @@ nav,.page-header,.controls,.deck-nav,.timer-row,footer{display:none}
 <span class="deck-counter" id="deckCounter"></span>
 <button class="nav-btn primary" id="nextTopic" onclick="goTopic(1)">Next topic &rarr;</button>
 </div>
-<div class="timer-row">
-<span class="timer-pill" onclick="startTimer(60,this)">1 min</span>
-<span class="timer-pill" onclick="startTimer(120,this)">2 min</span>
-<span class="timer-pill" onclick="startTimer(180,this)">3 min</span>
-<span class="timer-pill" onclick="startTimer(300,this)">5 min</span>
+<div class="timer-section">
+<div class="timer-controls">
+<span class="timer-pill" onclick="selectTime(30,this)">30s</span>
+<span class="timer-pill" onclick="selectTime(60,this)">1 min</span>
+<span class="timer-pill" onclick="selectTime(120,this)">2 min</span>
+<span class="timer-pill" onclick="selectTime(180,this)">3 min</span>
+<button class="timer-play" id="timerPlay" onclick="toggleTimer()">&#9654; Start</button>
 <span class="timer-display" id="timerDisplay">0:00</span>
-<button class="timer-stop" id="timerStop" onclick="stopTimer()">Stop</button>
+<button class="timer-restart" id="timerRestart" onclick="restartTimer()">Restart</button>
+</div>
+<div class="timer-progress"><div class="timer-progress-fill" id="timerProgress"></div></div>
 </div>
 </div>
 
@@ -245,43 +256,56 @@ function goTopic(dir) {
   selectTopic(newIdx, null);
 }
 
-// Timer
+// Timer — unified
 var timerInterval = null;
 var timerSeconds = 0;
+var timerTotal = 0;
+var timerRunning = false;
+var timerPaused = false;
 
-function startTimer(secs, pill) {
-  stopTimer();
-  document.querySelectorAll('.timer-pill').forEach(function(p) { p.classList.remove('active'); });
+function selectTime(secs,pill){
+  if(timerRunning||timerPaused) resetTimer();
+  timerTotal=secs;timerSeconds=secs;
+  document.querySelectorAll('.timer-pill').forEach(function(p){p.classList.remove('active');});
   pill.classList.add('active');
-  timerSeconds = secs;
-  document.getElementById('timerDisplay').className = 'timer-display';
-  document.getElementById('timerStop').className = 'timer-stop show';
+  document.getElementById('timerRestart').className='timer-restart show';
+  document.getElementById('timerPlay').textContent='\u25B6 Start';
+  document.getElementById('timerPlay').className='timer-play';
   updateTimerDisplay();
-  timerInterval = setInterval(function() {
-    timerSeconds--;
-    if (timerSeconds <= 10 && timerSeconds > 0) document.getElementById('timerDisplay').className = 'timer-display warn';
-    if (timerSeconds <= 0) {
-      clearInterval(timerInterval); timerInterval = null;
-      document.getElementById('timerDisplay').className = 'timer-display done';
-      document.getElementById('timerDisplay').textContent = "0:00";
-      document.querySelectorAll('.timer-pill').forEach(function(p) { p.classList.remove('active'); });
-      document.getElementById('timerStop').className = 'timer-stop';
-    } else { updateTimerDisplay(); }
-  }, 1000);
+  document.getElementById('timerProgress').style.width='0%';
+  document.getElementById('timerProgress').className='timer-progress-fill';
 }
-
-function updateTimerDisplay() {
-  var m = Math.floor(timerSeconds / 60);
-  var s = timerSeconds % 60;
-  document.getElementById('timerDisplay').textContent = m + ':' + (s < 10 ? '0' : '') + s;
+function toggleTimer(){
+  if(!timerTotal) return;
+  var btn=document.getElementById('timerPlay');
+  if(!timerRunning&&!timerPaused){timerRunning=true;btn.textContent='\u23F8 Pause';btn.className='timer-play';runTimer();}
+  else if(timerRunning){clearInterval(timerInterval);timerInterval=null;timerRunning=false;timerPaused=true;btn.textContent='\u25B6 Resume';btn.className='timer-play paused';}
+  else{timerPaused=false;timerRunning=true;btn.textContent='\u23F8 Pause';btn.className='timer-play';runTimer();}
 }
-
-function stopTimer() {
-  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-  document.getElementById('timerDisplay').textContent = '0:00';
-  document.getElementById('timerDisplay').className = 'timer-display';
-  document.querySelectorAll('.timer-pill').forEach(function(p) { p.classList.remove('active'); });
-  document.getElementById('timerStop').className = 'timer-stop';
+function runTimer(){
+  var disp=document.getElementById('timerDisplay');var prog=document.getElementById('timerProgress');
+  timerInterval=setInterval(function(){
+    timerSeconds--;var pct=((timerTotal-timerSeconds)/timerTotal)*100;prog.style.width=pct+'%';
+    if(timerSeconds<=10&&timerSeconds>0){disp.className='timer-display warn';prog.className='timer-progress-fill warn';}
+    if(timerSeconds<=0){clearInterval(timerInterval);timerInterval=null;timerRunning=false;disp.className='timer-display done';disp.textContent='0:00';prog.style.width='100%';prog.className='timer-progress-fill warn';document.getElementById('timerPlay').textContent='\u25B6 Start';document.getElementById('timerPlay').className='timer-play';}
+    else{updateTimerDisplay();}
+  },1000);
+}
+function restartTimer(){
+  if(!timerTotal)return;clearInterval(timerInterval);timerInterval=null;timerSeconds=timerTotal;timerRunning=false;timerPaused=false;
+  document.getElementById('timerDisplay').className='timer-display';document.getElementById('timerProgress').style.width='0%';document.getElementById('timerProgress').className='timer-progress-fill';
+  document.getElementById('timerPlay').textContent='\u25B6 Start';document.getElementById('timerPlay').className='timer-play';updateTimerDisplay();
+}
+function resetTimer(){
+  clearInterval(timerInterval);timerInterval=null;timerRunning=false;timerPaused=false;timerTotal=0;timerSeconds=0;
+  document.getElementById('timerDisplay').textContent='0:00';document.getElementById('timerDisplay').className='timer-display';
+  document.getElementById('timerProgress').style.width='0%';document.getElementById('timerProgress').className='timer-progress-fill';
+  document.querySelectorAll('.timer-pill').forEach(function(p){p.classList.remove('active');});
+  document.getElementById('timerRestart').className='timer-restart';document.getElementById('timerPlay').textContent='\u25B6 Start';document.getElementById('timerPlay').className='timer-play';
+}
+function updateTimerDisplay(){
+  var m=Math.floor(timerSeconds/60),s=timerSeconds%60;
+  document.getElementById('timerDisplay').textContent=m+':'+(s<10?'0':'')+s;
 }
 
 function randomTopic() {
