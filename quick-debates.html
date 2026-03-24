@@ -161,6 +161,20 @@ footer{text-align:center;padding:3rem 2rem;font-size:.8rem;color:var(--muted);bo
 .fp-item:nth-child(odd){color:var(--lavender);font-weight:700;font-style:italic}
 .fp-item:nth-child(even){color:var(--ink);font-weight:700}
 .fp-item.crossed{text-decoration:line-through;opacity:.35}
+
+/* Teacher feedback */
+.teacher-feedback{max-width:960px;margin:1.5rem auto 0;padding:0 2rem;position:relative;z-index:1}
+.tf-label{font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--sun);margin-bottom:.8rem;font-weight:500}
+.tf-grid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+.tf-item{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:1rem 1.2rem}
+.tf-criterion{font-family:'DM Serif Display',serif;font-size:.95rem;margin-bottom:.3rem}
+.tf-desc{font-size:.75rem;color:var(--muted);margin-bottom:.5rem;line-height:1.4}
+.tf-scale{display:flex;gap:.3rem}
+.tf-dot{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:var(--muted);cursor:pointer;transition:all .2s}
+.tf-dot:hover,.tf-dot.selected{background:var(--sea);border-color:var(--sea);color:#fff}
+@media(max-width:768px){.tf-grid{grid-template-columns:1fr}}
+@media(max-width:640px){.teacher-feedback{padding:0 1.2rem}}
+@media print{.teacher-feedback{display:none}}
 </style>
 </head>
 <body>
@@ -237,6 +251,33 @@ footer{text-align:center;padding:3rem 2rem;font-size:.8rem;color:var(--muted);bo
 <button class="pb-lvl" onclick="setPBLevel('C2',this)">C2</button>
 </div>
 <div class="pb-grid" id="pbGrid"></div>
+</div>
+</div>
+
+<div class="teacher-feedback">
+<div class="tf-label">Teacher Feedback</div>
+<div class="tf-grid">
+<div class="tf-item">
+<div class="tf-criterion">Grammar &amp; Vocabulary</div>
+<div class="tf-desc">Used a range of grammatical structures and vocabulary accurately and appropriately</div>
+<div class="tf-scale"><div class="tf-dot" onclick="tfRate(this)">1</div><div class="tf-dot" onclick="tfRate(this)">2</div><div class="tf-dot" onclick="tfRate(this)">3</div><div class="tf-dot" onclick="tfRate(this)">4</div><div class="tf-dot" onclick="tfRate(this)">5</div></div>
+</div>
+<div class="tf-item">
+<div class="tf-criterion">Pronunciation</div>
+<div class="tf-desc">Clear individual sounds, appropriate word and sentence stress, and natural intonation</div>
+<div class="tf-scale"><div class="tf-dot" onclick="tfRate(this)">1</div><div class="tf-dot" onclick="tfRate(this)">2</div><div class="tf-dot" onclick="tfRate(this)">3</div><div class="tf-dot" onclick="tfRate(this)">4</div><div class="tf-dot" onclick="tfRate(this)">5</div></div>
+</div>
+<div class="tf-item">
+<div class="tf-criterion">Discourse Management</div>
+<div class="tf-desc">Organised ideas coherently with appropriate cohesive devices and relevant contributions</div>
+<div class="tf-scale"><div class="tf-dot" onclick="tfRate(this)">1</div><div class="tf-dot" onclick="tfRate(this)">2</div><div class="tf-dot" onclick="tfRate(this)">3</div><div class="tf-dot" onclick="tfRate(this)">4</div><div class="tf-dot" onclick="tfRate(this)">5</div></div>
+</div>
+<div class="tf-item">
+<div class="tf-criterion">Interactive Communication</div>
+<div class="tf-desc">Initiated and responded appropriately, maintained and developed the interaction</div>
+<div class="tf-scale"><div class="tf-dot" onclick="tfRate(this)">1</div><div class="tf-dot" onclick="tfRate(this)">2</div><div class="tf-dot" onclick="tfRate(this)">3</div><div class="tf-dot" onclick="tfRate(this)">4</div><div class="tf-dot" onclick="tfRate(this)">5</div></div>
+</div>
+</div>
 </div>
 </div>
 
@@ -685,6 +726,15 @@ resetDebates = function() {
 
 populateDropdown();
 render();
+
+function tfRate(dot){
+  var siblings=dot.parentElement.children;
+  var val=parseInt(dot.textContent);
+  for(var i=0;i<siblings.length;i++){
+    if(i<val)siblings[i].classList.add('selected');
+    else siblings[i].classList.remove('selected');
+  }
+}
 </script>
 </body>
 </html>
