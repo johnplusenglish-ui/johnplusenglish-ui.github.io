@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Picture Discussion — John + English</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Nunito:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--sun:#FFB347;--sky:#4A90D9;--sky-light:#E8F2FD;--sea:#2EC4B6;--sea-light:#E4F8F6;--coral:#FF6B6B;--lavender:#9B72CF;--lavender-light:#F0E8FA;--mint:#5DDEA0;--sand:#FFF5E6;--cream:#FFFCF7;--ink:#2D3047;--muted:#7A7D8E;--border:#E8E5DF;--card:#fff;--radius:14px;--radius-sm:10px;--shadow-sm:0 1px 3px rgba(45,48,71,.06);--shadow-md:0 4px 14px rgba(45,48,71,.08)}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Nunito',sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,var(--border) 1px,transparent 1px);background-size:28px 28px;opacity:.4;pointer-events:none;z-index:0}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,252,247,.88);backdrop-filter:blur(16px);border-bottom:1.5px solid var(--border);padding:.85rem 2rem;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-family:'DM Serif Display',serif;font-size:1.3rem;color:var(--ink);text-decoration:none}
+.nav-logo span{color:var(--sky)}
+.nav-links{display:flex;gap:1.8rem}
+.nav-links a{font-size:.85rem;font-weight:600;color:var(--muted);text-decoration:none;transition:color .2s}
+.nav-links a:hover{color:var(--sky)}
+
+.page-header{padding:6.5rem 2rem 1rem;max-width:960px;margin:0 auto}
+.back-link{display:inline-flex;align-items:center;gap:.4rem;font-size:.85rem;font-weight:600;color:var(--muted);text-decoration:none;margin-bottom:1.2rem;transition:color .2s}
+.back-link:hover{color:var(--sky)}
+.section-label{font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--sun);margin-bottom:.5rem;font-weight:500}
+.page-title{font-family:'DM Serif Display',serif;font-size:clamp(2rem,5vw,3rem);margin-bottom:.8rem;font-weight:400}
+.page-desc{color:var(--muted);font-size:1.05rem;max-width:600px;line-height:1.7;margin-bottom:1.5rem}
+
+.main-area{max-width:960px;margin:0 auto;padding:0 2rem 4rem;position:relative;z-index:1}
+
+/* Mode pills */
+.mode-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.8rem}
+.mode-pill{padding:9px 18px;border-radius:100px;font-size:.82rem;font-weight:700;cursor:pointer;border:2px solid var(--border);background:var(--card);color:var(--muted);transition:all .2s;white-space:nowrap;font-family:'Nunito',sans-serif;display:flex;align-items:center;gap:7px}
+.mode-pill .lvl{font-family:'JetBrains Mono',monospace;font-size:.65rem;font-weight:500;padding:2px 7px;border-radius:5px;letter-spacing:.5px}
+.mode-pill:hover{border-color:var(--sky);color:var(--ink)}
+.mode-pill.active{color:#fff;box-shadow:var(--shadow-sm)}
+.mode-pill[data-mode="b2"].active{background:var(--sky);border-color:var(--sky)}
+.mode-pill[data-mode="c1"].active{background:var(--sea);border-color:var(--sea)}
+.mode-pill[data-mode="c2"].active{background:var(--lavender);border-color:var(--lavender)}
+.mode-pill[data-mode="gen"].active{background:var(--sun);border-color:var(--sun);color:var(--ink)}
+.mode-pill.active .lvl{background:rgba(255,255,255,.2);color:#fff}
+.mode-pill[data-mode="gen"].active .lvl{background:rgba(0,0,0,.1);color:var(--ink)}
+.mode-pill:not(.active) .lvl-b2{background:var(--sky-light);color:var(--sky)}
+.mode-pill:not(.active) .lvl-c1{background:var(--sea-light);color:var(--sea)}
+.mode-pill:not(.active) .lvl-c2{background:var(--lavender-light);color:var(--lavender)}
+.mode-pill:not(.active) .lvl-gen{background:var(--sand);color:var(--sun)}
+
+/* Panels */
+.panel{display:none;animation:fadeUp .3s ease}
+.panel.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* Exam info banner */
+.exam-info{display:flex;gap:12px;align-items:flex-start;padding:14px 18px;border-radius:var(--radius-sm);margin-bottom:20px;font-size:.88rem;line-height:1.55;color:var(--ink)}
+.exam-info.b2{background:var(--sky-light);border-left:3px solid var(--sky)}
+.exam-info.c1{background:var(--sea-light);border-left:3px solid var(--sea)}
+.exam-info.c2{background:var(--lavender-light);border-left:3px solid var(--lavender)}
+.exam-info.gen{background:var(--sand);border-left:3px solid var(--sun)}
+.exam-info svg{flex-shrink:0;margin-top:2px}
+.exam-info strong{font-weight:700}
+
+/* ── ACCORDION CARDS ── */
+.acc-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);margin-bottom:12px;overflow:hidden;transition:box-shadow .2s}
+.acc-card:hover{box-shadow:var(--shadow-md)}
+.acc-card.open{box-shadow:var(--shadow-md)}
+.acc-header{padding:16px 22px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:background .15s;user-select:none}
+.acc-header:hover{background:var(--cream)}
+.acc-title{display:flex;align-items:center;gap:10px;font-weight:700;font-size:.95rem}
+.set-badge{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:500;padding:4px 10px;border-radius:6px;letter-spacing:.5px}
+.set-badge.b2{background:var(--sky-light);color:var(--sky)}
+.set-badge.c1{background:var(--sea-light);color:var(--sea)}
+.set-badge.c2{background:var(--lavender-light);color:var(--lavender)}
+.set-badge.gen{background:var(--sand);color:var(--sun)}
+.chevron{color:var(--muted);transition:transform .25s;font-size:.85rem}
+.acc-card.open .chevron{transform:rotate(180deg)}
+.acc-body{display:none;padding:0 22px 22px;border-top:1.5px solid var(--border)}
+.acc-card.open .acc-body{display:block;animation:fadeUp .2s ease}
+
+/* Labels */
+.lbl{font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;margin-top:16px;font-weight:500}
+.lbl:first-child{margin-top:14px}
+
+/* Images */
+.img-row{display:flex;gap:12px;margin-bottom:4px}
+.img-slot{flex:1;aspect-ratio:4/3;border-radius:var(--radius-sm);overflow:hidden;position:relative;background:var(--cream);border:1.5px solid var(--border)}
+.img-slot img{width:100%;height:100%;object-fit:cover;display:block}
+.img-label{position:absolute;top:7px;left:7px;background:rgba(45,48,71,.6);color:#fff;font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:5px;backdrop-filter:blur(4px);letter-spacing:.3px}
+.img-row.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.img-row.grid-3 .img-slot{aspect-ratio:4/3}
+.img-row.grid-5{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.img-row.grid-5 .img-slot{aspect-ratio:1}
+.img-row.single{max-width:440px}
+
+/* Task instruction */
+.task-q{font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:700;line-height:1.55;color:var(--ink);padding:14px 18px;border-radius:var(--radius-sm);margin-top:14px;margin-bottom:4px}
+.task-q.b2{background:var(--sky-light);border-left:3px solid var(--sky)}
+.task-q.c1{background:var(--sea-light);border-left:3px solid var(--sea)}
+.task-q.c2{background:var(--lavender-light);border-left:3px solid var(--lavender)}
+.task-q.gen{background:var(--sand);border-left:3px solid var(--sun)}
+
+/* Timer */
+.timer-row{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--cream);border-radius:var(--radius-sm);margin-top:12px;border:1.5px solid var(--border);font-size:.84rem;color:var(--muted)}
+.timer-row strong{color:var(--ink);font-weight:700}
+.timer-display{font-family:'JetBrains Mono',monospace;font-size:.95rem;font-weight:500;color:var(--ink);min-width:44px;text-align:center;display:none}
+.timer-display.visible{display:inline}
+.timer-btn{margin-left:auto;background:var(--sky);color:#fff;border:none;border-radius:100px;padding:6px 16px;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;font-family:'Nunito',sans-serif}
+.timer-btn:hover{background:#3A7DC4;transform:translateY(-1px)}
+.timer-btn.running{background:var(--coral)}
+.timer-btn.running:hover{background:#E55A5A}
+
+/* Guided prompts */
+.prompts-list{display:flex;flex-direction:column;gap:8px;margin-top:2px}
+.p-item{display:flex;align-items:flex-start;gap:10px;padding:11px 14px;background:var(--cream);border-radius:var(--radius-sm);border:1.5px solid transparent;transition:all .15s}
+.p-item:hover{border-color:var(--border);background:var(--card)}
+.p-num{width:24px;height:24px;border-radius:50%;font-size:.7rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.p-num.b2{background:var(--sky-light);color:var(--sky)}
+.p-num.c1{background:var(--sea-light);color:var(--sea)}
+.p-num.c2{background:var(--lavender-light);color:var(--lavender)}
+.p-num.gen{background:var(--sand);color:var(--sun)}
+.p-text{font-size:.87rem;color:var(--ink);line-height:1.5;font-weight:600}
+.p-hint{display:block;font-size:.8rem;color:var(--muted);font-style:italic;margin-top:2px;font-weight:400}
+
+/* Follow-up */
+.followup{padding:11px 14px;border-radius:var(--radius-sm);display:flex;align-items:flex-start;gap:10px;margin-top:2px}
+.followup.b2{background:var(--sky-light)}
+.followup.c1{background:var(--sea-light)}
+
+/* Language box */
+.lang-box{border-radius:var(--radius-sm);padding:14px 18px;margin-top:0}
+.lang-box.b2{background:var(--sky-light);border:1px solid rgba(74,144,217,.15)}
+.lang-box.c1{background:var(--sea-light);border:1px solid rgba(46,196,182,.15)}
+.lang-box.c2{background:var(--lavender-light);border:1px solid rgba(155,114,207,.15)}
+.lang-box.gen{background:var(--sand);border:1px solid rgba(255,179,71,.15)}
+.lang-title{font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:500;text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px}
+.lang-box.b2 .lang-title{color:var(--sky)}
+.lang-box.c1 .lang-title{color:var(--sea)}
+.lang-box.c2 .lang-title{color:var(--lavender)}
+.lang-box.gen .lang-title{color:var(--sun)}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{font-size:.8rem;font-weight:600;background:var(--card);border:1.5px solid var(--border);border-radius:100px;padding:4px 12px;color:var(--ink);transition:all .15s}
+.chip:hover{transform:translateY(-1px);box-shadow:var(--shadow-sm)}
+
+/* C2 phase tabs */
+.phase-tabs{display:flex;gap:4px;background:var(--cream);border-radius:100px;padding:3px;width:fit-content;margin-top:14px;border:1.5px solid var(--border)}
+.phase-tab{font-family:'Nunito',sans-serif;padding:6px 16px;border-radius:100px;font-size:.78rem;font-weight:700;cursor:pointer;border:none;background:transparent;color:var(--muted);transition:all .2s}
+.phase-tab:hover{color:var(--ink)}
+.phase-tab.active{background:var(--lavender);color:#fff;box-shadow:var(--shadow-sm)}
+.phase-block{display:none;margin-top:10px}
+.phase-block.active{display:block}
+
+/* Sub-dropdowns inside accordion cards */
+.sub-drop{margin-top:12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;background:var(--card)}
+.sub-drop-header{padding:11px 16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none;transition:background .15s;font-size:.84rem;font-weight:700;color:var(--ink)}
+.sub-drop-header:hover{background:var(--cream)}
+.sub-drop-header .sub-icon{font-size:.75rem;color:var(--muted);transition:transform .2s}
+.sub-drop.open .sub-drop-header .sub-icon{transform:rotate(180deg)}
+.sub-drop-body{display:none;padding:0 16px 14px;border-top:1px solid var(--border)}
+.sub-drop.open .sub-drop-body{display:block}
+.sub-drop-header .sub-label{display:flex;align-items:center;gap:8px}
+.sub-drop-header .sub-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.sub-dot.b2{background:var(--sky)}.sub-dot.c1{background:var(--sea)}.sub-dot.c2{background:var(--lavender)}.sub-dot.gen{background:var(--sun)}
+
+@media(max-width:700px){
+  .page-header{padding:5.5rem 1.2rem 1rem}
+  .main-area{padding:0 1.2rem 3rem}
+  .acc-header{padding:14px 16px}
+  .acc-body{padding:0 16px 18px}
+  .img-row{flex-direction:column}
+  .img-row.grid-3,.img-row.grid-5{grid-template-columns:1fr 1fr}
+  .phase-tabs{width:100%}
+  .phase-tab{flex:1;text-align:center;font-size:.72rem;padding:6px 8px}
+  nav{padding:.85rem 1.2rem}
+  .nav-links{gap:1rem}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">John <span>+</span> English</a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="resources.html">Resources</a>
+    <a href="#">Speaking</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <a href="index.html" class="back-link">← Back to Home</a>
+  <div class="section-label">Speaking Practice</div>
+  <h1 class="page-title">Picture Discussion</h1>
+  <p class="page-desc">Describe, compare, and speculate about images. Practise for Cambridge Speaking Part 2 or build descriptive fluency at any level.</p>
+</div>
+
+<div class="main-area">
+  <div class="mode-bar" role="tablist">
+    <button class="mode-pill active" role="tab" data-mode="b2"><span class="lvl lvl-b2">B2</span> FCE Part 2</button>
+    <button class="mode-pill" role="tab" data-mode="c1"><span class="lvl lvl-c1">C1</span> CAE Part 2</button>
+    <button class="mode-pill" role="tab" data-mode="c2"><span class="lvl lvl-c2">C2</span> CPE Part 2</button>
+    <button class="mode-pill" role="tab" data-mode="gen"><span class="lvl lvl-gen">ALL</span> Free Describe</button>
+  </div>
+
+  <div class="panel active" id="panel-b2"></div>
+  <div class="panel" id="panel-c1"></div>
+  <div class="panel" id="panel-c2"></div>
+  <div class="panel" id="panel-gen"></div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+//  IMAGE SET DATA
+// ══════════════════════════════════════════
+const U = (id, w=480) => `https://images.unsplash.com/photo-${id}?w=${w}&q=80&auto=format`;
+
+const b2Sets = [
+  { topic:"Spending free time", photos:[U("1529156069898-49953e39b3ac"),U("1515191107209-c28698631303")], question:"Here are two photographs showing people spending their free time. Compare the photographs, and say <strong>how relaxing each activity might be</strong>.", followUp:"Which of these ways of spending free time do you prefer?" },
+  { topic:"Working", photos:[U("1497366216548-37526070297c"),U("1521898284481-a5ec348cb555")], question:"Here are two photographs showing people working. Compare the photographs, and say <strong>what the advantages and disadvantages of each work environment might be</strong>.", followUp:"Which of these work environments would you prefer?" },
+  { topic:"Celebrating", photos:[U("1530103862676-de8c9debad1d"),U("1504674900247-0877df9cc836")], question:"Here are two photographs showing people celebrating. Compare the photographs, and say <strong>how the people might be feeling</strong>.", followUp:"Do you prefer big celebrations or smaller, more intimate ones?" },
+  { topic:"Shopping", photos:[U("1441986300917-64674bd600d8"),U("1556742049-0cfed4f6a45d")], question:"Here are two photographs showing people shopping. Compare the photographs, and say <strong>how enjoyable each shopping experience might be</strong>.", followUp:"Do you prefer shopping in person or online?" },
+  { topic:"Exercising", photos:[U("1571019614242-c5c5dee9f50c"),U("1551698618-1dfe5d97d256")], question:"Here are two photographs showing people exercising. Compare the photographs, and say <strong>how motivating each type of exercise might be</strong>.", followUp:"Which type of exercise do you think is better for your health?" },
+  { topic:"Travelling", photos:[U("1469854523086-cc02fe5d8800"),U("1436491865332-7a61a109db05")], question:"Here are two photographs showing people travelling. Compare the photographs, and say <strong>how exciting each way of travelling might be</strong>.", followUp:"Which way of travelling do you enjoy more?" },
+  { topic:"Eating together", photos:[U("1414235077428-338989a2e8c0"),U("1517248135467-4c7edcad34c4")], question:"Here are two photographs showing people eating together. Compare the photographs, and say <strong>what the people might be enjoying about each situation</strong>.", followUp:"Do you prefer eating at home or going out to a restaurant?" },
+  { topic:"Learning", photos:[U("1524178232363-1fb2b075b655"),U("1588702547923-7093a6c3ba33")], question:"Here are two photographs showing people learning. Compare the photographs, and say <strong>how effective each learning situation might be</strong>.", followUp:"Which way of learning works best for you?" },
+  { topic:"Performing", photos:[U("1493225457124-a3eb161ffa5f"),U("1516450360452-9312f5e86fc7")], question:"Here are two photographs showing people performing music. Compare the photographs, and say <strong>how the performers might be feeling</strong>.", followUp:"Have you ever performed in front of other people?" },
+  { topic:"Helping others", photos:[U("1559027615-cd4628902d4a"),U("1516321318423-f06f85e504b3")], question:"Here are two photographs showing people helping others. Compare the photographs, and say <strong>how rewarding each experience might be</strong>.", followUp:"Which type of helping others appeals to you more?" },
+];
+
+const c1Sets = [
+  { topic:"Ways of keeping fit", photos:[U("1534438327276-14e5300c3a48"),U("1544367567-0f2fcb009e0b"),U("1571019613454-1cb2f99b2d8b")], question:"Here are some photographs showing different ways of keeping fit. I'd like you to compare two of the photographs, and say <strong>how challenging each activity might be for a beginner</strong>.", followUp:"Which of these activities do you think is the most effective way to keep fit?" },
+  { topic:"Places to live", photos:[U("1480714378408-67cf0d13bc1b"),U("1510798831971-661eb04b3739"),U("1545324418-cc1a3fa10c00")], question:"Here are some photographs showing different places to live. I'd like you to compare two of the photographs, and say <strong>what the quality of life might be like in each place</strong>.", followUp:"Which of these places would you most like to live in?" },
+  { topic:"Ways of communicating", photos:[U("1543269865-cbf427effbad"),U("1516321318423-f06f85e504b3"),U("1534536281715-e28d76689b4d")], question:"Here are some photographs showing different ways of communicating. I'd like you to compare two of the photographs, and say <strong>how personal each form of communication feels</strong>.", followUp:"Which form of communication do you use the most?" },
+  { topic:"Holiday activities", photos:[U("1507525428034-b723cf961d3e"),U("1551632811-561732d1e306"),U("1533105079780-92b9be482077")], question:"Here are some photographs showing different holiday activities. I'd like you to compare two of the photographs, and say <strong>how memorable each experience might be</strong>.", followUp:"Which of these holiday activities appeals to you the most?" },
+  { topic:"Working with others", photos:[U("1522202176988-66273c2fd55f"),U("1573164574572-cb89e39749b4"),U("1531482615713-2adb69a1a225")], question:"Here are some photographs showing people working with others. I'd like you to compare two of the photographs, and say <strong>how productive each way of working together might be</strong>.", followUp:"Do you prefer working in a small team or a larger group?" },
+  { topic:"Entertainment", photos:[U("1489599849927-2ee91cede3ba"),U("1501281668745-f7f57925c3b4"),U("1511882150382-421056c89033")], question:"Here are some photographs showing different forms of entertainment. I'd like you to compare two of the photographs, and say <strong>how immersive each experience might be</strong>.", followUp:"Which of these do you turn to most often for entertainment?" },
+  { topic:"Environmental actions", photos:[U("1532996122724-e3c354a0b15b"),U("1509391366360-2e959784a276"),U("1416169607655-0c2b3ce2e1cc")], question:"Here are some photographs showing different ways of helping the environment. I'd like you to compare two of the photographs, and say <strong>how effective each action might be in making a real difference</strong>.", followUp:"Which of these environmental actions do you think has the biggest impact?" },
+  { topic:"Childhood experiences", photos:[U("1503454537195-1dcabb73ffb9"),U("1485546246426-74dc88dec4d9"),U("1472162072942-cd5147eb3902")], question:"Here are some photographs showing different childhood experiences. I'd like you to compare two of the photographs, and say <strong>how beneficial each activity might be for a child's development</strong>.", followUp:"Which of these activities did you enjoy most as a child?" },
+  { topic:"Eating out", photos:[U("1414235077428-338989a2e8c0"),U("1565299624946-b28f40a0ae38"),U("1567521464027-f127ff144326")], question:"Here are some photographs showing different places to eat. I'd like you to compare two of the photographs, and say <strong>how satisfying each dining experience might be</strong>.", followUp:"Which of these places to eat would you choose for a special occasion?" },
+  { topic:"Technology in daily life", photos:[U("1556656195-b8de57c0eb4f"),U("1512941937-1e0979b0b30b"),U("1588702547923-7093a6c3ba33")], question:"Here are some photographs showing technology being used in daily life. I'd like you to compare two of the photographs, and say <strong>how much each type of technology improves people's lives</strong>.", followUp:"Which piece of technology could you not live without?" },
+];
+
+const c2Sets = [
+  { topic:"Travel", theme:"travel", photos:[U("1469854523086-cc02fe5d8800"),U("1507525428034-b723cf961d3e"),U("1520250497591-112f2f40a3f4"),U("1501555088652-021faa106b9b"),U("1476514525535-07fb3b4ae5f1")], p1Photos:"1 and 4", p1Q:"Looking at photos 1 and 4, discuss together: <strong>What kind of person might choose each type of travel, and why?</strong>", p2Q:"Now, looking at all five photographs, discuss together: <strong>Which photo would be the most effective cover image for a travel magazine aimed at young adults?</strong> You must reach an agreement." },
+  { topic:"Education", theme:"education", photos:[U("1524178232363-1fb2b075b655"),U("1588702547923-7093a6c3ba33"),U("1427504494785-3a9ca7044f45"),U("1522202176988-66273c2fd55f"),U("1513542789411-b6a5d4f31634")], p1Photos:"2 and 5", p1Q:"Looking at photos 2 and 5, discuss together: <strong>What are the advantages and limitations of learning alone?</strong>", p2Q:"Now, looking at all five photographs, discuss together: <strong>Which approach to education would be most effective for training adults in a new skill?</strong> You must reach an agreement." },
+  { topic:"Work-life balance", theme:"work-life balance", photos:[U("1497366216548-37526070297c"),U("1521898284481-a5ec348cb555"),U("1529156069898-49953e39b3ac"),U("1544367567-0f2fcb009e0b"),U("1504674900247-0877df9cc836")], p1Photos:"1 and 4", p1Q:"Looking at photos 1 and 4, discuss together: <strong>How might these two aspects of life complement or conflict with each other?</strong>", p2Q:"Now, looking at all five photographs, discuss together: <strong>Which image best represents a healthy work-life balance for an advertising campaign?</strong> You must reach an agreement." },
+  { topic:"The environment", theme:"the environment", photos:[U("1532996122724-e3c354a0b15b"),U("1509391366360-2e959784a276"),U("1416169607655-0c2b3ce2e1cc"),U("1441985745073-57089202e2e4"),U("1542601906990-b4d3fb778b09")], p1Photos:"1 and 3", p1Q:"Looking at photos 1 and 3, discuss together: <strong>How effective might individual actions like these be in tackling environmental problems?</strong>", p2Q:"Now, looking at all five photographs, discuss together: <strong>Which image would be the most powerful for a poster promoting environmental awareness?</strong> You must reach an agreement." },
+  { topic:"Health and wellbeing", theme:"health and wellbeing", photos:[U("1571019614242-c5c5dee9f50c"),U("1498837167922-ddd27525d352"),U("1544367567-0f2fcb009e0b"),U("1529156069898-49953e39b3ac"),U("1515191107209-c28698631303")], p1Photos:"3 and 5", p1Q:"Looking at photos 3 and 5, discuss together: <strong>In what ways might these activities contribute to a person's overall wellbeing?</strong>", p2Q:"Now, looking at all five photographs, discuss together: <strong>Which activity should a new wellness centre prioritise in their marketing?</strong> You must reach an agreement." },
+  { topic:"Communication", theme:"communication", photos:[U("1543269865-cbf427effbad"),U("1516321318423-f06f85e504b3"),U("1534536281715-e28d76689b4d"),U("1531482615713-2adb69a1a225"),U("1573164574572-cb89e39749b4")], p1Photos:"2 and 3", p1Q:"Looking at photos 2 and 3, discuss together: <strong>What might each form of communication reveal about the relationship between the people involved?</strong>", p2Q:"Now, looking at all five photographs, discuss together: <strong>Which image best captures the essence of human connection for a photography exhibition?</strong> You must reach an agreement." },
+  { topic:"Urban vs rural life", theme:"urban vs rural life", photos:[U("1480714378408-67cf0d13bc1b"),U("1510798831971-661eb04b3739"),U("1517248135467-4c7edcad34c4"),U("1500382017468-9049fed747ef"),U("1545324418-cc1a3fa10c00")], p1Photos:"1 and 2", p1Q:"Looking at photos 1 and 2, discuss together: <strong>What assumptions do people often make about the quality of life in each setting?</strong>", p2Q:"Now, looking at all five photographs, discuss together: <strong>Which setting would you recommend for a documentary series about the good life?</strong> You must reach an agreement." },
+  { topic:"Art and creativity", theme:"art and creativity", photos:[U("1460661419-2ba91f829279"),U("1485546246426-74dc88dec4d9"),U("1493225457124-a3eb161ffa5f"),U("1501281668745-f7f57925c3b4"),U("1513364776144-60967b0f800f")], p1Photos:"2 and 5", p1Q:"Looking at photos 2 and 5, discuss together: <strong>How do these two forms of creative expression differ in terms of purpose and audience?</strong>", p2Q:"Now, looking at all five photographs, discuss together: <strong>Which image best represents creativity for a school prospectus?</strong> You must reach an agreement." },
+  { topic:"Food and culture", theme:"food and culture", photos:[U("1414235077428-338989a2e8c0"),U("1565299624946-b28f40a0ae38"),U("1556742049-0cfed4f6a45d"),U("1517248135467-4c7edcad34c4"),U("1498837167922-ddd27525d352")], p1Photos:"2 and 4", p1Q:"Looking at photos 2 and 4, discuss together: <strong>What does each dining experience say about the culture it belongs to?</strong>", p2Q:"Now, looking at all five photographs, discuss together: <strong>Which image should be the cover of a cookbook celebrating international cuisine?</strong> You must reach an agreement." },
+  { topic:"Childhood", theme:"childhood", photos:[U("1503454537195-1dcabb73ffb9"),U("1485546246426-74dc88dec4d9"),U("1472162072942-cd5147eb3902"),U("1524178232363-1fb2b075b655"),U("1529156069898-49953e39b3ac")], p1Photos:"1 and 3", p1Q:"Looking at photos 1 and 3, discuss together: <strong>How have children's leisure activities changed over the past generation, and does it matter?</strong>", p2Q:"Now, looking at all five photographs, discuss together: <strong>Which image best captures the happiest aspect of childhood for a charity campaign?</strong> You must reach an agreement." },
+];
+
+const genSets = [
+  { topic:"Daily life", photos:[U("1504674900247-0877df9cc836")], prompt:"Look at this image. <strong>What can you tell about the relationship between the people?</strong> Describe, speculate, and share your thoughts." },
+  { topic:"Travel", photos:[U("1469854523086-cc02fe5d8800")], prompt:"Look at this image. <strong>Where do you think this person is going, and why?</strong> Use your imagination." },
+  { topic:"Environment", photos:[U("1542601906990-b4d3fb778b09")], prompt:"Look at this image. <strong>What feelings does this scene evoke?</strong> Describe what you see and how it makes you feel." },
+  { topic:"Technology", photos:[U("1556656195-b8de57c0eb4f")], prompt:"Look at this image. <strong>How is technology changing the way we live?</strong> Use this image as a starting point." },
+  { topic:"Food & culture", photos:[U("1565299624946-b28f40a0ae38")], prompt:"Look at this image. <strong>What does this scene tell you about the local culture?</strong> Describe the atmosphere." },
+  { topic:"People", photos:[U("1529156069898-49953e39b3ac")], prompt:"Look at this image. <strong>What do you think has just happened?</strong> Tell the story behind the moment." },
+  { topic:"Work & education", photos:[U("1497366216548-37526070297c")], prompt:"Look at this image. <strong>What might a typical day be like for these people?</strong> Describe and speculate." },
+  { topic:"Health & sport", photos:[U("1571019614242-c5c5dee9f50c")], prompt:"Look at this image. <strong>Why do people push themselves physically?</strong> Describe what you see and explore the idea." },
+  { topic:"Urban life", photos:[U("1480714378408-67cf0d13bc1b")], prompt:"Look at this image. <strong>What are the best and worst things about living in a place like this?</strong>" },
+  { topic:"Leisure", photos:[U("1515191107209-c28698631303")], prompt:"Look at this image. <strong>Why might someone choose to spend their time like this?</strong> Describe the scene and reflect." },
+];
+
+// Useful language per level
+const lang = {
+  b2: [
+    "It looks as if…","They seem to be…","One key difference is…","Both photos suggest…",
+    "Whereas in the first photo…","I get the impression…","The main similarity is…",
+    "In contrast to the first photo…","They appear to be…","What stands out in this photo is…",
+    "You can see that…","This photo gives the impression of…","Compared to the other photo…",
+    "I'd say the people are probably…","The atmosphere seems quite…"
+  ],
+  c1: [
+    "What strikes me about this is…","I'd argue that…","The main contrast lies in…",
+    "It largely depends on…","Having said that…","To a certain extent…",
+    "One thing that stands out is…","There's a clear distinction between…",
+    "I suppose it could be argued that…","On the other hand…",
+    "What's particularly noticeable is…","If you look more closely…",
+    "It's worth considering that…","From a practical standpoint…","The underlying theme seems to be…"
+  ],
+  c2: [
+    "What's immediately striking is…","I'd be inclined to say…","That's a fair point, although…",
+    "There's a certain irony in…","Weighing it all up…","Shall we settle on…?",
+    "To my mind, this speaks to…","One could argue that…","It raises the question of…",
+    "From a broader perspective…","I take your point, but equally…",
+    "What underpins this is…","If we're to reach a consensus…",
+    "There's something quite compelling about…","On balance, I'd lean towards…"
+  ],
+  gen: [
+    "The first thing I notice is…","It looks like…","This reminds me of…",
+    "I think this might be…","What stands out is…","If I had to guess…",
+    "The atmosphere feels quite…","It makes me think of…",
+    "What's interesting about this is…","I can imagine that…",
+    "There's a sense of…","You get the feeling that…",
+    "One detail that catches my eye is…","It gives me the impression of…","I'd describe this as…"
+  ],
+};
+
+// Guided prompts per level
+const prompts = {
+  b2: [
+    {text:"Briefly describe what you see in each photo.",hint:'"In the first photo I can see…" / "The second photo shows…"'},
+    {text:"Compare: What do the photos have in common and how do they differ?",hint:'"Both photos show… but whereas in the first…" / "Unlike…"'},
+    {text:"Respond to the question above.",hint:'"They might be… because…" / "I\'d imagine…" / "It seems likely that…"'},
+  ],
+  c1: [
+    {text:"State which two you're comparing, and briefly describe each.",hint:'"I\'m going to compare photos 1 and 3. In the first one…"'},
+    {text:"Compare: How are the situations similar and different?",hint:'"What strikes me is that both…" / "The main contrast is…"'},
+    {text:"Answer the task question thoughtfully.",hint:'"I\'d argue that…" / "It depends on…" / "To a certain extent…"'},
+  ],
+  c2p1: [
+    {text:"What does each photo suggest? Share your first impressions.",hint:'"What strikes me about this one is…" / "Would you say that…?"'},
+    {text:"Exchange and build on each other's ideas.",hint:'"That\'s an interesting point — I\'d add that…" / "I see what you mean, although…"'},
+  ],
+  c2p2: [
+    {text:"Evaluate each option — what makes it appealing or unsuitable?",hint:'"This one has a certain appeal because…" / "I\'m not sure this would work since…"'},
+    {text:"Narrow the field: which 2–3 are strongest contenders?",hint:'"Shall we rule out…?" / "I think it\'s between … and …"'},
+    {text:"Reach a decision together. Justify your final choice.",hint:'"On balance, I\'d go with… because…" / "Can we agree on…?"'},
+  ],
+  gen: [
+    {text:"Describe the image in detail. What do you notice first?"},
+    {text:"What story might be behind this image? Speculate freely."},
+    {text:"How does this image make you feel? Why?"},
+    {text:"Connect this image to a personal experience or a wider theme."},
+  ],
+};
+
+// ══════════════════════════════════════════
+//  RENDER ENGINE
+// ══════════════════════════════════════════
+
+function imgs(photos, cls, labels) {
+  return `<div class="img-row ${cls||''}">${photos.map((u,i)=>`<div class="img-slot"><span class="img-label">${labels?labels[i]:(i+1)}</span><img src="${u}" alt="Photo ${i+1}" loading="lazy"></div>`).join('')}</div>`;
+}
+
+function promptsList(list, level) {
+  return `<div class="prompts-list">${list.map((p,i)=>`<div class="p-item"><span class="p-num ${level}">${i+1}</span><div><span class="p-text">${p.text}</span>${p.hint?`<span class="p-hint">${p.hint}</span>`:''}</div></div>`).join('')}</div>`;
+}
+
+function langBox(level) {
+  return `<div class="lang-box ${level}"><div class="lang-title">Useful Language</div><div class="chips">${lang[level].map(c=>`<span class="chip">${c}</span>`).join('')}</div></div>`;
+}
+
+function timerHTML(id, secs) {
+  const m = Math.floor(secs/60), s = secs%60;
+  return `<div class="timer-row"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="5.5"/><path d="M7 4v3l2 1"/></svg><span>Speaking time: <strong>${m>0?m+' min':''}${s>0?' '+s+' sec':''}</strong></span><span class="timer-display" id="td-${id}">${m}:${String(s).padStart(2,'0')}</span><button class="timer-btn" id="tb-${id}" data-secs="${secs}">Start Timer</button></div>`;
+}
+
+function subDrop(label, level, content, openByDefault=false) {
+  return `<div class="sub-drop${openByDefault?' open':''}"><div class="sub-drop-header" onclick="this.parentElement.classList.toggle('open')"><span class="sub-label"><span class="sub-dot ${level}"></span>${label}</span><span class="sub-icon">▾</span></div><div class="sub-drop-body">${content}</div></div>`;
+}
+
+function renderB2() {
+  const el = document.getElementById('panel-b2');
+  let h = `<div class="exam-info b2"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg><div><strong>FCE Speaking Part 2 — Individual long turn.</strong> You speak alone for 1 minute, comparing two photos and responding to a question printed above them. Your partner then answers a brief 30-second follow-up. Roles swap.</div></div>`;
+  b2Sets.forEach((s,i) => {
+    const id = `b2-${i}`;
+    h += `<div class="acc-card" id="${id}"><div class="acc-header" onclick="toggle('${id}')"><div class="acc-title"><span class="set-badge b2">Set ${i+1}</span>${s.topic}</div><span class="chevron">▾</span></div><div class="acc-body">`;
+    h += `<div class="lbl">Your two photos</div>`;
+    h += imgs(s.photos, '', ['Photo 1','Photo 2']);
+    h += timerHTML(id, 60);
+    h += `<div class="task-q b2">${s.question}</div>`;
+    h += subDrop('Useful Language', 'b2', langBox('b2'), true);
+    h += subDrop('Guided Prompts', 'b2', promptsList(prompts.b2, 'b2'));
+    h += subDrop("Partner's Follow-up (30 sec)", 'b2',
+      `<div class="followup b2"><span class="p-num b2">?</span><div><span class="p-text">${s.followUp}</span><span class="p-hint">Partner answers briefly — no need to compare the photos again.</span></div></div>`);
+    h += `</div></div>`;
+  });
+  el.innerHTML = h;
+}
+
+function renderC1() {
+  const el = document.getElementById('panel-c1');
+  let h = `<div class="exam-info c1"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg><div><strong>CAE Speaking Part 2 — Individual long turn.</strong> You're given three photos. Choose two and speak alone for 1 minute, comparing them and responding to the task question. Your partner then answers a 30-second follow-up. Roles swap.</div></div>`;
+  c1Sets.forEach((s,i) => {
+    const id = `c1-${i}`;
+    h += `<div class="acc-card" id="${id}"><div class="acc-header" onclick="toggle('${id}')"><div class="acc-title"><span class="set-badge c1">Set ${i+1}</span>${s.topic}</div><span class="chevron">▾</span></div><div class="acc-body">`;
+    h += `<div class="lbl">Choose two of these three photos</div>`;
+    h += imgs(s.photos, 'grid-3');
+    h += timerHTML(id, 60);
+    h += `<div class="task-q c1">${s.question}</div>`;
+    h += subDrop('Useful Language', 'c1', langBox('c1'), true);
+    h += subDrop('Guided Prompts', 'c1', promptsList(prompts.c1, 'c1'));
+    h += subDrop("Partner's Follow-up (30 sec)", 'c1',
+      `<div class="followup c1"><span class="p-num c1">?</span><div><span class="p-text">${s.followUp}</span><span class="p-hint">Partner gives a brief personal answer.</span></div></div>`);
+    h += `</div></div>`;
+  });
+  el.innerHTML = h;
+}
+
+function renderC2() {
+  const el = document.getElementById('panel-c2');
+  let h = `<div class="exam-info c2"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg><div><strong>CPE Speaking Part 2 — Collaborative task (~4 min total).</strong> Done with a partner. In Phase 1, the examiner selects 2–3 photos and you both discuss a question together (~1 min). In Phase 2, using all the photos, you discuss and make a decision together (~3 min).</div></div>`;
+  c2Sets.forEach((s,i) => {
+    const id = `c2-${i}`;
+    h += `<div class="acc-card" id="${id}"><div class="acc-header" onclick="toggle('${id}')"><div class="acc-title"><span class="set-badge c2">Set ${i+1}</span>${s.topic}</div><span class="chevron">▾</span></div><div class="acc-body">`;
+    h += `<div class="lbl">Photo set — theme: ${s.theme}</div>`;
+    h += imgs(s.photos, 'grid-5');
+    h += `<div class="phase-tabs"><button class="phase-tab active" onclick="switchPhase(this,'${id}',1)">Phase 1 — Discuss (~1 min)</button><button class="phase-tab" onclick="switchPhase(this,'${id}',2)">Phase 2 — Discuss &amp; Decide (~3 min)</button></div>`;
+    // Phase 1
+    h += `<div class="phase-block active" id="${id}-p1">`;
+    h += timerHTML(id+'-p1', 60);
+    h += `<div class="task-q c2">The examiner has selected photos ${s.p1Photos}. ${s.p1Q}</div>`;
+    h += subDrop('Guided Prompts (Phase 1)', 'c2', promptsList(prompts.c2p1, 'c2'));
+    h += `</div>`;
+    // Phase 2
+    h += `<div class="phase-block" id="${id}-p2">`;
+    h += timerHTML(id+'-p2', 180);
+    h += `<div class="task-q c2">${s.p2Q}</div>`;
+    h += subDrop('Guided Prompts (Phase 2)', 'c2', promptsList(prompts.c2p2, 'c2'));
+    h += `</div>`;
+    h += subDrop('Useful Language', 'c2', langBox('c2'), true);
+    h += `</div></div>`;
+  });
+  el.innerHTML = h;
+}
+
+function renderGen() {
+  const el = document.getElementById('panel-gen');
+  let h = `<div class="exam-info gen"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg><div><strong>Free mode — no exam constraints.</strong> Choose any image and practise descriptive fluency at your own pace. Great for building confidence at any level.</div></div>`;
+  genSets.forEach((s,i) => {
+    const id = `gen-${i}`;
+    h += `<div class="acc-card" id="${id}"><div class="acc-header" onclick="toggle('${id}')"><div class="acc-title"><span class="set-badge gen">Image ${i+1}</span>${s.topic}</div><span class="chevron">▾</span></div><div class="acc-body">`;
+    h += `<div class="lbl">Image</div>`;
+    h += imgs(s.photos, 'single');
+    h += `<div class="task-q gen">${s.prompt}</div>`;
+    h += subDrop('Useful Language', 'gen', langBox('gen'), true);
+    h += subDrop('Guided Prompts', 'gen', promptsList(prompts.gen, 'gen'));
+    h += `</div></div>`;
+  });
+  el.innerHTML = h;
+}
+
+// ── Accordion toggle ──
+function toggle(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+// ── Phase switching (C2) ──
+function switchPhase(btn, cardId, phase) {
+  const card = document.getElementById(cardId);
+  card.querySelectorAll('.phase-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  card.querySelectorAll('.phase-block').forEach(b => b.classList.remove('active'));
+  document.getElementById(`${cardId}-p${phase}`).classList.add('active');
+}
+
+// ── Timer logic (event delegation) ──
+const timers = {};
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.timer-btn');
+  if (!btn) return;
+  const id = btn.id;
+  const display = document.getElementById(id.replace('tb-','td-'));
+  if (timers[id]) {
+    clearInterval(timers[id]);
+    timers[id] = null;
+    btn.textContent = 'Start Timer';
+    btn.classList.remove('running');
+    display.classList.remove('visible');
+    return;
+  }
+  let remaining = parseInt(btn.dataset.secs);
+  display.classList.add('visible');
+  btn.textContent = 'Stop';
+  btn.classList.add('running');
+  const tick = () => {
+    const m = Math.floor(remaining/60), s = remaining%60;
+    display.textContent = `${m}:${String(s).padStart(2,'0')}`;
+    if (remaining <= 0) {
+      clearInterval(timers[id]);
+      timers[id] = null;
+      btn.textContent = 'Start Timer';
+      btn.classList.remove('running');
+      display.textContent = "Time!";
+      setTimeout(() => display.classList.remove('visible'), 3000);
+    }
+    remaining--;
+  };
+  tick();
+  timers[id] = setInterval(tick, 1000);
+});
+
+// ── Mode switching ──
+document.querySelectorAll('.mode-pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('.mode-pill').forEach(p => { p.classList.remove('active'); p.setAttribute('aria-selected','false'); });
+    pill.classList.add('active'); pill.setAttribute('aria-selected','true');
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + pill.dataset.mode).classList.add('active');
+  });
+});
+
+// ── Init ──
+renderB2(); renderC1(); renderC2(); renderGen();
+</script>
+</body>
+</html>
