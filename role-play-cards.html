@@ -182,6 +182,33 @@ nav{padding:.75rem 1.2rem}.nav-links{gap:1rem}.nav-links a{font-size:.78rem}
 .reveal-btn:hover{background:var(--coral);color:#fff}
 .role-b-shown .role-tag,.role-b-shown .role-name,.role-b-shown .role-desc{filter:none}
 
+/* Student assigner */
+.assigner{max-width:800px;margin:.8rem auto 0;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:.8rem 1.2rem;box-shadow:0 2px 12px rgba(45,48,71,.04)}
+.assigner-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;margin-bottom:.6rem}
+.assigner-title{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--lavender);display:flex;align-items:center;gap:.4rem}
+.assigner-input-row{display:flex;gap:.4rem;margin-bottom:.5rem}
+.assigner-input{font-family:'Nunito',sans-serif;font-size:.85rem;padding:.4rem .8rem;border:1.5px solid var(--border);border-radius:8px;background:var(--cream);color:var(--ink);flex:1;outline:none;transition:border-color .15s}
+.assigner-input:focus{border-color:var(--lavender)}
+.assigner-add{font-family:'Nunito',sans-serif;font-size:.8rem;font-weight:700;padding:.4rem .8rem;border:1.5px solid var(--lavender);border-radius:8px;background:var(--lavender);color:#fff;cursor:pointer;transition:opacity .15s;white-space:nowrap}
+.assigner-add:hover{opacity:.85}
+.assigner-tags{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:.6rem}
+.assigner-tag{font-family:'Nunito',sans-serif;font-size:.75rem;font-weight:600;padding:.2rem .55rem;border:1.5px solid var(--border);border-radius:18px;background:var(--cream);color:var(--ink);display:flex;align-items:center;gap:.25rem}
+.assigner-tag .rm{cursor:pointer;color:var(--muted);font-size:.65rem;transition:color .15s;padding:0 2px}
+.assigner-tag .rm:hover{color:var(--coral)}
+.assign-btn{font-family:'Nunito',sans-serif;font-size:.85rem;font-weight:700;padding:.5rem 1.2rem;border:1.5px solid var(--lavender);border-radius:10px;background:var(--card);color:var(--lavender);cursor:pointer;transition:all .15s;width:100%}
+.assign-btn:hover{background:var(--lavender);color:#fff}
+.assign-result{margin-top:.6rem;display:flex;flex-wrap:wrap;gap:.5rem}
+.assign-pair{display:flex;align-items:center;gap:.3rem;font-size:.88rem;font-weight:600}
+.assign-role{font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:.15rem .45rem;border-radius:5px}
+.assign-role-a{background:var(--sky-light);color:var(--sky)}
+.assign-role-b{background:#FFF0F0;color:var(--coral)}
+.assign-role-c{background:#E8FBF7;color:var(--sea)}
+.assign-role-d{background:var(--sand);color:var(--sun)}
+.assign-name{font-family:'DM Serif Display',serif;font-size:1rem}
+.assign-arrow{color:var(--muted);font-size:.75rem}
+.assign-pop{animation:assignPop .4s ease-out}
+@keyframes assignPop{0%{opacity:0;transform:scale(.9)}100%{opacity:1;transform:scale(1)}}
+
 </style>
 </head>
 <body>
@@ -242,6 +269,19 @@ nav{padding:.75rem 1.2rem}.nav-links{gap:1rem}.nav-links a{font-size:.78rem}
 <button class="nav-btn" id="prevBtn" onclick="goCard(-1)">&larr; Previous</button>
 <span class="card-counter" id="cardCounter">1 / 200</span>
 <button class="nav-btn primary" id="nextBtn" onclick="goCard(1)">Next &rarr;</button>
+</div>
+<div class="assigner" id="assigner">
+<div class="assigner-header">
+<span class="assigner-title">&#127919; Assign Students to Roles</span>
+<span style="font-size:.7rem;color:var(--muted);cursor:pointer" onclick="clearAssignerNames()" title="Clear all">Clear all</span>
+</div>
+<div class="assigner-input-row">
+<input type="text" class="assigner-input" id="assignerInput" placeholder="Add student name..." onkeydown="if(event.key==='Enter')addAssignerName()">
+<button class="assigner-add" onclick="addAssignerName()">Add</button>
+</div>
+<div class="assigner-tags" id="assignerTags"></div>
+<button class="assign-btn" onclick="assignRoles()">&#127922; Assign random roles</button>
+<div class="assign-result" id="assignResult"></div>
 </div>
 <div class="timer-section">
 <div class="timer-controls">
@@ -1366,6 +1406,62 @@ function updateTimerDisplay(){
   var m=Math.floor(timerSeconds/60),s=timerSeconds%60;
   document.getElementById('timerDisplay').textContent=m+':'+(s<10?'0':'')+s;
 }
+
+// ── Student Assigner ──
+var rpStudents = JSON.parse(localStorage.getItem('speakingStudents') || '[]');
+function renderAssignerNames() {
+  var box = document.getElementById('assignerTags');
+  if (rpStudents.length === 0) { box.innerHTML = '<span style="font-size:.78rem;color:var(--muted)">No students added yet.</span>'; return; }
+  var h = '';
+  rpStudents.forEach(function(name, i) {
+    h += '<span class="assigner-tag">' + name + '<span class="rm" onclick="removeAssignerName(' + i + ')">&times;</span></span>';
+  });
+  box.innerHTML = h;
+}
+function addAssignerName() {
+  var input = document.getElementById('assignerInput');
+  var name = input.value.trim();
+  if (!name) return;
+  rpStudents.push(name);
+  localStorage.setItem('speakingStudents', JSON.stringify(rpStudents));
+  input.value = '';
+  renderAssignerNames();
+}
+function removeAssignerName(idx) {
+  rpStudents.splice(idx, 1);
+  localStorage.setItem('speakingStudents', JSON.stringify(rpStudents));
+  renderAssignerNames();
+}
+function clearAssignerNames() {
+  if (rpStudents.length === 0) return;
+  rpStudents = [];
+  localStorage.setItem('speakingStudents', JSON.stringify(rpStudents));
+  document.getElementById('assignResult').innerHTML = '';
+  renderAssignerNames();
+}
+function assignRoles() {
+  var rolesNeeded = playerCount;
+  if (rpStudents.length < rolesNeeded) {
+    document.getElementById('assignResult').innerHTML = '<span style="font-size:.82rem;color:var(--coral)">Need at least ' + rolesNeeded + ' students for ' + rolesNeeded + '-player mode.</span>';
+    return;
+  }
+  var shuffled = rpStudents.slice().sort(function() { return Math.random() - 0.5; });
+  var picked = shuffled.slice(0, rolesNeeded);
+  var roleLabels = ['A', 'B', 'C', 'D'];
+  var roleClasses = ['assign-role-a', 'assign-role-b', 'assign-role-c', 'assign-role-d'];
+  var el = document.getElementById('assignResult');
+  el.innerHTML = '';
+  var h = '';
+  picked.forEach(function(name, i) {
+    h += '<div class="assign-pair assign-pop" style="animation-delay:' + (i * 0.1) + 's">';
+    h += '<span class="assign-role ' + roleClasses[i] + '">Student ' + roleLabels[i] + '</span>';
+    h += '<span class="assign-arrow">&rarr;</span>';
+    h += '<span class="assign-name">' + name + '</span>';
+    h += '</div>';
+  });
+  el.innerHTML = h;
+}
+renderAssignerNames();
 
 buildControls();
 applyFilters();
