@@ -68,13 +68,13 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,252,247,
 .rp-roles{display:grid;grid-template-columns:1fr 1fr;min-height:180px}
 .rp-roles.three-col{grid-template-columns:1fr 1fr 1fr}
 .role{padding:1.4rem 1.5rem}
-.role-a{background:rgba(155,114,207,.08);border-right:1px solid var(--border)}
-.role-b{background:rgba(93,222,160,.08)}
+.role-a{background:var(--sky-light);border-right:1px solid var(--border)}
+.role-b{background:rgba(255,182,193,.12)}
 .role-c{background:rgba(46,196,182,.06);border-left:1px solid var(--border)}
 .role-d{background:rgba(255,179,71,.06);border-left:1px solid var(--border)}
 .role-tag{font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:.4rem}
-.role-a .role-tag{color:var(--lavender)}
-.role-b .role-tag{color:var(--mint)}
+.role-a .role-tag{color:var(--sky)}
+.role-b .role-tag{color:#E8729A}
 .role-c .role-tag{color:var(--sea)}
 .role-d .role-tag{color:var(--sun)}
 .rp-roles.four-col{grid-template-columns:1fr 1fr 1fr 1fr}
@@ -200,8 +200,8 @@ nav{padding:.75rem 1.2rem}.nav-links{gap:1rem}.nav-links a{font-size:.78rem}
 .assign-result{margin-top:.6rem;display:flex;flex-wrap:wrap;gap:.5rem}
 .assign-pair{display:flex;align-items:center;gap:.3rem;font-size:.88rem;font-weight:600}
 .assign-role{font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:.15rem .45rem;border-radius:5px}
-.assign-role-a{background:rgba(155,114,207,.1);color:var(--lavender)}
-.assign-role-b{background:rgba(93,222,160,.1);color:var(--mint)}
+.assign-role-a{background:var(--sky-light);color:var(--sky)}
+.assign-role-b{background:rgba(255,182,193,.15);color:#E8729A}
 .assign-role-c{background:rgba(46,196,182,.1);color:var(--sea)}
 .assign-role-d{background:var(--sand);color:var(--sun)}
 .assign-name{font-family:'DM Serif Display',serif;font-size:1rem}
@@ -271,10 +271,12 @@ nav{padding:.75rem 1.2rem}.nav-links{gap:1rem}.nav-links a{font-size:.78rem}
 <button class="nav-btn primary" id="nextBtn" onclick="goCard(1)">Next &rarr;</button>
 </div>
 <div class="assigner" id="assigner">
-<div class="assigner-header">
+<div class="assigner-header" onclick="toggleAssigner()" style="cursor:pointer">
 <span class="assigner-title">&#127919; Assign Students to Roles</span>
-<span style="font-size:.7rem;color:var(--muted);cursor:pointer" onclick="clearAssignerNames()" title="Clear all">Clear all</span>
+<span style="font-size:.7rem;color:var(--muted)" id="assignerArrow">&#9660;</span>
 </div>
+<div class="assigner-body" id="assignerBody" style="display:none">
+<div style="text-align:right;margin-bottom:.4rem"><span style="font-size:.7rem;color:var(--muted);cursor:pointer" onclick="clearAssignerNames()" title="Clear all">Clear all</span></div>
 <div class="assigner-input-row">
 <input type="text" class="assigner-input" id="assignerInput" placeholder="Add student name..." onkeydown="if(event.key==='Enter')addAssignerName()">
 <button class="assigner-add" onclick="addAssignerName()">Add</button>
@@ -282,6 +284,7 @@ nav{padding:.75rem 1.2rem}.nav-links{gap:1rem}.nav-links a{font-size:.78rem}
 <div class="assigner-tags" id="assignerTags"></div>
 <button class="assign-btn" onclick="assignRoles()">&#127922; Assign random roles</button>
 <div class="assign-result" id="assignResult"></div>
+</div>
 </div>
 <div class="timer-section">
 <div class="timer-controls">
@@ -1237,10 +1240,14 @@ function renderCard(){
   // Roles
   var colClass=playerCount===3?'three-col':playerCount===4?'four-col':'';
   h+='<div class="rp-roles '+colClass+'">';
-  h+='<div class="role role-a"><div class="role-tag">Student A</div><div class="role-name">'+d.a.role+'</div><div class="role-desc">'+d.a.desc+'</div></div>';
-  h+='<div class="role role-b"><div class="role-tag">Student B</div><div class="role-name">'+d.b.role+'</div><div class="role-desc">'+d.b.desc+'</div></div>';
-  if(playerCount>=3 && d.c){h+='<div class="role role-c"><div class="role-tag">Student C</div><div class="role-name">'+d.c.role+'</div><div class="role-desc">'+d.c.desc+'</div></div>';}
-  if(playerCount>=4 && d.d){h+='<div class="role role-d"><div class="role-tag">Student D</div><div class="role-name">'+d.d.role+'</div><div class="role-desc">'+d.d.desc+'</div></div>';}
+  var nameA = assignedNames[0] || 'Student A';
+  var nameB = assignedNames[1] || 'Student B';
+  var nameC = assignedNames[2] || 'Student C';
+  var nameD = assignedNames[3] || 'Student D';
+  h+='<div class="role role-a"><div class="role-tag">'+nameA+'</div><div class="role-name">'+d.a.role+'</div><div class="role-desc">'+d.a.desc+'</div></div>';
+  h+='<div class="role role-b"><div class="role-tag">'+nameB+'</div><div class="role-name">'+d.b.role+'</div><div class="role-desc">'+d.b.desc+'</div></div>';
+  if(playerCount>=3 && d.c){h+='<div class="role role-c"><div class="role-tag">'+nameC+'</div><div class="role-name">'+d.c.role+'</div><div class="role-desc">'+d.c.desc+'</div></div>';}
+  if(playerCount>=4 && d.d){h+='<div class="role role-d"><div class="role-tag">'+nameD+'</div><div class="role-name">'+d.d.role+'</div><div class="role-desc">'+d.d.desc+'</div></div>';}
   h+='</div>';
   // Phrases panel
   h+='<div class="rp-phrases"><button class="rp-phrases-toggle" onclick="togglePhrases(this)">Useful phrases <span class="arrow">&#9660;</span></button>';
@@ -1409,6 +1416,13 @@ function updateTimerDisplay(){
 
 // ── Student Assigner ──
 var rpStudents = JSON.parse(localStorage.getItem('speakingStudents') || '[]');
+var assignedNames = [];
+var assignerOpen = false;
+function toggleAssigner() {
+  assignerOpen = !assignerOpen;
+  document.getElementById('assignerBody').style.display = assignerOpen ? 'block' : 'none';
+  document.getElementById('assignerArrow').innerHTML = assignerOpen ? '&#9650;' : '&#9660;';
+}
 function renderAssignerNames() {
   var box = document.getElementById('assignerTags');
   if (rpStudents.length === 0) { box.innerHTML = '<span style="font-size:.78rem;color:var(--muted)">No students added yet.</span>'; return; }
@@ -1435,9 +1449,11 @@ function removeAssignerName(idx) {
 function clearAssignerNames() {
   if (rpStudents.length === 0) return;
   rpStudents = [];
+  assignedNames = [];
   localStorage.setItem('speakingStudents', JSON.stringify(rpStudents));
   document.getElementById('assignResult').innerHTML = '';
   renderAssignerNames();
+  renderCard();
 }
 function assignRoles() {
   var rolesNeeded = playerCount;
@@ -1447,6 +1463,7 @@ function assignRoles() {
   }
   var shuffled = rpStudents.slice().sort(function() { return Math.random() - 0.5; });
   var picked = shuffled.slice(0, rolesNeeded);
+  assignedNames = picked;
   var roleLabels = ['A', 'B', 'C', 'D'];
   var roleClasses = ['assign-role-a', 'assign-role-b', 'assign-role-c', 'assign-role-d'];
   var el = document.getElementById('assignResult');
@@ -1460,6 +1477,7 @@ function assignRoles() {
     h += '</div>';
   });
   el.innerHTML = h;
+  renderCard();
 }
 renderAssignerNames();
 
