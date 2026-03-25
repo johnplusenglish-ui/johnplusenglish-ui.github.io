@@ -83,22 +83,22 @@ footer{text-align:center;padding:3rem 2rem;font-size:.8rem;color:var(--muted);bo
 .topnav-links a{font-size:.8rem;font-weight:600;color:var(--muted);text-decoration:none;transition:color .2s}
 .topnav-links a:hover{color:var(--sky)}
 .sidebar-nav{position:fixed;top:52px;left:0;bottom:0;width:var(--sidebar-collapsed);background:rgba(255,252,247,.95);backdrop-filter:blur(12px);border-right:1.5px solid var(--border);z-index:90;padding:1.2rem 0;overflow:hidden;display:flex;flex-direction:column;gap:.2rem;transition:width .25s ease}
-.sidebar-nav:hover{width:var(--sidebar-w);overflow-y:auto}
+.sidebar-nav.expanded{width:var(--sidebar-w);overflow-y:auto}
 .sb-group-label{font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:.8rem 1.4rem .35rem;margin-top:.3rem;white-space:nowrap;opacity:0;transition:opacity .2s ease .05s}
-.sidebar-nav:hover .sb-group-label{opacity:1}
+.sidebar-nav.expanded .sb-group-label{opacity:1}
 .sb-group-label:first-child{margin-top:0}
 .sb-divider{height:1px;background:var(--border);margin:.5rem .8rem;transition:margin .25s}
-.sidebar-nav:hover .sb-divider{margin:.5rem 1.2rem}
+.sidebar-nav.expanded .sb-divider{margin:.5rem 1.2rem}
 .sb-link{display:flex;align-items:center;gap:.6rem;font-size:.82rem;font-weight:600;color:var(--muted);text-decoration:none;padding:.55rem .85rem;transition:all .15s;border-left:3px solid transparent;margin:0 .2rem;white-space:nowrap;min-height:36px}
-.sidebar-nav:hover .sb-link{padding:.5rem 1.4rem}
+.sidebar-nav.expanded .sb-link{padding:.5rem 1.4rem}
 .sb-link:hover{color:var(--ink);background:rgba(0,0,0,.03);border-left-color:var(--border)}
 .sb-link.active{color:var(--sky);background:var(--sky-light);border-left-color:var(--sky);font-weight:700}
 .sb-icon{font-size:1.05rem;width:1.2rem;text-align:center;flex-shrink:0}
 .sb-label{opacity:0;transition:opacity .15s ease;overflow:hidden}
-.sidebar-nav:hover .sb-label{opacity:1}
+.sidebar-nav.expanded .sb-label{opacity:1}
 .sb-link.coming{opacity:.5;pointer-events:none}
 .sb-link.coming .sb-soon{font-size:.55rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;background:var(--border);color:var(--muted);padding:.1rem .4rem;border-radius:4px;margin-left:auto;opacity:0;transition:opacity .15s ease}
-.sidebar-nav:hover .sb-link.coming .sb-soon{opacity:1}
+.sidebar-nav.expanded .sb-link.coming .sb-soon{opacity:1}
 .hamburger{display:none;background:none;border:none;cursor:pointer;padding:.3rem;color:var(--ink)}
 .hamburger svg{width:22px;height:22px}
 .main{margin-left:var(--sidebar-collapsed);padding-top:52px;position:relative;z-index:1;transition:margin-left .25s ease}
@@ -107,7 +107,7 @@ footer{text-align:center;padding:3rem 2rem;font-size:.8rem;color:var(--muted);bo
 @media(max-width:800px){
 .sidebar-nav{transform:translateX(-100%);transition:transform .3s ease,width .25s ease;width:260px;top:52px;box-shadow:4px 0 24px rgba(0,0,0,.08)}
 .sidebar-nav.open{transform:translateX(0)}
-.sidebar-nav.open .sb-group-label,.sidebar-nav.open .sb-label,.sidebar-nav.open .sb-link.coming .sb-soon{opacity:1}
+.sidebar-nav.open .sb-group-label,.sidebar-nav.open .sb-label,.sidebar-nav.open .sb-link.coming .sb-soon,.sidebar-nav.expanded .sb-group-label,.sidebar-nav.expanded .sb-label,.sidebar-nav.expanded .sb-link.coming .sb-soon{opacity:1}
 .hamburger{display:block}
 .main{margin-left:0}
 }
@@ -256,16 +256,41 @@ document.querySelectorAll('.reveal').forEach(function(el) { observer.observe(el)
 </script>
 
 
-<script>
-document.getElementById('hamburgerBtn').addEventListener('click', function() {
-  document.getElementById('sidebarNav').classList.toggle('open');
-  document.getElementById('sidebarOverlay').classList.toggle('open');
-});
-document.getElementById('sidebarOverlay').addEventListener('click', function() {
-  document.getElementById('sidebarNav').classList.remove('open');
-  document.getElementById('sidebarOverlay').classList.remove('open');
-});
-</script>
 
+
+<script>
+(function() {
+  var sb = document.getElementById('sidebarNav');
+  var overlay = document.getElementById('sidebarOverlay');
+  var burger = document.getElementById('hamburgerBtn');
+  
+  // Restore state from localStorage
+  if (localStorage.getItem('sb-expanded') === '1') {
+    sb.classList.add('expanded');
+  }
+  
+  // Hover in: expand + remember
+  sb.addEventListener('mouseenter', function() {
+    sb.classList.add('expanded');
+    localStorage.setItem('sb-expanded', '1');
+  });
+  
+  // Hover out: collapse + remember
+  sb.addEventListener('mouseleave', function() {
+    sb.classList.remove('expanded');
+    localStorage.setItem('sb-expanded', '0');
+  });
+  
+  // Mobile hamburger toggle
+  burger.addEventListener('click', function() {
+    sb.classList.toggle('open');
+    overlay.classList.toggle('open');
+  });
+  overlay.addEventListener('click', function() {
+    sb.classList.remove('open');
+    overlay.classList.remove('open');
+  });
+})();
+</script>
 </body>
 </html>
