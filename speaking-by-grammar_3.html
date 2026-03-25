@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Speaking by Grammar — John + English</title>
+<meta name="description" content="Speaking activities targeting specific grammar points. Conditionals, reported speech, passives, and more.">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Nunito:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--sun:#FFB347;--sky:#4A90D9;--sky-light:#E8F2FD;--sea:#2EC4B6;--coral:#FF6B6B;--lavender:#9B72CF;--mint:#5DDEA0;--sand:#FFF5E6;--cream:#FFFCF7;--ink:#2D3047;--muted:#7A7D8E;--border:#E8E5DF;--card:#fff;--radius:14px}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
+body{font-family:'Nunito',sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,var(--border) 1px,transparent 1px);background-size:28px 28px;opacity:.4;pointer-events:none;z-index:0}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,252,247,.88);backdrop-filter:blur(16px);border-bottom:1.5px solid var(--border);padding:.85rem 2rem;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-family:'DM Serif Display',serif;font-size:1.3rem;color:var(--ink);text-decoration:none}.nav-logo span{color:var(--sky)}
+.nav-links{display:flex;gap:1.8rem}
+.nav-links a{font-size:.85rem;font-weight:600;color:var(--muted);text-decoration:none;transition:color .2s;position:relative}
+.nav-links a:hover{color:var(--sky)}
+.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:2px;background:var(--sun);border-radius:2px;transform:scaleX(0);transition:transform .25s ease}
+.nav-links a:hover::after{transform:scaleX(1)}
+.page-header{padding:6.5rem 2rem 1.5rem;max-width:960px;margin:0 auto}
+.back-link{display:inline-flex;align-items:center;gap:.4rem;font-size:.85rem;font-weight:600;color:var(--muted);text-decoration:none;margin-bottom:1.2rem;transition:color .2s}
+.back-link:hover{color:var(--sky)}
+.section-label{font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--sun);margin-bottom:.5rem;font-weight:500}
+.page-title{font-family:'DM Serif Display',serif;font-size:clamp(2rem,5vw,3rem);margin-bottom:.8rem;font-weight:400}
+.page-desc{color:var(--muted);font-size:1.05rem;max-width:620px;line-height:1.7}
+
+/* Mode cards */
+.mode-section{max-width:960px;margin:0 auto;padding:1.5rem 2rem 1.5rem;position:relative;z-index:1;border-bottom:1.5px solid var(--border);margin-bottom:.5rem}
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.mode-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:1.5rem;cursor:pointer;transition:all .25s;display:flex;flex-direction:column;gap:.4rem;position:relative;overflow:hidden;text-align:left}
+.mode-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;border-radius:var(--radius) var(--radius) 0 0;transition:height .25s}
+.mode-card:nth-child(1)::before{background:var(--sea)}
+.mode-card:nth-child(2)::before{background:var(--lavender)}
+.mode-card:nth-child(3)::before{background:var(--sun)}
+.mode-card:nth-child(4)::before{background:var(--coral)}
+.mode-card:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(45,48,71,.08);border-color:transparent}
+.mode-card:hover::before{height:5px}
+.mode-card.active{box-shadow:0 4px 20px rgba(46,196,182,.12)}
+.mode-card:nth-child(1).active{border-color:var(--sea)}
+.mode-card:nth-child(2).active{border-color:var(--lavender)}
+.mode-card:nth-child(3).active{border-color:var(--sun)}
+.mode-card:nth-child(4).active{border-color:var(--coral)}
+.mode-emoji{font-size:1.5rem;margin-bottom:.2rem}
+.mode-title{font-family:'DM Serif Display',serif;font-size:1.1rem}
+.mode-desc{font-size:.82rem;color:var(--muted);line-height:1.55}
+
+/* Grammar selector */
+.grammar-bar{max-width:960px;margin:0 auto;padding:1.5rem 2rem .5rem;position:relative;z-index:1}
+.grammar-groups{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem}
+.grammar-group{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:1rem 1.2rem;display:flex;flex-direction:column;gap:.5rem}
+.grammar-group-label{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;font-weight:500;color:var(--muted);margin-bottom:.1rem}
+.grammar-group:nth-child(1) .grammar-group-label{color:var(--sea)}
+.grammar-group:nth-child(2) .grammar-group-label{color:var(--lavender)}
+.grammar-group:nth-child(3) .grammar-group-label{color:var(--sun)}
+.grammar-group:nth-child(4) .grammar-group-label{color:var(--coral)}
+.grammar-group:nth-child(5) .grammar-group-label{color:var(--sky)}
+.grammar-pills{display:flex;flex-wrap:wrap;gap:.4rem}
+.grammar-pill{font-family:'Nunito',sans-serif;font-size:.75rem;font-weight:600;padding:.35rem .8rem;border-radius:50px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s;white-space:nowrap}
+.grammar-pill:hover{border-color:var(--sea);color:var(--sea)}
+.grammar-pill.active{background:var(--sea);border-color:var(--sea);color:#fff}
+.grammar-all-row{margin-bottom:.8rem}
+.grammar-all-row .grammar-pill{font-size:.8rem;padding:.45rem 1.2rem}
+
+/* Main content */
+.content-area{max-width:960px;margin:0 auto;padding:1.5rem 2rem 4rem;position:relative;z-index:1}
+
+/* Browse view */
+.grammar-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:1.5rem}
+.grammar-card-header{padding:1.5rem 1.8rem 1rem;position:relative}
+.grammar-card-header::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:var(--sea)}
+.gc-title{font-family:'DM Serif Display',serif;font-size:1.4rem;margin-bottom:.3rem}
+.gc-rule{font-size:.88rem;color:var(--muted);line-height:1.6;padding:.6rem .9rem;background:var(--sand);border-radius:8px;margin-top:.5rem}
+.gc-rule strong{color:var(--ink)}
+
+/* Prompts */
+.prompt-list{padding:0 1.8rem 1rem}
+.prompt-item{padding:.8rem 0;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:.8rem;cursor:pointer;transition:all .2s;border-radius:6px;margin:0 -.4rem;padding-left:.4rem;padding-right:.4rem}
+.prompt-item:last-child{border-bottom:none}
+.prompt-item:hover{transform:translateX(6px);background:rgba(46,196,182,.04)}
+.prompt-num{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:700;color:var(--sea);min-width:1.5rem;padding-top:.15rem;flex-shrink:0;transition:all .2s}
+.prompt-item:hover .prompt-num{transform:scale(1.2);color:var(--ink)}
+.prompt-text{font-size:.95rem;font-weight:600;line-height:1.55;flex:1;transition:all .25s}
+.prompt-item.done{opacity:.4}
+.prompt-item.done .prompt-text{text-decoration:line-through}
+.prompt-item.done .prompt-num{color:var(--muted)}
+.prompt-item.done:hover{transform:translateX(6px);opacity:.55}
+
+/* Examples & mistakes */
+.gc-panels{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--border)}
+.gc-panel{padding:1.2rem 1.8rem}
+.gc-panel:first-child{border-right:1px solid var(--border)}
+.gc-panel-label{font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;font-weight:500;margin-bottom:.5rem}
+.gc-panel:first-child .gc-panel-label{color:var(--sea)}
+.gc-panel:last-child .gc-panel-label{color:var(--coral)}
+.gc-example{font-size:.84rem;color:var(--ink);padding:.25rem 0;line-height:1.5;font-style:italic}
+.gc-mistake{font-size:.84rem;padding:.25rem 0;line-height:1.5}
+.gc-mistake .wrong{text-decoration:line-through;color:var(--coral);opacity:.7}
+.gc-mistake .right{color:var(--sea);font-weight:600}
+
+/* Practice mode */
+.practice-area{display:none}
+.practice-area.visible{display:block}
+.practice-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:2.5rem;text-align:center;position:relative;overflow:hidden;min-height:350px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.practice-card::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:var(--lavender);border-radius:var(--radius) var(--radius) 0 0}
+.practice-grammar{font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--sea);margin-bottom:1rem;font-weight:500}
+.practice-prompt{font-family:'DM Serif Display',serif;font-size:clamp(1.3rem,3vw,1.7rem);font-weight:400;line-height:1.45;max-width:600px;margin-bottom:1.5rem}
+.practice-rule{font-size:.82rem;color:var(--muted);background:var(--sand);padding:.5rem 1rem;border-radius:8px;margin-bottom:1rem;max-width:500px;display:none}
+.practice-rule.show{display:block}
+.practice-controls{display:flex;gap:.8rem;flex-wrap:wrap;justify-content:center;margin-top:.5rem}
+.btn{font-family:'Nunito',sans-serif;font-size:.85rem;font-weight:700;padding:.6rem 1.4rem;border-radius:50px;border:1.5px solid var(--border);background:var(--card);color:var(--ink);cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:.4rem}
+.btn:hover{border-color:var(--sea);color:var(--sea);transform:translateY(-1px)}
+.btn-sea{background:var(--sea);border-color:var(--sea);color:#fff}
+.btn-sea:hover{background:#26ab9f;border-color:#26ab9f;color:#fff;transform:translateY(-1px)}
+.btn-lavender{background:var(--lavender);border-color:var(--lavender);color:#fff}
+.btn-lavender:hover{background:#8a62b8;border-color:#8a62b8;color:#fff;transform:translateY(-1px)}
+
+/* Timer */
+.timer-row{display:flex;gap:.5rem;align-items:center;justify-content:center;margin-top:1rem}
+.timer-pill{font-family:'JetBrains Mono',monospace;font-size:.75rem;padding:.35rem .7rem;border-radius:50px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s}
+.timer-pill:hover,.timer-pill.on{border-color:var(--lavender);color:var(--lavender)}
+.timer-display{font-family:'JetBrains Mono',monospace;font-size:1.8rem;font-weight:500;color:var(--ink);letter-spacing:.05em;margin-left:.5rem}
+.timer-display.warn{color:var(--coral)}
+
+/* Count */
+.q-count{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--muted);margin-bottom:1rem}
+
+/* Level tags */
+.prompt-level{font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:700;padding:.15rem .45rem;border-radius:50px;flex-shrink:0;margin-top:.2rem}
+.prompt-level.B1{background:#E8F5E9;color:#388E3C}
+.prompt-level.B2{background:var(--sky-light);color:var(--sky)}
+.prompt-level.C1{background:#F3E5F5;color:var(--lavender)}
+.teacher-tip{margin:0 1.8rem 1rem;padding:.8rem 1rem;background:var(--sand);border-radius:8px;border-left:3px solid var(--sun);display:none}
+.teacher-tip.show{display:block}
+.teacher-tip-toggle{font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:700;color:var(--sun);background:none;border:none;cursor:pointer;padding:0;margin:0 1.8rem .5rem;transition:color .2s;display:flex;align-items:center;gap:.3rem}
+.teacher-tip-toggle:hover{color:var(--ink)}
+.teacher-tip-text{font-size:.84rem;color:var(--ink);line-height:1.6}
+.error-bank{margin:0 1.8rem 1rem;display:none}
+.error-bank.show{display:block}
+.error-bank-toggle{font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:700;color:var(--coral);background:none;border:none;cursor:pointer;padding:0;margin:0 1.8rem .5rem;transition:color .2s;display:flex;align-items:center;gap:.3rem}
+.error-bank-toggle:hover{color:var(--ink)}
+.error-input{width:100%;font-family:'Nunito',sans-serif;font-size:.84rem;padding:.6rem .8rem;border:1.5px solid var(--border);border-radius:8px;background:var(--card);color:var(--ink);resize:vertical;min-height:60px;transition:border-color .2s}
+.error-input:focus{outline:none;border-color:var(--coral)}
+.error-list{margin-top:.5rem;display:flex;flex-direction:column;gap:.3rem}
+.error-entry{font-size:.82rem;padding:.4rem .7rem;background:var(--card);border:1px solid var(--border);border-radius:6px;display:flex;justify-content:space-between;align-items:center}
+.error-entry .remove{color:var(--muted);cursor:pointer;font-size:.7rem;padding:0 .3rem}
+.error-entry .remove:hover{color:var(--coral)}
+.project-area{display:none}
+.project-area.visible{display:block}
+.project-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:4rem 3rem;text-align:center;position:relative;overflow:hidden;min-height:450px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.project-card::before{content:'';position:absolute;top:0;left:0;right:0;height:6px;background:var(--sun);border-radius:var(--radius) var(--radius) 0 0}
+.project-grammar{font-family:'JetBrains Mono',monospace;font-size:.85rem;letter-spacing:.12em;text-transform:uppercase;color:var(--sea);margin-bottom:1.5rem;font-weight:500}
+.project-prompt{font-family:'DM Serif Display',serif;font-size:clamp(1.8rem,4vw,2.6rem);font-weight:400;line-height:1.4;max-width:700px;margin-bottom:2rem}
+.project-controls{display:flex;gap:.8rem;flex-wrap:wrap;justify-content:center}
+.challenge-area{display:none}
+.challenge-area.visible{display:block}
+.challenge-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem}
+.challenge-side{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:2rem;text-align:center;position:relative;overflow:hidden;min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.challenge-side:first-child::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:var(--sea);border-radius:var(--radius) var(--radius) 0 0}
+.challenge-side:last-child::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:var(--coral);border-radius:var(--radius) var(--radius) 0 0}
+.challenge-label{font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;font-weight:600;margin-bottom:.5rem}
+.challenge-side:first-child .challenge-label{color:var(--sea)}
+.challenge-side:last-child .challenge-label{color:var(--coral)}
+.challenge-grammar{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--muted);margin-bottom:.8rem;letter-spacing:.05em}
+.challenge-prompt{font-family:'DM Serif Display',serif;font-size:1.2rem;line-height:1.45;max-width:350px}
+.challenge-center{text-align:center}
+.roulette-btn{font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:700;padding:.7rem 1.8rem;border-radius:50px;border:2px solid var(--sun);background:var(--sand);color:var(--ink);cursor:pointer;transition:all .3s;display:inline-flex;align-items:center;gap:.5rem}
+.roulette-btn:hover{background:var(--sun);color:#fff;transform:scale(1.03)}
+.roulette-btn.spinning{animation:rouletteSpin .15s ease 3}
+@keyframes rouletteSpin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+
+footer{text-align:center;padding:3rem 2rem;font-size:.8rem;color:var(--muted);border-top:1.5px solid var(--border);max-width:960px;margin:2rem auto 0;position:relative;z-index:1}
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .65s ease,transform .65s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-d1{transition-delay:.1s}
+.fade-in{animation:fadeIn .4s ease forwards}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:900px){.mode-grid{grid-template-columns:1fr 1fr}.gc-panels{grid-template-columns:1fr}.gc-panel:first-child{border-right:none;border-bottom:1px solid var(--border)}.grammar-groups{grid-template-columns:1fr 1fr}}
+@media(max-width:640px){nav{padding:.75rem 1.2rem}.nav-links{gap:1rem}.nav-links a{font-size:.78rem}.page-header{padding:5.5rem 1.2rem 1.2rem}.mode-section{padding:1rem 1.2rem 0}.grammar-bar{padding:1rem 1.2rem .5rem}.grammar-groups{grid-template-columns:1fr}.content-area{padding:1rem 1.2rem 3rem}.mode-grid{grid-template-columns:1fr}.grammar-card-header{padding:1.2rem}.prompt-list{padding:0 1.2rem 1rem}.gc-panel{padding:1rem 1.2rem}.practice-card{padding:1.8rem 1.2rem}}
+</style>
+</head>
+<body>
+<nav>
+<a href="class-activities.html" class="nav-logo">john<span>+</span>english</a>
+<div class="nav-links"><a href="index.html">Home</a><a href="class-activities.html">Activities</a></div>
+</nav>
+<div class="page-header">
+<a href="class-activities.html" class="back-link">&larr; Back to activities</a>
+<div class="section-label">Class Activity</div>
+<h1 class="page-title">📖 Speaking by Grammar</h1>
+<p class="page-desc">Speaking prompts designed to practise specific grammar points. Choose a structure, project a prompt, and get students talking &mdash; with the right grammar in focus.</p>
+</div>
+
+<div class="mode-section reveal">
+<div class="mode-grid">
+<div class="mode-card active" onclick="setMode('browse')" id="mode-browse"><div class="mode-emoji">📋</div><div class="mode-title">Browse by Grammar</div><div class="mode-desc">All prompts grouped by grammar point with examples and mistakes.</div></div>
+<div class="mode-card" onclick="setMode('practice')" id="mode-practice"><div class="mode-emoji">⏱️</div><div class="mode-title">Practice Mode</div><div class="mode-desc">One prompt at a time with timer. Ideal for quick-fire speaking.</div></div>
+<div class="mode-card" onclick="setMode('project')" id="mode-project"><div class="mode-emoji">📺</div><div class="mode-title">Projection Mode</div><div class="mode-desc">Big clean display for classroom screens. Just the prompt.</div></div>
+<div class="mode-card" onclick="setMode('challenge')" id="mode-challenge"><div class="mode-emoji">🔀</div><div class="mode-title">Challenge Mode</div><div class="mode-desc">Two students get different grammar points. Conversation must use both.</div></div>
+</div>
+</div>
+
+<div class="grammar-bar reveal reveal-d1" id="grammar-bar">
+<div class="grammar-all-row"><button class="grammar-pill active" data-g="all" onclick="setGrammar('all',this)">All (28)</button></div>
+<div class="grammar-groups">
+<div class="grammar-group">
+<div class="grammar-group-label">Tenses & Time</div>
+<div class="grammar-pills" id="grp-tenses"></div>
+</div>
+<div class="grammar-group">
+<div class="grammar-group-label">Conditionals</div>
+<div class="grammar-pills" id="grp-conditionals"></div>
+</div>
+<div class="grammar-group">
+<div class="grammar-group-label">Sentence Structure</div>
+<div class="grammar-pills" id="grp-structure"></div>
+</div>
+<div class="grammar-group">
+<div class="grammar-group-label">Verbs & Expressions</div>
+<div class="grammar-pills" id="grp-verbs"></div>
+</div>
+<div class="grammar-group">
+<div class="grammar-group-label">Nouns, Articles & Quantifiers</div>
+<div class="grammar-pills" id="grp-nouns"></div>
+</div>
+</div>
+</div>
+
+<div class="content-area" id="view-browse">
+<div class="q-count" id="q-count"></div>
+<div id="grammar-list"></div>
+</div>
+
+<div class="content-area practice-area" id="view-practice">
+<div class="practice-card">
+<div class="practice-grammar" id="prac-grammar"></div>
+<div class="practice-prompt" id="prac-prompt">Press "Next" to begin</div>
+<div class="practice-rule" id="prac-rule"></div>
+<div class="practice-controls">
+<button class="btn" onclick="toggleRule()" id="rule-btn">💡 Show Rule</button>
+<button class="btn btn-lavender" onclick="nextPrompt()">Next →</button>
+<button class="btn" onclick="randomPrompt()">🎲 Random</button>
+<button class="roulette-btn" onclick="grammarRoulette(this)" id="roulette-btn">🎰 Grammar Roulette</button>
+</div>
+<div class="timer-row">
+<span class="timer-pill" onclick="setTime(60,this)">1 min</span>
+<span class="timer-pill" onclick="setTime(120,this)">2 min</span>
+<span class="timer-pill" onclick="setTime(180,this)">3 min</span>
+<button class="btn btn-sea" onclick="toggleTimer()" id="timer-btn" style="padding:.4rem 1rem;font-size:.8rem">▶ Start</button>
+<span class="timer-display" id="timer-display">0:00</span>
+</div>
+</div>
+</div>
+
+<div class="content-area project-area" id="view-project">
+<div class="project-card">
+<div class="project-grammar" id="proj-grammar"></div>
+<div class="project-prompt" id="proj-prompt">Press "Next" to begin</div>
+<div class="project-controls">
+<button class="btn btn-sea" onclick="nextProject()">Next →</button>
+<button class="btn" onclick="randomProject()">🎲 Random</button>
+<button class="roulette-btn" onclick="projectRoulette(this)">🎰 Grammar Roulette</button>
+</div>
+</div>
+</div>
+
+<div class="content-area challenge-area" id="view-challenge">
+<div class="challenge-grid">
+<div class="challenge-side">
+<div class="challenge-label">Student A</div>
+<div class="challenge-grammar" id="ch-grammar-a"></div>
+<div class="challenge-prompt" id="ch-prompt-a">Press "New Challenge" to begin</div>
+</div>
+<div class="challenge-side">
+<div class="challenge-label">Student B</div>
+<div class="challenge-grammar" id="ch-grammar-b"></div>
+<div class="challenge-prompt" id="ch-prompt-b">Press "New Challenge" to begin</div>
+</div>
+</div>
+<div class="challenge-center">
+<button class="btn btn-sea" onclick="newChallenge()" style="font-size:.95rem;padding:.7rem 2rem">🔀 New Challenge</button>
+</div>
+</div>
+
+<footer>&copy; 2026 John + English. All rights reserved.</footer>
+
+<script>
+var data = [
+{grammar:"Present Perfect vs Past Simple",rule:"Use the <strong>present perfect</strong> for experiences or unfinished time. Use the <strong>past simple</strong> for finished actions at a specific time.",prompts:["Tell your partner about a country you've visited. When did you go? What did you do there?","Have you ever tried an extreme sport? If yes, what happened? If not, would you like to?","What's the best meal you've ever had? Where were you? Who were you with?","How long have you lived in your current home? Where did you live before?","Have you ever lost something important? What happened?","What's the most interesting thing you've done this year so far?"],examples:["I've been to Japan twice. I went there in 2019 and 2023.","She's never tried sushi, but she ate Thai food last week.","I've lived here for three years. Before that, I lived in Madrid."],mistakes:[{wrong:"I have been to Paris last year.",right:"I went to Paris last year."},{wrong:"Did you ever see a whale?",right:"Have you ever seen a whale?"},{wrong:"I've finished it yesterday.",right:"I finished it yesterday."}],teacherTip:"Listen for \'I have been to Paris last year\' — the most common error. Drill the difference between finished time (yesterday, last week, in 2019) and unfinished time (this week, today, ever). Ask follow-up questions that force tense switching: \'Have you ever…?\' → \'When did you…?\'",levels:["B1","B1","B1","B2","B1","B2"]},
+{grammar:"Second Conditional",rule:"Use <strong>If + past simple, would + infinitive</strong> to talk about imaginary or unlikely situations in the present/future.",prompts:["If you could live anywhere in the world, where would you choose? Why?","What would you do if you won the lottery tomorrow?","If you could have dinner with any person, alive or dead, who would it be?","If you didn't have to work, how would you spend your time?","What would you change about your city if you were the mayor?","If you could speak any language fluently, which one would you pick?"],examples:["If I had more time, I'd learn to play the piano.","I wouldn't live in a big city if I had the choice.","If she were president, she'd invest in education."],mistakes:[{wrong:"If I would have money, I would buy a car.",right:"If I had money, I would buy a car."},{wrong:"If I will be you, I'd go.",right:"If I were you, I'd go."},{wrong:"I would went there if I could.",right:"I would go there if I could."}],teacherTip:"The biggest error is \'If I would have…\' instead of \'If I had…\'. Encourage students to start with \'If I were…\' for hypothetical identity questions. This works brilliantly as a warmer — everyone has an opinion.",levels:["B1","B1","B2","B2","B2","B1"]},
+{grammar:"Third Conditional",rule:"Use <strong>If + past perfect, would have + past participle</strong> to talk about imaginary situations in the past.",prompts:["Think of a big decision in your life. What would have happened if you'd chosen differently?","If you hadn't studied English, how would your life have been different?","What would you have done if you'd been born 100 years earlier?","If you'd known then what you know now, what would you have changed?","Tell your partner about a missed opportunity. What would have happened if you'd taken it?","If you hadn't come to class today, what would you have done instead?"],examples:["If I'd studied harder, I would have passed the exam.","She wouldn't have got the job if she hadn't prepared for the interview.","If we'd left earlier, we wouldn't have missed the train."],mistakes:[{wrong:"If I would have known, I would have called.",right:"If I had known, I would have called."},{wrong:"If she studied, she would have passed.",right:"If she had studied, she would have passed."},{wrong:"I would had gone if you asked.",right:"I would have gone if you'd asked."}],teacherTip:"This is cognitively demanding. Give students 30 seconds of thinking time before speaking. The double \'have\' (\'would have… had\') trips people up. Model one example yourself first.",levels:["B2","B2","C1","B2","B2","B1"]},
+{grammar:"Reported Speech",rule:"When reporting what someone said, <strong>shift the tense back</strong>: present → past, past → past perfect, will → would.",prompts:["Tell your partner something interesting someone told you recently. What did they say?","Think of a piece of advice a parent or teacher gave you. Report it to your partner.","What was the last lie someone told you — or you told someone?","Report a conversation you had yesterday. What did the other person say?","What's the best compliment anyone has ever given you? What did they say exactly?","Think of a promise someone made to you. Did they keep it?"],examples:["She said she was tired and wanted to go home.","He told me he had never been to London.","My mum said I should follow my heart."],mistakes:[{wrong:"He said he is coming tomorrow.",right:"He said he was coming the next day."},{wrong:"She told that she was happy.",right:"She told me that she was happy."},{wrong:"He said me to wait.",right:"He told me to wait."}],teacherTip:"Don\'t just focus on tense backshift — also practise reporting verbs (told, asked, suggested, promised). Students at B2+ often avoid reported speech entirely and just quote directly. Push them to report naturally.",levels:["B2","B2","B2","B1","B2","B2"]},
+{grammar:"Passive Voice",rule:"Use the passive when the <strong>action is more important than who did it</strong>: subject + be + past participle.",prompts:["Describe how your favourite food is made. What ingredients are used?","What was your town or city originally built for? What is it known for now?","Think of a famous building. When was it built? What is it used for?","What languages are spoken in your country? Which ones are taught in schools?","Describe a process at work or school — how is something done step by step?","What changes should be made in your country's education system?"],examples:["Coffee is grown in Brazil and exported all over the world.","The building was designed by a famous architect in the 1920s.","English is spoken in over 60 countries."],mistakes:[{wrong:"The cake made by my grandmother.",right:"The cake was made by my grandmother."},{wrong:"The book was wrote by Orwell.",right:"The book was written by Orwell."},{wrong:"It builded in 1990.",right:"It was built in 1990."}],teacherTip:"Students overuse \'by\' — remind them that 80% of passives in English don\'t include an agent. Focus on when the passive is natural (processes, rules, news) rather than forcing it into every sentence.",levels:["B1","B2","B1","B2","B2","C1"]},
+{grammar:"Modals of Speculation",rule:"Use <strong>must</strong> (certain), <strong>might/could</strong> (possible), <strong>can't</strong> (impossible) to speculate about present situations.",prompts:["Look at your partner's belongings. What can you guess about their day? They must be… They might…","Your neighbour's lights have been off for a week. What could have happened?","A friend hasn't replied to your messages for three days. Speculate — what might be going on?","You find a wallet on the street with €500 inside. Who could it belong to?","Your boss looks really happy today. Why might that be?","There's a strange noise coming from upstairs. What could it be?"],examples:["She must be tired — she's been working all day.","He might be on holiday. I'm not sure.","That can't be right — the shop closes at 6."],mistakes:[{wrong:"He must to be at home.",right:"He must be at home."},{wrong:"She can be Italian.",right:"She could/might be Italian."},{wrong:"They must be know the answer.",right:"They must know the answer."}],teacherTip:"Listen for \'She must to be…\' and \'He can be Italian.\' Drill the difference between must (90% sure), might/could (50%), and can\'t (impossible). Use pictures or scenarios to prompt natural speculation.",levels:["B2","B2","B2","B2","B1","B1"]},
+{grammar:"Used to / Would",rule:"Use <strong>used to + infinitive</strong> for past habits and states. Use <strong>would + infinitive</strong> only for repeated past actions (not states).",prompts:["What did you use to do as a child that you don't do any more?","Describe a typical weekend when you were a teenager. What would you usually do?","Did you use to have a different opinion about something? What changed?","Tell your partner about a place you used to go to regularly. What would you do there?","What did you use to be afraid of? Are you still afraid of it?","Think about school. What would a normal day look like?"],examples:["I used to play football every weekend when I was young.","We would always go to my grandma's house on Sundays.","She used to live in Paris, but she moved to London."],mistakes:[{wrong:"I was used to wake up early.",right:"I used to wake up early."},{wrong:"She would be shy as a child.",right:"She used to be shy as a child."},{wrong:"I didn't used to like coffee.",right:"I didn't use to like coffee."}],teacherTip:"The key distinction: \'used to\' works for states AND habits, but \'would\' only works for repeated actions. \'I would be shy\' is wrong; \'I used to be shy\' is correct. Students often mix up \'used to\' with \'be used to\' (= be accustomed to).",levels:["B1","B2","B2","B2","B1","B1"]},
+{grammar:"Wish & Regret",rule:"Use <strong>wish + past simple</strong> for present wishes. Use <strong>wish + past perfect</strong> for past regrets. Use <strong>wish + would</strong> for complaints.",prompts:["What do you wish was different about your daily life?","Is there something you wish you'd done differently in the past?","What do you wish other people would stop doing? Why does it annoy you?","If you could change one thing about where you live, what would you wish for?","Think about your education. Do you wish you'd studied something different?","What do you wish you were better at?"],examples:["I wish I had more free time.","I wish I'd learned to drive when I was younger.","I wish people wouldn't use their phones at dinner."],mistakes:[{wrong:"I wish I can speak French.",right:"I wish I could speak French."},{wrong:"I wish I didn't went to that party.",right:"I wish I hadn't gone to that party."},{wrong:"I wish it will rain.",right:"I wish it would rain."}],teacherTip:"Three patterns, three meanings — drill them separately before mixing. Wish + past simple (present), wish + past perfect (past regret), wish + would (complaints about others). Students often say \'I wish I can…\' instead of \'I wish I could…\'",levels:["B2","B2","B2","B2","B2","B1"]},
+{grammar:"Relative Clauses",rule:"Use <strong>who</strong> for people, <strong>which/that</strong> for things, <strong>where</strong> for places, <strong>whose</strong> for possession. Non-defining clauses use commas.",prompts:["Describe someone in your life who has influenced you. What did they do?","Tell me about a place where you feel completely relaxed. What makes it special?","What's something that changed your mind about something important?","Describe a person whose job you find interesting. What do they do?","Talk about a film or book which made a big impression on you.","Describe the kind of person who you'd like to work with."],examples:["My grandmother, who is 85, still goes swimming every morning.","The restaurant where we met is closing down.","That's the colleague whose idea saved the project."],mistakes:[{wrong:"The man which called is my brother.",right:"The man who called is my brother."},{wrong:"That's the city who I was born.",right:"That's the city where I was born."},{wrong:"My friend, that lives in Rome, is visiting.",right:"My friend, who lives in Rome, is visiting."}],teacherTip:"Focus on when \'that\' vs \'who/which\' is possible, and when commas matter. Non-defining clauses (with commas) are harder and often avoided — push B2+ students to use them. \'My sister, who lives in Rome, is visiting\' vs \'The sister who lives in Rome is visiting.\'",levels:["B2","B1","B2","B2","B1","B2"]},
+{grammar:"Future Forms",rule:"Use <strong>will</strong> for predictions/decisions. <strong>Going to</strong> for plans/intentions. <strong>Present continuous</strong> for fixed arrangements.",prompts:["What are your plans for this weekend? What are you doing?","Where do you think you'll be in ten years? Make some predictions.","What are you going to do differently next year?","Tell your partner about something you're meeting someone for soon.","Do you think technology will replace teachers? Why or why not?","What's something you've been planning to do but haven't started yet?"],examples:["I'm meeting Sarah for lunch tomorrow — it's all arranged.","I think it'll rain later — look at those clouds.","I'm going to start running in January. That's my plan."],mistakes:[{wrong:"I will meet them tomorrow at 3pm.",right:"I'm meeting them tomorrow at 3pm. (fixed arrangement)"},{wrong:"Look at the sky — it will rain.",right:"Look at the sky — it's going to rain. (evidence)"},{wrong:"I'm going to probably be late.",right:"I'll probably be late. (prediction)"}],teacherTip:"The three-way distinction (will/going to/present continuous) is tested heavily in Cambridge exams. Use timeline drawings on the board. The key test: Is it a plan (going to), an arrangement (present continuous), or a prediction/spontaneous decision (will)?",levels:["B1","B2","B1","B1","C1","B2"]}
+,
+{grammar:"Comparatives & Superlatives",rule:"Use <strong>-er/more</strong> to compare two things. Use <strong>-est/most</strong> for the extreme. Add <strong>than</strong> for comparisons.",prompts:["Compare two cities you've been to. Which is bigger, more interesting, more affordable?","Who's the most important person in your life? Why?","What's the worst journey you've ever had? What made it so bad?","Is learning English easier or harder than you expected? Why?","Compare your life now with your life five years ago. What's better? What's worse?","What's the best decision you've ever made?"],examples:["London is more expensive than Madrid, but it's also more exciting.","That was the longest flight I've ever taken.","She's much taller than her sister."],mistakes:[{wrong:"She is more taller than me.",right:"She is taller than me."},{wrong:"It's the more beautiful city.",right:"It's the most beautiful city."},{wrong:"This is gooder than that.",right:"This is better than that."}],teacherTip:"Beyond basic -er/-est, push students towards \'far more\', \'slightly less\', \'by far the most\' — these hedging phrases are what separate B1 from B2. Watch for double comparatives: \'more better\', \'more easier\'.",levels:["B1","B1","B1","B2","B2","B1"]},
+{grammar:"Gerunds vs Infinitives",rule:"Some verbs take <strong>-ing</strong> (enjoy, avoid, mind). Others take <strong>to + infinitive</strong> (want, decide, hope). Some change meaning (stop, remember, try).",prompts:["What do you enjoy doing at the weekend that you never get tired of?","Is there anything you've decided to change about your life recently?","What do you avoid doing if you can? Why?","Have you ever forgotten to do something really important? What happened?","What did you stop doing that you wish you hadn't?","What are you hoping to achieve this year?"],examples:["I enjoy cooking but I avoid baking — it's too precise.","She decided to quit her job and start travelling.","I stopped smoking two years ago. / I stopped to smoke on the way home."],mistakes:[{wrong:"I enjoy to read books.",right:"I enjoy reading books."},{wrong:"I want going home.",right:"I want to go home."},{wrong:"She suggested to go out.",right:"She suggested going out."}],teacherTip:"Give students a list of 5-6 verbs and ask them to make sentences. The meaning-change verbs (stop, remember, try, forget) are gold for discussion: \'I stopped to smoke\' vs \'I stopped smoking\' — completely different meanings.",levels:["B1","B2","B2","B2","B2","B1"]},
+{grammar:"Articles",rule:"Use <strong>a/an</strong> for first mention or non-specific. Use <strong>the</strong> for specific/known. Use <strong>no article</strong> for general plural/uncountable nouns.",prompts:["Describe your morning routine from start to finish. Pay attention to a/the/no article.","Tell me about the area where you live. What's it like?","What's the most unusual job you've ever heard of?","Describe a typical meal in your country. What do people usually eat?","Talk about a hobby you have. How did you start?","If a tourist visited your city, what would you recommend?"],examples:["I had a coffee this morning. The coffee was really good.","Life is short. / The life of a doctor is stressful.","She plays the piano. / She plays tennis."],mistakes:[{wrong:"I went to the bed at 11.",right:"I went to bed at 11."},{wrong:"She's doctor.",right:"She's a doctor."},{wrong:"I love the music.",right:"I love music. (general)"}],teacherTip:"Articles are the single hardest thing for many L1 backgrounds (Spanish, Russian, Arabic, Japanese all have different systems). Don\'t over-correct in fluency activities — note patterns and address them afterwards.",levels:["B2","B1","B2","B1","B1","B2"]},
+{grammar:"Phrasal Verbs in Context",rule:"Phrasal verbs combine a verb + particle to create a new meaning. Many are <strong>informal</strong> and essential for natural English.",prompts:["Tell me about a time you gave up on something. Do you regret it?","Have you ever come across something completely unexpected? What happened?","Describe a situation where you had to figure something out on your own.","What do you usually put off doing? Why?","Tell me about someone you look up to. What makes them special?","Have you ever turned down an opportunity and wished you hadn't?"],examples:["I came across an old photo and it brought back so many memories.","She turned down the job because the salary was too low.","I need to figure out how to fix this before tomorrow."],mistakes:[{wrong:"I look up to him. > I look him up to.",right:"I look up to him. (inseparable)"},{wrong:"I put off it until tomorrow.",right:"I put it off until tomorrow. (separable)"},{wrong:"She gave up to smoke.",right:"She gave up smoking."}],teacherTip:"Don\'t teach phrasal verbs in isolation. These prompts encourage storytelling, which is where phrasal verbs appear most naturally. Listen for students avoiding them and using formal alternatives — \'I rejected it\' instead of \'I turned it down.\'",levels:["B2","B2","B2","B2","B2","B2"]},
+{grammar:"Question Tags",rule:"Use a <strong>positive statement + negative tag</strong> or <strong>negative statement + positive tag</strong>. Match the auxiliary verb.",prompts:["Make statements about your partner and check with question tags: 'You like coffee, don't you?'","Talk about things you think are true about your country. Check with your partner.","Discuss plans for the weekend using question tags: 'We're meeting at 7, aren't we?'","Make assumptions about famous people: 'She's American, isn't she?'","Talk about shared memories with a friend: 'We had a great time, didn't we?'","Use question tags to make polite requests: 'You couldn't help me, could you?'"],examples:["You've been to France, haven't you?","It isn't going to rain, is it?","She can swim, can't she?"],mistakes:[{wrong:"You like it, isn't it?",right:"You like it, don't you?"},{wrong:"He's coming, doesn't he?",right:"He's coming, isn't he?"},{wrong:"They went home, don't they?",right:"They went home, didn't they?"}],teacherTip:"Intonation matters as much as grammar here. Rising intonation = genuine question. Falling intonation = expecting agreement. Practise both. Students often default to \'isn\'t it?\' for everything — push them to match the auxiliary.",levels:["B1","B2","B1","B1","B1","B2"]},
+{grammar:"Inversion",rule:"For emphasis or in formal English, <strong>invert subject and auxiliary</strong> after negative/restrictive adverbs: Never have I…, Not only… but also…, Rarely does…",prompts:["Tell your partner about an extreme experience: 'Never have I been so scared/excited/surprised.'","Describe someone impressive: 'Not only is she talented, but she's also incredibly kind.'","Talk about things you rarely do: 'Rarely do I get the chance to…'","Discuss something that only happened after a long wait: 'Only when I moved abroad did I realise…'","Describe a situation using 'Under no circumstances would I…'","Talk about a turning point: 'Little did I know that…'"],examples:["Never have I seen such a beautiful sunset.","Not only did she win, but she also broke the record.","Rarely do I eat fast food — perhaps once a year."],mistakes:[{wrong:"Never I have seen this before.",right:"Never have I seen this before."},{wrong:"Not only she is smart, but also kind.",right:"Not only is she smart, but she's also kind."},{wrong:"Rarely I go to the cinema.",right:"Rarely do I go to the cinema."}],teacherTip:"This is C1+ territory. Students don\'t need to produce inversion spontaneously — they need to recognise it and use it occasionally for emphasis. Great for formal writing and presentations. Start with the easiest: \'Never have I…\' and \'Not only… but also…\'",levels:["C1","C1","C1","C1","C1","C1"]},
+{grammar:"Mixed Conditionals",rule:"Combine <strong>third conditional (past cause)</strong> with <strong>second conditional (present result)</strong>, or vice versa.",prompts:["If you'd chosen a different career, what would your life be like now?","If you hadn't learned English, where would you be working today?","If you were more organised, what would you have achieved by now?","If you'd grown up in a different country, how would you be different?","If you weren't afraid of anything, what would you have done differently in the past?","If you'd married someone else, how would your daily life be different now?"],examples:["If I'd studied medicine, I would be a doctor now. (past > present)","If I were braver, I would have spoken up at the meeting. (present > past)","If she hadn't moved to London, she wouldn't be so independent now."],mistakes:[{wrong:"If I would have studied, I would be rich.",right:"If I had studied, I would be rich."},{wrong:"If I was more careful, I wouldn't have broken it.",right:"If I were more careful, I wouldn't have broken it."},{wrong:"If he didn't move, he would have a different job now.",right:"If he hadn't moved, he would have a different job now."}],teacherTip:"Only introduce this after students are comfortable with 2nd and 3rd conditionals separately. The concept is simple (past cause → present result, or vice versa) but the form is complex. Use personal examples — they make it stick.",levels:["C1","C1","C1","C1","C1","C1"]},
+{grammar:"Cleft Sentences",rule:"Use <strong>It is/was… that/who</strong> or <strong>What… is/was</strong> to add emphasis to a specific part of the sentence.",prompts:["What's the thing you love most about your job? Start with 'What I love about… is…'","Talk about a turning point: 'It was [person/event] that changed everything.'","Emphasise what annoys you: 'What really bothers me is…'","Describe what makes your country special: 'What makes it unique is…'","Talk about a misunderstanding: 'What I actually meant was…'","Discuss what you need: 'What I really need right now is…'"],examples:["What I love about this city is the food.","It was my teacher who encouraged me to study abroad.","What surprised me most was how friendly everyone was."],mistakes:[{wrong:"What I like is travel.",right:"What I like is travelling."},{wrong:"It was him that told I.",right:"It was him who told me."},{wrong:"What annoys me is people are late.",right:"What annoys me is when people are late."}],teacherTip:"These feel unnatural to many students, but they\'re everywhere in spoken English. \'What I mean is…\', \'The thing is…\', \'It was X that…\'. Start with \'What… is…\' constructions as they\'re the most conversational.",levels:["B2","B2","B2","B2","B2","B2"]},
+{grammar:"Narrative Tenses",rule:"Use <strong>past simple</strong> for main events, <strong>past continuous</strong> for background, and <strong>past perfect</strong> for earlier events when telling stories.",prompts:["Tell a story about something funny that happened to you. Set the scene with past continuous.","Describe a memorable day. What had happened before the main event?","Tell your partner about a time something went wrong. What were you doing when it happened?","Describe how you met an important person in your life. What had you been doing before?","Tell a story about a journey. What happened? What had you planned?","Narrate a childhood memory using all three tenses."],examples:["I was walking home when I saw a fox. I'd never seen one in the city before.","She had already left when I arrived. I was feeling really disappointed.","We were sitting in a cafe when it started to rain. We hadn't brought an umbrella."],mistakes:[{wrong:"I walked home when I saw him.",right:"I was walking home when I saw him."},{wrong:"When I arrived, she already left.",right:"When I arrived, she had already left."},{wrong:"I have been waiting when he called.",right:"I had been waiting when he called."}],teacherTip:"Storytelling is the best way to practise this. Give students 2 minutes of preparation time. Listen for the past continuous (background) and past perfect (earlier events) — students often tell stories entirely in past simple.",levels:["B2","B2","B2","B2","B2","B1"]},
+{grammar:"Causative (have/get something done)",rule:"Use <strong>have/get + object + past participle</strong> when someone else does something for you.",prompts:["When did you last have your hair cut? Where do you usually get it done?","Have you ever had something repaired that cost more than the item was worth?","What do you get done professionally that you could do yourself?","Have you ever had a photo taken that you really hated?","Talk about your home — have you had anything renovated recently?","What would you love to have done for you every day if money wasn't an issue?"],examples:["I had my car serviced last week — it cost a fortune.","She's getting her kitchen renovated at the moment.","I need to get my eyes tested."],mistakes:[{wrong:"I cut my hair yesterday. (someone else did it)",right:"I had my hair cut yesterday."},{wrong:"I got painted my house.",right:"I got my house painted."},{wrong:"She has her car fix.",right:"She had her car fixed."}],teacherTip:"Students confuse \'I cut my hair\' (I did it myself) with \'I had my hair cut\' (someone else did it). Use daily routine and service contexts. \'Get\' is more informal than \'have\' — both are correct.",levels:["B1","B2","B2","B2","B2","B2"]},
+{grammar:"So / Such / Too / Enough",rule:"<strong>So + adjective</strong>, <strong>such + noun phrase</strong>, <strong>too + adjective</strong> (= excessive), <strong>adjective + enough</strong> (= sufficient).",prompts:["Describe a film that was so good you watched it twice. What made it so special?","Talk about a place that was such a disappointment. What went wrong?","Have you ever been too tired to do something important? What happened?","Is your English good enough for your goals? What do you still need to improve?","Describe a person who is so kind that everyone loves them.","Tell me about something that was too expensive but you bought it anyway."],examples:["The film was so boring that I fell asleep.","It was such a beautiful day that we went to the beach.","The coffee was too hot to drink. / It wasn't cool enough."],mistakes:[{wrong:"It was so a good film.",right:"It was such a good film."},{wrong:"It's too enough hot.",right:"It's too hot. / It's hot enough."},{wrong:"She is such nice.",right:"She is so nice. / She is such a nice person."}],teacherTip:"The so/such distinction causes the most errors: \'so + adjective\' vs \'such + a + adjective + noun\'. Too vs enough is easier but students forget that \'enough\' comes after the adjective: \'good enough\', not \'enough good\'.",levels:["B2","B2","B2","B2","B1","B2"]},
+{grammar:"Subject-Verb Agreement",rule:"Some nouns look plural but take a <strong>singular verb</strong> (news, physics). Some look singular but take a <strong>plural verb</strong> (police, people).",prompts:["Discuss the news today. 'The news is…' What's happening in the world?","Talk about different groups: 'The police are… / The government is…'","Describe your family. 'My family is/are…' — does it live together or separately?","Talk about money, time, and distance: 'Ten kilometres is a long way.'","Discuss subjects you studied: 'Mathematics is/was…', 'Politics is/are…'","Talk about things in pairs: 'A pair of scissors is…', 'These trousers are…'"],examples:["The news is shocking today.","The police are investigating the crime.","Ten dollars isn't enough for lunch."],mistakes:[{wrong:"The news are very bad.",right:"The news is very bad."},{wrong:"The police is coming.",right:"The police are coming."},{wrong:"Everyone are happy.",right:"Everyone is happy."}],teacherTip:"Collect confusing examples on the board: news (singular), police (plural), family (both), everyone (singular). This is more about awareness than production — most errors happen in writing, but speaking practice builds the instinct.",levels:["B1","B2","B2","B2","B2","B2"]},
+{grammar:"Determiners & Quantifiers",rule:"<strong>A few / few</strong> (countable), <strong>a little / little</strong> (uncountable). 'A few/a little' = some (positive). 'Few/little' = not enough (negative).",prompts:["How much free time do you have? 'I have a little / little time because…'","Do you have many close friends, or just a few? Tell me about them.","Talk about a resource that's running out: 'There's very little… left.'","Describe your English ability honestly using these quantifiers.","How much money do you spend on food each week?","Talk about changes in your city: 'There are fewer… than before / there's less… now.'"],examples:["I have a few good friends — about three or four.","There's little hope of finding it now. (= almost none)","A few people came to the party. (= some, positive)"],mistakes:[{wrong:"I have a few money.",right:"I have a little money. (uncountable)"},{wrong:"There are less people here.",right:"There are fewer people here. (countable)"},{wrong:"I have few of time.",right:"I have little time."}],teacherTip:"The a few/few and a little/little distinction is subtle but important. \'A few friends came\' (positive — some came) vs \'Few friends came\' (negative — not many). Use real-life contexts where the distinction changes the meaning.",levels:["B2","B2","B2","B2","B1","B2"]},
+{grammar:"Zero & First Conditionals",rule:"<strong>Zero</strong>: If + present, present (general truths). <strong>First</strong>: If + present, will + infinitive (real future possibilities).",prompts:["What happens if you don't sleep enough? Describe the effects using zero conditional.","What will you do if the weather is good this weekend?","If you get a pay rise, what will you spend it on?","What happens to your mood if you don't exercise for a week?","What will happen if you don't practise your English regularly?","If you could only eat one meal forever, what will you choose?"],examples:["If you heat water to 100C, it boils. (zero)","If it rains tomorrow, I'll stay at home. (first)","If I pass the exam, I'll celebrate with my friends."],mistakes:[{wrong:"If it will rain, I stay home.",right:"If it rains, I'll stay home."},{wrong:"If you heat water, it will boil.",right:"If you heat water, it boils. (zero)"},{wrong:"If I will see her, I tell her.",right:"If I see her, I'll tell her."}],teacherTip:"Students confuse these with the second conditional. Zero = always true (scientific facts, habits). First = real possibility. The test: \'If it rains tomorrow\' (first — possible) vs \'If you heat ice\' (zero — always true).",levels:["B1","B1","B1","B1","B2","B2"]},
+{grammar:"Emphasis with Do/Does/Did",rule:"Use <strong>do/does/did + base form</strong> before the main verb to add emphasis or contradict. Stressed in speech.",prompts:["Contradict a common assumption: 'Actually, I DO enjoy…' / 'I DID go to…'","Talk about something you feel strongly about: 'I do believe that…'","Respond to a partner's doubt: 'I did finish it!' / 'She does work hard!'","Describe a hidden truth: 'People think I'm quiet, but I do have strong opinions.'","Emphasise a recommendation: 'You really do need to visit…'","Tell your partner about a time you were right about something but nobody listened. What happened in the end?"],examples:["I do like coffee — I just don't drink it every day.","She did apologise, but it was too late.","We do have a plan — we just haven't shared it yet."],mistakes:[{wrong:"I do likes it.",right:"I do like it."},{wrong:"She does works hard.",right:"She does work hard."},{wrong:"I did went there.",right:"I did go there."}],teacherTip:"This is about spoken stress as much as grammar. Model the emphasis clearly: \'I DO like it\' with stress on \'do\'. Great for contradiction and persuasion practice. Works well as a follow-up to a debate or disagreement activity.",levels:["B2","B2","B2","B2","B1","B2"]},
+{grammar:"Present Perfect Continuous",rule:"Use <strong>have/has been + -ing</strong> to talk about actions that started in the past and are still happening, or recent actions with visible results.",prompts:["What have you been doing today? Describe your day so far.","How long have you been learning English? How has your approach changed over time?","You look tired — what have you been doing? Ask your partner the same.","What hobbies or activities have you been spending more time on recently?","Has anything been annoying you lately? What's been going on?","What have you been thinking about a lot recently? Why?"],examples:["I've been working here for three years.","She's been crying — her eyes are red.","We've been waiting for over an hour."],mistakes:[{wrong:"I've been knowing him for years.",right:"I've known him for years. (state verb — no continuous)"},{wrong:"She has been work all day.",right:"She has been working all day."},{wrong:"How long are you living here?",right:"How long have you been living here?"}],teacherTip:"Students often confuse this with present perfect simple. Focus on duration (how long) and visible results (you look tired). State verbs (know, like, believe) don\'t take continuous — watch for \'I\'ve been knowing him.\'",levels:["B1","B2","B1","B2","B2","B2"]},
+{grammar:"Modals of Obligation & Permission",rule:"<strong>Must/have to</strong> = obligation. <strong>Should/ought to</strong> = advice. <strong>Can/be allowed to</strong> = permission. <strong>Don't have to</strong> = no obligation. <strong>Mustn't</strong> = prohibited.",prompts:["What do you have to do at work that you wish you didn't have to?","What should tourists know before visiting your country? What must they avoid?","What were you allowed to do as a teenager that your parents probably shouldn't have let you do?","What rules do you think every workplace should have?","Is there anything you don't have to do any more that you used to have to? How does it feel?","What do you think people ought to do more of in daily life?"],examples:["You must wear a seatbelt — it's the law.","You don't have to tip in Japan, but you can if you want.","You shouldn't eat so much sugar. / You ought to exercise more."],mistakes:[{wrong:"You mustn't come if you don't want to.",right:"You don't have to come if you don't want to. (no obligation, not prohibition)"},{wrong:"I must to finish this today.",right:"I must finish this today."},{wrong:"You haven't to worry.",right:"You don't have to worry."}],teacherTip:"The must/have to distinction is subtle: \'must\' often implies the speaker\'s authority, \'have to\' implies external rules. But the real teaching point is mustn\'t (prohibition) vs don\'t have to (no obligation) — students confuse these constantly.",levels:["B2","B2","B2","B2","B2","B2"]},
+{grammar:"Countable vs Uncountable Nouns",rule:"Countable nouns have singular/plural forms (a chair, two chairs). Uncountable nouns have <strong>no plural</strong> and take singular verbs: information, advice, furniture, luggage, news, progress, research, work, money, weather.",prompts:["Give your partner some advice about learning English. How much advice can you give in one minute?","Describe your furniture at home. What would you change?","Talk about a recent trip. How much luggage did you take? Was it too much?","What kind of research have you done recently — for work, for a purchase, or just out of curiosity?","Has your city made much progress on any big projects recently?","What equipment do you need for your job or hobby? Is any of it expensive?"],examples:["Can you give me some advice? (NOT an advice / advices)","I need to buy some new furniture. (NOT furnitures)","The news is on at six. (NOT The news are)"],mistakes:[{wrong:"She gave me a good advice.",right:"She gave me some good advice. / She gave me a good piece of advice."},{wrong:"I have too many luggages.",right:"I have too much luggage."},{wrong:"The informations are useful.",right:"The information is useful."}],teacherTip:"Keep a running list of tricky uncountables on the board: advice, information, furniture, luggage, news, progress, research, equipment, homework. Students from Romance language backgrounds especially struggle because many of these are countable in their L1.",levels:["B1","B2","B2","B2","B2","B2"]}];
+
+var currentMode='browse',activeGrammar='all',pracIdx=-1,allPrompts=[],timerInterval=null,timerRunning=false,timerSec=0,timerTotal=0;
+
+// Build grammar pills into groups
+(function(){
+  var groups = {
+    'grp-tenses': ['Present Perfect vs Past Simple','Present Perfect Continuous','Narrative Tenses','Future Forms','Used to / Would'],
+    'grp-conditionals': ['Zero & First Conditionals','Second Conditional','Third Conditional','Mixed Conditionals'],
+    'grp-structure': ['Reported Speech','Passive Voice','Relative Clauses','Cleft Sentences','Inversion','Emphasis with Do/Does/Did'],
+    'grp-verbs': ['Gerunds vs Infinitives','Modals of Speculation','Modals of Obligation & Permission','Causative (have/get something done)','Phrasal Verbs in Context','Wish & Regret','Question Tags'],
+    'grp-nouns': ['Articles','Countable vs Uncountable Nouns','Comparatives & Superlatives','So / Such / Too / Enough','Subject-Verb Agreement','Determiners & Quantifiers']
+  };
+  Object.keys(groups).forEach(function(grpId){
+    var container = document.getElementById(grpId);
+    groups[grpId].forEach(function(name){
+      var found = data.find(function(g){return g.grammar===name;});
+      if(!found) return;
+      var b = document.createElement('button');
+      b.className = 'grammar-pill';
+      b.dataset.g = found.grammar;
+      b.textContent = found.grammar;
+      b.onclick = function(){setGrammar(found.grammar, b);};
+      container.appendChild(b);
+    });
+  });
+})();
+
+var errorBanks = {}; // store errors per grammar point
+
+function setMode(mode){
+  currentMode=mode;
+  document.querySelectorAll('.mode-card').forEach(function(c){c.classList.remove('active');});
+  document.getElementById('mode-'+mode).classList.add('active');
+  ['browse','practice','project','challenge'].forEach(function(m){
+    var el=document.getElementById('view-'+m);
+    if(!el)return;
+    el.style.display='none';
+    el.classList.remove('visible');
+  });
+  var grammarBar=document.getElementById('grammar-bar');
+  grammarBar.style.display=(mode==='challenge')?'none':'block';
+  var target=document.getElementById('view-'+mode);
+  if(target){target.style.display='block';setTimeout(function(){target.classList.add('visible');},10);}
+  if(mode==='browse')renderBrowse();
+  if(mode==='practice'){buildPromptList();pracIdx=-1;}
+  if(mode==='project'){buildPromptList();projIdx=-1;}
+}
+
+function setGrammar(g,btn){
+  activeGrammar=g;
+  document.querySelectorAll('.grammar-pill').forEach(function(p){p.classList.remove('active');});
+  btn.classList.add('active');
+  if(currentMode==='browse')renderBrowse();
+  if(currentMode==='practice'){buildPromptList();pracIdx=-1;}
+}
+
+function getFiltered(){
+  if(activeGrammar==='all')return data;
+  return data.filter(function(g){return g.grammar===activeGrammar;});
+}
+
+function renderBrowse(){
+  var filtered=getFiltered();
+  var container=document.getElementById('grammar-list');
+  var count=document.getElementById('q-count');
+  var total=0;
+  filtered.forEach(function(g){total+=g.prompts.length;});
+  count.textContent=total+' prompt'+(total!==1?'s':'')+' across '+filtered.length+' grammar point'+(filtered.length!==1?'s':'');
+
+  container.innerHTML=filtered.map(function(g,gi){
+    var gid='g'+gi;
+    var h='<div class="grammar-card fade-in" style="animation-delay:'+Math.min(gi*.08,.4)+'s">';
+    h+='<div class="grammar-card-header"><div class="gc-title">'+g.grammar+'</div>';
+    h+='<div class="gc-rule">'+g.rule+'</div></div>';
+    // Teacher tip
+    if(g.teacherTip){
+      h+='<button class="teacher-tip-toggle" onclick="toggleTip(\''+gid+'\')">🍎 Teacher Tip</button>';
+      h+='<div class="teacher-tip" id="tip-'+gid+'"><div class="teacher-tip-text">'+g.teacherTip+'</div></div>';
+    }
+    h+='<div class="prompt-list">';
+    g.prompts.forEach(function(p,pi){
+      var lvl=(g.levels&&g.levels[pi])?g.levels[pi]:'B2';
+      h+='<div class="prompt-item" onclick="this.classList.toggle(\'done\')"><div class="prompt-num">'+(pi+1)+'</div><div class="prompt-text">'+p+'</div><span class="prompt-level '+lvl+'">'+lvl+'</span></div>';
+    });
+    h+='</div>';
+    // Error bank
+    h+='<button class="error-bank-toggle" onclick="toggleErrors(\''+gid+'\')">✏️ Error Bank</button>';
+    h+='<div class="error-bank" id="errors-'+gid+'">';
+    h+='<div style="display:flex;gap:.5rem"><input class="error-input" id="errinput-'+gid+'" placeholder="Type an error you heard…" style="min-height:36px;resize:none" onkeydown="if(event.key===\'Enter\'){addError(\''+gid+'\');event.preventDefault()}"><button class="btn btn-sea" onclick="addError(\''+gid+'\')" style="padding:.4rem .8rem;font-size:.75rem;flex-shrink:0">Add</button></div>';
+    h+='<div class="error-list" id="errlist-'+gid+'"></div></div>';
+    h+='<div class="gc-panels"><div class="gc-panel"><div class="gc-panel-label">Examples</div>';
+    g.examples.forEach(function(e){h+='<div class="gc-example">'+e+'</div>';});
+    h+='</div><div class="gc-panel"><div class="gc-panel-label">Common mistakes</div>';
+    g.mistakes.forEach(function(m){h+='<div class="gc-mistake"><span class="wrong">'+m.wrong+'</span> → <span class="right">'+m.right+'</span></div>';});
+    h+='</div></div></div>';
+    return h;
+  }).join('');
+  // Restore saved errors
+  filtered.forEach(function(g,gi){
+    var gid='g'+gi;
+    var saved=errorBanks[g.grammar]||[];
+    saved.forEach(function(e){renderError(gid,e);});
+  });
+}
+
+function buildPromptList(){
+  allPrompts=[];
+  getFiltered().forEach(function(g){
+    g.prompts.forEach(function(p){
+      allPrompts.push({grammar:g.grammar,prompt:p,rule:g.rule});
+    });
+  });
+}
+
+function nextPrompt(){
+  if(!allPrompts.length)buildPromptList();
+  if(!allPrompts.length)return;
+  pracIdx=(pracIdx+1)%allPrompts.length;
+  showPrompt();
+}
+
+function randomPrompt(){
+  if(!allPrompts.length)buildPromptList();
+  if(!allPrompts.length)return;
+  pracIdx=Math.floor(Math.random()*allPrompts.length);
+  showPrompt();
+}
+
+function showPrompt(){
+  var p=allPrompts[pracIdx];
+  document.getElementById('prac-grammar').textContent=p.grammar;
+  document.getElementById('prac-prompt').textContent=p.prompt;
+  document.getElementById('prac-rule').innerHTML=p.rule;
+  document.getElementById('prac-rule').classList.remove('show');
+  document.getElementById('rule-btn').textContent='💡 Show Rule';
+}
+
+function toggleRule(){
+  var el=document.getElementById('prac-rule');
+  el.classList.toggle('show');
+  document.getElementById('rule-btn').textContent=el.classList.contains('show')?'💡 Hide Rule':'💡 Show Rule';
+}
+
+function setTime(sec,el){
+  document.querySelectorAll('.timer-pill').forEach(function(p){p.classList.remove('on');});
+  el.classList.add('on');
+  timerTotal=sec;timerSec=sec;
+  clearInterval(timerInterval);timerRunning=false;
+  document.getElementById('timer-btn').textContent='▶ Start';
+  updateTimerDisplay();
+}
+
+function toggleTimer(){
+  if(timerRunning){clearInterval(timerInterval);timerRunning=false;document.getElementById('timer-btn').textContent='▶ Resume';return;}
+  if(!timerTotal)return;
+  if(timerSec<=0){timerSec=timerTotal;}
+  timerRunning=true;
+  document.getElementById('timer-btn').textContent='⏸ Pause';
+  timerInterval=setInterval(function(){
+    timerSec--;updateTimerDisplay();
+    if(timerSec<=0){clearInterval(timerInterval);timerRunning=false;document.getElementById('timer-btn').textContent='▶ Start';document.getElementById('timer-display').classList.add('warn');}
+  },1000);
+}
+
+function updateTimerDisplay(){
+  var m=Math.floor(timerSec/60),s=timerSec%60;
+  var d=document.getElementById('timer-display');
+  d.textContent=m+':'+(s<10?'0':'')+s;
+  d.classList.toggle('warn',timerSec<=10&&timerSec>0);
+}
+
+// Teacher tip toggle
+function toggleTip(gid){var el=document.getElementById('tip-'+gid);el.classList.toggle('show');}
+
+// Error bank
+function toggleErrors(gid){var el=document.getElementById('errors-'+gid);el.classList.toggle('show');}
+function addError(gid){
+  var input=document.getElementById('errinput-'+gid);
+  var text=input.value.trim();if(!text)return;
+  input.value='';
+  var filtered=getFiltered();
+  var gi=parseInt(gid.replace('g',''));
+  var grammar=filtered[gi].grammar;
+  if(!errorBanks[grammar])errorBanks[grammar]=[];
+  errorBanks[grammar].push(text);
+  renderError(gid,text);
+}
+function renderError(gid,text){
+  var list=document.getElementById('errlist-'+gid);
+  var div=document.createElement('div');div.className='error-entry';
+  div.innerHTML='<span>'+text+'</span><span class="remove" onclick="removeError(this,\''+gid+'\')">✕</span>';
+  list.appendChild(div);
+}
+function removeError(el,gid){
+  var text=el.parentElement.querySelector('span').textContent;
+  var filtered=getFiltered();
+  var gi=parseInt(gid.replace('g',''));
+  var grammar=filtered[gi].grammar;
+  var arr=errorBanks[grammar]||[];
+  var idx=arr.indexOf(text);if(idx>-1)arr.splice(idx,1);
+  el.parentElement.remove();
+}
+
+// Projection mode
+var projIdx=-1;
+function nextProject(){
+  if(!allPrompts.length)buildPromptList();
+  if(!allPrompts.length)return;
+  projIdx=(projIdx+1)%allPrompts.length;
+  showProject();
+}
+function randomProject(){
+  if(!allPrompts.length)buildPromptList();
+  if(!allPrompts.length)return;
+  projIdx=Math.floor(Math.random()*allPrompts.length);
+  showProject();
+}
+function showProject(){
+  var p=allPrompts[projIdx];
+  document.getElementById('proj-grammar').textContent=p.grammar;
+  document.getElementById('proj-prompt').textContent=p.prompt;
+}
+function projectRoulette(btn){
+  btn.classList.add('spinning');
+  var count=0;var interval=setInterval(function(){
+    var ri=Math.floor(Math.random()*data.length);
+    document.getElementById('proj-grammar').textContent=data[ri].grammar;
+    var rp=data[ri].prompts[Math.floor(Math.random()*data[ri].prompts.length)];
+    document.getElementById('proj-prompt').textContent=rp;
+    count++;
+    if(count>=8){clearInterval(interval);btn.classList.remove('spinning');
+      var fg=data[Math.floor(Math.random()*data.length)];
+      var fp=fg.prompts[Math.floor(Math.random()*fg.prompts.length)];
+      document.getElementById('proj-grammar').textContent=fg.grammar;
+      document.getElementById('proj-prompt').textContent=fp;
+    }
+  },120);
+}
+
+// Challenge mode
+function newChallenge(){
+  var a=Math.floor(Math.random()*data.length);
+  var b=Math.floor(Math.random()*data.length);
+  while(b===a&&data.length>1)b=Math.floor(Math.random()*data.length);
+  var pa=data[a].prompts[Math.floor(Math.random()*data[a].prompts.length)];
+  var pb=data[b].prompts[Math.floor(Math.random()*data[b].prompts.length)];
+  document.getElementById('ch-grammar-a').textContent=data[a].grammar;
+  document.getElementById('ch-prompt-a').textContent=pa;
+  document.getElementById('ch-grammar-b').textContent=data[b].grammar;
+  document.getElementById('ch-prompt-b').textContent=pb;
+}
+
+// Grammar roulette (practice mode)
+function grammarRoulette(btn){
+  btn.classList.add('spinning');
+  var count=0;var interval=setInterval(function(){
+    var ri=Math.floor(Math.random()*data.length);
+    document.getElementById('prac-grammar').textContent=data[ri].grammar;
+    var rp=data[ri].prompts[Math.floor(Math.random()*data[ri].prompts.length)];
+    document.getElementById('prac-prompt').textContent=rp;
+    count++;
+    if(count>=8){clearInterval(interval);btn.classList.remove('spinning');
+      var fg=data[Math.floor(Math.random()*data.length)];
+      var fp=fg.prompts[Math.floor(Math.random()*fg.prompts.length)];
+      document.getElementById('prac-grammar').textContent=fg.grammar;
+      document.getElementById('prac-prompt').textContent=fp;
+      document.getElementById('prac-rule').innerHTML=fg.rule;
+      document.getElementById('prac-rule').classList.remove('show');
+      document.getElementById('rule-btn').textContent='💡 Show Rule';
+    }
+  },120);
+}
+
+// Init
+document.addEventListener('DOMContentLoaded',function(){
+  renderBrowse();
+  var observer=new IntersectionObserver(function(entries){entries.forEach(function(entry){if(entry.isIntersecting)entry.target.classList.add('visible');});},{threshold:.1});
+  document.querySelectorAll('.reveal').forEach(function(el){observer.observe(el);});
+});
+</script>
+</body>
+</html>
