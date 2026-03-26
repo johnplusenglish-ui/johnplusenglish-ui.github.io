@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grammar Auction — John + English</title>
+<meta name="description" content="Interactive grammar auction game for English classes. Teams bid on sentences, deciding if they're correct or contain errors.">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Nunito:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--sun:#FFB347;--sky:#4A90D9;--sky-light:#E8F2FD;--sea:#2EC4B6;--coral:#FF6B6B;--lavender:#9B72CF;--mint:#5DDEA0;--sand:#FFF5E6;--cream:#FFFCF7;--ink:#2D3047;--muted:#7A7D8E;--border:#E8E5DF;--card:#fff;--radius:14px}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth;overflow-y:scroll}
+body{font-family:'Nunito',sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,var(--border) 1px,transparent 1px);background-size:28px 28px;opacity:.4;pointer-events:none;z-index:0}
+.page-header{padding:6.5rem 2rem 1.5rem;max-width:960px;margin:0 auto}
+.section-label{font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--sun);margin-bottom:.5rem;font-weight:500}
+.page-title{font-family:'DM Serif Display',serif;font-size:clamp(2rem,5vw,3rem);margin-bottom:.6rem;font-weight:400}
+.page-desc{color:var(--muted);font-size:1rem;max-width:600px;line-height:1.7}
+.game-area{max-width:960px;margin:0 auto;padding:1rem 2rem 4rem;position:relative;z-index:1}
+.setup{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:2rem;margin-bottom:1.5rem}
+.setup h3{font-family:'DM Serif Display',serif;font-size:1.3rem;font-weight:400;margin-bottom:1rem}
+.setup-row{display:flex;gap:1rem;flex-wrap:wrap;align-items:end;margin-bottom:1rem}
+.setup-field{display:flex;flex-direction:column;gap:.3rem}
+.setup-field label{font-size:.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.setup-field select{font-family:'Nunito',sans-serif;font-size:.9rem;padding:.55rem .8rem;border:1.5px solid var(--border);border-radius:8px;background:var(--cream);color:var(--ink);outline:none;transition:border-color .2s}
+.setup-field select:focus{border-color:var(--sky)}
+.level-pills{display:flex;gap:.5rem;flex-wrap:wrap}
+.level-pill{font-family:'Nunito',sans-serif;font-size:.85rem;font-weight:700;padding:.5rem 1.2rem;border-radius:8px;border:1.5px solid var(--border);background:var(--cream);color:var(--muted);cursor:pointer;transition:all .2s}
+.level-pill:hover{border-color:var(--sky);color:var(--sky)}
+.level-pill.active{background:var(--sky);color:#fff;border-color:var(--sky)}
+.btn{display:inline-flex;align-items:center;gap:.4rem;font-family:'Nunito',sans-serif;font-weight:700;font-size:.88rem;padding:.65rem 1.5rem;border-radius:10px;border:none;cursor:pointer;transition:all .2s}
+.btn-primary{background:var(--sky);color:#fff;box-shadow:0 3px 12px rgba(74,144,217,.25)}
+.btn-primary:hover{background:#3d7ec4;transform:translateY(-1px)}
+.btn-sea{background:var(--sea);color:#fff;box-shadow:0 3px 12px rgba(46,196,182,.25)}
+.btn-sea:hover{background:#27b0a3;transform:translateY(-1px)}
+.btn-outline{background:none;border:1.5px solid var(--border);color:var(--muted)}
+.btn-outline:hover{border-color:var(--sky);color:var(--sky)}
+.btn-sm{padding:.45rem 1rem;font-size:.8rem}
+.teams-bar{display:flex;gap:.8rem;flex-wrap:wrap;margin-bottom:1.5rem}
+.team-chip{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:.6rem 1.2rem;display:flex;align-items:center;gap:.6rem;transition:all .2s;min-width:160px}
+.team-emoji{font-size:1.2rem}
+.team-info{display:flex;flex-direction:column}
+.team-name{font-size:.82rem;font-weight:700}
+.team-budget{font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--muted)}
+.sentence-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:2rem;margin-bottom:1rem;position:relative;overflow:hidden}
+.sentence-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:var(--sky)}
+.sentence-num{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.8rem}
+.sentence-topic{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--sea);background:rgba(46,196,182,.1);display:inline-block;padding:.15rem .5rem;border-radius:5px;margin-left:.6rem}
+.sentence-text{font-family:'DM Serif Display',serif;font-size:1.4rem;font-weight:400;line-height:1.5;margin-bottom:1.2rem;color:var(--ink)}
+.bid-area{display:flex;gap:.8rem;align-items:center;flex-wrap:wrap;padding-top:1rem;border-top:1px solid var(--border)}
+.bid-input{width:100px;font-family:'JetBrains Mono',monospace;font-size:1rem;padding:.5rem .8rem;border:1.5px solid var(--border);border-radius:8px;text-align:center;background:var(--cream);color:var(--ink);outline:none}
+.bid-input:focus{border-color:var(--sky)}
+.reveal-area{display:none;margin-top:1.2rem;padding:1.2rem;border-radius:10px;border:1.5px solid}
+.reveal-area.correct{background:#dcfce7;border-color:#86efac;color:#166534}
+.reveal-area.incorrect{background:#fee2e2;border-color:#fca5a5;color:#991b1b}
+.reveal-verdict{font-weight:800;font-size:.9rem;margin-bottom:.3rem;text-transform:uppercase;letter-spacing:.04em}
+.reveal-correction{font-size:.9rem;line-height:1.6}
+.reveal-correction strong{font-weight:700}
+.progress-bar{background:var(--border);height:6px;border-radius:3px;margin-bottom:1.5rem;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--sky),var(--sea));border-radius:3px;transition:width .4s ease}
+.results{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:2rem;display:none}
+.results h3{font-family:'DM Serif Display',serif;font-size:1.5rem;font-weight:400;margin-bottom:1rem;text-align:center}
+.results-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:1.5rem}
+.result-card{background:var(--cream);border-radius:10px;padding:1.2rem;text-align:center}
+.result-card.winner{background:var(--sand);border:2px solid var(--sun)}
+.result-emoji{font-size:2rem;margin-bottom:.3rem}
+.result-name{font-family:'DM Serif Display',serif;font-size:1.1rem;margin-bottom:.2rem}
+.result-score{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--muted)}
+.result-label{font-size:.7rem;font-weight:700;color:var(--sun);text-transform:uppercase;letter-spacing:.06em;margin-top:.3rem}
+.hidden{display:none!important}
+footer{text-align:center;padding:2.5rem 2rem;font-size:.8rem;color:var(--muted);border-top:1.5px solid var(--border);max-width:960px;margin:2rem auto 0;position:relative;z-index:1}
+@media(max-width:640px){.page-header{padding:5.5rem 1.2rem 1.5rem}.game-area{padding:1rem 1.2rem 3rem}.setup-row{flex-direction:column}.sentence-text{font-size:1.15rem}.teams-bar{flex-direction:column}}
+</style>
+<style id="sidebar-styles">
+.topnav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(255,252,247,.88);backdrop-filter:blur(16px);border-bottom:1.5px solid #E8E5DF;padding:0 2rem;display:flex;align-items:center;justify-content:space-between}
+.topnav .nav-logo{font-family:'DM Serif Display',serif;font-size:1.3rem;color:#2D3047;text-decoration:none}.topnav .nav-logo span{color:#4A90D9}
+.topnav-links{display:flex;gap:1.2rem;align-items:center}.topnav-links a{font-size:.8rem;font-weight:600;color:#7A7D8E;text-decoration:none;transition:color .2s}.topnav-links a:hover{color:#4A90D9}
+.sidebar-nav{position:fixed;top:52px;left:0;bottom:0;width:52px;background:rgba(255,252,247,.95);backdrop-filter:blur(12px);border-right:1.5px solid #E8E5DF;z-index:190;padding:1.2rem 0;overflow:hidden;display:flex;flex-direction:column;gap:.2rem;transition:width .25s ease}
+.sidebar-nav.expanded{width:220px;overflow-y:auto}
+.sb-group-label{font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:#7A7D8E;padding:.8rem 1.4rem .35rem;margin-top:.3rem;white-space:nowrap;opacity:0;transition:opacity .2s ease .05s}.sidebar-nav.expanded .sb-group-label{opacity:1}.sb-group-label:first-child{margin-top:0}
+.sb-divider{height:1px;background:#E8E5DF;margin:.5rem .8rem;transition:margin .25s}.sidebar-nav.expanded .sb-divider{margin:.5rem 1.2rem}
+.sb-link{display:flex;align-items:center;gap:.6rem;font-size:.82rem;font-weight:600;color:#7A7D8E;text-decoration:none;padding:.55rem .85rem;transition:all .15s;border-left:3px solid transparent;margin:0 .2rem;white-space:nowrap;min-height:36px}.sidebar-nav.expanded .sb-link{padding:.5rem 1.4rem}
+.sb-link:hover{color:#2D3047;background:rgba(0,0,0,.03);border-left-color:#E8E5DF}.sb-link.active{color:#4A90D9;background:#E8F2FD;border-left-color:#4A90D9;font-weight:700}
+.sb-icon{font-size:1.05rem;width:1.2rem;text-align:center;flex-shrink:0}.sb-label{opacity:0;transition:opacity .15s ease;overflow:hidden}.sidebar-nav.expanded .sb-label{opacity:1}
+.sb-link.coming{opacity:.5;pointer-events:none}.sb-link.coming .sb-soon{font-size:.55rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;background:#E8E5DF;color:#7A7D8E;padding:.1rem .4rem;border-radius:4px;margin-left:auto;opacity:0;transition:opacity .15s ease}.sidebar-nav.expanded .sb-link.coming .sb-soon{opacity:1}
+.hamburger{display:none;background:none;border:none;cursor:pointer;padding:.3rem;color:#2D3047}.hamburger svg{width:22px;height:22px}
+.main{margin-left:52px;padding-top:52px;position:relative;z-index:1}
+.sidebar-overlay{display:none;position:fixed;inset:0;top:52px;background:rgba(0,0,0,.25);z-index:185}.sidebar-overlay.open{display:block}
+@media(max-width:800px){.sidebar-nav{transform:translateX(-100%);transition:transform .3s ease,width .25s ease;width:260px;top:52px;box-shadow:4px 0 24px rgba(0,0,0,.08)}.sidebar-nav.open{transform:translateX(0)}.sidebar-nav.open .sb-group-label,.sidebar-nav.open .sb-label,.sidebar-nav.open .sb-link.coming .sb-soon,.sidebar-nav.expanded .sb-group-label,.sidebar-nav.expanded .sb-label,.sidebar-nav.expanded .sb-link.coming .sb-soon{opacity:1}.hamburger{display:block}.main{margin-left:0}}
+</style>
+</head>
+<body>
+<div class="topnav"><div style="display:flex;align-items:center;gap:.8rem"><button class="hamburger" id="hamburgerBtn" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button><a href="index.html" class="nav-logo">john<span>+</span>english</a></div><div class="topnav-links"><a href="index.html#about">About</a><a href="index.html#contact">Contact</a></div></div>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<aside class="sidebar-nav" id="sidebarNav"><div class="sb-group-label">Self-Study</div><a href="prepositions.html" class="sb-link"><span class="sb-icon">✏️</span><span class="sb-label">Prepositions</span></a><a href="phrasal-verbs.html" class="sb-link"><span class="sb-icon">🧩</span><span class="sb-label">Phrasal Verbs</span></a><a href="resources.html" class="sb-link"><span class="sb-icon">📄</span><span class="sb-label">Resources</span></a><div class="sb-divider"></div><div class="sb-group-label">Teaching</div><a href="class-activities.html" class="sb-link active"><span class="sb-icon">🎲</span><span class="sb-label">Class Activities</span></a><a href="#" class="sb-link coming"><span class="sb-icon">📝</span><span class="sb-label">Lesson Plans</span><span class="sb-soon">soon</span></a><a href="#" class="sb-link coming"><span class="sb-icon">🖨️</span><span class="sb-label">Worksheets</span><span class="sb-soon">soon</span></a><a href="writing-skills.html" class="sb-link"><span class="sb-icon">✍️</span><span class="sb-label">Writing Skills</span></a><div class="sb-divider"></div><div class="sb-group-label">Connect</div><a href="https://instagram.com/johnplusenglish" target="_blank" class="sb-link"><span class="sb-icon">📷</span><span class="sb-label">Instagram</span></a><a href="https://open.spotify.com/show/0ERmnuJjSWA2upf8GDCmTe" target="_blank" class="sb-link"><span class="sb-icon">🎙️</span><span class="sb-label">Podcast</span></a></aside>
+
+<div class="main">
+<div class="page-header">
+<div class="section-label">Class Activities</div>
+<h1 class="page-title">Grammar Auction</h1>
+<p class="page-desc">Teams start with a budget and bid on sentences. Correct sentences earn double — but incorrect ones lose your money. Strategy meets grammar knowledge.</p>
+</div>
+<div class="game-area">
+<div class="setup" id="setupPanel">
+<h3>Game Setup</h3>
+<div class="setup-row"><div class="setup-field"><label>Level</label><div class="level-pills" id="levelPills"><button class="level-pill" data-level="B1" onclick="pickLevel(this)">B1</button><button class="level-pill active" data-level="B2" onclick="pickLevel(this)">B2</button><button class="level-pill" data-level="C1" onclick="pickLevel(this)">C1</button><button class="level-pill" data-level="C2" onclick="pickLevel(this)">C2</button></div></div></div>
+<div class="setup-row"><div class="setup-field"><label>Grammar Topic</label><select id="topicSelect"></select></div><div class="setup-field"><label>Sentences</label><select id="countSelect"><option value="8">8</option><option value="10" selected>10</option><option value="12">12</option><option value="15">15</option></select></div><div class="setup-field"><label>Teams</label><select id="teamCount"><option value="2">2 teams</option><option value="3" selected>3 teams</option></select></div><div class="setup-field"><label>Budget</label><select id="budgetSelect"><option value="500">€500</option><option value="1000" selected>€1,000</option><option value="2000">€2,000</option></select></div></div>
+<div class="setup-row"><button class="btn btn-primary" onclick="startGame()">🎯 Start Auction</button></div>
+</div>
+<div id="gamePanel" class="hidden"><div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div><div class="teams-bar" id="teamsBar"></div><div id="sentenceArea"></div><div style="display:flex;gap:.6rem;margin-top:1rem"><button class="btn btn-outline btn-sm" onclick="skipSentence()">Skip →</button><button class="btn btn-outline btn-sm" onclick="endGame()">End Game</button></div></div>
+<div class="results" id="resultsPanel"><h3>🏆 Auction Results</h3><div class="results-grid" id="resultsGrid"></div><div style="text-align:center"><button class="btn btn-primary" onclick="resetGame()">Play Again</button></div></div>
+</div>
+<footer>© 2026 John + English. All rights reserved.</footer>
+</div>
+
+<script>
+(function(){var sb=document.getElementById('sidebarNav'),ov=document.getElementById('sidebarOverlay'),bu=document.getElementById('hamburgerBtn');if(localStorage.getItem('sb-expanded')==='1')sb.classList.add('expanded');sb.addEventListener('mouseenter',function(){sb.classList.add('expanded');localStorage.setItem('sb-expanded','1')});sb.addEventListener('mouseleave',function(){sb.classList.remove('expanded');localStorage.setItem('sb-expanded','0')});bu.addEventListener('click',function(){sb.classList.toggle('open');ov.classList.toggle('open')});ov.addEventListener('click',function(){sb.classList.remove('open');ov.classList.remove('open')})})();
+
+var DB={
+B1:{
+tenses:[
+{s:"I have been living here since five years.",ok:false,fix:"I have been living here <strong>for</strong> five years.",note:"Use 'for' with durations, 'since' with points in time."},
+{s:"She has already finished her homework.",ok:true,note:"Present perfect + already — correct."},
+{s:"When I arrived, they were eating dinner.",ok:true,note:"Past continuous for an action in progress when another happened."},
+{s:"I am knowing the answer.",ok:false,fix:"I <strong>know</strong> the answer.",note:"'Know' is a stative verb — no continuous form."},
+{s:"I didn't used to like coffee.",ok:false,fix:"I <strong>didn't use to</strong> like coffee.",note:"After 'didn't', use the base form 'use to'."},
+{s:"The film starts at 8pm tonight.",ok:true,note:"Present simple for scheduled future events."},
+{s:"She was working here since 2019.",ok:false,fix:"She <strong>has been working</strong> here since 2019.",note:"'Since' requires present perfect, not past continuous."},
+{s:"We have been to Paris three times.",ok:true,note:"Present perfect for life experiences."},
+{s:"I will call you when I will arrive.",ok:false,fix:"I will call you when I <strong>arrive</strong>.",note:"Present simple, not 'will', in time clauses after 'when'."},
+{s:"I'm seeing the dentist at 3pm tomorrow.",ok:true,note:"Present continuous for a fixed future arrangement."},
+{s:"She goes to the gym every day last year.",ok:false,fix:"She <strong>went</strong> to the gym every day last year.",note:"Past time reference requires past simple."},
+{s:"I've just spoken to her on the phone.",ok:true,note:"Present perfect with 'just' for very recent actions."}
+,
+{s:"He has gone to Paris last week.",ok:false,fix:"He <strong>went</strong> to Paris last week.",note:"'Last week' = finished past time → use past simple, not present perfect."},
+{s:"I was watching TV when she called.",ok:true,note:"Past continuous interrupted by past simple — correct."},
+{s:"They live here for twenty years.",ok:false,fix:"They <strong>have lived</strong> here for twenty years.",note:"'For' + duration up to now requires present perfect."},
+{s:"Look! It's snowing outside.",ok:true,note:"Present continuous for something happening right now — correct."},
+{s:"She is always complaining about the weather.",ok:true,note:"Present continuous + 'always' for annoying habits — correct."},
+{s:"I have seen that film yesterday.",ok:false,fix:"I <strong>saw</strong> that film yesterday.",note:"'Yesterday' = finished past → past simple, not present perfect."},
+{s:"Water boils at 100 degrees Celsius.",ok:true,note:"Present simple for scientific facts — correct."},
+{s:"By the time I got home, she already left.",ok:false,fix:"By the time I got home, she <strong>had already left</strong>.",note:"'By the time' + past → past perfect for the earlier action."}
+],
+prepositions:[
+{s:"She's been married with John for ten years.",ok:false,fix:"She's been married <strong>to</strong> John for ten years.",note:"'Married to', not 'married with'."},
+{s:"I'm not very good at cooking.",ok:true,note:"'Good at' + gerund — correct."},
+{s:"I'm looking forward to see you.",ok:false,fix:"I'm looking forward to <strong>seeing</strong> you.",note:"'Look forward to' + gerund ('to' is a preposition here)."},
+{s:"She depends on her parents for support.",ok:true,note:"'Depend on' — correct."},
+{s:"I apologised for being late.",ok:true,note:"'Apologise for' + gerund — correct."},
+{s:"I'm interested on learning more.",ok:false,fix:"I'm interested <strong>in</strong> learning more.",note:"'Interested in', not 'interested on'."},
+{s:"He arrived to the airport at noon.",ok:false,fix:"He arrived <strong>at</strong> the airport at noon.",note:"'Arrive at' a place, not 'arrive to'."},
+{s:"She complained about the noise.",ok:true,note:"'Complain about' — correct."},
+{s:"I agree with you completely.",ok:true,note:"'Agree with' someone — correct."},
+{s:"We discussed about the problem.",ok:false,fix:"We <strong>discussed</strong> the problem.",note:"'Discuss' is transitive — no preposition needed."},
+{s:"It depends of the weather.",ok:false,fix:"It depends <strong>on</strong> the weather.",note:"'Depend on', not 'depend of'."},
+{s:"She listened to the music carefully.",ok:true,note:"'Listen to' — correct."}
+,
+{s:"She's afraid from spiders.",ok:false,fix:"She's afraid <strong>of</strong> spiders.",note:"'Afraid of', not 'afraid from'."},
+{s:"He's responsible for training new staff.",ok:true,note:"'Responsible for' — correct."},
+{s:"I'm tired of waiting in this queue.",ok:true,note:"'Tired of' + gerund — correct."},
+{s:"She's very keen in learning new languages.",ok:false,fix:"She's very keen <strong>on</strong> learning new languages.",note:"'Keen on', not 'keen in'."},
+{s:"He insisted in paying for the meal.",ok:false,fix:"He insisted <strong>on</strong> paying for the meal.",note:"'Insist on', not 'insist in'."},
+{s:"They are thinking about moving abroad.",ok:true,note:"'Think about' + gerund — correct."},
+{s:"She reminds me about my mother.",ok:false,fix:"She reminds me <strong>of</strong> my mother.",note:"'Remind someone of' = make think of. 'Remind about' = tell not to forget."},
+{s:"He succeeded in passing all his exams.",ok:true,note:"'Succeed in' + gerund — correct."}
+],
+articles:[
+{s:"I need an advice about my career.",ok:false,fix:"I need <strong>some advice</strong> about my career.",note:"'Advice' is uncountable — no 'an'."},
+{s:"The life is beautiful.",ok:false,fix:"<strong>Life</strong> is beautiful.",note:"No article with abstract nouns in a general sense."},
+{s:"She plays the piano beautifully.",ok:true,note:"'The' with musical instruments — correct."},
+{s:"I had a breakfast at 7am.",ok:false,fix:"I had <strong>breakfast</strong> at 7am.",note:"No article with meal names in general."},
+{s:"He's a honest person.",ok:false,fix:"He's <strong>an</strong> honest person.",note:"Use 'an' before silent 'h' — vowel sound."},
+{s:"What a lovely weather!",ok:false,fix:"What <strong>lovely weather</strong>!",note:"'Weather' is uncountable — no 'a'."},
+{s:"She is the best student in the class.",ok:true,note:"'The' with superlatives — correct."},
+{s:"I bought a new furniture.",ok:false,fix:"I bought <strong>some new furniture</strong>.",note:"'Furniture' is uncountable."},
+{s:"The Netherlands is a beautiful country.",ok:true,note:"'The' with plural country names — correct."},
+{s:"Can you pass me the salt, please?",ok:true,note:"'The' for a specific item both speakers know about."},
+{s:"She's a doctor at hospital in the city centre.",ok:false,fix:"She's a doctor at <strong>a</strong> hospital in the city centre.",note:"Countable singular nouns need an article."},
+{s:"I go to work by the bus.",ok:false,fix:"I go to work by <strong>bus</strong>.",note:"No article after 'by' with transport."}
+,
+{s:"She's studying to be doctor.",ok:false,fix:"She's studying to be <strong>a</strong> doctor.",note:"Jobs need an article: 'a/an' + job."},
+{s:"The moon goes around the earth.",ok:true,note:"'The' with unique objects — correct."},
+{s:"He plays football every Saturday.",ok:true,note:"No article with sports — correct."},
+{s:"I love the chocolate.",ok:false,fix:"I love <strong>chocolate</strong>.",note:"No article with uncountable nouns in a general sense."},
+{s:"She went to hospital after the accident.",ok:true,note:"'Go to hospital' (as a patient) — no article in British English."},
+{s:"He's the only person who can help us.",ok:true,note:"'The' with 'only' — correct."},
+{s:"I'd like a cup of the tea, please.",ok:false,fix:"I'd like a cup of <strong>tea</strong>, please.",note:"No article after 'of' with uncountable nouns in general."},
+{s:"She works as a teacher in a primary school.",ok:true,note:"'As a' + job — correct."}
+],
+modals:[
+{s:"You mustn't to smoke in here.",ok:false,fix:"You mustn't <strong>smoke</strong> in here.",note:"Modal verbs take the bare infinitive — no 'to'."},
+{s:"I could to swim when I was five.",ok:false,fix:"I <strong>could swim</strong> when I was five.",note:"No 'to' after modal verbs."},
+{s:"You should see a doctor about that.",ok:true,note:"'Should' + infinitive for advice — correct."},
+{s:"He must be at home — his car is outside.",ok:true,note:"'Must be' for logical deduction — correct."},
+{s:"You don't must park here.",ok:false,fix:"You <strong>mustn't</strong> park here.",note:"Modals form negatives directly — mustn't, not 'don't must'."},
+{s:"Can I borrow your pen, please?",ok:true,note:"'Can I' for requests — correct."},
+{s:"She can speaks three languages.",ok:false,fix:"She can <strong>speak</strong> three languages.",note:"Bare infinitive after 'can' — no -s."},
+{s:"You don't have to wear a uniform.",ok:true,note:"'Don't have to' = not necessary — correct."},
+{s:"I must to go now or I'll be late.",ok:false,fix:"I <strong>must go</strong> now or I'll be late.",note:"No 'to' after 'must'."},
+{s:"Could you help me with this, please?",ok:true,note:"'Could you' for polite requests — correct."},
+{s:"You should to study harder.",ok:false,fix:"You should <strong>study</strong> harder.",note:"No 'to' after 'should'."},
+{s:"We might go to the beach if it's sunny.",ok:true,note:"'Might' for possibility — correct."}
+,
+{s:"She can't to come to the party tonight.",ok:false,fix:"She can't <strong>come</strong> to the party tonight.",note:"No 'to' after 'can/can't'."},
+{s:"You ought to be more careful.",ok:true,note:"'Ought to' + infinitive for advice — correct."},
+{s:"Shall we go for a walk?",ok:true,note:"'Shall we' for suggestions — correct."},
+{s:"He may comes later if he finishes work.",ok:false,fix:"He may <strong>come</strong> later.",note:"Bare infinitive after 'may' — no -s."},
+{s:"You needn't worry about the exam.",ok:true,note:"'Needn't' + bare infinitive — correct."},
+{s:"She would rather stay home than going out.",ok:false,fix:"She would rather stay home than <strong>go</strong> out.",note:"'Would rather…than' + bare infinitive."},
+{s:"I had better go now or I'll miss the bus.",ok:true,note:"'Had better' + bare infinitive — correct."},
+{s:"Must I to bring my passport?",ok:false,fix:"<strong>Must I bring</strong> my passport?",note:"No 'to' after 'must'."}
+],
+gerunds_infinitives:[
+{s:"I enjoy to play tennis at weekends.",ok:false,fix:"I enjoy <strong>playing</strong> tennis at weekends.",note:"'Enjoy' is followed by a gerund, not infinitive."},
+{s:"She decided to take the job.",ok:true,note:"'Decide' + to infinitive — correct."},
+{s:"He avoids to eat fast food.",ok:false,fix:"He avoids <strong>eating</strong> fast food.",note:"'Avoid' takes a gerund."},
+{s:"I want going to the cinema tonight.",ok:false,fix:"I want <strong>to go</strong> to the cinema tonight.",note:"'Want' takes the to-infinitive."},
+{s:"She suggested going to the park.",ok:true,note:"'Suggest' + gerund — correct."},
+{s:"They promised to help us move house.",ok:true,note:"'Promise' + to infinitive — correct."},
+{s:"I can't stand to wait in long queues.",ok:false,fix:"I can't stand <strong>waiting</strong> in long queues.",note:"'Can't stand' takes a gerund."},
+{s:"We hope to see you again soon.",ok:true,note:"'Hope' + to infinitive — correct."},
+{s:"He admitted to steal the money.",ok:false,fix:"He admitted <strong>stealing</strong> / admitted <strong>to stealing</strong> the money.",note:"'Admit' + gerund or 'admit to' + gerund."},
+{s:"She offered to give me a lift.",ok:true,note:"'Offer' + to infinitive — correct."},
+{s:"I don't mind to work late occasionally.",ok:false,fix:"I don't mind <strong>working</strong> late occasionally.",note:"'Mind' takes a gerund."},
+{s:"He refused to answer the question.",ok:true,note:"'Refuse' + to infinitive — correct."}
+,
+{s:"She finished to write the essay at midnight.",ok:false,fix:"She finished <strong>writing</strong> the essay at midnight.",note:"'Finish' takes a gerund."},
+{s:"I look forward to meeting you next week.",ok:true,note:"'Look forward to' + gerund — correct."},
+{s:"He keeps to make the same mistakes.",ok:false,fix:"He keeps <strong>making</strong> the same mistakes.",note:"'Keep' + gerund for repeated actions."},
+{s:"She agreed to lend me her car.",ok:true,note:"'Agree' + to infinitive — correct."},
+{s:"Would you mind to close the window?",ok:false,fix:"Would you mind <strong>closing</strong> the window?",note:"'Mind' takes a gerund."},
+{s:"He managed to finish the race despite the heat.",ok:true,note:"'Manage' + to infinitive — correct."},
+{s:"I fancy to go out for dinner tonight.",ok:false,fix:"I fancy <strong>going</strong> out for dinner tonight.",note:"'Fancy' takes a gerund."},
+{s:"They expect to arrive by 6pm.",ok:true,note:"'Expect' + to infinitive — correct."}
+],
+comparatives:[
+{s:"She is more taller than her sister.",ok:false,fix:"She is <strong>taller</strong> than her sister.",note:"Don't use 'more' with -er comparatives."},
+{s:"This is the most expensive restaurant in town.",ok:true,note:"Superlative with 'most' — correct."},
+{s:"He drives more carefully than his brother.",ok:true,note:"'More' + adverb for comparison — correct."},
+{s:"My English is getting more better every day.",ok:false,fix:"My English is getting <strong>better</strong> every day.",note:"'Better' is already comparative — don't add 'more'."},
+{s:"The more you practise, the better you get.",ok:true,note:"'The more…the better' — correct."},
+{s:"This exercise is less difficult as the last one.",ok:false,fix:"This exercise is less difficult <strong>than</strong> the last one.",note:"Use 'than' with comparatives, not 'as'."},
+{s:"He's not as tall as his father.",ok:true,note:"'Not as…as' for comparison — correct."},
+{s:"It's the more interesting book I've ever read.",ok:false,fix:"It's the <strong>most</strong> interesting book I've ever read.",note:"Superlative requires 'most', not 'more'."},
+{s:"She works much harder than everyone else.",ok:true,note:"'Much' as intensifier with comparatives — correct."},
+{s:"This is the baddest film I've ever seen.",ok:false,fix:"This is the <strong>worst</strong> film I've ever seen.",note:"Irregular superlative: bad → worst."},
+{s:"He's slightly older than me.",ok:true,note:"'Slightly' as a modifier with comparatives — correct."},
+{s:"The weather today is the same than yesterday.",ok:false,fix:"The weather today is the same <strong>as</strong> yesterday.",note:"'The same as', not 'the same than'."}
+,
+{s:"He runs the most fastest on the team.",ok:false,fix:"He runs the <strong>fastest</strong> on the team.",note:"Don't combine 'most' with -est superlatives."},
+{s:"The film was not as good as the book.",ok:true,note:"'Not as…as' — correct."},
+{s:"This is a bit more expensive than I expected.",ok:true,note:"'A bit' as modifier — correct."},
+{s:"She's the most intelligent of the two sisters.",ok:false,fix:"She's the <strong>more</strong> intelligent of the two sisters.",note:"Use comparative, not superlative, when comparing two things."},
+{s:"The more I study, more I understand.",ok:false,fix:"The more I study, <strong>the more</strong> I understand.",note:"'The more…the more' — both need 'the'."},
+{s:"It was by far the best meal I've ever had.",ok:true,note:"'By far' as emphatic superlative modifier — correct."},
+{s:"He's as tall than his father.",ok:false,fix:"He's as tall <strong>as</strong> his father.",note:"'As…as', not 'as…than'."},
+{s:"This shirt is less expensive than that one.",ok:true,note:"'Less…than' — correct."}
+],
+countables:[
+{s:"Can you give me some informations?",ok:false,fix:"Can you give me some <strong>information</strong>?",note:"'Information' is uncountable — no plural."},
+{s:"She has a lot of experience in teaching.",ok:true,note:"'Experience' (uncountable) with 'a lot of' — correct."},
+{s:"I need to buy some new furnitures.",ok:false,fix:"I need to buy some new <strong>furniture</strong>.",note:"'Furniture' is uncountable."},
+{s:"There are fewer students in the class this year.",ok:true,note:"'Fewer' with countable nouns — correct."},
+{s:"He gave me a good advice.",ok:false,fix:"He gave me <strong>some good advice</strong> / <strong>a good piece of advice</strong>.",note:"'Advice' is uncountable."},
+{s:"We don't have much time left.",ok:true,note:"'Much' with uncountable 'time' — correct."},
+{s:"How many luggages do you have?",ok:false,fix:"How <strong>much luggage</strong> do you have?",note:"'Luggage' is uncountable — use 'much'."},
+{s:"There is less traffic today than yesterday.",ok:true,note:"'Less' with uncountable 'traffic' — correct."},
+{s:"She has made a lot of progresses this term.",ok:false,fix:"She has made a lot of <strong>progress</strong> this term.",note:"'Progress' is uncountable."},
+{s:"Could I have a glass of water, please?",ok:true,note:"'A glass of' to quantify uncountable nouns — correct."},
+{s:"I have too many homeworks to finish.",ok:false,fix:"I have too <strong>much homework</strong> to finish.",note:"'Homework' is uncountable."},
+{s:"The news is very surprising.",ok:true,note:"'News' is uncountable and takes singular verb — correct."}
+,
+{s:"She gave me some useful informations.",ok:false,fix:"She gave me some useful <strong>information</strong>.",note:"'Information' is uncountable — no plural."},
+{s:"How many people were at the party?",ok:true,note:"'Many' with countable 'people' — correct."},
+{s:"We had a very good weather on holiday.",ok:false,fix:"We had <strong>very good weather</strong> on holiday.",note:"'Weather' is uncountable — no 'a'."},
+{s:"I haven't got enough money to buy it.",ok:true,note:"'Money' (uncountable) with 'enough' — correct."},
+{s:"There are less cars on the road today.",ok:false,fix:"There are <strong>fewer</strong> cars on the road today.",note:"'Fewer' with countable nouns, 'less' with uncountable."},
+{s:"She has lots of experience with children.",ok:true,note:"'Lots of' with uncountable 'experience' — correct."},
+{s:"Could you give me two breads, please?",ok:false,fix:"Could you give me two <strong>loaves of bread</strong> / two <strong>rolls</strong>?",note:"'Bread' is uncountable — use a measure word."},
+{s:"There isn't much space in this flat.",ok:true,note:"'Much' with uncountable 'space' — correct."}
+],
+word_order:[
+{s:"She always is late for class.",ok:false,fix:"She <strong>is always</strong> late for class.",note:"Adverbs of frequency go after 'be'."},
+{s:"I usually have breakfast at 7am.",ok:true,note:"Adverb of frequency before main verb — correct."},
+{s:"He drives very carefully his car.",ok:false,fix:"He drives his car <strong>very carefully</strong>.",note:"Manner adverbs go after the object."},
+{s:"Never I have seen such a beautiful sunset.",ok:false,fix:"<strong>Never have I</strong> seen such a beautiful sunset.",note:"Inversion after 'never' at the start of a sentence."},
+{s:"She speaks English fluently.",ok:true,note:"Adverb after the object — correct."},
+{s:"I don't know what is his name.",ok:false,fix:"I don't know what <strong>his name is</strong>.",note:"Indirect questions use statement word order."},
+{s:"They have enough money to buy a car.",ok:true,note:"'Enough' after adjective/before noun — correct here."},
+{s:"She told me that she was not enough old to drive.",ok:false,fix:"She told me that she was <strong>not old enough</strong> to drive.",note:"'Enough' comes after adjectives."},
+{s:"He gave to me the book yesterday.",ok:false,fix:"He gave <strong>me the book</strong> / gave <strong>the book to me</strong> yesterday.",note:"Indirect object either comes first or uses 'to'."},
+{s:"What time does the train leave?",ok:true,note:"Question word order with auxiliary 'does' — correct."},
+{s:"She very much enjoyed the concert.",ok:true,note:"'Very much' can precede the main verb — correct."},
+{s:"I wonder where is the station.",ok:false,fix:"I wonder where <strong>the station is</strong>.",note:"Indirect questions: statement word order."}
+,
+{s:"She speaks very well English.",ok:false,fix:"She speaks English <strong>very well</strong>.",note:"Object before adverb of manner."},
+{s:"I always have coffee in the morning.",ok:true,note:"Frequency adverb before main verb — correct."},
+{s:"He told me what had happened.",ok:true,note:"Indirect question: statement word order — correct."},
+{s:"Do you know where is the bank?",ok:false,fix:"Do you know where <strong>the bank is</strong>?",note:"Indirect questions use statement word order."},
+{s:"She hardly ever goes to the cinema.",ok:true,note:"Adverb of frequency placement — correct."},
+{s:"He is enough strong to lift it.",ok:false,fix:"He is <strong>strong enough</strong> to lift it.",note:"'Enough' goes after adjectives."},
+{s:"Only rarely does she take a day off.",ok:true,note:"Inversion after fronted negative adverb — correct."},
+{s:"I have no idea who that man is.",ok:true,note:"Indirect question word order — correct."}
+]
+},
+B2:{
+tenses:[
+{s:"By next June, I will have been working here for ten years.",ok:true,note:"Future perfect continuous — correct."},
+{s:"She told me she is coming to the party.",ok:false,fix:"She told me she <strong>was coming</strong> to the party.",note:"Reported speech requires backshift."},
+{s:"I used to be going to the gym every day.",ok:false,fix:"I used to <strong>go</strong> to the gym every day.",note:"'Used to' takes the base form."},
+{s:"They had already left by the time we arrived.",ok:true,note:"Past perfect for the earlier of two past events."},
+{s:"He has been reading that book for weeks and still hasn't finished.",ok:true,note:"Present perfect continuous for ongoing action."},
+{s:"I have been knowing her for years.",ok:false,fix:"I <strong>have known</strong> her for years.",note:"Stative verbs don't take continuous form."},
+{s:"This time next week, I'll be lying on a beach.",ok:true,note:"Future continuous — correct."},
+{s:"She was about to leave when the phone rang.",ok:true,note:"'Was about to' for imminent past action — correct."},
+{s:"I wish I didn't say that to her yesterday.",ok:false,fix:"I wish I <strong>hadn't said</strong> that to her yesterday.",note:"'Wish' + past perfect for past regrets."},
+{s:"By the time you get here, I will finish cooking.",ok:false,fix:"By the time you get here, I <strong>will have finished</strong> cooking.",note:"Future perfect for completed action before a future point."},
+{s:"We were used to living in a small flat.",ok:true,note:"'Be used to' + gerund — correct."},
+{s:"He denied that he had been involved.",ok:true,note:"Past perfect in reported speech — correct."}
+,
+{s:"She has been studying English since she was a child.",ok:true,note:"Present perfect continuous + since — correct."},
+{s:"I realised I had been there before.",ok:true,note:"Past perfect for earlier past event — correct."},
+{s:"This time tomorrow, we'll fly to London.",ok:false,fix:"This time tomorrow, we'll <strong>be flying</strong> to London.",note:"Future continuous for action in progress at a future time."},
+{s:"He told me he has already finished.",ok:false,fix:"He told me he <strong>had</strong> already finished.",note:"Present perfect → past perfect in reported speech."},
+{s:"I've been meaning to call you all week.",ok:true,note:"Present perfect continuous for ongoing intention — correct."},
+{s:"By 2030, they will have completed the project.",ok:true,note:"Future perfect — correct."},
+{s:"She would always bring cakes to the office on Fridays.",ok:true,note:"'Would' for past habits — correct."},
+{s:"It's the first time I am visiting this city.",ok:false,fix:"It's the first time I <strong>have visited</strong> this city.",note:"'It's the first time' + present perfect."}
+],
+conditionals:[
+{s:"If I would have known, I would have told you.",ok:false,fix:"If I <strong>had known</strong>, I would have told you.",note:"Third conditional: if + past perfect, not 'would have'."},
+{s:"If it rains tomorrow, we'll stay inside.",ok:true,note:"First conditional — correct."},
+{s:"I wish I would be taller.",ok:false,fix:"I wish I <strong>were</strong> taller.",note:"'Wish' + past simple (subjunctive)."},
+{s:"If she studied harder, she would pass the exam.",ok:true,note:"Second conditional — correct."},
+{s:"Unless you don't hurry, we'll miss the bus.",ok:false,fix:"<strong>Unless you hurry</strong>, we'll miss the bus.",note:"'Unless' = 'if not' — don't double the negative."},
+{s:"If I were you, I'd take the job.",ok:true,note:"Subjunctive 'were' — correct."},
+{s:"If I will see her, I'll tell her.",ok:false,fix:"If I <strong>see</strong> her, I'll tell her.",note:"No 'will' in the if-clause."},
+{s:"I wouldn't have gone if I had known.",ok:true,note:"Third conditional — correct."},
+{s:"Provided that you finish on time, you can leave.",ok:true,note:"'Provided that' as conditional — correct."},
+{s:"If she would ask me, I would help her.",ok:false,fix:"If she <strong>asked</strong> me, I would help her.",note:"Second conditional: if + past simple, not 'would'."},
+{s:"If only I had more free time.",ok:true,note:"'If only' + past simple for wishes — correct."},
+{s:"What would you do if you won the lottery?",ok:true,note:"Second conditional question — correct."}
+,
+{s:"If you heat water to 100°C, it boils.",ok:true,note:"Zero conditional for facts — correct."},
+{s:"Suppose you lost your job, what would you do?",ok:true,note:"'Suppose' + past simple for hypothetical — correct."},
+{s:"I'd rather you didn't tell anyone about this.",ok:true,note:"'Would rather' + past simple for preferences about others — correct."},
+{s:"Were I in your position, I would accept the offer.",ok:true,note:"Inverted second conditional (formal) — correct."},
+{s:"Should you require any assistance, please don't hesitate to ask.",ok:true,note:"Inverted first conditional (formal) — correct."},
+{s:"If I wouldn't have left early, I would have missed the train.",ok:false,fix:"If I <strong>hadn't</strong> left early, I would have missed the train.",note:"Third conditional: if + past perfect."},
+{s:"But for your help, I wouldn't have passed.",ok:true,note:"'But for' = 'if it hadn't been for' — correct."},
+{s:"As long as you promise to be careful, you can borrow my car.",ok:true,note:"'As long as' as conditional — correct."}
+],
+passive:[
+{s:"English is spoke all over the world.",ok:false,fix:"English is <strong>spoken</strong> all over the world.",note:"Past participle of 'speak' is 'spoken'."},
+{s:"The building is being renovated at the moment.",ok:true,note:"Present continuous passive — correct."},
+{s:"She was offered a promotion last week.",ok:true,note:"Passive with indirect object — correct."},
+{s:"The homework needs to being completed by Friday.",ok:false,fix:"The homework needs to <strong>be completed</strong> by Friday.",note:"Passive infinitive: to be + past participle."},
+{s:"It is believed that he is the best candidate.",ok:true,note:"Impersonal passive — correct."},
+{s:"A new hospital is going to been built next year.",ok:false,fix:"A new hospital is going to <strong>be built</strong> next year.",note:"Going to be + past participle."},
+{s:"The students were given extra time.",ok:true,note:"Passive with indirect object — correct."},
+{s:"Mistakes were been made during the process.",ok:false,fix:"Mistakes <strong>were made</strong> during the process.",note:"Simple past passive: was/were + past participle."},
+{s:"The report was being written when the power went out.",ok:true,note:"Past continuous passive — correct."},
+{s:"He is said to be a brilliant scientist.",ok:true,note:"Personal passive — correct."},
+{s:"The window has been break by the children.",ok:false,fix:"The window has been <strong>broken</strong> by the children.",note:"Past participle of 'break' is 'broken'."},
+{s:"This song was wrote by Lennon.",ok:false,fix:"This song was <strong>written</strong> by Lennon.",note:"Past participle of 'write' is 'written'."}
+,
+{s:"The museum was visited by thousands of tourists every year.",ok:false,fix:"The museum <strong>is visited</strong> by thousands every year.",note:"Habitual present requires present passive, not past."},
+{s:"She is known to have worked for the government.",ok:true,note:"Personal passive + perfect infinitive — correct."},
+{s:"The new law is being debated in parliament.",ok:true,note:"Present continuous passive — correct."},
+{s:"The parcels should have been deliver yesterday.",ok:false,fix:"The parcels should have been <strong>delivered</strong> yesterday.",note:"Past participle required: 'delivered'."},
+{s:"Having been warned about the risks, they decided to proceed anyway.",ok:true,note:"Perfect passive participle clause — correct."},
+{s:"The road has been being repaired since January.",ok:true,note:"Present perfect continuous passive — rare but grammatically correct."},
+{s:"It is being said that the company will merge.",ok:false,fix:"It <strong>is said</strong> that the company will merge.",note:"Impersonal passive uses simple form: 'it is said'."},
+{s:"The children were made to tidy up their rooms.",ok:true,note:"Passive of 'make' adds 'to' — correct."}
+],
+reported:[
+{s:"She said she was tired and wanted to go home.",ok:true,note:"Correct backshift in reported speech."},
+{s:"He told that he would be late.",ok:false,fix:"He <strong>told me</strong> that he would be late.",note:"'Tell' needs an object."},
+{s:"She asked me where did I live.",ok:false,fix:"She asked me where I <strong>lived</strong>.",note:"Reported questions use statement word order."},
+{s:"He asked me if I could help him.",ok:true,note:"Reported yes/no question — correct."},
+{s:"She told me don't touch it.",ok:false,fix:"She told me <strong>not to touch</strong> it.",note:"Reported commands: told + object + (not) to + infinitive."},
+{s:"He said me that he was sorry.",ok:false,fix:"He <strong>told me</strong> / He <strong>said</strong> that he was sorry.",note:"'Say' doesn't take an indirect object directly."},
+{s:"The teacher explained that water boils at 100°C.",ok:true,note:"General truths don't need backshift."},
+{s:"She asked whether I had finished the report.",ok:true,note:"'Whether' in reported questions — correct."},
+{s:"She reminded me to not forget my passport.",ok:false,fix:"She reminded me <strong>not to forget</strong> my passport.",note:"'Not' before 'to' in negative infinitives."},
+{s:"He denied stealing the money.",ok:true,note:"'Deny' + gerund — correct."},
+{s:"He suggested that we should go to the cinema.",ok:true,note:"'Suggest that + should' — correct."},
+{s:"She said she will come the next day.",ok:false,fix:"She said she <strong>would</strong> come the next day.",note:"'Will' becomes 'would' in reported speech."}
+,
+{s:"They said they had never been to Japan.",ok:true,note:"Past perfect in reported speech — correct."},
+{s:"She warned me to not go out alone at night.",ok:false,fix:"She warned me <strong>not to go</strong> out alone at night.",note:"'Not' before 'to' in negative infinitives."},
+{s:"He asked that I should arrive early.",ok:true,note:"Reported request with 'should' — correct."},
+{s:"She wanted to know how much did the tickets cost.",ok:false,fix:"She wanted to know how much the tickets <strong>cost</strong>.",note:"Indirect question: statement word order."},
+{s:"The doctor advised him to take more exercise.",ok:true,note:"'Advise' + object + to infinitive — correct."},
+{s:"He claimed to being innocent.",ok:false,fix:"He claimed to <strong>be</strong> innocent.",note:"'Claim' + to infinitive, not gerund."},
+{s:"She promised that she would be there on time.",ok:true,note:"'Promise that' + would — correct."},
+{s:"They urged the government to reconsider its decision.",ok:true,note:"'Urge' + object + to infinitive — correct."}
+],
+gerunds_infinitives:[
+{s:"She stopped to smoke five years ago.",ok:false,fix:"She stopped <strong>smoking</strong> five years ago.",note:"'Stop' + gerund = quit the habit. 'Stop to smoke' = pause in order to smoke."},
+{s:"I remember locking the door before I left.",ok:true,note:"'Remember' + gerund = recall a past action — correct."},
+{s:"He tried to open the window but it was stuck.",ok:true,note:"'Try' + infinitive = attempt — correct."},
+{s:"She went on to explain the reasons behind her decision.",ok:true,note:"'Go on' + infinitive = do something new — correct."},
+{s:"I regret to inform you that your application was unsuccessful.",ok:true,note:"'Regret' + infinitive for formal announcements — correct."},
+{s:"He denies to have been at the scene.",ok:false,fix:"He denies <strong>having been</strong> at the scene.",note:"'Deny' takes a gerund, not infinitive."},
+{s:"She can't help feeling nervous before exams.",ok:true,note:"'Can't help' + gerund — correct."},
+{s:"I meant telling you earlier but I forgot.",ok:false,fix:"I meant <strong>to tell</strong> you earlier but I forgot.",note:"'Mean' + infinitive = intend. 'Mean' + gerund = involve."},
+{s:"The roof wants repairing before winter.",ok:true,note:"'Want' + gerund = need (British English) — correct."},
+{s:"He's used to get up early for work.",ok:false,fix:"He's used to <strong>getting</strong> up early for work.",note:"'Be used to' + gerund, not infinitive."},
+{s:"She let me to borrow her car.",ok:false,fix:"She let me <strong>borrow</strong> her car.",note:"'Let' + object + bare infinitive (no 'to')."},
+{s:"I'd prefer to stay in rather than go out.",ok:true,note:"'Prefer' + to infinitive — correct."}
+,
+{s:"I'll never forget visiting the Grand Canyon.",ok:true,note:"'Forget' + gerund = memory of past action — correct."},
+{s:"She pretended not to see me.",ok:true,note:"'Pretend' + negative infinitive — correct."},
+{s:"I need having my car serviced.",ok:false,fix:"I need <strong>to have</strong> my car serviced.",note:"'Need' + to infinitive."},
+{s:"He keeps putting off making a decision.",ok:true,note:"'Put off' + gerund — correct."},
+{s:"Would you like me to help you with that?",ok:true,note:"'Would like' + object + to infinitive — correct."},
+{s:"She appears to be enjoying herself.",ok:true,note:"'Appear' + to infinitive — correct."},
+{s:"They risk to lose everything they own.",ok:false,fix:"They risk <strong>losing</strong> everything they own.",note:"'Risk' takes a gerund."},
+{s:"I caught him trying to climb over the fence.",ok:true,note:"'Catch' + object + -ing — correct."}
+],
+phrasal_verbs:[
+{s:"She turned down the offer because of the low salary.",ok:true,note:"'Turn down' = reject — correct."},
+{s:"He came up a great idea during the meeting.",ok:false,fix:"He came up <strong>with</strong> a great idea.",note:"'Come up with' = think of."},
+{s:"I need to look after my younger sister this evening.",ok:true,note:"'Look after' = take care of — correct."},
+{s:"She called off the wedding at the last minute.",ok:true,note:"'Call off' = cancel — correct."},
+{s:"He gets along well with his colleagues.",ok:true,note:"'Get along with' = have a good relationship — correct."},
+{s:"I'm looking forward to hear from you.",ok:false,fix:"I'm looking forward to <strong>hearing</strong> from you.",note:"'Look forward to' + gerund."},
+{s:"Could you put me through the manager?",ok:false,fix:"Could you put me through <strong>to</strong> the manager?",note:"'Put through to' someone on the phone."},
+{s:"They brought up three children on a small income.",ok:true,note:"'Bring up' = raise children — correct."},
+{s:"She takes after her mother in many ways.",ok:true,note:"'Take after' = resemble — correct."},
+{s:"I can't put up with this noise any longer.",ok:true,note:"'Put up with' = tolerate — correct."},
+{s:"He ran over the main points before the meeting.",ok:false,fix:"He <strong>ran through</strong> / <strong>went over</strong> the main points.",note:"'Run over' = hit with a vehicle. 'Run through'/'go over' = review."},
+{s:"We need to sort out this problem immediately.",ok:true,note:"'Sort out' = resolve — correct."}
+,
+{s:"She's always putting off her homework.",ok:true,note:"'Put off' = postpone — correct."},
+{s:"They ran out of milk this morning.",ok:true,note:"'Run out of' = have no more — correct."},
+{s:"I'll pick up you from the station.",ok:false,fix:"I'll pick <strong>you up</strong> from the station.",note:"Pronouns go between the verb and particle."},
+{s:"He takes after his father in many ways.",ok:true,note:"'Take after' = resemble — correct (inseparable)."},
+{s:"Can you look up this word in the dictionary?",ok:true,note:"'Look up' = search for — correct."},
+{s:"She broke up with her boyfriend last week.",ok:true,note:"'Break up with' = end a relationship — correct."},
+{s:"I need to catch up the rest of the class.",ok:false,fix:"I need to catch up <strong>with</strong> the rest of the class.",note:"'Catch up with' — needs the preposition."},
+{s:"The plane took off ten minutes late.",ok:true,note:"'Take off' = leave the ground — correct."}
+],
+linking:[
+{s:"Despite of the rain, we went for a walk.",ok:false,fix:"<strong>Despite</strong> the rain / <strong>In spite of</strong> the rain, we went for a walk.",note:"'Despite' has no 'of'. 'In spite of' does."},
+{s:"Although she was tired, she continued working.",ok:true,note:"'Although' + clause — correct."},
+{s:"He failed the exam. However, he didn't give up.",ok:true,note:"'However' as a linking adverb — correct."},
+{s:"I stayed at home because of I was feeling ill.",ok:false,fix:"I stayed at home <strong>because</strong> I was feeling ill.",note:"'Because' + clause. 'Because of' + noun phrase."},
+{s:"She's very talented. Moreover, she works incredibly hard.",ok:true,note:"'Moreover' for addition — correct."},
+{s:"Even though the price was high, but we bought it anyway.",ok:false,fix:"<strong>Even though</strong> the price was high, we bought it anyway.",note:"Don't combine 'even though' with 'but' — choose one."},
+{s:"The hotel was expensive. On the other hand, the location was perfect.",ok:true,note:"'On the other hand' for contrast — correct."},
+{s:"Due to the bad weather, the match was cancelled.",ok:true,note:"'Due to' + noun phrase — correct."},
+{s:"She passed the exam in spite she didn't study much.",ok:false,fix:"She passed in spite <strong>of the fact that</strong> / <strong>of not studying</strong> much.",note:"'In spite of' + noun/gerund, not a clause directly."},
+{s:"As a result of the flooding, hundreds of families were displaced.",ok:true,note:"'As a result of' — correct."},
+{s:"He's very clever; nevertheless, he lacks common sense.",ok:true,note:"'Nevertheless' for unexpected contrast — correct."},
+{s:"I like both swimming as well as running.",ok:false,fix:"I like both swimming <strong>and</strong> running. / I like swimming <strong>as well as</strong> running.",note:"'Both…and', not 'both…as well as'."}
+,
+{s:"While the food was good, the service was terrible.",ok:true,note:"'While' for contrast — correct."},
+{s:"In addition to working full-time, she studies at night.",ok:true,note:"'In addition to' + gerund — correct."},
+{s:"He failed the exam. As a consequence, he had to retake it.",ok:true,note:"'As a consequence' — correct."},
+{s:"She's very experienced; furthermore, she's highly motivated.",ok:true,note:"'Furthermore' for addition — correct."},
+{s:"He trained hard so that to win the race.",ok:false,fix:"He trained hard <strong>so that he could</strong> / <strong>in order to</strong> win the race.",note:"'So that' + clause; 'in order to' + infinitive."},
+{s:"Whereas I prefer the beach, my husband prefers the mountains.",ok:true,note:"'Whereas' for contrast — correct."},
+{s:"They cancelled the picnic on account to the bad weather.",ok:false,fix:"They cancelled the picnic <strong>on account of</strong> the bad weather.",note:"'On account of', not 'on account to'."},
+{s:"She left early so as not to miss the train.",ok:true,note:"'So as not to' = in order not to — correct."}
+]
+},
+C1:{
+tenses:[
+{s:"Hardly had she arrived when the meeting started.",ok:true,note:"Inverted past perfect with 'hardly…when' — correct."},
+{s:"It's high time we left.",ok:true,note:"'It's high time' + past simple — correct."},
+{s:"No sooner I had sat down than the phone rang.",ok:false,fix:"No sooner <strong>had I</strong> sat down than the phone rang.",note:"Inversion required after 'no sooner'."},
+{s:"I'd sooner you didn't mention it.",ok:true,note:"'Would sooner' + past simple for preferences about others."},
+{s:"I wish I would have studied harder.",ok:false,fix:"I wish I <strong>had</strong> studied harder.",note:"'Wish' + past perfect for past regrets, not 'would have'."},
+{s:"Not until I read the article did I understand the issue.",ok:true,note:"Negative inversion with 'not until' — correct."},
+{s:"Were she to accept the offer, she'd have to relocate.",ok:true,note:"Inverted conditional (formal) — correct."},
+{s:"Little did they know what was about to happen.",ok:true,note:"Negative adverb inversion — correct."},
+{s:"It's about time the government does something.",ok:false,fix:"It's about time the government <strong>did</strong> something.",note:"'It's about time' + past simple (subjunctive)."},
+{s:"Seldom have I seen such a remarkable performance.",ok:true,note:"Inversion after 'seldom' — correct."},
+{s:"Had I known about the delay, I wouldn't have rushed.",ok:true,note:"Inverted third conditional — correct."},
+{s:"She is to have completed the report by Friday.",ok:true,note:"'Be to have + past participle' for expected completion."}
+,
+{s:"Only when I got home did I realise my wallet was missing.",ok:true,note:"Inversion after 'only when' — correct."},
+{s:"At no point were we informed of the changes.",ok:true,note:"Inversion after 'at no point' — correct."},
+{s:"She would sooner have resigned than accept the terms.",ok:true,note:"'Would sooner have' + past participle — correct."},
+{s:"In no way I intended to offend anyone.",ok:false,fix:"In no way <strong>did I intend</strong> to offend anyone.",note:"Inversion required after 'in no way'."},
+{s:"Not for a moment did she consider giving up.",ok:true,note:"Inversion after fronted negative — correct."},
+{s:"So difficult was the exam that half the students failed.",ok:true,note:"Inverted 'so…that' — correct."},
+{s:"Only by working together we can solve this problem.",ok:false,fix:"Only by working together <strong>can we</strong> solve this problem.",note:"Inversion required after 'only by'."},
+{s:"Such was his talent that he was offered a scholarship.",ok:true,note:"Inverted 'such…that' — correct."}
+],
+modals:[
+{s:"She can't have left already — her coat is here.",ok:true,note:"'Can't have' for past impossibility — correct."},
+{s:"You should have told me earlier.",ok:true,note:"'Should have' for past regret — correct."},
+{s:"You needn't have bought so much food.",ok:true,note:"'Needn't have' = unnecessary past action — correct."},
+{s:"She might have been waiting for us.",ok:true,note:"Past possibility with continuous — correct."},
+{s:"He should of gone to the doctor.",ok:false,fix:"He should <strong>have</strong> gone to the doctor.",note:"'Should have', not 'should of'."},
+{s:"I'd rather to stay at home tonight.",ok:false,fix:"I'd rather <strong>stay</strong> at home tonight.",note:"'Would rather' + bare infinitive."},
+{s:"He must have been working all night — he looks exhausted.",ok:true,note:"Deduction about past action — correct."},
+{s:"She could have not known about the change.",ok:false,fix:"She <strong>couldn't have known</strong> about the change.",note:"'Not' after the modal, not after 'have'."},
+{s:"You might as well take a taxi — it's pouring.",ok:true,note:"'Might as well' — correct."},
+{s:"I'd rather you hadn't said anything.",ok:true,note:"'Would rather' + past perfect for past regrets about others."},
+{s:"He is supposed to have arrived by now.",ok:true,note:"Expected past event — correct."},
+{s:"They need not to worry about the results.",ok:false,fix:"They <strong>need not worry</strong> / <strong>don't need to worry</strong>.",note:"Modal 'need' = need not + bare infinitive."}
+,
+{s:"She would have been bound to notice eventually.",ok:true,note:"'Bound to' + complex modal — correct."},
+{s:"You may well be right about that.",ok:true,note:"'May well' for strong possibility — correct."},
+{s:"He need hardly be reminded of his responsibilities.",ok:true,note:"'Need hardly' — formal, correct."},
+{s:"I would just as soon stay at home as go out.",ok:true,note:"'Would just as soon' for equal preference — correct."},
+{s:"She can hardly have been unaware of the situation.",ok:true,note:"'Can hardly have' for near impossibility — correct."},
+{s:"He might have well left by now.",ok:false,fix:"He might <strong>well have</strong> left by now.",note:"'Well' goes after the modal: 'might well have'."},
+{s:"They were supposed to have finished by Friday.",ok:true,note:"'Supposed to have' + past participle — correct."},
+{s:"You could at least have warned us.",ok:true,note:"'Could at least have' — correct."}
+],
+relative:[
+{s:"The woman which lives next door is a doctor.",ok:false,fix:"The woman <strong>who</strong> lives next door is a doctor.",note:"Use 'who' for people."},
+{s:"The book that I bought it yesterday was fascinating.",ok:false,fix:"The book that I bought yesterday was fascinating.",note:"Don't repeat the object pronoun."},
+{s:"My sister, who lives in Paris, is visiting next week.",ok:true,note:"Non-defining relative clause — correct."},
+{s:"The reason because I'm late is the traffic.",ok:false,fix:"The reason <strong>why</strong> I'm late is the traffic.",note:"'The reason why', not 'the reason because'."},
+{s:"She's the teacher whose classes are always full.",ok:true,note:"'Whose' for possession — correct."},
+{s:"This is the hotel in that we stayed.",ok:false,fix:"This is the hotel <strong>in which</strong> / <strong>where</strong> we stayed.",note:"'In which' or 'where', not 'in that'."},
+{s:"Everything what she said was true.",ok:false,fix:"Everything <strong>that</strong> she said was true.",note:"'That' after everything/something, not 'what'."},
+{s:"The film, that was directed by Spielberg, won three Oscars.",ok:false,fix:"The film, <strong>which</strong> was directed by Spielberg, won three Oscars.",note:"Non-defining clauses use 'which', not 'that'."},
+{s:"The city where I grew up in has changed.",ok:false,fix:"The city <strong>where</strong> I grew up / The city I grew up <strong>in</strong>.",note:"Don't combine 'where' and 'in'."},
+{s:"He's someone whom I admire greatly.",ok:true,note:"'Whom' as object — correct (formal)."},
+{s:"There are several factors, none of which have been considered.",ok:true,note:"'None of which' in non-defining clause — correct."},
+{s:"The day when we met was the happiest of my life.",ok:true,note:"'When' for time — correct."}
+,
+{s:"The proposal, the details of which are still unclear, has caused debate.",ok:true,note:"Preposition + which in non-defining clause — correct."},
+{s:"The house where Shakespeare was born in is now a museum.",ok:false,fix:"The house <strong>where</strong> Shakespeare was born / the house Shakespeare was born <strong>in</strong>.",note:"Don't combine 'where' with 'in'."},
+{s:"There are few people to whom she feels she can turn.",ok:true,note:"Preposition + whom — formal, correct."},
+{s:"What I don't understand is why nobody objected.",ok:true,note:"Nominal relative with 'what' — correct."},
+{s:"All what he said turned out to be true.",ok:false,fix:"All <strong>that</strong> he said / <strong>Everything</strong> he said turned out to be true.",note:"'All that' or 'everything', not 'all what'."},
+{s:"She is someone on whom you can always rely.",ok:true,note:"Preposition + whom — formal, correct."},
+{s:"The extent to which the government is involved remains unclear.",ok:true,note:"'The extent to which' — correct."},
+{s:"He was the last person who I expected to see there.",ok:true,note:"Defining relative clause — correct."}
+],
+passive:[
+{s:"My car has been being repaired for two weeks.",ok:true,note:"Present perfect continuous passive — rare but correct."},
+{s:"He is thought to have been living abroad.",ok:true,note:"Personal passive + perfect continuous infinitive."},
+{s:"The proposal needs being revised.",ok:false,fix:"The proposal needs <strong>to be revised</strong> / needs <strong>revising</strong>.",note:"'Need' + passive infinitive or gerund, not 'being'."},
+{s:"Had the bridge not been repaired, it would have collapsed.",ok:true,note:"Inverted third conditional passive — correct."},
+{s:"The suspect is reported to has fled the country.",ok:false,fix:"The suspect is reported to <strong>have fled</strong> the country.",note:"Perfect infinitive: to have + past participle."},
+{s:"It's widely acknowledged that the system needs reform.",ok:true,note:"Impersonal passive — correct."},
+{s:"The data is currently being been analysed.",ok:false,fix:"The data is currently <strong>being analysed</strong>.",note:"Present continuous passive: is being + past participle."},
+{s:"She is believed to have been wrongly convicted.",ok:true,note:"Personal passive + perfect passive infinitive."},
+{s:"He got his car fixed by the mechanic.",ok:true,note:"Causative 'get' — correct."},
+{s:"The results are expected to be announced tomorrow.",ok:true,note:"Passive + passive infinitive — correct."},
+{s:"She had her bag stolen at the market.",ok:true,note:"Causative 'have' for unwanted events — correct."},
+{s:"Rarely are such opportunities given to newcomers.",ok:true,note:"Inverted passive with 'rarely' — correct."}
+,
+{s:"She is alleged to have embezzled company funds.",ok:true,note:"Personal passive + perfect infinitive — correct."},
+{s:"The decision is thought to been taken in haste.",ok:false,fix:"The decision is thought to <strong>have been</strong> taken in haste.",note:"Perfect passive infinitive: to have been + pp."},
+{s:"Not a word was spoken throughout the entire meeting.",ok:true,note:"Passive with fronted negative — correct."},
+{s:"He was seen to leave the building at around midnight.",ok:true,note:"Passive of 'see' + to infinitive — correct."},
+{s:"The proposal was met with widespread opposition.",ok:true,note:"'Be met with' — correct."},
+{s:"It has been suggested that the project be scaled back.",ok:true,note:"Impersonal passive + subjunctive — correct."},
+{s:"She was having her portrait painted by a local artist.",ok:true,note:"Past continuous causative — correct."},
+{s:"The bridge is said to have been designed by Brunel.",ok:true,note:"Personal passive + perfect passive infinitive — correct."}
+],
+gerunds_infinitives:[
+{s:"There's no point in to complain about it now.",ok:false,fix:"There's no point in <strong>complaining</strong> about it now.",note:"Preposition 'in' is followed by a gerund."},
+{s:"I can't bear to think what might have happened.",ok:true,note:"'Can't bear' + infinitive — correct."},
+{s:"It's no use crying over spilt milk.",ok:true,note:"'It's no use' + gerund — correct."},
+{s:"She went as far as to accuse him of lying.",ok:true,note:"'Go as far as' + to infinitive — correct."},
+{s:"He narrowly avoided to be hit by the car.",ok:false,fix:"He narrowly avoided <strong>being hit</strong> by the car.",note:"'Avoid' + gerund. Passive gerund: being + past participle."},
+{s:"I distinctly recall having locked the door.",ok:true,note:"'Recall' + perfect gerund for past action — correct."},
+{s:"There's no question of him to resign.",ok:false,fix:"There's no question of him <strong>resigning</strong>.",note:"Preposition 'of' + gerund."},
+{s:"She appears to have been misquoted in the press.",ok:true,note:"'Appear' + perfect infinitive — correct."},
+{s:"He resented being told what to do.",ok:true,note:"'Resent' + gerund (passive) — correct."},
+{s:"I'd sooner die than to admit I was wrong.",ok:false,fix:"I'd sooner die than <strong>admit</strong> I was wrong.",note:"'Would sooner…than' + bare infinitive."},
+{s:"The prisoner is believed to have escaped during the night.",ok:true,note:"Passive + perfect infinitive — correct."},
+{s:"It remains to be seen whether the plan will succeed.",ok:true,note:"'Remain to be seen' — correct."}
+,
+{s:"She is accustomed to being treated with respect.",ok:true,note:"'Accustomed to' + gerund — correct."},
+{s:"He objected to being called a liar.",ok:true,note:"'Object to' + gerund — correct."},
+{s:"I wouldn't dream of to ask for a pay rise.",ok:false,fix:"I wouldn't dream of <strong>asking</strong> for a pay rise.",note:"Preposition 'of' + gerund."},
+{s:"She was reported to have fled the country.",ok:true,note:"Passive + perfect infinitive — correct."},
+{s:"He proceeded to explain his theory in great detail.",ok:true,note:"'Proceed' + to infinitive — correct."},
+{s:"It's worth bearing in mind that the data is incomplete.",ok:true,note:"'Worth' + gerund — correct."},
+{s:"She professed to knowing nothing about the incident.",ok:false,fix:"She professed to <strong>know</strong> nothing about the incident.",note:"'Profess' + to infinitive, not gerund."},
+{s:"He is liable to change his mind at the last minute.",ok:true,note:"'Liable to' + infinitive — correct."}
+],
+collocations:[
+{s:"She made a terrible mistake during the presentation.",ok:true,note:"'Make a mistake' — correct collocation."},
+{s:"He did a suggestion that we change the schedule.",ok:false,fix:"He <strong>made</strong> a suggestion that we change the schedule.",note:"'Make a suggestion', not 'do a suggestion'."},
+{s:"The company has taken drastic measures to cut costs.",ok:true,note:"'Take measures' — correct collocation."},
+{s:"Can you do me a favour and close the window?",ok:true,note:"'Do someone a favour' — correct."},
+{s:"She gave a long speech at the conference.",ok:true,note:"'Give a speech' — correct collocation."},
+{s:"He caught a cold after walking in the rain.",ok:true,note:"'Catch a cold' — correct."},
+{s:"I need to make my homework before dinner.",ok:false,fix:"I need to <strong>do</strong> my homework before dinner.",note:"'Do homework', not 'make homework'."},
+{s:"She paid him a compliment on his cooking.",ok:true,note:"'Pay a compliment' — correct."},
+{s:"The teacher made a comment about the students' progress.",ok:true,note:"'Make a comment' — correct."},
+{s:"They took a decision without consulting anyone.",ok:false,fix:"They <strong>made</strong> a decision without consulting anyone.",note:"'Make a decision' is standard. 'Take a decision' is used in some varieties but 'make' is safer."},
+{s:"He committed a serious crime and was arrested.",ok:true,note:"'Commit a crime' — correct collocation."},
+{s:"She did an effort to arrive on time.",ok:false,fix:"She <strong>made</strong> an effort to arrive on time.",note:"'Make an effort', not 'do an effort'."}
+,
+{s:"The results fell short of expectations.",ok:true,note:"'Fall short of' — correct."},
+{s:"She raised a valid point during the discussion.",ok:true,note:"'Raise a point' — correct."},
+{s:"He drew attention to a serious flaw in the argument.",ok:true,note:"'Draw attention to' — correct."},
+{s:"They reached a compromise after hours of negotiation.",ok:true,note:"'Reach a compromise' — correct."},
+{s:"She did a big impression on the interviewers.",ok:false,fix:"She <strong>made</strong> a big impression on the interviewers.",note:"'Make an impression', not 'do an impression' (which means to imitate)."},
+{s:"He bears full responsibility for the decision.",ok:true,note:"'Bear responsibility' — correct."},
+{s:"The new evidence sheds light on the mystery.",ok:true,note:"'Shed light on' — correct."},
+{s:"The team took pride in their achievement.",ok:true,note:"'Take pride in' — correct."}
+],
+linking:[
+{s:"Much as I admire her work, I disagree with her conclusions.",ok:true,note:"'Much as' = although — correct formal usage."},
+{s:"Notwithstanding the risks involved, they proceeded with the plan.",ok:true,note:"'Notwithstanding' — correct formal linking."},
+{s:"Not only is she talented, but she is also extremely hard-working.",ok:true,note:"Inversion after 'not only' + 'but also' — correct."},
+{s:"Insofar as the budget allows, we will expand the programme.",ok:true,note:"'Insofar as' = to the extent that — correct."},
+{s:"She resigned, whereby her deputy took over.",ok:false,fix:"She resigned, <strong>whereupon</strong> her deputy took over.",note:"'Whereupon' = after which. 'Whereby' = by which method."},
+{s:"Be that as it may, we still need to find a solution.",ok:true,note:"'Be that as it may' = despite that — correct."},
+{s:"The project failed, owing the lack of funding.",ok:false,fix:"The project failed, owing <strong>to</strong> the lack of funding.",note:"'Owing to', not 'owing'."},
+{s:"Inasmuch as the evidence suggests, the theory holds true.",ok:true,note:"'Inasmuch as' — formal, correct."},
+{s:"She was promoted on account of her dedication and skill.",ok:true,note:"'On account of' — correct."},
+{s:"Conversely, some argue that the policy has had the opposite effect.",ok:true,note:"'Conversely' for opposite viewpoints — correct."},
+{s:"Provided the funding is secured, the project will go ahead.",ok:true,note:"'Provided' as a conditional linker — correct."},
+{s:"The plan worked, albeit not without some difficulties.",ok:true,note:"'Albeit' = although — correct."}
+,
+{s:"In the event that funding is withdrawn, the project will be shelved.",ok:true,note:"'In the event that' — formal conditional, correct."},
+{s:"With a view to reducing costs, the company restructured.",ok:true,note:"'With a view to' + gerund — correct."},
+{s:"For all his wealth, he remains deeply unhappy.",ok:true,note:"'For all' = despite — correct."},
+{s:"In so far as the law permits, exceptions will be made.",ok:true,note:"'In so far as' — correct."},
+{s:"Granted that the task is difficult, we must still try.",ok:true,note:"'Granted that' — concessive, correct."},
+{s:"The policy failed, not least because it was poorly implemented.",ok:true,note:"'Not least because' — correct."},
+{s:"He accepted the post, albeit with some reservations.",ok:true,note:"'Albeit' = although — correct."},
+{s:"Seeing as we have no alternative, let's proceed.",ok:true,note:"'Seeing as' = given that — correct."}
+]
+},
+C2:{
+tenses:[
+{s:"Not only did she pass, but she got the highest mark.",ok:true,note:"Inversion with 'not only…but' — correct."},
+{s:"Barely had we set off when the car broke down.",ok:true,note:"Inversion with 'barely…when' — correct."},
+{s:"Under no circumstances are you to leave this room.",ok:true,note:"Inversion after 'under no circumstances' — correct."},
+{s:"Such was the force of the explosion that windows shattered.",ok:true,note:"Inverted 'such…that' — correct."},
+{s:"Only after she had left I realised my mistake.",ok:false,fix:"Only after she had left <strong>did I realise</strong> my mistake.",note:"Inversion required in main clause after 'only after'."},
+{s:"So engrossed was he in the book that he missed his stop.",ok:true,note:"Inverted 'so…that' — correct."},
+{s:"At no time the passengers were informed of the delay.",ok:false,fix:"At no time <strong>were the passengers</strong> informed.",note:"Inversion required after 'at no time'."},
+{s:"In no way can this decision be justified.",ok:true,note:"Inversion after 'in no way' — correct."},
+{s:"Not for one moment I doubted her sincerity.",ok:false,fix:"Not for one moment <strong>did I doubt</strong> her sincerity.",note:"Inversion after negative fronted adverbials."},
+{s:"Scarcely had the game begun when it started raining.",ok:true,note:"'Scarcely…when' with inversion — correct."},
+{s:"Never before have we witnessed such extraordinary unity.",ok:true,note:"'Never before' + inversion — correct."},
+{s:"On no account should students be left unsupervised.",ok:true,note:"Inversion after 'on no account' — correct."}
+,
+{s:"Nowhere else will you find such a diverse range of species.",ok:true,note:"Inversion after 'nowhere else' — correct."},
+{s:"Only then I understood the magnitude of the problem.",ok:false,fix:"Only then <strong>did I understand</strong> the magnitude of the problem.",note:"Inversion required after 'only then'."},
+{s:"So pervasive has the influence become that resistance seems futile.",ok:true,note:"Inverted 'so…that' — correct."},
+{s:"At no time did the defendant show any remorse.",ok:true,note:"Inversion after 'at no time' — correct."},
+{s:"Not since the war had the city seen such devastation.",ok:true,note:"Inversion after 'not since' — correct."},
+{s:"Little does he realise the impact of his actions.",ok:true,note:"Inversion after 'little' — correct."},
+{s:"No sooner had the curtain risen when the audience erupted.",ok:false,fix:"No sooner had the curtain risen <strong>than</strong> the audience erupted.",note:"'No sooner…than', not 'no sooner…when'."},
+{s:"Only by sheer determination was she able to complete the marathon.",ok:true,note:"Inversion after 'only by' — correct."}
+],
+modals:[
+{s:"She might well have been the most talented in the group.",ok:true,note:"'Might well have been' — correct."},
+{s:"You may as well have not bothered.",ok:false,fix:"You <strong>might as well not have</strong> bothered.",note:"Negative before 'have'; 'might as well' preferred."},
+{s:"She cannot but admire his dedication.",ok:true,note:"'Cannot but' + bare infinitive (formal) — correct."},
+{s:"They ought to not have released the information.",ok:false,fix:"They <strong>ought not to have</strong> released the information.",note:"'Not' after 'ought', not after 'to'."},
+{s:"He must have must have been exhausted.",ok:false,fix:"He <strong>must have been</strong> exhausted.",note:"Doubled 'must have' — remove repetition."},
+{s:"I dare say you're right about that.",ok:true,note:"'Dare say' — fixed expression, correct."},
+{s:"You need scarcely remind me of my obligations.",ok:true,note:"'Need scarcely' — formal but correct."},
+{s:"She could not have been more gracious in defeat.",ok:true,note:"'Could not have been more' for emphasis — correct."},
+{s:"He would sooner resign than compromise his principles.",ok:true,note:"'Would sooner…than' — correct."},
+{s:"I would rather you hadn't brought the matter up.",ok:true,note:"'Would rather' + past perfect — correct."},
+{s:"She is to not leave under any circumstances.",ok:false,fix:"She is <strong>not to leave</strong> under any circumstances.",note:"'Is not to', not 'is to not'."},
+{s:"He would have had to have been informed beforehand.",ok:true,note:"Complex modal chain — correct."}
+,
+{s:"They may well not have received the invitation.",ok:true,note:"'May well not have' — correct."},
+{s:"One can but marvel at the sheer scale of the achievement.",ok:true,note:"'Can but' = can only — correct."},
+{s:"He would have been unlikely to have agreed to those terms.",ok:true,note:"Complex modal chain — correct."},
+{s:"She need not necessarily have been present at the time.",ok:true,note:"'Need not necessarily have' — correct."},
+{s:"You cannot help but be impressed by the architecture.",ok:true,note:"'Cannot help but' + bare infinitive — correct."},
+{s:"He could scarcely have chosen a worse moment.",ok:true,note:"'Could scarcely have' — correct."},
+{s:"They might just as well not have bothered.",ok:true,note:"'Might just as well not have' — correct."},
+{s:"She must needs comply with the regulations.",ok:true,note:"'Must needs' — archaic/formal but grammatically correct."}
+],
+articles:[
+{s:"She's studying at the university.",ok:false,fix:"She's studying at <strong>university</strong>.",note:"No article with institutions for their primary purpose."},
+{s:"The Sahara Desert is the largest hot desert.",ok:true,note:"'The' with geographical names + common noun — correct."},
+{s:"He has a thorough understanding of the issues.",ok:true,note:"'A' with abstract nouns qualified by an adjective — correct."},
+{s:"In spite of the fact he's wealthy, he leads the simple life.",ok:false,fix:"…he leads <strong>a</strong> simple life.",note:"'Lead a … life' requires the indefinite article."},
+{s:"The poor are disproportionately affected by the policy.",ok:true,note:"'The' + adjective as collective noun — correct."},
+{s:"She has the patience of a saint.",ok:true,note:"Fixed expression — correct."},
+{s:"History has tendency to repeat itself.",ok:false,fix:"History has <strong>a</strong> tendency to repeat itself.",note:"'Have a tendency' requires 'a'."},
+{s:"The President of the United States addressed the nation.",ok:true,note:"'The' with unique titles — correct."},
+{s:"By and the large, the experiment was a success.",ok:false,fix:"<strong>By and large</strong>, the experiment was a success.",note:"Fixed phrase — no article."},
+{s:"She was appointed chair of the committee.",ok:true,note:"No article with unique roles when appointed — correct."},
+{s:"We had the most wonderful time on holiday.",ok:true,note:"Superlative with uncountable — correct."},
+{s:"She plays a remarkable piano for someone her age.",ok:true,note:"'A' + adjective + instrument = quality of playing — correct."}
+,
+{s:"To err is human; to forgive, divine.",ok:true,note:"No articles with abstract concepts in proverbs — correct."},
+{s:"She was elected the president of the association.",ok:false,fix:"She was elected <strong>president</strong> of the association.",note:"No article with unique roles in 'elected/appointed' + role."},
+{s:"The accused was brought before the court.",ok:true,note:"'The accused' as a noun — correct."},
+{s:"A Mr Thompson called while you were out.",ok:true,note:"'A' + name = someone called (unknown) — correct."},
+{s:"He is something of an authority on the subject.",ok:true,note:"'Something of an' — correct."},
+{s:"The hotel offers the height of luxury.",ok:true,note:"'The height of' — correct."},
+{s:"She took the chair at the meeting.",ok:true,note:"'Take the chair' = preside — correct."},
+{s:"By a process of elimination, we arrived at the answer.",ok:true,note:"'By a process of' — correct."}
+],
+reported:[
+{s:"He is reputed to have amassed a considerable fortune.",ok:true,note:"Passive reporting verb + perfect infinitive — correct."},
+{s:"It has been alleged that funds were misappropriated.",ok:true,note:"Impersonal passive with 'allege' — correct."},
+{s:"She is said to has been living abroad for decades.",ok:false,fix:"She is said to <strong>have been</strong> living abroad.",note:"'To have been', not 'to has been'."},
+{s:"The minister denied to have any knowledge of the scheme.",ok:false,fix:"The minister denied <strong>having</strong> any knowledge.",note:"'Deny' + gerund, not infinitive."},
+{s:"Reports suggest that the company is on the verge of collapse.",ok:true,note:"'Suggest that' — correct."},
+{s:"He is understood to have tendered his resignation.",ok:true,note:"Personal passive + perfect infinitive — correct."},
+{s:"The witness testified to having seen the accused.",ok:true,note:"'Testify to' + gerund — correct."},
+{s:"He recommended that she takes a different approach.",ok:false,fix:"He recommended that she <strong>take</strong> a different approach.",note:"Subjunctive after 'recommend that' — bare infinitive."},
+{s:"The CEO is rumoured to be considering stepping down.",ok:true,note:"Passive reporting + continuous infinitive — correct."},
+{s:"She demanded that he should to apologise immediately.",ok:false,fix:"She demanded that he <strong>apologise</strong> / <strong>should apologise</strong>.",note:"Subjunctive or 'should' + bare infinitive after 'demand'."},
+{s:"It was widely reported that the talks had broken down.",ok:true,note:"Impersonal passive in past — correct."},
+{s:"She insists that she is innocent of the charges.",ok:true,note:"'Insist that' with no backshift — correct."}
+,
+{s:"It has been intimated that further redundancies are likely.",ok:true,note:"Impersonal passive with 'intimate' — correct."},
+{s:"He purported to have evidence of wrongdoing.",ok:true,note:"'Purport' + to infinitive — correct."},
+{s:"The ambassador was quoted as to have said that talks had stalled.",ok:false,fix:"The ambassador was quoted as <strong>having said</strong> / as <strong>saying</strong> that talks had stalled.",note:"'Quoted as' + gerund, not infinitive."},
+{s:"She was at pains to stress that no decision had yet been taken.",ok:true,note:"'Be at pains to' + infinitive — correct."},
+{s:"It transpired that the accounts had been falsified.",ok:true,note:"'It transpired that' — correct."},
+{s:"He made it abundantly clear that he would not be swayed.",ok:true,note:"'Make it clear that' — correct."},
+{s:"The report concluded that the regulations were wholly inadequate.",ok:true,note:"'Conclude that' — correct."},
+{s:"She went on record as opposing the merger.",ok:true,note:"'Go on record as' + gerund — correct."}
+],
+subjunctive:[
+{s:"It is essential that he attend the meeting.",ok:true,note:"Subjunctive after 'essential that' — bare infinitive, correct."},
+{s:"I suggest that she leaves immediately.",ok:false,fix:"I suggest that she <strong>leave</strong> immediately.",note:"Subjunctive: bare infinitive after 'suggest that'."},
+{s:"The committee recommended that the proposal be rejected.",ok:true,note:"Subjunctive passive — correct."},
+{s:"If need be, we can postpone the event.",ok:true,note:"'If need be' — fixed subjunctive expression, correct."},
+{s:"It is vital that every student is given equal opportunity.",ok:false,fix:"It is vital that every student <strong>be given</strong> equal opportunity.",note:"Subjunctive after 'it is vital that'."},
+{s:"She demanded that he resign with immediate effect.",ok:true,note:"Subjunctive after 'demand that' — correct."},
+{s:"Far be it from me to interfere.",ok:true,note:"Fixed subjunctive expression — correct."},
+{s:"He insisted that the matter was resolved before his departure.",ok:false,fix:"He insisted that the matter <strong>be resolved</strong> before his departure.",note:"Subjunctive after 'insist that' (formal)."},
+{s:"Suffice it to say, the situation is far from ideal.",ok:true,note:"'Suffice it to say' — fixed subjunctive, correct."},
+{s:"It is imperative that all employees follows the new guidelines.",ok:false,fix:"…that all employees <strong>follow</strong> the new guidelines.",note:"Subjunctive: no -s ending regardless of subject."},
+{s:"God forbid that anything should go wrong.",ok:true,note:"Subjunctive with 'God forbid' — correct."},
+{s:"Come what may, we will not abandon the project.",ok:true,note:"'Come what may' — fixed subjunctive, correct."}
+,
+{s:"It is desirable that all candidates be interviewed.",ok:true,note:"Subjunctive after 'it is desirable that' — correct."},
+{s:"Lest we forget the sacrifices that were made.",ok:true,note:"'Lest' + subjunctive — correct."},
+{s:"It is proposed that the committee meet quarterly.",ok:true,note:"Subjunctive after 'propose that' — correct."},
+{s:"The judge ordered that the accused is remanded in custody.",ok:false,fix:"…that the accused <strong>be remanded</strong> in custody.",note:"Subjunctive after 'order that'."},
+{s:"Would that I could turn back the clock.",ok:true,note:"'Would that' — literary subjunctive, correct."},
+{s:"Heaven forbid that such a tragedy should occur again.",ok:true,note:"'Heaven forbid' — correct."},
+{s:"It is crucial that the deadline is met.",ok:false,fix:"It is crucial that the deadline <strong>be met</strong>.",note:"Subjunctive after 'it is crucial that'."},
+{s:"If truth be told, I was never entirely convinced.",ok:true,note:"'If truth be told' — fixed subjunctive, correct."}
+],
+collocations:[
+{s:"The findings lend credence to the theory.",ok:true,note:"'Lend credence to' — correct."},
+{s:"She takes great pains to ensure accuracy.",ok:true,note:"'Take pains' — correct."},
+{s:"He paid little heed to the warnings.",ok:true,note:"'Pay heed to' — correct."},
+{s:"The scandal cast doubt on her integrity.",ok:true,note:"'Cast doubt on' — correct."},
+{s:"They made havoc in the classroom.",ok:false,fix:"They <strong>wreaked</strong> / <strong>caused</strong> havoc in the classroom.",note:"'Wreak havoc' or 'cause havoc', not 'make havoc'."},
+{s:"She bears a striking resemblance to her grandmother.",ok:true,note:"'Bear a resemblance' — correct."},
+{s:"The evidence does justice to the prosecution's claims.",ok:false,fix:"The evidence <strong>lends weight</strong> / <strong>gives credence</strong> to the prosecution's claims.",note:"'Do justice to' means to show fairly, not to support."},
+{s:"He harbours a deep resentment towards his former employer.",ok:true,note:"'Harbour resentment' — correct."},
+{s:"The government has fallen short of expectations.",ok:true,note:"'Fall short of' — correct."},
+{s:"She voiced her concerns at the board meeting.",ok:true,note:"'Voice concerns' — correct."},
+{s:"The new policy has drawn widespread criticism.",ok:true,note:"'Draw criticism' — correct."},
+{s:"He struck a compromise between the two parties.",ok:false,fix:"He <strong>reached</strong> / <strong>struck</strong> a compromise.",note:"'Strike/reach a compromise' — both correct. Tricky because 'struck' is actually fine here!"}
+,
+{s:"The policy has come under intense scrutiny.",ok:true,note:"'Come under scrutiny' — correct."},
+{s:"She commands enormous respect in her field.",ok:true,note:"'Command respect' — correct."},
+{s:"The revelation sent shockwaves through the industry.",ok:true,note:"'Send shockwaves' — correct."},
+{s:"He gave testimony to the committee yesterday.",ok:false,fix:"He <strong>gave testimony before</strong> / <strong>gave evidence to</strong> the committee.",note:"'Give testimony before' or 'give evidence to' — nuance matters."},
+{s:"The decision flies in the face of established convention.",ok:true,note:"'Fly in the face of' — correct."},
+{s:"She holds the view that reform is urgently needed.",ok:true,note:"'Hold a/the view' — correct."},
+{s:"The findings run counter to previous research.",ok:true,note:"'Run counter to' — correct."},
+{s:"He exercised considerable restraint in his response.",ok:true,note:"'Exercise restraint' — correct."}
+],
+gerunds_infinitives:[
+{s:"She went so far as to accuse him of corruption.",ok:true,note:"'Go so far as to' + infinitive — correct."},
+{s:"I can ill afford to make another mistake.",ok:true,note:"'Can ill afford to' — formal, correct."},
+{s:"It ill behoves him to criticise others.",ok:true,note:"'It ill behoves' — very formal, correct."},
+{s:"They begrudge having to pay higher taxes.",ok:true,note:"'Begrudge' + gerund — correct."},
+{s:"She condescended to speaking to us briefly.",ok:false,fix:"She condescended <strong>to speak</strong> to us briefly.",note:"'Condescend to' + bare infinitive (the 'to' is part of 'condescend to')."},
+{s:"He deigned to acknowledge our presence.",ok:true,note:"'Deign to' + infinitive — correct."},
+{s:"I cannot envisage him being elected president.",ok:true,note:"'Envisage' + object + gerund — correct."},
+{s:"There is no gainsaying the importance of education.",ok:true,note:"'There is no gainsaying' + noun — correct."},
+{s:"She ventured to suggest that the plan was flawed.",ok:true,note:"'Venture to' + infinitive — correct."},
+{s:"It doesn't bear to think about what could have happened.",ok:false,fix:"It doesn't bear <strong>thinking</strong> about.",note:"'Bear thinking about' — gerund, not infinitive."},
+{s:"He is reputed to be one of the wealthiest people in the country.",ok:true,note:"Passive + to infinitive — correct."},
+{s:"I don't relish the prospect of having to start again.",ok:true,note:"'Relish the prospect of' + gerund — correct."}
+,
+{s:"It behoves us to act with the utmost caution.",ok:true,note:"'Behove' + to infinitive — correct."},
+{s:"He was prevailed upon to reconsider his decision.",ok:true,note:"'Prevail upon' + to infinitive — correct."},
+{s:"She demurred at to accept the terms as stated.",ok:false,fix:"She demurred at <strong>accepting</strong> the terms as stated.",note:"'Demur at' + gerund."},
+{s:"They baulked at having to fund the project themselves.",ok:true,note:"'Baulk at' + gerund — correct."},
+{s:"I would be loath to make any hasty decisions.",ok:true,note:"'Loath to' + infinitive — correct."},
+{s:"He presumed to speak on behalf of the entire department.",ok:true,note:"'Presume to' + infinitive — correct."},
+{s:"She was compelled to resign under pressure.",ok:true,note:"'Compel' + to infinitive — correct."},
+{s:"I am at a loss to explain his behaviour.",ok:true,note:"'At a loss to' + infinitive — correct."}
+]
+}
+};
+
+var teamEmojis=['🔴','🔵','🟢'];
+var teamNames=['Red Team','Blue Team','Green Team'];
+var game={};
+var selectedLevel='B2';
+var topicLabels={tenses:'Tenses',conditionals:'Conditionals',passive:'Passive Voice',reported:'Reported Speech',articles:'Articles & Determiners',prepositions:'Prepositions',modals:'Modal Verbs',relative:'Relative Clauses',gerunds_infinitives:'Gerunds & Infinitives',comparatives:'Comparatives & Superlatives',countables:'Countable & Uncountable',word_order:'Word Order',phrasal_verbs:'Phrasal Verbs',linking:'Linking Words',collocations:'Collocations',subjunctive:'Subjunctive'};
+
+function pickLevel(btn){
+  document.querySelectorAll('.level-pill').forEach(function(p){p.classList.remove('active')});
+  btn.classList.add('active');
+  selectedLevel=btn.dataset.level;
+  populateTopics();
+}
+
+function populateTopics(){
+  var sel=document.getElementById('topicSelect');
+  var bank=DB[selectedLevel]||{};
+  sel.innerHTML='<option value="mixed">Mixed Grammar</option>';
+  Object.keys(bank).forEach(function(t){
+    sel.innerHTML+='<option value="'+t+'">'+(topicLabels[t]||t)+'</option>';
+  });
+}
+
+function startGame(){
+  var topic=document.getElementById('topicSelect').value;
+  var count=parseInt(document.getElementById('countSelect').value);
+  var numTeams=parseInt(document.getElementById('teamCount').value);
+  var budget=parseInt(document.getElementById('budgetSelect').value);
+  var bank=DB[selectedLevel]||{};
+  var pool=[];
+  if(topic==='mixed'){
+    Object.keys(bank).forEach(function(k){bank[k].forEach(function(item){pool.push({s:item.s,ok:item.ok,fix:item.fix||'',note:item.note,topic:k})})});
+  }else{
+    (bank[topic]||[]).forEach(function(item){pool.push({s:item.s,ok:item.ok,fix:item.fix||'',note:item.note,topic:topic})});
+  }
+  pool.sort(function(){return Math.random()-0.5});
+  game={sentences:pool.slice(0,Math.min(count,pool.length)),current:0,teams:[]};
+  for(var i=0;i<numTeams;i++) game.teams.push({name:teamNames[i],emoji:teamEmojis[i],budget:budget,score:0,correct:0});
+  document.getElementById('setupPanel').classList.add('hidden');
+  document.getElementById('gamePanel').classList.remove('hidden');
+  document.getElementById('resultsPanel').style.display='none';
+  renderTeams();renderSentence();
+}
+
+function renderTeams(){
+  var h='';
+  game.teams.forEach(function(t,i){h+='<div class="team-chip" id="team'+i+'"><div class="team-emoji">'+t.emoji+'</div><div class="team-info"><div class="team-name">'+t.name+'</div><div class="team-budget">€'+t.budget.toLocaleString()+'</div></div></div>'});
+  document.getElementById('teamsBar').innerHTML=h;
+}
+
+function renderSentence(){
+  if(game.current>=game.sentences.length){endGame();return}
+  var s=game.sentences[game.current];
+  document.getElementById('progressFill').style.width=(game.current/game.sentences.length*100)+'%';
+  var h='<div class="sentence-card"><div class="sentence-num">Sentence '+(game.current+1)+' of '+game.sentences.length;
+  if(s.topic)h+='<span class="sentence-topic">'+(topicLabels[s.topic]||s.topic)+'</span>';
+  h+='</div><div class="sentence-text">\u201c'+s.s+'\u201d</div><div class="bid-area">';
+  game.teams.forEach(function(t,i){h+='<div style="display:flex;align-items:center;gap:.4rem"><span style="font-size:.9rem">'+t.emoji+'</span><input type="number" class="bid-input" id="bid'+i+'" placeholder="€0" min="0" max="'+t.budget+'" step="50"></div>'});
+  h+='</div><div style="margin-top:1rem;display:flex;gap:.6rem"><button class="btn btn-sea btn-sm" onclick="revealAnswer()">🔍 Reveal Answer</button></div><div class="reveal-area" id="revealArea"></div></div>';
+  document.getElementById('sentenceArea').innerHTML=h;
+}
+
+function revealAnswer(){
+  var s=game.sentences[game.current],rev=document.getElementById('revealArea');
+  game.teams.forEach(function(t,i){var bid=parseInt(document.getElementById('bid'+i).value)||0;bid=Math.min(bid,t.budget);if(bid>0){t.budget-=bid;if(s.ok){t.budget+=bid*2;t.score+=bid;t.correct++}}});
+  renderTeams();
+  var cls=s.ok?'correct':'incorrect';
+  var verdict=s.ok?'✅ CORRECT':'❌ INCORRECT';
+  var expl=s.ok?'<strong>This sentence is correct.</strong> '+s.note:'<strong>Correction:</strong> '+s.fix+'<br>'+s.note;
+  rev.className='reveal-area '+cls;
+  rev.innerHTML='<div class="reveal-verdict">'+verdict+'</div><div class="reveal-correction">'+expl+'</div>';
+  rev.style.display='block';
+  rev.previousElementSibling.innerHTML='<button class="btn btn-primary btn-sm" onclick="nextSentence()">Next Sentence →</button>';
+}
+
+function nextSentence(){game.current++;renderSentence()}
+function skipSentence(){game.current++;renderSentence()}
+
+function endGame(){
+  document.getElementById('gamePanel').classList.add('hidden');
+  var p=document.getElementById('resultsPanel');p.style.display='block';
+  var mx=Math.max.apply(null,game.teams.map(function(t){return t.score}));
+  var h='';
+  game.teams.forEach(function(t){var w=t.score===mx&&t.score>0;h+='<div class="result-card'+(w?' winner':'')+'"><div class="result-emoji">'+t.emoji+'</div><div class="result-name">'+t.name+'</div><div class="result-score">Profit: €'+t.score.toLocaleString()+'</div><div class="result-score">Budget: €'+t.budget.toLocaleString()+'</div><div class="result-score">Correct bids: '+t.correct+'</div>'+(w?'<div class="result-label">🏆 Winner!</div>':'')+'</div>'});
+  document.getElementById('resultsGrid').innerHTML=h;
+  document.getElementById('progressFill').style.width='100%';
+}
+
+function resetGame(){
+  document.getElementById('resultsPanel').style.display='none';
+  document.getElementById('gamePanel').classList.add('hidden');
+  document.getElementById('setupPanel').classList.remove('hidden');
+}
+
+populateTopics();
+</script>
+</body>
+</html>
