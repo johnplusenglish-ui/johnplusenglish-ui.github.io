@@ -191,8 +191,32 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,252,247,
 .sub-drop-header .sub-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .sub-dot.b2{background:var(--sky)}.sub-dot.c1{background:var(--sea)}.sub-dot.c2{background:var(--lavender)}.sub-dot.gen{background:var(--sun)}
 
-.img-slot.faded{opacity:.25;transition:opacity .3s}
-.img-slot.faded img{filter:grayscale(40%)}
+.mode-pill[data-mode="phrases"].active{background:var(--ink);border-color:var(--ink);color:#fff}
+.mode-pill:not(.active) .lvl-phrases{background:#f0f0f0;color:var(--ink)}
+
+/* Phrase Bank */
+.pb-level-bar{display:flex;gap:4px;background:var(--cream);border-radius:100px;padding:3px;width:fit-content;margin-bottom:1.8rem;border:1.5px solid var(--border)}
+.pb-level-btn{font-family:'Nunito',sans-serif;padding:7px 20px;border-radius:100px;font-size:.82rem;font-weight:700;cursor:pointer;border:none;background:transparent;color:var(--muted);transition:all .2s}
+.pb-level-btn:hover{color:var(--ink)}
+.pb-level-btn.active.b2{background:var(--sky);color:#fff}
+.pb-level-btn.active.c1{background:var(--sea);color:#fff}
+.pb-level-btn.active.c2{background:var(--lavender);color:#fff}
+.pb-level-btn.active.gen{background:var(--sun);color:var(--ink)}
+.pb-panel{display:none}
+.pb-panel.active{display:block;animation:fadeUp .3s ease}
+.pb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.pb-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow-sm)}
+.pb-card-title{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.pb-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.pb-dot.b2{background:var(--sky)}.pb-dot.c1{background:var(--sea)}.pb-dot.c2{background:var(--lavender)}.pb-dot.gen{background:var(--sun)}
+.pb-fn{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:500;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+.pb-chips{display:flex;flex-wrap:wrap;gap:5px}
+
+@media(max-width:700px){
+  .pb-level-bar{width:100%}
+  .pb-level-btn{flex:1;text-align:center;padding:7px 8px;font-size:.75rem}
+  .pb-grid{grid-template-columns:1fr}
+}
 
 @media(max-width:700px){
   .page-header{padding:5.5rem 1.2rem 1rem}
@@ -232,12 +256,14 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,252,247,
     <button class="mode-pill" role="tab" data-mode="c1"><span class="lvl lvl-c1">C1</span> CAE Part 2</button>
     <button class="mode-pill" role="tab" data-mode="c2"><span class="lvl lvl-c2">C2</span> CPE Part 2</button>
     <button class="mode-pill" role="tab" data-mode="gen"><span class="lvl lvl-gen">ALL</span> Free Describe</button>
+    <button class="mode-pill" role="tab" data-mode="phrases"><span class="lvl lvl-phrases">💬</span> Phrase Bank</button>
   </div>
 
   <div class="panel active" id="panel-b2"></div>
   <div class="panel" id="panel-c1"></div>
   <div class="panel" id="panel-c2"></div>
   <div class="panel" id="panel-gen"></div>
+  <div class="panel" id="panel-phrases"></div>
 </div>
 
 <script>
@@ -363,6 +389,76 @@ const prompts = {
     {text:"Connect this image to a personal experience or a wider theme."},
   ],
 };
+
+// ══════════════════════════════════════════
+//  PHRASE BANK DATA
+// ══════════════════════════════════════════
+const phraseBank = {
+  b2: [
+    { fn:"Describing", phrases:["In the foreground / background…","On the left / right…","In the centre of the photo…","There seems to be…","It looks like…","You can see…","The photo shows…","In the distance…"] },
+    { fn:"Comparing", phrases:["Both photos show…","Whereas in the first photo…","In contrast to…","One key difference is…","The main similarity is…","Unlike the first photo…","On the other hand…","Compared to…"] },
+    { fn:"Speculating", phrases:["It looks as if…","They seem to be…","I get the impression…","They appear to be…","I'd say the people are probably…","It might be…","Perhaps they're…","This could be…"] },
+    { fn:"Giving opinions", phrases:["I think…","In my opinion…","Personally, I feel…","It seems to me that…","I'd say…","From what I can see…","I believe…","To my mind…"] },
+    { fn:"Atmosphere & feeling", phrases:["The atmosphere seems quite…","It gives the impression of…","It feels very…","There's a sense of…","The mood is…","This photo gives the impression of…","It conveys a feeling of…"] },
+    { fn:"Responding to follow-up", phrases:["I'd definitely prefer…","For me, the first / second option…","Personally, I think…","I can see why some people…","It depends on…","In my case…","If I had to choose…"] },
+  ],
+  c1: [
+    { fn:"Describing & interpreting", phrases:["What strikes me about this is…","If you look more closely…","There's a clear sense of…","What's particularly noticeable is…","The overall impression is…","It's interesting that…","What catches my eye is…"] },
+    { fn:"Comparing & contrasting", phrases:["The main contrast lies in…","There's a clear distinction between…","While both share…","What sets them apart is…","In terms of…, they differ significantly","One thing they have in common is…","Broadly speaking, both…"] },
+    { fn:"Speculating & evaluating", phrases:["I'd argue that…","To a certain extent…","It largely depends on…","One thing that stands out is…","I suppose it could be argued that…","From a practical standpoint…","It's worth considering that…"] },
+    { fn:"Developing ideas", phrases:["Having said that…","On the other hand…","What's more…","That said…","Taking this further…","Building on that idea…","It raises the question of…","This links to the idea that…"] },
+    { fn:"Expressing perspective", phrases:["The underlying theme seems to be…","From my perspective…","It's not just about…, it's also about…","What I find most interesting is…","There's more to this than…","It speaks to a broader issue of…"] },
+    { fn:"Responding to follow-up", phrases:["I'd be inclined to say…","It's hard to say definitively, but…","If I had to weigh it up…","On balance, I'd say…","What appeals to me most is…","I can see merits in both, but…"] },
+  ],
+  c2: [
+    { fn:"Opening & observing", phrases:["What's immediately striking is…","There's a certain irony in…","What underpins this is…","To my mind, this speaks to…","One could argue that…","There's something quite compelling about…","What this really comes down to is…"] },
+    { fn:"Discussing & building", phrases:["That's a fair point, although…","I take your point, but equally…","I'd be inclined to say…","Would you say that…?","I see what you mean, though I'd add…","There's a case to be made for…","It raises the question of…"] },
+    { fn:"Speculating & analysing", phrases:["From a broader perspective…","It raises broader questions about…","This could be seen as a reflection of…","There's a certain tension between…","It's not simply a matter of…","What's implicit here is…","If we consider the wider context…"] },
+    { fn:"Evaluating options", phrases:["Weighing it all up…","This one has a certain appeal because…","I'm not sure this would work since…","The strongest case for this is…","What makes this stand out is…","The drawback here is…","This arguably has the most impact because…"] },
+    { fn:"Reaching agreement", phrases:["Shall we settle on…?","If we're to reach a consensus…","Can we agree on…?","Shall we rule out…?","I think it's between … and …","On balance, I'd lean towards…","I think we're broadly agreed that…"] },
+    { fn:"Sophisticated hedging", phrases:["There's a degree of…","It's not entirely clear-cut…","One mustn't overlook the fact that…","That's arguably the case, though…","It would be remiss not to mention…","There's something to be said for…","To play devil's advocate…"] },
+  ],
+  gen: [
+    { fn:"First impressions", phrases:["The first thing I notice is…","What catches my eye is…","The overall mood is…","There's a sense of…","It gives me the impression of…","I'd describe this as…","It makes me think of…"] },
+    { fn:"Describing in detail", phrases:["In the foreground…","On the left / right…","In the background…","Looking more closely…","What's interesting is…","One detail that stands out is…","The lighting suggests…"] },
+    { fn:"Speculating & imagining", phrases:["If I had to guess…","I think this might be…","I can imagine that…","It looks like…","Perhaps this is…","This reminds me of…","You get the feeling that…"] },
+    { fn:"Reacting & reflecting", phrases:["This makes me think about…","It raises the question of…","What strikes me is…","I find it interesting that…","It's surprising that…","I wonder whether…","This connects to the idea of…"] },
+  ],
+};
+
+function renderPhrases() {
+  const el = document.getElementById('panel-phrases');
+  const levels = [
+    { key:'b2', label:'B2 — FCE' },
+    { key:'c1', label:'C1 — CAE' },
+    { key:'c2', label:'C2 — CPE' },
+    { key:'gen', label:'Free' },
+  ];
+  let h = `<div class="pb-level-bar">`;
+  levels.forEach((lv,i) => {
+    h += `<button class="pb-level-btn${i===0?' active b2':''}" data-pblevel="${lv.key}" onclick="switchPbLevel(this,'${lv.key}')">${lv.label}</button>`;
+  });
+  h += `</div>`;
+  levels.forEach((lv,i) => {
+    h += `<div class="pb-panel${i===0?' active':''}" id="pb-${lv.key}">`;
+    h += `<button class="print-btn" style="margin-bottom:14px" onclick="printPbLevel('${lv.key}')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>Print all</button>`;
+    h += `<div class="pb-grid" id="pb-grid-${lv.key}">`;
+    phraseBank[lv.key].forEach(cat => {
+      const cardId = `pb-${lv.key}-${cat.fn.replace(/\s+/g,'-').replace(/[^a-z0-9-]/gi,'')}`;
+      h += `<div class="pb-card" id="${cardId}"><div class="pb-card-title"><span class="pb-dot ${lv.key}"></span><span class="pb-fn">${cat.fn}</span></div><div class="pb-chips">${cat.phrases.map(p=>`<span class="chip">${p}</span>`).join('')}</div></div>`;
+    });
+    h += `</div></div>`;
+  });
+  el.innerHTML = h;
+}
+
+function switchPbLevel(btn, level) {
+  const bar = btn.closest('.pb-level-bar');
+  bar.querySelectorAll('.pb-level-btn').forEach(b => b.className = 'pb-level-btn');
+  btn.classList.add('active', level);
+  document.querySelectorAll('.pb-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(`pb-${level}`).classList.add('active');
+}
 
 // ══════════════════════════════════════════
 //  RENDER ENGINE
@@ -656,6 +752,36 @@ function printCard(id) {
   win.focus();
   setTimeout(() => win.print(), 600);
 }
+// ── Print phrase bank level ──
+function printPbLevel(level) {
+  const grid = document.getElementById(`pb-grid-${level}`);
+  const clone = grid.cloneNode(true);
+  const levelLabels = {b2:'B2 — FCE Part 2', c1:'C1 — CAE Part 2', c2:'C2 — CPE Part 2', gen:'Free Describe'};
+  const dotColors = {b2:'#4A90D9', c1:'#2EC4B6', c2:'#9B72CF', gen:'#FFB347'};
+  const win = window.open('','_blank','width=900,height=700');
+  win.document.write(`<!DOCTYPE html><html><head><title>Phrase Bank — ${levelLabels[level]}</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Nunito:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+      *{box-sizing:border-box;margin:0;padding:0}
+      body{font-family:'Nunito',sans-serif;padding:28px;color:#2D3047}
+      h2{font-family:'DM Serif Display',serif;font-size:1.4rem;margin-bottom:18px;font-weight:400}
+      .pb-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+      .pb-card{border:1.5px solid #E8E5DF;border-radius:12px;padding:16px 18px;break-inside:avoid}
+      .pb-card-title{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+      .pb-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;background:${dotColors[level]}}
+      .pb-fn{font-family:'JetBrains Mono',monospace;font-size:.65rem;font-weight:500;text-transform:uppercase;letter-spacing:.12em;color:#7A7D8E}
+      .pb-chips{display:flex;flex-wrap:wrap;gap:5px}
+      .chip{font-size:.78rem;font-weight:600;border:1.5px solid #E8E5DF;border-radius:100px;padding:4px 12px;color:#2D3047}
+      .chip.used{text-decoration:line-through;opacity:.35}
+      @media print{body{padding:16px}}
+    </style></head><body>
+    <h2>Phrase Bank — ${levelLabels[level]}</h2>`);
+  win.document.write(clone.outerHTML);
+  win.document.write('</body></html>');
+  win.document.close();
+  win.focus();
+  setTimeout(() => win.print(), 400);
+}
 document.querySelectorAll('.mode-pill').forEach(pill => {
   pill.addEventListener('click', () => {
     document.querySelectorAll('.mode-pill').forEach(p => { p.classList.remove('active'); p.setAttribute('aria-selected','false'); });
@@ -666,7 +792,7 @@ document.querySelectorAll('.mode-pill').forEach(pill => {
 });
 
 // ── Init ──
-renderB2(); renderC1(); renderC2(); renderGen();
+renderB2(); renderC1(); renderC2(); renderGen(); renderPhrases();
 </script>
 </body>
 </html>
