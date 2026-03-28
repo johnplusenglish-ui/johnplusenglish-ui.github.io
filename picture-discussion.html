@@ -134,10 +134,37 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,252,247,
 .lang-box.c2{background:var(--lavender-light);border:1px solid rgba(155,114,207,.15)}
 .lang-box.gen{background:var(--sand);border:1px solid rgba(255,179,71,.15)}
 .lang-title{font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:500;text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px}
+.lang-box-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.lang-title{font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:500;text-transform:uppercase;letter-spacing:.12em}
 .lang-box.b2 .lang-title{color:var(--sky)}
 .lang-box.c1 .lang-title{color:var(--sea)}
 .lang-box.c2 .lang-title{color:var(--lavender)}
 .lang-box.gen .lang-title{color:var(--sun)}
+.reset-chips{font-family:'Nunito',sans-serif;font-size:.72rem;font-weight:700;color:var(--muted);background:none;border:none;cursor:pointer;padding:2px 6px;border-radius:5px;transition:color .15s}
+.reset-chips:hover{color:var(--ink)}
+
+.print-btn{display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:7px 16px;border-radius:100px;font-size:.78rem;font-weight:700;cursor:pointer;border:1.5px solid var(--border);background:var(--card);color:var(--muted);font-family:'Nunito',sans-serif;transition:all .2s}
+.print-btn:hover{border-color:var(--ink);color:var(--ink)}
+.print-btn svg{flex-shrink:0}
+
+.gen-timer-row{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--cream);border-radius:var(--radius-sm);margin-top:12px;border:1.5px solid var(--border);font-size:.84rem;color:var(--muted)}
+.gen-timer-row strong{color:var(--ink);font-weight:700}
+.gen-timer-btns{display:flex;gap:5px;margin-left:auto}
+.gen-timer-btn{background:var(--card);color:var(--ink);border:1.5px solid var(--border);border-radius:100px;padding:5px 13px;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;font-family:'Nunito',sans-serif}
+.gen-timer-btn:hover{border-color:var(--sky);color:var(--sky)}
+.gen-timer-btn.running{background:var(--coral);color:#fff;border-color:var(--coral)}
+.gen-timer-display{font-family:'JetBrains Mono',monospace;font-size:.95rem;font-weight:500;color:var(--ink);min-width:44px;text-align:center;display:none}
+.gen-timer-display.visible{display:inline}
+
+.img-slot.c1-faded{opacity:.3;transition:opacity .25s;filter:grayscale(30%)}
+
+@media print{
+  nav,.mode-bar,.acc-header .chevron,.sub-drop-header,.timer-row,.gen-timer-row,.print-btn,.phase-tabs{display:none!important}
+  .acc-card{box-shadow:none!important;border:1px solid #ddd!important;break-inside:avoid}
+  .acc-body{display:block!important}
+  .sub-drop-body{display:block!important}
+  body::before{display:none}
+}
 .chips{display:flex;flex-wrap:wrap;gap:5px}
 .chip{font-size:.8rem;font-weight:600;background:var(--card);border:1.5px solid var(--border);border-radius:100px;padding:4px 12px;color:var(--ink);transition:all .2s;cursor:pointer;user-select:none}
 .chip:hover{background:var(--sky-light);border-color:var(--sky);color:var(--sky);transform:translateY(-1px);box-shadow:var(--shadow-sm)}
@@ -350,7 +377,15 @@ function promptsList(list, level) {
 }
 
 function langBox(level) {
-  return `<div class="lang-box ${level}"><div class="lang-title">Useful Language</div><div class="chips">${lang[level].map(c=>`<span class="chip">${c}</span>`).join('')}</div></div>`;
+  return `<div class="lang-box ${level}"><div class="lang-box-header"><div class="lang-title">Useful Language</div><button class="reset-chips" onclick="resetChips(this)">Reset</button></div><div class="chips">${lang[level].map(c=>`<span class="chip">${c}</span>`).join('')}</div></div>`;
+}
+
+function genTimerHTML(id) {
+  return `<div class="gen-timer-row"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="5.5"/><path d="M7 4v3l2 1"/></svg><span>Timer</span><span class="gen-timer-display" id="gtd-${id}"></span><div class="gen-timer-btns"><button class="gen-timer-btn" id="gtb-${id}-60" data-secs="60" data-gid="${id}">1 min</button><button class="gen-timer-btn" id="gtb-${id}-120" data-secs="120" data-gid="${id}">2 min</button><button class="gen-timer-btn" id="gtb-${id}-180" data-secs="180" data-gid="${id}">3 min</button></div></div>`;
+}
+
+function printBtn(id) {
+  return `<button class="print-btn" onclick="printCard('${id}')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>Print</button>`;
 }
 
 function timerHTML(id, secs) {
@@ -376,6 +411,7 @@ function renderB2() {
     h += subDrop('Guided Prompts', 'b2', promptsList(prompts.b2, 'b2'));
     h += subDrop("Partner's Follow-up (30 sec)", 'b2',
       `<div class="followup b2"><span class="p-num b2">?</span><div><span class="p-text">${s.followUp}</span><span class="p-hint">Partner answers briefly — no need to compare the photos again.</span></div></div>`);
+    h += printBtn(id);
     h += `</div></div>`;
   });
   el.innerHTML = h;
@@ -387,14 +423,15 @@ function renderC1() {
   c1Sets.forEach((s,i) => {
     const id = `c1-${i}`;
     h += `<div class="acc-card" id="${id}"><div class="acc-header" onclick="toggle('${id}')"><div class="acc-title"><span class="set-badge c1">Set ${i+1}</span>${s.topic}</div><span class="chevron">▾</span></div><div class="acc-body">`;
-    h += `<div class="lbl">Choose two of these three photos</div>`;
-    h += imgs(s.photos, 'grid-3');
+    h += `<div class="lbl">Choose two of these three photos — click the one you're <em>not</em> using</div>`;
+    h += `<div class="img-row grid-3" id="${id}-imgrow">${s.photos.map((u,pi)=>`<div class="img-slot" data-photo="${pi+1}" onclick="toggleC1Photo(this,'${id}')"><span class="img-label">${pi+1}</span><img src="${u}" alt="Photo ${pi+1}" loading="lazy"></div>`).join('')}</div>`;
     h += timerHTML(id, 60);
     h += `<div class="task-q c1">${s.question}</div>`;
     h += subDrop('Useful Language', 'c1', langBox('c1'));
     h += subDrop('Guided Prompts', 'c1', promptsList(prompts.c1, 'c1'));
     h += subDrop("Partner's Follow-up (30 sec)", 'c1',
       `<div class="followup c1"><span class="p-num c1">?</span><div><span class="p-text">${s.followUp}</span><span class="p-hint">Partner gives a brief personal answer.</span></div></div>`);
+    h += printBtn(id);
     h += `</div></div>`;
   });
   el.innerHTML = h;
@@ -424,6 +461,7 @@ function renderC2() {
     h += subDrop('Guided Prompts (Phase 2)', 'c2', promptsList(prompts.c2p2, 'c2'));
     h += `</div>`;
     h += subDrop('Useful Language', 'c2', langBox('c2'));
+    h += printBtn(id);
     h += `</div></div>`;
   });
   el.innerHTML = h;
@@ -437,9 +475,11 @@ function renderGen() {
     h += `<div class="acc-card" id="${id}"><div class="acc-header" onclick="toggle('${id}')"><div class="acc-title"><span class="set-badge gen">Image ${i+1}</span>${s.topic}</div><span class="chevron">▾</span></div><div class="acc-body">`;
     h += `<div class="lbl">Image</div>`;
     h += imgs(s.photos, 'single');
+    h += genTimerHTML(id);
     h += `<div class="task-q gen">${s.prompt}</div>`;
     h += subDrop('Useful Language', 'gen', langBox('gen'));
     h += subDrop('Guided Prompts', 'gen', promptsList(prompts.gen, 'gen'));
+    h += printBtn(id);
     h += `</div></div>`;
   });
   el.innerHTML = h;
@@ -507,6 +547,115 @@ document.addEventListener('click', e => {
   const chip = e.target.closest('.chip');
   if (chip) chip.classList.toggle('used');
 });
+
+// ── Reset chips ──
+function resetChips(btn) {
+  btn.closest('.lang-box').querySelectorAll('.chip').forEach(c => c.classList.remove('used'));
+}
+
+// ── C1 photo fade (click unused photo) ──
+function toggleC1Photo(slot, cardId) {
+  const row = document.getElementById(`${cardId}-imgrow`);
+  const slots = row.querySelectorAll('.img-slot');
+  const isFaded = slot.classList.contains('c1-faded');
+  if (isFaded) {
+    slot.classList.remove('c1-faded');
+  } else {
+    const fadedCount = row.querySelectorAll('.img-slot.c1-faded').length;
+    if (fadedCount < 1) slot.classList.add('c1-faded');
+  }
+}
+
+// ── Gen timer ──
+const genTimers = {};
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.gen-timer-btn');
+  if (!btn) return;
+  const gid = btn.dataset.gid;
+  const secs = parseInt(btn.dataset.secs);
+  const display = document.getElementById(`gtd-${gid}`);
+  const allBtns = btn.closest('.gen-timer-btns').querySelectorAll('.gen-timer-btn');
+  // if this timer is already running, stop it
+  if (genTimers[gid] && btn.classList.contains('running')) {
+    clearInterval(genTimers[gid]);
+    genTimers[gid] = null;
+    btn.classList.remove('running');
+    display.classList.remove('visible');
+    return;
+  }
+  // stop any running timer for this card
+  if (genTimers[gid]) {
+    clearInterval(genTimers[gid]);
+    genTimers[gid] = null;
+    allBtns.forEach(b => b.classList.remove('running'));
+  }
+  let remaining = secs;
+  display.classList.add('visible');
+  btn.classList.add('running');
+  const tick = () => {
+    const m = Math.floor(remaining/60), s = remaining%60;
+    display.textContent = `${m}:${String(s).padStart(2,'0')}`;
+    if (remaining <= 0) {
+      clearInterval(genTimers[gid]);
+      genTimers[gid] = null;
+      btn.classList.remove('running');
+      display.textContent = 'Time!';
+      setTimeout(() => display.classList.remove('visible'), 3000);
+    }
+    remaining--;
+  };
+  tick();
+  genTimers[gid] = setInterval(tick, 1000);
+});
+
+// ── Print card ──
+function printCard(id) {
+  const card = document.getElementById(id);
+  const clone = card.cloneNode(true);
+  clone.classList.add('open');
+  clone.querySelectorAll('.sub-drop').forEach(d => d.classList.add('open'));
+  const win = window.open('','_blank','width=800,height=600');
+  win.document.write(`<!DOCTYPE html><html><head><title>Print</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Nunito:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+      *{box-sizing:border-box;margin:0;padding:0}
+      body{font-family:'Nunito',sans-serif;padding:24px;color:#2D3047;line-height:1.6}
+      .acc-header .chevron,.print-btn,.timer-row,.gen-timer-row,.sub-drop-header .sub-icon,.phase-tabs{display:none!important}
+      .acc-header{padding:0 0 12px;border-bottom:2px solid #E8E5DF;margin-bottom:16px}
+      .acc-title{font-family:'DM Serif Display',serif;font-size:1.4rem;display:flex;align-items:center;gap:10px}
+      .set-badge{font-family:'JetBrains Mono',monospace;font-size:.65rem;padding:3px 9px;border-radius:5px}
+      .acc-body{display:block!important}
+      .sub-drop-body{display:block!important;padding:0 0 12px}
+      .sub-drop-header{font-weight:700;padding:8px 0;font-size:.84rem}
+      .img-row{display:flex;gap:10px;margin-bottom:12px}
+      .img-slot{flex:1;border-radius:8px;overflow:hidden;position:relative}
+      .img-slot img{width:100%;height:auto;display:block}
+      .img-label{position:absolute;top:6px;left:6px;background:rgba(45,48,71,.6);color:#fff;font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:4px}
+      .img-row.grid-3{display:grid;grid-template-columns:repeat(3,1fr)}
+      .img-row.grid-5{display:grid;grid-template-columns:repeat(3,1fr)}
+      .task-q{padding:12px 16px;border-radius:8px;margin:10px 0;font-weight:700;font-size:.9rem}
+      .task-q.b2{background:#E8F2FD;border-left:3px solid #4A90D9}
+      .task-q.c1{background:#E4F8F6;border-left:3px solid #2EC4B6}
+      .task-q.c2{background:#F0E8FA;border-left:3px solid #9B72CF}
+      .task-q.gen{background:#FFF5E6;border-left:3px solid #FFB347}
+      .chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+      .chip{font-size:.78rem;font-weight:600;border:1.5px solid #E8E5DF;border-radius:100px;padding:3px 11px}
+      .chip.used{text-decoration:line-through;opacity:.35}
+      .lang-title{font-family:'JetBrains Mono',monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
+      .p-item{display:flex;gap:8px;padding:8px;margin-bottom:4px}
+      .p-num{width:22px;height:22px;border-radius:50%;font-size:.68rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+      .p-text{font-size:.85rem;font-weight:600}
+      .p-hint{font-size:.78rem;color:#7A7D8E;font-style:italic}
+      .img-slot.c1-faded,.img-slot.faded{opacity:.25}
+      .phase-block{display:none}.phase-block.active{display:block}
+      .reset-chips,.lang-box-header button{display:none}
+    </style></head><body>`);
+  win.document.write(clone.outerHTML);
+  win.document.write('</body></html>');
+  win.document.close();
+  win.focus();
+  setTimeout(() => win.print(), 600);
+}
 document.querySelectorAll('.mode-pill').forEach(pill => {
   pill.addEventListener('click', () => {
     document.querySelectorAll('.mode-pill').forEach(p => { p.classList.remove('active'); p.setAttribute('aria-selected','false'); });
