@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Use of English C1 Advanced — John + English</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Nunito:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--sun:#FFB347;--sky:#4A90D9;--sky-light:#E8F2FD;--sea:#2EC4B6;--coral:#FF6B6B;--lavender:#9B72CF;--mint:#5DDEA0;--sand:#FFF5E6;--cream:#FFFCF7;--ink:#2D3047;--muted:#7A7D8E;--border:#E8E5DF;--card:#fff;--radius:14px;--radius-sm:10px;--shadow-sm:0 1px 3px rgba(45,48,71,.06);--shadow-md:0 4px 14px rgba(45,48,71,.08);--accent:#4A90D9;--accent-light:#E8F2FD;--correct:#34C759;--wrong:#FF3B30}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
+body{font-family:'Nunito',sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,var(--border) 1px,transparent 1px);background-size:28px 28px;opacity:.4;pointer-events:none;z-index:0}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,252,247,.88);backdrop-filter:blur(16px);border-bottom:1.5px solid var(--border);padding:.85rem 2rem;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-family:'DM Serif Display',serif;font-size:1.3rem;color:var(--ink);text-decoration:none}.nav-logo span{color:var(--sky)}
+.nav-links{display:flex;gap:1.8rem}
+.nav-links a{font-size:.85rem;font-weight:600;color:var(--muted);text-decoration:none;transition:color .2s}
+.nav-links a:hover{color:var(--sky)}
+.page-header{padding:6.5rem 2rem 2rem;max-width:800px;margin:0 auto}
+.back-link{display:block;font-size:.85rem;font-weight:600;color:var(--muted);text-decoration:none;margin-bottom:.6rem;transition:color .2s}
+.back-link:hover{color:var(--accent)}
+.level-badge{display:inline-flex;margin-top:.4rem;align-items:center;gap:.4rem;font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);background:var(--accent-light);padding:.3rem .9rem;border-radius:20px;margin-bottom:1rem}
+.page-title{font-family:'DM Serif Display',serif;font-size:clamp(2rem,5vw,2.8rem);margin-bottom:.6rem;font-weight:400;line-height:1.1}
+.page-desc{color:var(--muted);font-size:1rem;max-width:560px;line-height:1.7}
+.parts-section{max-width:800px;margin:0 auto;padding:1.5rem 2rem 4rem;position:relative;z-index:1}
+.pills{display:flex;flex-wrap:wrap;gap:.6rem}
+.part-pill{display:inline-flex;align-items:center;gap:.55rem;padding:.55rem 1.2rem;border-radius:50px;border:1.5px solid var(--border);background:var(--card);text-decoration:none;color:var(--ink);font-size:.88rem;font-weight:700;transition:all .2s;white-space:nowrap;cursor:pointer}
+.part-pill:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-2px);box-shadow:0 4px 14px rgba(0,0,0,.08)}
+.part-pill.active{border-color:var(--accent);background:var(--accent);color:#fff}
+.part-pill.active .part-pill-level{background:rgba(255,255,255,.2);color:#fff}
+.part-pill-level{font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);background:var(--accent-light);padding:.2rem .55rem;border-radius:5px}
+.part-pill-emoji{font-size:1rem}
+.part-pill-title{font-size:.86rem}
+
+/* ── Test area ── */
+.test-area{display:none;max-width:800px;margin:0 auto;padding:0 2rem 2rem;position:relative;z-index:1}
+.test-area.visible{display:block}
+.test-selector{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.test-tab{font-family:'JetBrains Mono',monospace;font-size:.7rem;font-weight:600;padding:6px 14px;border-radius:100px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s;letter-spacing:.3px}
+.test-tab:hover{border-color:var(--accent);color:var(--ink)}
+.test-tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.exam-info{display:flex;gap:12px;align-items:flex-start;padding:14px 18px;border-radius:var(--radius-sm);margin-bottom:20px;font-size:.88rem;line-height:1.55;color:var(--ink);background:var(--accent-light);border-left:3px solid var(--accent)}
+.exam-info svg{flex-shrink:0;margin-top:2px}
+.exam-info strong{font-weight:700}
+.test-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden}
+.test-header{padding:18px 24px;border-bottom:1.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.test-title{font-weight:700;font-size:.95rem;display:flex;align-items:center;gap:8px}
+.test-title .tag{font-family:'JetBrains Mono',monospace;font-size:.65rem;font-weight:500;padding:4px 10px;border-radius:6px;letter-spacing:.5px;background:var(--accent-light);color:var(--accent)}
+.score-display{font-family:'JetBrains Mono',monospace;font-size:.85rem;font-weight:500;color:var(--muted);display:none;align-items:center;gap:6px}
+.score-display.visible{display:flex}
+.score-display .score-val{color:var(--accent);font-weight:700}
+.progress-bar{height:3px;background:var(--border);border-radius:2px;margin:0 24px;overflow:hidden}
+.progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .3s ease;width:0}
+.passage{padding:24px;font-size:.95rem;line-height:2.1}
+.passage .title-line{font-family:'DM Serif Display',serif;font-size:1.2rem;text-align:center;margin-bottom:18px;color:var(--ink);font-weight:400}
+/* Custom dropdown */
+.gap{display:inline-block;vertical-align:middle}
+.gap-num{font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:700;color:var(--accent);margin-right:1px;vertical-align:super}
+.gap-wrap{position:relative;display:inline-block;vertical-align:middle}
+.gap-trigger{display:inline-flex;align-items:center;gap:4px;font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:600;padding:4px 10px;border:1.5px solid rgba(232,229,223,.6);border-radius:8px;background:rgba(255,255,255,.45);backdrop-filter:blur(12px);cursor:pointer;color:var(--muted);transition:all .2s;min-width:120px;box-shadow:0 1px 4px rgba(45,48,71,.04);user-select:none}
+.gap-trigger:hover{border-color:rgba(46,196,182,.5);background:rgba(255,255,255,.6)}
+.gap-trigger.open{border-color:var(--accent);box-shadow:0 0 0 3px rgba(46,196,182,.12);background:rgba(255,255,255,.65)}
+.gap-trigger.answered{color:var(--ink)}
+.gap-trigger .arrow{margin-left:auto;font-size:.55rem;color:var(--muted);transition:transform .2s}
+.gap-trigger.open .arrow{transform:rotate(180deg)}
+.gap-trigger.correct{border-color:var(--correct);background:rgba(52,199,89,.1);color:#1a7a34}
+.gap-trigger.wrong{border-color:var(--wrong);background:rgba(255,59,48,.08);color:#c0392b}
+.gap-trigger.shown{border-color:var(--accent);background:rgba(46,196,182,.08);color:var(--accent)}
+.gap-trigger.locked{cursor:default}
+.gap-panel{display:none;position:absolute;top:calc(100% + 1px);left:0;z-index:50;width:max-content;background:rgba(255,252,247,.75);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(232,229,223,.3);border-radius:10px;box-shadow:0 4px 20px rgba(45,48,71,.06);padding:4px;overflow:hidden}
+.gap-panel.drop-up{top:auto;bottom:calc(100% + 1px)}
+.gap-panel.open{display:block;animation:dropIn .15s ease}
+@keyframes dropIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.gap-option{padding:6px 10px;border-radius:7px;font-family:'Nunito',sans-serif;font-size:.85rem;font-weight:600;color:var(--ink);cursor:pointer;transition:all .12s;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.gap-option:hover{background:rgba(46,196,182,.08)}
+.gap-option.selected{background:var(--accent-light);color:var(--accent);font-weight:700}
+.gap-option.eliminated{color:var(--border);text-decoration:line-through;pointer-events:none;opacity:.45}
+.gap-divider{height:1px;background:var(--border);margin:3px 4px}
+.gap-ruleout{padding:5px 10px;border-radius:7px;font-family:'JetBrains Mono',monospace;font-size:.7rem;font-weight:600;color:var(--coral);cursor:pointer;transition:all .12s;display:flex;align-items:center;gap:6px;letter-spacing:.3px;white-space:nowrap}
+.gap-ruleout:hover{background:rgba(255,107,107,.08)}
+.gap-ruleout.used{color:var(--border);pointer-events:none}
+.correction{display:none;font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:600;color:var(--correct);margin-left:4px;vertical-align:middle}
+.correction.visible{display:inline}
+.actions{padding:18px 24px;border-top:1.5px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.btn{font-family:'Nunito',sans-serif;font-size:.84rem;font-weight:700;padding:10px 22px;border-radius:100px;border:2px solid transparent;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:var(--shadow-md)}
+.btn-primary:disabled{opacity:.5;cursor:default;transform:none;box-shadow:none}
+.btn-secondary{background:var(--card);color:var(--muted);border-color:var(--border)}
+.btn-secondary:hover{color:var(--ink);border-color:var(--accent);transform:translateY(-1px)}
+.btn-amber{background:var(--sun);color:var(--ink);border-color:var(--sun)}
+.btn-amber:hover{background:#f0a030;border-color:#f0a030;transform:translateY(-1px);box-shadow:var(--shadow-md)}
+.explanations{display:none;padding:0 24px 24px}
+.explanations.visible{display:block}
+.exp-title{font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:12px;font-weight:500;padding-top:4px}
+.exp-grid{display:flex;flex-direction:column;gap:8px}
+.exp-item{display:flex;gap:10px;padding:10px 14px;border-radius:var(--radius-sm);background:var(--cream);border:1.5px solid transparent}
+.exp-item.was-correct{border-color:rgba(52,199,89,.2)}
+.exp-item.was-wrong{border-color:rgba(255,59,48,.2)}
+.exp-num{width:24px;height:24px;border-radius:50%;font-size:.7rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--accent-light);color:var(--accent)}
+.exp-text{font-size:.85rem;line-height:1.55;color:var(--ink)}
+.exp-text strong{font-weight:700}
+.exp-wrong-answer{font-family:'JetBrains Mono',monospace;font-size:.78rem;font-weight:600;color:var(--wrong);text-decoration:line-through;margin-right:4px}
+footer{text-align:center;padding:2.5rem 2rem;font-size:.8rem;color:var(--muted);border-top:1.5px solid var(--border);max-width:800px;margin:2rem auto 0;position:relative;z-index:1}
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .55s ease,transform .55s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+@media(max-width:640px){nav{padding:.75rem 1.2rem}.page-header{padding:5.5rem 1.2rem 1.5rem}.parts-section{padding:1rem 1.2rem 3rem}.test-area{padding:0 1.2rem 2rem}.test-header,.passage,.actions{padding-left:16px;padding-right:16px}.progress-bar{margin:0 16px}.explanations{padding:0 16px 20px}.gap-trigger{min-width:105px;font-size:.82rem;padding:3px 8px}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">john<span>+</span>english</a>
+  <div class="nav-links"><a href="index.html">Home</a><a href="index.html#about">About</a><a href="index.html#contact">Contact</a></div>
+</nav>
+<div class="page-header reveal">
+  <a href="index.html#group-uoe" class="back-link">&larr; Back to Home</a>
+  <div class="level-badge">🔵 C1 Advanced</div>
+  <h1 class="page-title">Use of English</h1>
+  <p class="page-desc">Cambridge exam practice for C1 Advanced. Choose a section below to practise each part of the Use of English paper.</p>
+</div>
+<div class="parts-section reveal">
+  <div class="pills" id="pills">
+    <span class="part-pill" data-part="1"><span class="part-pill-level">Part 1</span><span class="part-pill-emoji">🔘</span><span class="part-pill-title">Multiple Choice Cloze</span></span>
+    <a href="#" class="part-pill"><span class="part-pill-level">Part 2</span><span class="part-pill-emoji">✏️</span><span class="part-pill-title">Open Cloze</span></a>
+    <a href="#" class="part-pill"><span class="part-pill-level">Part 3</span><span class="part-pill-emoji">🔤</span><span class="part-pill-title">Word Formation</span></a>
+    <a href="#" class="part-pill"><span class="part-pill-level">Part 4</span><span class="part-pill-emoji">🔑</span><span class="part-pill-title">Key Word Transformation</span></a>
+  </div>
+</div>
+<div class="test-area" id="testArea">
+  <div class="exam-info">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>
+    <div><strong>Part 1 — Multiple Choice Cloze.</strong> Read the text and choose the best answer (A, B, C or D) for each gap. Eight questions, 1 mark each.</div>
+  </div>
+  <div class="test-selector" id="testSelector"></div>
+  <div class="test-card" id="testCard">
+    <div class="test-header">
+      <div class="test-title"><span class="tag">Part 1</span><span id="testTitle"></span></div>
+      <div class="score-display" id="scoreDisplay"><span>Score:</span> <span class="score-val" id="scoreVal"></span></div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="passage" id="passage"></div>
+    <div class="explanations" id="explanations"></div>
+    <div class="actions">
+      <button class="btn btn-primary" id="checkBtn" disabled onclick="checkAnswers()"><span class="btn-icon">✓</span> Check Answers</button>
+      <button class="btn btn-amber" id="showBtn" onclick="showAnswers()"><span class="btn-icon">👁</span> Show Answers</button>
+      <button class="btn btn-secondary" id="resetBtn" onclick="resetTest()" style="display:none"><span class="btn-icon">↺</span> Try Again</button>
+      <button class="btn btn-secondary" id="expBtn" onclick="toggleExplanations()" style="display:none"><span class="btn-icon">💡</span> Explanations</button>
+    </div>
+  </div>
+</div>
+<footer>&copy; 2026 John + English. All rights reserved.</footer>
+<script>
+const TESTS = [{"title": "The Ethics of Artificial Intelligence", "text": ["As artificial intelligence becomes increasingly ", "{1}", " in everyday life, questions about its ethical implications are gaining urgency. While AI has the potential to revolutionise industries ranging from healthcare to transport, it also ", "{2}", " profound risks that society has barely begun to address.", "\n\n", "One of the most pressing concerns relates to algorithmic bias. If the data used to train AI systems is ", "{3}", " in some way, the resulting decisions may perpetuate or even amplify existing inequalities. This is particularly troubling in high-", "{4}", " areas such as criminal justice and recruitment, where biased algorithms could have devastating consequences for individuals.", "\n\n", "There is also the question of accountability. When an autonomous system makes an error that ", "{5}", " in harm, it is often unclear who should bear responsibility — the developer, the operator, or the machine itself. The lack of clear legal ", "{6}", " in this area has left a significant gap in governance.", "\n\n", "Proponents of AI argue that the technology should not be held to a higher standard than human decision-making, which is itself far from ", "{7}", ". Nevertheless, the speed at which AI is being deployed means there is little room for complacency. It is ", "{8}", " that robust regulatory frameworks are developed before the technology outpaces our ability to control it."], "gaps": [{"num": 1, "options": ["A embedded", "B installed", "C fixed", "D attached"], "correct": 0, "exp": "<strong>Embedded</strong> — <strong>embedded in</strong> everyday life means deeply integrated into it."}, {"num": 2, "options": ["A bears", "B carries", "C poses", "D holds"], "correct": 2, "exp": "<strong>Poses</strong> — <strong>poses risks</strong> means presents or creates dangers."}, {"num": 3, "options": ["A twisted", "B slanted", "C flawed", "D broken"], "correct": 2, "exp": "<strong>Flawed</strong> — <strong>flawed data</strong> means data containing errors or biases."}, {"num": 4, "options": ["A risk", "B stakes", "C danger", "D threat"], "correct": 1, "exp": "<strong>Stakes</strong> — <strong>high-stakes areas</strong> means contexts where the consequences are very significant."}, {"num": 5, "options": ["A leads", "B results", "C turns", "D ends"], "correct": 1, "exp": "<strong>Results</strong> — <strong>results in harm</strong> means causes harm as an outcome."}, {"num": 6, "options": ["A structures", "B frameworks", "C systems", "D models"], "correct": 1, "exp": "<strong>Frameworks</strong> — <strong>legal frameworks</strong> is the standard term for systems of regulation."}, {"num": 7, "options": ["A faultless", "B spotless", "C flawless", "D errorless"], "correct": 2, "exp": "<strong>Flawless</strong> — <strong>far from flawless</strong> means not perfect, containing imperfections."}, {"num": 8, "options": ["A imperative", "B compulsory", "C obligatory", "D mandatory"], "correct": 0, "exp": "<strong>Imperative</strong> — <strong>it is imperative that</strong> means it is absolutely essential."}]}, {"title": "The Decline of High Streets", "text": ["The transformation of Britain's high streets has been one of the most ", "{1}", " economic shifts of recent decades. Where once thriving shops and bustling markets drew crowds, many town centres now present a bleak picture of boarded-up premises and dwindling footfall.", "\n\n", "The rise of online retail has undeniably played a ", "{2}", " role in this decline. Consumers, drawn by the convenience and competitive pricing of e-commerce, have increasingly ", "{3}", " away from physical stores. The pandemic only served to ", "{4}", " this trend, pushing even the most reluctant shoppers online.", "\n\n", "Local authorities have attempted to ", "{5}", " the tide through regeneration projects and rate relief for small businesses. Some have sought to reimagine the high street as a social and cultural hub rather than a purely commercial space. However, progress has been hampered by a lack of sustained investment and ", "{6}", " bureaucratic processes.", "\n\n", "Commentators warn that without a fundamental rethink, many town centres risk falling into a vicious ", "{7}", " of decline. The ", "{8}", " is on policymakers to act decisively before the damage becomes irreversible."], "gaps": [{"num": 1, "options": ["A notable", "B striking", "C marked", "D sharp"], "correct": 1, "exp": "<strong>Striking</strong> — <strong>striking shifts</strong> means very noticeable or remarkable changes."}, {"num": 2, "options": ["A crucial", "B key", "C chief", "D prime"], "correct": 1, "exp": "<strong>Key</strong> — <strong>a key role</strong> means a central or essential role."}, {"num": 3, "options": ["A moved", "B turned", "C pulled", "D drawn"], "correct": 1, "exp": "<strong>Turned</strong> — <strong>turned away from</strong> means stopped using or supporting."}, {"num": 4, "options": ["A speed", "B hasten", "C accelerate", "D quicken"], "correct": 2, "exp": "<strong>Accelerate</strong> — <strong>accelerate a trend</strong> means to make it happen faster."}, {"num": 5, "options": ["A hold", "B stem", "C block", "D halt"], "correct": 1, "exp": "<strong>Stem</strong> — <strong>stem the tide</strong> is a fixed expression meaning to stop something from getting worse."}, {"num": 6, "options": ["A lengthy", "B extended", "C prolonged", "D slow"], "correct": 0, "exp": "<strong>Lengthy</strong> — <strong>lengthy bureaucratic processes</strong> describes procedures that take a long time."}, {"num": 7, "options": ["A ring", "B loop", "C circle", "D cycle"], "correct": 3, "exp": "<strong>Cycle</strong> — <strong>a vicious cycle</strong> is a fixed expression for a self-reinforcing negative pattern."}, {"num": 8, "options": ["A weight", "B pressure", "C onus", "D burden"], "correct": 2, "exp": "<strong>Onus</strong> — <strong>the onus is on</strong> means the responsibility falls to someone."}]}, {"title": "Neuroplasticity and Lifelong Learning", "text": ["For much of the twentieth century, it was widely ", "{1}", " that the adult brain was essentially fixed — incapable of significant change after a certain age. This assumption has since been comprehensively ", "{2}", " by research into neuroplasticity.", "\n\n", "Scientists now know that the brain retains a remarkable capacity to reorganise itself throughout life. New neural pathways can be formed in ", "{3}", " to learning, experience, and even injury. This discovery has far-", "{4}", " implications for education, rehabilitation, and mental health.", "\n\n", "The practical applications are already ", "{5}", " shape. Stroke patients, for example, can regain lost functions through targeted exercises that encourage the brain to reroute signals around damaged areas. Similarly, cognitive training programmes have shown promise in ", "{6}", " off age-related mental decline.", "\n\n", "However, neuroplasticity is not a magic solution. The brain's ability to change ", "{7}", " on sustained effort and repetition. Passive exposure alone is rarely sufficient. For those willing to ", "{8}", " the time and commitment, though, the rewards can be transformative."], "gaps": [{"num": 1, "options": ["A thought", "B assumed", "C supposed", "D considered"], "correct": 1, "exp": "<strong>Assumed</strong> — <strong>widely assumed</strong> means generally believed without question."}, {"num": 2, "options": ["A denied", "B rejected", "C overturned", "D opposed"], "correct": 2, "exp": "<strong>Overturned</strong> — <strong>overturned by research</strong> means disproved or reversed."}, {"num": 3, "options": ["A answer", "B reaction", "C reply", "D response"], "correct": 3, "exp": "<strong>Response</strong> — <strong>in response to</strong> is a fixed phrase meaning as a reaction to."}, {"num": 4, "options": ["A reaching", "B stretching", "C spreading", "D extending"], "correct": 0, "exp": "<strong>Reaching</strong> — <strong>far-reaching implications</strong> is a fixed collocation meaning wide-ranging effects."}, {"num": 5, "options": ["A making", "B taking", "C getting", "D having"], "correct": 1, "exp": "<strong>Taking</strong> — <strong>taking shape</strong> means beginning to develop a clear form."}, {"num": 6, "options": ["A holding", "B keeping", "C warding", "D fighting"], "correct": 2, "exp": "<strong>Warding</strong> — <strong>warding off</strong> means preventing or keeping away."}, {"num": 7, "options": ["A relies", "B counts", "C depends", "D rests"], "correct": 2, "exp": "<strong>Depends</strong> — <strong>depends on</strong> means is determined by."}, {"num": 8, "options": ["A give", "B dedicate", "C spend", "D devote"], "correct": 1, "exp": "<strong>Dedicate</strong> — <strong>dedicate the time</strong> means to commit time and effort to something."}]}, {"title": "The Gig Economy", "text": ["The rapid expansion of the gig economy has fundamentally altered the relationship between employers and workers. Millions of people now earn their living through short-term contracts and freelance work, a shift that has ", "{1}", " rise to both opportunities and uncertainties.", "\n\n", "Advocates argue that gig work offers unparalleled flexibility, enabling individuals to ", "{2}", " their own schedules and pursue a portfolio of projects. For companies, the ability to scale their workforce up or down in ", "{3}", " with demand represents a significant competitive advantage.", "\n\n", "Critics, however, point to the precarious nature of such arrangements. Gig workers often lack the protections that come with traditional employment, including sick pay, pensions, and job security. The ", "{4}", " of these benefits places workers in a vulnerable position, particularly during economic downturns.", "\n\n", "Several high-profile legal cases have ", "{5}", " light on the ambiguous status of gig workers. Courts in various jurisdictions have ", "{6}", " conflicting rulings on whether such individuals should be classified as employees or self-employed contractors.", "\n\n", "Finding a regulatory balance that preserves flexibility while ", "{7}", " basic protections remains a formidable challenge. The outcome of this debate will have lasting ", "{8}", " for the future of work."], "gaps": [{"num": 1, "options": ["A brought", "B given", "C made", "D taken"], "correct": 1, "exp": "<strong>Given</strong> — <strong>given rise to</strong> is a fixed phrase meaning caused or produced."}, {"num": 2, "options": ["A set", "B fix", "C put", "D lay"], "correct": 0, "exp": "<strong>Set</strong> — <strong>set their own schedules</strong> means to decide their working hours."}, {"num": 3, "options": ["A step", "B tune", "C line", "D pace"], "correct": 2, "exp": "<strong>Line</strong> — <strong>in line with</strong> means in accordance with or matching."}, {"num": 4, "options": ["A shortage", "B absence", "C lack", "D deficit"], "correct": 1, "exp": "<strong>Absence</strong> — <strong>the absence of</strong> benefits is the most formal and precise option."}, {"num": 5, "options": ["A thrown", "B cast", "C shed", "D put"], "correct": 2, "exp": "<strong>Shed</strong> — <strong>shed light on</strong> is a fixed expression meaning to reveal or clarify."}, {"num": 6, "options": ["A issued", "B delivered", "C passed", "D handed"], "correct": 1, "exp": "<strong>Delivered</strong> — <strong>delivered rulings</strong> is a formal legal collocation."}, {"num": 7, "options": ["A granting", "B awarding", "C ensuring", "D providing"], "correct": 2, "exp": "<strong>Ensuring</strong> — <strong>ensuring protections</strong> means making certain they are in place."}, {"num": 8, "options": ["A effects", "B outcomes", "C ramifications", "D results"], "correct": 2, "exp": "<strong>Ramifications</strong> — <strong>lasting ramifications</strong> means long-term consequences, often complex."}]}, {"title": "Urban Green Spaces", "text": ["Access to green spaces in urban areas has emerged as one of the defining public health issues of the twenty-first century. A growing ", "{1}", " of evidence suggests that proximity to parks and gardens has a measurable impact on both physical and mental wellbeing.", "\n\n", "Studies have consistently ", "{2}", " a correlation between time spent in nature and lower rates of anxiety, depression, and cardiovascular disease. The mechanisms behind this are not fully understood, but researchers believe that natural environments help to ", "{3}", " the nervous system and promote recovery from stress.", "\n\n", "Despite the evidence, green spaces remain unevenly distributed. Wealthier neighbourhoods tend to have significantly more parkland per capita, a disparity that has ", "{4}", " into sharp focus in recent years. Campaigners argue that access to nature should be ", "{5}", " as a basic right rather than a luxury.", "\n\n", "Urban planners are beginning to take these concerns on ", "{6}", ". Initiatives such as green corridors, rooftop gardens, and community allotments are gaining ", "{7}", " in cities worldwide. While progress has been encouraging, the scale of investment needed to ", "{8}", " the gap in provision remains substantial."], "gaps": [{"num": 1, "options": ["A mass", "B body", "C volume", "D bulk"], "correct": 1, "exp": "<strong>Body</strong> — <strong>a growing body of evidence</strong> is a fixed academic collocation."}, {"num": 2, "options": ["A demonstrated", "B displayed", "C exhibited", "D presented"], "correct": 0, "exp": "<strong>Demonstrated</strong> — <strong>demonstrated a correlation</strong> is the standard academic phrasing."}, {"num": 3, "options": ["A settle", "B ease", "C calm", "D soothe"], "correct": 2, "exp": "<strong>Calm</strong> — <strong>calm the nervous system</strong> means to reduce its activity and promote relaxation."}, {"num": 4, "options": ["A brought", "B come", "C drawn", "D put"], "correct": 1, "exp": "<strong>Come</strong> — <strong>come into sharp focus</strong> means to become clearly apparent."}, {"num": 5, "options": ["A viewed", "B seen", "C regarded", "D looked"], "correct": 2, "exp": "<strong>Regarded</strong> — <strong>regarded as</strong> means considered or treated as."}, {"num": 6, "options": ["A hand", "B board", "C account", "D mind"], "correct": 1, "exp": "<strong>Board</strong> — <strong>take on board</strong> means to accept and consider seriously."}, {"num": 7, "options": ["A speed", "B traction", "C pace", "D movement"], "correct": 1, "exp": "<strong>Traction</strong> — <strong>gaining traction</strong> means becoming increasingly popular or accepted."}, {"num": 8, "options": ["A fill", "B close", "C bridge", "D seal"], "correct": 2, "exp": "<strong>Bridge</strong> — <strong>bridge the gap</strong> is a fixed expression meaning to reduce a difference."}]}];
+let currentTest = 0;
+let checked = false;
+const state = {};
+
+// Pill toggle
+document.querySelector('[data-part="1"]').addEventListener('click', function() {
+  const area = document.getElementById('testArea');
+  const pill = this;
+  if(pill.classList.contains('active')) {
+    pill.classList.remove('active');
+    area.classList.remove('visible');
+  } else {
+    pill.classList.add('active');
+    area.classList.add('visible');
+    area.scrollIntoView({ behavior:'smooth', block:'start' });
+  }
+});
+
+// Test selector tabs
+function buildSelector() {
+  const el = document.getElementById('testSelector');
+  el.innerHTML = TESTS.map((t,i) => `<span class="test-tab ${i===currentTest?'active':''}" onclick="switchTest(${i})">Test ${i+1}</span>`).join('');
+}
+
+function switchTest(idx) {
+  currentTest = idx;
+  checked = false;
+  buildSelector();
+  loadTest();
+}
+
+function initState() {
+  const gaps = TESTS[currentTest].gaps;
+  gaps.forEach(g => { state[g.num] = { selected: null, eliminated: [] }; });
+}
+
+function loadTest() {
+  initState();
+  const t = TESTS[currentTest];
+  document.getElementById('testTitle').textContent = t.title;
+  document.getElementById('scoreDisplay').classList.remove('visible');
+  document.getElementById('resetBtn').style.display = 'none';
+  document.getElementById('expBtn').style.display = 'none';
+  document.getElementById('showBtn').style.display = 'inline-flex';
+  document.getElementById('explanations').classList.remove('visible');
+  document.getElementById('explanations').innerHTML = '';
+  document.getElementById('checkBtn').disabled = true;
+  document.getElementById('progressFill').style.width = '0';
+  renderPassage();
+}
+
+function renderPassage() {
+  const t = TESTS[currentTest];
+  const el = document.getElementById('passage');
+  let html = '<div class="title-line">' + t.title + '</div>';
+  const full = t.text.join('');
+  const parts = full.split(/(\{[1-8]\})/);
+  parts.forEach(p => {
+    const m = p.match(/^\{(\d)\}$/);
+    if(m) {
+      const g = t.gaps[parseInt(m[1])-1];
+      const n = g.num;
+      html += '<span class="gap" id="gap-'+n+'"><span class="gap-num">'+n+'</span><span class="gap-wrap"><span class="gap-trigger" id="trigger-'+n+'" onclick="toggleDrop('+n+')"><span class="gap-text" id="text-'+n+'">Choose</span><span class="arrow">▾</span></span><div class="gap-panel" id="panel-'+n+'">';
+      g.options.forEach((o,i) => { html += '<div class="gap-option" id="opt-'+n+'-'+i+'" onclick="pickOption('+n+','+i+')">'+o+'</div>'; });
+      html += '<div class="gap-divider"></div><div class="gap-ruleout" id="ruleout-'+n+'" onclick="useRuleOut('+n+')">✂️ rule out</div></div></span><span class="correction" id="corr-'+n+'"></span></span>';
+    } else {
+      html += p.replace(/\n/g,'<br>');
+    }
+  });
+  el.innerHTML = html;
+}
+
+function toggleDrop(n) {
+  if(checked) return;
+  const gaps = TESTS[currentTest].gaps;
+  gaps.forEach(g => {
+    if(g.num !== n) {
+      document.getElementById('panel-'+g.num).classList.remove('open');
+      document.getElementById('trigger-'+g.num).classList.remove('open');
+    }
+  });
+  const panel = document.getElementById('panel-'+n);
+  const trigger = document.getElementById('trigger-'+n);
+  const isOpen = panel.classList.contains('open');
+  if(isOpen) { panel.classList.remove('open'); trigger.classList.remove('open'); }
+  else {
+    panel.classList.remove('drop-up');
+    panel.classList.add('open'); trigger.classList.add('open');
+    const rect = panel.getBoundingClientRect();
+    if(rect.bottom > window.innerHeight - 10) panel.classList.add('drop-up');
+  }
+}
+
+function pickOption(n, idx) {
+  if(checked) return;
+  const s = state[n];
+  if(s.eliminated.includes(idx)) return;
+  const g = TESTS[currentTest].gaps[n-1];
+  if(s.selected === idx) {
+    s.selected = null;
+    document.getElementById('text-'+n).textContent = 'Choose';
+    document.getElementById('trigger-'+n).classList.remove('answered');
+    document.getElementById('opt-'+n+'-'+idx).classList.remove('selected');
+  } else {
+    s.selected = idx;
+    document.getElementById('text-'+n).textContent = g.options[idx];
+    document.getElementById('trigger-'+n).classList.add('answered');
+    g.options.forEach((_,i) => { document.getElementById('opt-'+n+'-'+i).classList.toggle('selected', i===idx); });
+    document.getElementById('panel-'+n).classList.remove('open');
+    document.getElementById('trigger-'+n).classList.remove('open');
+  }
+  updateProgress(); updateCheckBtn();
+}
+
+function useRuleOut(n) {
+  if(checked) return;
+  const s = state[n];
+  const g = TESTS[currentTest].gaps[n-1];
+  const btn = document.getElementById('ruleout-'+n);
+  const wrongAvail = [];
+  for(let i=0;i<g.options.length;i++) { if(i!==g.correct && !s.eliminated.includes(i)) wrongAvail.push(i); }
+  if(wrongAvail.length <= 1) { btn.classList.add('used'); return; }
+  const pick = wrongAvail[Math.floor(Math.random()*wrongAvail.length)];
+  s.eliminated.push(pick);
+  document.getElementById('opt-'+n+'-'+pick).classList.add('eliminated');
+  if(s.selected === pick) {
+    s.selected = null;
+    document.getElementById('text-'+n).textContent = 'Choose';
+    document.getElementById('trigger-'+n).classList.remove('answered');
+    document.getElementById('opt-'+n+'-'+pick).classList.remove('selected');
+  }
+  const remaining = [];
+  for(let i=0;i<g.options.length;i++) { if(i!==g.correct && !s.eliminated.includes(i)) remaining.push(i); }
+  if(remaining.length <= 1) btn.classList.add('used');
+  updateProgress(); updateCheckBtn();
+}
+
+function updateProgress() {
+  let n=0; const gaps = TESTS[currentTest].gaps;
+  gaps.forEach(g => { if(state[g.num].selected !== null) n++; });
+  document.getElementById('progressFill').style.width = ((n/gaps.length)*100)+'%';
+}
+function updateCheckBtn() {
+  let all=true; TESTS[currentTest].gaps.forEach(g => { if(state[g.num].selected === null) all=false; });
+  document.getElementById('checkBtn').disabled = !all;
+}
+function closeAllPanels() {
+  TESTS[currentTest].gaps.forEach(g => {
+    document.getElementById('panel-'+g.num).classList.remove('open');
+    document.getElementById('trigger-'+g.num).classList.remove('open');
+  });
+}
+
+function checkAnswers() {
+  if(checked) return; checked = true; closeAllPanels();
+  let score = 0;
+  TESTS[currentTest].gaps.forEach(g => {
+    const s = state[g.num];
+    const trigger = document.getElementById('trigger-'+g.num);
+    const corr = document.getElementById('corr-'+g.num);
+    trigger.classList.add('locked');
+    const fb = document.getElementById('ruleout-'+g.num); if(fb) fb.style.display='none';
+    if(s.selected === g.correct) { trigger.classList.add('correct'); score++; }
+    else { trigger.classList.add('wrong'); corr.textContent = '→ '+g.options[g.correct].substring(2); corr.classList.add('visible'); }
+  });
+  document.getElementById('scoreVal').textContent = score+' / '+TESTS[currentTest].gaps.length;
+  document.getElementById('scoreDisplay').classList.add('visible');
+  document.getElementById('checkBtn').disabled = true;
+  document.getElementById('showBtn').style.display = 'none';
+  document.getElementById('resetBtn').style.display = 'inline-flex';
+  document.getElementById('expBtn').style.display = 'inline-flex';
+  renderExplanations();
+}
+
+function showAnswers() {
+  if(checked) return; checked = true; closeAllPanels();
+  let score = 0;
+  TESTS[currentTest].gaps.forEach(g => {
+    const s = state[g.num];
+    const trigger = document.getElementById('trigger-'+g.num);
+    trigger.classList.add('locked','shown');
+    document.getElementById('text-'+g.num).textContent = g.options[g.correct];
+    if(s.selected === g.correct) score++;
+    const fb = document.getElementById('ruleout-'+g.num); if(fb) fb.style.display='none';
+  });
+  document.getElementById('scoreVal').textContent = score+' / '+TESTS[currentTest].gaps.length;
+  document.getElementById('scoreDisplay').classList.add('visible');
+  document.getElementById('checkBtn').disabled = true;
+  document.getElementById('showBtn').style.display = 'none';
+  document.getElementById('resetBtn').style.display = 'inline-flex';
+  document.getElementById('expBtn').style.display = 'inline-flex';
+  document.getElementById('progressFill').style.width = '100%';
+  renderExplanations();
+}
+
+function renderExplanations() {
+  const el = document.getElementById('explanations');
+  let html = '<div class="exp-title">Answer Explanations</div><div class="exp-grid">';
+  TESTS[currentTest].gaps.forEach(g => {
+    const s = state[g.num]; const ok = s.selected === g.correct;
+    html += '<div class="exp-item '+(ok?'was-correct':'was-wrong')+'"><span class="exp-num">'+g.num+'</span><div class="exp-text">';
+    if(!ok && s.selected !== null) html += '<span class="exp-wrong-answer">'+g.options[s.selected].substring(2)+'</span> ';
+    html += g.exp+'</div></div>';
+  });
+  html += '</div>'; el.innerHTML = html;
+}
+
+function toggleExplanations() {
+  const el = document.getElementById('explanations');
+  const btn = document.getElementById('expBtn');
+  el.classList.toggle('visible');
+  btn.innerHTML = el.classList.contains('visible') ? '<span class="btn-icon">💡</span> Hide Explanations' : '<span class="btn-icon">💡</span> Explanations';
+}
+
+function resetTest() {
+  checked = false;
+  document.getElementById('scoreDisplay').classList.remove('visible');
+  document.getElementById('resetBtn').style.display = 'none';
+  document.getElementById('expBtn').style.display = 'none';
+  document.getElementById('showBtn').style.display = 'inline-flex';
+  document.getElementById('explanations').classList.remove('visible');
+  document.getElementById('explanations').innerHTML = '';
+  document.getElementById('checkBtn').disabled = true;
+  document.getElementById('progressFill').style.width = '0';
+  initState(); renderPassage();
+}
+
+document.addEventListener('click', e => { if(!e.target.closest('.gap')) closeAllPanels(); });
+
+var observer = new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting)e.target.classList.add('visible')});},{threshold:.1});
+document.querySelectorAll('.reveal').forEach(function(el){observer.observe(el);});
+
+buildSelector();
+loadTest();
+</script>
+</body>
+</html>
