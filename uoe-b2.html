@@ -158,6 +158,32 @@ footer{text-align:center;padding:2.5rem 2rem;font-size:.8rem;color:var(--muted);
 .wf-correction{display:none;font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:600;color:var(--correct);margin-left:4px;vertical-align:middle}
 .wf-correction.visible{display:inline}
 @media(max-width:640px){.wf-table td.wf-right{width:80px}.wf-input{width:100px}}
+
+
+/* Key Word Transformations */
+.kwt-item{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:18px 22px;margin-bottom:14px}
+.kwt-num{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:700;color:var(--accent);margin-bottom:8px;letter-spacing:.5px}
+.kwt-lead{font-size:.95rem;font-weight:600;color:var(--ink);line-height:1.6;margin-bottom:10px}
+.kwt-key{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:.78rem;font-weight:700;color:var(--accent);letter-spacing:.1em;padding:4px 12px;border-radius:6px;background:var(--accent-light);margin-bottom:10px}
+.kwt-gapped{font-size:.95rem;font-weight:600;color:var(--ink);line-height:1.8}
+.kwt-wrap{display:inline-flex;align-items:center;gap:3px;vertical-align:middle;position:relative}
+.kwt-input{font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:600;padding:4px 10px;border:1.5px solid rgba(232,229,223,.6);border-radius:8px;background:rgba(255,255,255,.45);backdrop-filter:blur(12px);color:var(--ink);width:260px;outline:none;transition:all .2s}
+.kwt-input:hover{border-color:rgba(46,196,182,.5)}
+.kwt-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(46,196,182,.12)}
+.kwt-input.correct{border-color:var(--correct);background:rgba(52,199,89,.1);color:#1a7a34}
+.kwt-input.wrong{border-color:var(--wrong);background:rgba(255,59,48,.08);color:#c0392b}
+.kwt-input.shown{border-color:var(--accent);background:rgba(46,196,182,.08);color:var(--accent)}
+.kwt-input:disabled{cursor:default;opacity:1}
+.kwt-hint-btn{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--border);background:rgba(255,255,255,.6);color:var(--muted);font-size:.68rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all .15s;font-family:'Nunito',sans-serif;flex-shrink:0}
+.kwt-hint-btn:hover{border-color:var(--sun);color:var(--sun);background:rgba(255,179,71,.08)}
+.kwt-hint-btn.used{border-color:var(--sun);color:var(--sun);background:rgba(255,179,71,.08)}
+.kwt-hint-tip{display:none;position:absolute;top:calc(100% + 4px);left:0;z-index:50;background:rgba(255,252,247,.92);backdrop-filter:blur(16px);border:1px solid rgba(255,179,71,.3);border-radius:8px;padding:8px 12px;font-size:.78rem;color:var(--ink);line-height:1.4;width:max-content;max-width:260px;box-shadow:0 4px 16px rgba(45,48,71,.08);font-weight:600}
+.kwt-hint-tip.visible{display:block;animation:dropIn .15s ease}
+.kwt-correction{display:none;font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:600;color:var(--correct);margin-left:6px;vertical-align:middle}
+.kwt-correction.visible{display:inline}
+.kwt-word-count{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--muted);margin-left:4px;vertical-align:middle}
+.kwt-word-count.warn{color:var(--coral)}
+@media(max-width:640px){.kwt-input{width:100%}}
 </style>
 </head>
 <body>
@@ -176,7 +202,7 @@ footer{text-align:center;padding:2.5rem 2rem;font-size:.8rem;color:var(--muted);
     <span class="part-pill" data-part="1"><span class="part-pill-level">Part 1</span><span class="part-pill-emoji">🔘</span><span class="part-pill-title">Multiple Choice Cloze</span></span>
     <span class="part-pill" data-part="2"><span class="part-pill-level">Part 2</span><span class="part-pill-emoji">✏️</span><span class="part-pill-title">Open Cloze</span></span>
     <span class="part-pill" data-part="3"><span class="part-pill-level">Part 3</span><span class="part-pill-emoji">🔤</span><span class="part-pill-title">Word Formation</span></span>
-    <a href="#" class="part-pill"><span class="part-pill-level">Part 4</span><span class="part-pill-emoji">🔑</span><span class="part-pill-title">Key Word Transformation</span></a>
+    </span></span>
   </div>
 </div>
 <div class="test-area" id="testArea">
@@ -242,6 +268,28 @@ footer{text-align:center;padding:2.5rem 2rem;font-size:.8rem;color:var(--muted);
       <button class="btn btn-amber" id="wfShowBtn" onclick="wfShow()"><span class="btn-icon">👁</span> Show Answers</button>
       <button class="btn btn-secondary" id="wfResetBtn" onclick="wfReset()" style="display:none"><span class="btn-icon">↺</span> Try Again</button>
       <button class="btn btn-secondary" id="wfExpBtn" onclick="wfToggleExp()" style="display:none"><span class="btn-icon">💡</span> Explanations</button>
+    </div>
+  </div>
+</div>
+<div class="test-area" id="kwtArea">
+  <div class="exam-info">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>
+    <div><strong>Part 4 — Key Word Transformations.</strong> Complete the second sentence so that it has a similar meaning to the first, using the word given. Do not change the word given.</div>
+  </div>
+  <div class="test-selector" id="kwtSelector"></div>
+  <div class="test-card" id="kwtCard">
+    <div class="test-header">
+      <div class="test-title"><span class="tag">Part 4</span><span id="kwtTitle"></span></div>
+      <div class="score-display" id="kwtScoreDisplay"><span>Score:</span> <span class="score-val" id="kwtScoreVal"></span></div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="kwtProgressFill"></div></div>
+    <div id="kwtItems"></div>
+    <div class="explanations" id="kwtExplanations"></div>
+    <div class="actions">
+      <button class="btn btn-primary" id="kwtCheckBtn" disabled onclick="kwtCheck()"><span class="btn-icon">✓</span> Check Answers</button>
+      <button class="btn btn-amber" id="kwtShowBtn" onclick="kwtShow()"><span class="btn-icon">👁</span> Show Answers</button>
+      <button class="btn btn-secondary" id="kwtResetBtn" onclick="kwtReset()" style="display:none"><span class="btn-icon">↺</span> Try Again</button>
+      <button class="btn btn-secondary" id="kwtExpBtn" onclick="kwtToggleExp()" style="display:none"><span class="btn-icon">💡</span> Explanations</button>
     </div>
   </div>
 </div>
@@ -723,6 +771,120 @@ function wfReset(){
 }
 document.addEventListener('click',function(e){if(!e.target.closest('.wf-wrap'))document.querySelectorAll('.wf-hint-tip').forEach(t=>t.classList.remove('visible'));});
 wfBuildSel();wfLoad();
+
+
+
+
+// ====== KEY WORD TRANSFORMATION ENGINE ======
+const KWT_TESTS = [{"title": "Key Word Transformations — Set 1", "items": [{"lead": "I regret not studying harder for the exam.", "key": "WISH", "gapped": "I ______________________ harder for the exam.", "answer": "wish I had studied", "hint": "wish + past perfect for past regret"}, {"lead": "People say the restaurant is excellent.", "key": "SAID", "gapped": "The restaurant ______________________ excellent.", "answer": "is said to be", "hint": "Passive reporting: is said to be"}, {"lead": "She was too tired to finish the report.", "key": "SO", "gapped": "She was ______________________ she couldn't finish the report.", "answer": "so tired that", "hint": "so + adjective + that"}, {"lead": "I haven't spoken to James for months.", "key": "LAST", "gapped": "The ______________________ James was months ago.", "answer": "last time I spoke to", "hint": "the last time + past simple"}, {"lead": "They cancelled the match because of the rain.", "key": "CALLED", "gapped": "The match ______________________ because of the rain.", "answer": "was called off", "hint": "Passive phrasal verb: call off = cancel"}, {"lead": "I have never run a marathon before.", "key": "TIME", "gapped": "This would be the first ______________________ a marathon.", "answer": "time I had run", "hint": "the first time + past perfect"}]}, {"title": "Key Word Transformations — Set 2", "items": [{"lead": "It's not worth trying to fix it.", "key": "POINT", "gapped": "There is no ______________________ to fix it.", "answer": "point in trying", "hint": "there's no point in + -ing"}, {"lead": "I'm sure he didn't steal the money.", "key": "HAVE", "gapped": "He can't ______________________ the money.", "answer": "possibly have stolen", "hint": "can't possibly have + past participle"}, {"lead": "Although he's rich, he isn't happy.", "key": "SPITE", "gapped": "In ______________________ rich, he isn't happy.", "answer": "spite of being", "hint": "in spite of + -ing"}, {"lead": "The teacher made us rewrite the essay.", "key": "MADE", "gapped": "We were ______________________ the essay.", "answer": "made to rewrite", "hint": "Passive of make: was/were made to"}, {"lead": "She started working here ten years ago.", "key": "BEEN", "gapped": "She has ______________________ ten years.", "answer": "been working here for", "hint": "Present perfect continuous + for"}, {"lead": "I didn't expect the test to be so hard.", "key": "HARDER", "gapped": "The test was ______________________ expected.", "answer": "harder than I had", "hint": "Comparative + than + past perfect"}]}, {"title": "Key Word Transformations — Set 3", "items": [{"lead": "He doesn't earn enough to buy a flat.", "key": "TOO", "gapped": "He earns ______________________ a flat.", "answer": "too little to buy", "hint": "too + adjective/adverb + to"}, {"lead": "They think the painting was stolen last night.", "key": "THOUGHT", "gapped": "The painting is ______________________ last night.", "answer": "thought to have been stolen", "hint": "Passive reporting + perfect infinitive"}, {"lead": "I only realised my mistake when I got home.", "key": "DID", "gapped": "Not until I got home ______________________ my mistake.", "answer": "did I realise", "hint": "Inversion after negative adverbial"}, {"lead": "It's a pity you can't come to the party.", "key": "ONLY", "gapped": "If ______________________ come to the party.", "answer": "only you could", "hint": "If only + past simple for regret"}, {"lead": "We had to queue for two hours to get tickets.", "key": "TOOK", "gapped": "It ______________________ to get tickets.", "answer": "took us two hours of queuing", "hint": "It took + person + time + to"}, {"lead": "The boss doesn't let us leave early on Fridays.", "key": "ALLOWED", "gapped": "We aren't ______________________ early on Fridays.", "answer": "allowed to leave", "hint": "not allowed to + verb"}]}, {"title": "Key Word Transformations — Set 4", "items": [{"lead": "Nobody has complained about the new rules.", "key": "COMPLAINTS", "gapped": "There have been ______________________ the new rules.", "answer": "no complaints about", "hint": "there have been no + noun + about"}, {"lead": "You shouldn't have told her the secret.", "key": "BETTER", "gapped": "You had ______________________ the secret.", "answer": "better not have told her", "hint": "had better not + have + past participle"}, {"lead": "She succeeded in passing the exam despite being ill.", "key": "MANAGED", "gapped": "Despite being ill, she ______________________ the exam.", "answer": "managed to pass", "hint": "manage to + verb = succeed in"}, {"lead": "He didn't say a word during the entire meeting.", "key": "SILENT", "gapped": "He remained ______________________ the entire meeting.", "answer": "completely silent during", "hint": "remain + adverb + adjective + during"}, {"lead": "I find it very difficult to get up early in the morning.", "key": "TROUBLE", "gapped": "I have a lot of ______________________ early.", "answer": "trouble getting up", "hint": "have trouble + -ing"}, {"lead": "We won't go unless the weather improves.", "key": "ONLY", "gapped": "We will ______________________ the weather improves.", "answer": "only go if", "hint": "only + verb + if"}]}, {"title": "Key Word Transformations — Set 5", "items": [{"lead": "He speaks French fluently because he grew up in Paris.", "key": "BROUGHT", "gapped": "He speaks French fluently because he ______________________ in Paris.", "answer": "was brought up", "hint": "Phrasal verb: bring up = raise"}, {"lead": "I started this job two years ago.", "key": "WORKING", "gapped": "I have ______________________ two years.", "answer": "been working here for", "hint": "Present perfect continuous + for"}, {"lead": "They will probably announce the results tomorrow.", "key": "LIKELY", "gapped": "The results are ______________________ tomorrow.", "answer": "likely to be announced", "hint": "be likely to + passive infinitive"}, {"lead": "You can borrow my car if you drive carefully.", "key": "LONG", "gapped": "You can borrow my car as ______________________ carefully.", "answer": "long as you drive", "hint": "as long as = on condition that"}, {"lead": "I couldn't sleep because of the noise outside.", "key": "KEPT", "gapped": "The noise outside ______________________ .", "answer": "kept me awake", "hint": "keep + object + adjective"}, {"lead": "\"I didn't break the window,\" said Tom.", "key": "DENIED", "gapped": "Tom ______________________ the window.", "answer": "denied having broken", "hint": "deny + having + past participle"}]}];
+const KWT_MIN=3, KWT_MAX=6;
+let kwtCurrent=0, kwtChecked=false;
+document.querySelector('[data-part="4"]').addEventListener('click', function() {
+  const area=document.getElementById('kwtArea');
+  if(this.classList.contains('active')){this.classList.remove('active');area.classList.remove('visible');}
+  else{this.classList.add('active');area.classList.add('visible');area.scrollIntoView({behavior:'smooth',block:'start'});}
+});
+function kwtBuildSel(){document.getElementById('kwtSelector').innerHTML=KWT_TESTS.map((t,i)=>'<span class="test-tab '+(i===kwtCurrent?'active':'')+'" onclick="kwtSwitch('+i+')">Test '+(i+1)+'</span>').join('');}
+function kwtSwitch(i){kwtCurrent=i;kwtChecked=false;kwtBuildSel();kwtLoad();}
+function kwtLoad(){const t=KWT_TESTS[kwtCurrent];document.getElementById('kwtTitle').textContent=t.title;document.getElementById('kwtScoreDisplay').classList.remove('visible');document.getElementById('kwtResetBtn').style.display='none';document.getElementById('kwtExpBtn').style.display='none';document.getElementById('kwtShowBtn').style.display='inline-flex';document.getElementById('kwtExplanations').classList.remove('visible');document.getElementById('kwtExplanations').innerHTML='';document.getElementById('kwtCheckBtn').disabled=true;document.getElementById('kwtProgressFill').style.width='0';kwtRender();}
+function kwtRender(){
+  const t=KWT_TESTS[kwtCurrent], el=document.getElementById('kwtItems');
+  let h='';
+  t.items.forEach((item,i)=>{
+    const n=i+1;
+    const parts=item.gapped.split('______________________');
+    h+='<div class="kwt-item">';
+    h+='<div class="kwt-num">Question '+n+'</div>';
+    h+='<div class="kwt-lead">'+item.lead+'</div>';
+    h+='<div class="kwt-key">'+item.key+'</div>';
+    h+='<div class="kwt-gapped">'+parts[0]+'<span class="kwt-wrap"><input type="text" class="kwt-input" id="kwt-'+n+'" autocomplete="off" autocapitalize="off" spellcheck="false" oninput="kwtInput('+n+')"></span><span class="kwt-correction" id="kwtcorr-'+n+'"></span><span class="kwt-word-count" id="kwtwc-'+n+'"></span>'+(parts[1]||'')+' <span class="kwt-wrap"><button class="kwt-hint-btn" id="kwthint-'+n+'" onclick="kwtHint('+n+')" title="Hint">?</button><div class="kwt-hint-tip" id="kwttip-'+n+'">'+item.hint+'</div></span></div>';
+    h+='</div>';
+  });
+  el.innerHTML=h;
+}
+function kwtHint(n){
+  const tip=document.getElementById('kwttip-'+n),btn=document.getElementById('kwthint-'+n);
+  if(tip.classList.contains('visible')){tip.classList.remove('visible');}
+  else{document.querySelectorAll('.kwt-hint-tip').forEach(t=>t.classList.remove('visible'));tip.classList.add('visible');btn.classList.add('used');}
+}
+function kwtInput(n){
+  if(kwtChecked)return;
+  const inp=document.getElementById('kwt-'+n);
+  const words=inp.value.trim().split(/\s+/).filter(w=>w).length;
+  const wc=document.getElementById('kwtwc-'+n);
+  if(inp.value.trim()===''){wc.textContent='';wc.classList.remove('warn');}
+  else{wc.textContent=words+' word'+(words!==1?'s':'');wc.classList.toggle('warn',words<KWT_MIN||words>KWT_MAX);}
+  let filled=0;const t=KWT_TESTS[kwtCurrent];
+  t.items.forEach((_,i)=>{if(document.getElementById('kwt-'+(i+1)).value.trim()!=='')filled++;});
+  document.getElementById('kwtProgressFill').style.width=((filled/t.items.length)*100)+'%';
+  document.getElementById('kwtCheckBtn').disabled=(filled<t.items.length);
+}
+function kwtNorm(s){return s.toLowerCase().replace(/[\u2019'']/g,"'").replace(/\s+/g,' ').trim();}
+function kwtCheck(){
+  if(kwtChecked)return;kwtChecked=true;
+  document.querySelectorAll('.kwt-hint-tip').forEach(t=>t.classList.remove('visible'));
+  let score=0;const t=KWT_TESTS[kwtCurrent];
+  t.items.forEach((item,i)=>{
+    const n=i+1,inp=document.getElementById('kwt-'+n),corr=document.getElementById('kwtcorr-'+n),btn=document.getElementById('kwthint-'+n),wc=document.getElementById('kwtwc-'+n);
+    inp.disabled=true;btn.style.display='none';wc.style.display='none';
+    if(kwtNorm(inp.value)===kwtNorm(item.answer)){inp.classList.add('correct');score++;}
+    else{inp.classList.add('wrong');corr.textContent='\u2192 '+item.answer;corr.classList.add('visible');}
+  });
+  document.getElementById('kwtScoreVal').textContent=score+' / '+t.items.length;
+  document.getElementById('kwtScoreDisplay').classList.add('visible');
+  document.getElementById('kwtCheckBtn').disabled=true;
+  document.getElementById('kwtShowBtn').style.display='none';
+  document.getElementById('kwtResetBtn').style.display='inline-flex';
+  document.getElementById('kwtExpBtn').style.display='inline-flex';
+  kwtRenderExp();
+}
+function kwtShow(){
+  if(kwtChecked)return;kwtChecked=true;
+  document.querySelectorAll('.kwt-hint-tip').forEach(t=>t.classList.remove('visible'));
+  let score=0;const t=KWT_TESTS[kwtCurrent];
+  t.items.forEach((item,i)=>{
+    const n=i+1,inp=document.getElementById('kwt-'+n),btn=document.getElementById('kwthint-'+n),wc=document.getElementById('kwtwc-'+n);
+    if(kwtNorm(inp.value)===kwtNorm(item.answer))score++;
+    inp.value=item.answer;inp.disabled=true;inp.classList.add('shown');btn.style.display='none';wc.style.display='none';
+  });
+  document.getElementById('kwtScoreVal').textContent=score+' / '+t.items.length;
+  document.getElementById('kwtScoreDisplay').classList.add('visible');
+  document.getElementById('kwtCheckBtn').disabled=true;
+  document.getElementById('kwtShowBtn').style.display='none';
+  document.getElementById('kwtResetBtn').style.display='inline-flex';
+  document.getElementById('kwtExpBtn').style.display='inline-flex';
+  document.getElementById('kwtProgressFill').style.width='100%';
+  kwtRenderExp();
+}
+function kwtRenderExp(){
+  const el=document.getElementById('kwtExplanations'),t=KWT_TESTS[kwtCurrent];
+  let h='<div class="exp-title">Answers</div><div class="exp-grid">';
+  t.items.forEach((item,i)=>{
+    const n=i+1,inp=document.getElementById('kwt-'+n);
+    const ok=kwtNorm(inp.value)===kwtNorm(item.answer);
+    h+='<div class="exp-item '+(ok?'was-correct':'was-wrong')+'"><span class="exp-num">'+n+'</span><div class="exp-text"><strong>'+item.answer+'</strong> \u2014 '+item.hint+'</div></div>';
+  });
+  h+='</div>';el.innerHTML=h;
+}
+function kwtToggleExp(){
+  const el=document.getElementById('kwtExplanations'),btn=document.getElementById('kwtExpBtn');
+  el.classList.toggle('visible');
+  btn.innerHTML=el.classList.contains('visible')?'<span class="btn-icon">\U0001f4a1</span> Hide Explanations':'<span class="btn-icon">\U0001f4a1</span> Explanations';
+}
+function kwtReset(){
+  kwtChecked=false;
+  document.getElementById('kwtScoreDisplay').classList.remove('visible');
+  document.getElementById('kwtResetBtn').style.display='none';
+  document.getElementById('kwtExpBtn').style.display='none';
+  document.getElementById('kwtShowBtn').style.display='inline-flex';
+  document.getElementById('kwtExplanations').classList.remove('visible');
+  document.getElementById('kwtExplanations').innerHTML='';
+  document.getElementById('kwtCheckBtn').disabled=true;
+  document.getElementById('kwtProgressFill').style.width='0';
+  kwtRender();
+}
+document.addEventListener('click',function(e){if(!e.target.closest('.kwt-wrap'))document.querySelectorAll('.kwt-hint-tip').forEach(t=>t.classList.remove('visible'));});
+kwtBuildSel();kwtLoad();
 
 </script>
 </body>
