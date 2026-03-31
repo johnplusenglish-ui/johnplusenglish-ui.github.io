@@ -71,6 +71,8 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .pill-group[data-group="uoe"] .pill-group-count{background:var(--lavender-light);color:var(--lavender)}
 .pill-group[data-group="writing"] .pill-group-toggle{border-top:3px solid var(--coral)}
 .pill-group[data-group="writing"] .pill-group-count{background:var(--coral-light);color:var(--coral)}
+.pill-group[data-group="exam-speaking"] .pill-group-toggle{border-top:3px solid var(--sky)}
+.pill-group[data-group="exam-speaking"] .pill-group-count{background:var(--sky-light);color:var(--sky)}
 
 /* Pill body */
 .pill-group-body{display:none;padding:16px 20px 20px;background:var(--card);border:1.5px solid var(--border);border-top:none;border-radius:0 0 var(--radius) var(--radius);box-shadow:var(--shadow-sm)}
@@ -85,6 +87,8 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 
 .pill.sea:hover{border-color:var(--sea);color:var(--sea)}
 .pill.sea .pill-ct{background:var(--sea-light);color:var(--sea)}
+.pill.sky:hover{border-color:var(--sky);color:var(--sky)}
+.pill.sky .pill-ct{background:var(--sky-light);color:var(--sky)}
 .pill.sun:hover{border-color:var(--sun);color:#c97800}
 .pill.sun .pill-ct{background:var(--sand);color:#c97800}
 .pill.coral:hover{border-color:var(--coral);color:var(--coral)}
@@ -93,6 +97,13 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .pill.muted .pill-ct{background:rgba(0,0,0,.04);color:var(--muted)}
 .pill.grey:hover{border-color:var(--muted);color:var(--ink)}
 .pill.grey .pill-ct{background:rgba(0,0,0,.05);color:var(--muted)}
+
+/* Sub-tabs inside pill groups */
+.sub-tabs{display:flex;gap:4px;margin-bottom:14px;background:var(--cream);border-radius:100px;padding:3px;width:fit-content;border:1.5px solid var(--border)}
+.sub-tab{font-family:'Nunito',sans-serif;padding:5px 14px;border-radius:100px;font-size:.76rem;font-weight:700;cursor:pointer;border:none;background:transparent;color:var(--muted);transition:all .2s;white-space:nowrap}
+.sub-tab:hover{color:var(--ink)}
+.sub-tab.active{background:var(--sky);color:#fff;box-shadow:var(--shadow-sm)}
+.sub-tab-panel{display:none}.sub-tab-panel.active{display:block}
 
 /* ── About ── */
 .about{max-width:800px;margin:1.5rem auto 0;padding:0 2rem}
@@ -238,6 +249,24 @@ footer{text-align:center;padding:2.5rem 2rem;font-size:.8rem;color:var(--muted);
       </div>
     </div>
 
+    <!-- Exam Speaking -->
+    <div class="pill-group" data-group="exam-speaking" id="group-exam-speaking">
+      <div class="pill-group-toggle" onclick="toggleGroup(this)">
+        <span class="pill-group-icon">🗣️</span>
+        <span class="pill-group-title">Exam Speaking</span>
+        <span class="pill-group-count">4 exams</span>
+        <span class="pill-group-chevron">▾</span>
+      </div>
+      <div class="pill-group-body">
+        <div class="pills">
+          <a href="ielts-speaking.html" class="pill sky"><span class="pill-emoji">🎙️</span>IELTS<span class="pill-ct">all parts</span></a>
+          <a href="picture-discussion.html#b2" class="pill sky"><span class="pill-emoji">📸</span>B2 First<span class="pill-ct">Part 2</span></a>
+          <a href="picture-discussion.html#c1" class="pill sky"><span class="pill-emoji">📸</span>C1 Advanced<span class="pill-ct">Part 2</span></a>
+          <a href="picture-discussion.html#c2" class="pill sky"><span class="pill-emoji">📸</span>C2 Proficiency<span class="pill-ct">Part 2</span></a>
+        </div>
+      </div>
+    </div>
+
     <!-- Coming Soon -->
     <div class="pill-group" data-group="coming" id="group-coming">
       <div class="pill-group-toggle" onclick="toggleGroup(this)">
@@ -314,6 +343,13 @@ footer{text-align:center;padding:2.5rem 2rem;font-size:.8rem;color:var(--muted);
 <script>
 function toggleGroup(toggle) {
   toggle.parentElement.classList.toggle('open');
+}
+function switchSubTab(btn, group, tab) {
+  const body = btn.closest('.pill-group-body');
+  body.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+  body.querySelectorAll('.sub-tab-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(`${group}-${tab}`).classList.add('active');
 }
 (function() {
   var hash = window.location.hash;
