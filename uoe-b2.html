@@ -160,6 +160,7 @@ footer{text-align:center;padding:2.5rem 2rem;font-size:.8rem;color:var(--muted);
 @media(max-width:640px){.wf-table td.wf-right{width:80px}.wf-input{width:100px}}
 
 
+
 /* Key Word Transformations */
 .kwt-item{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:18px 22px;margin-bottom:14px}
 .kwt-num{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:700;color:var(--accent);margin-bottom:8px;letter-spacing:.5px}
@@ -184,6 +185,38 @@ footer{text-align:center;padding:2.5rem 2rem;font-size:.8rem;color:var(--muted);
 .kwt-word-count{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--muted);margin-left:4px;vertical-align:middle}
 .kwt-word-count.warn{color:var(--coral)}
 @media(max-width:640px){.kwt-input{width:100%}}
+
+
+/* Progress Tracking */
+.progress-overview{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:0;margin-top:28px;margin-bottom:24px;box-shadow:var(--shadow-sm);overflow:hidden}
+.po-header{padding:16px 22px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none;transition:background .15s}
+.po-header:hover{background:var(--cream)}
+.po-header-left{font-family:'DM Serif Display',serif;font-size:1.1rem;color:var(--ink);display:flex;align-items:center;gap:10px}
+.po-header-right{display:flex;align-items:center;gap:10px}
+.po-summary{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:600;color:var(--accent);padding:2px 8px;background:var(--accent-light);border-radius:5px}
+.po-chevron{color:var(--muted);transition:transform .25s;font-size:.85rem}
+.po-body{padding:16px 22px 20px;border-top:1.5px solid var(--border)}
+.po-body.collapsed{display:none}
+.progress-overview.collapsed .po-chevron{transform:rotate(-90deg)}
+.progress-overview.collapsed .po-body{display:none}
+.po-reset{font-family:'Nunito',sans-serif;font-size:.7rem;font-weight:600;color:var(--muted);cursor:pointer;padding:4px 10px;border-radius:100px;border:1.5px solid var(--border);background:var(--card);transition:all .15s}
+.po-title .po-reset:hover{border-color:var(--coral);color:var(--coral)}
+.po-section{margin-bottom:16px}
+.po-section:last-child{margin-bottom:0}
+.po-label{font-family:'JetBrains Mono',monospace;font-size:.65rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.po-grid{display:flex;flex-wrap:wrap;gap:5px}
+.po-dot{width:32px;height:32px;border-radius:8px;border:1.5px solid var(--border);background:var(--cream);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:700;color:var(--muted);cursor:pointer;transition:all .15s;position:relative}
+.po-dot:hover{border-color:var(--accent);transform:translateY(-1px);box-shadow:var(--shadow-sm)}
+.po-dot.done{background:rgba(52,199,89,.1);border-color:rgba(52,199,89,.4);color:#1a7a34}
+.po-dot.perfect{background:rgba(52,199,89,.2);border-color:rgba(52,199,89,.6);color:#1a7a34}
+.po-dot.perfect::after{content:'\2605';position:absolute;top:-4px;right:-4px;font-size:.5rem;color:var(--sun)}
+.po-stats{display:flex;gap:16px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border)}
+.po-stat{font-size:.78rem;color:var(--muted)}
+.po-stat strong{color:var(--ink);font-weight:700}
+.po-tip{display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:rgba(45,48,71,.9);color:#fff;font-family:'Nunito',sans-serif;font-size:.7rem;font-weight:600;padding:6px 10px;border-radius:6px;white-space:nowrap;z-index:60;pointer-events:none}
+.po-dot:hover .po-tip{display:block}
+.test-tab .tab-score{font-family:'JetBrains Mono',monospace;font-size:.55rem;font-weight:600;margin-left:4px;padding:1px 5px;border-radius:4px;background:rgba(52,199,89,.12);color:#1a7a34}
+.test-tab .tab-score.perfect{background:rgba(255,179,71,.15);color:#b87a1a}
 </style>
 </head>
 <body>
@@ -202,8 +235,17 @@ footer{text-align:center;padding:2.5rem 2rem;font-size:.8rem;color:var(--muted);
     <span class="part-pill" data-part="1"><span class="part-pill-level">Part 1</span><span class="part-pill-emoji">🔘</span><span class="part-pill-title">Multiple Choice Cloze</span></span>
     <span class="part-pill" data-part="2"><span class="part-pill-level">Part 2</span><span class="part-pill-emoji">✏️</span><span class="part-pill-title">Open Cloze</span></span>
     <span class="part-pill" data-part="3"><span class="part-pill-level">Part 3</span><span class="part-pill-emoji">🔤</span><span class="part-pill-title">Word Formation</span></span>
-    </span></span>
+    <span class="part-pill" data-part="4"><span class="part-pill-level">Part 4</span><span class="part-pill-emoji">🔑</span><span class="part-pill-title">Key Word Transformation</span></span>
   </div>
+<div class="progress-overview" id="progressOverview">
+  <div class="po-header" onclick="poToggle()">
+    <span class="po-header-left">Your Progress <span class="po-summary" id="poSummary"></span></span>
+    <span class="po-header-right"><button class="po-reset" onclick="event.stopPropagation();poReset()">Reset All</button><span class="po-chevron" id="poChevron">▾</span></span>
+  </div>
+  <div class="po-body" id="poBody">
+    <div id="poGrid"></div>
+  </div>
+</div>
 </div>
 <div class="test-area" id="testArea">
   <div class="exam-info">
@@ -220,8 +262,8 @@ footer{text-align:center;padding:2.5rem 2rem;font-size:.8rem;color:var(--muted);
     <div class="passage" id="passage"></div>
     <div class="explanations" id="explanations"></div>
     <div class="actions">
-      <button class="btn btn-primary" id="checkBtn" disabled onclick="checkAnswers()"><span class="btn-icon">✓</span> Check Answers</button>
-      <button class="btn btn-amber" id="showBtn" onclick="showAnswers()"><span class="btn-icon">👁</span> Show Answers</button>
+      <button class="btn btn-primary" id="checkBtn" disabled onclick="poCheckP1()"><span class="btn-icon">✓</span> Check Answers</button>
+      <button class="btn btn-amber" id="showBtn" onclick="poShowP1()"><span class="btn-icon">👁</span> Show Answers</button>
       <button class="btn btn-secondary" id="resetBtn" onclick="resetTest()" style="display:none"><span class="btn-icon">↺</span> Try Again</button>
       <button class="btn btn-secondary" id="expBtn" onclick="toggleExplanations()" style="display:none"><span class="btn-icon">💡</span> Explanations</button>
     </div>
@@ -242,8 +284,8 @@ footer{text-align:center;padding:2.5rem 2rem;font-size:.8rem;color:var(--muted);
     <div class="passage" id="ocPassage"></div>
     <div class="explanations" id="ocExplanations"></div>
     <div class="actions">
-      <button class="btn btn-primary" id="ocCheckBtn" disabled onclick="ocCheck()"><span class="btn-icon">✓</span> Check Answers</button>
-      <button class="btn btn-amber" id="ocShowBtn" onclick="ocShow()"><span class="btn-icon">👁</span> Show Answers</button>
+      <button class="btn btn-primary" id="ocCheckBtn" disabled onclick="poCheckOC()"><span class="btn-icon">✓</span> Check Answers</button>
+      <button class="btn btn-amber" id="ocShowBtn" onclick="poShowOC()"><span class="btn-icon">👁</span> Show Answers</button>
       <button class="btn btn-secondary" id="ocResetBtn" onclick="ocReset()" style="display:none"><span class="btn-icon">↺</span> Try Again</button>
       <button class="btn btn-secondary" id="ocExpBtn" onclick="ocToggleExp()" style="display:none"><span class="btn-icon">💡</span> Explanations</button>
     </div>
@@ -264,8 +306,8 @@ footer{text-align:center;padding:2.5rem 2rem;font-size:.8rem;color:var(--muted);
     <div class="passage" id="wfPassage"></div>
     <div class="explanations" id="wfExplanations"></div>
     <div class="actions">
-      <button class="btn btn-primary" id="wfCheckBtn" disabled onclick="wfCheck()"><span class="btn-icon">✓</span> Check Answers</button>
-      <button class="btn btn-amber" id="wfShowBtn" onclick="wfShow()"><span class="btn-icon">👁</span> Show Answers</button>
+      <button class="btn btn-primary" id="wfCheckBtn" disabled onclick="poCheckWF()"><span class="btn-icon">✓</span> Check Answers</button>
+      <button class="btn btn-amber" id="wfShowBtn" onclick="poShowWF()"><span class="btn-icon">👁</span> Show Answers</button>
       <button class="btn btn-secondary" id="wfResetBtn" onclick="wfReset()" style="display:none"><span class="btn-icon">↺</span> Try Again</button>
       <button class="btn btn-secondary" id="wfExpBtn" onclick="wfToggleExp()" style="display:none"><span class="btn-icon">💡</span> Explanations</button>
     </div>
@@ -286,8 +328,8 @@ footer{text-align:center;padding:2.5rem 2rem;font-size:.8rem;color:var(--muted);
     <div id="kwtItems"></div>
     <div class="explanations" id="kwtExplanations"></div>
     <div class="actions">
-      <button class="btn btn-primary" id="kwtCheckBtn" disabled onclick="kwtCheck()"><span class="btn-icon">✓</span> Check Answers</button>
-      <button class="btn btn-amber" id="kwtShowBtn" onclick="kwtShow()"><span class="btn-icon">👁</span> Show Answers</button>
+      <button class="btn btn-primary" id="kwtCheckBtn" disabled onclick="poCheckKWT()"><span class="btn-icon">✓</span> Check Answers</button>
+      <button class="btn btn-amber" id="kwtShowBtn" onclick="poShowKWT()"><span class="btn-icon">👁</span> Show Answers</button>
       <button class="btn btn-secondary" id="kwtResetBtn" onclick="kwtReset()" style="display:none"><span class="btn-icon">↺</span> Try Again</button>
       <button class="btn btn-secondary" id="kwtExpBtn" onclick="kwtToggleExp()" style="display:none"><span class="btn-icon">💡</span> Explanations</button>
     </div>
@@ -775,8 +817,10 @@ wfBuildSel();wfLoad();
 
 
 
+
+
 // ====== KEY WORD TRANSFORMATION ENGINE ======
-const KWT_TESTS = [{"title": "Key Word Transformations — Set 1", "items": [{"lead": "I regret not studying harder for the exam.", "key": "WISH", "gapped": "I ______________________ harder for the exam.", "answer": "wish I had studied", "hint": "wish + past perfect for past regret"}, {"lead": "People say the restaurant is excellent.", "key": "SAID", "gapped": "The restaurant ______________________ excellent.", "answer": "is said to be", "hint": "Passive reporting: is said to be"}, {"lead": "She was too tired to finish the report.", "key": "SO", "gapped": "She was ______________________ she couldn't finish the report.", "answer": "so tired that", "hint": "so + adjective + that"}, {"lead": "I haven't spoken to James for months.", "key": "LAST", "gapped": "The ______________________ James was months ago.", "answer": "last time I spoke to", "hint": "the last time + past simple"}, {"lead": "They cancelled the match because of the rain.", "key": "CALLED", "gapped": "The match ______________________ because of the rain.", "answer": "was called off", "hint": "Passive phrasal verb: call off = cancel"}, {"lead": "I have never run a marathon before.", "key": "TIME", "gapped": "This would be the first ______________________ a marathon.", "answer": "time I had run", "hint": "the first time + past perfect"}]}, {"title": "Key Word Transformations — Set 2", "items": [{"lead": "It's not worth trying to fix it.", "key": "POINT", "gapped": "There is no ______________________ to fix it.", "answer": "point in trying", "hint": "there's no point in + -ing"}, {"lead": "I'm sure he didn't steal the money.", "key": "HAVE", "gapped": "He can't ______________________ the money.", "answer": "possibly have stolen", "hint": "can't possibly have + past participle"}, {"lead": "Although he's rich, he isn't happy.", "key": "SPITE", "gapped": "In ______________________ rich, he isn't happy.", "answer": "spite of being", "hint": "in spite of + -ing"}, {"lead": "The teacher made us rewrite the essay.", "key": "MADE", "gapped": "We were ______________________ the essay.", "answer": "made to rewrite", "hint": "Passive of make: was/were made to"}, {"lead": "She started working here ten years ago.", "key": "BEEN", "gapped": "She has ______________________ ten years.", "answer": "been working here for", "hint": "Present perfect continuous + for"}, {"lead": "I didn't expect the test to be so hard.", "key": "HARDER", "gapped": "The test was ______________________ expected.", "answer": "harder than I had", "hint": "Comparative + than + past perfect"}]}, {"title": "Key Word Transformations — Set 3", "items": [{"lead": "He doesn't earn enough to buy a flat.", "key": "TOO", "gapped": "He earns ______________________ a flat.", "answer": "too little to buy", "hint": "too + adjective/adverb + to"}, {"lead": "They think the painting was stolen last night.", "key": "THOUGHT", "gapped": "The painting is ______________________ last night.", "answer": "thought to have been stolen", "hint": "Passive reporting + perfect infinitive"}, {"lead": "I only realised my mistake when I got home.", "key": "DID", "gapped": "Not until I got home ______________________ my mistake.", "answer": "did I realise", "hint": "Inversion after negative adverbial"}, {"lead": "It's a pity you can't come to the party.", "key": "ONLY", "gapped": "If ______________________ come to the party.", "answer": "only you could", "hint": "If only + past simple for regret"}, {"lead": "We had to queue for two hours to get tickets.", "key": "TOOK", "gapped": "It ______________________ to get tickets.", "answer": "took us two hours of queuing", "hint": "It took + person + time + to"}, {"lead": "The boss doesn't let us leave early on Fridays.", "key": "ALLOWED", "gapped": "We aren't ______________________ early on Fridays.", "answer": "allowed to leave", "hint": "not allowed to + verb"}]}, {"title": "Key Word Transformations — Set 4", "items": [{"lead": "Nobody has complained about the new rules.", "key": "COMPLAINTS", "gapped": "There have been ______________________ the new rules.", "answer": "no complaints about", "hint": "there have been no + noun + about"}, {"lead": "You shouldn't have told her the secret.", "key": "BETTER", "gapped": "You had ______________________ the secret.", "answer": "better not have told her", "hint": "had better not + have + past participle"}, {"lead": "She succeeded in passing the exam despite being ill.", "key": "MANAGED", "gapped": "Despite being ill, she ______________________ the exam.", "answer": "managed to pass", "hint": "manage to + verb = succeed in"}, {"lead": "He didn't say a word during the entire meeting.", "key": "SILENT", "gapped": "He remained ______________________ the entire meeting.", "answer": "completely silent during", "hint": "remain + adverb + adjective + during"}, {"lead": "I find it very difficult to get up early in the morning.", "key": "TROUBLE", "gapped": "I have a lot of ______________________ early.", "answer": "trouble getting up", "hint": "have trouble + -ing"}, {"lead": "We won't go unless the weather improves.", "key": "ONLY", "gapped": "We will ______________________ the weather improves.", "answer": "only go if", "hint": "only + verb + if"}]}, {"title": "Key Word Transformations — Set 5", "items": [{"lead": "He speaks French fluently because he grew up in Paris.", "key": "BROUGHT", "gapped": "He speaks French fluently because he ______________________ in Paris.", "answer": "was brought up", "hint": "Phrasal verb: bring up = raise"}, {"lead": "I started this job two years ago.", "key": "WORKING", "gapped": "I have ______________________ two years.", "answer": "been working here for", "hint": "Present perfect continuous + for"}, {"lead": "They will probably announce the results tomorrow.", "key": "LIKELY", "gapped": "The results are ______________________ tomorrow.", "answer": "likely to be announced", "hint": "be likely to + passive infinitive"}, {"lead": "You can borrow my car if you drive carefully.", "key": "LONG", "gapped": "You can borrow my car as ______________________ carefully.", "answer": "long as you drive", "hint": "as long as = on condition that"}, {"lead": "I couldn't sleep because of the noise outside.", "key": "KEPT", "gapped": "The noise outside ______________________ .", "answer": "kept me awake", "hint": "keep + object + adjective"}, {"lead": "\"I didn't break the window,\" said Tom.", "key": "DENIED", "gapped": "Tom ______________________ the window.", "answer": "denied having broken", "hint": "deny + having + past participle"}]}];
+const KWT_TESTS = [{"title": "Key Word Transformations — Set 1", "items": [{"lead": "I regret not studying harder for the exam.", "key": "WISH", "gapped": "I ______________________ harder for the exam.", "answer": "wish I had studied", "hint": "wish + past perfect for past regret"}, {"lead": "People say the restaurant is excellent.", "key": "SAID", "gapped": "The restaurant ______________________ excellent.", "answer": "is said to be", "hint": "Passive reporting: is said to be"}, {"lead": "She was too tired to finish the report.", "key": "SO", "gapped": "She was ______________________ she couldn't finish the report.", "answer": "so tired that", "hint": "so + adjective + that"}, {"lead": "I haven't spoken to James for months.", "key": "LAST", "gapped": "The ______________________ James was months ago.", "answer": "last time I spoke to", "hint": "the last time + past simple"}, {"lead": "They cancelled the match because of the rain.", "key": "CALLED", "gapped": "The match ______________________ because of the rain.", "answer": "was called off", "hint": "Passive phrasal verb: call off = cancel"}, {"lead": "I have never run a marathon before.", "key": "TIME", "gapped": "This would be the first ______________________ a marathon.", "answer": "time I had run", "hint": "the first time + past perfect"}]}, {"title": "Key Word Transformations — Set 2", "items": [{"lead": "It's not worth trying to fix it.", "key": "POINT", "gapped": "There is no ______________________ to fix it.", "answer": "point in trying", "hint": "there's no point in + -ing"}, {"lead": "I'm sure he didn't steal the money.", "key": "HAVE", "gapped": "He can't ______________________ the money.", "answer": "possibly have stolen", "hint": "can't possibly have + past participle"}, {"lead": "Although he's rich, he isn't happy.", "key": "SPITE", "gapped": "In ______________________ rich, he isn't happy.", "answer": "spite of being", "hint": "in spite of + -ing"}, {"lead": "The teacher made us rewrite the essay.", "key": "MADE", "gapped": "We were ______________________ the essay.", "answer": "made to rewrite", "hint": "Passive of make: was/were made to"}, {"lead": "She started working here ten years ago.", "key": "BEEN", "gapped": "She has ______________________ ten years.", "answer": "been working here for", "hint": "Present perfect continuous + for"}, {"lead": "I didn't expect the test to be so hard.", "key": "HARDER", "gapped": "The test was ______________________ expected.", "answer": "harder than I had", "hint": "Comparative + than + past perfect"}]}, {"title": "Key Word Transformations — Set 3", "items": [{"lead": "He doesn't earn enough to buy a flat.", "key": "TOO", "gapped": "He earns ______________________ a flat.", "answer": "too little to buy", "hint": "too + adjective/adverb + to"}, {"lead": "They think the painting was stolen last night.", "key": "THOUGHT", "gapped": "The painting is ______________________ last night.", "answer": "thought to have been stolen", "hint": "Passive reporting + perfect infinitive"}, {"lead": "I only realised my mistake when I got home.", "key": "DID", "gapped": "Not until I got home ______________________ my mistake.", "answer": "did I realise", "hint": "Inversion after negative adverbial"}, {"lead": "It's a pity you can't come to the party.", "key": "ONLY", "gapped": "If ______________________ come to the party.", "answer": "only you could", "hint": "If only + past simple for regret"}, {"lead": "We had to queue for two hours to get tickets.", "key": "TOOK", "gapped": "It ______________________ to get tickets.", "answer": "took us two hours of queuing", "hint": "It took + person + time + to"}, {"lead": "The boss doesn't let us leave early on Fridays.", "key": "ALLOWED", "gapped": "We aren't ______________________ early on Fridays.", "answer": "allowed to leave", "hint": "not allowed to + verb"}]}, {"title": "Key Word Transformations — Set 4", "items": [{"lead": "Nobody has complained about the new rules.", "key": "COMPLAINTS", "gapped": "There have been ______________________ the new rules.", "answer": "no complaints about", "hint": "there have been no + noun + about"}, {"lead": "You shouldn't have told her the secret.", "key": "BETTER", "gapped": "You had ______________________ the secret.", "answer": "better not have told her", "hint": "had better not + have + past participle"}, {"lead": "She succeeded in passing the exam despite being ill.", "key": "MANAGED", "gapped": "Despite being ill, she ______________________ the exam.", "answer": "managed to pass", "hint": "manage to + verb = succeed in"}, {"lead": "He didn't say a word during the entire meeting.", "key": "SILENT", "gapped": "He remained ______________________ the entire meeting.", "answer": "completely silent during", "hint": "remain + adverb + adjective + during"}, {"lead": "I find it very difficult to get up early in the morning.", "key": "TROUBLE", "gapped": "I have a lot of ______________________ early.", "answer": "trouble getting up", "hint": "have trouble + -ing"}, {"lead": "We won't go unless the weather improves.", "key": "ONLY", "gapped": "We will ______________________ the weather improves.", "answer": "only go if", "hint": "only + verb + if"}]}, {"title": "Key Word Transformations — Set 5", "items": [{"lead": "He speaks French fluently because he grew up in Paris.", "key": "BROUGHT", "gapped": "He speaks French fluently because he ______________________ in Paris.", "answer": "was brought up", "hint": "Phrasal verb: bring up = raise"}, {"lead": "I started this job two years ago.", "key": "WORKING", "gapped": "I have ______________________ two years.", "answer": "been working here for", "hint": "Present perfect continuous + for"}, {"lead": "They will probably announce the results tomorrow.", "key": "LIKELY", "gapped": "The results are ______________________ tomorrow.", "answer": "likely to be announced", "hint": "be likely to + passive infinitive"}, {"lead": "You can borrow my car if you drive carefully.", "key": "LONG", "gapped": "You can borrow my car as ______________________ carefully.", "answer": "long as you drive", "hint": "as long as = on condition that"}, {"lead": "I couldn't sleep because of the noise outside.", "key": "KEPT", "gapped": "The noise outside ______________________ .", "answer": "kept me awake", "hint": "keep + object + adjective"}, {"lead": "\"I didn't break the window,\" said Tom.", "key": "DENIED", "gapped": "Tom ______________________ the window.", "answer": "denied having broken", "hint": "deny + having + past participle"}]}, {"title": "Key Word Transformations — Set 6", "items": [{"lead": "He didn't say a single word during the meeting.", "key": "REMAINED", "gapped": "He ______________________ the entire meeting.", "answer": "remained silent throughout", "hint": "remain + adjective + throughout"}, {"lead": "I'm sure she didn't take the money.", "key": "POSSIBLY", "gapped": "She can't ______________________ the money.", "answer": "possibly have taken", "hint": "can't possibly have + past participle"}, {"lead": "It's a pity we didn't book earlier.", "key": "ONLY", "gapped": "If ______________________ booked earlier.", "answer": "only we had", "hint": "If only + past perfect"}, {"lead": "The government is expected to raise taxes.", "key": "LIKELIHOOD", "gapped": "In all ______________________ raise taxes.", "answer": "likelihood the government will", "hint": "in all likelihood = very probably"}, {"lead": "I prefer walking to driving.", "key": "RATHER", "gapped": "I would ______________________ drive.", "answer": "rather walk than", "hint": "would rather + verb + than"}, {"lead": "'I didn't eat the last biscuit,' said Paul.", "key": "DENIED", "gapped": "Paul ______________________ the last biscuit.", "answer": "denied having eaten", "hint": "deny + having + past participle"}]}, {"title": "Key Word Transformations — Set 7", "items": [{"lead": "This is the best meal I've ever had.", "key": "SUCH", "gapped": "I have never ______________________ meal.", "answer": "had such a good", "hint": "never + have + such + a + adjective + noun"}, {"lead": "It seems that nobody remembered to lock the door.", "key": "APPEARS", "gapped": "Nobody ______________________ to lock the door.", "answer": "appears to have remembered", "hint": "appear to have + past participle"}, {"lead": "He got the job although he had no experience.", "key": "SPITE", "gapped": "He got the job in ______________________ no experience.", "answer": "spite of having", "hint": "in spite of + -ing"}, {"lead": "I'd prefer it if you didn't tell anyone.", "key": "RATHER", "gapped": "I'd ______________________ tell anyone.", "answer": "rather you didn't", "hint": "would rather + past simple"}, {"lead": "They had to delay the flight because of fog.", "key": "PUT", "gapped": "The flight had to ______________________ because of fog.", "answer": "be put back", "hint": "Passive phrasal verb: put back = delay"}, {"lead": "She finds it hard to make decisions quickly.", "key": "DIFFICULTY", "gapped": "She has considerable ______________________ quickly.", "answer": "difficulty making decisions", "hint": "have difficulty + -ing"}]}, {"title": "Key Word Transformations — Set 8", "items": [{"lead": "It's possible that he forgot about the meeting.", "key": "MAY", "gapped": "He ______________________ about the meeting.", "answer": "may have forgotten", "hint": "may have + past participle"}, {"lead": "I don't think you should trust him.", "key": "WERE", "gapped": "If ______________________ trust him.", "answer": "I were you I wouldn't", "hint": "If I were you + conditional"}, {"lead": "Nobody believed what he said.", "key": "TAKEN", "gapped": "What he said was not ______________________ .", "answer": "taken seriously by anyone", "hint": "Passive: taken seriously + by"}, {"lead": "She tried to phone but the line was engaged.", "key": "THROUGH", "gapped": "She tried to ______________________ but the line was engaged.", "answer": "get through to him", "hint": "get through to + person"}, {"lead": "You should eat less sugar.", "key": "CUT", "gapped": "You should ______________________ sugar.", "answer": "cut down on", "hint": "Phrasal verb: cut down on = reduce"}, {"lead": "I'm sure they've arrived by now.", "key": "MUST", "gapped": "They ______________________ by now.", "answer": "must have arrived", "hint": "must have + past participle = deduction"}]}, {"title": "Key Word Transformations — Set 9", "items": [{"lead": "He left without saying goodbye to anyone.", "key": "BOTHERING", "gapped": "He left without ______________________ goodbye to anyone.", "answer": "even bothering to say", "hint": "without even bothering to + verb"}, {"lead": "I'd really like you to stop making that noise.", "key": "MIND", "gapped": "Would you ______________________ that noise?", "answer": "mind not making", "hint": "would you mind + not + -ing"}, {"lead": "She always turns up late for meetings.", "key": "HABIT", "gapped": "She has a ______________________ late for meetings.", "answer": "habit of turning up", "hint": "have a habit of + -ing"}, {"lead": "The police think a local gang committed the robbery.", "key": "THOUGHT", "gapped": "The robbery is ______________________ by a local gang.", "answer": "thought to have been committed", "hint": "Passive reporting + perfect infinitive"}, {"lead": "I started working here in 2019.", "key": "BEEN", "gapped": "I have ______________________ 2019.", "answer": "been working here since", "hint": "Present perfect continuous + since"}, {"lead": "He didn't mention anything about resigning.", "key": "REFERENCE", "gapped": "He made ______________________ resigning.", "answer": "no reference to", "hint": "make no reference to"}]}, {"title": "Key Word Transformations — Set 10", "items": [{"lead": "We couldn't get tickets because the concert was sold out.", "key": "IMPOSSIBLE", "gapped": "It was ______________________ as the concert was sold out.", "answer": "impossible to get tickets", "hint": "it was impossible to + verb"}, {"lead": "Nobody expected the team to win the final.", "key": "SURPRISE", "gapped": "The team's victory in the final came ______________________ everyone.", "answer": "as a surprise to", "hint": "come as a surprise to"}, {"lead": "She regrets not going to university.", "key": "WISHES", "gapped": "She ______________________ to university.", "answer": "wishes she had gone", "hint": "wish + past perfect for past regret"}, {"lead": "I'd prefer to stay in rather than go out tonight.", "key": "FEEL", "gapped": "I don't ______________________ out tonight.", "answer": "feel like going", "hint": "feel like + -ing = want to"}, {"lead": "They demolished the old factory last month.", "key": "TORN", "gapped": "The old factory ______________________ last month.", "answer": "was torn down", "hint": "Passive phrasal verb: tear down"}, {"lead": "He succeeded in fixing the car by himself.", "key": "MANAGED", "gapped": "He ______________________ the car by himself.", "answer": "managed to fix", "hint": "manage to + verb = succeed"}]}, {"title": "Key Word Transformations — Set 11", "items": [{"lead": "I think you should apply for that job.", "key": "WORTH", "gapped": "I think that job is ______________________ .", "answer": "worth applying for", "hint": "be worth + -ing"}, {"lead": "We've never stayed in such a luxurious hotel.", "key": "MOST", "gapped": "This is the ______________________ we've ever stayed in.", "answer": "most luxurious hotel", "hint": "Superlative: the most + adjective + noun"}, {"lead": "She spoke so quietly that I could barely hear her.", "key": "SUCH", "gapped": "She spoke in ______________________ I could barely hear her.", "answer": "such a quiet voice that", "hint": "such + a + adjective + noun + that"}, {"lead": "You shouldn't eat just before going to bed.", "key": "AVOID", "gapped": "You should ______________________ just before bedtime.", "answer": "avoid eating anything", "hint": "avoid + -ing + object"}, {"lead": "They haven't delivered the package yet.", "key": "STILL", "gapped": "The package ______________________ delivered.", "answer": "still hasn't been", "hint": "still + present perfect passive"}, {"lead": "He's probably forgotten about the appointment.", "key": "LIKELIHOOD", "gapped": "In all ______________________ about the appointment.", "answer": "likelihood he has forgotten", "hint": "in all likelihood = very probably"}]}, {"title": "Key Word Transformations — Set 12", "items": [{"lead": "She didn't want anyone to know her secret.", "key": "KEPT", "gapped": "She wanted her secret ______________________ .", "answer": "to be kept", "hint": "want + noun + to be + past participle"}, {"lead": "I'm afraid I can't help you with that.", "key": "POSITION", "gapped": "I'm not in a ______________________ with that.", "answer": "position to help you", "hint": "not in a position to + verb"}, {"lead": "They had to postpone the wedding because of COVID.", "key": "OFF", "gapped": "The wedding had to ______________________ because of COVID.", "answer": "be put off", "hint": "Passive phrasal verb: put off = postpone"}, {"lead": "He's the funniest person I've ever met.", "key": "ANYONE", "gapped": "I've never met ______________________ him.", "answer": "anyone funnier than", "hint": "never + anyone + comparative + than"}, {"lead": "She might not come to the party.", "key": "CHANCE", "gapped": "There is a ______________________ not come to the party.", "answer": "chance she might", "hint": "there is a chance + clause"}, {"lead": "The teacher made the students rewrite the essay.", "key": "MADE", "gapped": "The students were ______________________ the essay.", "answer": "made to rewrite", "hint": "Passive of make: were made to"}]}, {"title": "Key Word Transformations — Set 13", "items": [{"lead": "I haven't made up my mind about the offer yet.", "key": "DECISION", "gapped": "I haven't reached a ______________________ yet.", "answer": "decision about the offer", "hint": "reach a decision about"}, {"lead": "He pretended that nothing had happened.", "key": "THOUGH", "gapped": "He acted as ______________________ happened.", "answer": "though nothing had", "hint": "as though + past perfect"}, {"lead": "It seems that the company is in financial trouble.", "key": "APPEARS", "gapped": "The company ______________________ in financial trouble.", "answer": "appears to be", "hint": "appear to + be"}, {"lead": "You can't enter the building without a pass.", "key": "UNLESS", "gapped": "You can't enter the building ______________________ a pass.", "answer": "unless you have", "hint": "unless + clause"}, {"lead": "She told me not to worry about the results.", "key": "SAID", "gapped": "'Don't worry about the results,' ______________________ me.", "answer": "she said to", "hint": "Direct speech + said to"}, {"lead": "Nobody thought the plan would work.", "key": "EXPECTED", "gapped": "The plan ______________________ to work.", "answer": "was not expected", "hint": "Passive: was not expected"}]}, {"title": "Key Word Transformations — Set 14", "items": [{"lead": "The hotel was so expensive that we couldn't afford it.", "key": "TOO", "gapped": "The hotel was ______________________ to afford.", "answer": "too expensive for us", "hint": "too + adjective + for + person"}, {"lead": "I strongly advise you to see a lawyer.", "key": "BETTER", "gapped": "You had ______________________ a lawyer as soon as possible.", "answer": "better go and see", "hint": "had better + base verb"}, {"lead": "He said he hadn't received the email.", "key": "DENIED", "gapped": "He ______________________ the email.", "answer": "denied having received", "hint": "deny + having + past participle"}, {"lead": "I can't understand why she left so suddenly.", "key": "LOSS", "gapped": "I'm at a ______________________ she left so suddenly.", "answer": "loss to understand why", "hint": "be at a loss to + verb"}, {"lead": "We need to set off early to avoid the traffic.", "key": "ORDER", "gapped": "We need to set off early in ______________________ the traffic.", "answer": "order to avoid", "hint": "in order to + verb"}, {"lead": "He wasn't paying attention, so he missed the announcement.", "key": "BEEN", "gapped": "Had he ______________________ , he wouldn't have missed the announcement.", "answer": "been paying attention", "hint": "Third conditional inversion: Had + subject + past participle"}]}, {"title": "Key Word Transformations — Set 15", "items": [{"lead": "She started the business with absolutely nothing.", "key": "SCRATCH", "gapped": "She built her business from ______________________ nothing.", "answer": "scratch with absolutely", "hint": "from scratch = from nothing"}, {"lead": "I really don't want to go to that party.", "key": "FEEL", "gapped": "I really don't ______________________ that party.", "answer": "feel like going to", "hint": "feel like + -ing"}, {"lead": "He admitted he had made a mistake.", "key": "OWNED", "gapped": "He ______________________ a mistake.", "answer": "owned up to making", "hint": "own up to + -ing = admit"}, {"lead": "You are not permitted to take photographs here.", "key": "ALLOWED", "gapped": "Taking photographs here ______________________ .", "answer": "is not allowed", "hint": "Passive: is not allowed"}, {"lead": "I'm sure she didn't do it on purpose.", "key": "HAVE", "gapped": "She can't ______________________ on purpose.", "answer": "have done it", "hint": "can't have + past participle"}, {"lead": "They are going to renovate the town hall.", "key": "DONE", "gapped": "The town hall is going to ______________________ .", "answer": "have work done on it", "hint": "have + noun + done = arrange renovation"}]}];
 const KWT_MIN=3, KWT_MAX=6;
 let kwtCurrent=0, kwtChecked=false;
 document.querySelector('[data-part="4"]').addEventListener('click', function() {
@@ -885,6 +929,103 @@ function kwtReset(){
 }
 document.addEventListener('click',function(e){if(!e.target.closest('.kwt-wrap'))document.querySelectorAll('.kwt-hint-tip').forEach(t=>t.classList.remove('visible'));});
 kwtBuildSel();kwtLoad();
+
+
+
+
+// ====== PROGRESS TRACKING ======
+var PO_KEY='uoe-b2';
+function poGet(){try{return JSON.parse(localStorage.getItem(PO_KEY))||{};}catch(e){return {};}}
+function poSave(part,idx,score,total){
+  var p=poGet(),k=part+'-'+idx,old=p[k]||{};
+  var pct=Math.round(score/total*100);
+  p[k]={last:score,total:total,pct:pct,best:Math.max(score,old.best||0),bestPct:Math.max(pct,old.bestPct||0),date:new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short'}),n:(old.n||0)+1};
+  localStorage.setItem(PO_KEY,JSON.stringify(p));
+  poRender();
+
+}
+function poReset(){if(!confirm('Reset all progress? This cannot be undone.'))return;localStorage.removeItem(PO_KEY);poRender();}
+
+function poReadScore(id){
+  var el=document.getElementById(id);
+  if(!el)return null;
+  var m=el.textContent.match(/(\d+)\s*\/\s*(\d+)/);
+  return m?[parseInt(m[1]),parseInt(m[2])]:null;
+}
+
+// Wrapper functions that call original then save
+function poCheckP1(){checkAnswers();var s=poReadScore('scoreVal');if(s)poSave('p1',currentTest,s[0],s[1]);}
+function poShowP1(){showAnswers();var s=poReadScore('scoreVal');if(s)poSave('p1',currentTest,s[0],s[1]);}
+function poCheckOC(){ocCheck();var s=poReadScore('ocScoreVal');if(s)poSave('oc',ocCurrent,s[0],s[1]);}
+function poShowOC(){ocShow();var s=poReadScore('ocScoreVal');if(s)poSave('oc',ocCurrent,s[0],s[1]);}
+function poCheckWF(){wfCheck();var s=poReadScore('wfScoreVal');if(s)poSave('wf',wfCurrent,s[0],s[1]);}
+function poShowWF(){wfShow();var s=poReadScore('wfScoreVal');if(s)poSave('wf',wfCurrent,s[0],s[1]);}
+function poCheckKWT(){kwtCheck();var s=poReadScore('kwtScoreVal');if(s)poSave('kwt',kwtCurrent,s[0],s[1]);}
+function poShowKWT(){kwtShow();var s=poReadScore('kwtScoreVal');if(s)poSave('kwt',kwtCurrent,s[0],s[1]);}
+
+
+function poToggle(){
+  document.getElementById('progressOverview').classList.toggle('collapsed');
+  
+}
+function poRender(){
+  var p=poGet(),el=document.getElementById('poGrid');
+  if(!el)return;
+  var secs=[
+    {l:'Part 1 — Multiple Choice Cloze',k:'p1',n:TESTS.length},
+    {l:'Part 2 — Open Cloze',k:'oc',n:typeof OC_TESTS!=='undefined'?OC_TESTS.length:0},
+    {l:'Part 3 — Word Formation',k:'wf',n:typeof WF_TESTS!=='undefined'?WF_TESTS.length:0},
+    {l:'Part 4 — Key Word Transformations',k:'kwt',n:typeof KWT_TESTS!=='undefined'?KWT_TESTS.length:0}
+  ];
+  var done=0,tot=0,perf=0,h='';
+  secs.forEach(function(sec){
+    if(!sec.n)return;
+    h+='<div class="po-section"><div class="po-label">'+sec.l+'</div><div class="po-grid">';
+    for(var i=0;i<sec.n;i++){
+      var d=p[sec.k+'-'+i];tot++;
+      var cls='',tip='Test '+(i+1)+': Not attempted';
+      if(d){done++;if(d.last===d.total){cls='perfect';perf++;}else cls='done';tip='Test '+(i+1)+': '+d.last+'/'+d.total+' ('+d.pct+'%)';if(d.best>d.last)tip+=' · Best: '+d.best+'/'+d.total;tip+=' · '+d.date;}
+      h+='<div class="po-dot '+cls+'" data-pk="'+sec.k+'" data-pi="'+i+'" onclick="poJump(this.dataset.pk,+this.dataset.pi)"><div class="po-tip">'+tip+'</div>'+(i+1)+'</div>';
+    }
+    h+='</div></div>';
+  });
+  h+='<div class="po-stats"><div class="po-stat"><strong>'+done+'</strong> / '+tot+' completed</div><div class="po-stat"><strong>'+perf+'</strong> perfect</div></div>';
+  el.innerHTML=h;
+  // Update summary
+  var sumEl=document.getElementById('poSummary');
+  if(sumEl) sumEl.textContent=done+'/'+tot+(perf?' · '+perf+' ★':'');
+  // Update test tab badges
+  secs.forEach(function(sec){
+    var selId=sec.k==='p1'?'testSelector':sec.k==='oc'?'ocSelector':sec.k==='wf'?'wfSelector':'kwtSelector';
+    var sel=document.getElementById(selId);
+    if(!sel)return;
+    sel.querySelectorAll('.test-tab').forEach(function(tab,i){
+      var old=tab.querySelector('.tab-score');if(old)old.remove();
+      var d=p[sec.k+'-'+i];
+      if(d){var b=document.createElement('span');b.className='tab-score'+(d.last===d.total?' perfect':'');b.textContent=d.pct+'%';tab.appendChild(b);}
+    });
+  });
+}
+
+function poJump(part,idx){
+  var pillSel=part==='p1'?'[data-part="1"]':part==='oc'?'[data-part="2"]':part==='wf'?'[data-part="3"]':'[data-part="4"]';
+  var pill=document.querySelector(pillSel);
+  if(pill&&!pill.classList.contains('active'))pill.click();
+  setTimeout(function(){
+    if(part==='p1'){currentTest=idx;checked=false;buildSelector();load();}
+    else if(part==='oc')ocSwitch(idx);
+    else if(part==='wf')wfSwitch(idx);
+    else if(part==='kwt')kwtSwitch(idx);
+  },150);
+}
+
+// Re-render after each selector rebuild (to add badges)
+var _origBS=buildSelector;buildSelector=function(){_origBS();poRender();};
+var _origOBS=typeof ocBuildSel!=='undefined'?ocBuildSel:null;if(_origOBS){ocBuildSel=function(){_origOBS();poRender();};}
+var _origWBS=typeof wfBuildSel!=='undefined'?wfBuildSel:null;if(_origWBS){wfBuildSel=function(){_origWBS();poRender();};}
+var _origKBS=typeof kwtBuildSel!=='undefined'?kwtBuildSel:null;if(_origKBS){kwtBuildSel=function(){_origKBS();poRender();};}
+
+poRender();
 
 </script>
 </body>
