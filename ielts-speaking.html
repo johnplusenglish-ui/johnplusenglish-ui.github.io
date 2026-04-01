@@ -37,6 +37,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,252,247,
 .mode-pill.active{background:var(--sky);border-color:var(--sky);color:#fff}
 .mode-pill .pill-num{font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:500;opacity:.7;letter-spacing:.05em}
 .mode-pill .pill-topic{font-size:.75rem;font-weight:700;line-height:1.3;white-space:normal}
+.mode-pill.mode-pill-lt{border-color:var(--sea);color:var(--sea);background:var(--sea-light)}
+.mode-pill.mode-pill-lt.active{background:var(--sea);border-color:var(--sea);color:#fff}
+.mode-pill.mode-pill-lt:hover{border-color:var(--sea);background:var(--sea);color:#fff}
 @media(max-width:700px){.mode-bar{grid-template-columns:repeat(3,1fr)}}
 
 /* Panels */
@@ -176,6 +179,20 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,252,247,
 
 .tips-full{margin-top:12px}
 
+/* Long Turn vocab dropdown */
+.lt-vocab-drop{margin-top:12px;border-top:1px solid rgba(46,196,182,.25);padding-top:10px}
+.lt-vocab-header{display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;padding:4px 0}
+.lt-vocab-label{font-family:'JetBrains Mono',monospace;font-size:.65rem;text-transform:uppercase;letter-spacing:.12em;color:var(--sea);font-weight:500}
+.lt-vocab-icon{color:var(--sea);font-size:.75rem;transition:transform .2s}
+.lt-vocab-drop.open .lt-vocab-icon{transform:rotate(180deg)}
+.lt-vocab-body{display:none;padding-top:10px}
+.lt-vocab-drop.open .lt-vocab-body{display:block}
+.lt-card-wrap{display:flex;flex-direction:column;gap:10px}
+.lt-counter{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px}
+.lt-actions{display:flex;justify-content:flex-end}
+.lt-shuffle-btn{background:var(--sea);color:#fff;border:none;border-radius:100px;padding:9px 22px;font-size:.84rem;font-weight:700;cursor:pointer;transition:all .2s;font-family:'Nunito',sans-serif}
+.lt-shuffle-btn:hover{background:#28b0a2;transform:translateY(-1px);box-shadow:var(--shadow-md)}
+
 @media(max-width:700px){.tips-grid{grid-template-columns:1fr}}
 
 @media(max-width:700px){
@@ -277,6 +294,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,252,247,
   <div class="mode-bar" id="mode-bar"></div>
 
   <div id="tests-container"></div>
+  <div id="panel-lt" class="panel"></div>
 
 </div>
 
@@ -882,6 +900,160 @@ const moreTests = [
 
 tests.push(...moreTests);
 
+// ── 100 Long Turn cue cards ──
+const longTurns = [
+  { topic:"a place you visited that made a strong impression", bullets:["where it was","what you saw or did there","who you were with"], rounding:"explain why it left such an impression on you", vocab:["stunning","atmosphere","breathtaking","awe-inspiring","memorable","vivid","overwhelming","struck me"] },
+  { topic:"a person who has inspired you", bullets:["who they are","how you know or know of them","what they have achieved or done"], rounding:"explain why they inspire you", vocab:["admire","motivate","role model","achievement","determination","influence","look up to","aspiring"] },
+  { topic:"a skill you would like to learn", bullets:["what it is","why you want to learn it","how you would go about learning it"], rounding:"explain how it would change your life", vocab:["proficiency","master","dedicate","practice","talent","fulfilling","challenge","rewarding"] },
+  { topic:"a book or film that affected you deeply", bullets:["what it is and who created it","what it is about","when you read or watched it"], rounding:"explain why it had such an impact on you", vocab:["moved","thought-provoking","compelling","resonate","perspective","profound","gripping","reflect"] },
+  { topic:"a time when you received helpful advice", bullets:["who gave you the advice","what the situation was","what the advice was"], rounding:"explain how it helped you", vocab:["guidance","mentor","perspective","reassured","insight","constructive","grateful","turning point"] },
+  { topic:"an important decision you made", bullets:["what the decision was","why it was difficult","what you decided to do"], rounding:"explain what the outcome was and whether you regret it", vocab:["weigh up","consequences","deliberate","commitment","sacrifice","regret","confident","pivotal"] },
+  { topic:"a celebration or special event you attended", bullets:["what the occasion was","where it was held and who attended","what happened"], rounding:"explain why it was so memorable", vocab:["joyful","festive","gather","cherish","atmosphere","unforgettable","occasion","toast"] },
+  { topic:"a piece of technology you find particularly useful", bullets:["what it is","how you use it","when you got it or started using it"], rounding:"explain what you would do without it", vocab:["convenient","efficient","indispensable","rely on","innovative","seamless","transform","everyday"] },
+  { topic:"a time when you helped someone", bullets:["who you helped and what the situation was","what you did","how the person responded"], rounding:"explain how it made you feel", vocab:["compassion","empathy","support","gratitude","selfless","rewarding","reach out","meaningful"] },
+  { topic:"a hobby or interest you have", bullets:["what it is","how you got into it","how much time you spend on it"], rounding:"explain what you get out of it", vocab:["passion","unwind","fulfilling","engrossing","therapeutic","creative","dedicated","lose track of time"] },
+  { topic:"a time when you were very proud of yourself", bullets:["what the situation was","what you did","how others reacted"], rounding:"explain why you felt so proud", vocab:["achievement","determination","persevere","rewarding","overcome","self-belief","confidence","milestone"] },
+  { topic:"a place in your country that you would recommend to visitors", bullets:["where it is","what it is famous for","when the best time to visit is"], rounding:"explain why you think visitors should go there", vocab:["picturesque","cultural","historic","vibrant","welcoming","unique","off the beaten track","unmissable"] },
+  { topic:"a time when things did not go as planned", bullets:["what you were hoping to do","what went wrong","how you dealt with it"], rounding:"explain what you learned from the experience", vocab:["setback","adapt","resilience","frustrating","unexpected","overcome","lesson","flexible"] },
+  { topic:"a subject you studied that you found fascinating", bullets:["what the subject was","who taught it or where you studied it","what you found most interesting"], rounding:"explain why it has stayed with you", vocab:["captivating","intellectually stimulating","curious","in-depth","inspired","complex","rewarding","broaden"] },
+  { topic:"a gift you gave or received that was particularly meaningful", bullets:["what the gift was","who gave or received it","what the occasion was"], rounding:"explain why it meant so much", vocab:["thoughtful","sentimental","heartfelt","precious","cherish","gesture","symbolise","treasure"] },
+  { topic:"a time you tried something for the first time", bullets:["what it was","why you decided to try it","what happened"], rounding:"explain whether you would do it again", vocab:["apprehensive","exhilarating","nervous","overcome","daring","eye-opening","memorable","step out"] },
+  { topic:"a piece of music that is meaningful to you", bullets:["what it is and who it is by","when you first heard it","what memories or feelings it evokes"], rounding:"explain why it is so special to you", vocab:["evocative","nostalgic","lyrics","melody","resonate","emotionally","soothing","stirring"] },
+  { topic:"an occasion when you felt nervous", bullets:["what the situation was","why you felt nervous","what you did"], rounding:"explain how you overcame your nerves", vocab:["anxious","apprehensive","butterflies","adrenaline","composed","overcome","breathe","reassure"] },
+  { topic:"a journey you found particularly memorable", bullets:["where you were going","how you travelled","who you were with"], rounding:"explain why it stands out in your memory", vocab:["adventure","scenic","exhausting","exhilarating","distant","winding","unfamiliar","horizon"] },
+  { topic:"a skill or talent you have that others admire", bullets:["what it is","how you developed it","how you use it"], rounding:"explain how it has benefited you", vocab:["proficient","natural","hone","practise","compliment","effortless","versatile","distinctive"] },
+  { topic:"a time you disagreed with someone and how you handled it", bullets:["who you disagreed with","what the disagreement was about","how you responded"], rounding:"explain what you learned about communication or compromise", vocab:["conflict","perspective","tactful","compromise","assertive","diplomatic","resolve","empathise"] },
+  { topic:"a meal that you will always remember", bullets:["where you had it and who with","what you ate","what the occasion was"], rounding:"explain why it is unforgettable", vocab:["flavourful","indulge","savour","atmosphere","wholesome","mouthwatering","occasion","linger"] },
+  { topic:"a time when you felt very happy", bullets:["when and where it was","what happened","who was with you"], rounding:"explain what made it so special", vocab:["elated","content","joyful","beaming","carefree","grateful","lighthearted","blissful"] },
+  { topic:"a historical figure you find interesting", bullets:["who they are","what they are famous for","when they lived"], rounding:"explain why you find them fascinating", vocab:["influential","legacy","era","remarkable","revolutionary","controversial","visionary","significant"] },
+  { topic:"an object that is important to you", bullets:["what it is","where it came from","how long you have had it"], rounding:"explain why it matters to you", vocab:["sentimental","irreplaceable","cherish","symbolise","memories","precious","handed down","meaningful"] },
+  { topic:"a time you achieved something through hard work", bullets:["what you were trying to achieve","what obstacles you faced","how long it took"], rounding:"explain how it felt when you succeeded", vocab:["determination","perseverance","dedication","rewarding","overcome","milestone","relentless","payoff"] },
+  { topic:"a city or place you would love to live in", bullets:["where it is","what it is like","why it appeals to you"], rounding:"explain what is stopping you from living there", vocab:["vibrant","cosmopolitan","culture","lifestyle","pace of life","welcoming","opportunity","thrive"] },
+  { topic:"a time when you experienced culture shock", bullets:["where you were","what surprised or confused you","how you reacted"], rounding:"explain what it taught you about cultural differences", vocab:["unfamiliar","disoriented","customs","adapt","open-minded","differences","perspective","adjust"] },
+  { topic:"a teacher or mentor who influenced you", bullets:["who they were","what subject or skill they taught","how they treated you"], rounding:"explain the lasting impact they had on you", vocab:["encourage","inspire","patient","passionate","formative","guidance","belief","transform"] },
+  { topic:"a time when you changed your mind about something important", bullets:["what your original view was","what happened to make you reconsider","how you felt about the change"], rounding:"explain whether you think changing your mind was a sign of strength or weakness", vocab:["reconsider","open-minded","evidence","perspective","humility","evolve","reassess","turning point"] },
+  { topic:"a news story that affected you emotionally", bullets:["what it was about","when and how you heard about it","what your immediate reaction was"], rounding:"explain why it affected you so strongly", vocab:["disturbing","moving","outrage","empathy","eye-opening","injustice","awareness","struck"] },
+  { topic:"a sport or physical activity you enjoy", bullets:["what it is","how you got started","how often you do it"], rounding:"explain what it gives you beyond physical fitness", vocab:["endurance","competitive","energising","teamwork","discipline","rewarding","release","exhilarating"] },
+  { topic:"an ambition you have had since you were young", bullets:["what it is","where it came from","whether you have pursued it"], rounding:"explain whether you still think it is achievable", vocab:["aspire","dream","pursue","determination","realistic","passion","envision","dedicated"] },
+  { topic:"a photograph that has special meaning to you", bullets:["what it shows","when it was taken and by whom","where you keep it"], rounding:"explain why it is precious to you", vocab:["nostalgic","capture","moment","cherish","vivid","meaningful","irreplaceable","evokes"] },
+  { topic:"a time when you overcame a fear", bullets:["what the fear was","what prompted you to face it","what you did"], rounding:"explain how it changed you", vocab:["courage","confront","dread","anxiety","breakthrough","empowering","relief","triumph"] },
+  { topic:"a conversation you had that you still think about", bullets:["who it was with","what it was about","when and where it took place"], rounding:"explain why it has stayed with you", vocab:["candid","meaningful","thought-provoking","linger","honest","perspective","resonated","struck me"] },
+  { topic:"a local tradition or custom that you value", bullets:["what it is","when and how it is observed","who takes part"], rounding:"explain why you think it is worth preserving", vocab:["heritage","preserve","celebrate","identity","ritual","community","meaningful","hand down"] },
+  { topic:"a time when you made a mistake and learned from it", bullets:["what the mistake was","how it happened","what the consequences were"], rounding:"explain what you took away from the experience", vocab:["misjudge","consequences","accountability","reflect","constructive","growth","lesson","bounce back"] },
+  { topic:"a childhood memory that makes you smile", bullets:["what happened","where and when it was","who else was involved"], rounding:"explain why it still makes you happy", vocab:["nostalgic","innocent","carefree","fond","vivid","cherish","simpler times","warmth"] },
+  { topic:"a time you had to adapt to a new situation quickly", bullets:["what the new situation was","why you had to adapt","what you did"], rounding:"explain how the experience helped you grow", vocab:["flexible","resilient","resourceful","unfamiliar","challenge","adjust","cope","determination"] },
+  { topic:"a piece of art, design, or architecture you find beautiful", bullets:["what it is","where you saw or experienced it","what it looks like"], rounding:"explain why it appeals to you", vocab:["aesthetically","striking","intricate","elegant","craftsmanship","evocative","timeless","awe-inspiring"] },
+  { topic:"a time when a stranger was kind to you", bullets:["what the situation was","what they did","how you reacted"], rounding:"explain what it taught you about human nature", vocab:["generosity","unexpected","restore faith","humanity","gratitude","selfless","moved","random kindness"] },
+  { topic:"an environmental issue that concerns you", bullets:["what the issue is","why it matters to you","what is being done about it"], rounding:"explain what you think individuals can do to help", vocab:["alarming","urgent","sustainability","emissions","biodiversity","awareness","collective action","responsibility"] },
+  { topic:"a time you spent money on something and regretted it", bullets:["what you bought","why you bought it","what you thought afterwards"], rounding:"explain what it taught you about spending habits", vocab:["impulse","overpriced","disappointment","regret","frivolous","lesson","reconsider","value"] },
+  { topic:"a social occasion that you found difficult", bullets:["what the occasion was","why you found it difficult","how you managed"], rounding:"explain what you would do differently now", vocab:["awkward","uncomfortable","self-conscious","navigate","small talk","overwhelmed","manage","composure"] },
+  { topic:"a time when you were surprised by someone's behaviour", bullets:["who it was","what they did","how you reacted at the time"], rounding:"explain whether it changed how you thought about them", vocab:["unexpected","taken aback","reassess","judgement","generous","contradicted","perceptions","reveal"] },
+  { topic:"a language or subject you would like to study", bullets:["what it is","why you want to study it","how you would approach learning it"], rounding:"explain what you hope to gain from it", vocab:["fluent","dedicate","immerse","broaden","pursue","proficiency","challenging","rewarding"] },
+  { topic:"a time when you had to work as part of a team", bullets:["what the task or project was","who you worked with","what role you played"], rounding:"explain what you learned about collaboration", vocab:["collaborate","divide","coordinate","communicate","contribute","friction","consensus","dynamic"] },
+  { topic:"a rule or law you think is unfair", bullets:["what it is","why you think it exists","who it affects"], rounding:"explain what you would change about it", vocab:["unjust","outdated","discriminatory","reform","enforce","debate","rights","challenge"] },
+  { topic:"a time when you felt out of your comfort zone", bullets:["what the situation was","why it was uncomfortable","how you responded"], rounding:"explain whether you think it was worth pushing yourself", vocab:["uncomfortable","challenge","vulnerable","stretch","resilient","courage","growth","unfamiliar"] },
+  { topic:"a website or app you use regularly", bullets:["what it is","what you use it for","how often you use it"], rounding:"explain what you would do without it", vocab:["streamline","indispensable","intuitive","convenient","efficient","reliable","transform","habit"] },
+  { topic:"a time you performed or presented in front of others", bullets:["what the occasion was","how you prepared","what happened"], rounding:"explain how it felt and whether you would do it again", vocab:["nerve-wracking","rehearse","adrenaline","poised","audience","overcome","confident","deliver"] },
+  { topic:"a festival or public holiday you enjoy", bullets:["what it is","how it is celebrated","who you celebrate with"], rounding:"explain what makes it special to you", vocab:["festive","tradition","gather","celebrate","vibrant","joyful","community","occasion"] },
+  { topic:"a time when you had to be patient", bullets:["what you were waiting for","how long it took","how you dealt with the wait"], rounding:"explain what the experience taught you", vocab:["frustrating","persistent","persevere","endure","composed","eventually","worthwhile","reward"] },
+  { topic:"a person in your life who always makes you laugh", bullets:["who they are","how you know them","what they do or say that makes you laugh"], rounding:"explain why humour is important in a relationship", vocab:["humour","witty","lighthearted","bond","laughter","infectious","spontaneous","joy"] },
+  { topic:"a time you experienced failure and what came next", bullets:["what you attempted","what went wrong","how you felt"], rounding:"explain how failure changed your approach to future challenges", vocab:["setback","deflating","resilience","determination","reframe","persevere","comeback","lesson"] },
+  { topic:"a time when you felt very stressed and how you coped", bullets:["what was causing the stress","how it affected you","what you did to deal with it"], rounding:"explain what you learned about managing pressure", vocab:["overwhelmed","pressure","burnout","decompress","coping strategy","mindful","relief","prioritise"] },
+  { topic:"a time you witnessed or experienced injustice", bullets:["what happened","who was involved","how you reacted"], rounding:"explain how it made you think about fairness and justice", vocab:["unfair","powerless","outraged","speak up","empathy","systemic","dignity","stand up"] },
+  { topic:"a building or place in your city that you find interesting", bullets:["what it is and where it is","what it is used for","its history or significance"], rounding:"explain why it stands out to you", vocab:["architectural","landmark","historic","character","striking","heritage","atmosphere","distinctive"] },
+  { topic:"an activity you do to relax", bullets:["what it is","when and how often you do it","how you discovered it"], rounding:"explain why it works for you as a way to unwind", vocab:["unwind","therapeutic","recharge","calm","switch off","mindful","soothing","restorative"] },
+  { topic:"a time you had to make a difficult choice between two things you wanted", bullets:["what the two options were","why both appealed to you","what you chose"], rounding:"explain whether you think you made the right decision", vocab:["dilemma","weigh up","sacrifice","trade-off","deliberate","commit","regret","compromise"] },
+  { topic:"a job or career that interests you", bullets:["what it is","what it involves","why it appeals to you"], rounding:"explain whether you think you could pursue it realistically", vocab:["rewarding","stimulating","purpose","challenging","opportunity","passion","meaningful","aspire"] },
+  { topic:"a time when you did something spontaneous", bullets:["what you did","why you decided to do it","what the result was"], rounding:"explain whether you think spontaneity is generally a good thing", vocab:["impulsive","carefree","adventurous","liberating","unexpected","memorable","on a whim","no regrets"] },
+  { topic:"a tradition in your family that you value", bullets:["what it is","how it started","how it is observed today"], rounding:"explain why you would like to pass it on", vocab:["heritage","ritual","preserve","bond","nostalgic","meaningful","hand down","identity"] },
+  { topic:"a time when you felt a strong sense of belonging", bullets:["where you were","who you were with","what was happening"], rounding:"explain what that feeling of belonging meant to you", vocab:["connected","community","acceptance","included","warmth","bond","at home","valued"] },
+  { topic:"a time you were deeply moved by something", bullets:["what it was — a film, event, piece of music, or moment","when and where it happened","how you reacted"], rounding:"explain why it had such an emotional impact", vocab:["emotional","profound","stirring","moved to tears","resonated","touching","overwhelming","raw"] },
+  { topic:"a complaint you made and how it was handled", bullets:["what you were unhappy about","how you raised it","what happened as a result"], rounding:"explain whether you feel the outcome was fair", vocab:["frustrated","assertive","resolute","satisfactory","resolved","persistence","feedback","justified"] },
+  { topic:"a time you had to say goodbye to someone or something", bullets:["what or who you were saying goodbye to","what the circumstances were","how you felt"], rounding:"explain how you dealt with the experience", vocab:["bittersweet","emotional","closure","moving on","cherish","transition","farewell","grief"] },
+  { topic:"a dream or ambition you gave up on", bullets:["what it was","why you had it","why you let it go"], rounding:"explain whether you have any regrets about giving it up", vocab:["unrealistic","let go","regret","redirect","accept","pragmatic","evolve","peace with it"] },
+  { topic:"an animal or place in nature that fascinates you", bullets:["what it is","where you encountered or learned about it","what is remarkable about it"], rounding:"explain why it captures your imagination", vocab:["extraordinary","ecosystem","captivating","rare","preserve","in awe","breathtaking","biodiversity"] },
+  { topic:"a time when technology let you down", bullets:["what happened","when and where it occurred","how it affected you"], rounding:"explain what it made you think about our dependence on technology", vocab:["frustrating","dependent","malfunction","disruptive","vulnerable","backup","restore","reliability"] },
+  { topic:"a person from history you wish you could meet", bullets:["who they are","what they are famous for","what era they lived in"], rounding:"explain what you would ask or say to them", vocab:["legendary","era","influential","visionary","iconic","insight","curious about","lasting impact"] },
+  { topic:"a time you had to apologise for something", bullets:["what happened","why you needed to apologise","how the other person responded"], rounding:"explain what you learned about the importance of saying sorry", vocab:["sincere","remorseful","accountable","humble","repair","genuine","forgiveness","acknowledge"] },
+  { topic:"a time when reading or watching something changed how you saw the world", bullets:["what you read or watched","when it was","what view or assumption it challenged"], rounding:"explain how your thinking has been different since", vocab:["perspective","eye-opening","challenge","broaden","assumptions","empathy","profound","reframe"] },
+  { topic:"a time you felt genuinely proud of someone else", bullets:["who it was","what they did or achieved","how you heard about it"], rounding:"explain what it says about your relationship with that person", vocab:["admire","celebrate","beaming","inspired","deserve","achievement","moved","proud"] },
+  { topic:"something you used to believe that you no longer do", bullets:["what the belief was","where it came from","what made you change your mind"], rounding:"explain whether you think it is easy or hard to change deeply held beliefs", vocab:["evolve","reconsider","challenge","open-minded","grow","naive","shift","informed"] },
+  { topic:"a time when you had to deal with uncertainty", bullets:["what the situation was","what was uncertain","how you managed not knowing"], rounding:"explain what the experience taught you about yourself", vocab:["anxious","ambiguous","unpredictable","cope","resilient","adapt","trust","accept"] },
+  { topic:"an experience that made you grateful for what you have", bullets:["what happened","when and where it was","how your perspective shifted"], rounding:"explain whether it had a lasting effect on your attitude to life", vocab:["perspective","appreciative","fortunate","count your blessings","humbling","contentment","reflect","privilege"] },
+  { topic:"a time you tried a food or cuisine you had never eaten before", bullets:["what it was","where and when you tried it","what you thought of it"], rounding:"explain whether it changed your view of food from that culture", vocab:["adventurous","unfamiliar","flavour","texture","exotic","culture","broaden","palate"] },
+  { topic:"a person who always gives you good advice", bullets:["who they are","how you know them","the kind of advice they give"], rounding:"explain why you trust their judgement", vocab:["trusted","insightful","wise","perspective","reliable","candid","mentor","turn to"] },
+  { topic:"a time when you had more responsibility than usual", bullets:["what the situation was","what was expected of you","how you coped"], rounding:"explain what the experience revealed about your ability to handle pressure", vocab:["accountable","pressure","stepping up","capability","trusted","demanding","manage","growth"] },
+  { topic:"a subject or debate in the news that you feel strongly about", bullets:["what the issue is","why you care about it","what the different perspectives are"], rounding:"explain what you think should be done about it", vocab:["passionate","concerned","urgent","stance","evidence","debate","advocate","convince"] },
+  { topic:"a time you did something creative", bullets:["what you made or created","what inspired you","how long it took"], rounding:"explain what the creative process means to you", vocab:["imaginative","expressive","absorbed","flow","original","craft","fulfilling","create"] },
+  { topic:"a time you felt misunderstood", bullets:["what the situation was","what you were trying to communicate","how the other person reacted"], rounding:"explain what you learned about communication", vocab:["frustrating","communicate","context","intent","misjudged","clarify","patient","empathy"] },
+  { topic:"a time you had to start over from scratch", bullets:["what you were doing","what went wrong or changed","how you approached starting again"], rounding:"explain whether you think starting over made things better or worse", vocab:["daunting","fresh start","rebuild","resilient","opportunity","challenge","determination","blank slate"] },
+  { topic:"a childhood toy or game you remember fondly", bullets:["what it was","when and how you used it","who you played with"], rounding:"explain why you think childhood play matters", vocab:["nostalgic","innocent","imaginative","simple","carefree","bond","creative","memories"] },
+  { topic:"something in your daily routine that you find important", bullets:["what it is","when and why you do it","how long you have done it"], rounding:"explain what would change if you stopped doing it", vocab:["grounding","consistent","structure","habit","ritual","wellbeing","purposeful","anchor"] },
+  { topic:"a time when you felt that life was unfair", bullets:["what happened","who was involved","how you felt at the time"], rounding:"explain how you moved on from it", vocab:["frustrated","resentful","injustice","accept","perspective","move on","resilient","bitter"] },
+  { topic:"a time you witnessed an act of great kindness", bullets:["what happened","who was involved","where and when it took place"], rounding:"explain what effect it had on your belief in people", vocab:["generous","selfless","touched","restore faith","humanity","compassion","inspiring","unexpected"] },
+  { topic:"a time you had to speak in public", bullets:["what the occasion was","how you prepared","what happened"], rounding:"explain how you felt before, during, and after", vocab:["nerve-wracking","rehearse","stumble","compose","adrenaline","audience","confidence","deliver"] },
+  { topic:"something you wish you had done differently in the past", bullets:["what it was","when it happened","why you made the choice you did at the time"], rounding:"explain what you would do if you could go back", vocab:["regret","hindsight","reconsider","learn","reflect","missed opportunity","accept","grow"] },
+  { topic:"a time when your expectations of something were completely wrong", bullets:["what you expected","what actually happened","how you reacted to the difference"], rounding:"explain what it taught you about making assumptions", vocab:["assumption","surprise","misconception","reality","adjust","open-minded","rethink","taken aback"] },
+  { topic:"a time you felt truly at peace", bullets:["where you were","what you were doing","who you were with or whether you were alone"], rounding:"explain what that sense of peace means to you", vocab:["serenity","contentment","stillness","mindful","present","calm","breathe","unhurried"] },
+  { topic:"a situation where you had to be honest even though it was uncomfortable", bullets:["what the situation was","what you said or did","how the other person responded"], rounding:"explain whether you believe honesty is always the right choice", vocab:["candid","difficult truth","courage","trust","transparent","awkward","integrity","uncomfortable"] },
+  { topic:"a time you were inspired by something unexpected", bullets:["what it was — a conversation, an experience, an object","when and where it happened","what idea or feeling it sparked"], rounding:"explain what came out of that inspiration", vocab:["spontaneous","spark","creative","motivation","unexpected","profound","shift","energised"] },
+  { topic:"a time you had to cope with a big change in your life", bullets:["what changed","how quickly it happened","what challenges it brought"], rounding:"explain how the experience shaped who you are today", vocab:["transition","adjustment","upheaval","adapt","resilient","uncertainty","grow","navigate"] },
+  { topic:"a time when you felt completely lost or confused", bullets:["what the situation was","why you felt so disoriented","who helped you or how you found your way"], rounding:"explain what the experience taught you about asking for help", vocab:["confused","overwhelmed","disorientated","uncertain","anxious","clarity","relief","resilience"] },
+  { topic:"a time when you had to learn something very quickly", bullets:["what you needed to learn","why there was so little time","how you went about it"], rounding:"explain how well you managed and what the outcome was", vocab:["pressure","deadline","adapt","absorb","focus","efficient","cramming","under pressure"] },
+  { topic:"an important conversation you had with a family member", bullets:["who it was with","what it was about","when and where it took place"], rounding:"explain why that conversation has stayed with you", vocab:["meaningful","candid","honest","bond","understand","revelation","heartfelt","open up"] },
+  { topic:"a time when you felt truly free", bullets:["when and where it was","what you were doing","what circumstances allowed you to feel that way"], rounding:"explain what freedom means to you personally", vocab:["liberated","carefree","spontaneous","unburdened","escape","peace","independence","alive"] },
+];
+
+function renderLongTurn() {
+  const panel = document.getElementById('panel-lt');
+  panel.innerHTML = `
+    <div class="exam-info">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>
+      <div><strong>Long Turn Practice — Part 2 drill.</strong> A random cue card appears each time. Take 1 minute to prepare notes, then speak for 1–2 minutes. Tap shuffle for a new card.</div>
+    </div>
+    <div class="lt-card-wrap">
+      <div class="lt-counter" id="lt-counter"></div>
+      <div class="cue-card" id="lt-cue"></div>
+      <div class="lt-actions">
+        <button class="lt-shuffle-btn" onclick="shuffleLT()">🎲 Shuffle</button>
+      </div>
+      ${timerHTML('lt-prep', 60)}
+      <div class="lbl" style="margin-top:14px">Speaking (1–2 min)</div>
+      ${timerHTML('lt-speak', 120)}
+    </div>`;
+  shuffleLT();
+}
+
+let ltSeen = [];
+function shuffleLT() {
+  if (ltSeen.length >= longTurns.length) ltSeen = [];
+  const remaining = longTurns.filter((_,i) => !ltSeen.includes(i));
+  const idx = longTurns.indexOf(remaining[Math.floor(Math.random() * remaining.length)]);
+  ltSeen.push(idx);
+  const c = longTurns[idx];
+  document.getElementById('lt-counter').textContent = `Card ${ltSeen.length} of ${longTurns.length}`;
+  document.getElementById('lt-cue').innerHTML = `
+    <div class="cue-topic">Describe ${c.topic}.</div>
+    <div class="cue-prompt">You should say:</div>
+    <ul class="cue-bullets">${c.bullets.map(b=>`<li>${b}</li>`).join('')}</ul>
+    <div class="cue-footer">…and ${c.rounding}.</div>
+    ${c.vocab ? `<div class="lt-vocab-drop">
+      <div class="lt-vocab-header" onclick="this.parentElement.classList.toggle('open')">
+        <span class="lt-vocab-label">Topic vocabulary</span>
+        <span class="lt-vocab-icon">▾</span>
+      </div>
+      <div class="lt-vocab-body"><div class="chips">${c.vocab.map(v=>`<span class="chip">${v}</span>`).join('')}</div></div>
+    </div>` : ''}`;
+  // reset timers
+  ['lt-prep','lt-speak'].forEach(id => {
+    const btn = document.getElementById('tb-'+id);
+    const disp = document.getElementById('td-'+id);
+    if (timers['tb-'+id]) { clearInterval(timers['tb-'+id]); timers['tb-'+id]=null; }
+    if (btn) { btn.textContent='Start Timer'; btn.classList.remove('running'); }
+    if (disp) disp.classList.remove('visible');
+  });
+}
+
 const langP1 = [
   "Well, to be honest…","That's an interesting question — I'd say…",
   "I suppose the main thing is…","I've always been quite…",
@@ -941,14 +1113,14 @@ function renderTests() {
   const bar = document.getElementById('mode-bar');
   bar.innerHTML = tests.map((t,i) =>
     `<button class="mode-pill${i===0?' active':''}" data-test="${t.id}"><span class="pill-num">Test ${t.id}</span><span class="pill-topic">${t.p1Topic}</span></button>`
-  ).join('');
+  ).join('') +
+  `<button class="mode-pill mode-pill-lt" data-test="lt"><span class="pill-num">Practice</span><span class="pill-topic">Long Turn Shuffle</span></button>`;
 
   // Build panels
   const container = document.getElementById('tests-container');
   container.innerHTML = tests.map(t => {
     const id = `t${t.id}`;
     return `<div class="panel${t.id===1?' active':''}" id="panel-${t.id}">
-
       <div class="exam-info">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>
         <div><strong>IELTS Speaking — 3 parts, 11–14 minutes total.</strong> Part 1: examiner interview (4–5 min). Part 2: individual long turn with 1 min prep (3–4 min). Part 3: two-way discussion on abstract themes (4–5 min).</div>
@@ -1075,11 +1247,12 @@ document.getElementById('mode-bar').addEventListener('click', e => {
   if (!pill) return;
   document.querySelectorAll('.mode-pill').forEach(p => p.classList.remove('active'));
   pill.classList.add('active');
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('#tests-container .panel, #panel-lt').forEach(p => p.classList.remove('active'));
   document.getElementById('panel-' + pill.dataset.test).classList.add('active');
 });
 
 renderTests();
+renderLongTurn();
 </script>
 </body>
 </html>
