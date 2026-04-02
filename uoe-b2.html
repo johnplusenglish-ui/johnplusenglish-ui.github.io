@@ -277,6 +277,39 @@ footer{text-align:center;padding:2.5rem 2rem;font-size:.8rem;color:var(--muted);
 .part-section-header .part-tag{font-family:'JetBrains Mono',monospace;font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);background:var(--accent-light);padding:4px 10px;border-radius:6px}
 .test-container{display:none;max-width:800px;margin:0 auto;padding:0 2rem 2rem;position:relative;z-index:1}
 .test-container.visible{display:block}
+
+/* Print */
+.print-btn{font-family:'Nunito',sans-serif;font-size:.75rem;font-weight:600;color:var(--muted);cursor:pointer;padding:5px 12px;border-radius:100px;border:1.5px solid var(--border);background:var(--card);transition:all .15s;display:inline-flex;align-items:center;gap:4px}
+.print-btn:hover{border-color:var(--accent);color:var(--accent)}
+/* Score summary */
+.score-summary{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-top:24px;margin-bottom:8px;box-shadow:var(--shadow-sm);text-align:center}
+.score-summary-title{font-family:'DM Serif Display',serif;font-size:1.15rem;margin-bottom:12px}
+.score-summary-grid{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+.score-summary-item{text-align:center;min-width:80px}
+.score-summary-item .ss-label{font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.score-summary-item .ss-val{font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:700;color:var(--accent)}
+.score-summary-total{font-family:'JetBrains Mono',monospace;font-size:.85rem;font-weight:700;color:var(--ink);padding-top:10px;border-top:1.5px solid var(--border)}
+.score-summary .btn{margin-top:14px}
+/* Progress tracker */
+.progress-tracker{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);margin-bottom:20px;overflow:hidden;box-shadow:var(--shadow-sm)}
+.pt-header{padding:14px 20px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none;transition:background .15s}
+.pt-header:hover{background:var(--cream)}
+.pt-title{font-family:'DM Serif Display',serif;font-size:1rem;display:flex;align-items:center;gap:8px}
+.pt-summary{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:600;color:var(--accent);padding:2px 8px;background:var(--accent-light);border-radius:5px}
+.pt-chevron{color:var(--muted);transition:transform .25s;font-size:.85rem}
+.progress-tracker.collapsed .pt-chevron{transform:rotate(-90deg)}
+.pt-body{padding:14px 20px 18px;border-top:1.5px solid var(--border)}
+.progress-tracker.collapsed .pt-body{display:none}
+.pt-grid{display:flex;flex-wrap:wrap;gap:5px}
+.pt-dot{width:32px;height:32px;border-radius:8px;border:1.5px solid var(--border);background:var(--cream);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:700;color:var(--muted);cursor:pointer;transition:all .15s;position:relative}
+.pt-dot:hover{border-color:var(--accent);transform:translateY(-1px);box-shadow:var(--shadow-sm)}
+.pt-dot.done{background:rgba(52,199,89,.1);border-color:rgba(52,199,89,.4);color:#1a7a34}
+.pt-dot.partial{background:var(--accent-light);border-color:var(--accent);color:var(--accent)}
+.pt-reset{font-family:'Nunito',sans-serif;font-size:.7rem;font-weight:600;color:var(--muted);cursor:pointer;padding:4px 10px;border-radius:100px;border:1.5px solid var(--border);background:var(--card);transition:all .15s}
+.pt-reset:hover{border-color:var(--coral);color:var(--coral)}
+/* Next test */
+.next-test-bar{text-align:center;padding:20px 0;margin-top:12px}
+@media print{body *{display:none!important}.part-section.printing,.part-section.printing *{display:revert!important}.part-section.printing{position:absolute;top:0;left:0;width:100%}.part-section.printing .exam-tips,.part-section.printing .actions,.part-section.printing .exam-info,.part-section.printing .score-display,.part-section.printing .progress-bar,.part-section.printing .print-btn,.part-section.printing .part-section-header{display:block!important}.part-section.printing .test-card{border:none!important;box-shadow:none!important}body::before{display:none!important}}
 </style>
 </head>
 <body>
@@ -300,6 +333,14 @@ footer{text-align:center;padding:2.5rem 2rem;font-size:.8rem;color:var(--muted);
     <span class="part-filter-pill" data-part="3" onclick="filterPart('3')">Part 3</span>
     <span class="part-filter-pill" data-part="4" onclick="filterPart('4')">Part 4</span>
   </div>
+
+  <div class="progress-tracker collapsed" id="progressTracker">
+    <div class="pt-header" onclick="ptToggle()">
+      <span class="pt-title">Your Progress <span class="pt-summary" id="ptSummary">0 / 20</span></span>
+      <span style="display:flex;align-items:center;gap:8px"><button class="pt-reset" onclick="event.stopPropagation();ptReset()">Reset</button><span class="pt-chevron" id="ptChevron">▾</span></span>
+    </div>
+    <div class="pt-body"><div class="pt-grid" id="ptGrid"></div></div>
+  </div>
 </div>
 <div class="test-container" id="testContainer">
   <!-- Part 1 -->
@@ -309,7 +350,7 @@ footer{text-align:center;padding:2.5rem 2rem;font-size:.8rem;color:var(--muted);
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>
       <div><strong>Part 1 — Multiple Choice Cloze.</strong> Read the text and choose the best answer (A, B, C or D) for each gap. Eight questions, 1 mark each.</div>
     </div>
-    <div class="exam-tips" id="tips-testArea"><div class="exam-tips-header" onclick="this.parentElement.classList.toggle('open')"><span>📝 Exam Tips — Part 1</span><span class="exam-tips-chevron">▾</span></div><div class="exam-tips-body"><div class="tip-category">Strategy</div><div class="tip-item"><span class="tip-icon">💡</span><span>Read the whole text first before looking at the options. Understanding the overall meaning helps you choose the right word.</span></div><div class="tip-item"><span class="tip-icon">💡</span><span>Look at the words before and after each gap. Many answers depend on collocations (words that naturally go together).</span></div><div class="tip-category">Common Mistakes</div><div class="tip-item"><span class="tip-icon">⚠️</span><span>All four options may seem possible. Check which one fits the specific context and grammar of the sentence.</span></div><div class="tip-item"><span class="tip-icon">⚠️</span><span>Don’t choose an answer just because it translates well from your language. English collocations are often different.</span></div><div class="tip-category">Time Management</div><div class="tip-item"><span class="tip-icon">⏱️</span><span>Aim for about 10 minutes on Part 1. If stuck, move on and come back.</span></div></div></div>
+    <div class="exam-tips" id="tips-p1"><div class="exam-tips-header" onclick="this.parentElement.classList.toggle('open')"><span>📝 Exam Tips — Part 1</span><span class="exam-tips-chevron">▾</span></div><div class="exam-tips-body"><div class="tip-category">Strategy</div><div class="tip-item"><span class="tip-icon">💡</span><span>Read the whole text first for overall meaning. Then read each gapped sentence carefully before looking at the options.</span></div><div class="tip-item"><span class="tip-icon">💡</span><span>Many questions test collocations (words that naturally go together). Think: does this word "sound right" with the words around it?</span></div><div class="tip-category">Common Mistakes</div><div class="tip-item"><span class="tip-icon">⚠️</span><span>All four options may be grammatically correct. The difference is often which word collocates with the context.</span></div><div class="tip-item"><span class="tip-icon">⚠️</span><span>Don't translate from your language — English collocations are often different from what you'd expect.</span></div><div class="tip-category">Time</div><div class="tip-item"><span class="tip-icon">⏱️</span><span>Aim for about 10 minutes. If stuck, eliminate the options you're sure are wrong and make your best choice.</span></div></div></div>
     <div class="test-card" id="p1Card">
       <div class="test-header">
         <div class="test-title"><span class="tag">Part 1</span><span id="p1Title"></span></div>
@@ -319,6 +360,7 @@ footer{text-align:center;padding:2.5rem 2rem;font-size:.8rem;color:var(--muted);
       <div class="passage" id="p1Passage"></div>
       <div class="explanations" id="p1Explanations"></div>
       <div class="actions">
+        <button class="print-btn" onclick="printPart('p1')">🖨️ Print</button>
         <button class="btn btn-primary" id="p1CheckBtn" disabled onclick="p1Check()"><span class="btn-icon">✓</span> Check Answers</button>
         <button class="btn btn-amber" id="p1ShowBtn" onclick="p1Show()"><span class="btn-icon">👁</span> Show Answers</button>
         <button class="btn btn-secondary" id="p1ResetBtn" onclick="p1Reset()" style="display:none"><span class="btn-icon">↺</span> Try Again</button>
@@ -333,7 +375,7 @@ footer{text-align:center;padding:2.5rem 2rem;font-size:.8rem;color:var(--muted);
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>
       <div><strong>Part 2 — Open Cloze.</strong> Read the text and think of the word which best fits each gap. Use only one word in each gap.</div>
     </div>
-    <div class="exam-tips" id="tips-ocArea"><div class="exam-tips-header" onclick="this.parentElement.classList.toggle('open')"><span>📝 Exam Tips — Part 2</span><span class="exam-tips-chevron">▾</span></div><div class="exam-tips-body"><div class="tip-category">Strategy</div><div class="tip-item"><span class="tip-icon">💡</span><span>Most answers are grammar words: prepositions, conjunctions, pronouns, articles, auxiliaries.</span></div><div class="tip-item"><span class="tip-icon">💡</span><span>Look for fixed phrases and collocations: “in spite of”, “as well as”, “due to”.</span></div><div class="tip-category">Common Mistakes</div><div class="tip-item"><span class="tip-icon">⚠️</span><span>Only ONE word per gap. Contractions like “don’t” count as two words.</span></div><div class="tip-item"><span class="tip-icon">⚠️</span><span>Check your answer fits grammatically with the words on both sides of the gap.</span></div><div class="tip-category">Time Management</div><div class="tip-item"><span class="tip-icon">⏱️</span><span>Aim for about 10 minutes. Fill in the easy gaps first, then return to harder ones.</span></div></div></div>
+    <div class="exam-tips" id="tips-p2"><div class="exam-tips-header" onclick="this.parentElement.classList.toggle('open')"><span>📝 Exam Tips — Part 2</span><span class="exam-tips-chevron">▾</span></div><div class="exam-tips-body"><div class="tip-category">Strategy</div><div class="tip-item"><span class="tip-icon">💡</span><span>Most answers are grammar words: prepositions, conjunctions, pronouns, articles, auxiliaries, or quantifiers.</span></div><div class="tip-item"><span class="tip-icon">💡</span><span>Look for fixed phrases and collocations: "in spite of", "as well as", "due to", "apart from".</span></div><div class="tip-category">Common Mistakes</div><div class="tip-item"><span class="tip-icon">⚠️</span><span>Only ONE word per gap. Contractions like "don't" count as two words.</span></div><div class="tip-item"><span class="tip-icon">⚠️</span><span>Check your answer fits grammatically with the words on BOTH sides of the gap.</span></div><div class="tip-category">Time</div><div class="tip-item"><span class="tip-icon">⏱️</span><span>Aim for about 10 minutes. Fill in the confident answers first, then return to harder ones.</span></div></div></div>
     <div class="test-card" id="p2Card">
       <div class="test-header">
         <div class="test-title"><span class="tag">Part 2</span><span id="p2Title"></span></div>
@@ -343,6 +385,7 @@ footer{text-align:center;padding:2.5rem 2rem;font-size:.8rem;color:var(--muted);
       <div class="passage" id="p2Passage"></div>
       <div class="explanations" id="p2Explanations"></div>
       <div class="actions">
+        <button class="print-btn" onclick="printPart('p2')">🖨️ Print</button>
         <button class="btn btn-primary" id="p2CheckBtn" disabled onclick="p2Check()"><span class="btn-icon">✓</span> Check Answers</button>
         <button class="btn btn-amber" id="p2ShowBtn" onclick="p2Show()"><span class="btn-icon">👁</span> Show Answers</button>
         <button class="btn btn-secondary" id="p2ResetBtn" onclick="p2Reset()" style="display:none"><span class="btn-icon">↺</span> Try Again</button>
@@ -357,7 +400,7 @@ footer{text-align:center;padding:2.5rem 2rem;font-size:.8rem;color:var(--muted);
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>
       <div><strong>Part 3 — Word Formation.</strong> Read the text below. Use the word given in capitals at the end of some of the lines to form a word that fits in the gap in the same line.</div>
     </div>
-    <div class="exam-tips" id="tips-wfArea"><div class="exam-tips-header" onclick="this.parentElement.classList.toggle('open')"><span>📝 Exam Tips — Part 3</span><span class="exam-tips-chevron">▾</span></div><div class="exam-tips-body"><div class="tip-category">Strategy</div><div class="tip-item"><span class="tip-icon">💡</span><span>Decide what part of speech is needed: noun, adjective, adverb, or verb.</span></div><div class="tip-item"><span class="tip-icon">💡</span><span>Check whether you need a negative form (un-, in-, im-, dis-) or a plural.</span></div><div class="tip-category">Common Mistakes</div><div class="tip-item"><span class="tip-icon">⚠️</span><span>Spelling matters! Double-check tricky suffixes: -tion/-sion, -ence/-ance, -ible/-able.</span></div><div class="tip-item"><span class="tip-icon">⚠️</span><span>Some words need two changes: e.g. EMPLOY → unemployment (prefix + suffix).</span></div><div class="tip-category">Time Management</div><div class="tip-item"><span class="tip-icon">⏱️</span><span>Aim for about 10 minutes. If stuck, write your best guess — a blank scores zero.</span></div></div></div>
+    <div class="exam-tips" id="tips-p3"><div class="exam-tips-header" onclick="this.parentElement.classList.toggle('open')"><span>📝 Exam Tips — Part 3</span><span class="exam-tips-chevron">▾</span></div><div class="exam-tips-body"><div class="tip-category">Strategy</div><div class="tip-item"><span class="tip-icon">💡</span><span>Decide what part of speech is needed: noun, adjective, adverb, or verb. Then consider whether it's positive or negative.</span></div><div class="tip-item"><span class="tip-icon">💡</span><span>Check whether you need a negative prefix (un-, in-, im-, dis-), a plural, or a compound change (e.g. EMPLOY → unemployment).</span></div><div class="tip-category">Common Mistakes</div><div class="tip-item"><span class="tip-icon">⚠️</span><span>Spelling matters! Double-check tricky suffixes: -tion/-sion, -ence/-ance, -ible/-able.</span></div><div class="tip-item"><span class="tip-icon">⚠️</span><span>Some words need two changes: a prefix AND a suffix. Read the full sentence to check the meaning.</span></div><div class="tip-category">Time</div><div class="tip-item"><span class="tip-icon">⏱️</span><span>About 10 minutes. If stuck, write your best guess — a blank always scores zero.</span></div></div></div>
     <div class="test-card" id="p3Card">
       <div class="test-header">
         <div class="test-title"><span class="tag">Part 3</span><span id="p3Title"></span></div>
@@ -367,6 +410,7 @@ footer{text-align:center;padding:2.5rem 2rem;font-size:.8rem;color:var(--muted);
       <div class="passage" id="p3Passage"></div>
       <div class="explanations" id="p3Explanations"></div>
       <div class="actions">
+        <button class="print-btn" onclick="printPart('p3')">🖨️ Print</button>
         <button class="btn btn-primary" id="p3CheckBtn" disabled onclick="p3Check()"><span class="btn-icon">✓</span> Check Answers</button>
         <button class="btn btn-amber" id="p3ShowBtn" onclick="p3Show()"><span class="btn-icon">👁</span> Show Answers</button>
         <button class="btn btn-secondary" id="p3ResetBtn" onclick="p3Reset()" style="display:none"><span class="btn-icon">↺</span> Try Again</button>
@@ -381,7 +425,7 @@ footer{text-align:center;padding:2.5rem 2rem;font-size:.8rem;color:var(--muted);
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>
       <div><strong>Part 4 — Key Word Transformations.</strong> Complete the second sentence so that it has a similar meaning to the first, using the word given. Do not change the word given.</div>
     </div>
-    <div class="exam-tips" id="tips-kwtArea"><div class="exam-tips-header" onclick="this.parentElement.classList.toggle('open')"><span>📝 Exam Tips — Part 4</span><span class="exam-tips-chevron">▾</span></div><div class="exam-tips-body"><div class="tip-category">Strategy</div><div class="tip-item"><span class="tip-icon">💡</span><span>The key word must NOT be changed in any way — no adding -s, -ed, -ing.</span></div><div class="tip-item"><span class="tip-icon">💡</span><span>Identify the grammar being tested: passive, conditional, reported speech, phrasal verb, etc.</span></div><div class="tip-category">Common Mistakes</div><div class="tip-item"><span class="tip-icon">⚠️</span><span>Count your words! The answer must be between 3 and 6 words including the key word.</span></div><div class="tip-item"><span class="tip-icon">⚠️</span><span>Both sentences must have exactly the same meaning. Don’t add or lose information.</span></div><div class="tip-category">Time Management</div><div class="tip-item"><span class="tip-icon">⏱️</span><span>Aim for about 15 minutes on Part 4. It’s often the hardest part.</span></div></div></div>
+    <div class="exam-tips" id="tips-p4"><div class="exam-tips-header" onclick="this.parentElement.classList.toggle('open')"><span>📝 Exam Tips — Part 4</span><span class="exam-tips-chevron">▾</span></div><div class="exam-tips-body"><div class="tip-category">Strategy</div><div class="tip-item"><span class="tip-icon">💡</span><span>The key word must NOT be changed in any way — no adding -s, -ed, -ing.</span></div><div class="tip-item"><span class="tip-icon">💡</span><span>Identify the grammar being tested: passive, conditional, reported speech, phrasal verb, comparison, etc.</span></div><div class="tip-category">Common Mistakes</div><div class="tip-item"><span class="tip-icon">⚠️</span><span>Count your words! The answer must be between 3 and 6 words including the key word.</span></div><div class="tip-item"><span class="tip-icon">⚠️</span><span>Both sentences must have exactly the same meaning. Don't add or lose information.</span></div><div class="tip-category">Time</div><div class="tip-item"><span class="tip-icon">⏱️</span><span>About 12–15 minutes. Part 4 is often the hardest, so invest the time.</span></div></div></div>
     <div class="test-card" id="p4Card">
       <div class="test-header">
         <div class="test-title"><span class="tag">Part 4</span><span id="p4Title"></span></div>
@@ -391,12 +435,20 @@ footer{text-align:center;padding:2.5rem 2rem;font-size:.8rem;color:var(--muted);
       <div id="p4Items"></div>
       <div class="explanations" id="p4Explanations"></div>
       <div class="actions">
+        <button class="print-btn" onclick="printPart('p4')">🖨️ Print</button>
         <button class="btn btn-primary" id="p4CheckBtn" disabled onclick="p4Check()"><span class="btn-icon">✓</span> Check Answers</button>
         <button class="btn btn-amber" id="p4ShowBtn" onclick="p4Show()"><span class="btn-icon">👁</span> Show Answers</button>
         <button class="btn btn-secondary" id="p4ResetBtn" onclick="p4Reset()" style="display:none"><span class="btn-icon">↺</span> Try Again</button>
         <button class="btn btn-secondary" id="p4ExpBtn" onclick="p4ToggleExp()" style="display:none"><span class="btn-icon">💡</span> Explanations</button>
       </div>
     </div>
+  </div>
+
+  <div class="score-summary" id="scoreSummary" style="display:none">
+    <div class="score-summary-title">Test Score</div>
+    <div class="score-summary-grid" id="scoreSummaryGrid"></div>
+    <div class="score-summary-total" id="scoreSummaryTotal"></div>
+    <div class="next-test-bar"><button class="btn btn-primary" id="nextTestBtn" onclick="nextTest()">Next Test →</button></div>
   </div>
 </div>
 <footer>&copy; 2026 John + English. All rights reserved.</footer>
@@ -556,6 +608,7 @@ function p1Check() {
   document.getElementById('p1ResetBtn').style.display='inline-flex';
   document.getElementById('p1ExpBtn').style.display='inline-flex';
   p1RenderExp();
+  updateSummary();
 }
 function p1Show() {
   if(p1Checked)return; p1Checked=true; p1CloseAll();
@@ -574,6 +627,7 @@ function p1Show() {
   document.getElementById('p1ExpBtn').style.display='inline-flex';
   document.getElementById('p1ProgressFill').style.width='100%';
   p1RenderExp();
+  updateSummary();
 }
 function p1RenderExp() {
   const el=document.getElementById('p1Explanations'), t=TESTS[currentTest];
@@ -652,6 +706,7 @@ function p2Check() {
   document.getElementById('p2ResetBtn').style.display='inline-flex';
   document.getElementById('p2ExpBtn').style.display='inline-flex';
   p2RenderExp();
+  updateSummary();
 }
 function p2Show() {
   if(p2Checked)return; p2Checked=true;
@@ -670,6 +725,7 @@ function p2Show() {
   document.getElementById('p2ExpBtn').style.display='inline-flex';
   document.getElementById('p2ProgressFill').style.width='100%';
   p2RenderExp();
+  updateSummary();
 }
 function p2RenderExp() {
   const el=document.getElementById('p2Explanations'), t=OC_TESTS[currentTest];
@@ -751,6 +807,7 @@ function p3Check() {
   document.getElementById('p3ResetBtn').style.display='inline-flex';
   document.getElementById('p3ExpBtn').style.display='inline-flex';
   p3RenderExp();
+  updateSummary();
 }
 function p3Show() {
   if(p3Checked)return; p3Checked=true;
@@ -769,6 +826,7 @@ function p3Show() {
   document.getElementById('p3ExpBtn').style.display='inline-flex';
   document.getElementById('p3ProgressFill').style.width='100%';
   p3RenderExp();
+  updateSummary();
 }
 function p3RenderExp() {
   const el=document.getElementById('p3Explanations'),t=WF_TESTS[currentTest];
@@ -846,6 +904,7 @@ function p4Check() {
   document.getElementById('p4ResetBtn').style.display='inline-flex';
   document.getElementById('p4ExpBtn').style.display='inline-flex';
   p4RenderExp();
+  updateSummary();
 }
 function p4Show() {
   if(p4Checked)return; p4Checked=true;
@@ -864,6 +923,7 @@ function p4Show() {
   document.getElementById('p4ExpBtn').style.display='inline-flex';
   document.getElementById('p4ProgressFill').style.width='100%';
   p4RenderExp();
+  updateSummary();
 }
 function p4RenderExp() {
   const el=document.getElementById('p4Explanations'),t=KWT_TESTS[currentTest];
@@ -882,6 +942,113 @@ function p4ToggleExp() {
 function p4Reset() { p4Load(); }
 document.addEventListener('click',function(e){if(!e.target.closest('.kwt-wrap'))document.querySelectorAll('.kwt-hint-tip').forEach(t=>t.classList.remove('visible'));});
 
+
+// ══════════════════════════════════════════
+//  PRINT
+// ══════════════════════════════════════════
+function printPart(part) {
+  const partMap = {p1:'1',p2:'2',p3:'3',p4:'4'};
+  const section = document.querySelector(`.part-section[data-part="${partMap[part]}"]`);
+  section.classList.add('printing');
+  window.print();
+  setTimeout(() => section.classList.remove('printing'), 500);
+}
+
+// ══════════════════════════════════════════
+//  SCORE SUMMARY
+// ══════════════════════════════════════════
+function updateSummary() {
+  // Check if all visible parts are done
+  const parts = [];
+  let totalScore = 0, totalMax = 0;
+  
+  if(activeParts.has('1') && p1Checked) {
+    let s=0; TESTS[currentTest].gaps.forEach(g=>{if(p1State[g.num].selected===g.correct)s++;});
+    parts.push({label:'Part 1', score:s, max:TESTS[currentTest].gaps.length});
+    totalScore+=s; totalMax+=TESTS[currentTest].gaps.length;
+  }
+  if(activeParts.has('2') && p2Checked) {
+    let s=0; OC_TESTS[currentTest].gaps.forEach(g=>{
+      const inp=document.getElementById('p2inp-'+g.num);
+      if(inp&&inp.value.trim().toLowerCase()===g.answer.toLowerCase())s++;
+    });
+    parts.push({label:'Part 2', score:s, max:OC_TESTS[currentTest].gaps.length});
+    totalScore+=s; totalMax+=OC_TESTS[currentTest].gaps.length;
+  }
+  if(activeParts.has('3') && p3Checked) {
+    let s=0; WF_TESTS[currentTest].gaps.forEach(g=>{
+      const inp=document.getElementById('p3inp-'+g.num);
+      if(inp&&inp.value.trim().toLowerCase()===g.answer.toLowerCase())s++;
+    });
+    parts.push({label:'Part 3', score:s, max:WF_TESTS[currentTest].gaps.length});
+    totalScore+=s; totalMax+=WF_TESTS[currentTest].gaps.length;
+  }
+  if(activeParts.has('4') && p4Checked) {
+    let s=0; KWT_TESTS[currentTest].items.forEach((item,i)=>{
+      const inp=document.getElementById('p4inp-'+(i+1));
+      if(inp&&p4Norm(inp.value)===p4Norm(item.answer))s++;
+    });
+    parts.push({label:'Part 4', score:s, max:KWT_TESTS[currentTest].items.length});
+    totalScore+=s; totalMax+=KWT_TESTS[currentTest].items.length;
+  }
+  
+  const allDone = parts.length === activeParts.size;
+  const el = document.getElementById('scoreSummary');
+  
+  if(allDone && parts.length > 0) {
+    el.style.display = 'block';
+    document.getElementById('scoreSummaryGrid').innerHTML = parts.map(p =>
+      `<div class="score-summary-item"><div class="ss-label">${p.label}</div><div class="ss-val">${p.score} / ${p.max}</div></div>`
+    ).join('');
+    document.getElementById('scoreSummaryTotal').textContent = `Total: ${totalScore} / ${totalMax}`;
+    document.getElementById('nextTestBtn').style.display = currentTest < NUM_TESTS-1 ? 'inline-flex' : 'none';
+    
+    // Save progress
+    ptSaveScore(currentTest, totalScore, totalMax);
+    ptRender();
+  } else {
+    el.style.display = 'none';
+  }
+}
+
+function nextTest() {
+  if(currentTest < NUM_TESTS-1) switchTest(currentTest+1);
+}
+
+// ══════════════════════════════════════════
+//  PROGRESS TRACKER (localStorage)
+// ══════════════════════════════════════════
+const PT_KEY = 'uoe-progress-' + document.title.replace(/[^a-zA-Z0-9]/g,'').toLowerCase();
+
+function ptGet() {
+  try { return JSON.parse(localStorage.getItem(PT_KEY)) || {}; } catch(e) { return {}; }
+}
+function ptSaveScore(testIdx, score, max) {
+  const data = ptGet();
+  data[testIdx] = {score, max, ts: Date.now()};
+  localStorage.setItem(PT_KEY, JSON.stringify(data));
+}
+function ptRender() {
+  const data = ptGet();
+  const grid = document.getElementById('ptGrid');
+  let done = 0;
+  grid.innerHTML = Array.from({length:NUM_TESTS}, (_,i) => {
+    const d = data[i];
+    let cls = '', title = `Test ${i+1}`;
+    if(d) { done++; cls = d.score===d.max ? 'done' : 'partial'; title += ` — ${d.score}/${d.max}`; }
+    return `<div class="pt-dot ${cls}" onclick="switchTest(${i})" title="${title}">${i+1}</div>`;
+  }).join('');
+  document.getElementById('ptSummary').textContent = `${done} / ${NUM_TESTS}`;
+}
+function ptToggle() {
+  document.getElementById('progressTracker').classList.toggle('collapsed');
+}
+function ptReset() {
+  if(!confirm('Reset all progress?')) return;
+  localStorage.removeItem(PT_KEY);
+  ptRender();
+}
+
 // ══════════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════════
@@ -889,6 +1056,7 @@ var observer = new IntersectionObserver(function(entries){entries.forEach(functi
 document.querySelectorAll('.reveal').forEach(function(el){observer.observe(el);});
 
 buildTestNav();
+ptRender();
 switchTest(0);
 </script>
 </body>
