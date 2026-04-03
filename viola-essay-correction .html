@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Essay Corrections – Viola</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f4f2ee;
+    --card: #fff;
+    --card-border: #ddd;
+    --text: #1a1a1a;
+    --muted: #999;
+    --accent: #8c6d3f;
+    --accent-dim: rgba(140,109,63,0.08);
+    --red: #b04040;
+    --red-bg: #fde8e8;
+    --red-border: #e07070;
+    --orange: #b06820;
+    --orange-bg: #fef0e0;
+    --orange-border: #e09050;
+    --purple: #5a3a8a;
+    --purple-bg: #f0eaf8;
+    --purple-border: #a080cc;
+    --green: #2e6b45;
+    --green-bg: #e6f4ec;
+  }
+
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 0 0 6rem;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* ── HERO HEADER ── */
+  .hero {
+    position: relative;
+    width: 100%;
+    background: #fff;
+    border-bottom: 1px solid #e0dbd3;
+    padding: 4rem 2rem 3rem;
+    overflow: hidden;
+    margin-bottom: 3rem;
+  }
+
+  .hero::before {
+    content: 'MILANO';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(80px, 18vw, 220px);
+    color: rgba(0,0,0,0.04);
+    letter-spacing: 0.15em;
+    white-space: nowrap;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .hero-rule-top {
+    width: 100%;
+    max-width: 780px;
+    margin: 0 auto 1.8rem;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  }
+
+  .hero-eyebrow {
+    text-align: center;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1rem;
+  }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 8vw, 6.5rem);
+    text-align: center;
+    color: #1a1a1a;
+    letter-spacing: 0.08em;
+    line-height: 0.95;
+    margin-bottom: 0.6rem;
+  }
+
+  .subtitle {
+    text-align: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--accent);
+    margin-bottom: 1.8rem;
+    letter-spacing: 0.06em;
+    font-weight: 300;
+  }
+
+  .hero-rule-bottom {
+    width: 100%;
+    max-width: 780px;
+    margin: 0 auto;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  }
+
+  /* page wrapper */
+  .page-body {
+    padding: 0 1rem;
+  }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    gap: 0.4rem;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 0.2rem;
+    flex-wrap: wrap;
+  }
+
+  .tab-btn {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.6rem 1.2rem;
+    border: 1px solid #ddd;
+    border-bottom: none;
+    border-radius: 3px 3px 0 0;
+    background: #eae6e0;
+    color: #aaa;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+    white-space: nowrap;
+  }
+
+  .tab-btn.active {
+    background: var(--card);
+    color: var(--accent);
+    border-color: #ddd;
+  }
+
+  .tab-btn:hover:not(.active) { color: #666; background: #e2ded8; }
+
+  /* CARD */
+  .card {
+    background: var(--card);
+    border-radius: 0 3px 3px 3px;
+    padding: 2rem 2.2rem 2.5rem;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.07);
+    max-width: 780px;
+    margin: 0 auto;
+    border: 1px solid var(--card-border);
+  }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* TASK BOX */
+  .task-box {
+    background: rgba(140,109,63,0.05);
+    border-left: 2px solid var(--accent);
+    border-radius: 0 3px 3px 0;
+    padding: 0.9rem 1.1rem;
+    margin-bottom: 1.6rem;
+    font-size: 0.83rem;
+    color: #666;
+    line-height: 1.6;
+  }
+  .task-box strong {
+    color: var(--accent);
+    display: block;
+    margin-bottom: 0.25rem;
+    font-size: 0.68rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  /* TOGGLE */
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .toggle-label {
+    font-size: 0.72rem;
+    color: var(--muted);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+
+  .toggle {
+    position: relative;
+    width: 48px;
+    height: 26px;
+    flex-shrink: 0;
+  }
+
+  .toggle input { opacity: 0; width: 0; height: 0; }
+
+  .slider {
+    position: absolute;
+    inset: 0;
+    background: #ddd;
+    border-radius: 26px;
+    cursor: pointer;
+    transition: background 0.25s;
+  }
+
+  .slider::before {
+    content: '';
+    position: absolute;
+    width: 20px; height: 20px;
+    left: 3px; top: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.25s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+
+  input:checked + .slider { background: var(--accent); }
+  input:checked + .slider::before { transform: translateX(22px); }
+
+  /* ESSAY */
+  .letter {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.05rem;
+    line-height: 1.95;
+    color: #2a2a2a;
+  }
+
+  .letter p + p { margin-top: 1.1rem; }
+
+  /* ERROR SPANS */
+  .err {
+    padding: 0 2px;
+    border-radius: 2px;
+    border-bottom: 2px solid;
+    cursor: help;
+    position: relative;
+  }
+
+  .err.grammar  { background: var(--red-bg);    color: var(--red);    border-color: var(--red-border); }
+  .err.register { background: var(--purple-bg); color: var(--purple); border-color: var(--purple-border); }
+  .err.typo     { background: var(--orange-bg); color: var(--orange); border-color: var(--orange-border); }
+
+  .err::after {
+    content: attr(data-note);
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1a1a1a;
+    color: #f0ece6;
+    border: 1px solid #333;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.72rem;
+    padding: 6px 10px;
+    border-radius: 3px;
+    white-space: normal;
+    z-index: 10;
+    line-height: 1.5;
+    pointer-events: none;
+    width: 240px;
+    text-align: center;
+  }
+
+  .err:hover::after { display: block; }
+
+  .fix {
+    background: var(--green-bg);
+    color: var(--green);
+    border-radius: 2px;
+    padding: 0 2px;
+  }
+
+  /* LEGEND */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin-top: 1.6rem;
+    padding-top: 1rem;
+    border-top: 1px solid #eee;
+    font-size: 0.75rem;
+    align-items: center;
+    color: var(--muted);
+  }
+
+  .legend-item { display: flex; align-items: center; gap: 0.4rem; }
+
+  .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .dot.grammar  { background: var(--red); }
+  .dot.register { background: var(--purple); }
+  .dot.typo     { background: var(--orange); }
+  .dot.fix      { background: var(--green); }
+
+  .legend-note { font-size: 0.72rem; color: #bbb; width: 100%; margin-top: 0.3rem; }
+
+  /* TIPS CARD */
+  .tips-card {
+    background: var(--card);
+    border-radius: 3px;
+    padding: 2rem 2.2rem 2.5rem;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.07);
+    max-width: 780px;
+    margin: 2rem auto 0;
+    border: 1px solid var(--card-border);
+  }
+
+  .tips-card h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 400;
+    color: var(--accent);
+    margin-bottom: 1.4rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid #eee;
+    letter-spacing: 0.12em;
+  }
+
+  .tip {
+    display: grid;
+    grid-template-columns: 2rem 1fr;
+    gap: 0.2rem 0.8rem;
+    margin-bottom: 1.3rem;
+    align-items: start;
+  }
+
+  .tip:last-child { margin-bottom: 0; }
+  .tip-icon { font-size: 1rem; line-height: 1.7; text-align: center; }
+
+  .tip-body { font-size: 0.85rem; line-height: 1.7; color: #555; }
+
+  .tip-body strong {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--text);
+    display: block;
+    margin-bottom: 0.2rem;
+  }
+
+  .tip-body .example {
+    margin-top: 0.4rem;
+    padding: 0.5rem 0.8rem;
+    background: #f9f7f4;
+    border-left: 2px solid var(--accent);
+    border-radius: 0 3px 3px 0;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 0.92rem;
+    color: #888;
+    line-height: 1.6;
+  }
+
+  .tip-body .example span { font-style: normal; color: var(--accent); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-rule-top"></div>
+  <div class="hero-eyebrow">C1 Advanced · Essay Corrections</div>
+  <h1>Viola</h1>
+  <p class="subtitle">Three Writing Tasks</p>
+  <div class="hero-rule-bottom"></div>
+</div>
+
+<div class="page-body">
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('crime', this)">Essay 1 · Youth Crime</button>
+  <button class="tab-btn" onclick="switchTab('arts', this)">Essay 2 · The Arts</button>
+  <button class="tab-btn" onclick="switchTab('env', this)">Essay 3 · Environment</button>
+</div>
+
+<div class="card">
+
+  <!-- ==================== ESSAY 1: YOUTH CRIME ==================== -->
+  <div class="tab-content active" id="crime">
+    <div class="task-box">
+      <strong>Task</strong>
+      Write an essay for your tutor discussing <em>two</em> reasons why young people commit crimes (lack of parental control / influence of friends). Explain which is most important and give reasons. 220–260 words.
+    </div>
+    <div class="toggle-row">
+      <span class="toggle-label" id="crime-left" style="color:var(--text)">Flagged</span>
+      <label class="toggle"><input type="checkbox" onchange="toggleView('crime', this)"><span class="slider"></span></label>
+      <span class="toggle-label" id="crime-right">Corrected</span>
+    </div>
+
+    <div class="letter" id="crime-flagged">
+      <p>Hardly a week goes by without another report of underage crime appearing in the media. In order to prevent <span class="err grammar" data-note="🔴 Wrong word — 'consistency' implies regularity, not a problem. Use 'persistence' or 'prevalence'">the consistency of</span> this phenomenon, it is essential to <span class="err register" data-note="🟣 Register — too colloquial for academic writing; use 'examine' or 'address'">come face to face with</span> two of the possible causes lying behind it — the lack of control by the family and the role played by peers. This essay argues that, although every factor matters, the first cause ultimately prevails.</p>
+      <p>Research indicates that <span class="err grammar" data-note="🔴 Word order error — should be 'that adolescence is the main phase'">is adolescence the main phase</span> in which most episodes of crime start to arise. This cannot be taken as a surprise, since it coincides with <span class="err grammar" data-note="🔴 Article error — uncountable noun: 'less control', not 'a less control'">a less control</span> exercised by superiors and with the young stepping into the real world, in which they will encounter people from a wide range of backgrounds. However, <span class="err register" data-note="🟣 Register — vague and journalistic; use 'the most serious cases involve'">the worst reports involve</span> school dropout or cyberbullying, <span class="err register" data-note="🟣 Register — too informal; try 'far too serious to be attributed merely to peer pressure'">too serious to be linked just to a couple of schoolmates</span>. It should, as a result, lie in the environment in which teenagers grow up: the more carefully it is taken care of, <span class="err grammar" data-note="🔴 Comparative error — 'the fewer will be the variables'; better: 'the fewer variables there will be'">the few will be the variables</span> that may lead <span class="err grammar" data-note="🔴 Pronoun agreement — 'teenagers' is plural; use 'them'">him</span> to commit crimes.</p>
+      <p>It becomes clear, then, that this kind of influence can be prevented by parents, who <span class="err grammar" data-note="🔴 Wrong homophone — 'reins' (control), not 'rains'">hold the rains</span> from the beginning and <span class="err grammar" data-note="🔴 Wrong collocation — 'in charge of building', not 'in charge to build'">are in charge to build</span> the foundation for their children's future. This can be exemplified not only by giving them a proper education through school, but also by dedicating the right amount of attention and affection, which cannot be underestimated when it comes to developing one's chief values. This is why even an apparently innocent misbehaviour, such as shoplifting, <span class="err grammar" data-note="🔴 Subject-verb agreement — 'misbehaviour' is singular: 'hides'">often hide</span> <span class="err typo" data-note="🟠 Typo — 'lack of', not 'lack fo'">lack fo</span> supervision or <span class="err grammar" data-note="🔴 Wrong word form — noun needed: 'neglect', not 'neglecting'">complete neglecting</span>.</p>
+      <p>In conclusion, even if a teenager falls under a bad influence <span class="err register" data-note="🟣 Register / collocation — odd phrasing; use 'along the way' or 'as they grow up'">throughout his path</span>, how it will ultimately affect <span class="err grammar" data-note="🔴 Wrong word + pronoun — 'their propensity', not 'his possibility'">his possibility</span> to commit a crime is to be ascribed to an inner set of morals, which are originally established by the parents and their educational efforts.</p>
+    </div>
+
+    <div class="letter" id="crime-corrected" style="display:none">
+      <p>Hardly a week goes by without another report of underage crime appearing in the media. In order to prevent <span class="fix">the persistence of</span> this phenomenon, it is essential to <span class="fix">examine</span> two of the possible causes lying behind it — the lack of control by the family and the role played by peers. This essay argues that, although every factor matters, the first cause ultimately prevails.</p>
+      <p>Research indicates that <span class="fix">adolescence is the main phase</span> in which most episodes of crime start to arise. This cannot be taken as a surprise, since it coincides with <span class="fix">less control</span> exercised by superiors and with the young stepping into the real world, in which they will encounter people from a wide range of backgrounds. However, <span class="fix">the most serious cases involve</span> school dropout or cyberbullying, <span class="fix">far too serious to be attributed merely to peer pressure</span>. It should, as a result, lie in the environment in which teenagers grow up: the more carefully it is taken care of, <span class="fix">the fewer variables there will be</span> that may lead <span class="fix">them</span> to commit crimes.</p>
+      <p>It becomes clear, then, that this kind of influence can be prevented by parents, who <span class="fix">hold the reins</span> from the beginning and <span class="fix">are in charge of building</span> the foundation for their children's future. This can be exemplified not only by giving them a proper education through school, but also by dedicating the right amount of attention and affection, which cannot be underestimated when it comes to developing one's chief values. This is why even an apparently innocent misbehaviour, such as shoplifting, <span class="fix">often hides a lack of</span> supervision or <span class="fix">complete neglect</span>.</p>
+      <p>In conclusion, even if a teenager falls under a bad influence <span class="fix">along the way</span>, how it will ultimately affect <span class="fix">their propensity</span> to commit a crime is to be ascribed to an inner set of morals, which are originally established by the parents and their educational efforts.</p>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><span class="dot grammar"></span> Grammar / lexical</div>
+      <div class="legend-item"><span class="dot register"></span> Register / style</div>
+      <div class="legend-item"><span class="dot typo"></span> Typo</div>
+      <div class="legend-item"><span class="dot fix"></span> Corrected</div>
+      <div class="legend-note">Hover over highlighted text to see the note.</div>
+    </div>
+  </div>
+
+  <!-- ==================== ESSAY 2: THE ARTS ==================== -->
+  <div class="tab-content" id="arts">
+    <div class="task-box">
+      <strong>Task</strong>
+      Write an essay discussing <em>two</em> reasons why the arts are important in modern society (need for escapism / appreciating beauty / cost of funding). Explain which is most important and give reasons. 220–260 words.
+    </div>
+    <div class="toggle-row">
+      <span class="toggle-label" id="arts-left" style="color:var(--text)">Flagged</span>
+      <label class="toggle"><input type="checkbox" onchange="toggleView('arts', this)"><span class="slider"></span></label>
+      <span class="toggle-label" id="arts-right">Corrected</span>
+    </div>
+
+    <div class="letter" id="arts-flagged">
+      <p>The 21st century is proving to be a time of huge change in society, especially as regards arts and entertainment industries. The two used to be under the spotlight many decades ago, but now they are losing their spark as they are no longer seen as valuable sources. <span class="err grammar" data-note="🔴 Wrong construction — 'This essay aims to', not 'is aimed to'">This essay is aimed to underlight</span> <span class="err grammar" data-note="🔴 Not a word — did you mean 'highlight' or 'shed light on'?"> </span>their positive impact on people, which seems to be irrelevant to <span class="err grammar" data-note="🔴 Agreement error — 'those who only see', not 'sees' (plural antecedent)">those who only sees</span> them as a waste of funds.</p>
+      <p>The widespread view among <span class="err register" data-note="🟣 Register — too colloquial; use 'those who are sceptical of the arts' or 'sceptics'">the cynical ones</span> is that, indeed, there is <span class="err grammar" data-note="🔴 Wrong preposition — 'no need for', not 'no need of'">no need of</span> art galleries or theatres in modern society. Alongside this, these people also <span class="err grammar" data-note="🔴 Wrong construction — 'argue that maintaining them is too expensive'">lament their maintenance to be too expensive</span> and that the money should be <span class="err grammar" data-note="🔴 Wrong preposition — 'invested in', not 'invested on'">invested on</span> sports facilities. What they are forgetting is that, <span class="err register" data-note="🟣 Register — 'however' is misplaced mid-clause; move it to the start of the sentence">however,</span> our culture and customs only exist thanks to arts development, which is also what makes a country different from the others.</p>
+      <p>It becomes clear, then, that the main reason why <span class="err typo" data-note="🟠 Typo — 'we'll', not 'we we'll'">we we'll</span> always need art <span class="err grammar" data-note="🔴 Wrong word — 'declination' is a grammar/astronomy term; use 'in all its forms'">in each of its declination</span> is because it represents a solid point of reference for whenever we feel confused or face a period of difficulty, allowing us to escape from reality, <span class="err grammar" data-note="🔴 Dangling participle — 'going backwards in time' is loosely attached; try 'and travel back in time'">going backwards in time</span>. Humans have in fact relied on art <span class="err grammar" data-note="🔴 Missing article — 'since the Stone Age'">ever since stone age</span> in order to express their feelings, which are universal and timeless.</p>
+      <p>In conclusion, although it may seem that nowadays art is only <span class="err register" data-note="🟣 Wrong word — 'vice' means a bad habit or moral failing; use 'an indulgence' or 'a luxury'">a fancy vice</span> for people who only like to be entertained, there's a reason why art is still taught in schools and why tourists go overseas just to admire it: it stands in its power to become a sort of bridge uniting all <span class="err grammar" data-note="🔴 French word used in English text — use 'eras' or 'epochs'">époques</span> and ethnicities.</p>
+    </div>
+
+    <div class="letter" id="arts-corrected" style="display:none">
+      <p>The 21st century is proving to be a time of huge change in society, especially as regards the arts and entertainment industries. The two used to be under the spotlight many decades ago, but now they are losing their spark as they are no longer seen as valuable. <span class="fix">This essay aims to highlight</span> their positive impact on people, which seems to be irrelevant to <span class="fix">those who only see</span> them as a waste of funds.</p>
+      <p>The widespread view among <span class="fix">those who are sceptical of the arts</span> is that, indeed, there is <span class="fix">no need for</span> art galleries or theatres in modern society. Alongside this, these people also <span class="fix">argue that maintaining them is too expensive</span> and that the money should be <span class="fix">invested in</span> sports facilities. <span class="fix">However,</span> what they are forgetting is that our culture and customs only exist thanks to the development of the arts, which is also what makes one country different from another.</p>
+      <p>It becomes clear, then, that the main reason why <span class="fix">we'll</span> always need art <span class="fix">in all its forms</span> is because it represents a solid point of reference for whenever we feel confused or face a period of difficulty, allowing us to escape from reality <span class="fix">and travel back in time</span>. Humans have in fact relied on art <span class="fix">ever since the Stone Age</span> in order to express their feelings, which are universal and timeless.</p>
+      <p>In conclusion, although it may seem that nowadays art is only <span class="fix">an indulgence</span> for people who only like to be entertained, there's a reason why art is still taught in schools and why tourists go overseas just to admire it: it stands in its power to become a sort of bridge uniting all <span class="fix">eras</span> and ethnicities.</p>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><span class="dot grammar"></span> Grammar / lexical</div>
+      <div class="legend-item"><span class="dot register"></span> Register / style</div>
+      <div class="legend-item"><span class="dot typo"></span> Typo</div>
+      <div class="legend-item"><span class="dot fix"></span> Corrected</div>
+      <div class="legend-note">Hover over highlighted text to see the note.</div>
+    </div>
+  </div>
+
+  <!-- ==================== ESSAY 3: ENVIRONMENT ==================== -->
+  <div class="tab-content" id="env">
+    <div class="task-box">
+      <strong>Task</strong>
+      Write an essay discussing <em>two</em> ways individuals can make a difference to environmental issues (avoid plastic / raise awareness / choose how to travel). Explain which is more effective and give reasons. 220–260 words.
+    </div>
+    <div class="toggle-row">
+      <span class="toggle-label" id="env-left" style="color:var(--text)">Flagged</span>
+      <label class="toggle"><input type="checkbox" onchange="toggleView('env', this)"><span class="slider"></span></label>
+      <span class="toggle-label" id="env-right">Corrected</span>
+    </div>
+
+    <div class="letter" id="env-flagged">
+      <p>Amid ongoing social and technological change, few issues are as relevant as <span class="err grammar" data-note="🔴 Missing article + weak phrasing — 'the environmental one' is odd; use 'environmental concerns' or 'the state of our environment'">environmental one</span>. <span class="err grammar" data-note="🔴 Awkward non-finite subject — try 'A rapidly warming planet poses a serious threat to future generations'">Our planet getting hotter and hotter is a threat to future lives</span>, and only our habits can <span class="err register" data-note="🟣 Register — too colloquial for academic writing; use 'curb this process' or 'slow this trend'">put the brakes on it</span>. This essay examines whether greater emphasis should be placed on plastic avoidance or on alternative ways of transportation.</p>
+      <p>It is generally considered that gas emissions are to be blamed on the gasoline used to fuel cars. Therefore, many government policies have tried to push people to travel in alternative ways: to <span class="err register" data-note="🟣 Register — slightly awkward; 'to take one example' is more natural">give just one illustration</span>, the introduction of restricted areas where only certain vehicles are allowed. Although this may undoubtedly reduce <span class="err grammar" data-note="🔴 Article error — general uncountable use: 'pollution', no article needed">the pollution</span>, banning cars altogether is a rather <span class="err grammar" data-note="🔴 Non-standard word — use 'impractical' or 'unfeasible'">unviable</span> option, due to the fact that most people can only rely on their own car to get to work.</p>
+      <p>Beyond this, a more consequential issue emerges: the <span class="err register" data-note="🟣 Register — 'gigantic' is informal; use 'vast' or 'enormous'">gigantic</span> plastic consumption. In fact, its combustion pollutes as much as cars do. Coupled with this, not only does plastic affect our health with its poisonous emissions: its massive presence damages the lives of all ecosystems, <span class="err grammar" data-note="🔴 Wrong construction — 'whether underwater or above ground', not 'being them'">being them underwater or above ground</span>. <span class="err grammar" data-note="🔴 Missing article — 'The government should'">Government should</span> therefore focus on measures to prevent such use of plastic, but <span class="err register" data-note="🟣 Register — too colloquial; use 'ultimately' or 'in practice'">at the end of the day</span> it does not take huge effort to separate plastic from the other rubbish, to opt for a steel bottle or a reusable bag <span class="err grammar" data-note="🔴 Wrong collocation (Italianism) — 'to do the shopping' or 'for grocery shopping'">to do the groceries</span>.</p>
+      <p>In conclusion, as it is unthinkable <span class="err grammar" data-note="🔴 Italianism (circolare) — use 'to get around' or 'to manage daily life'">to circulate without cars</span>, becoming more conscious of our use of plastic only requires a few small habits in our daily lives, which will certainly have a meaningful impact on the environment.</p>
+    </div>
+
+    <div class="letter" id="env-corrected" style="display:none">
+      <p>Amid ongoing social and technological change, few issues are as pressing as <span class="fix">environmental concerns</span>. <span class="fix">A rapidly warming planet poses a serious threat to future generations</span>, and only a change in our habits can <span class="fix">curb this process</span>. This essay examines whether greater emphasis should be placed on plastic avoidance or on alternative ways of travelling.</p>
+      <p>It is generally considered that gas emissions are to be blamed on the fuel used to power cars. Therefore, many government policies have tried to encourage people to travel in alternative ways: <span class="fix">to take one example</span>, the introduction of restricted areas where only certain vehicles are allowed. Although this may undoubtedly reduce <span class="fix">pollution</span>, banning cars altogether is a rather <span class="fix">impractical</span> option, given that most people rely on their own car to get to work.</p>
+      <p>Beyond this, a more consequential issue emerges: the <span class="fix">vast</span> consumption of plastic. In fact, its combustion generates significant emissions. Coupled with this, not only does plastic affect our health: its massive presence damages ecosystems, <span class="fix">whether underwater or above ground</span>. <span class="fix">The government should</span> therefore focus on measures to reduce plastic use, but <span class="fix">ultimately</span> it does not take great effort to separate plastic from other waste, to opt for a steel bottle or a reusable bag <span class="fix">for grocery shopping</span>.</p>
+      <p>In conclusion, as it is unrealistic <span class="fix">to get around without cars</span>, becoming more conscious of our use of plastic only requires a few small changes to our daily habits, which will certainly have a meaningful impact on the environment.</p>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><span class="dot grammar"></span> Grammar / lexical</div>
+      <div class="legend-item"><span class="dot register"></span> Register / style</div>
+      <div class="legend-item"><span class="dot typo"></span> Typo</div>
+      <div class="legend-item"><span class="dot fix"></span> Corrected</div>
+      <div class="legend-note">Hover over highlighted text to see the note.</div>
+    </div>
+  </div>
+
+</div><!-- /card -->
+
+<!-- ==================== TIPS ==================== -->
+<div class="tips-card">
+  <h2>✏️ Tips for Viola — C1 Advanced Essay Writing</h2>
+
+  <div class="tip">
+    <div class="tip-icon">📐</div>
+    <div class="tip-body">
+      <strong>Keep a clear four-paragraph structure</strong>
+      Introduction (thesis) → Body 1 (point 1) → Body 2 (point 2 + comparison) → Conclusion. All three of your essays drift between ideas within paragraphs. Each body paragraph should have one clear focus, developed and then linked back to your overall argument.
+    </div>
+  </div>
+
+  <div class="tip">
+    <div class="tip-icon">🎯</div>
+    <div class="tip-body">
+      <strong>State your thesis clearly — and argue it throughout</strong>
+      Your introductions are confident and well-signposted, which is a real strength. Make sure the argument promised in the introduction is actually developed and resolved in the body paragraphs, not just restated in the conclusion.
+      <div class="example">"This essay argues that, while <em>X</em> cannot be dismissed, <span>Y is ultimately the more significant factor</span> for the following reasons..."</div>
+    </div>
+  </div>
+
+  <div class="tip">
+    <div class="tip-icon">⚖️</div>
+    <div class="tip-body">
+      <strong>Compare your two points explicitly</strong>
+      All three tasks ask you to decide which point is more important or effective. Don't just describe both — weigh them against each other using comparative language.
+      <div class="example">"While changing travel habits requires systemic infrastructure, <span>reducing plastic use demands only small, immediate changes at individual level</span> — making it the more achievable and therefore more impactful option."</div>
+    </div>
+  </div>
+
+  <div class="tip">
+    <div class="tip-icon">🔗</div>
+    <div class="tip-body">
+      <strong>Use precise academic linking language</strong>
+      Avoid informal connectors. Upgrade to higher-register alternatives that signal logical relationships more precisely.
+      <div class="example">❌ <em>"at the end of the day"</em> → <span>✅ "ultimately" / "in practice"</span><br>❌ <em>"What they are forgetting is that, however"</em> → <span>✅ "However, what is frequently overlooked is that..."</span></div>
+    </div>
+  </div>
+
+  <div class="tip">
+    <div class="tip-icon">📚</div>
+    <div class="tip-body">
+      <strong>Paraphrase the discussion prompts — don't ignore them</strong>
+      The task says to use your own words as far as possible. Rephrase the opinions and build on them rather than lifting them directly. This shows range and earns marks for vocabulary.
+      <div class="example">Prompt: <em>"It's impossible to change the way we travel."</em><br><span>"While a wholesale shift away from car travel may be unrealistic given existing infrastructure, individuals can still make meaningful choices about how they travel day to day."</span></div>
+    </div>
+  </div>
+
+  <div class="tip">
+    <div class="tip-icon">🧠</div>
+    <div class="tip-body">
+      <strong>Watch for Italian interference (false friends and calques)</strong>
+      Several errors across the three essays come from Italian structures mapped directly onto English. The most common patterns to watch for:
+      <div class="example">
+        <em>circolare</em> → <span>"get around / travel"</span> (not "circulate")<br>
+        <em>declinazione</em> → <span>"form / type"</span> (not "declination")<br>
+        <em>fare la spesa</em> → <span>"do the shopping"</span> (not "do the groceries")<br>
+        <em>investire su</em> → <span>"invest in"</span> (not "invest on")
+      </div>
+    </div>
+  </div>
+
+  <div class="tip">
+    <div class="tip-icon">🔢</div>
+    <div class="tip-body">
+      <strong>Use they/their for generic singular reference</strong>
+      When referring to a teenager, an individual, or a person generically, use <strong>they/their</strong> throughout — not <em>his</em>. This is both grammatically correct and natural in contemporary academic English. This error appears in all three essays.
+    </div>
+  </div>
+
+  <div class="tip">
+    <div class="tip-icon">✅</div>
+    <div class="tip-body">
+      <strong>What you're already doing well</strong>
+      Your introductions are structured and confident. Your vocabulary range is genuinely strong — words like <em>ascribed to, prevails, consequential, misbehaviour</em> show real C1 awareness. You use complex sentence structures effectively and your conclusions are often your best paragraphs. The work now is to bring the body paragraphs up to the same standard: tighter logic, consistent register, and no Italian interference.
+    </div>
+  </div>
+
+</div>
+
+</div><!-- /page-body -->
+
+<script>
+  function switchTab(name, btn) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(name).classList.add('active');
+  }
+
+  function toggleView(name, checkbox) {
+    const flagged   = document.getElementById(name + '-flagged');
+    const corrected = document.getElementById(name + '-corrected');
+    const lblLeft   = document.getElementById(name + '-left');
+    const lblRight  = document.getElementById(name + '-right');
+    if (checkbox.checked) {
+      flagged.style.display   = 'none';
+      corrected.style.display = 'block';
+      lblLeft.style.color  = 'var(--muted)';
+      lblRight.style.color = 'var(--text)';
+    } else {
+      flagged.style.display   = 'block';
+      corrected.style.display = 'none';
+      lblLeft.style.color  = 'var(--text)';
+      lblRight.style.color = 'var(--muted)';
+    }
+  }
+</script>
+
+</body>
+</html>
