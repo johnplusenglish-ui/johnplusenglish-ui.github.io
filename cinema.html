@@ -617,36 +617,127 @@ async function fetchPosterURL(title,year){
   if(!API_KEY)return null;
   if(inflightRequests.has(key))return inflightRequests.get(key);
   
+// Map display title -> OMDb's canonical title (for films indexed under alternate names)
+const TITLE_OVERRIDES={
+  "La Grande Bellezza":"The Great Beauty",
+  "El Secreto de Sus Ojos":"The Secret in Their Eyes",
+  "Irma la Douce":"Irma La Douce",
+  "My Neighbour Totoro":"My Neighbor Totoro",
+  "A Brighter Summer Day":"A Brighter Summer Day",
+  "Long Day's Journey Into Night":"Long Day's Journey Into Night",
+  "Yi Yi":"Yi Yi",
+  "8½":"8 1/2",
+  "Amélie":"Amelie",
+  "Caché":"Cache",
+  "Léon: The Professional":"Leon: The Professional",
+  "Amores Perros":"Amores Perros",
+  "Y Tu Mamá También":"Y Tu Mama Tambien",
+  "Pan's Labyrinth":"Pan's Labyrinth",
+  "Cléo from 5 to 7":"Cleo from 5 to 7",
+  "Au Hasard Balthazar":"Au Hasard Balthazar",
+  "Umberto D.":"Umberto D.",
+  "4 Months, 3 Weeks and 2 Days":"4 Months, 3 Weeks and 2 Days",
+  "Spring, Summer, Fall, Winter... and Spring":"Spring, Summer, Fall, Winter... and Spring",
+  "The Double Life of Véronique":"The Double Life of Veronique",
+  "Chungking Express":"Chungking Express",
+};
+
+// Build a list of title variants to try
+function titleVariants(title){
+  const variants=new Set();
+  
+  // Override mapping takes priority
+  if(TITLE_OVERRIDES[title]){
+    variants.add(TITLE_OVERRIDES[title]);
+  }
+  
+  variants.add(title);
+  
+  // British -> American spelling swaps
+  const swaps=[
+    [/\bNeighbour\b/gi,'Neighbor'],[/\bColour\b/gi,'Color'],[/\bHonour\b/gi,'Honor'],
+    [/\bFavourite\b/gi,'Favorite'],[/\bTheatre\b/gi,'Theater'],[/\bCentre\b/gi,'Center'],
+    [/\bGrey\b/gi,'Gray'],[/\bTravelling\b/gi,'Traveling'],[/\bOrganisation\b/gi,'Organization'],
+  ];
+  let americanized=title;
+  swaps.forEach(([re,to])=>{americanized=americanized.replace(re,to)});
+  if(americanized!==title)variants.add(americanized);
+  
+  // American -> British variants too (reverse)
+  const revswaps=[
+    [/\bNeighbor\b/gi,'Neighbour'],[/\bColor\b/gi,'Colour'],[/\bHonor\b/gi,'Honour'],
+    [/\bFavorite\b/gi,'Favourite'],[/\bTheater\b/gi,'Theatre'],[/\bCenter\b/gi,'Centre'],
+  ];
+  let british=title;
+  revswaps.forEach(([re,to])=>{british=british.replace(re,to)});
+  if(british!==title)variants.add(british);
+  
+  // Strip accents (é → e, á → a, etc.) — crucial for OMDb
+  const deaccented=title.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  if(deaccented!==title)variants.add(deaccented);
+  
+  // Strip leading articles
+  const stripped=title.replace(/^(The|A|An)\s+/i,'');
+  if(stripped!==title)variants.add(stripped);
+  
+  // Remove subtitle after colon
+  if(title.includes(':')){
+    variants.add(title.split(':')[0].trim());
+  }
+  
+  // Replace curly quotes with straight
+  const normQuotes=title.replace(/[''`]/g,"'").replace(/[""]/g,'"');
+  if(normQuotes!==title)variants.add(normQuotes);
+  
+  return Array.from(variants);
+}
+
+async function tryOMDbLookup(t,year){
+  // Exact match with year
+  const r1=await fetch(`https://www.omdbapi.com/?apikey=${API_KEY}&t=${encodeURIComponent(t)}&y=${year}&type=movie`);
+  if(r1.ok){
+    const d=await r1.json();
+    if(d.Response==='True'&&d.Poster&&d.Poster!=='N/A')return {url:d.Poster,error:null};
+    if(d.Error&&d.Error.toLowerCase().includes('invalid api key'))return {url:null,error:'invalid_key'};
+    if(d.Error&&d.Error.toLowerCase().includes('limit'))return {url:null,error:'limit'};
+  }
+  // Exact match without year
+  const r2=await fetch(`https://www.omdbapi.com/?apikey=${API_KEY}&t=${encodeURIComponent(t)}&type=movie`);
+  if(r2.ok){
+    const d=await r2.json();
+    if(d.Response==='True'&&d.Poster&&d.Poster!=='N/A'&&Math.abs(parseInt(d.Year)-year)<=2)return {url:d.Poster,error:null};
+  }
+  // Fuzzy search with year
+  const r3=await fetch(`https://www.omdbapi.com/?apikey=${API_KEY}&s=${encodeURIComponent(t)}&y=${year}&type=movie`);
+  if(r3.ok){
+    const d=await r3.json();
+    if(d.Response==='True'&&d.Search){
+      for(const m of d.Search){
+        if(m.Poster&&m.Poster!=='N/A'&&Math.abs(parseInt(m.Year)-year)<=2)return {url:m.Poster,error:null};
+      }
+    }
+  }
+  // Fuzzy search without year
+  const r4=await fetch(`https://www.omdbapi.com/?apikey=${API_KEY}&s=${encodeURIComponent(t)}&type=movie`);
+  if(r4.ok){
+    const d=await r4.json();
+    if(d.Response==='True'&&d.Search){
+      for(const m of d.Search){
+        if(m.Poster&&m.Poster!=='N/A'&&Math.abs(parseInt(m.Year)-year)<=2)return {url:m.Poster,error:null};
+      }
+    }
+  }
+  return {url:null,error:null};
+}
+
   const promise=(async()=>{
     try{
-      // OMDb search by title + year
-      const url=`https://www.omdbapi.com/?apikey=${API_KEY}&t=${encodeURIComponent(title)}&y=${year}&type=movie`;
-      const res=await fetch(url);
-      if(!res.ok){
-        showApiError(`HTTP ${res.status} — check key at omdbapi.com`);
-        return null;
-      }
-      const data=await res.json();
-      if(data.Response==='False'){
-        if(data.Error&&data.Error.toLowerCase().includes('invalid api key')){
-          showApiError(`Invalid key. Check email for activation link, then re-enter.`);
-          return null;
-        }
-        if(data.Error&&data.Error.toLowerCase().includes('limit')){
-          showApiError(`Daily limit reached (1000/day on free tier).`);
-          return null;
-        }
-        // Movie not found for this year — try fallback
-      }else if(data.Poster&&data.Poster!=='N/A'){
-        return data.Poster;
-      }
-      // Fallback: try without year
-      const url2=`https://www.omdbapi.com/?apikey=${API_KEY}&t=${encodeURIComponent(title)}&type=movie`;
-      const res2=await fetch(url2);
-      if(!res2.ok)return 'N/A';
-      const data2=await res2.json();
-      if(data2.Response==='True'&&data2.Poster&&data2.Poster!=='N/A'){
-        if(Math.abs(parseInt(data2.Year)-year)<=2)return data2.Poster;
+      const variants=titleVariants(title);
+      for(const v of variants){
+        const result=await tryOMDbLookup(v,year);
+        if(result.error==='invalid_key'){showApiError(`Invalid key. Check email for activation link, then re-enter.`);return null}
+        if(result.error==='limit'){showApiError(`Daily limit reached (1000/day on free tier).`);return null}
+        if(result.url)return result.url;
       }
       return 'N/A';
     }catch(e){
