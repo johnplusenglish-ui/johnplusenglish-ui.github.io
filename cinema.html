@@ -601,6 +601,17 @@ function removeApiKey(){
 }
 
 // ============ OMDb POSTER FETCHING ============
+let apiErrorShown=false;
+function showApiError(msg){
+  if(apiErrorShown)return;
+  apiErrorShown=true;
+  const banner=document.createElement('div');
+  banner.style.cssText='position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#a8341f;color:#fff;padding:14px 24px;font-family:monospace;font-size:12px;z-index:1000;max-width:90%;box-shadow:0 4px 20px rgba(0,0,0,0.3);border-left:4px solid #fff';
+  banner.innerHTML=`<strong>OMDb API Error:</strong> ${msg} <span style="margin-left:12px;cursor:pointer;opacity:0.7" onclick="this.parentElement.remove();apiErrorShown=false">✕</span>`;
+  document.body.appendChild(banner);
+  setTimeout(()=>{if(banner.parentElement){banner.remove();apiErrorShown=false}},10000);
+}
+
 async function fetchPosterURL(title,year){
   const key=`${title}|${year}`;
   if(imageCache[key]!==undefined)return imageCache[key];
@@ -612,23 +623,36 @@ async function fetchPosterURL(title,year){
       // OMDb search by title + year
       const url=`https://www.omdbapi.com/?apikey=${API_KEY}&t=${encodeURIComponent(title)}&y=${year}&type=movie`;
       const res=await fetch(url);
-      if(!res.ok)return null;
+      if(!res.ok){
+        showApiError(`HTTP ${res.status} — check key at omdbapi.com`);
+        return null;
+      }
       const data=await res.json();
-      if(data.Response==='True'&&data.Poster&&data.Poster!=='N/A'){
+      if(data.Response==='False'){
+        if(data.Error&&data.Error.toLowerCase().includes('invalid api key')){
+          showApiError(`Invalid key. Check email for activation link, then re-enter.`);
+          return null;
+        }
+        if(data.Error&&data.Error.toLowerCase().includes('limit')){
+          showApiError(`Daily limit reached (1000/day on free tier).`);
+          return null;
+        }
+        // Movie not found for this year — try fallback
+      }else if(data.Poster&&data.Poster!=='N/A'){
         return data.Poster;
       }
-      // Fallback: try without year (year metadata sometimes differs)
+      // Fallback: try without year
       const url2=`https://www.omdbapi.com/?apikey=${API_KEY}&t=${encodeURIComponent(title)}&type=movie`;
       const res2=await fetch(url2);
-      if(!res2.ok)return null;
+      if(!res2.ok)return 'N/A';
       const data2=await res2.json();
       if(data2.Response==='True'&&data2.Poster&&data2.Poster!=='N/A'){
-        // Sanity check: years should be within 1 year
-        if(Math.abs(parseInt(data2.Year)-year)<=1)return data2.Poster;
+        if(Math.abs(parseInt(data2.Year)-year)<=2)return data2.Poster;
       }
       return 'N/A';
     }catch(e){
       console.warn('OMDb fetch failed for',title,e);
+      showApiError(`Network error: ${e.message}`);
       return null;
     }
   })();
@@ -636,9 +660,12 @@ async function fetchPosterURL(title,year){
   inflightRequests.set(key,promise);
   const result=await promise;
   inflightRequests.delete(key);
-  imageCache[key]=result;
-  saveImageCache();
-  updateKeyUI();
+  // Only cache real results (a URL or confirmed "N/A"). Don't cache null (errors) so they retry next time.
+  if(result!==null){
+    imageCache[key]=result;
+    saveImageCache();
+    updateKeyUI();
+  }
   return result;
 }
 
@@ -736,8 +763,8 @@ function card(m,i,ir,isUser){
   return o+`</div></div>`;
 }
 
-let cS="score-desc",cF={genre:"All",decade:"All",country:"All",score:"All"},cV=true;
-let rS="default",rF={genre:"All",decade:"All",country:"All"},rV=true;
+let cS="score-desc",cFilters={genre:"All",decade:"All",country:"All",score:"All"},cV=true;
+let rS="default",rFilters={genre:"All",decade:"All",country:"All"},rV=true;
 let editingId=null;
 
 function uniq(a,k){return["All",...new Set(a.map(m=>m[k]))].sort()}
@@ -759,9 +786,9 @@ function bfHTML(data,f,px){
   return h;
 }
 
-window.cF=function(k,v){cF[k]=v;ren()};
-window.rF=function(k,v){rF[k]=v;renR()};
-function ca(p){if(p==='c'){cF={genre:"All",decade:"All",country:"All",score:"All"};document.getElementById('si').value='';ren()}else{rF={genre:"All",decade:"All",country:"All"};document.getElementById('ri').value='';renR()}}
+window.cF=function(k,v){cFilters[k]=v;ren()};
+window.rF=function(k,v){rFilters[k]=v;renR()};
+function ca(p){if(p==='c'){cFilters={genre:"All",decade:"All",country:"All",score:"All"};document.getElementById('si').value='';ren()}else{rFilters={genre:"All",decade:"All",country:"All"};document.getElementById('ri').value='';renR()}}
 function ss(el){cS=el.dataset.sort;document.querySelectorAll('[data-sort]').forEach(b=>b.classList.toggle('active',b.dataset.sort===cS));ren()}
 function rs(el){rS=el.dataset.rsort;document.querySelectorAll('[data-rsort]').forEach(b=>b.classList.toggle('active',b.dataset.rsort===rS));renR()}
 function tf(n){if(n===1){cV=!cV;document.getElementById('fp1').classList.toggle('hidden',!cV);const b=document.getElementById('ft1');b.classList.toggle('active',cV);b.textContent=cV?'▾ Filters':'▸ Filters'}else{rV=!rV;document.getElementById('fp2').classList.toggle('hidden',!rV);const b=document.getElementById('ft2');b.classList.toggle('active',rV);b.textContent=rV?'▾ Filters':'▸ Filters'}}
@@ -795,10 +822,10 @@ function setupImgObserver(){
 function ren(){
   addDecade(M);
   const q=document.getElementById('si').value.toLowerCase();
-  let res=srt(filt(M,cF,q),cS,false);
-  document.getElementById('fp1').innerHTML=bfHTML(M,cF,'c');
+  let res=srt(filt(M,cFilters,q),cS,false);
+  document.getElementById('fp1').innerHTML=bfHTML(M,cFilters,'c');
   const g=document.getElementById('g1');
-  const hf=Object.values(cF).some(v=>v!=='All')||q;
+  const hf=Object.values(cFilters).some(v=>v!=='All')||q;
   if(!res.length){g.innerHTML=`<div class="empty"><span class="ei">Nothing found</span><p class="et">No films match these filters</p><button class="eb" onclick="ca('c')">Reset filters</button></div>`}
   else{g.innerHTML=res.map((m,i)=>card(m,i,false,!!m.id)).join('')}
   document.getElementById('rc1').innerHTML=`Showing ${res.length} of ${M.length} films${hf?' <span class="ft">· filtered</span>':''}`;
@@ -808,10 +835,10 @@ function ren(){
 }
 function renR(){
   const q=document.getElementById('ri').value.toLowerCase();
-  let res=srt(filt(R,rF,q),rS,true);
-  document.getElementById('fp2').innerHTML=bfHTML(R,rF,'r');
+  let res=srt(filt(R,rFilters,q),rS,true);
+  document.getElementById('fp2').innerHTML=bfHTML(R,rFilters,'r');
   const g=document.getElementById('g2');
-  const hf=Object.values(rF).some(v=>v!=='All')||q;
+  const hf=Object.values(rFilters).some(v=>v!=='All')||q;
   if(!res.length){g.innerHTML=`<div class="empty"><span class="ei">Nothing found</span><p class="et">No recommendations match</p><button class="eb" onclick="ca('r')">Reset filters</button></div>`}
   else{g.innerHTML=res.map((m,i)=>card(m,i,true,false)).join('')}
   document.getElementById('rc2').innerHTML=`Showing ${res.length} of ${R.length} recommendations${hf?' <span class="ft">· filtered</span>':''}`;
