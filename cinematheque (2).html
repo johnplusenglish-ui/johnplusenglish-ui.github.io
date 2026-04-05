@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cinematheque — Personal Film Archive</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,400;1,9..144,600&family=JetBrains+Mono:wght@300;400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f5f1e8;--bg-card:#ffffff;--bg-card-hover:#faf7ef;
+  --ink:#1a1a1a;--ink-soft:#3a3a3a;--ink-dim:#6a6a6a;--ink-dimmer:#999;
+  --accent:#a8341f;--accent-soft:#c54a34;--gold:#8b6f00;
+  --rule:#1a1a1a;--rule-soft:#d4ceb8;--paper:#ede7d3;
+  --serif:'Fraunces',Georgia,serif;--sans:'Inter',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);min-height:100vh;-webkit-font-smoothing:antialiased;background-image:radial-gradient(circle at 1px 1px,rgba(26,26,26,0.04) 1px,transparent 0);background-size:24px 24px}
+::-webkit-scrollbar{width:8px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:#c4bca0;border-radius:4px}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes modalIn{from{opacity:0;transform:translateY(-20px) scale(0.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes overlayIn{from{opacity:0}to{opacity:1}}
+@keyframes shimmerBG{0%{background-position:0% 50%}100%{background-position:100% 50%}}
+@keyframes pulse{0%,100%{opacity:0.4}50%{opacity:0.7}}
+.container{max-width:1280px;margin:0 auto;padding:48px 32px}
+
+.masthead{border-bottom:3px double var(--rule);padding-bottom:24px;margin-bottom:32px}
+.masthead-top{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--mono);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--ink-dim);margin-bottom:20px;border-bottom:1px solid var(--rule-soft);padding-bottom:12px;flex-wrap:wrap;gap:8px}
+.masthead-edition{font-weight:600;color:var(--ink)}
+.masthead-title{font-family:var(--serif);font-weight:900;font-size:clamp(52px,8vw,96px);line-height:0.9;letter-spacing:-0.02em;margin-bottom:8px;font-variation-settings:"opsz" 144}
+.masthead-subtitle{font-family:var(--serif);font-style:italic;font-size:18px;color:var(--ink-dim);font-weight:400}
+.masthead-rule{display:flex;gap:16px;align-items:center;margin-top:24px;font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-dim)}
+.masthead-rule-line{flex:1;height:1px;background:var(--rule)}
+
+/* API KEY BANNER */
+.key-banner{margin-bottom:24px;padding:20px 24px;background:var(--bg-card);border:1px solid var(--accent);border-left:4px solid var(--accent);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+.key-banner.hidden{display:none}
+.key-banner-text{flex:1;min-width:260px}
+.key-banner-title{font-family:var(--serif);font-weight:700;font-size:18px;margin-bottom:4px}
+.key-banner-desc{font-family:var(--serif);font-style:italic;font-size:13px;color:var(--ink-dim);line-height:1.5}
+.key-banner-desc a{color:var(--accent);text-decoration:underline}
+.key-banner-form{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.key-input{padding:10px 12px;background:var(--bg);border:1px solid var(--rule-soft);font-family:var(--mono);font-size:12px;min-width:200px;outline:none;letter-spacing:1px}
+.key-input:focus{border-color:var(--ink)}
+.key-save-btn{padding:10px 20px;background:var(--accent);color:#fff;border:1px solid var(--accent);font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;font-weight:600;transition:all 0.2s}
+.key-save-btn:hover{background:var(--ink);border-color:var(--ink)}
+
+.key-status{margin-bottom:20px;padding:10px 16px;background:var(--bg-card);border:1px solid var(--rule-soft);font-family:var(--mono);font-size:10px;letter-spacing:1px;color:var(--ink-dim);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.key-status.hidden{display:none}
+.key-status-left{display:flex;align-items:center;gap:8px}
+.key-indicator{width:8px;height:8px;border-radius:50%;background:#2d6a4f}
+.key-remove-btn{padding:4px 10px;background:transparent;border:1px solid var(--rule-soft);color:var(--ink-dim);font-family:var(--mono);font-size:9px;letter-spacing:1px;text-transform:uppercase;cursor:pointer}
+.key-remove-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:0;margin-bottom:40px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.stat{padding:16px 20px;border-right:1px solid var(--rule-soft);text-align:center}
+.stat:last-child{border-right:none}
+.stat-value{font-family:var(--serif);font-weight:700;font-size:32px;line-height:1;color:var(--ink);display:block;margin-bottom:4px;font-variation-settings:"opsz" 48}
+.stat-label{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-dim)}
+
+.tabs{display:flex;gap:0;margin-bottom:28px;border-bottom:2px solid var(--rule);flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px}
+.tabs-left{display:flex}
+.tab-btn{padding:14px 28px;background:transparent;border:none;color:var(--ink-dim);font-size:13px;font-family:var(--serif);font-weight:600;font-style:italic;cursor:pointer;transition:all 0.2s;position:relative;letter-spacing:0.02em}
+.tab-btn.active{color:var(--ink)}
+.tab-btn.active::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:4px;background:var(--accent)}
+.tab-btn:hover{color:var(--ink)}
+.tab-btn-num{font-family:var(--mono);font-size:9px;font-style:normal;vertical-align:super;margin-left:6px;color:var(--ink-dim);font-weight:400}
+.tab-btn.active .tab-btn-num{color:var(--accent)}
+.add-btn{padding:10px 20px;background:var(--accent);color:#fff;border:none;font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;font-weight:600;transition:all 0.2s;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.add-btn:hover{background:var(--ink)}
+.add-btn-icon{font-size:16px;line-height:1}
+
+.controls{display:flex;gap:16px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
+.search-wrap{position:relative;flex:1 1 260px;min-width:220px}
+.search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--ink-dim);font-size:13px;pointer-events:none;font-family:var(--mono)}
+.search-input{width:100%;padding:11px 14px 11px 36px;background:var(--bg-card);border:1px solid var(--rule-soft);border-radius:0;color:var(--ink);font-size:13px;font-family:var(--sans);outline:none;transition:border-color 0.2s}
+.search-input:focus{border-color:var(--ink)}
+.search-input::placeholder{color:var(--ink-dimmer);font-style:italic;font-family:var(--serif)}
+.sort-group{display:flex;gap:0;align-items:center;flex-wrap:wrap;border:1px solid var(--rule-soft);background:var(--bg-card)}
+.sort-label{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink-dim);padding:0 10px 0 12px;border-right:1px solid var(--rule-soft)}
+.sort-btn{padding:8px 14px;font-size:11px;font-family:var(--mono);border:none;background:transparent;color:var(--ink-dim);cursor:pointer;transition:all 0.15s;border-right:1px solid var(--rule-soft);letter-spacing:0.5px}
+.sort-btn:last-child{border-right:none}
+.sort-btn.active{background:var(--ink);color:var(--bg)}
+.sort-btn:hover:not(.active){background:var(--paper);color:var(--ink)}
+.ftoggle{padding:9px 16px;border:1px solid var(--rule-soft);background:var(--bg-card);color:var(--ink-dim);font-size:11px;cursor:pointer;font-family:var(--mono);transition:all 0.2s;letter-spacing:0.5px}
+.ftoggle.active{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+.fp{margin-bottom:28px;padding:22px 24px;background:var(--bg-card);border:1px solid var(--rule-soft);animation:fadeIn 0.25s ease}
+.fl{font-family:var(--mono);font-size:9px;color:var(--ink);text-transform:uppercase;letter-spacing:2px;display:block;margin-bottom:10px;font-weight:600;border-left:3px solid var(--accent);padding-left:8px}
+.fr{display:flex;gap:6px;flex-wrap:wrap}
+.fs{margin-bottom:18px}
+.fs:last-of-type{margin-bottom:0}
+.pill{padding:5px 12px;border-radius:0;font-size:11px;font-family:var(--mono);cursor:pointer;transition:all 0.15s;border:1px solid var(--rule-soft);background:var(--bg);color:var(--ink-soft);display:inline-flex;align-items:center;gap:6px;white-space:nowrap;user-select:none;letter-spacing:0.3px}
+.pill:hover{border-color:var(--ink);color:var(--ink)}
+.pill.active{border-color:var(--ink);background:var(--ink);color:var(--bg)}
+.pc{padding:0 0 0 4px;font-size:9px;opacity:0.7;font-weight:600}
+.cb{margin-top:14px;padding:7px 14px;border:1px solid var(--accent);background:var(--bg-card);color:var(--accent);font-size:10px;cursor:pointer;font-family:var(--mono);letter-spacing:1px;text-transform:uppercase;font-weight:600;transition:all 0.2s}
+.cb:hover{background:var(--accent);color:var(--bg-card)}
+.rc{margin-bottom:18px;font-size:11px;color:var(--ink-dim);font-family:var(--mono);letter-spacing:0.5px}
+.ft{color:var(--accent);font-weight:600}
+
+.mg{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:0;border-top:1px solid var(--rule);border-left:1px solid var(--rule)}
+.mc{cursor:default;transition:all 0.25s ease;position:relative;animation:fadeIn 0.4s ease both;background:var(--bg-card);border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);display:flex;flex-direction:column;overflow:hidden}
+.mc:hover{background:var(--bg-card-hover)}
+.mc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);opacity:0;transition:opacity 0.25s;z-index:3}
+.mc:hover::before{opacity:1}
+
+.poster-wrap{position:relative;width:100%;aspect-ratio:2/3;overflow:hidden;background:linear-gradient(135deg,var(--paper) 0%,var(--bg) 50%,var(--paper) 100%);background-size:200% 200%;animation:shimmerBG 3s ease infinite;border-bottom:1px solid var(--rule-soft)}
+.poster-img{width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity 0.5s ease;position:absolute;inset:0}
+.poster-img.loaded{opacity:1}
+.poster-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--ink-dimmer);font-family:var(--serif);font-style:italic;font-size:13px;text-align:center;padding:20px;background:linear-gradient(135deg,var(--paper),var(--bg))}
+.poster-placeholder-icon{font-size:32px;margin-bottom:6px;font-style:normal}
+.poster-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--ink-dimmer);font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;z-index:1;animation:pulse 1.5s ease infinite}
+.poster-no-key{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--ink-dimmer);font-family:var(--serif);font-size:13px;font-style:italic;text-align:center;padding:20px;background:linear-gradient(135deg,var(--paper),var(--bg))}
+
+.card-content{padding:16px 20px 18px;flex:1;display:flex;flex-direction:column;position:relative}
+.card-score-badge{position:absolute;top:-22px;right:16px;font-family:var(--serif);font-weight:700;font-size:15px;padding:5px 10px;background:var(--ink);color:var(--bg);line-height:1;font-variation-settings:"opsz" 18;z-index:3;box-shadow:0 2px 8px rgba(0,0,0,0.15)}
+.card-score-badge.perfect{background:var(--accent);color:#fff}
+
+.card-year-overline{font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--ink-dim);text-transform:uppercase;margin-bottom:5px;font-weight:500}
+.card-title-main{font-family:var(--serif);font-weight:700;font-size:19px;line-height:1.2;color:var(--ink);margin-bottom:8px;letter-spacing:-0.01em;font-variation-settings:"opsz" 28;padding-right:8px}
+.card-meta{display:flex;gap:5px;flex-wrap:wrap;margin-top:auto;padding-top:8px}
+.meta-pill{padding:3px 9px;font-size:9px;font-family:var(--mono);letter-spacing:1px;text-transform:uppercase;font-weight:500}
+.meta-genre{background:var(--paper);color:var(--ink)}
+.meta-country{background:transparent;color:var(--ink-dim);border:1px solid var(--rule-soft)}
+.meta-decade{background:transparent;color:var(--ink-dim);border:1px solid var(--rule-soft)}
+.card-stars{display:flex;align-items:center;gap:1px;margin-bottom:4px}
+.star{font-size:10px;color:var(--gold)}
+.star-empty{color:var(--rule-soft)}
+.card-reason{margin:10px 0 0;padding:10px 0 0;font-family:var(--serif);font-style:italic;font-size:12px;color:var(--ink-soft);line-height:1.5;border-top:1px solid var(--rule-soft)}
+
+.card-actions{position:absolute;top:10px;right:10px;display:flex;gap:4px;opacity:0;transition:opacity 0.2s;z-index:3}
+.mc:hover .card-actions{opacity:1}
+.card-action-btn{background:rgba(255,255,255,0.95);border:1px solid var(--rule-soft);width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:var(--mono);font-size:12px;color:var(--ink);transition:all 0.15s;padding:0}
+.card-action-btn:hover{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.custom-badge{position:absolute;bottom:8px;left:8px;font-family:var(--mono);font-size:8px;padding:2px 6px;background:rgba(168,52,31,0.95);color:#fff;letter-spacing:1px;text-transform:uppercase;z-index:3;font-weight:600;border-radius:2px}
+
+.dh{padding:28px 32px;margin-bottom:32px;background:var(--bg-card);border:1px solid var(--rule);border-left:4px solid var(--accent);position:relative}
+.dh-kicker{font-family:var(--mono);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:8px}
+.dt{margin:0 0 8px;font-family:var(--serif);font-size:30px;color:var(--ink);font-weight:700;line-height:1.15;letter-spacing:-0.01em;font-variation-settings:"opsz" 48}
+.dd{margin:0;font-family:var(--serif);font-size:15px;color:var(--ink-soft);line-height:1.55;font-style:italic;max-width:680px}
+
+.empty{text-align:center;padding:80px 20px;color:var(--ink-dim);grid-column:1/-1}
+.ei{font-family:var(--serif);font-size:48px;display:block;margin-bottom:16px;font-style:italic;color:var(--ink-dimmer)}
+.et{font-family:var(--serif);font-size:20px;font-style:italic;margin-bottom:16px}
+.eb{margin-top:8px;padding:10px 20px;border:1px solid var(--ink);background:transparent;color:var(--ink);font-family:var(--mono);font-size:11px;cursor:pointer;letter-spacing:1px;text-transform:uppercase}
+.eb:hover{background:var(--ink);color:var(--bg)}
+
+.overlay{position:fixed;inset:0;background:rgba(26,26,26,0.6);backdrop-filter:blur(4px);z-index:100;display:flex;align-items:flex-start;justify-content:center;padding:40px 20px;overflow-y:auto;animation:overlayIn 0.2s ease}
+.overlay.hidden{display:none}
+.modal{background:var(--bg-card);border:1px solid var(--rule);max-width:620px;width:100%;padding:32px 36px;animation:modalIn 0.25s ease;position:relative;border-top:4px solid var(--accent)}
+.modal-title{font-family:var(--serif);font-size:28px;font-weight:700;letter-spacing:-0.01em;margin-bottom:4px;font-variation-settings:"opsz" 48}
+.modal-sub{font-family:var(--serif);font-style:italic;font-size:14px;color:var(--ink-dim);margin-bottom:28px}
+.modal-close{position:absolute;top:16px;right:16px;background:transparent;border:none;font-family:var(--mono);font-size:20px;cursor:pointer;color:var(--ink-dim);width:32px;height:32px;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
+.modal-close:hover{color:var(--accent)}
+.form-row{margin-bottom:18px}
+.form-row.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.form-label{display:block;font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink);font-weight:600;margin-bottom:6px}
+.form-label.required::after{content:' *';color:var(--accent)}
+.form-input,.form-select{width:100%;padding:10px 12px;background:var(--bg);border:1px solid var(--rule-soft);color:var(--ink);font-size:14px;font-family:var(--sans);outline:none;transition:border-color 0.2s;border-radius:0}
+.form-input:focus,.form-select:focus{border-color:var(--ink)}
+.form-select{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%236a6a6a' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;appearance:none}
+.score-input-wrap{display:flex;align-items:center;gap:10px}
+.score-slider{flex:1;height:4px;background:var(--rule-soft);outline:none;-webkit-appearance:none;cursor:pointer}
+.score-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;background:var(--accent);border:2px solid var(--bg-card);cursor:pointer;box-shadow:0 0 0 1px var(--ink)}
+.score-slider::-moz-range-thumb{width:18px;height:18px;background:var(--accent);border:2px solid var(--bg-card);cursor:pointer;border-radius:0}
+.score-display{font-family:var(--serif);font-weight:700;font-size:20px;min-width:40px;text-align:center;color:var(--accent);font-variation-settings:"opsz" 32}
+.form-help{font-family:var(--serif);font-style:italic;font-size:12px;color:var(--ink-dim);margin-top:6px}
+.form-actions{display:flex;gap:10px;margin-top:28px;border-top:1px solid var(--rule-soft);padding-top:20px;justify-content:flex-end}
+.btn{padding:10px 20px;font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:1px solid var(--ink);transition:all 0.2s;font-weight:600}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-primary:hover{background:var(--ink);border-color:var(--ink)}
+.btn-secondary{background:transparent;color:var(--ink)}
+.btn-secondary:hover{background:var(--ink);color:var(--bg)}
+.btn-danger{background:transparent;color:var(--accent);border-color:var(--accent);margin-right:auto}
+.btn-danger:hover{background:var(--accent);color:#fff}
+
+.footer-actions{display:flex;gap:8px;justify-content:center;margin-top:16px;flex-wrap:wrap}
+.export-btn{padding:8px 16px;background:transparent;border:1px solid var(--rule-soft);color:var(--ink-dim);font-family:var(--mono);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all 0.2s}
+.export-btn:hover{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.export-btn.clear-cache{border-color:var(--accent);color:var(--accent)}
+.export-btn.clear-cache:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+.footer{margin-top:72px;padding-top:24px;border-top:3px double var(--rule);text-align:center}
+.ftext{font-family:var(--mono);font-size:9px;color:var(--ink-dim);letter-spacing:3px;text-transform:uppercase;display:block;margin-bottom:6px}
+.footer-ornament{font-family:var(--serif);font-style:italic;color:var(--accent);font-size:20px;display:block;margin-bottom:12px}
+
+.hidden{display:none !important}
+
+@media(max-width:640px){
+  .container{padding:28px 20px}
+  .masthead-title{font-size:48px}
+  .card-title-main{font-size:17px}
+  .mg{grid-template-columns:1fr}
+  .modal{padding:24px 20px}
+  .form-row.three-col{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="masthead">
+  <div class="masthead-top">
+    <span id="today"></span>
+    <span class="masthead-edition">— No. 1 —</span>
+    <span>Personal Edition</span>
+  </div>
+  <h1 class="masthead-title">Cinematheque</h1>
+  <p class="masthead-subtitle">A personal archive of cinema, carefully kept</p>
+  <div class="masthead-rule">
+    <span>Established 2026</span>
+    <span class="masthead-rule-line"></span>
+    <span>Est. Cantabria</span>
+  </div>
+</div>
+
+<!-- API KEY BANNER -->
+<div class="key-banner" id="key-banner">
+  <div class="key-banner-text">
+    <div class="key-banner-title">✦ Enable Film Posters</div>
+    <div class="key-banner-desc">Get your free OMDb API key at <a href="https://www.omdbapi.com/apikey.aspx" target="_blank" rel="noopener">omdbapi.com/apikey.aspx</a> — takes 30 seconds. Paste it here, saved locally in your browser.</div>
+  </div>
+  <div class="key-banner-form">
+    <input class="key-input" id="key-input" type="text" placeholder="OMDb API Key" maxlength="20">
+    <button class="key-save-btn" onclick="saveApiKey()">Save Key</button>
+  </div>
+</div>
+
+<!-- KEY STATUS (when key saved) -->
+<div class="key-status hidden" id="key-status">
+  <div class="key-status-left">
+    <span class="key-indicator"></span>
+    <span>OMDb key active · <span id="cache-count">0</span> posters cached</span>
+  </div>
+  <button class="key-remove-btn" onclick="removeApiKey()">Remove Key</button>
+</div>
+
+<div class="stats" id="sb"></div>
+
+<div class="tabs">
+  <div class="tabs-left">
+    <button class="tab-btn active" data-tab="c" onclick="sw('c')">The Collection<span class="tab-btn-num" id="tc-count">0</span></button>
+    <button class="tab-btn" data-tab="r" onclick="sw('r')">Discover<span class="tab-btn-num">178</span></button>
+  </div>
+  <button class="add-btn" onclick="openAddModal()"><span class="add-btn-icon">+</span> Add Film</button>
+</div>
+
+<div id="tc">
+  <div class="controls">
+    <div class="search-wrap"><span class="search-icon">⌕</span><input class="search-input" type="text" placeholder="Search titles..." id="si" oninput="ren()"></div>
+    <div class="sort-group">
+      <span class="sort-label">Sort</span>
+      <button class="sort-btn active" data-sort="score-desc" onclick="ss(this)">Score ↓</button>
+      <button class="sort-btn" data-sort="score-asc" onclick="ss(this)">Score ↑</button>
+      <button class="sort-btn" data-sort="year-desc" onclick="ss(this)">Newest</button>
+      <button class="sort-btn" data-sort="year-asc" onclick="ss(this)">Oldest</button>
+      <button class="sort-btn" data-sort="title-asc" onclick="ss(this)">A → Z</button>
+      <button class="sort-btn" data-sort="added-desc" onclick="ss(this)">Last Added</button>
+    </div>
+    <button class="ftoggle active" id="ft1" onclick="tf(1)">▾ Filters</button>
+  </div>
+  <div id="fp1" class="fp"></div>
+  <div class="rc" id="rc1"></div>
+  <div class="mg" id="g1"></div>
+</div>
+
+<div id="tr" class="hidden">
+  <div class="dh">
+    <div class="dh-kicker">✦ Editor's Picks</div>
+    <h2 class="dt">Curated For You</h2>
+    <p class="dd" id="recdesc"></p>
+  </div>
+  <div class="controls">
+    <div class="search-wrap"><span class="search-icon">⌕</span><input class="search-input" type="text" placeholder="Search recommendations..." id="ri" oninput="renR()"></div>
+    <div class="sort-group">
+      <span class="sort-label">Sort</span>
+      <button class="sort-btn active" data-rsort="default" onclick="rs(this)">Curated</button>
+      <button class="sort-btn" data-rsort="year-desc" onclick="rs(this)">Newest</button>
+      <button class="sort-btn" data-rsort="year-asc" onclick="rs(this)">Oldest</button>
+      <button class="sort-btn" data-rsort="title-asc" onclick="rs(this)">A → Z</button>
+    </div>
+    <button class="ftoggle active" id="ft2" onclick="tf(2)">▾ Filters</button>
+  </div>
+  <div id="fp2" class="fp"></div>
+  <div class="rc" id="rc2"></div>
+  <div class="mg" id="g2"></div>
+</div>
+
+<div class="footer">
+  <span class="footer-ornament">❦</span>
+  <span class="ftext" id="ftt"></span>
+  <div class="footer-actions">
+    <button class="export-btn" onclick="exportData()">Export Collection</button>
+    <button class="export-btn" onclick="document.getElementById('importFile').click()">Import Collection</button>
+    <button class="export-btn clear-cache" onclick="clearImageCache()">Clear Poster Cache</button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+  </div>
+  <span class="ftext" style="font-size:8px;opacity:0.5;margin-top:12px">Posters via OMDb API · Fin</span>
+</div>
+</div>
+
+<div class="overlay hidden" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h2 class="modal-title" id="modal-title">Add a Film</h2>
+    <p class="modal-sub" id="modal-sub">A new entry to your collection</p>
+    <div class="form-row">
+      <label class="form-label required">Title</label>
+      <input class="form-input" id="f-title" type="text" placeholder="e.g., The Seventh Seal">
+    </div>
+    <div class="form-row three-col">
+      <div>
+        <label class="form-label required">Year</label>
+        <input class="form-input" id="f-year" type="number" min="1888" max="2030" placeholder="1957">
+      </div>
+      <div>
+        <label class="form-label required">Country</label>
+        <input class="form-input" id="f-country" type="text" placeholder="Sweden" list="country-list">
+        <datalist id="country-list"></datalist>
+      </div>
+      <div>
+        <label class="form-label required">Genre</label>
+        <select class="form-select" id="f-genre">
+          <option value="Drama">Drama</option><option value="Comedy">Comedy</option><option value="Thriller">Thriller</option>
+          <option value="Animation">Animation</option><option value="Romance">Romance</option><option value="Sci-Fi">Sci-Fi</option>
+          <option value="Action">Action</option><option value="Adventure">Adventure</option><option value="Western">Western</option>
+          <option value="Horror">Horror</option><option value="Fantasy">Fantasy</option><option value="War">War</option>
+          <option value="Musical">Musical</option><option value="Documentary">Documentary</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="form-label required">Your Score</label>
+      <div class="score-input-wrap">
+        <input class="score-slider" id="f-score" type="range" min="0" max="10" step="0.5" value="8" oninput="document.getElementById('score-display').textContent=this.value">
+        <span class="score-display" id="score-display">8</span>
+      </div>
+      <p class="form-help">From 0 to 10, in half-point increments</p>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-danger hidden" id="delete-btn" onclick="deleteFilm()">Delete</button>
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveFilm()" id="save-btn">Save Film</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============ DATA ============
+const SEED_M=[
+{t:"Supermarket Woman",s:8.0,c:"Japan",g:"Comedy",y:1996},{t:"Tampopo",s:9.5,c:"Japan",g:"Comedy",y:1985},
+{t:"Airbag",s:8.5,c:"Spain",g:"Comedy",y:1997},{t:"My Neighbour Totoro",s:9.0,c:"Japan",g:"Animation",y:1988},
+{t:"La Grande Bellezza",s:10,c:"Italy",g:"Drama",y:2013},{t:"Memories of Murder",s:9.0,c:"South Korea",g:"Thriller",y:2003},
+{t:"Yi Yi",s:9.5,c:"Taiwan",g:"Drama",y:2000},{t:"The Banshees of Inisherin",s:8.5,c:"Ireland",g:"Drama",y:2022},
+{t:"The Red Turtle",s:9.5,c:"Japan",g:"Animation",y:2016},{t:"The Chaser",s:7.5,c:"South Korea",g:"Thriller",y:2008},
+{t:"In The Mood for Love",s:10,c:"Hong Kong",g:"Romance",y:2000},{t:"The Lives of Others",s:10,c:"Germany",g:"Drama",y:2006},
+{t:"El Secreto de Sus Ojos",s:10,c:"Argentina",g:"Thriller",y:2009},{t:"My Dinner With Andre",s:10,c:"US",g:"Drama",y:1981},
+{t:"Her",s:10,c:"US",g:"Sci-Fi",y:2013},{t:"The Diving Bell and The Butterfly",s:9.5,c:"France",g:"Drama",y:2007},
+{t:"Perfect Days",s:9.0,c:"Japan",g:"Drama",y:2023},{t:"A Brighter Summer Day",s:9.5,c:"Taiwan",g:"Drama",y:1991},
+{t:"The Hand of God",s:9.5,c:"Italy",g:"Drama",y:2021},{t:"The Northman",s:8.5,c:"Norway",g:"Action",y:2022},
+{t:"Chungking Express",s:8.5,c:"Hong Kong",g:"Romance",y:1994},{t:"The Batman",s:9.5,c:"US",g:"Action",y:2022},
+{t:"Long Day's Journey Into Night",s:7.5,c:"China",g:"Drama",y:2018},{t:"The Count of Monte Cristo",s:9.5,c:"France",g:"Adventure",y:2024},
+{t:"North by Northwest",s:10,c:"US",g:"Thriller",y:1959},{t:"The Apartment",s:8.5,c:"US",g:"Comedy",y:1960},
+{t:"Some Like It Hot",s:9.0,c:"US",g:"Comedy",y:1959},{t:"Irma la Douce",s:8.0,c:"US",g:"Comedy",y:1963},
+{t:"Flow",s:10,c:"Latvia",g:"Animation",y:2024},{t:"Reservoir Dogs",s:8.5,c:"US",g:"Thriller",y:1992},
+{t:"Four Rooms",s:7.0,c:"US",g:"Comedy",y:1995},{t:"Glengarry Glen Ross",s:9.5,c:"US",g:"Drama",y:1992},
+{t:"Unforgiven",s:9.0,c:"US",g:"Western",y:1992},{t:"The Revenant",s:10,c:"US",g:"Adventure",y:2015},
+{t:"Porco Rosso",s:9.0,c:"Japan",g:"Animation",y:1992},{t:"Midnight in Paris",s:9.5,c:"US",g:"Romance",y:2011},
+{t:"One Battle After Another",s:9.5,c:"US",g:"Drama",y:2025},{t:"Pig",s:9.5,c:"US",g:"Drama",y:2021},
+{t:"A House of Dynamite",s:8.0,c:"US",g:"Drama",y:2024},{t:"Nosferatu",s:9.5,c:"US",g:"Horror",y:2024},
+{t:"Knives Out",s:9.0,c:"US",g:"Thriller",y:2019},{t:"Glass Onion",s:7.0,c:"US",g:"Thriller",y:2022},
+{t:"Wake Up Dead Man",s:7.0,c:"US",g:"Thriller",y:2025},{t:"Predestination",s:9.0,c:"US",g:"Sci-Fi",y:2014},
+{t:"Boyhood",s:9.5,c:"US",g:"Drama",y:2014},{t:"Gattaca",s:10,c:"US",g:"Sci-Fi",y:1997},
+{t:"The Order",s:8.5,c:"US",g:"Thriller",y:2024},{t:"Train Dreams",s:9.5,c:"US",g:"Drama",y:2024},
+{t:"Paris, Texas",s:10,c:"US",g:"Drama",y:1984},{t:"Before Sunrise",s:10,c:"US",g:"Romance",y:1995},
+];
+
+const R=[
+{t:"Spirited Away",y:2001,c:"Japan",g:"Animation",r:"Miyazaki at peak ambition — Totoro and Porco Rosso transcended"},
+{t:"Stalker",y:1979,c:"Russia",g:"Sci-Fi",r:"Meditative pacing of Perfect Days meets philosophical depth of My Dinner With Andre"},
+{t:"Parasite",y:2019,c:"South Korea",g:"Thriller",r:"Bong Joon-ho's masterpiece — if Memories of Murder floored you, this will too"},
+{t:"Oldboy",y:2003,c:"South Korea",g:"Thriller",r:"Park Chan-wook turns the screws further than The Chaser ever dared"},
+{t:"Before Sunset",y:2004,c:"US",g:"Romance",r:"The perfect sequel to Before Sunrise — many argue it's even better"},
+{t:"Before Midnight",y:2013,c:"US",g:"Romance",r:"The trilogy's gut-punch finale — love tested by time and reality"},
+{t:"Pather Panchali",y:1955,c:"India",g:"Drama",r:"Humanist storytelling on par with Yi Yi — a cornerstone of world cinema"},
+{t:"A Separation",y:2011,c:"Iran",g:"Drama",r:"Moral complexity rivalling El Secreto de Sus Ojos with devastating restraint"},
+{t:"Wings of Desire",y:1987,c:"Germany",g:"Fantasy",r:"Poetic and tender like In The Mood for Love, set in a divided Berlin"},
+{t:"Roma",y:2018,c:"Mexico",g:"Drama",r:"Visual poetry and quiet humanism alongside Boyhood and Perfect Days"},
+{t:"Ikiru",y:1952,c:"Japan",g:"Drama",r:"Kurosawa's most human film — La Grande Bellezza's existential warmth"},
+{t:"Amores Perros",y:2000,c:"Mexico",g:"Thriller",r:"Raw intersecting narratives with the intensity of Memories of Murder"},
+{t:"Cinema Paradiso",y:1988,c:"Italy",g:"Drama",r:"Pure love letter to film — the nostalgia of Midnight in Paris with Italian soul"},
+{t:"Three Colors: Red",y:1994,c:"France",g:"Drama",r:"Kieslowski's finest — elegance and mystery like Diving Bell"},
+{t:"The Handmaiden",y:2016,c:"South Korea",g:"Thriller",r:"Twisting, gorgeous — the craft of Knives Out meets Asian cinema mastery"},
+{t:"Come and See",y:1985,c:"Belarus",g:"War",r:"As visceral as The Revenant — unforgettable anti-war cinema"},
+{t:"Wild Strawberries",y:1957,c:"Sweden",g:"Drama",r:"Bergman's warmest film — reflective beauty like Paris, Texas"},
+{t:"Fallen Angels",y:1995,c:"Hong Kong",g:"Romance",r:"Wong Kar-wai's neon-soaked companion piece to Chungking Express"},
+{t:"The Seventh Seal",y:1957,c:"Sweden",g:"Drama",r:"Nosferatu's gothic ancestor — philosophy, death, and chess"},
+{t:"Spring, Summer, Fall, Winter... and Spring",y:2003,c:"South Korea",g:"Drama",r:"Meditative and cyclical — The Red Turtle's tranquility in live action"},
+{t:"The Tale of the Princess Kaguya",y:2013,c:"Japan",g:"Animation",r:"Studio Ghibli's most breathtaking visual achievement"},
+{t:"Rashomon",y:1950,c:"Japan",g:"Drama",r:"The film that invented unreliable narration — truth as slippery as Knives Out"},
+{t:"2001: A Space Odyssey",y:1968,c:"US",g:"Sci-Fi",r:"The philosophical Sci-Fi benchmark — Her and Gattaca descend from this"},
+{t:"Blade Runner",y:1982,c:"US",g:"Sci-Fi",r:"Visual DNA of every beautiful dystopia since — Gattaca owes it everything"},
+{t:"Blade Runner 2049",y:2017,c:"US",g:"Sci-Fi",r:"Villeneuve's staggering sequel — loneliness and beauty on Her's wavelength"},
+{t:"Solaris",y:1972,c:"Russia",g:"Sci-Fi",r:"Tarkovsky's answer to 2001 — grief and memory in space, closer to Her"},
+{t:"Tokyo Story",y:1953,c:"Japan",g:"Drama",r:"Ozu's masterpiece — the family dynamics of Yi Yi distilled to perfection"},
+{t:"Late Spring",y:1949,c:"Japan",g:"Drama",r:"Ozu's gentle devastation — Perfect Days inherits its quiet philosophy"},
+{t:"Shoplifters",y:2018,c:"Japan",g:"Drama",r:"Kore-eda's warm meditation on found family — Yi Yi's spiritual cousin"},
+{t:"Still Walking",y:2008,c:"Japan",g:"Drama",r:"A family gathering with emotional precision of Yi Yi"},
+{t:"Departures",y:2008,c:"Japan",g:"Drama",r:"Tender drama about death and dignity — Perfect Days' emotional register"},
+{t:"Drive My Car",y:2021,c:"Japan",g:"Drama",r:"Hamaguchi's slow-burn masterpiece — grief through art, like Diving Bell"},
+{t:"Happy Together",y:1997,c:"Hong Kong",g:"Romance",r:"Wong Kar-wai's most raw — Buenos Aires through Chungking Express' lens"},
+{t:"An Autumn Afternoon",y:1962,c:"Japan",g:"Drama",r:"Ozu's final film — ageing fathers and quiet melancholy"},
+{t:"Woman in the Dunes",y:1964,c:"Japan",g:"Drama",r:"Existential Japanese surrealism — Kafka meets The Red Turtle"},
+{t:"Harakiri",y:1962,c:"Japan",g:"Drama",r:"Devastating samurai deconstruction — Knives Out's structural precision with real stakes"},
+{t:"Seven Samurai",y:1954,c:"Japan",g:"Adventure",r:"Kurosawa's epic that inspired everything — Unforgiven wouldn't exist without it"},
+{t:"Yojimbo",y:1961,c:"Japan",g:"Action",r:"The sly ronin that invented the anti-hero Western"},
+{t:"Grave of the Fireflies",y:1988,c:"Japan",g:"Animation",r:"Ghibli's heartbreak — war through children's eyes, devastating as Come and See"},
+{t:"Princess Mononoke",y:1997,c:"Japan",g:"Animation",r:"Miyazaki's most ambitious epic — environmentalism and moral complexity collide"},
+{t:"Howl's Moving Castle",y:2004,c:"Japan",g:"Animation",r:"Whimsical Miyazaki romance — Totoro's warmth with anti-war undercurrents"},
+{t:"The Wind Rises",y:2013,c:"Japan",g:"Animation",r:"Miyazaki's most personal — dreams, ambition, and loss beautifully rendered"},
+{t:"Millennium Actress",y:2001,c:"Japan",g:"Animation",r:"Satoshi Kon's love letter to cinema — reality blurs like Midnight in Paris"},
+{t:"Paprika",y:2006,c:"Japan",g:"Animation",r:"Kon's dreamscape — the film Inception borrowed from"},
+{t:"Akira",y:1988,c:"Japan",g:"Animation",r:"Neo-Tokyo cyberpunk landmark — the visual ambition anime inherited"},
+{t:"Ghost in the Shell",y:1995,c:"Japan",g:"Sci-Fi",r:"Philosophical cyberpunk — identity questions as profound as Her"},
+{t:"The Wailing",y:2016,c:"South Korea",g:"Horror",r:"Korean horror building dread like Nosferatu with folk-terror roots"},
+{t:"Mother",y:2009,c:"South Korea",g:"Thriller",r:"Bong Joon-ho's taut maternal thriller — Memories of Murder's sibling"},
+{t:"A Taxi Driver",y:2017,c:"South Korea",g:"Drama",r:"Gwangju uprising — political drama with The Lives of Others' weight"},
+{t:"Burning",y:2018,c:"South Korea",g:"Thriller",r:"Lee Chang-dong's slow-burn mystery — class tension and literary dread"},
+{t:"Poetry",y:2010,c:"South Korea",g:"Drama",r:"Beauty amid horror — delicate as Diving Bell"},
+{t:"A Bittersweet Life",y:2005,c:"South Korea",g:"Action",r:"Stylish Korean noir — The Chaser's intensity with operatic flair"},
+{t:"The Age of Innocence",y:1993,c:"US",g:"Romance",r:"Scorsese's restrained passion — desire suppressed like In The Mood for Love"},
+{t:"Amélie",y:2001,c:"France",g:"Comedy",r:"Whimsical Parisian magic — Midnight in Paris' playful cousin"},
+{t:"The Grand Budapest Hotel",y:2014,c:"US",g:"Comedy",r:"Anderson's most intricate confection — visual wit at its finest"},
+{t:"Moonrise Kingdom",y:2012,c:"US",g:"Comedy",r:"Anderson's sweetest — childhood adventure with Before Sunrise's innocence"},
+{t:"The Double Life of Véronique",y:1991,c:"France",g:"Drama",r:"Kieslowski's dreamlike meditation on identity"},
+{t:"Three Colors: Blue",y:1993,c:"France",g:"Drama",r:"Grief and freedom explored with musical precision"},
+{t:"Caché",y:2005,c:"France",g:"Thriller",r:"Haneke's surveillance thriller — guilt as gripping as El Secreto de Sus Ojos"},
+{t:"Amour",y:2012,c:"France",g:"Drama",r:"Haneke's devastating love story — unflinching as Diving Bell"},
+{t:"The White Ribbon",y:2009,c:"Germany",g:"Drama",r:"Evil's origins with Lives of Others' precision"},
+{t:"Portrait of a Lady on Fire",y:2019,c:"France",g:"Romance",r:"Gazes that burn like In The Mood for Love — desire painted in silence"},
+{t:"Léon: The Professional",y:1994,c:"France",g:"Action",r:"Besson's iconic thriller — stylish action with unexpected tenderness"},
+{t:"La Haine",y:1995,c:"France",g:"Drama",r:"24 hours in Paris banlieue — raw social fury in black-and-white"},
+{t:"The Umbrellas of Cherbourg",y:1964,c:"France",g:"Musical",r:"Demy's all-sung romance — Before Sunrise's French ancestor"},
+{t:"Rififi",y:1955,c:"France",g:"Thriller",r:"The heist that invented the genre — 30 minutes of silent tension"},
+{t:"City of God",y:2002,c:"Brazil",g:"Thriller",r:"Kinetic Brazilian favela epic — Amores Perros' energy amplified"},
+{t:"Pan's Labyrinth",y:2006,c:"Mexico",g:"Fantasy",r:"Del Toro's dark fairy tale — war seen through a child's mythology"},
+{t:"Y Tu Mamá También",y:2001,c:"Mexico",g:"Drama",r:"Cuarón's road trip — coming-of-age with political undercurrents"},
+{t:"The Spirit of the Beehive",y:1973,c:"Spain",g:"Drama",r:"Post-Civil War through a child's eyes — haunting as Red Turtle"},
+{t:"All About My Mother",y:1999,c:"Spain",g:"Drama",r:"Almodóvar's compassionate masterpiece — melodrama elevated to art"},
+{t:"Talk to Her",y:2002,c:"Spain",g:"Drama",r:"Almodóvar's most daring — obsessive love explored uncomfortably"},
+{t:"8½",y:1963,c:"Italy",g:"Drama",r:"Fellini's dreamscape — La Grande Bellezza's direct ancestor"},
+{t:"La Dolce Vita",y:1960,c:"Italy",g:"Drama",r:"Rome's decadent soul — La Grande Bellezza is its 21st-century sequel"},
+{t:"Bicycle Thieves",y:1948,c:"Italy",g:"Drama",r:"Italian neorealism's crown jewel — simple and devastating"},
+{t:"Persona",y:1966,c:"Sweden",g:"Drama",r:"Bergman's most radical — identity dissolves in stunning black-and-white"},
+{t:"Fanny and Alexander",y:1982,c:"Sweden",g:"Drama",r:"Bergman's warm epic — childhood and magic across seasons"},
+{t:"Andrei Rublev",y:1966,c:"Russia",g:"Drama",r:"Tarkovsky's medieval epic — art and faith amid violence"},
+{t:"The Mirror",y:1975,c:"Russia",g:"Drama",r:"Tarkovsky's most personal — memory as fluid as Long Day's Journey"},
+{t:"Ida",y:2013,c:"Poland",g:"Drama",r:"Gorgeous B&W — a nun discovers her past, still and devastating"},
+{t:"Cold War",y:2018,c:"Poland",g:"Romance",r:"Decades-spanning love across Iron Curtain — In The Mood for Love's Polish echo"},
+{t:"The Conformist",y:1970,c:"Italy",g:"Drama",r:"Bertolucci's visual mastery — fascism thriller that influenced every prestige film"},
+{t:"The Leopard",y:1963,c:"Italy",g:"Drama",r:"Visconti's aristocratic elegy — a world ending in splendor"},
+{t:"Life Is Beautiful",y:1997,c:"Italy",g:"Comedy",r:"Benigni's Holocaust fable — comedy shielding horror"},
+{t:"The Wages of Fear",y:1953,c:"France",g:"Thriller",r:"Clouzot's sweat-drenched masterpiece — tension that makes modern thrillers look tame"},
+{t:"Diabolique",y:1955,c:"France",g:"Thriller",r:"The twist Hitchcock wished he'd made — suspense perfected"},
+{t:"The 400 Blows",y:1959,c:"France",g:"Drama",r:"Truffaut's debut — the French New Wave's Boyhood"},
+{t:"Children of Men",y:2006,c:"US",g:"Sci-Fi",r:"Cuarón's dystopia masterclass — long takes redefining immersion"},
+{t:"Eternal Sunshine of the Spotless Mind",y:2004,c:"US",g:"Sci-Fi",r:"Memory and loss — Her's emotional twin in Kaufman's genius"},
+{t:"Mulholland Drive",y:2001,c:"US",g:"Thriller",r:"Lynch's dream-puzzle — nothing is what it seems, endlessly rewatchable"},
+{t:"There Will Be Blood",y:2007,c:"US",g:"Drama",r:"Daniel Day-Lewis devours the screen — ambition as American origin story"},
+{t:"No Country for Old Men",y:2007,c:"US",g:"Thriller",r:"The Coens' most terrifying — fate and violence, Unforgiven's heir"},
+{t:"The Thin Red Line",y:1998,c:"US",g:"War",r:"Malick's war poem — nature and violence coexist, The Revenant's ancestor"},
+{t:"Days of Heaven",y:1978,c:"US",g:"Drama",r:"Malick's visual masterpiece — golden hour photography redefined"},
+{t:"The Tree of Life",y:2011,c:"US",g:"Drama",r:"Malick's most ambitious — childhood, cosmos, and memory woven together"},
+{t:"Magnolia",y:1999,c:"US",g:"Drama",r:"PTA's sprawling interconnected stories — coincidence and redemption"},
+{t:"Punch-Drunk Love",y:2002,c:"US",g:"Romance",r:"PTA's weirdest, most tender — Sandler as romantic hero"},
+{t:"Phantom Thread",y:2017,c:"US",g:"Romance",r:"PTA and Day-Lewis' swan song — love as power struggle"},
+{t:"The Master",y:2012,c:"US",g:"Drama",r:"PTA's most hypnotic — Hoffman and Phoenix in a battle of wills"},
+{t:"Zodiac",y:2007,c:"US",g:"Thriller",r:"Fincher's obsession procedural — Memories of Murder's American counterpart"},
+{t:"Se7en",y:1995,c:"US",g:"Thriller",r:"Fincher's rain-soaked horror-noir — The Chaser's bleakness perfected"},
+{t:"Fight Club",y:1999,c:"US",g:"Thriller",r:"Fincher's anarchic cult classic — identity crisis as spectacle"},
+{t:"The Social Network",y:2010,c:"US",g:"Drama",r:"Sorkin meets Fincher — Glengarry Glen Ross energy for Silicon Valley"},
+{t:"Prisoners",y:2013,c:"US",g:"Thriller",r:"Villeneuve's first English masterwork — moral compromise as gripping as El Secreto"},
+{t:"Sicario",y:2015,c:"US",g:"Thriller",r:"Villeneuve's border war — dread and spectacle in equal measure"},
+{t:"Arrival",y:2016,c:"US",g:"Sci-Fi",r:"Language as time travel — Her's emotional intelligence applied to first contact"},
+{t:"Whiplash",y:2014,c:"US",g:"Drama",r:"Percussion as warfare — mentor-student tension at breaking point"},
+{t:"La La Land",y:2016,c:"US",g:"Musical",r:"Chazelle's love letter to dreamers — Midnight in Paris reimagined as musical"},
+{t:"Manchester by the Sea",y:2016,c:"US",g:"Drama",r:"Grief in silence — devastating restraint, Diving Bell's American cousin"},
+{t:"Moonlight",y:2016,c:"US",g:"Drama",r:"Identity and tenderness across three chapters — Boyhood's poetic counterpart"},
+{t:"Inside Llewyn Davis",y:2013,c:"US",g:"Drama",r:"The Coens' folk-music odyssey — failure as art, cold and beautiful"},
+{t:"Fargo",y:1996,c:"US",g:"Thriller",r:"Snow-bound crime classic — dark comedy perfected in Minnesota"},
+{t:"The Big Lebowski",y:1998,c:"US",g:"Comedy",r:"The Dude abides — a laid-back noir masterpiece"},
+{t:"12 Angry Men",y:1957,c:"US",g:"Drama",r:"One room, twelve men, total cinema — Glengarry Glen Ross's ancestor"},
+{t:"Network",y:1976,c:"US",g:"Drama",r:"Media prophecy that only gets more relevant"},
+{t:"Taxi Driver",y:1976,c:"US",g:"Drama",r:"Scorsese's urban madness — cinema's loneliest figure"},
+{t:"Goodfellas",y:1990,c:"US",g:"Thriller",r:"Scorsese's kinetic mob epic — effortlessly brilliant"},
+{t:"Chinatown",y:1974,c:"US",g:"Thriller",r:"Perfect noir — corruption deeper than any Knives Out twist"},
+{t:"The Conversation",y:1974,c:"US",g:"Thriller",r:"Coppola's surveillance paranoia — Lives of Others' American precursor"},
+{t:"Apocalypse Now",y:1979,c:"US",g:"War",r:"Vietnam fever dream — war as madness, The Revenant's spiritual ancestor"},
+{t:"Once Upon a Time in America",y:1984,c:"US",g:"Drama",r:"Leone's 4-hour gangster elegy — memory and regret spanning a lifetime"},
+{t:"The Good, the Bad and the Ugly",y:1966,c:"Italy",g:"Western",r:"Leone's spaghetti Western apex — Unforgiven stands on its shoulders"},
+{t:"Once Upon a Time in the West",y:1968,c:"Italy",g:"Western",r:"Leone's operatic opening — 15 minutes of silence that rewrote cinema"},
+{t:"High and Low",y:1963,c:"Japan",g:"Thriller",r:"Kurosawa's modern thriller — kidnapping that splits screen and society"},
+{t:"Ran",y:1985,c:"Japan",g:"Drama",r:"King Lear by Kurosawa — epic battles and color mastery"},
+{t:"Annie Hall",y:1977,c:"US",g:"Comedy",r:"Allen's romantic comedy revolution — neurotic wit and New York love"},
+{t:"Do the Right Thing",y:1989,c:"US",g:"Drama",r:"Spike Lee's Brooklyn pressure cooker — a perfect day that boils over"},
+{t:"Vertigo",y:1958,c:"US",g:"Thriller",r:"Hitchcock's obsessive masterpiece — North By Northwest's darker twin"},
+{t:"Rear Window",y:1954,c:"US",g:"Thriller",r:"Voyeuristic suspense through a single apartment window"},
+{t:"Psycho",y:1960,c:"US",g:"Horror",r:"Hitchcock's most shocking — Nosferatu's mid-century descendant"},
+{t:"Sunset Boulevard",y:1950,c:"US",g:"Drama",r:"Wilder's Hollywood noir — Some Like It Hot's creator at his most savage"},
+{t:"Double Indemnity",y:1944,c:"US",g:"Thriller",r:"Wilder's noir perfection — the femme fatale template"},
+{t:"Witness for the Prosecution",y:1957,c:"US",g:"Thriller",r:"Wilder's courtroom twist — Knives Out's golden-age ancestor"},
+{t:"The Truman Show",y:1998,c:"US",g:"Sci-Fi",r:"Existential masterwork — reality as constructed as Her's AI world"},
+{t:"Lost in Translation",y:2003,c:"US",g:"Romance",r:"Coppola's Tokyo loneliness — In The Mood for Love whispered in English"},
+{t:"Once",y:2007,c:"Ireland",g:"Musical",r:"Dublin street music — Before Sunrise with instruments"},
+{t:"The Lobster",y:2015,c:"Ireland",g:"Sci-Fi",r:"Lanthimos' absurdist love dystopia — Banshees' humor pushed into sci-fi"},
+{t:"Capernaum",y:2018,c:"Lebanon",g:"Drama",r:"A child sues his parents for being born — devastating and defiant"},
+{t:"The Salesman",y:2016,c:"Iran",g:"Drama",r:"Farhadi's theatre-meets-life — A Separation's successor"},
+{t:"Close-Up",y:1990,c:"Iran",g:"Drama",r:"Kiarostami blurs truth and fiction — cinema's mirror"},
+{t:"Taste of Cherry",y:1997,c:"Iran",g:"Drama",r:"A man drives through Tehran seeking help — Palme d'Or winner"},
+{t:"Son of Saul",y:2015,c:"Hungary",g:"War",r:"Holocaust through shallow focus — horrifying and formally revolutionary"},
+{t:"The Act of Killing",y:2012,c:"Indonesia",g:"Documentary",r:"Mass murderers reenact their crimes — the most disturbing doc ever made"},
+{t:"Waltz with Bashir",y:2008,c:"Israel",g:"Animation",r:"Animated war memoir — memory and trauma in surreal images"},
+{t:"The Lighthouse",y:2019,c:"US",g:"Horror",r:"Eggers' fever dream — Nosferatu's director at his most unhinged"},
+{t:"The Witch",y:2015,c:"US",g:"Horror",r:"Eggers' debut — 1630s New England, the slow-burn dread of Nosferatu"},
+{t:"Hereditary",y:2018,c:"US",g:"Horror",r:"Aster's family nightmare — grief and horror intertwined"},
+{t:"Ex Machina",y:2014,c:"UK",g:"Sci-Fi",r:"AI consciousness probed — Her's questions in a claustrophobic framework"},
+{t:"Under the Skin",y:2013,c:"UK",g:"Sci-Fi",r:"Alien eyes on humanity — hypnotic and cold"},
+{t:"Trainspotting",y:1996,c:"UK",g:"Drama",r:"Edinburgh adrenaline shot — Reservoir Dogs' energy applied to addiction"},
+{t:"The Third Man",y:1949,c:"UK",g:"Thriller",r:"Post-war Vienna noir — zither score, sewer chase, perfection"},
+{t:"Brief Encounter",y:1945,c:"UK",g:"Romance",r:"Lean's restrained passion — In The Mood for Love's British forerunner"},
+{t:"Hunger",y:2008,c:"UK",g:"Drama",r:"McQueen's debut — 17-minute unbroken dialogue scene"},
+{t:"Fitzcarraldo",y:1982,c:"Germany",g:"Adventure",r:"Herzog drags a steamship over a mountain — for real"},
+{t:"Das Boot",y:1981,c:"Germany",g:"War",r:"The U-boat film — claustrophobia that never relents"},
+{t:"Downfall",y:2004,c:"Germany",g:"War",r:"Hitler's final days — Ganz's legendary performance"},
+{t:"The Hunt",y:2012,c:"Denmark",g:"Drama",r:"Mikkelsen accused in a small town — tension that never lets up"},
+{t:"Another Round",y:2020,c:"Denmark",g:"Comedy",r:"Mikkelsen drinks through midlife — darkly hilarious, then transcendent"},
+{t:"A Prophet",y:2009,c:"France",g:"Thriller",r:"Audiard's prison epic — a young man rises through the system"},
+{t:"4 Months, 3 Weeks and 2 Days",y:2007,c:"Romania",g:"Drama",r:"Romanian New Wave's most harrowing — unflinching"},
+{t:"Toni Erdmann",y:2016,c:"Germany",g:"Comedy",r:"A father pranks his corporate daughter — 3 hours of surprise"},
+{t:"Once Upon a Time in Anatolia",y:2011,c:"Turkey",g:"Drama",r:"Nocturnal procedural becomes existential meditation"},
+{t:"Winter Sleep",y:2014,c:"Turkey",g:"Drama",r:"Ceylan's Palme d'Or — moral bankruptcy in Cappadocia"},
+{t:"After Life",y:1998,c:"Japan",g:"Fantasy",r:"Which memory would you keep forever? Quiet, profound, perfect"},
+{t:"Cure",y:1997,c:"Japan",g:"Horror",r:"Hypnotic serial killer film — dread seeping under your skin"},
+{t:"Let the Right One In",y:2008,c:"Sweden",g:"Horror",r:"Vampire tenderness — childhood loneliness meets Nosferatu's lineage"},
+{t:"Force Majeure",y:2014,c:"Sweden",g:"Comedy",r:"An avalanche tests a marriage — dark Scandinavian comedy"},
+{t:"I Am Love",y:2009,c:"Italy",g:"Drama",r:"Tilda Swinton in Guadagnino's sensuous Milan"},
+{t:"Umberto D.",y:1952,c:"Italy",g:"Drama",r:"An old man and his dog against indifferent Rome"},
+{t:"The Passion of Joan of Arc",y:1928,c:"France",g:"Drama",r:"Silent cinema's most powerful face — Falconetti transcends time"},
+{t:"Au Hasard Balthazar",y:1966,c:"France",g:"Drama",r:"Bresson's donkey — all of human cruelty witnessed by an animal"},
+{t:"Cléo from 5 to 7",y:1962,c:"France",g:"Drama",r:"Varda's real-time Paris walk — beautifully observed"},
+{t:"The Battle of Algiers",y:1966,c:"Algeria",g:"War",r:"Revolutionary cinema — blueprint for every political thriller"},
+{t:"Badlands",y:1973,c:"US",g:"Thriller",r:"Malick's debut — young killers on the run, beautiful and chilling"},
+{t:"Dog Day Afternoon",y:1975,c:"US",g:"Thriller",r:"Lumet's hostage masterclass — Pacino at his most electric"},
+{t:"Raging Bull",y:1980,c:"US",g:"Drama",r:"De Niro as self-destructive force — Scorsese's most raw"},
+{t:"Rope",y:1948,c:"US",g:"Thriller",r:"Hitchcock's real-time experiment — one continuous escalating dread"},
+{t:"Ace in the Hole",y:1951,c:"US",g:"Drama",r:"Wilder's media satire — exploitation for ratings, prophetic"},
+];
+
+// ============ OMDb API KEY MANAGEMENT ============
+const API_KEY_STORAGE='cinematheque_omdb_key_v1';
+const IMG_CACHE_KEY='cinematheque_poster_cache_v2';
+let API_KEY=localStorage.getItem(API_KEY_STORAGE)||'';
+const imageCache=JSON.parse(localStorage.getItem(IMG_CACHE_KEY)||'{}');
+const inflightRequests=new Map();
+
+function saveImageCache(){
+  try{localStorage.setItem(IMG_CACHE_KEY,JSON.stringify(imageCache))}
+  catch(e){console.warn('Cache save failed',e)}
+}
+
+function updateKeyUI(){
+  const banner=document.getElementById('key-banner');
+  const status=document.getElementById('key-status');
+  if(API_KEY){
+    banner.classList.add('hidden');
+    status.classList.remove('hidden');
+    const count=Object.values(imageCache).filter(v=>v&&v!=='N/A').length;
+    document.getElementById('cache-count').textContent=count;
+  }else{
+    banner.classList.remove('hidden');
+    status.classList.add('hidden');
+  }
+}
+
+function saveApiKey(){
+  const key=document.getElementById('key-input').value.trim();
+  if(!key){alert('Please enter your OMDb API key');return}
+  if(key.length<6){alert('That doesn\'t look like a valid key');return}
+  API_KEY=key;
+  localStorage.setItem(API_KEY_STORAGE,key);
+  updateKeyUI();
+  ren();renR();
+}
+
+function removeApiKey(){
+  if(!confirm('Remove API key? Posters will stop loading for uncached films.'))return;
+  API_KEY='';
+  localStorage.removeItem(API_KEY_STORAGE);
+  updateKeyUI();
+  ren();renR();
+}
+
+// ============ OMDb POSTER FETCHING ============
+async function fetchPosterURL(title,year){
+  const key=`${title}|${year}`;
+  if(imageCache[key]!==undefined)return imageCache[key];
+  if(!API_KEY)return null;
+  if(inflightRequests.has(key))return inflightRequests.get(key);
+  
+  const promise=(async()=>{
+    try{
+      // OMDb search by title + year
+      const url=`https://www.omdbapi.com/?apikey=${API_KEY}&t=${encodeURIComponent(title)}&y=${year}&type=movie`;
+      const res=await fetch(url);
+      if(!res.ok)return null;
+      const data=await res.json();
+      if(data.Response==='True'&&data.Poster&&data.Poster!=='N/A'){
+        return data.Poster;
+      }
+      // Fallback: try without year (year metadata sometimes differs)
+      const url2=`https://www.omdbapi.com/?apikey=${API_KEY}&t=${encodeURIComponent(title)}&type=movie`;
+      const res2=await fetch(url2);
+      if(!res2.ok)return null;
+      const data2=await res2.json();
+      if(data2.Response==='True'&&data2.Poster&&data2.Poster!=='N/A'){
+        // Sanity check: years should be within 1 year
+        if(Math.abs(parseInt(data2.Year)-year)<=1)return data2.Poster;
+      }
+      return 'N/A';
+    }catch(e){
+      console.warn('OMDb fetch failed for',title,e);
+      return null;
+    }
+  })();
+  
+  inflightRequests.set(key,promise);
+  const result=await promise;
+  inflightRequests.delete(key);
+  imageCache[key]=result;
+  saveImageCache();
+  updateKeyUI();
+  return result;
+}
+
+async function loadImageForCard(cardEl,title,year){
+  const wrap=cardEl.querySelector('.poster-wrap');
+  if(!wrap||wrap.dataset.loaded==='true')return;
+  wrap.dataset.loaded='true';
+  
+  if(!API_KEY){
+    wrap.innerHTML=`<div class="poster-no-key">Add OMDb key above<br>to load posters</div>`;
+    return;
+  }
+  
+  const url=await fetchPosterURL(title,year);
+  const loading=wrap.querySelector('.poster-loading');
+  
+  if(!url||url==='N/A'){
+    if(loading)loading.remove();
+    const existing=wrap.querySelector('.poster-placeholder');
+    if(!existing){
+      const div=document.createElement('div');
+      div.className='poster-placeholder';
+      div.innerHTML=`<span class="poster-placeholder-icon">◈</span>No poster found`;
+      wrap.appendChild(div);
+    }
+    return;
+  }
+  
+  const img=new Image();
+  img.className='poster-img';
+  img.alt='';
+  img.onload=()=>{
+    if(loading)loading.remove();
+    img.classList.add('loaded');
+  };
+  img.onerror=()=>{
+    if(loading)loading.remove();
+    const div=document.createElement('div');
+    div.className='poster-placeholder';
+    div.innerHTML=`<span class="poster-placeholder-icon">◈</span>Image unavailable`;
+    wrap.appendChild(div);
+  };
+  img.src=url;
+  wrap.appendChild(img);
+}
+
+function clearImageCache(){
+  if(!confirm('Clear all cached posters? They will re-fetch from OMDb on next view.'))return;
+  localStorage.removeItem(IMG_CACHE_KEY);
+  for(const k in imageCache)delete imageCache[k];
+  updateKeyUI();
+  ren();renR();
+}
+
+// ============ COLLECTION STORAGE ============
+const STORAGE_KEY='cinematheque_collection_v1';
+let M=[];
+function loadCollection(){
+  try{
+    const stored=localStorage.getItem(STORAGE_KEY);
+    if(stored){M=JSON.parse(stored)}
+    else{
+      M=SEED_M.map((m,i)=>({...m,id:genId(),added:Date.now()-((SEED_M.length-i)*86400000)}));
+      saveCollection();
+    }
+  }catch(e){console.error(e);M=SEED_M.map((m,i)=>({...m,id:genId(),added:Date.now()-i*86400000}))}
+}
+function saveCollection(){
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(M))}
+  catch(e){alert('Could not save - storage full')}
+}
+function genId(){return 'f'+Date.now()+'_'+Math.random().toString(36).slice(2,8)}
+function addDecade(arr){arr.forEach(m=>{m.d=Math.floor(m.y/10)*10+"s"})}
+
+function stars(s){
+  const f=Math.floor(s/2),h=s%2>=0.5;
+  let o='<div class="card-stars">';
+  for(let i=0;i<5;i++){const a=i<f,hs=i===f&&h;o+=`<span class="star${a||hs?'':' star-empty'}">${hs?'◐':'●'}</span>`}
+  return o+'</div>';
+}
+
+function card(m,i,ir,isUser){
+  const perfect=m.s===10?'perfect':'';
+  const scoreHTML=m.s?`<div class="card-score-badge ${perfect}">${m.s}</div>`:'';
+  const actions=isUser?`<div class="card-actions"><button class="card-action-btn" onclick="editFilm('${m.id}')" title="Edit">✎</button></div>`:'';
+  const userBadge=isUser?`<span class="custom-badge">Added</span>`:'';
+  let o=`<div class="mc" data-title="${escAttr(m.t)}" data-year="${m.y}" style="animation-delay:${Math.min(i*15,400)}ms">`;
+  o+=`<div class="poster-wrap"><div class="poster-loading">Loading...</div>${userBadge}${actions}</div>`;
+  o+=`<div class="card-content">${scoreHTML}`;
+  o+=`<div class="card-year-overline">${m.y} · ${m.c}</div>`;
+  o+=`<h3 class="card-title-main">${m.t}</h3>`;
+  if(m.s)o+=stars(m.s);
+  o+=`<div class="card-meta"><span class="meta-pill meta-genre">${m.g}</span><span class="meta-pill meta-decade">${m.d}</span></div>`;
+  if(ir&&m.r)o+=`<p class="card-reason">${m.r}</p>`;
+  return o+`</div></div>`;
+}
+
+let cS="score-desc",cF={genre:"All",decade:"All",country:"All",score:"All"},cV=true;
+let rS="default",rF={genre:"All",decade:"All",country:"All"},rV=true;
+let editingId=null;
+
+function uniq(a,k){return["All",...new Set(a.map(m=>m[k]))].sort()}
+function cnts(a,k){const c={};a.forEach(m=>{c[m[k]]=(c[m[k]]||0)+1});return c}
+function escAttr(s){return String(s).replace(/"/g,"&quot;").replace(/'/g,"&#39;")}
+function escJS(s){return String(s).replace(/\\/g,"\\\\").replace(/'/g,"\\'")}
+
+function bfHTML(data,f,px){
+  const gs=uniq(data,'g'),ds=uniq(data,'d'),cs=uniq(data,'c'),gc=cnts(data,'g');
+  let h='<div class="fs"><span class="fl">Genre</span><div class="fr">';
+  gs.forEach(g=>{const cnt=g==='All'?data.length:(gc[g]||0);h+=`<span class="pill ${f.genre===g?'active':''}" onclick="${px}F('genre','${escJS(g)}')">${g}<span class="pc">${cnt}</span></span>`});
+  h+='</div></div><div class="fs"><span class="fl">Decade</span><div class="fr">';
+  ds.forEach(d=>{h+=`<span class="pill ${f.decade===d?'active':''}" onclick="${px}F('decade','${escJS(d)}')">${d}</span>`});
+  h+='</div></div><div class="fs"><span class="fl">Country</span><div class="fr">';
+  cs.forEach(c=>{h+=`<span class="pill ${f.country===c?'active':''}" onclick="${px}F('country','${escJS(c)}')">${c}</span>`});
+  h+='</div></div>';
+  if(px==='c'){h+='<div class="fs"><span class="fl">Score</span><div class="fr">';["All","10","9+","8+"].forEach(s=>{h+=`<span class="pill ${f.score===s?'active':''}" onclick="cF('score','${s}')">${s==='10'?'Perfect 10':s}</span>`});h+='</div></div>'}
+  if(Object.values(f).some(v=>v!=='All'))h+=`<button class="cb" onclick="ca('${px}')">✕ Clear filters</button>`;
+  return h;
+}
+
+window.cF=function(k,v){cF[k]=v;ren()};
+window.rF=function(k,v){rF[k]=v;renR()};
+function ca(p){if(p==='c'){cF={genre:"All",decade:"All",country:"All",score:"All"};document.getElementById('si').value='';ren()}else{rF={genre:"All",decade:"All",country:"All"};document.getElementById('ri').value='';renR()}}
+function ss(el){cS=el.dataset.sort;document.querySelectorAll('[data-sort]').forEach(b=>b.classList.toggle('active',b.dataset.sort===cS));ren()}
+function rs(el){rS=el.dataset.rsort;document.querySelectorAll('[data-rsort]').forEach(b=>b.classList.toggle('active',b.dataset.rsort===rS));renR()}
+function tf(n){if(n===1){cV=!cV;document.getElementById('fp1').classList.toggle('hidden',!cV);const b=document.getElementById('ft1');b.classList.toggle('active',cV);b.textContent=cV?'▾ Filters':'▸ Filters'}else{rV=!rV;document.getElementById('fp2').classList.toggle('hidden',!rV);const b=document.getElementById('ft2');b.classList.toggle('active',rV);b.textContent=rV?'▾ Filters':'▸ Filters'}}
+
+function filt(a,f,q){return a.filter(m=>{if(f.genre!=='All'&&m.g!==f.genre)return false;if(f.decade!=='All'&&m.d!==f.decade)return false;if(f.country!=='All'&&m.c!==f.country)return false;if(f.score==='10'&&m.s!==10)return false;if(f.score==='9+'&&m.s<9)return false;if(f.score==='8+'&&m.s<8)return false;if(q&&!m.t.toLowerCase().includes(q))return false;return true})}
+function srt(a,sk,ir){
+  if(ir&&sk==='default')return a;
+  const r=[...a],[f,d]=sk.split('-');
+  if(f==='score')r.sort((x,y)=>d==='asc'?x.s-y.s:y.s-x.s);
+  else if(f==='title')r.sort((x,y)=>d==='asc'?x.t.localeCompare(y.t):y.t.localeCompare(x.t));
+  else if(f==='added')r.sort((x,y)=>d==='asc'?(x.added||0)-(y.added||0):(y.added||0)-(x.added||0));
+  else r.sort((x,y)=>d==='asc'?x.y-y.y:y.y-x.y);
+  return r;
+}
+
+let imgObserver=null;
+function setupImgObserver(){
+  if(imgObserver)imgObserver.disconnect();
+  imgObserver=new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        const c=e.target;
+        imgObserver.unobserve(c);
+        loadImageForCard(c,c.dataset.title,c.dataset.year);
+      }
+    });
+  },{rootMargin:'400px'});
+  document.querySelectorAll('.mc[data-title]').forEach(c=>imgObserver.observe(c));
+}
+
+function ren(){
+  addDecade(M);
+  const q=document.getElementById('si').value.toLowerCase();
+  let res=srt(filt(M,cF,q),cS,false);
+  document.getElementById('fp1').innerHTML=bfHTML(M,cF,'c');
+  const g=document.getElementById('g1');
+  const hf=Object.values(cF).some(v=>v!=='All')||q;
+  if(!res.length){g.innerHTML=`<div class="empty"><span class="ei">Nothing found</span><p class="et">No films match these filters</p><button class="eb" onclick="ca('c')">Reset filters</button></div>`}
+  else{g.innerHTML=res.map((m,i)=>card(m,i,false,!!m.id)).join('')}
+  document.getElementById('rc1').innerHTML=`Showing ${res.length} of ${M.length} films${hf?' <span class="ft">· filtered</span>':''}`;
+  document.getElementById('tc-count').textContent=M.length;
+  updateStats();
+  setupImgObserver();
+}
+function renR(){
+  const q=document.getElementById('ri').value.toLowerCase();
+  let res=srt(filt(R,rF,q),rS,true);
+  document.getElementById('fp2').innerHTML=bfHTML(R,rF,'r');
+  const g=document.getElementById('g2');
+  const hf=Object.values(rF).some(v=>v!=='All')||q;
+  if(!res.length){g.innerHTML=`<div class="empty"><span class="ei">Nothing found</span><p class="et">No recommendations match</p><button class="eb" onclick="ca('r')">Reset filters</button></div>`}
+  else{g.innerHTML=res.map((m,i)=>card(m,i,true,false)).join('')}
+  document.getElementById('rc2').innerHTML=`Showing ${res.length} of ${R.length} recommendations${hf?' <span class="ft">· filtered</span>':''}`;
+  setupImgObserver();
+}
+function sw(t){document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));document.getElementById('tc').classList.toggle('hidden',t!=='c');document.getElementById('tr').classList.toggle('hidden',t!=='r');if(t==='r')setupImgObserver()}
+
+function updateStats(){
+  const avg=M.length?(M.reduce((s,m)=>s+m.s,0)/M.length).toFixed(1):'0';
+  const pf=M.filter(m=>m.s===10).length;
+  const cc=new Set(M.map(m=>m.c)).size;
+  const oldest=M.length?Math.min(...M.map(m=>m.y)):'—';
+  const newest=M.length?Math.max(...M.map(m=>m.y)):'—';
+  document.getElementById('sb').innerHTML=[
+    {v:M.length,l:"Films"},{v:pf,l:"Perfect 10s"},{v:cc,l:"Countries"},
+    {v:avg,l:"Avg Score"},{v:oldest,l:"Oldest"},{v:newest,l:"Newest"}
+  ].map(s=>`<div class="stat"><span class="stat-value">${s.v}</span><span class="stat-label">${s.l}</span></div>`).join('');
+}
+
+function openAddModal(){
+  editingId=null;
+  document.getElementById('modal-title').textContent='Add a Film';
+  document.getElementById('modal-sub').textContent='A new entry to your collection';
+  document.getElementById('f-title').value='';
+  document.getElementById('f-year').value=new Date().getFullYear();
+  document.getElementById('f-country').value='';
+  document.getElementById('f-genre').value='Drama';
+  document.getElementById('f-score').value=8;
+  document.getElementById('score-display').textContent='8';
+  document.getElementById('delete-btn').classList.add('hidden');
+  document.getElementById('save-btn').textContent='Save Film';
+  const countries=[...new Set(M.map(m=>m.c))].sort();
+  document.getElementById('country-list').innerHTML=countries.map(c=>`<option value="${c}">`).join('');
+  document.getElementById('modal').classList.remove('hidden');
+  setTimeout(()=>document.getElementById('f-title').focus(),100);
+}
+function editFilm(id){
+  const m=M.find(x=>x.id===id);
+  if(!m)return;
+  editingId=id;
+  document.getElementById('modal-title').textContent='Edit Film';
+  document.getElementById('modal-sub').textContent='Update the details below';
+  document.getElementById('f-title').value=m.t;
+  document.getElementById('f-year').value=m.y;
+  document.getElementById('f-country').value=m.c;
+  document.getElementById('f-genre').value=m.g;
+  document.getElementById('f-score').value=m.s;
+  document.getElementById('score-display').textContent=m.s;
+  document.getElementById('delete-btn').classList.remove('hidden');
+  document.getElementById('save-btn').textContent='Save Changes';
+  const countries=[...new Set(M.map(m=>m.c))].sort();
+  document.getElementById('country-list').innerHTML=countries.map(c=>`<option value="${c}">`).join('');
+  document.getElementById('modal').classList.remove('hidden');
+}
+function closeModal(){document.getElementById('modal').classList.add('hidden');editingId=null}
+function saveFilm(){
+  const t=document.getElementById('f-title').value.trim();
+  const y=parseInt(document.getElementById('f-year').value);
+  const c=document.getElementById('f-country').value.trim();
+  const g=document.getElementById('f-genre').value;
+  const s=parseFloat(document.getElementById('f-score').value);
+  if(!t){alert('Please enter a title');return}
+  if(!y||y<1888||y>2030){alert('Please enter a valid year (1888-2030)');return}
+  if(!c){alert('Please enter a country');return}
+  if(editingId){
+    const idx=M.findIndex(m=>m.id===editingId);
+    if(idx>=0)M[idx]={...M[idx],t,y,c,g,s}
+  }else{
+    M.unshift({id:genId(),t,y,c,g,s,added:Date.now()});
+  }
+  saveCollection();
+  closeModal();
+  ren();
+}
+function deleteFilm(){
+  if(!editingId)return;
+  if(!confirm('Delete this film from your collection?'))return;
+  M=M.filter(m=>m.id!==editingId);
+  saveCollection();
+  closeModal();
+  ren();
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+
+function exportData(){
+  const blob=new Blob([JSON.stringify(M,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=`cinematheque-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+function importData(e){
+  const file=e.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=evt=>{
+    try{
+      const data=JSON.parse(evt.target.result);
+      if(!Array.isArray(data))throw new Error('Invalid format');
+      if(!confirm(`Import ${data.length} films? This will replace your current collection.`))return;
+      M=data.map(m=>({...m,id:m.id||genId(),added:m.added||Date.now()}));
+      saveCollection();
+      ren();
+      alert('Collection imported successfully');
+    }catch(err){alert('Could not import file: '+err.message)}
+  };
+  reader.readAsText(file);
+  e.target.value='';
+}
+
+// Enter key submits API key
+document.getElementById('key-input').addEventListener('keydown',e=>{if(e.key==='Enter')saveApiKey()});
+
+// INIT
+loadCollection();
+addDecade(R);
+updateKeyUI();
+document.getElementById('ftt').textContent=`Cinematheque · Your Personal Film Archive`;
+document.getElementById('recdesc').textContent=`${R.length} hand-picked films selected to resonate with your collection — world cinema, auteur storytelling, philosophical drama, sharp thrillers, and visually stunning animation. Each recommendation includes a reason tied directly to films you already love.`;
+const d=new Date();
+document.getElementById('today').textContent=d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+ren();renR();
+</script>
+</body>
+</html>
