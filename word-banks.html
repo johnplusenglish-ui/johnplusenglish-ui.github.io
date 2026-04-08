@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Word Banks — John + English</title>
+<meta name="description" content="Topic-based vocabulary banks for B2–C2 English learners. Browse key language by topic, practise with flashcards.">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Nunito:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--sun:#FFB347;--sky:#4A90D9;--sky-light:#E8F2FD;--sea:#2EC4B6;--sea-light:#E4F8F6;--coral:#FF6B6B;--coral-light:#FFE8E8;--lavender:#9B72CF;--lavender-light:#F0E8FA;--cream:#FFFCF7;--ink:#2D3047;--muted:#7A7D8E;--border:#E8E5DF;--card:#fff;--radius:14px;--radius-sm:10px;--shadow-sm:0 1px 3px rgba(45,48,71,.06);--shadow-md:0 4px 14px rgba(45,48,71,.08)}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Nunito',sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,var(--border) 1px,transparent 1px);background-size:28px 28px;opacity:.4;pointer-events:none;z-index:0}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,252,247,.88);backdrop-filter:blur(16px);border-bottom:1.5px solid var(--border);padding:.85rem 2rem;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-family:'DM Serif Display',serif;font-size:1.3rem;color:var(--ink);text-decoration:none}
+.nav-logo span{color:var(--sky)}
+.nav-links{display:flex;gap:1.8rem}
+.nav-links a{font-size:.85rem;font-weight:600;color:var(--muted);text-decoration:none;transition:color .2s}
+.nav-links a:hover{color:var(--sky)}
+
+.page-header{padding:5.5rem 2rem 2rem;max-width:960px;margin:0 auto}
+.back-link{display:inline-flex;align-items:center;gap:.4rem;font-size:.85rem;font-weight:600;color:var(--muted);text-decoration:none;margin-bottom:1.2rem;transition:color .2s}
+.back-link:hover{color:var(--sky)}
+.back-link svg{width:14px;height:14px}
+.section-label{font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--sea);margin-bottom:.5rem}
+.page-header h1{font-family:'DM Serif Display',serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:400;line-height:1.1;margin-bottom:.6rem}
+.page-header p{color:var(--muted);font-size:.95rem;max-width:560px;line-height:1.7}
+
+.main{max-width:960px;margin:0 auto;padding:0 2rem 4rem;position:relative;z-index:1}
+
+/* Tier filter */
+.tier-filter{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:2rem}
+.tier-btn{font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:700;padding:.45rem 1.1rem;border:1.5px solid var(--border);border-radius:20px;background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.tier-btn:hover{border-color:var(--sky);color:var(--sky)}
+.tier-btn.active{background:var(--sky);border-color:var(--sky);color:#fff}
+
+/* Tier group */
+.tier-group{margin-bottom:2.5rem}
+.tier-label{font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)}
+
+/* Topic grid */
+.topic-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem}
+
+.topic-card{display:flex;flex-direction:column;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:1.3rem 1.4rem;text-decoration:none;color:var(--ink);transition:all .22s;position:relative;overflow:hidden}
+.topic-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .22s}
+.topic-card:hover{border-color:transparent;transform:translateY(-2px);box-shadow:0 6px 20px rgba(45,48,71,.12)}
+.topic-card:hover::before{opacity:1}
+
+/* Per-topic accent colours */
+.topic-card[data-color="sea"]:hover{box-shadow:0 6px 20px rgba(46,196,182,.2)}
+.topic-card[data-color="sea"]::before{background:linear-gradient(135deg,rgba(46,196,182,.06),transparent)}
+.topic-card[data-color="sky"]:hover{box-shadow:0 6px 20px rgba(74,144,217,.2)}
+.topic-card[data-color="sky"]::before{background:linear-gradient(135deg,rgba(74,144,217,.06),transparent)}
+.topic-card[data-color="sun"]:hover{box-shadow:0 6px 20px rgba(255,179,71,.2)}
+.topic-card[data-color="sun"]::before{background:linear-gradient(135deg,rgba(255,179,71,.06),transparent)}
+.topic-card[data-color="coral"]:hover{box-shadow:0 6px 20px rgba(255,107,107,.2)}
+.topic-card[data-color="coral"]::before{background:linear-gradient(135deg,rgba(255,107,107,.06),transparent)}
+.topic-card[data-color="lavender"]:hover{box-shadow:0 6px 20px rgba(155,114,207,.2)}
+.topic-card[data-color="lavender"]::before{background:linear-gradient(135deg,rgba(155,114,207,.06),transparent)}
+
+.topic-emoji{font-size:1.6rem;margin-bottom:.7rem;line-height:1}
+.topic-icon-sm{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-bottom:.7rem}
+.topic-icon-sm svg{width:18px;height:18px}
+.topic-card[data-color="sky"] .topic-icon-sm{background:var(--sky-light);color:var(--sky)}
+.topic-card[data-color="sea"] .topic-icon-sm{background:#E4F8F6;color:var(--sea)}
+.topic-card[data-color="sun"] .topic-icon-sm{background:#FFF5E6;color:#c97800}
+.topic-card[data-color="coral"] .topic-icon-sm{background:#FFE8E8;color:var(--coral)}
+.topic-card[data-color="lavender"] .topic-icon-sm{background:#F0E8FA;color:var(--lavender)}
+.topic-name{font-family:'DM Serif Display',serif;font-size:1.1rem;font-weight:400;margin-bottom:.3rem}
+.topic-desc{font-size:.78rem;color:var(--muted);line-height:1.5;flex:1}
+.topic-meta{display:flex;align-items:center;justify-content:space-between;margin-top:.9rem}
+.topic-count{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--muted)}
+.topic-levels{display:flex;gap:.25rem}
+.lvl-tag{font-family:'JetBrains Mono',monospace;font-size:.58rem;font-weight:600;padding:.1rem .35rem;border-radius:4px;letter-spacing:.04em}
+.lvl-b2{background:#E8F2FD;color:#4A90D9}
+.lvl-c1{background:#E4F8F6;color:#1a9d92}
+.lvl-c2{background:#F0E8FA;color:#7B52AA}
+
+.topic-arrow{position:absolute;top:1.3rem;right:1.3rem;color:var(--border);transition:all .22s}
+.topic-card:hover .topic-arrow{color:var(--muted);transform:translateX(2px)}
+
+/* Coming soon state */
+.topic-card.soon{opacity:.55;cursor:default;pointer-events:none}
+.topic-card.soon .topic-name::after{content:' — coming soon';font-family:'JetBrains Mono',monospace;font-size:.55rem;color:var(--muted);vertical-align:middle;margin-left:.3rem}
+
+@media(max-width:600px){
+  .page-header{padding:5rem 1.2rem 1.5rem}
+  .main{padding:0 1.2rem 3rem}
+  .topic-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">John + <span>English</span></a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="resources.html">Resources</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <a class="back-link" href="index.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    Back to home
+  </a>
+  <div class="section-label">Study Tools</div>
+  <h1>Word Banks</h1>
+  <p>Topic-based vocabulary for B2–C2 learners. Each bank covers nouns, adjectives, verbs, phrasal verbs, collocations, idioms, and set phrases — with level tags so you know what to prioritise.</p>
+</div>
+
+<div class="main">
+
+  <div class="tier-filter">
+    <button class="tier-btn active" onclick="filterTier('all',this)">All topics</button>
+    <button class="tier-btn" onclick="filterTier('1',this)">Tier 1 — Universal</button>
+    <button class="tier-btn" onclick="filterTier('2',this)">Tier 2 — Society</button>
+    <button class="tier-btn" onclick="filterTier('3',this)">Tier 3 — Abstract</button>
+  </div>
+
+  <!-- TIER 1 -->
+  <div class="tier-group" data-tier="1">
+    <div class="tier-label">Tier 1 — Universal (B1–C2 essential)</div>
+    <div class="topic-grid">
+
+      <a href="word-bank-work.html" class="topic-card" data-color="sky">
+        <div class="topic-icon-sm">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+        </div>
+        <div class="topic-name">Work &amp; Careers</div>
+        <div class="topic-desc">Jobs, workplaces, ambition, and the changing world of employment.</div>
+        <div class="topic-meta">
+          <span class="topic-count">72 items</span>
+          <div class="topic-levels"><span class="lvl-tag lvl-b2">B2</span><span class="lvl-tag lvl-c1">C1</span><span class="lvl-tag lvl-c2">C2</span></div>
+        </div>
+        <svg class="topic-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+
+      <a href="word-bank-home.html" class="topic-card" data-color="sea">
+        <div class="topic-icon-sm">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+        <div class="topic-name">Home &amp; Housework</div>
+        <div class="topic-desc">Cleaning, chores, organising, and keeping a home in good order.</div>
+        <div class="topic-meta">
+          <span class="topic-count">72 items</span>
+          <div class="topic-levels"><span class="lvl-tag lvl-b2">B2</span><span class="lvl-tag lvl-c1">C1</span><span class="lvl-tag lvl-c2">C2</span></div>
+        </div>
+        <svg class="topic-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+
+      <a href="word-bank-technology.html" class="topic-card soon" data-color="sea">
+        <div class="topic-icon-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+        <div class="topic-name">Technology</div>
+        <div class="topic-desc">Digital life, AI, privacy, and society's relationship with tech.</div>
+        <div class="topic-meta">
+          <span class="topic-count">coming soon</span>
+          <div class="topic-levels"><span class="lvl-tag lvl-b2">B2</span><span class="lvl-tag lvl-c1">C1</span><span class="lvl-tag lvl-c2">C2</span></div>
+        </div>
+      </a>
+
+      <a href="word-bank-environment.html" class="topic-card soon" data-color="sea">
+        <div class="topic-icon-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
+        <div class="topic-name">The Environment</div>
+        <div class="topic-desc">Climate, sustainability, biodiversity, and eco-conscious living.</div>
+        <div class="topic-meta">
+          <span class="topic-count">coming soon</span>
+          <div class="topic-levels"><span class="lvl-tag lvl-b2">B2</span><span class="lvl-tag lvl-c1">C1</span><span class="lvl-tag lvl-c2">C2</span></div>
+        </div>
+      </a>
+
+      <a href="word-bank-health.html" class="topic-card soon" data-color="sun">
+        <div class="topic-icon-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a5 5 0 00-5 5c0 1.5.67 2.84 1.72 3.76C6.11 12.04 5 14.15 5 16.5c0 .28.02.55.05.82A3.5 3.5 0 008.5 21h7a3.5 3.5 0 003.45-3.68c.03-.27.05-.54.05-.82 0-2.35-1.11-4.46-2.72-6.74A5 5 0 0012 2z"/></svg></div>
+        <div class="topic-name">Health &amp; Wellbeing</div>
+        <div class="topic-desc">Physical and mental health, lifestyle, and self-care.</div>
+        <div class="topic-meta">
+          <span class="topic-count">coming soon</span>
+          <div class="topic-levels"><span class="lvl-tag lvl-b2">B2</span><span class="lvl-tag lvl-c1">C1</span><span class="lvl-tag lvl-c2">C2</span></div>
+        </div>
+      </a>
+
+      <a href="word-bank-education.html" class="topic-card soon" data-color="lavender">
+        <div class="topic-icon-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
+        <div class="topic-name">Education</div>
+        <div class="topic-desc">Learning, schools, universities, and the purpose of education.</div>
+        <div class="topic-meta">
+          <span class="topic-count">coming soon</span>
+          <div class="topic-levels"><span class="lvl-tag lvl-b2">B2</span><span class="lvl-tag lvl-c1">C1</span><span class="lvl-tag lvl-c2">C2</span></div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- TIER 2 -->
+  <div class="tier-group" data-tier="2">
+    <div class="tier-label">Tier 2 — Opinion &amp; Society (B2–C2)</div>
+    <div class="topic-grid">
+
+      <a href="word-bank-social-media.html" class="topic-card soon" data-color="sky">
+        <div class="topic-icon-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
+        <div class="topic-name">Social Media</div>
+        <div class="topic-desc">Online culture, influence, mental health, and digital communication.</div>
+        <div class="topic-meta">
+          <span class="topic-count">coming soon</span>
+          <div class="topic-levels"><span class="lvl-tag lvl-b2">B2</span><span class="lvl-tag lvl-c1">C1</span></div>
+        </div>
+      </a>
+
+      <a href="word-bank-crime.html" class="topic-card soon" data-color="coral">
+        <div class="topic-icon-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="21"/><path d="M3 9l9-6 9 6M3 15l9 6 9-6"/></svg></div>
+        <div class="topic-name">Crime &amp; Justice</div>
+        <div class="topic-desc">Law, punishment, rehabilitation, and the justice system.</div>
+        <div class="topic-meta">
+          <span class="topic-count">coming soon</span>
+          <div class="topic-levels"><span class="lvl-tag lvl-b2">B2</span><span class="lvl-tag lvl-c1">C1</span><span class="lvl-tag lvl-c2">C2</span></div>
+        </div>
+      </a>
+
+      <a href="word-bank-money.html" class="topic-card soon" data-color="sun">
+        <div class="topic-icon-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v2m0 8v2M9.5 9a2.5 2.5 0 015 0c0 1.5-1 2-2.5 3s-2.5 1.5-2.5 3a2.5 2.5 0 005 0"/></svg></div>
+        <div class="topic-name">Money &amp; Finance</div>
+        <div class="topic-desc">Personal finance, economics, debt, and financial decisions.</div>
+        <div class="topic-meta">
+          <span class="topic-count">coming soon</span>
+          <div class="topic-levels"><span class="lvl-tag lvl-b2">B2</span><span class="lvl-tag lvl-c1">C1</span><span class="lvl-tag lvl-c2">C2</span></div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+function filterTier(tier, btn) {
+  document.querySelectorAll('.tier-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.tier-group').forEach(g => {
+    g.style.display = (tier === 'all' || g.dataset.tier === tier) ? '' : 'none';
+  });
+}
+</script>
+</body>
+</html>
