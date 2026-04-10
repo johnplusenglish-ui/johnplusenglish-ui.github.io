@@ -67,7 +67,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,252,247,
 .exam-info{display:flex;gap:12px;align-items:flex-start;padding:14px 18px;border-radius:var(--radius-sm);margin-bottom:20px;font-size:.88rem;line-height:1.55;color:var(--ink);background:var(--accent-light);border-left:3px solid var(--accent)}
 .exam-info svg{flex-shrink:0;margin-top:2px}
 .exam-info strong{font-weight:700}
-.test-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden}
+.test-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:visible}
 .test-header{padding:18px 24px;border-bottom:1.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
 .test-title{font-weight:700;font-size:.95rem;display:flex;align-items:center;gap:8px}
 .test-title .tag{font-family:'JetBrains Mono',monospace;font-size:.65rem;font-weight:500;padding:4px 10px;border-radius:6px;letter-spacing:.5px;background:var(--accent-light);color:var(--accent)}
@@ -92,7 +92,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,252,247,
 .gap-trigger.wrong{border-color:var(--wrong);background:rgba(255,59,48,.08);color:#c0392b}
 .gap-trigger.shown{border-color:var(--accent);background:rgba(46,196,182,.08);color:var(--accent)}
 .gap-trigger.locked{cursor:default}
-.gap-panel{display:none;position:absolute;top:calc(100% + 1px);left:0;z-index:50;width:max-content;background:rgba(255,252,247,.75);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(232,229,223,.3);border-radius:10px;box-shadow:0 4px 20px rgba(45,48,71,.06);padding:4px;overflow:hidden}
+.gap-panel{display:none;position:absolute;top:calc(100% + 1px);left:0;z-index:50;width:max-content;background:rgba(255,252,247,.95);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(232,229,223,.4);border-radius:10px;box-shadow:0 4px 20px rgba(45,48,71,.08);padding:4px;max-height:min(320px,calc(100vh - 40px));overflow-y:auto;overscroll-behavior:contain}
 .gap-panel.drop-up{top:auto;bottom:calc(100% + 1px)}
 .gap-panel.open{display:block;animation:dropIn .15s ease}
 @keyframes dropIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
@@ -693,7 +693,7 @@ function p1ToggleDrop(n) {
   });
   const panel = document.getElementById('p1panel-'+n), trigger = document.getElementById('p1trigger-'+n);
   if(panel.classList.contains('open')){ panel.classList.remove('open'); trigger.classList.remove('open'); }
-  else { panel.classList.remove('drop-up'); panel.classList.add('open'); trigger.classList.add('open'); const r=panel.getBoundingClientRect(); if(r.bottom>window.innerHeight-10)panel.classList.add('drop-up'); }
+  else { panel.classList.remove('drop-up'); panel.style.maxHeight=''; panel.classList.add('open'); trigger.classList.add('open'); const tr=trigger.getBoundingClientRect(); const spaceBelow=window.innerHeight-tr.bottom-16, spaceAbove=tr.top-16; const ph=panel.scrollHeight; if(ph>spaceBelow && spaceAbove>spaceBelow){ panel.classList.add('drop-up'); panel.style.maxHeight=Math.max(120,spaceAbove)+'px'; } else { panel.style.maxHeight=Math.max(120,spaceBelow)+'px'; } }
 }
 function p1Pick(n, idx) {
   if(p1Checked) return;
