@@ -475,7 +475,14 @@ function renderCards(parsed) {
   results.innerHTML = '';
   ['en','es','it','fr','uk'].forEach(function(lang, i) {
     var d = parsed[lang];
-    if (!d) return;
+    if (d) renderOneCard(lang, d, i);
+  });
+}
+
+function renderOneCard(lang, d, i) {
+  var results = document.getElementById('results');
+  // Skip if a card for this language already exists (streaming safety)
+  if (results.querySelector('.lang-card[data-lang="'+lang+'"]')) return;
 
     var card = document.createElement('div');
     card.className = 'lang-card' + (visibleLangs.has(lang) ? '' : ' hidden');
@@ -550,8 +557,7 @@ function renderCards(parsed) {
     }
 
     results.appendChild(card);
-    setTimeout(function(){ card.classList.add('visible'); }, i * 90);
-  });
+    setTimeout(function(){ card.classList.add('visible'); }, 30);
 }
 
 // ── Main lookup ──
@@ -624,6 +630,7 @@ async function lookup() {
     '\nSIMPLIFIED PHONETICS: write so a Spanish/Italian/French speaker reading it as English letters produces a recognisable approximation. Use AH (father), EH (bed), EE (see), OH (go), OO (food), UH (sun), AY (day), OW (cow), OY (boy), AIR (hair). For French nasals use AHN/OHN/AN. For Ukrainian, use Y as in "yes" for й/palatalisation (DYAH-koo-yoo for дякую), and KH for х (as in Scottish "loch"). For very long phrases (5+ syllables), it is acceptable to simplify only the trickiest words rather than every syllable — clarity beats completeness.\n'+
     '\nUKRAINIAN-SPECIFIC: write the phrase in Cyrillic script (NOT transliterated Latin). Use Ukrainian orthography with і, ї, є, ґ where appropriate. Idioms should be genuinely Ukrainian — e.g. "break a leg" → "ні пуху, ні пера" (literally "neither down nor feather"); "it\'s raining cats and dogs" → "ллє як з відра". If no idiomatic equivalent exists, give the most natural neutral phrasing rather than a calque.\n'+
     '\nRules: natural register, complete sentences, accurate IPA, raw JSON only.\n'+
+    'EVERY language object MUST include ALL of these fields: phrase, pos, register, ipa, simplified, example, synonyms. The "definition" field is the ONLY optional one (source language only). Do not omit ipa or simplified under any circumstances — they are required for every card.\n'+
     'Shape: {"en":{"phrase":"...","pos":"...","register":"neutral","ipa":"...","simplified":"...","example":"...","synonyms":[],"definition":"... (ONLY on source-language object)"},"es":{...},"it":{...},"fr":{...},"uk":{...}}';
 
   try {
@@ -638,22 +645,106 @@ async function lookup() {
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
         max_tokens: 1500,
+        stream: true,
         messages: [{role:'user', content:prompt}]
       })
     });
 
-    var data = await resp.json();
-    if (!resp.ok) throw new Error(data.error ? data.error.message : 'API error');
+    if (!resp.ok) {
+      var errData = await resp.json().catch(function(){ return {}; });
+      throw new Error(errData.error ? errData.error.message : 'API error ('+resp.status+')');
+    }
 
-    var raw = data.content.map(function(b){ return b.text||''; }).join('').trim();
-    var result;
-    try { result = JSON.parse(raw.replace(/```json|```/g,'').trim()); }
-    catch(e) { throw new Error('Could not parse response. Please try again.'); }
+    var reader = resp.body.getReader();
+    var decoder = new TextDecoder();
+    var sseBuffer = '';
+    var jsonBuffer = '';
+    var renderedLangs = {};
+    var langOrder = ['en','es','it','fr','uk'];
+    var firstCardRendered = false;
+
+    function tryExtractCompleteObjects() {
+      // Find any "lang": { ... } where the braces are balanced.
+      langOrder.forEach(function(lang, i) {
+        if (renderedLangs[lang]) return;
+        var keyPattern = new RegExp('"'+lang+'"\\s*:\\s*\\{');
+        var m = keyPattern.exec(jsonBuffer);
+        if (!m) return;
+        var start = m.index + m[0].length - 1; // index of opening {
+        var depth = 0, inStr = false, esc = false, end = -1;
+        for (var p = start; p < jsonBuffer.length; p++) {
+          var ch = jsonBuffer[p];
+          if (esc) { esc = false; continue; }
+          if (ch === '\\') { esc = true; continue; }
+          if (ch === '"') { inStr = !inStr; continue; }
+          if (inStr) continue;
+          if (ch === '{') depth++;
+          else if (ch === '}') {
+            depth--;
+            if (depth === 0) { end = p; break; }
+          }
+        }
+        if (end === -1) return; // not yet complete
+        var objStr = jsonBuffer.substring(start, end + 1);
+        try {
+          var obj = JSON.parse(objStr);
+          console.log('[lingua] streamed card:', lang, obj);
+          renderedLangs[lang] = obj;
+          if (!firstCardRendered) {
+            loader.classList.remove('active');
+            firstCardRendered = true;
+          }
+          renderOneCard(lang, obj, i);
+        } catch(e) { /* malformed; wait for more */ }
+      });
+    }
+
+    while (true) {
+      var chunk = await reader.read();
+      if (chunk.done) break;
+      sseBuffer += decoder.decode(chunk.value, {stream:true});
+      var lines = sseBuffer.split('\n');
+      sseBuffer = lines.pop(); // keep incomplete line
+      for (var li = 0; li < lines.length; li++) {
+        var line = lines[li];
+        if (line.indexOf('data: ') !== 0) continue;
+        var payload = line.substring(6);
+        if (payload === '[DONE]') continue;
+        try {
+          var ev = JSON.parse(payload);
+          if (ev.type === 'content_block_delta' && ev.delta && ev.delta.type === 'text_delta') {
+            jsonBuffer += ev.delta.text;
+          } else if (ev.type === 'message_stop') {
+            // final flush handled below
+          } else if (ev.type === 'error') {
+            throw new Error(ev.error && ev.error.message ? ev.error.message : 'Stream error');
+          }
+        } catch(e) { /* skip malformed line */ }
+      }
+      tryExtractCompleteObjects();
+    }
+
+    // Final extraction pass in case last objects only completed at message_stop
+    tryExtractCompleteObjects();
+
+    // Build the merged result for caching/logging
+    var result = {};
+    var anyRendered = false;
+    langOrder.forEach(function(lang) {
+      if (renderedLangs[lang]) { result[lang] = renderedLangs[lang]; anyRendered = true; }
+    });
+
+    if (!anyRendered) {
+      // Fallback: try parsing the whole buffer as a single JSON object
+      try {
+        result = JSON.parse(jsonBuffer.replace(/```json|```/g,'').trim());
+        renderCards(result);
+      } catch(e) { throw new Error('Could not parse response. Please try again.'); }
+    }
 
     storageSet(cacheKey, JSON.stringify(result));
     saveToHistory(word);
     saveToLog(word, result);
-    renderCards(result);
 
   } catch(err) {
     errorEl.textContent = '⚠ '+err.message;
