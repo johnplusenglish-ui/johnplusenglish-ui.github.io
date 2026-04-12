@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Abrapalabra — by JohnPlusEnglish</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500&family=Cormorant+Garamond:ital,wght@1,400;1,600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sky:#0ea5e9; --sea:#0369a1; --coral:#f97316;
+  --cream:#fafaf7; --sand:#e8e2d6; --ink:#1a1a2e; --muted:#64748b; --card-bg:#fff;
+  --en:#0369a1; --es:#c0392b; --it:#2a7a4b; --fr:#4a3f9f; --uk:#d4a017;
+  --reg-formal:#1e6fa5; --reg-neutral:#64748b; --reg-colloquial:#b45309; --reg-slang:#7c3aed; --reg-vulgar:#991b1b;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;}
+
+/* KEY BAR */
+.key-bar{background:#f8f4ef;border-bottom:1px solid var(--sand);padding:.5rem 1.2rem;
+  display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;justify-content:center;}
+.key-bar.ok{background:#f0fdf4;border-bottom-color:#bbf7d0;}
+.key-label{font-size:.68rem;color:var(--muted);letter-spacing:.06em;white-space:nowrap;flex-shrink:0;}
+.key-input{font-family:'DM Sans',sans-serif;font-size:.78rem;padding:.3rem .7rem;
+  border:1.5px solid var(--sand);border-radius:7px;background:#fff;color:var(--ink);
+  outline:none;flex:1;min-width:16rem;max-width:28rem;transition:border-color .2s;}
+.key-input:focus{border-color:var(--sky);}
+.key-status{font-size:.7rem;font-weight:500;white-space:nowrap;}
+.btn-key-set{font-family:'DM Sans',sans-serif;font-size:.74rem;font-weight:500;
+  padding:.3rem .9rem;background:var(--ink);color:#fff;border:none;border-radius:7px;
+  cursor:pointer;flex-shrink:0;}
+.btn-key-set:hover{background:#2d2d4a;}
+
+/* HEADER */
+header{background:var(--ink);padding:1.3rem 2rem 1rem;text-align:center;position:relative;overflow:hidden;}
+header::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 70% 50%,rgba(14,165,233,.15) 0%,transparent 70%),
+             radial-gradient(ellipse at 20% 80%,rgba(249,115,22,.12) 0%,transparent 60%);}
+header h1{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(1.8rem,5vw,3rem);
+  color:#fff;letter-spacing:-.02em;line-height:1;position:relative;}
+header h1 span{color:var(--coral);}
+header p.tagline{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:.95rem;
+  color:rgba(255,255,255,.45);margin-top:.35rem;position:relative;}
+
+/* NAV */
+.nav-tabs{background:var(--ink);border-top:1px solid rgba(255,255,255,.08);display:flex;justify-content:center;}
+.nav-tab{font-family:'DM Sans',sans-serif;font-size:.72rem;font-weight:500;letter-spacing:.1em;
+  text-transform:uppercase;padding:.5rem 1.3rem;color:rgba(255,255,255,.35);cursor:pointer;
+  border-bottom:2px solid transparent;transition:all .18s;user-select:none;}
+.nav-tab:hover{color:rgba(255,255,255,.7);}
+.nav-tab.active{color:#fff;border-bottom-color:var(--coral);}
+
+/* LANG STRIP */
+.lang-strip{background:var(--ink);padding:.45rem 1rem .9rem;display:flex;flex-direction:column;align-items:center;gap:.4rem;}
+.strip-row{display:flex;align-items:center;gap:.28rem;}
+.strip-label{font-size:.56rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.26);
+  font-family:'DM Sans',sans-serif;margin-right:.3rem;min-width:3.6rem;text-align:right;}
+.lang-pill{font-family:'Playfair Display',serif;font-weight:700;font-size:.73rem;letter-spacing:.1em;
+  text-transform:uppercase;padding:.22rem .8rem;border-radius:2rem;cursor:pointer;transition:all .18s;
+  user-select:none;border:1.5px solid transparent;color:rgba(255,255,255,.28);}
+.src-select{font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:600;
+  padding:0 .55rem;border:2.5px solid var(--sand);border-radius:10px;background:#fff;
+  color:var(--ink);outline:none;cursor:pointer;transition:border-color .2s;
+  appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%23888' d='M0 0l5 6 5-6z'/></svg>");
+  background-repeat:no-repeat;background-position:right .45rem center;padding-right:1.4rem;}
+.src-select:focus{border-color:var(--sky);}
+.flt-pill{border-color:rgba(255,255,255,.12);}
+.flt-pill.on[data-lang="en"]{background:var(--en);color:#fff;border-color:transparent;}
+.flt-pill.on[data-lang="es"]{background:var(--es);color:#fff;border-color:transparent;}
+.flt-pill.on[data-lang="it"]{background:var(--it);color:#fff;border-color:transparent;}
+.flt-pill.on[data-lang="fr"]{background:var(--fr);color:#fff;border-color:transparent;}
+.flt-pill.on[data-lang="uk"]{background:var(--uk);color:#fff;border-color:transparent;}
+.flt-pill:not(.on):hover{color:rgba(255,255,255,.6);}
+
+/* SEARCH */
+.search-wrap{max-width:680px;margin:0 auto;padding:1.1rem 1.5rem .5rem;}
+.input-row{display:flex;gap:.7rem;align-items:stretch;}
+.input-row input{flex:1;font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;
+  padding:.7rem 1rem;border:2.5px solid var(--sand);border-radius:10px;background:#fff;
+  color:var(--ink);outline:none;transition:border-color .2s;}
+.input-row input:focus{border-color:var(--sky);}
+.input-row input::placeholder{color:#b0aaa0;font-weight:700;}
+.btn-search{font-family:'DM Sans',sans-serif;font-weight:500;font-size:.92rem;padding:0 1.3rem;
+  background:var(--coral);color:#fff;border:none;border-radius:10px;cursor:pointer;
+  transition:background .2s;white-space:nowrap;}
+.btn-search:hover{background:#ea6c0a;}
+.btn-search:disabled{background:var(--sand);color:var(--muted);cursor:not-allowed;}
+.hint{font-size:.75rem;color:var(--muted);margin-top:.45rem;padding-left:.2rem;}
+.hint strong{color:var(--ink);}
+
+/* RESULTS */
+.results{max-width:680px;margin:0 auto 3rem;padding:0 1.5rem;display:flex;flex-direction:column;gap:.5rem;}
+.lang-card{background:var(--card-bg);border-radius:10px;border-left:4px solid var(--sand);
+  padding:.65rem .95rem;box-shadow:0 1px 6px rgba(0,0,0,.05);
+  opacity:0;transform:translateY(10px);transition:opacity .35s ease,transform .35s ease;}
+.lang-card.visible{opacity:1;transform:translateY(0);}
+.lang-card.hidden{display:none;}
+.lang-card[data-lang="en"]{border-color:var(--en);}
+.lang-card[data-lang="es"]{border-color:var(--es);}
+.lang-card[data-lang="it"]{border-color:var(--it);}
+.lang-card[data-lang="fr"]{border-color:var(--fr);}
+.lang-card[data-lang="uk"]{border-color:var(--uk);}
+.card-top{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-bottom:.2rem;}
+.card-id{display:flex;align-items:center;gap:.3rem;flex-shrink:0;}
+.flag{font-size:1rem;line-height:1;}
+.lang-label{font-size:.58rem;font-weight:500;letter-spacing:.13em;text-transform:uppercase;white-space:nowrap;}
+.lang-card[data-lang="en"] .lang-label{color:var(--en);}
+.lang-card[data-lang="es"] .lang-label{color:var(--es);}
+.lang-card[data-lang="it"] .lang-label{color:var(--it);}
+.lang-card[data-lang="fr"] .lang-label{color:var(--fr);}
+.lang-card[data-lang="uk"] .lang-label{color:var(--uk);}
+.phrase-pos{display:flex;align-items:baseline;gap:.45rem;flex:1;}
+.phrase{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--ink);line-height:1.2;}
+.pos-note{font-size:.66rem;color:var(--muted);font-style:italic;white-space:nowrap;}
+.reg-tag{font-size:.6rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+  padding:.15rem .5rem;border-radius:1rem;margin-left:auto;flex-shrink:0;white-space:nowrap;}
+.reg-formal{background:#dbeafe;color:var(--reg-formal);}
+.reg-neutral{background:#f1f5f9;color:var(--reg-neutral);}
+.reg-colloquial{background:#fef3c7;color:var(--reg-colloquial);}
+.reg-slang{background:#ede9fe;color:var(--reg-slang);}
+.reg-vulgar{background:#fee2e2;color:var(--reg-vulgar);}
+
+/* PRONUNCIATION */
+.pron-row{display:flex;align-items:center;gap:.55rem;margin-bottom:.22rem;flex-wrap:wrap;}
+.pron-ipa{font-size:.8rem;color:var(--muted);}
+.pron-ipa .slash{color:#aab;}
+.pron-simplified{font-size:.72rem;color:#aab4be;border-left:1px solid var(--sand);padding-left:.55rem;}
+.btn-speak{background:none;border:none;cursor:pointer;font-size:.85rem;padding:0;
+  opacity:.4;transition:opacity .15s;line-height:1;flex-shrink:0;}
+.btn-speak:hover{opacity:.9;}
+.btn-speak.speaking{opacity:1;animation:pulse .6s ease-in-out infinite alternate;}
+@keyframes pulse{from{opacity:.5;}to{opacity:1;}}
+
+/* EXAMPLE */
+.example{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:.93rem;color:#4a4a5a;
+  line-height:1.45;padding-top:.22rem;margin-top:.18rem;border-top:1px solid var(--sand);}
+.example em{font-style:normal;font-weight:600;color:var(--ink);}
+.definition{font-family:'DM Sans',sans-serif;font-size:.78rem;color:#5a5a6a;line-height:1.45;
+  margin-top:.32rem;padding:.35rem .55rem;background:rgba(0,0,0,.025);border-radius:6px;}
+.definition::before{content:'def. ';font-size:.6rem;font-weight:600;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--muted);margin-right:.25rem;}
+
+/* SYNONYMS */
+.synonyms{display:flex;flex-wrap:wrap;gap:.25rem;margin-top:.28rem;align-items:center;}
+.syn-label{font-size:.58rem;color:#ccc;letter-spacing:.05em;text-transform:uppercase;margin-right:.1rem;}
+.syn-chip{font-size:.72rem;padding:.1rem .45rem;border-radius:1rem;border:1px solid transparent;
+  background:transparent;color:#aab4be;cursor:pointer;transition:color .15s,border-color .15s;font-family:'DM Sans',sans-serif;}
+.syn-chip:hover{color:var(--sea);border-color:var(--sand);}
+
+/* LOADER / ERROR */
+.loader{text-align:center;display:none;max-width:680px;margin:0 auto;padding:1.4rem;}
+.loader.active{display:block;}
+.dots{display:inline-flex;gap:6px;}
+.dots span{width:8px;height:8px;border-radius:50%;display:inline-block;animation:bounce 1.2s infinite ease-in-out;}
+.dots span:nth-child(1){background:var(--sky);}
+.dots span:nth-child(2){animation-delay:.2s;background:var(--coral);}
+.dots span:nth-child(3){animation-delay:.4s;background:var(--it);}
+.dots span:nth-child(4){animation-delay:.6s;background:var(--fr);}
+@keyframes bounce{0%,80%,100%{transform:translateY(0);}40%{transform:translateY(-9px);}}
+.loader p{font-size:.8rem;color:var(--muted);margin-top:.55rem;}
+.error-msg{max-width:680px;margin:0 1.5rem 1rem;background:#fff0ee;border:1.5px solid #fbb;
+  border-radius:10px;padding:.75rem 1rem;font-size:.86rem;color:#c0392b;display:none;}
+.error-msg.active{display:block;}
+
+/* RECENT CHIPS */
+.history-wrap{max-width:680px;margin:0 auto .65rem;padding:0 1.5rem;display:flex;flex-wrap:wrap;gap:.32rem;min-height:1.6rem;}
+.hist-chip{font-size:.73rem;padding:.18rem .6rem;border-radius:2rem;background:var(--sand);color:var(--ink);
+  cursor:pointer;transition:background .15s;font-family:'DM Sans',sans-serif;border:none;}
+.hist-chip:hover{background:#d4cec5;}
+
+/* LOG */
+.log-panel{max-width:680px;margin:0 auto 3rem;padding:0 1.5rem;}
+.log-toolbar{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.7rem;}
+.log-filter-row{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;margin-bottom:.75rem;}
+.log-filter-row label{font-size:.68rem;color:var(--muted);margin-right:.2rem;}
+.filter-chip{font-size:.7rem;padding:.2rem .6rem;border-radius:1rem;border:1.5px solid var(--sand);
+  background:#fff;color:var(--muted);cursor:pointer;transition:all .15s;user-select:none;}
+.filter-chip.on-star{background:#fef9c3;border-color:#fbbf24;color:#92400e;}
+.filter-chip:hover{background:var(--sand);}
+.btn-sm{font-family:'DM Sans',sans-serif;font-size:.76rem;font-weight:500;padding:.3rem .85rem;
+  border-radius:7px;border:none;cursor:pointer;transition:background .15s;white-space:nowrap;}
+.btn-copy{background:var(--ink);color:#fff;}
+.btn-copy:hover{background:#2d2d4a;}
+.btn-csv{background:var(--it);color:#fff;}
+.btn-csv:hover{background:#226040;}
+.btn-clear{background:#fee2e2;color:#c0392b;margin-left:auto;}
+.btn-clear:hover{background:#fecaca;}
+.btn-sm.flash{background:#22c55e!important;color:#fff;}
+.log-empty{text-align:center;padding:2.5rem 1rem;color:var(--muted);
+  font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.05rem;}
+.log-entry{background:#fff;border-radius:9px;border-left:3px solid var(--sand);padding:.5rem .8rem;
+  margin-bottom:.38rem;box-shadow:0 1px 4px rgba(0,0,0,.04);}
+.log-entry.starred{border-left-color:#fbbf24;}
+.log-entry-head{display:flex;align-items:center;gap:.4rem;margin-bottom:.25rem;overflow:hidden;}
+.log-entry-word{font-family:'Playfair Display',serif;font-weight:700;font-size:.95rem;color:var(--ink);}
+.log-entry-time{font-size:.6rem;color:#bbb;}
+.btn-star{background:none;border:none;cursor:pointer;font-size:1rem;padding:0 .1rem;
+  margin-left:auto;opacity:.3;transition:opacity .15s;flex-shrink:0;}
+.btn-star:hover{opacity:.7;}
+.log-entry.starred .btn-star{opacity:1;}
+.btn-del{background:none;border:none;cursor:pointer;font-size:.75rem;color:#ddd;
+  transition:color .15s;padding:0 .2rem;}
+.btn-del:hover{color:#c0392b;}
+.log-langs{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:.22rem;}
+.log-lang-item{font-size:.76rem;padding:.16rem .5rem;border-radius:1rem;background:var(--cream);
+  border:1px solid var(--sand);color:var(--ink);}
+.log-lang-item span{font-weight:600;}
+.log-lang-item.ll-en{border-color:rgba(3,105,161,.3);}
+.log-lang-item.ll-es{border-color:rgba(192,57,43,.3);}
+.log-lang-item.ll-it{border-color:rgba(42,122,75,.3);}
+.log-lang-item.ll-fr{border-color:rgba(74,63,159,.3);}
+.log-entry-example{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:.83rem;
+  color:#4a4a5a;padding-top:.2rem;border-top:1px solid var(--sand);}
+.log-entry-example em{font-style:normal;font-weight:600;color:var(--ink);}
+.log-note{width:100%;font-family:'DM Sans',sans-serif;font-size:.75rem;padding:.28rem .5rem;
+  border:1px solid var(--sand);border-radius:6px;background:var(--cream);color:var(--ink);
+  outline:none;resize:none;margin-top:.28rem;transition:border-color .18s;}
+.log-note:focus{border-color:var(--sky);background:#fff;}
+.log-note::placeholder{color:#ccc;}
+</style>
+</head>
+<body>
+
+<div class="key-bar" id="keyBar">
+  <span class="key-label">🔑 API Key</span>
+  <input type="password" class="key-input" id="keyInput" placeholder="Paste your Anthropic API key here" autocomplete="off" spellcheck="false"/>
+  <button class="btn-key-set" id="btnSetKey">Save</button>
+  <span class="key-status" id="keyStatus"></span>
+</div>
+
+<header>
+  <h1>abra<span>·</span>palabra</h1>
+  <p class="tagline">four languages · real context · by <strong style="color:rgba(255,255,255,.7);font-style:normal;">JohnPlusEnglish</strong></p>
+</header>
+
+<div class="nav-tabs">
+  <div class="nav-tab active" id="tab-lookup">Lookup</div>
+  <div class="nav-tab" id="tab-log">Log <span id="logCount" style="opacity:.5;font-size:.75em;"></span></div>
+</div>
+
+<div id="view-lookup">
+  <div class="lang-strip">
+    <div class="strip-row">
+      <span class="strip-label">Show</span>
+      <span class="lang-pill flt-pill on" id="flt-en" data-lang="en">EN</span>
+      <span class="lang-pill flt-pill on" id="flt-es" data-lang="es">ES</span>
+      <span class="lang-pill flt-pill on" id="flt-it" data-lang="it">IT</span>
+      <span class="lang-pill flt-pill on" id="flt-fr" data-lang="fr">FR</span>
+      <span class="lang-pill flt-pill on" id="flt-uk" data-lang="uk">UK</span>
+    </div>
+  </div>
+  <div class="search-wrap">
+    <div class="input-row">
+      <select id="srcSelect" class="src-select" title="Input language">
+        <option value="en">🇬🇧 EN</option>
+        <option value="es">🇪🇸 ES</option>
+        <option value="it">🇮🇹 IT</option>
+        <option value="fr">🇫🇷 FR</option>
+        <option value="uk">🇺🇦 UK</option>
+      </select>
+      <input type="text" id="wordInput" placeholder="e.g. stubborn, let me down, make ends meet…" autocomplete="off"/>
+      <button class="btn-search" id="searchBtn">Translate</button>
+    </div>
+  </div>
+  <div class="history-wrap" id="historyWrap"></div>
+  <div class="loader" id="loader"><div class="dots"><span></span><span></span><span></span><span></span></div><p>Looking up…</p></div>
+  <div class="error-msg" id="errorMsg"></div>
+  <div class="results" id="results"></div>
+</div>
+
+<div id="view-log" style="display:none;">
+  <div class="log-panel">
+    <div class="log-toolbar">
+      <button class="btn-sm btn-copy" id="btnCopy">Copy</button>
+      <button class="btn-sm btn-csv" id="btnCSV">CSV</button>
+      <button class="btn-sm btn-clear" id="btnClear">Clear</button>
+    </div>
+    <div class="log-filter-row">
+      <label>Filter:</label>
+      <span class="filter-chip" id="fc-star">⭐ Starred</span>
+    </div>
+    <div id="logEntries"></div>
+  </div>
+</div>
+
+<script>
+const LANGS = {
+  en:{label:'English', flag:'🇬🇧'},
+  es:{label:'Spanish (Spain)', flag:'🇪🇸'},
+  it:{label:'Italian', flag:'🇮🇹'},
+  fr:{label:'French', flag:'🇫🇷'},
+  uk:{label:'Ukrainian', flag:'🇺🇦'}
+};
+const LANG_BCP = {en:'en-GB', es:'es-ES', it:'it-IT', fr:'fr-FR', uk:'uk-UA'};
+const REG_CLASSES = {formal:'reg-formal',neutral:'reg-neutral',colloquial:'reg-colloquial',slang:'reg-slang',vulgar:'reg-vulgar'};
+
+// ── State ──
+let apiKey = '';
+let sourceLang = 'en';
+let visibleLangs = new Set(['en','es','it','fr','uk']);
+let recentHistory = [];
+let log = [];
+let activeFilters = new Set();
+let currentUtterance = null;
+
+// ── Storage helpers ──
+function storageGet(k) { try { return localStorage.getItem(k); } catch(e) { return null; } }
+function storageSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
+
+// ── Init ──
+window.addEventListener('load', function() {
+  // Load persisted data
+  apiKey = storageGet('abra_key') || '';
+  try { recentHistory = JSON.parse(storageGet('abra_history') || '[]'); } catch(e) { recentHistory = []; }
+  try { log = JSON.parse(storageGet('abra_log') || '[]'); } catch(e) { log = []; }
+
+  // Key bar
+  document.getElementById('btnSetKey').addEventListener('click', saveKey);
+  document.getElementById('keyInput').addEventListener('keydown', function(e){ if(e.key==='Enter') saveKey(); });
+  updateKeyBar();
+
+  // Nav tabs
+  document.getElementById('tab-lookup').addEventListener('click', function(){ switchTab('lookup'); });
+  document.getElementById('tab-log').addEventListener('click', function(){ switchTab('log'); });
+
+  // Source lang select + filter pills
+  document.getElementById('srcSelect').addEventListener('change', function(e){ setSourceLang(e.target.value); });
+  ['en','es','it','fr','uk'].forEach(function(l) {
+    document.getElementById('flt-'+l).addEventListener('click', function(){ toggleVisible(l); });
+  });
+  setSourceLang('en');
+
+  // Search
+  document.getElementById('searchBtn').addEventListener('click', lookup);
+  document.getElementById('wordInput').addEventListener('keydown', function(e){ if(e.key==='Enter') lookup(); });
+
+  // Log controls
+  document.getElementById('btnCopy').addEventListener('click', copyLog);
+  document.getElementById('btnCSV').addEventListener('click', downloadCSV);
+  document.getElementById('btnClear').addEventListener('click', clearLog);
+  document.getElementById('fc-star').addEventListener('click', function(){ toggleFilterChip('star'); });
+
+  // TTS voice preload
+  if (window.speechSynthesis) {
+    window.speechSynthesis.getVoices();
+    window.speechSynthesis.onvoiceschanged = function(){ window.speechSynthesis.getVoices(); };
+  }
+
+  renderRecent();
+  updateLogCount();
+});
+
+// ── Key bar ──
+function saveKey() {
+  var val = document.getElementById('keyInput').value.trim();
+  if (!val) { alert('Please paste your API key first.'); return; }
+  apiKey = val;
+  storageSet('abra_key', val);
+  document.getElementById('keyInput').value = '';
+  document.getElementById('keyInput').placeholder = 'Key saved — paste a new one to replace';
+  updateKeyBar();
+}
+function updateKeyBar() {
+  var status = document.getElementById('keyStatus');
+  var bar = document.getElementById('keyBar');
+  if (apiKey) {
+    status.textContent = '✓ Key saved';
+    status.style.color = '#16a34a';
+    bar.classList.add('ok');
+  } else {
+    status.textContent = '';
+    bar.classList.remove('ok');
+  }
+}
+
+// ── Tabs ──
+function switchTab(tab) {
+  document.getElementById('view-lookup').style.display = tab==='lookup' ? '' : 'none';
+  document.getElementById('view-log').style.display    = tab==='log'    ? '' : 'none';
+  document.getElementById('tab-lookup').classList.toggle('active', tab==='lookup');
+  document.getElementById('tab-log').classList.toggle('active',    tab==='log');
+  if (tab==='log') renderLog();
+}
+
+// ── Source lang ──
+function setSourceLang(lang) {
+  sourceLang = lang;
+  var sel = document.getElementById('srcSelect');
+  if (sel && sel.value !== lang) sel.value = lang;
+}
+
+// ── Visibility filter ──
+function toggleVisible(lang) {
+  var pill = document.getElementById('flt-'+lang);
+  if (visibleLangs.has(lang)) {
+    if (visibleLangs.size === 1) return;
+    visibleLangs.delete(lang);
+    pill.classList.remove('on');
+  } else {
+    visibleLangs.add(lang);
+    pill.classList.add('on');
+  }
+  document.querySelectorAll('.lang-card').forEach(function(c) {
+    c.classList.toggle('hidden', !visibleLangs.has(c.getAttribute('data-lang')));
+  });
+}
+
+// ── Recent chips ──
+function renderRecent() {
+  var wrap = document.getElementById('historyWrap');
+  wrap.innerHTML = '';
+  recentHistory.slice(-10).reverse().forEach(function(item) {
+    var btn = document.createElement('button');
+    btn.className = 'hist-chip';
+    btn.textContent = item.word;
+    btn.addEventListener('click', function() {
+      document.getElementById('wordInput').value = item.word;
+      setSourceLang(item.lang);
+      lookup();
+    });
+    wrap.appendChild(btn);
+  });
+}
+
+// ── Log count ──
+function updateLogCount() {
+  var el = document.getElementById('logCount');
+  el.textContent = log.length ? '('+log.length+')' : '';
+}
+
+// ── Register helper ──
+function regClass(r) {
+  if (!r) return 'reg-neutral';
+  var k = r.toLowerCase();
+  for (var key in REG_CLASSES) { if (k.includes(key)) return REG_CLASSES[key]; }
+  return 'reg-neutral';
+}
+
+// ── Synonym chip ──
+function makeSynChip(word, lang) {
+  var chip = document.createElement('span');
+  chip.className = 'syn-chip';
+  chip.textContent = word;
+  chip.addEventListener('click', function() {
+    document.getElementById('wordInput').value = word;
+    setSourceLang(lang);
+    switchTab('lookup');
+    lookup();
+  });
+  return chip;
+}
+
+// ── TTS ──
+function speak(btn, phrase, lang) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  if (btn.classList.contains('speaking')) { btn.classList.remove('speaking'); return; }
+  document.querySelectorAll('.btn-speak').forEach(function(b){ b.classList.remove('speaking'); });
+  var utter = new SpeechSynthesisUtterance(phrase);
+  utter.lang = LANG_BCP[lang] || 'en-GB';
+  utter.rate = 0.88;
+  var voices = window.speechSynthesis.getVoices();
+  var match = voices.find(function(v){ return v.lang.startsWith(LANG_BCP[lang]||'en-GB'); });
+  if (match) utter.voice = match;
+  utter.onstart = function(){ btn.classList.add('speaking'); };
+  utter.onend = function(){ btn.classList.remove('speaking'); };
+  utter.onerror = function(){ btn.classList.remove('speaking'); };
+  window.speechSynthesis.speak(utter);
+}
+
+// ── Render cards ──
+function renderCards(parsed) {
+  var results = document.getElementById('results');
+  results.innerHTML = '';
+  ['en','es','it','fr','uk'].forEach(function(lang, i) {
+    var d = parsed[lang];
+    if (!d) return;
+
+    var card = document.createElement('div');
+    card.className = 'lang-card' + (visibleLangs.has(lang) ? '' : ' hidden');
+    card.setAttribute('data-lang', lang);
+
+    // Top row
+    var top = document.createElement('div');
+    top.className = 'card-top';
+
+    var cardId = document.createElement('div');
+    cardId.className = 'card-id';
+    cardId.innerHTML = '<span class="flag">'+LANGS[lang].flag+'</span><span class="lang-label">'+lang.toUpperCase()+'</span>';
+    top.appendChild(cardId);
+
+    var phrasePos = document.createElement('div');
+    phrasePos.className = 'phrase-pos';
+    phrasePos.innerHTML = '<span class="phrase">'+d.phrase+'</span>'+(d.pos?'<span class="pos-note">'+d.pos+'</span>':'');
+    top.appendChild(phrasePos);
+
+    var regCls = regClass(d.register || 'neutral');
+    var regTag = document.createElement('span');
+    regTag.className = 'reg-tag '+regCls;
+    regTag.textContent = (d.register || 'neutral').toLowerCase();
+    top.appendChild(regTag);
+    card.appendChild(top);
+
+    // Pronunciation row
+    var pronRow = document.createElement('div');
+    pronRow.className = 'pron-row';
+
+    // Audio removed — phonetics only
+
+    var ipaClean = (d.ipa || '').replace(/^\/|\/$/g, '');
+    if (ipaClean) {
+      var ipaEl = document.createElement('span');
+      ipaEl.className = 'pron-ipa';
+      ipaEl.innerHTML = '<span class="slash">/</span>'+ipaClean+'<span class="slash">/</span>';
+      pronRow.appendChild(ipaEl);
+    }
+    if (d.simplified) {
+      var simpEl = document.createElement('span');
+      simpEl.className = 'pron-simplified';
+      simpEl.textContent = d.simplified;
+      pronRow.appendChild(simpEl);
+    }
+    card.appendChild(pronRow);
+
+    // Example
+    var ex = document.createElement('div');
+    ex.className = 'example';
+    ex.innerHTML = d.example || '';
+    card.appendChild(ex);
+
+    // Definition (source-language card only)
+    if (lang === sourceLang && d.definition) {
+      var defEl = document.createElement('div');
+      defEl.className = 'definition';
+      defEl.textContent = d.definition;
+      card.appendChild(defEl);
+    }
+
+    // Synonyms
+    if (d.synonyms && d.synonyms.length) {
+      var synRow = document.createElement('div');
+      synRow.className = 'synonyms';
+      var lbl = document.createElement('span');
+      lbl.className = 'syn-label';
+      lbl.textContent = 'also:';
+      synRow.appendChild(lbl);
+      d.synonyms.forEach(function(s){ synRow.appendChild(makeSynChip(s, lang)); });
+      card.appendChild(synRow);
+    }
+
+    results.appendChild(card);
+    setTimeout(function(){ card.classList.add('visible'); }, i * 90);
+  });
+}
+
+// ── Main lookup ──
+async function lookup() {
+  if (!apiKey) {
+    document.getElementById('keyInput').focus();
+    document.getElementById('errorMsg').textContent = '⚠ Please save your API key first.';
+    document.getElementById('errorMsg').classList.add('active');
+    return;
+  }
+  var word = document.getElementById('wordInput').value.trim();
+  if (!word) return;
+
+  var btn = document.getElementById('searchBtn');
+  var loader = document.getElementById('loader');
+  var errorEl = document.getElementById('errorMsg');
+
+  btn.disabled = true;
+  loader.classList.add('active');
+  errorEl.classList.remove('active');
+  document.getElementById('results').innerHTML = '';
+
+  // Cache check
+  var cacheKey = 'lc_'+sourceLang+'_'+word.toLowerCase().trim();
+  var cached = storageGet(cacheKey);
+  if (cached) {
+    try {
+      var parsed = JSON.parse(cached);
+      renderCards(parsed);
+      saveToHistory(word);
+      saveToLog(word, parsed);
+      loader.classList.remove('active');
+      btn.disabled = false;
+      return;
+    } catch(e) { try { localStorage.removeItem(cacheKey); } catch(e2) {} }
+  }
+
+  var srcName = LANGS[sourceLang].label;
+  var prompt = 'You are a multilingual language expert specialising in British English, Castilian Spanish (Spain), Italian, French, and Ukrainian.\n'+
+    'The user has entered: "'+word+'" in '+srcName+'.\n\n'+
+    'Return ONLY a raw JSON object (no markdown, no preamble) with exactly five keys: "en", "es", "it", "fr", "uk".\n'+
+    'For Spanish use castellano — Spain usage (vosotros, Spain vocabulary). Avoid Latin American variants.\n\n'+
+    'Each key maps to an object with:\n'+
+    '- "phrase": natural equivalent. For source language copy the input.\n'+
+    '- "pos": brief grammar note (e.g. "adjective", "verb phrase")\n'+
+    '- "register": one of: formal / neutral / colloquial / slang / vulgar\n'+
+    '- "ipa": IPA transcription. Rules by language:\n'+
+    '  English: use RP. For words where RP drops the r (non-rhotic), mark the r in parentheses ONLY — e.g. /kɑː(r)/, /ˈwɔː.tə(r)/, /ˈstʌb.ə(r)n/. Do NOT use (r) in Spanish, Italian or French IPA — those languages are fully rhotic or have no equivalent ambiguity.\n'+
+    '  Spanish: standard Castilian IPA with θ for c/z. No (r) notation.\n'+
+    '  Italian: standard Italian IPA. No (r) notation.\n'+
+    '  French: standard French IPA with ʁ for r. No (r) notation.\n'+
+    '  Ukrainian: standard Ukrainian IPA. Use /ɦ/ for г (voiced glottal, NOT /g/ — that is ґ). Use /ɪ/ for и (NOT /i/), /i/ for і, /ji/ for ї. Palatalised consonants marked with ʲ (e.g. дякую /ˈdʲakuju/). Use /w/ or /ʋ/ for в depending on position. Vowels are NOT reduced like in Russian — unstressed o stays /ɔ/, not /ɐ/.\n'+
+    '  All languages: include primary stress marks (ˈ).\n'+
+    '- "simplified": phonetic respelling for learners using English letter patterns. Caps = stressed syllable, hyphens between syllables. e.g. EN: "STUH-bun", ES: "TEHR-koh", IT: "teh-STAR-doh", FR: "teh-TOO", UK: "DYAH-koo-yoo".\n'+
+    '- "example": one natural sentence 8-14 words using the phrase. Wrap phrase in <em> tags.\n'+
+    '- "synonyms": array of 2-3 close synonyms in that language. Empty array if none.\n'+
+    '- "definition": ONLY include this field on the source-language object (the language matching "'+srcName+'"). Omit it entirely from the other four language objects. Write a clear, concise monolingual learner-dictionary definition IN THAT SAME LANGUAGE (e.g. if the source is Spanish, the definition is written in Spanish; if French, in French). Maximum 20 words. Define the specific sense the word carries here, not all senses. For idioms and phrasal verbs, explain the meaning, not the literal words. Match the register of the headword (formal headword → formal definition wording).\n\n'+
+    '\nCRITICAL TRANSLATION PRINCIPLES:\n'+
+    '1. NATURAL EQUIVALENT, NEVER CALQUE. For idioms, phrasal verbs, and fixed expressions, give what a native would actually say in the same situation, even if the literal imagery is completely different. Examples: "break a leg" → ES "mucha mierda", IT "in bocca al lupo", FR "merde" (NOT "rompe una pierna"). "under the weather" → FR "ne pas être dans son assiette" (NOT "sous le temps"). "put up with" → ES "aguantar" (NOT "poner arriba con").\n'+
+    '2. MATCH THE STATE TYPE. For idioms about physical states, choose physical-state equivalents; for emotional states, emotional equivalents. "Under the weather" is physical illness, so prefer IT "essere un po\' fiacco" or "non sentirsi bene" over "giù di corda" (which is emotional/down-in-the-dumps).\n'+
+    '3. PRESERVE REGISTER ACROSS LANGUAGES. If the source is colloquial, all four translations must be colloquial (e.g. "tío" → EN "mate"/"bloke", FR "mec", IT "raga" — NOT "uncle"). If formal, all four formal (e.g. "domicilio" → EN "place of residence", NOT "house"). Slang stays slang. Vulgar stays vulgar.\n'+
+    '4. AVOID FALSE FRIENDS. Be alert to classic traps: FR "supporter" = tolerate, NOT support emotionally; ES "embarazada" = pregnant, NOT embarrassed; IT "fattoria" = farm, NOT factory; UK "магазин" (mahazyn) = shop, NOT magazine. Choose the meaning the source actually carries, not the lookalike. Also: do NOT default to Russian cognates for Ukrainian — use genuine Ukrainian vocabulary (e.g. "thank you" is "дякую" NOT "спасибі"; "hello" is "привіт" NOT "здравствуйте"; "but" is "але" NOT "но").\n'+
+    '5. SYNONYMS MUST BE SUBSTITUTABLE. Each synonym should be swappable into your example sentence with minimal rewording and the same register. Reject loosely-related words. 2-3 strong synonyms beats 3 weak ones; empty array is acceptable.\n'+
+    '6. EXAMPLES MUST SOUND SPOKEN, NOT TRANSLATED. Each example should read as something a native would naturally say or write — not a mirror of the English sentence in another language. Vary sentence structures across the four languages.\n'+
+    '\nIPA DETAILS:\n'+
+    '- English (r) rule: mark (r) only where RP drops it — word-finally (car, water, here) and pre-consonantally (stubborn, hurt). Do NOT mark (r) when followed by a vowel within the word (very, around, carry).\n'+
+    '- Italian: ALWAYS double consonants in IPA where the spelling doubles them (acqua /ˈakkwa/, sopportare /sopporˈtaːre/, bello /ˈbɛllo/). Use length mark ː on stressed open syllables.\n'+
+    '- Spanish: use /ɾ/ for single intervocalic r (pero), /r/ for rr or word-initial r (perro, rojo). Use /θ/ for c before e/i and z (cinco /ˈθinko/). Use /ɣ/ for intervocalic g (agua /ˈaɣwa/), /β/ for intervocalic b/v, /ð/ for intervocalic d.\n'+
+    '- French: nasals /ɑ̃ ɛ̃ ɔ̃ œ̃/ where applicable. Use /ʁ/ for r. Mark liaison only if naturally pronounced.\n'+
+    '\nSIMPLIFIED PHONETICS: write so a Spanish/Italian/French speaker reading it as English letters produces a recognisable approximation. Use AH (father), EH (bed), EE (see), OH (go), OO (food), UH (sun), AY (day), OW (cow), OY (boy), AIR (hair). For French nasals use AHN/OHN/AN. For Ukrainian, use Y as in "yes" for й/palatalisation (DYAH-koo-yoo for дякую), and KH for х (as in Scottish "loch"). For very long phrases (5+ syllables), it is acceptable to simplify only the trickiest words rather than every syllable — clarity beats completeness.\n'+
+    '\nUKRAINIAN-SPECIFIC: write the phrase in Cyrillic script (NOT transliterated Latin). Use Ukrainian orthography with і, ї, є, ґ where appropriate. Idioms should be genuinely Ukrainian — e.g. "break a leg" → "ні пуху, ні пера" (literally "neither down nor feather"); "it\'s raining cats and dogs" → "ллє як з відра". If no idiomatic equivalent exists, give the most natural neutral phrasing rather than a calque.\n'+
+    '\nRules: natural register, complete sentences, accurate IPA, raw JSON only.\n'+
+    'Shape: {"en":{"phrase":"...","pos":"...","register":"neutral","ipa":"...","simplified":"...","example":"...","synonyms":[],"definition":"... (ONLY on source-language object)"},"es":{...},"it":{...},"fr":{...},"uk":{...}}';
+
+  try {
+    var resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 1500,
+        messages: [{role:'user', content:prompt}]
+      })
+    });
+
+    var data = await resp.json();
+    if (!resp.ok) throw new Error(data.error ? data.error.message : 'API error');
+
+    var raw = data.content.map(function(b){ return b.text||''; }).join('').trim();
+    var result;
+    try { result = JSON.parse(raw.replace(/```json|```/g,'').trim()); }
+    catch(e) { throw new Error('Could not parse response. Please try again.'); }
+
+    storageSet(cacheKey, JSON.stringify(result));
+    saveToHistory(word);
+    saveToLog(word, result);
+    renderCards(result);
+
+  } catch(err) {
+    errorEl.textContent = '⚠ '+err.message;
+    errorEl.classList.add('active');
+  } finally {
+    loader.classList.remove('active');
+    btn.disabled = false;
+  }
+}
+
+function saveToHistory(word) {
+  recentHistory = recentHistory.filter(function(h){ return h.word!==word||h.lang!==sourceLang; });
+  recentHistory.push({word:word, lang:sourceLang});
+  if (recentHistory.length > 20) recentHistory = recentHistory.slice(-20);
+  storageSet('abra_history', JSON.stringify(recentHistory));
+  renderRecent();
+}
+
+function saveToLog(word, parsed) {
+  var now = new Date();
+  log.push({
+    id: Date.now(), word:word, srcLang:sourceLang,
+    date: now.toISOString().slice(0,10),
+    time: now.toTimeString().slice(0,5),
+    translations: parsed, starred: false, note: ''
+  });
+  storageSet('abra_log', JSON.stringify(log));
+  updateLogCount();
+}
+
+// ── Log ──
+function getFilteredLog() {
+  return log.filter(function(e) {
+    if (activeFilters.has('star') && !e.starred) return false;
+    return true;
+  });
+}
+
+function toggleFilterChip(key) {
+  var el = document.getElementById('fc-'+key);
+  if (activeFilters.has(key)) {
+    activeFilters.delete(key);
+    el.className = 'filter-chip';
+  } else {
+    activeFilters.add(key);
+    el.className = 'filter-chip on-'+key;
+  }
+  renderLog();
+}
+
+function saveLog() { storageSet('abra_log', JSON.stringify(log)); }
+
+function toggleStar(id) {
+  var e = log.find(function(x){ return x.id===id; });
+  if (e) { e.starred = !e.starred; saveLog(); renderLog(); }
+}
+
+function saveNote(id, val) {
+  var e = log.find(function(x){ return x.id===id; });
+  if (e) { e.note = val; saveLog(); }
+}
+
+function deleteEntry(id) {
+  log = log.filter(function(x){ return x.id!==id; });
+  saveLog(); updateLogCount(); renderLog();
+}
+
+function stripTags(html) { return (html||'').replace(/<[^>]+>/g,''); }
+
+function renderLog() {
+  var container = document.getElementById('logEntries');
+  var filtered = getFilteredLog();
+  if (!filtered.length) {
+    container.innerHTML = '<div class="log-empty">No entries yet.</div>';
+    return;
+  }
+  container.innerHTML = '';
+  var list = filtered.slice().reverse();
+  list.forEach(function(e) {
+    var card = document.createElement('div');
+    card.className = 'log-entry' + (e.starred ? ' starred' : '');
+
+    var head = document.createElement('div');
+    head.className = 'log-entry-head';
+    head.innerHTML = '<span class="log-entry-word">'+e.word+'</span>'+
+      '<span class="log-entry-time">'+e.time+'</span>';
+
+    var starBtn = document.createElement('button');
+    starBtn.className = 'btn-star';
+    starBtn.textContent = e.starred ? '⭐' : '☆';
+    starBtn.title = e.starred ? 'Unstar' : 'Star';
+    (function(id){ starBtn.addEventListener('click', function(){ toggleStar(id); }); })(e.id);
+    head.appendChild(starBtn);
+
+    var delBtn = document.createElement('button');
+    delBtn.className = 'btn-del';
+    delBtn.textContent = '✕';
+    delBtn.title = 'Delete';
+    (function(id){ delBtn.addEventListener('click', function(){ deleteEntry(id); }); })(e.id);
+    head.appendChild(delBtn);
+    card.appendChild(head);
+
+    var langs = document.createElement('div');
+    langs.className = 'log-langs';
+    ['en','es','it','fr','uk'].forEach(function(l) {
+      var t = e.translations[l]; if (!t) return;
+      var item = document.createElement('span');
+      item.className = 'log-lang-item ll-'+l;
+      item.innerHTML = LANGS[l].flag+' <span>'+t.phrase+'</span>';
+      langs.appendChild(item);
+    });
+    card.appendChild(langs);
+
+    var ex = (e.translations[e.srcLang]||e.translations['en']||{}).example;
+    if (ex) {
+      var exEl = document.createElement('div');
+      exEl.className = 'log-entry-example';
+      exEl.innerHTML = ex;
+      card.appendChild(exEl);
+    }
+
+    var note = document.createElement('textarea');
+    note.className = 'log-note';
+    note.rows = 1;
+    note.placeholder = 'Add a note…';
+    note.value = e.note || '';
+    (function(id){ note.addEventListener('input', function(){ saveNote(id, this.value); }); })(e.id);
+    card.appendChild(note);
+
+    container.appendChild(card);
+  });
+}
+
+// ── Copy ──
+function copyLog() {
+  var filtered = getFilteredLog();
+  if (!filtered.length) return;
+  var lines = [];
+  filtered.forEach(function(e) {
+    var lvl = e.level ? ' ['+e.level.toUpperCase()+']' : '';
+    var star = e.starred ? ' ⭐' : '';
+    lines.push(e.word+lvl+star+'  ('+e.time+')');
+    ['en','es','it','fr','uk'].forEach(function(l) {
+      var t = e.translations[l];
+      if (t) lines.push('  '+LANGS[l].flag+' '+t.phrase+'  ['+( t.register||'')+']  ('+( t.pos||'')+')  — '+stripTags(t.example||''));
+    });
+    if (e.note) lines.push('  📝 '+e.note);
+    lines.push('');
+  });
+  navigator.clipboard.writeText(lines.join('\n').trim()).then(function() {
+    var btn = document.getElementById('btnCopy');
+    btn.textContent = 'Copied ✓'; btn.classList.add('flash');
+    setTimeout(function(){ btn.textContent='Copy'; btn.classList.remove('flash'); }, 1800);
+  });
+}
+
+// ── CSV ──
+function downloadCSV() {
+  var filtered = getFilteredLog();
+  if (!filtered.length) return;
+  var rows = [['Time','Word','Starred','Note','Source',
+    'EN phrase','EN pos','EN register','EN example',
+    'ES phrase','ES pos','ES register','ES example',
+    'IT phrase','IT pos','IT register','IT example',
+    'FR phrase','FR pos','FR register','FR example',
+    'UK phrase','UK pos','UK register','UK example']];
+  filtered.forEach(function(e) {
+    var row = [e.time,e.word,e.starred?'yes':'',e.note||'',LANGS[e.srcLang]?LANGS[e.srcLang].label:e.srcLang];
+    ['en','es','it','fr','uk'].forEach(function(l) {
+      var t = e.translations[l];
+      row.push(t?t.phrase:'', t?t.pos||'':'', t?t.register||'':'', t?stripTags(t.example||''):'');
+    });
+    rows.push(row);
+  });
+  var csv = rows.map(function(r){ return r.map(function(c){ return '"'+String(c).replace(/"/g,'""')+'"'; }).join(','); }).join('\n');
+  var blob = new Blob([csv],{type:'text/csv'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'abrapalabra-'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ── Clear ──
+function clearLog() {
+  var msg = (activeFilters.size) ? 'Clear filtered entries?' : 'Clear the entire log?';
+  if (!confirm(msg)) return;
+  if (activeFilters.size) {
+    var keep = log.filter(function(e) {
+      if (activeFilters.has('star') && !e.starred) return true;
+      return false;
+    });
+    log = keep;
+  } else {
+    log = [];
+  }
+  saveLog(); updateLogCount(); renderLog();
+}
+</script>
+</body>
+</html>
