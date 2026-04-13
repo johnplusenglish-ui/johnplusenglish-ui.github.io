@@ -10,7 +10,7 @@
 :root {
   --sky:#0ea5e9; --sea:#0369a1; --coral:#f97316;
   --cream:#fafaf7; --sand:#e8e2d6; --ink:#1a1a2e; --muted:#64748b; --card-bg:#fff;
-  --en:#0369a1; --es:#c0392b; --it:#2a7a4b; --fr:#4a3f9f; --uk:#d4a017;
+  --en:#0369a1; --es:#c0392b; --it:#2a7a4b; --fr:#4a3f9f; --uk:#d4a017; --hu:#722f37;
   --reg-formal:#1e6fa5; --reg-neutral:#64748b; --reg-colloquial:#b45309; --reg-slang:#7c3aed; --reg-vulgar:#991b1b;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -71,6 +71,7 @@ header p.tagline{font-family:'Cormorant Garamond',serif;font-style:italic;font-s
 .flt-pill.on[data-lang="it"]{background:var(--it);color:#fff;border-color:transparent;}
 .flt-pill.on[data-lang="fr"]{background:var(--fr);color:#fff;border-color:transparent;}
 .flt-pill.on[data-lang="uk"]{background:var(--uk);color:#fff;border-color:transparent;}
+.flt-pill.on[data-lang="hu"]{background:var(--hu);color:#fff;border-color:transparent;}
 .flt-pill:not(.on):hover{color:rgba(255,255,255,.6);}
 
 /* SEARCH */
@@ -101,6 +102,7 @@ header p.tagline{font-family:'Cormorant Garamond',serif;font-style:italic;font-s
 .lang-card[data-lang="it"]{border-color:var(--it);}
 .lang-card[data-lang="fr"]{border-color:var(--fr);}
 .lang-card[data-lang="uk"]{border-color:var(--uk);}
+.lang-card[data-lang="hu"]{border-color:var(--hu);}
 .card-top{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-bottom:.2rem;}
 .card-id{display:flex;align-items:center;gap:.3rem;flex-shrink:0;}
 .flag{font-size:1rem;line-height:1;}
@@ -110,6 +112,7 @@ header p.tagline{font-family:'Cormorant Garamond',serif;font-style:italic;font-s
 .lang-card[data-lang="it"] .lang-label{color:var(--it);}
 .lang-card[data-lang="fr"] .lang-label{color:var(--fr);}
 .lang-card[data-lang="uk"] .lang-label{color:var(--uk);}
+.lang-card[data-lang="hu"] .lang-label{color:var(--hu);}
 .phrase-pos{display:flex;align-items:baseline;gap:.45rem;flex:1;}
 .phrase{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--ink);line-height:1.2;}
 .pos-note{font-size:.66rem;color:var(--muted);font-style:italic;white-space:nowrap;}
@@ -231,7 +234,7 @@ header p.tagline{font-family:'Cormorant Garamond',serif;font-style:italic;font-s
 
 <header>
   <h1>abra<span>·</span>palabra</h1>
-  <p class="tagline">five languages · real context · by <strong style="color:rgba(255,255,255,.7);font-style:normal;">JohnPlusEnglish</strong></p>
+  <p class="tagline">six languages · real context · by <strong style="color:rgba(255,255,255,.7);font-style:normal;">JohnPlusEnglish</strong></p>
 </header>
 
 <div class="nav-tabs">
@@ -248,6 +251,7 @@ header p.tagline{font-family:'Cormorant Garamond',serif;font-style:italic;font-s
       <span class="lang-pill flt-pill on" id="flt-it" data-lang="it">IT</span>
       <span class="lang-pill flt-pill on" id="flt-fr" data-lang="fr">FR</span>
       <span class="lang-pill flt-pill on" id="flt-uk" data-lang="uk">UK</span>
+      <span class="lang-pill flt-pill on" id="flt-hu" data-lang="hu">HU</span>
     </div>
   </div>
   <div class="search-wrap">
@@ -258,6 +262,7 @@ header p.tagline{font-family:'Cormorant Garamond',serif;font-style:italic;font-s
         <option value="it">🇮🇹 IT</option>
         <option value="fr">🇫🇷 FR</option>
         <option value="uk">🇺🇦 UK</option>
+        <option value="hu">🇭🇺 HU</option>
       </select>
       <input type="text" id="wordInput" placeholder="e.g. stubborn, let me down, make ends meet…" autocomplete="off"/>
       <button class="btn-search" id="searchBtn">Translate</button>
@@ -290,15 +295,16 @@ const LANGS = {
   es:{label:'Spanish (Spain)', flag:'🇪🇸'},
   it:{label:'Italian', flag:'🇮🇹'},
   fr:{label:'French', flag:'🇫🇷'},
-  uk:{label:'Ukrainian', flag:'🇺🇦'}
+  uk:{label:'Ukrainian', flag:'🇺🇦'},
+  hu:{label:'Hungarian', flag:'🇭🇺'}
 };
-const LANG_BCP = {en:'en-GB', es:'es-ES', it:'it-IT', fr:'fr-FR', uk:'uk-UA'};
+const LANG_BCP = {en:'en-GB', es:'es-ES', it:'it-IT', fr:'fr-FR', uk:'uk-UA', hu:'hu-HU'};
 const REG_CLASSES = {formal:'reg-formal',neutral:'reg-neutral',colloquial:'reg-colloquial',slang:'reg-slang',vulgar:'reg-vulgar'};
 
 // ── State ──
 let apiKey = '';
 let sourceLang = 'en';
-let visibleLangs = new Set(['en','es','it','fr','uk']);
+let visibleLangs = new Set(['en','es','it','fr','uk','hu']);
 let recentHistory = [];
 let log = [];
 let activeFilters = new Set();
@@ -326,7 +332,7 @@ window.addEventListener('load', function() {
 
   // Source lang select + filter pills
   document.getElementById('srcSelect').addEventListener('change', function(e){ setSourceLang(e.target.value); });
-  ['en','es','it','fr','uk'].forEach(function(l) {
+  ['en','es','it','fr','uk','hu'].forEach(function(l) {
     document.getElementById('flt-'+l).addEventListener('click', function(){ toggleVisible(l); });
   });
   setSourceLang('en');
@@ -473,7 +479,7 @@ function speak(btn, phrase, lang) {
 function renderCards(parsed) {
   var results = document.getElementById('results');
   results.innerHTML = '';
-  ['en','es','it','fr','uk'].forEach(function(lang, i) {
+  ['en','es','it','fr','uk','hu'].forEach(function(lang, i) {
     var d = parsed[lang];
     if (d) renderOneCard(lang, d, i);
   });
@@ -596,9 +602,9 @@ async function lookup() {
   }
 
   var srcName = LANGS[sourceLang].label;
-  var prompt = 'You are a multilingual language expert specialising in British English, Castilian Spanish (Spain), Italian, French, and Ukrainian.\n'+
+  var prompt = 'You are a multilingual language expert specialising in British English, Castilian Spanish (Spain), Italian, French, Ukrainian, and Hungarian.\n'+
     'The user has entered: "'+word+'" in '+srcName+'.\n\n'+
-    'Return ONLY a raw JSON object (no markdown, no preamble) with exactly five keys: "en", "es", "it", "fr", "uk".\n'+
+    'Return ONLY a raw JSON object (no markdown, no preamble) with exactly six keys: "en", "es", "it", "fr", "uk", "hu".\n'+
     'For Spanish use castellano — Spain usage (vosotros, Spain vocabulary). Avoid Latin American variants.\n\n'+
     'Each key maps to an object with:\n'+
     '- "phrase": natural equivalent. For source language copy the input.\n'+
@@ -610,18 +616,19 @@ async function lookup() {
     '  Italian: standard Italian IPA. No (r) notation.\n'+
     '  French: standard French IPA with ʁ for r. No (r) notation.\n'+
     '  Ukrainian: standard Ukrainian IPA. Use /ɦ/ for г (voiced glottal, NOT /g/ — that is ґ). Use /ɪ/ for и (NOT /i/), /i/ for і, /ji/ for ї. Palatalised consonants marked with ʲ (e.g. дякую /ˈdʲakuju/). Use /w/ or /ʋ/ for в depending on position. Vowels are NOT reduced like in Russian — unstressed o stays /ɔ/, not /ɐ/.\n'+
+    '  Hungarian: standard Hungarian IPA. Primary stress ALWAYS on the first syllable — mark it there without exception. Vowel length is phonemic: short /a/ vs long /aː/, /o/ vs /oː/, /ø/ vs /øː/, /y/ vs /yː/, etc. Note: á = /aː/ (open, NOT /a/), a = /ɒ/ (rounded, NOT /a/), e = /ɛ/, é = /eː/. Digraphs: sz = /s/, s = /ʃ/, zs = /ʒ/, cs = /tʃ/, gy = /ɟ/, ty = /c/, ny = /ɲ/, ly = /j/. Double consonants are geminated (hosszú /ˈhosːuː/).\n'+
     '  All languages: include primary stress marks (ˈ).\n'+
-    '- "simplified": phonetic respelling for learners using English letter patterns. Caps = stressed syllable, hyphens between syllables. e.g. EN: "STUH-bun", ES: "TEHR-koh", IT: "teh-STAR-doh", FR: "teh-TOO", UK: "DYAH-koo-yoo".\n'+
+    '- "simplified": phonetic respelling for learners using English letter patterns. Caps = stressed syllable, hyphens between syllables. e.g. EN: "STUH-bun", ES: "TEHR-koh", IT: "teh-STAR-doh", FR: "teh-TOO", UK: "DYAH-koo-yoo", HU: "KUH-suh-nuhm" (köszönöm).\n'+
     '- "example": one natural sentence 8-14 words using the phrase. Wrap phrase in <em> tags.\n'+
     '- "synonyms": array of 2-3 close synonyms in that language. Empty array if none.\n'+
     '- "definition": ONLY include this field on the source-language object (the language matching "'+srcName+'"). Omit it entirely from the other four language objects. Write a clear, concise monolingual learner-dictionary definition IN THAT SAME LANGUAGE (e.g. if the source is Spanish, the definition is written in Spanish; if French, in French). Maximum 20 words. Define the specific sense the word carries here, not all senses. For idioms and phrasal verbs, explain the meaning, not the literal words. Match the register of the headword (formal headword → formal definition wording).\n\n'+
     '\nCRITICAL TRANSLATION PRINCIPLES:\n'+
     '1. NATURAL EQUIVALENT, NEVER CALQUE. For idioms, phrasal verbs, and fixed expressions, give what a native would actually say in the same situation, even if the literal imagery is completely different. Examples: "break a leg" → ES "mucha mierda", IT "in bocca al lupo", FR "merde" (NOT "rompe una pierna"). "under the weather" → FR "ne pas être dans son assiette" (NOT "sous le temps"). "put up with" → ES "aguantar" (NOT "poner arriba con").\n'+
     '2. MATCH THE STATE TYPE. For idioms about physical states, choose physical-state equivalents; for emotional states, emotional equivalents. "Under the weather" is physical illness, so prefer IT "essere un po\' fiacco" or "non sentirsi bene" over "giù di corda" (which is emotional/down-in-the-dumps).\n'+
-    '3. PRESERVE REGISTER ACROSS LANGUAGES. If the source is colloquial, all four translations must be colloquial (e.g. "tío" → EN "mate"/"bloke", FR "mec", IT "raga" — NOT "uncle"). If formal, all four formal (e.g. "domicilio" → EN "place of residence", NOT "house"). Slang stays slang. Vulgar stays vulgar.\n'+
-    '4. AVOID FALSE FRIENDS. Be alert to classic traps: FR "supporter" = tolerate, NOT support emotionally; ES "embarazada" = pregnant, NOT embarrassed; IT "fattoria" = farm, NOT factory; UK "магазин" (mahazyn) = shop, NOT magazine. Choose the meaning the source actually carries, not the lookalike. Also: do NOT default to Russian cognates for Ukrainian — use genuine Ukrainian vocabulary (e.g. "thank you" is "дякую" NOT "спасибі"; "hello" is "привіт" NOT "здравствуйте"; "but" is "але" NOT "но").\n'+
+    '3. PRESERVE REGISTER ACROSS LANGUAGES. If the source is colloquial, all target translations must be colloquial (e.g. "tío" → EN "mate"/"bloke", FR "mec", IT "raga" — NOT "uncle"). If formal, all formal (e.g. "domicilio" → EN "place of residence", NOT "house"). Slang stays slang. Vulgar stays vulgar.\n'+
+    '4. AVOID FALSE FRIENDS. Be alert to classic traps: FR "supporter" = tolerate, NOT support emotionally; ES "embarazada" = pregnant, NOT embarrassed; IT "fattoria" = farm, NOT factory; UK "магазин" (mahazyn) = shop, NOT magazine; HU "gimnázium" = secondary school, NOT gym. Choose the meaning the source actually carries, not the lookalike. Also: do NOT default to Russian cognates for Ukrainian — use genuine Ukrainian vocabulary (e.g. "thank you" is "дякую" NOT "спасибі"; "hello" is "привіт" NOT "здравствуйте"; "but" is "але" NOT "но").\n'+
     '5. SYNONYMS MUST BE SUBSTITUTABLE. Each synonym should be swappable into your example sentence with minimal rewording and the same register. Reject loosely-related words. 2-3 strong synonyms beats 3 weak ones; empty array is acceptable.\n'+
-    '6. EXAMPLES MUST SOUND SPOKEN, NOT TRANSLATED. Each example should read as something a native would naturally say or write — not a mirror of the English sentence in another language. Vary sentence structures across the five languages.\n'+
+    '6. EXAMPLES MUST SOUND SPOKEN, NOT TRANSLATED. Each example should read as something a native would naturally say or write — not a mirror of the English sentence in another language. Vary sentence structures across the six languages.\n'+
     '\nIPA DETAILS:\n'+
     '- English (r) rule: mark (r) only where RP drops it — word-finally (car, water, here) and pre-consonantally (stubborn, hurt). Do NOT mark (r) when followed by a vowel within the word (very, around, carry).\n'+
     '- Italian: ALWAYS double consonants in IPA where the spelling doubles them (acqua /ˈakkwa/, sopportare /sopporˈtaːre/, bello /ˈbɛllo/). Use length mark ː on stressed open syllables.\n'+
@@ -629,9 +636,10 @@ async function lookup() {
     '- French: nasals /ɑ̃ ɛ̃ ɔ̃ œ̃/ where applicable. Use /ʁ/ for r. Mark liaison only if naturally pronounced.\n'+
     '\nSIMPLIFIED PHONETICS: write so a Spanish/Italian/French speaker reading it as English letters produces a recognisable approximation. Use AH (father), EH (bed), EE (see), OH (go), OO (food), UH (sun), AY (day), OW (cow), OY (boy), AIR (hair). For French nasals use AHN/OHN/AN. For Ukrainian, use Y as in "yes" for й/palatalisation (DYAH-koo-yoo for дякую), and KH for х (as in Scottish "loch"). For very long phrases (5+ syllables), it is acceptable to simplify only the trickiest words rather than every syllable — clarity beats completeness.\n'+
     '\nUKRAINIAN-SPECIFIC: write the phrase in Cyrillic script (NOT transliterated Latin). Use Ukrainian orthography with і, ї, є, ґ where appropriate. Idioms should be genuinely Ukrainian — e.g. "break a leg" → "ні пуху, ні пера" (literally "neither down nor feather"); "it\'s raining cats and dogs" → "ллє як з відра". If no idiomatic equivalent exists, give the most natural neutral phrasing rather than a calque.\n'+
+    '\nHUNGARIAN-SPECIFIC: Hungarian is agglutinative and unrelated to Indo-European languages — be extra cautious with natural equivalents. Use correct diacritics (á é í ó ö ő ú ü ű). Remember vowel harmony — suffixes match the vowel class of the stem (back: -ban, -nak, -ról; front: -ben, -nek, -ről). Idioms should be genuinely Hungarian — e.g. "it\'s raining cats and dogs" → "úgy esik, mintha dézsából öntenék" (literally "as if pouring from a tub"); "to pull someone\'s leg" → "viccből mond"/"ugratja" (depending on register). Prefer idiomatic Hungarian word order (topic-focus structure) over a literal English mirror.\n'+
     '\nRules: natural register, complete sentences, accurate IPA, raw JSON only.\n'+
     'EVERY language object MUST include ALL of these fields: phrase, pos, register, ipa, simplified, example, synonyms. The "definition" field is the ONLY optional one (source language only). Do not omit ipa or simplified under any circumstances — they are required for every card.\n'+
-    'Shape: {"en":{"phrase":"...","pos":"...","register":"neutral","ipa":"...","simplified":"...","example":"...","synonyms":[],"definition":"... (ONLY on source-language object)"},"es":{...},"it":{...},"fr":{...},"uk":{...}}';
+    'Shape: {"en":{"phrase":"...","pos":"...","register":"neutral","ipa":"...","simplified":"...","example":"...","synonyms":[],"definition":"... (ONLY on source-language object)"},"es":{...},"it":{...},"fr":{...},"uk":{...},"hu":{...}}';
 
   try {
     var resp = await fetch('https://api.anthropic.com/v1/messages', {
@@ -660,7 +668,7 @@ async function lookup() {
     var sseBuffer = '';
     var jsonBuffer = '';
     var renderedLangs = {};
-    var langOrder = ['en','es','it','fr','uk'];
+    var langOrder = ['en','es','it','fr','uk','hu'];
     var firstCardRendered = false;
 
     function tryExtractCompleteObjects() {
@@ -849,7 +857,7 @@ function renderLog() {
 
     var langs = document.createElement('div');
     langs.className = 'log-langs';
-    ['en','es','it','fr','uk'].forEach(function(l) {
+    ['en','es','it','fr','uk','hu'].forEach(function(l) {
       var t = e.translations[l]; if (!t) return;
       var item = document.createElement('span');
       item.className = 'log-lang-item ll-'+l;
@@ -887,7 +895,7 @@ function copyLog() {
     var lvl = e.level ? ' ['+e.level.toUpperCase()+']' : '';
     var star = e.starred ? ' ⭐' : '';
     lines.push(e.word+lvl+star+'  ('+e.time+')');
-    ['en','es','it','fr','uk'].forEach(function(l) {
+    ['en','es','it','fr','uk','hu'].forEach(function(l) {
       var t = e.translations[l];
       if (t) lines.push('  '+LANGS[l].flag+' '+t.phrase+'  ['+( t.register||'')+']  ('+( t.pos||'')+')  — '+stripTags(t.example||''));
     });
@@ -910,10 +918,11 @@ function downloadCSV() {
     'ES phrase','ES pos','ES register','ES example',
     'IT phrase','IT pos','IT register','IT example',
     'FR phrase','FR pos','FR register','FR example',
-    'UK phrase','UK pos','UK register','UK example']];
+    'UK phrase','UK pos','UK register','UK example',
+    'HU phrase','HU pos','HU register','HU example']];
   filtered.forEach(function(e) {
     var row = [e.time,e.word,e.starred?'yes':'',e.note||'',LANGS[e.srcLang]?LANGS[e.srcLang].label:e.srcLang];
-    ['en','es','it','fr','uk'].forEach(function(l) {
+    ['en','es','it','fr','uk','hu'].forEach(function(l) {
       var t = e.translations[l];
       row.push(t?t.phrase:'', t?t.pos||'':'', t?t.register||'':'', t?stripTags(t.example||''):'');
     });
