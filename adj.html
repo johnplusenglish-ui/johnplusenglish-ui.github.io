@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adjective Database Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#F7F6F3;--card:#fff;--ink:#2D3047;--muted:#7A7D8E;--border:#E8E5DF;
+  --lavender:#9B72CF;--coral:#FF6B6B;--sea:#1DD3B0;--sky:#2176FF;--amber:#FFB347;
+  --green:#16A34A;--orange:#D97706;--gray:#9CA3AF;
+  --c-common:#16A34A;--c-somewhat:#D97706;--c-less:#9CA3AF;--c-unset:#CBD5E1;
+  --radius:10px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased}
+
+/* TOPBAR */
+.topbar{position:sticky;top:0;z-index:100;background:rgba(247,246,243,.95);backdrop-filter:blur(12px);border-bottom:1.5px solid var(--border);padding:.7rem 1.5rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+.topbar-title{font-weight:800;font-size:1rem;color:var(--ink)}
+.topbar-title span{color:var(--lavender)}
+.stats{display:flex;gap:.6rem;flex-wrap:wrap}
+.stat-pill{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:500;padding:.3rem .7rem;border-radius:20px;display:inline-flex;align-items:center;gap:.35rem}
+.stat-pill.all{background:#EEE8F8;color:#6B46A0}
+.stat-pill.common{background:#DCFCE7;color:#166534}
+.stat-pill.somewhat{background:#FEF3C7;color:#92400E}
+.stat-pill.less{background:#F1F5F9;color:#475569}
+.stat-pill.deleted{background:#FEE2E2;color:#991B1B}
+.stat-pill .dot{width:7px;height:7px;border-radius:50%}
+
+.topbar-right{display:flex;gap:.5rem;margin-left:auto;flex-wrap:wrap}
+.btn{font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:700;padding:.45rem .9rem;border-radius:8px;cursor:pointer;border:1.5px solid;transition:all .15s}
+.btn-export{background:var(--lavender);border-color:var(--lavender);color:#fff}
+.btn-export:hover{filter:brightness(.9)}
+.btn-reset{background:var(--card);border-color:var(--border);color:var(--muted)}
+.btn-reset:hover{border-color:var(--ink);color:var(--ink)}
+.btn-show-deleted{background:var(--card);border-color:#FCA5A5;color:#DC2626;font-size:.78rem}
+
+/* FILTERS */
+.filters{padding:.6rem 1.5rem;background:var(--card);border-bottom:1.5px solid var(--border);display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
+.filter-btn{font-size:.8rem;font-weight:600;padding:.35rem .8rem;border-radius:20px;border:1.5px solid var(--border);background:var(--cream);color:var(--muted);cursor:pointer;transition:all .15s}
+.filter-btn:hover{border-color:var(--ink);color:var(--ink)}
+.filter-btn.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.filter-btn.f-common.on{background:var(--c-common);border-color:var(--c-common);color:#fff}
+.filter-btn.f-somewhat.on{background:var(--c-somewhat);border-color:var(--c-somewhat);color:#fff}
+.filter-btn.f-less.on{background:var(--c-less);border-color:var(--c-less);color:#fff}
+.filter-btn.f-unset.on{background:#64748B;border-color:#64748B;color:#fff}
+.search{font-family:'Outfit',sans-serif;font-size:.88rem;padding:.38rem .8rem .38rem 2rem;border:1.5px solid var(--border);border-radius:8px;background:var(--cream);color:var(--ink);outline:none;width:200px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238E99A8' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:.55rem center;transition:border-color .2s}
+.search:focus{border-color:var(--lavender)}
+.cat-select{font-family:'Outfit',sans-serif;font-size:.82rem;padding:.38rem .7rem;border:1.5px solid var(--border);border-radius:8px;background:var(--cream);color:var(--ink);cursor:pointer;outline:none}
+.cat-select:focus{border-color:var(--lavender)}
+.filters-count{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted);margin-left:auto}
+
+/* BULK ACTIONS */
+.bulk-bar{padding:.5rem 1.5rem;background:#F8F7FF;border-bottom:1.5px solid #DDD6FE;display:none;align-items:center;gap:.6rem;flex-wrap:wrap}
+.bulk-bar.show{display:flex}
+.bulk-label{font-size:.82rem;font-weight:600;color:var(--lavender)}
+.bulk-btn{font-size:.78rem;font-weight:700;padding:.32rem .75rem;border-radius:6px;border:1.5px solid;cursor:pointer;transition:all .15s}
+.bulk-common{background:#DCFCE7;border-color:#86EFAC;color:#166534}
+.bulk-common:hover{background:#BBF7D0}
+.bulk-somewhat{background:#FEF3C7;border-color:#FCD34D;color:#92400E}
+.bulk-somewhat:hover{background:#FDE68A}
+.bulk-less{background:#F1F5F9;border-color:#CBD5E1;color:#475569}
+.bulk-less:hover{background:#E2E8F0}
+.bulk-delete{background:#FEE2E2;border-color:#FCA5A5;color:#991B1B}
+.bulk-delete:hover{background:#FECACA}
+.bulk-clear{background:var(--card);border-color:var(--border);color:var(--muted);font-size:.75rem}
+
+/* GRID */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.7rem;padding:1rem 1.5rem 3rem}
+
+/* CARD */
+.adj-card{background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:.8rem 1rem;cursor:pointer;transition:border-color .15s,transform .1s;position:relative;user-select:none}
+.adj-card:hover{transform:translateY(-1px)}
+.adj-card.selected{outline:2px solid var(--lavender);outline-offset:1px}
+.adj-card.deleted{opacity:.35;filter:grayscale(1);pointer-events:none}
+
+.adj-card.fc-common{border-color:var(--c-common);background:#F0FDF4}
+.adj-card.fc-somewhat{border-color:var(--c-somewhat);background:#FFFBEB}
+.adj-card.fc-less{border-color:var(--c-less);background:#F8FAFC}
+.adj-card.fc-unset{border-color:var(--c-unset)}
+
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:.4rem;margin-bottom:.35rem}
+.card-word{font-weight:800;font-size:.98rem;color:var(--ink);line-height:1.2}
+.card-type{font-family:'JetBrains Mono',monospace;font-size:.65rem;font-weight:500;padding:.15rem .5rem;border-radius:4px;flex-shrink:0}
+.card-type.gradable{background:#EEE8F8;color:#6B46A0}
+.card-type.strong{background:#FEE2E2;color:#991B1B}
+.card-type.nongrad{background:#E0F2FE;color:#075985}
+
+.card-def{font-size:.8rem;color:var(--muted);margin-bottom:.4rem;line-height:1.4;font-style:italic}
+.card-cat{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--muted);margin-bottom:.5rem}
+
+.freq-btns{display:flex;gap:.3rem;margin-top:.45rem}
+.freq-btn{flex:1;font-size:.7rem;font-weight:700;padding:.3rem .2rem;border-radius:5px;border:1.5px solid;cursor:pointer;text-align:center;transition:all .12s;font-family:'Outfit',sans-serif}
+.freq-btn.fb-common{border-color:#86EFAC;color:#166534;background:transparent}
+.freq-btn.fb-common:hover,.freq-btn.fb-common.active{background:#DCFCE7;border-color:var(--c-common)}
+.freq-btn.fb-somewhat{border-color:#FCD34D;color:#92400E;background:transparent}
+.freq-btn.fb-somewhat:hover,.freq-btn.fb-somewhat.active{background:#FEF3C7;border-color:var(--c-somewhat)}
+.freq-btn.fb-less{border-color:#CBD5E1;color:#475569;background:transparent}
+.freq-btn.fb-less:hover,.freq-btn.fb-less.active{background:#F1F5F9;border-color:var(--c-less)}
+
+.delete-btn{position:absolute;top:.5rem;right:.5rem;width:22px;height:22px;border-radius:50%;border:1.5px solid var(--border);background:var(--cream);color:var(--muted);font-size:.75rem;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s}
+.adj-card:hover .delete-btn{opacity:1}
+.delete-btn:hover{background:#FEE2E2;border-color:#FCA5A5;color:#DC2626}
+
+.card-check{position:absolute;top:.5rem;left:.5rem;width:18px;height:18px;border-radius:4px;border:1.5px solid var(--border);background:var(--cream);display:flex;align-items:center;justify-content:center;transition:all .15s;font-size:.7rem}
+.adj-card.selected .card-check{background:var(--lavender);border-color:var(--lavender);color:#fff}
+
+/* EXPORT MODAL */
+.modal-backdrop{position:fixed;inset:0;background:rgba(45,48,71,.5);z-index:1000;display:none;align-items:center;justify-content:center;padding:1rem}
+.modal-backdrop.open{display:flex}
+.modal{background:var(--card);border-radius:14px;max-width:700px;width:100%;max-height:85vh;display:flex;flex-direction:column;overflow:hidden}
+.modal-head{padding:1.2rem 1.5rem;border-bottom:1.5px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-weight:800;font-size:1.1rem}
+.modal-close{font-size:1.2rem;cursor:pointer;color:var(--muted);background:none;border:none;line-height:1}
+.modal-body{padding:1.2rem 1.5rem;overflow-y:auto;flex:1}
+.modal-body p{font-size:.88rem;color:var(--muted);margin-bottom:.75rem;line-height:1.5}
+.modal-body textarea{width:100%;font-family:'JetBrains Mono',monospace;font-size:.72rem;padding:.75rem;border:1.5px solid var(--border);border-radius:8px;background:#F8F7FF;color:var(--ink);resize:none;height:320px;outline:none}
+.modal-foot{padding:1rem 1.5rem;border-top:1.5px solid var(--border);display:flex;gap:.5rem;justify-content:flex-end}
+
+/* DELETED PANEL */
+.deleted-panel{background:#FFF5F5;border-top:1.5px solid #FCA5A5;padding:1rem 1.5rem;display:none}
+.deleted-panel.show{display:block}
+.deleted-panel-title{font-size:.82rem;font-weight:700;color:#DC2626;margin-bottom:.6rem}
+.deleted-chips{display:flex;flex-wrap:wrap;gap:.4rem}
+.deleted-chip{font-size:.75rem;padding:.25rem .6rem;background:#FEE2E2;border:1px solid #FCA5A5;border-radius:20px;color:#991B1B;display:flex;align-items:center;gap:.35rem;cursor:pointer}
+.deleted-chip:hover{background:#FECACA}
+.deleted-chip span{font-size:.65rem;opacity:.7}
+
+.empty-state{grid-column:1/-1;text-align:center;padding:3rem;color:var(--muted);font-style:italic}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-title">Adj <span>Builder</span></div>
+  <div class="stats">
+    <span class="stat-pill all">&#9632; <span id="s-total">0</span> total</span>
+    <span class="stat-pill common"><span class="dot" style="background:var(--c-common)"></span> <span id="s-common">0</span> common</span>
+    <span class="stat-pill somewhat"><span class="dot" style="background:var(--c-somewhat)"></span> <span id="s-somewhat">0</span> somewhat</span>
+    <span class="stat-pill less"><span class="dot" style="background:var(--c-less)"></span> <span id="s-less">0</span> less</span>
+    <span class="stat-pill deleted"><span class="dot" style="background:#DC2626"></span> <span id="s-deleted">0</span> deleted</span>
+  </div>
+  <div class="topbar-right">
+    <button class="btn btn-show-deleted" onclick="toggleDeleted()">Show deleted</button>
+    <button class="btn btn-reset" onclick="resetAll()">Reset all</button>
+    <button class="btn btn-export" onclick="openExport()">Export JSON</button>
+  </div>
+</div>
+
+<div class="filters">
+  <button class="filter-btn on" data-f="all" onclick="setFilter('all',this)">All</button>
+  <button class="filter-btn f-unset" data-f="unset" onclick="setFilter('unset',this)">Unset</button>
+  <button class="filter-btn f-common" data-f="common" onclick="setFilter('common',this)">Common</button>
+  <button class="filter-btn f-somewhat" data-f="somewhat" onclick="setFilter('somewhat',this)">Somewhat</button>
+  <button class="filter-btn f-less" data-f="less" onclick="setFilter('less',this)">Less common</button>
+  <select class="cat-select" id="catFilter" onchange="render()">
+    <option value="all">All categories</option>
+  </select>
+  <select class="cat-select" id="typeFilter" onchange="render()">
+    <option value="all">All types</option>
+    <option value="gradable">Gradable</option>
+    <option value="strong">Strong</option>
+    <option value="nongrad">Non-gradable</option>
+  </select>
+  <input class="search" id="searchBox" placeholder="Search..." oninput="render()">
+  <span class="filters-count" id="filterCount"></span>
+</div>
+
+<div class="bulk-bar" id="bulkBar">
+  <span class="bulk-label" id="bulkLabel">0 selected</span>
+  <button class="bulk-btn bulk-common" onclick="bulkSet('common')">Common</button>
+  <button class="bulk-btn bulk-somewhat" onclick="bulkSet('somewhat')">Somewhat</button>
+  <button class="bulk-btn bulk-less" onclick="bulkSet('less')">Less common</button>
+  <button class="bulk-btn bulk-delete" onclick="bulkDelete()">Delete</button>
+  <button class="bulk-btn bulk-clear" onclick="clearSelection()">Clear selection</button>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<div class="deleted-panel" id="deletedPanel">
+  <div class="deleted-panel-title">Deleted adjectives — click to restore</div>
+  <div class="deleted-chips" id="deletedChips"></div>
+</div>
+
+<!-- EXPORT MODAL -->
+<div class="modal-backdrop" id="exportModal" onclick="if(event.target===this)closeExport()">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="modal-title">Export JSON</span>
+      <button class="modal-close" onclick="closeExport()">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <p>Copy this into the <code>ADJ_DATA</code> array in <strong>adjectives.html</strong>. Only non-deleted adjectives are included. Frequency field added: <code>"freq":"common"</code> / <code>"somewhat"</code> / <code>"less"</code>.</p>
+      <textarea id="exportText" readonly onclick="this.select()"></textarea>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-reset" onclick="closeExport()">Close</button>
+      <button class="btn btn-export" onclick="copyExport()">Copy to clipboard</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── MASTER DATA ─────────────────────────────────────────────────────────────
+// type: gradable | strong | nongrad
+// freq: unset | common | somewhat | less
+const MASTER = [
+// EMOTIONS: Happiness
+{word:"thrilled",type:"strong",gradable:"happy",cat:"happiness",def:"Extremely pleased and excited",ex:"She was thrilled to hear the news.",prep:"about/with",coll:"absolutely thrilled, thrilled to bits"},
+{word:"elated",type:"strong",gradable:"happy",cat:"happiness",def:"Ecstatically happy, usually from achievement",ex:"The team was elated after the win.",prep:"by/at",coll:"absolutely elated"},
+{word:"overjoyed",type:"strong",gradable:"happy",cat:"happiness",def:"Extremely happy at unexpected good news",ex:"She was overjoyed at the birth of her grandchild.",coll:"absolutely overjoyed"},
+{word:"delighted",type:"strong",gradable:"happy",cat:"happiness",def:"Very pleased; slightly more formal than happy",ex:"We are delighted to announce the programme.",prep:"with/at",coll:"absolutely delighted"},
+{word:"ecstatic",type:"strong",gradable:"happy",cat:"happiness",def:"Overwhelmingly happy; often used informally as hyperbole",ex:"She was ecstatic when she got the job.",coll:"absolutely ecstatic"},
+{word:"stoked",type:"gradable",cat:"happiness",def:"Very excited or pleased; informal/slang",ex:"I'm so stoked about the festival.",coll:"really stoked"},
+{word:"buzzing",type:"gradable",cat:"happiness",def:"Excited and full of energy; British informal",ex:"The crowd was absolutely buzzing.",coll:"absolutely buzzing"},
+{word:"chuffed",type:"gradable",cat:"happiness",def:"Very pleased with yourself; British informal",ex:"He was dead chuffed when he passed.",coll:"dead chuffed, well chuffed"},
+{word:"over the moon",type:"strong",gradable:"happy",cat:"happiness",def:"Extremely happy; common British expression",ex:"She was over the moon about the news.",coll:"absolutely over the moon"},
+{word:"pumped",type:"gradable",cat:"happiness",def:"Very excited and full of energy; informal",ex:"We're pumped for the game tonight.",coll:"really pumped, pumped up"},
+{word:"hyped",type:"gradable",cat:"happiness",def:"Very excited; informal/slang",ex:"Everyone's hyped about the new series.",coll:"really hyped, hyped up"},
+{word:"gassed",type:"gradable",cat:"happiness",def:"Very excited or pleased; British slang",ex:"I'm absolutely gassed about this.",coll:"absolutely gassed"},
+{word:"made up",type:"gradable",cat:"happiness",def:"Very pleased; Northern British informal",ex:"I'm made up for you, mate.",coll:"dead made up"},
+// EMOTIONS: Sadness
+{word:"devastated",type:"strong",gradable:"sad",cat:"sadness",def:"Extremely upset by unexpected loss or failure",ex:"He was absolutely devastated when she left.",prep:"by/at",coll:"absolutely devastated"},
+{word:"heartbroken",type:"strong",gradable:"sad",cat:"sadness",def:"Overwhelmed by grief, especially from lost love",ex:"She was heartbroken after the breakup.",coll:"absolutely heartbroken"},
+{word:"distraught",type:"strong",gradable:"sad",cat:"sadness",def:"Extremely upset and visibly distressed",ex:"The parents were distraught at the news.",coll:"absolutely distraught"},
+{word:"melancholy",type:"gradable",cat:"sadness",def:"Pensive sadness; more literary in register",ex:"She felt a deep melancholy as winter set in.",coll:"deeply melancholy"},
+{word:"gutted",type:"strong",gradable:"sad",cat:"sadness",def:"Extremely disappointed; British informal",ex:"I'm absolutely gutted we lost.",coll:"absolutely gutted"},
+{word:"deflated",type:"gradable",cat:"sadness",def:"Suddenly less confident or happy",ex:"He felt deflated after the rejection.",coll:"a bit deflated"},
+{word:"despondent",type:"gradable",cat:"sadness",def:"In low spirits from loss of hope",ex:"She became despondent after months of rejection.",prep:"about",coll:"deeply despondent"},
+{word:"miserable",type:"gradable",cat:"sadness",def:"Very unhappy or uncomfortable",ex:"He looked absolutely miserable in the rain.",coll:"absolutely miserable, utterly miserable"},
+{word:"wretched",type:"strong",gradable:"sad",cat:"sadness",def:"Deeply unhappy or in poor condition",ex:"She felt wretched after hearing the news.",coll:"absolutely wretched"},
+// EMOTIONS: Anger
+{word:"furious",type:"strong",gradable:"angry",cat:"anger",def:"Extremely angry",ex:"She was absolutely furious when she found out.",prep:"at/with",coll:"absolutely furious, furious at/with"},
+{word:"livid",type:"strong",gradable:"angry",cat:"anger",def:"Extremely angry; slightly more formal",ex:"He was livid about the decision.",prep:"about/with",coll:"absolutely livid"},
+{word:"outraged",type:"strong",gradable:"angry",cat:"anger",def:"Very angry because of something unfair",ex:"The public was outraged by the verdict.",prep:"by/at",coll:"deeply outraged"},
+{word:"irritated",type:"gradable",cat:"anger",def:"Mildly annoyed",ex:"She was irritated by the constant interruptions.",prep:"by/at",coll:"mildly irritated"},
+{word:"seething",type:"strong",gradable:"angry",cat:"anger",def:"Extremely angry but often holding it in",ex:"He was seething with rage.",coll:"absolutely seething"},
+{word:"irate",type:"strong",gradable:"angry",cat:"anger",def:"Very angry; more formal register",ex:"Irate customers flooded the phone lines.",coll:"absolutely irate"},
+{word:"fuming",type:"strong",gradable:"angry",cat:"anger",def:"Extremely angry; very informal",ex:"She was absolutely fuming.",coll:"absolutely fuming"},
+{word:"wound up",type:"gradable",cat:"anger",def:"Agitated or angry; British informal",ex:"He got really wound up about it.",coll:"really wound up, wound up about"},
+{word:"narked",type:"gradable",cat:"anger",def:"Annoyed or irritated; British informal",ex:"She was a bit narked that nobody called.",coll:"a bit narked"},
+{word:"aggravated",type:"gradable",cat:"anger",def:"Irritated or made worse",ex:"He was aggravated by the constant noise.",prep:"by",coll:"really aggravated"},
+// EMOTIONS: Fear
+{word:"terrified",type:"strong",gradable:"scared",cat:"fear",def:"Extremely scared",ex:"She was absolutely terrified of the dark.",prep:"of",coll:"absolutely terrified, terrified of"},
+{word:"petrified",type:"strong",gradable:"scared",cat:"fear",def:"So scared you cannot move; informal",ex:"He was petrified before the speech.",prep:"of",coll:"absolutely petrified"},
+{word:"apprehensive",type:"gradable",cat:"fear",def:"Slightly anxious about what might happen",ex:"She felt apprehensive about the interview.",prep:"about",coll:"mildly apprehensive"},
+{word:"on edge",type:"gradable",cat:"fear",def:"Nervous and unable to relax",ex:"He's been really on edge all week.",coll:"really on edge"},
+{word:"jumpy",type:"gradable",cat:"fear",def:"Easily startled; nervous",ex:"She's been really jumpy since the accident.",coll:"a bit jumpy"},
+{word:"spooked",type:"gradable",cat:"fear",def:"Frightened or startled; informal",ex:"The noise really spooked me.",coll:"really spooked, totally spooked"},
+// EMOTIONS: Surprise
+{word:"astonished",type:"strong",gradable:"surprised",cat:"surprise",def:"Extremely surprised; stronger than amazed",ex:"I was absolutely astonished by the revelation.",prep:"by/at",coll:"absolutely astonished"},
+{word:"astounded",type:"strong",gradable:"surprised",cat:"surprise",def:"Extremely surprised by scale or degree",ex:"She was astounded by the number of volunteers.",prep:"by/at",coll:"absolutely astounded"},
+{word:"flabbergasted",type:"strong",gradable:"surprised",cat:"surprise",def:"Extremely surprised; very informal",ex:"He was flabbergasted when he heard the price.",coll:"absolutely flabbergasted"},
+{word:"gobsmacked",type:"strong",gradable:"surprised",cat:"surprise",def:"Completely shocked and surprised; British informal",ex:"I was absolutely gobsmacked.",coll:"absolutely gobsmacked"},
+{word:"taken aback",type:"gradable",cat:"surprise",def:"Surprised and disconcerted",ex:"I was a bit taken aback by her reaction.",coll:"a bit taken aback, quite taken aback"},
+{word:"mind-blown",type:"strong",gradable:"surprised",cat:"surprise",def:"Extremely amazed; informal/slang",ex:"The ending left me completely mind-blown.",coll:"absolutely mind-blown"},
+// EMOTIONS: Embarrassment
+{word:"mortified",type:"strong",gradable:"embarrassed",cat:"embarrassment",def:"Extremely embarrassed; strong social shame",ex:"She was mortified when she tripped on stage.",coll:"absolutely mortified"},
+{word:"humiliated",type:"strong",gradable:"embarrassed",cat:"embarrassment",def:"Made to feel foolish in front of others",ex:"He felt humiliated by the public criticism.",prep:"by",coll:"deeply humiliated"},
+{word:"cringe-worthy",type:"gradable",cat:"embarrassment",def:"Causing embarrassment or discomfort; informal",ex:"That was absolutely cringe-worthy.",coll:"absolutely cringe-worthy"},
+// EMOTIONS: Anxiety / Stress
+{word:"anxious",type:"gradable",cat:"anxiety",def:"Worried and nervous",ex:"She felt anxious about the results.",prep:"about",coll:"deeply anxious, incredibly anxious"},
+{word:"stressed",type:"gradable",cat:"anxiety",def:"Under mental or emotional pressure",ex:"She's been really stressed this week.",prep:"about",coll:"really stressed, massively stressed"},
+{word:"overwhelmed",type:"strong",gradable:"stressed",cat:"anxiety",def:"Buried by too much to cope with",ex:"She felt completely overwhelmed by the workload.",coll:"completely overwhelmed, totally overwhelmed"},
+{word:"frazzled",type:"strong",gradable:"stressed",cat:"anxiety",def:"Completely exhausted by stress; informal",ex:"I'm absolutely frazzled after that week.",coll:"absolutely frazzled, completely frazzled"},
+{word:"burnt out",type:"strong",gradable:"tired",cat:"anxiety",def:"Completely exhausted from overwork",ex:"She was totally burnt out by the end of term.",coll:"totally burnt out, completely burnt out"},
+{word:"run down",type:"gradable",cat:"anxiety",def:"Tired and unwell from overwork",ex:"I've been feeling a bit run down lately.",coll:"a bit run down"},
+// EMOTIONS: Excitement / Energy
+{word:"eager",type:"gradable",cat:"enthusiasm",def:"Keen and enthusiastic; willing to do something",ex:"She was eager to start the new project.",prep:"to/for",coll:"incredibly eager, eagerly awaited"},
+{word:"enthusiastic",type:"gradable",cat:"enthusiasm",def:"Having or showing intense interest",ex:"The students were enthusiastic about the trip.",prep:"about",coll:"genuinely enthusiastic, wildly enthusiastic"},
+{word:"passionate",type:"gradable",cat:"enthusiasm",def:"Having strong feelings about something",ex:"She's incredibly passionate about environmental issues.",prep:"about",coll:"incredibly passionate"},
+{word:"fired up",type:"gradable",cat:"enthusiasm",def:"Very enthusiastic and energised; informal",ex:"He's really fired up about this project.",coll:"really fired up"},
+{word:"amped",type:"gradable",cat:"enthusiasm",def:"Very excited or energised; informal/slang",ex:"The crowd was amped up after the announcement.",coll:"really amped, amped up"},
+{word:"psyched",type:"gradable",cat:"enthusiasm",def:"Very excited or mentally prepared; informal",ex:"I'm totally psyched for the concert.",coll:"totally psyched, psyched up"},
+// PHYSICAL: Tiredness
+{word:"exhausted",type:"strong",gradable:"tired",cat:"tiredness",def:"Completely tired out",ex:"By midnight I was utterly exhausted.",prep:"by",coll:"utterly exhausted, physically exhausted"},
+{word:"shattered",type:"strong",gradable:"tired",cat:"tiredness",def:"Completely exhausted; British informal",ex:"After the marathon, he was shattered.",coll:"absolutely shattered"},
+{word:"drained",type:"strong",gradable:"tired",cat:"tiredness",def:"Emptied of energy, often emotionally too",ex:"She felt completely drained after the argument.",coll:"emotionally drained, mentally drained"},
+{word:"knackered",type:"strong",gradable:"tired",cat:"tiredness",def:"Extremely tired; British informal",ex:"I'm absolutely knackered.",coll:"absolutely knackered"},
+{word:"wrecked",type:"strong",gradable:"tired",cat:"tiredness",def:"Completely exhausted; informal",ex:"I was totally wrecked after that shift.",coll:"totally wrecked, absolutely wrecked"},
+{word:"dead on your feet",type:"strong",gradable:"tired",cat:"tiredness",def:"So tired you can barely stand",ex:"By 10pm she was dead on her feet.",coll:"absolutely dead on your feet"},
+{word:"lethargic",type:"gradable",cat:"tiredness",def:"Lacking energy or enthusiasm",ex:"She felt lethargic after the illness.",coll:"deeply lethargic"},
+{word:"sluggish",type:"gradable",cat:"tiredness",def:"Slow and lethargic",ex:"He felt sluggish after a heavy lunch.",coll:"a bit sluggish"},
+{word:"groggy",type:"gradable",cat:"tiredness",def:"Dazed and weak, typically from sleep or illness",ex:"She was still groggy when the alarm went off.",coll:"a bit groggy"},
+// PHYSICAL: Temperature
+{word:"freezing",type:"strong",gradable:"cold",cat:"temperature",def:"Extremely cold",ex:"It was absolutely freezing last night.",coll:"absolutely freezing"},
+{word:"boiling",type:"strong",gradable:"hot",cat:"temperature",def:"Extremely hot; informal",ex:"It was boiling in the office.",coll:"absolutely boiling"},
+{word:"sweltering",type:"strong",gradable:"hot",cat:"temperature",def:"Uncomfortably hot; typically describes conditions",ex:"We worked in sweltering heat all afternoon.",coll:"sweltering heat"},
+{word:"scorching",type:"strong",gradable:"hot",cat:"temperature",def:"Extremely hot, especially from the sun",ex:"It was a scorching summer day.",coll:"scorching heat, scorching sun"},
+{word:"chilly",type:"gradable",cat:"temperature",def:"Moderately cold; somewhat uncomfortable",ex:"It's a bit chilly this morning.",coll:"a bit chilly, rather chilly"},
+{word:"nippy",type:"gradable",cat:"temperature",def:"Slightly cold; British informal",ex:"It's a bit nippy out there.",coll:"a bit nippy, rather nippy"},
+// PHYSICAL: Hunger / Appetite
+{word:"starving",type:"strong",gradable:"hungry",cat:"hunger",def:"Extremely hungry; informal hyperbole",ex:"I'm absolutely starving — when's dinner?",coll:"absolutely starving"},
+{word:"ravenous",type:"strong",gradable:"hungry",cat:"hunger",def:"Extremely hungry; slightly more formal",ex:"By 2pm I was ravenous.",coll:"absolutely ravenous"},
+{word:"peckish",type:"gradable",cat:"hunger",def:"Slightly hungry; British informal",ex:"I'm feeling a bit peckish.",coll:"a bit peckish"},
+{word:"famished",type:"strong",gradable:"hungry",cat:"hunger",def:"Very hungry; slightly literary",ex:"After the hike we were famished.",coll:"absolutely famished"},
+// PHYSICAL: Cleanliness
+{word:"filthy",type:"strong",gradable:"dirty",cat:"cleanliness",def:"Extremely dirty; also used to mean very rude",ex:"The flat was absolutely filthy.",coll:"absolutely filthy, filthy rich"},
+{word:"spotless",type:"strong",gradable:"clean",cat:"cleanliness",def:"Completely clean; not a single mark",ex:"The kitchen was spotless.",coll:"absolutely spotless"},
+{word:"immaculate",type:"strong",gradable:"clean",cat:"cleanliness",def:"Perfectly clean and tidy; formal register",ex:"Her work was always immaculate.",coll:"absolutely immaculate"},
+{word:"grubby",type:"gradable",cat:"cleanliness",def:"Quite dirty; informal",ex:"His hands were absolutely grubby.",coll:"absolutely grubby"},
+// SIZE / SCALE
+{word:"enormous",type:"strong",gradable:"big",cat:"size",def:"Extremely large in size or amount",ex:"The enormous crowd filled the stadium.",coll:"absolutely enormous, enormous amount"},
+{word:"massive",type:"strong",gradable:"big",cat:"size",def:"Very large; informal British English",ex:"There was a massive queue outside.",coll:"absolutely massive, massive impact"},
+{word:"colossal",type:"strong",gradable:"big",cat:"size",def:"Of huge scale; often used metaphorically",ex:"It was a colossal waste of time.",coll:"colossal failure, colossal waste"},
+{word:"gigantic",type:"strong",gradable:"big",cat:"size",def:"Of very great size",ex:"A gigantic crane towered over the street.",coll:"absolutely gigantic"},
+{word:"titanic",type:"strong",gradable:"big",cat:"size",def:"Of great size or strength; formal/literary",ex:"A titanic effort was needed.",coll:"titanic effort, titanic struggle"},
+{word:"tiny",type:"gradable",cat:"size",def:"Very small; less formal than minute",ex:"She lived in a tiny flat near the station.",coll:"incredibly tiny, a tiny bit"},
+{word:"minute",type:"gradable",cat:"size",def:"Extremely small; formal; adj pronounced /ˈmaɪnjuːt/",ex:"The difference was minute but significant.",coll:"absolutely minute"},
+{word:"minuscule",type:"gradable",cat:"size",def:"Extremely small in size or amount",ex:"The differences were minuscule.",coll:"absolutely minuscule"},
+{word:"teeny",type:"gradable",cat:"size",def:"Very small; informal/childlike",ex:"Just a teeny bit more, please.",coll:"a teeny bit, teeny tiny"},
+// QUALITY: Positive
+{word:"outstanding",type:"strong",gradable:"good",cat:"quality",def:"Excellent; noticeably above average",ex:"Her performance was outstanding.",coll:"absolutely outstanding"},
+{word:"superb",type:"strong",gradable:"good",cat:"quality",def:"Extremely impressive; slightly formal",ex:"The food was superb.",coll:"absolutely superb"},
+{word:"brilliant",type:"strong",gradable:"good",cat:"quality",def:"Excellent; very common in British informal English",ex:"That was a brilliant idea.",coll:"absolutely brilliant"},
+{word:"flawless",type:"strong",gradable:"good",cat:"quality",def:"Without any mistakes or faults",ex:"Her technique was flawless.",coll:"absolutely flawless"},
+{word:"impeccable",type:"strong",gradable:"good",cat:"quality",def:"Perfectly correct; no faults; formal",ex:"His taste in music is impeccable.",coll:"impeccable taste, impeccable manners"},
+{word:"stellar",type:"strong",gradable:"good",cat:"quality",def:"Excellent; informal; becoming common in British English",ex:"She gave a stellar performance.",coll:"absolutely stellar"},
+{word:"top-notch",type:"strong",gradable:"good",cat:"quality",def:"Of the highest quality; informal",ex:"The service was top-notch.",coll:"absolutely top-notch"},
+{word:"banging",type:"strong",gradable:"good",cat:"quality",def:"Excellent; British informal/slang",ex:"That tune is absolutely banging.",coll:"absolutely banging"},
+{word:"sick",type:"strong",gradable:"good",cat:"quality",def:"Excellent; youth slang",ex:"That trick was sick.",coll:"absolutely sick"},
+{word:"fire",type:"strong",gradable:"good",cat:"quality",def:"Excellent, very good; slang from African American English, now mainstream",ex:"That album is fire.",coll:"straight fire"},
+{word:"lit",type:"strong",gradable:"good",cat:"quality",def:"Excellent or exciting; slang",ex:"That party was absolutely lit.",coll:"absolutely lit"},
+{word:"mad",type:"gradable",cat:"quality",def:"Excellent or very impressive; British youth slang",ex:"That film is mad good.",coll:"mad good, mad skills"},
+{word:"peng",type:"strong",gradable:"good",cat:"quality",def:"Very attractive or good; British slang",ex:"That food was absolutely peng.",coll:"absolutely peng"},
+{word:"lush",type:"gradable",cat:"quality",def:"Very pleasant or attractive; British informal, especially Welsh/Southwest",ex:"That was lush.",coll:"absolutely lush"},
+{word:"sound",type:"gradable",cat:"quality",def:"Good, reliable; British informal",ex:"He's a sound bloke.",coll:"dead sound"},
+{word:"mint",type:"strong",gradable:"good",cat:"quality",def:"Excellent; Northern British slang",ex:"That car is absolutely mint.",coll:"absolutely mint"},
+{word:"wicked",type:"strong",gradable:"good",cat:"quality",def:"Excellent; British informal",ex:"That was wicked.",coll:"absolutely wicked"},
+{word:"ace",type:"strong",gradable:"good",cat:"quality",def:"Excellent; British informal",ex:"That's an ace idea.",coll:"absolutely ace"},
+{word:"cracking",type:"strong",gradable:"good",cat:"quality",def:"Excellent; British informal",ex:"That was a cracking match.",coll:"absolutely cracking"},
+{word:"blinding",type:"strong",gradable:"good",cat:"quality",def:"Excellent; British informal",ex:"He played a blinding game.",coll:"absolutely blinding"},
+{word:"belting",type:"strong",gradable:"good",cat:"quality",def:"Excellent or very strong; British informal",ex:"That was a belting goal.",coll:"absolutely belting"},
+{word:"class",type:"strong",gradable:"good",cat:"quality",def:"Excellent; British/Irish informal",ex:"That is pure class.",coll:"pure class, dead class"},
+{word:"immense",type:"strong",gradable:"good",cat:"quality",def:"Extremely impressive; informal",ex:"That set was absolutely immense.",coll:"absolutely immense"},
+{word:"banger",type:"strong",gradable:"good",cat:"quality",def:"Something excellent, especially a song; informal",ex:"This track is a total banger.",coll:"total banger, absolute banger"},
+// QUALITY: Negative
+{word:"dreadful",type:"strong",gradable:"bad",cat:"quality",def:"Extremely bad; British English",ex:"The weather was absolutely dreadful all week.",coll:"absolutely dreadful"},
+{word:"appalling",type:"strong",gradable:"bad",cat:"quality",def:"Extremely bad; adds moral shock",ex:"The conditions were appalling.",coll:"absolutely appalling"},
+{word:"atrocious",type:"strong",gradable:"bad",cat:"quality",def:"Extremely bad",ex:"The service was atrocious.",coll:"absolutely atrocious"},
+{word:"mediocre",type:"gradable",cat:"quality",def:"Only moderate quality; below average",ex:"The film was mediocre at best.",coll:"rather mediocre"},
+{word:"dire",type:"strong",gradable:"bad",cat:"quality",def:"Extremely bad; British informal",ex:"The situation is absolutely dire.",coll:"absolutely dire"},
+{word:"pants",type:"gradable",cat:"quality",def:"Rubbish, poor quality; British informal",ex:"That film was pants.",coll:"a bit pants, dead pants"},
+{word:"rubbish",type:"gradable",cat:"quality",def:"Of poor quality; British informal",ex:"That idea is absolutely rubbish.",coll:"absolute rubbish"},
+{word:"naff",type:"gradable",cat:"quality",def:"Unfashionable or of poor quality; British informal",ex:"That outfit is a bit naff.",coll:"a bit naff"},
+{word:"dodgy",type:"gradable",cat:"quality",def:"Dishonest, unreliable, or of poor quality; British informal",ex:"That deal sounds a bit dodgy.",coll:"a bit dodgy, rather dodgy"},
+{word:"shoddy",type:"gradable",cat:"quality",def:"Poorly made or done",ex:"The workmanship was shoddy.",coll:"pretty shoddy, absolutely shoddy"},
+// PERSONALITY: Positive
+{word:"tenacious",type:"gradable",cat:"personality",def:"Holding firmly to purpose; persistent",ex:"She was tenacious in pursuing her goals.",coll:"incredibly tenacious"},
+{word:"resilient",type:"gradable",cat:"personality",def:"Able to recover quickly from difficulties",ex:"Children can be remarkably resilient.",coll:"incredibly resilient"},
+{word:"empathetic",type:"gradable",cat:"personality",def:"Able to understand and share others' feelings",ex:"A good teacher needs to be empathetic.",coll:"deeply empathetic"},
+{word:"charismatic",type:"gradable",cat:"personality",def:"Having a compelling charm that inspires others",ex:"She's incredibly charismatic on stage.",coll:"incredibly charismatic, naturally charismatic"},
+{word:"assertive",type:"gradable",cat:"personality",def:"Confidently self-assured; direct",ex:"You need to be more assertive in meetings.",coll:"quietly assertive, professionally assertive"},
+{word:"articulate",type:"gradable",cat:"personality",def:"Able to express ideas fluently and clearly",ex:"She's incredibly articulate under pressure.",coll:"incredibly articulate, very articulate"},
+{word:"perceptive",type:"gradable",cat:"personality",def:"Having good insight; quick to notice things",ex:"He's remarkably perceptive about people.",coll:"remarkably perceptive"},
+{word:"resourceful",type:"gradable",cat:"personality",def:"Able to find solutions in difficult situations",ex:"She's incredibly resourceful under pressure.",coll:"incredibly resourceful"},
+{word:"laid-back",type:"gradable",cat:"personality",def:"Relaxed and easy-going; informal",ex:"He's very laid-back about the whole thing.",coll:"very laid-back, super laid-back"},
+{word:"down-to-earth",type:"gradable",cat:"personality",def:"Practical and realistic; not pretentious",ex:"She's very down-to-earth despite her success.",coll:"very down-to-earth, completely down-to-earth"},
+{word:"grounded",type:"gradable",cat:"personality",def:"Sensible and realistic; mentally stable",ex:"She's stayed very grounded despite the fame.",coll:"very grounded, completely grounded"},
+{word:"genuine",type:"gradable",cat:"personality",def:"Authentic; truly what they appear to be",ex:"He seems genuinely genuine.",coll:"absolutely genuine"},
+// PERSONALITY: Negative
+{word:"arrogant",type:"gradable",cat:"personality",def:"Exaggerated sense of one's own importance",ex:"He came across as arrogant and dismissive.",prep:"about",coll:"deeply arrogant"},
+{word:"condescending",type:"gradable",cat:"personality",def:"Behaving as if superior to others; patronising",ex:"She found his tone condescending.",coll:"deeply condescending"},
+{word:"pretentious",type:"gradable",cat:"personality",def:"Claiming importance or distinction that isn't warranted",ex:"The restaurant feels a bit pretentious.",coll:"a bit pretentious, utterly pretentious"},
+{word:"passive-aggressive",type:"gradable",cat:"personality",def:"Indirectly expressing aggression or negativity",ex:"He's been really passive-aggressive about the whole thing.",coll:"really passive-aggressive"},
+{word:"two-faced",type:"gradable",cat:"personality",def:"Insincere; saying one thing and doing another",ex:"She's completely two-faced.",coll:"completely two-faced, totally two-faced"},
+{word:"self-absorbed",type:"gradable",cat:"personality",def:"Preoccupied with one's own life and concerns",ex:"He's incredibly self-absorbed.",coll:"incredibly self-absorbed"},
+{word:"petty",type:"gradable",cat:"personality",def:"Giving undue importance to trivial matters",ex:"That's a really petty complaint.",coll:"a bit petty, incredibly petty"},
+{word:"toxic",type:"gradable",cat:"personality",def:"Harmful to relationships or wellbeing; modern usage",ex:"That friendship had become really toxic.",coll:"completely toxic, incredibly toxic"},
+{word:"manipulative",type:"gradable",cat:"personality",def:"Controlling others in an unfair or deceptive way",ex:"His behaviour was deeply manipulative.",coll:"deeply manipulative"},
+{word:"extra",type:"gradable",cat:"personality",def:"Over-the-top in behaviour; slang",ex:"She's being so extra right now.",coll:"so extra, a bit extra"},
+// SOCIAL / RELATIONAL
+{word:"awkward",type:"gradable",cat:"social",def:"Causing or feeling embarrassment; not smooth",ex:"That was such an awkward moment.",coll:"really awkward, incredibly awkward"},
+{word:"cringe",type:"gradable",cat:"social",def:"Embarrassing; used adjectivally in informal speech",ex:"That comment was so cringe.",coll:"so cringe, absolutely cringe"},
+{word:"relatable",type:"gradable",cat:"social",def:"Easy to relate to; modern usage",ex:"Her content is so relatable.",coll:"so relatable, incredibly relatable"},
+{word:"iconic",type:"strong",cat:"social",def:"Representative of a moment or culture; modern usage",ex:"That look is iconic.",coll:"absolutely iconic"},
+{word:"legendary",type:"strong",gradable:"impressive",cat:"social",def:"Extremely impressive; informal hyperbole",ex:"That performance was legendary.",coll:"absolutely legendary"},
+{word:"savage",type:"gradable",cat:"social",def:"Impressively harsh or blunt; slang",ex:"That comeback was savage.",coll:"absolutely savage"},
+{word:"shady",type:"gradable",cat:"social",def:"Of doubtful honesty; informal",ex:"Something about his story seems shady.",coll:"a bit shady, pretty shady"},
+{word:"basic",type:"gradable",cat:"social",def:"Unoriginal; mainstream without self-awareness; slang",ex:"That choice is so basic.",coll:"so basic, a bit basic"},
+{word:"clout-chasing",type:"gradable",cat:"social",def:"Seeking attention and social status; slang",ex:"That move was clout-chasing at its worst.",coll:"purely clout-chasing"},
+{word:"cancelled",type:"gradable",cat:"social",def:"Publicly rejected due to problematic behaviour; modern slang",ex:"He's basically cancelled now.",coll:"officially cancelled, totally cancelled"},
+{word:"tone-deaf",type:"gradable",cat:"social",def:"Lacking sensitivity to social or political context",ex:"That advert was completely tone-deaf.",coll:"completely tone-deaf"},
+// INTELLIGENCE / SKILL
+{word:"brilliant",type:"strong",gradable:"clever",cat:"intelligence",def:"Extremely clever; very common in British English",ex:"She's absolutely brilliant at maths.",coll:"absolutely brilliant"},
+{word:"sharp",type:"gradable",cat:"intelligence",def:"Mentally quick and perceptive",ex:"He's razor sharp.",coll:"razor sharp, incredibly sharp"},
+{word:"switched-on",type:"gradable",cat:"intelligence",def:"Alert and mentally quick; British informal",ex:"She's very switched-on for her age.",coll:"very switched-on"},
+{word:"clued-up",type:"gradable",cat:"intelligence",def:"Well informed about something; British informal",ex:"He's very clued-up on the topic.",prep:"on",coll:"very clued-up, clued-up on"},
+{word:"clueless",type:"gradable",cat:"intelligence",def:"Knowing nothing about something; informal",ex:"He's completely clueless about it.",coll:"completely clueless, totally clueless"},
+{word:"ditsy",type:"gradable",cat:"intelligence",def:"Silly and confused; informal",ex:"She can seem ditsy but she's actually sharp.",coll:"a bit ditsy"},
+// APPEARANCE
+{word:"stunning",type:"strong",gradable:"attractive",cat:"appearance",def:"Extremely attractive or impressive",ex:"She looked absolutely stunning.",coll:"absolutely stunning"},
+{word:"gorgeous",type:"strong",gradable:"attractive",cat:"appearance",def:"Very beautiful or attractive",ex:"That dress is gorgeous.",coll:"absolutely gorgeous"},
+{word:"ravishing",type:"strong",gradable:"attractive",cat:"appearance",def:"Extremely beautiful; slightly formal/literary",ex:"She looked ravishing.",coll:"absolutely ravishing"},
+{word:"hot",type:"gradable",cat:"appearance",def:"Sexually attractive; informal",ex:"He's really hot.",coll:"really hot, extremely hot"},
+{word:"fit",type:"gradable",cat:"appearance",def:"Attractive; British informal",ex:"He's well fit.",coll:"well fit, dead fit"},
+{word:"buff",type:"gradable",cat:"appearance",def:"Physically attractive, especially muscular; British informal",ex:"He's absolutely buff.",coll:"absolutely buff"},
+{word:"plain",type:"gradable",cat:"appearance",def:"Not especially attractive; neutral register",ex:"She described herself as plain.",coll:"quite plain, rather plain"},
+{word:"scruffy",type:"gradable",cat:"appearance",def:"Untidy in appearance",ex:"He always looks a bit scruffy.",coll:"a bit scruffy, quite scruffy"},
+{word:"dishevelled",type:"gradable",cat:"appearance",def:"Untidy or disordered in appearance",ex:"She arrived looking dishevelled.",coll:"a bit dishevelled"},
+{word:"dapper",type:"gradable",cat:"appearance",def:"Neat and trim in dress or appearance",ex:"He looked very dapper in his suit.",coll:"very dapper"},
+{word:"slick",type:"gradable",cat:"appearance",def:"Smooth and stylish; informal",ex:"That presentation was really slick.",coll:"really slick, very slick"},
+{word:"sleek",type:"gradable",cat:"appearance",def:"Smooth and elegant in design or appearance",ex:"The car has a really sleek design.",coll:"really sleek, incredibly sleek"},
+// SITUATION / CIRCUMSTANCES
+{word:"dire",type:"strong",gradable:"bad",cat:"situation",def:"Extremely serious or urgent",ex:"The situation is absolutely dire.",coll:"absolutely dire, in dire straits"},
+{word:"grim",type:"gradable",cat:"situation",def:"Very serious or depressing",ex:"The outlook is pretty grim.",coll:"pretty grim, absolutely grim"},
+{word:"bleak",type:"gradable",cat:"situation",def:"Without hope or encouragement",ex:"The future looks increasingly bleak.",coll:"pretty bleak, utterly bleak"},
+{word:"murky",type:"gradable",cat:"situation",def:"Not clear or transparent; figurative use",ex:"The situation is getting murkier.",coll:"a bit murky, rather murky"},
+{word:"chaotic",type:"gradable",cat:"situation",def:"In a state of complete disorder",ex:"The office is absolutely chaotic.",coll:"absolutely chaotic, completely chaotic"},
+{word:"hectic",type:"gradable",cat:"situation",def:"Full of activity and rushed",ex:"It's been an incredibly hectic week.",coll:"incredibly hectic, absolutely hectic"},
+{word:"overwhelming",type:"strong",gradable:"extreme",cat:"situation",def:"Too intense or extensive to handle",ex:"The response was overwhelming.",coll:"absolutely overwhelming"},
+{word:"unprecedented",type:"nongrad",cat:"situation",def:"Never done or known before",ex:"The scale of the response was unprecedented.",coll:"truly unprecedented, almost unprecedented"},
+{word:"pivotal",type:"gradable",cat:"situation",def:"Of crucial importance",ex:"This is a pivotal moment for the company.",coll:"absolutely pivotal, truly pivotal"},
+{word:"fraught",type:"gradable",cat:"situation",def:"Filled with anxiety or tension; or: full of",ex:"The situation is fraught with difficulty.",prep:"with",coll:"fraught with danger, incredibly fraught"},
+// NON-GRADABLE
+{word:"unique",type:"nongrad",cat:"classification",def:"One of a kind; cannot logically be more or less unique",ex:"Each person's DNA is unique.",prep:"to",coll:"truly unique, unique to"},
+{word:"impossible",type:"nongrad",cat:"classification",def:"Not possible; takes absolutely for emphasis",ex:"It was absolutely impossible to get tickets.",coll:"absolutely impossible, virtually impossible"},
+{word:"identical",type:"nongrad",cat:"classification",def:"Exactly the same in every detail",ex:"The two signatures were identical.",prep:"to",coll:"virtually identical, identical to"},
+{word:"universal",type:"nongrad",cat:"classification",def:"Applying to all cases or members of a group",ex:"This is a universal truth.",coll:"truly universal"},
+{word:"infinite",type:"nongrad",cat:"classification",def:"Having no end or limits",ex:"The possibilities are infinite.",coll:"seemingly infinite"},
+{word:"fatal",type:"nongrad",cat:"classification",def:"Causing death; or having fatal consequences",ex:"That was a fatal mistake.",coll:"potentially fatal, absolutely fatal"},
+{word:"absolute",type:"nongrad",cat:"classification",def:"Complete and total; not qualified in any way",ex:"It was an absolute disaster.",coll:"absolute disaster, in absolute terms"},
+// -ED/-ING PAIRS
+{word:"boring/bored",type:"gradable",cat:"participial",def:"-ing = causes boredom (source); -ed = feels boredom (experiencer)",ex:"The lecture was boring. She was bored."},
+{word:"exciting/excited",type:"gradable",cat:"participial",def:"-ing = causes excitement; -ed = feels excitement",ex:"The match was exciting. The fans were excited."},
+{word:"exhausting/exhausted",type:"gradable",cat:"participial",def:"-ing = tiring as a cause; -ed = completely tired",ex:"The work was exhausting. She was exhausted."},
+{word:"frustrating/frustrated",type:"gradable",cat:"participial",def:"-ing = causes frustration; -ed = feels frustrated",ex:"The delay was frustrating. He was frustrated."},
+{word:"alarming/alarmed",type:"gradable",cat:"participial",def:"-ing = causes alarm; -ed = feels alarmed",ex:"The rise in crime was alarming. Residents were alarmed."},
+{word:"overwhelming/overwhelmed",type:"gradable",cat:"participial",def:"-ing = causes overwhelm; -ed = feels overwhelmed",ex:"The response was overwhelming. She felt overwhelmed."},
+{word:"inspiring/inspired",type:"gradable",cat:"participial",def:"-ing = causes inspiration; -ed = feels inspired",ex:"The speech was inspiring. The crowd felt inspired."},
+{word:"satisfying/satisfied",type:"gradable",cat:"participial",def:"-ing = gives satisfaction; -ed = feels satisfied",ex:"It was a satisfying result. She felt satisfied."},
+{word:"disappointing/disappointed",type:"gradable",cat:"participial",def:"-ing = causes disappointment; -ed = feels disappointed",ex:"The result was disappointing. He was disappointed."},
+{word:"confusing/confused",type:"gradable",cat:"participial",def:"-ing = causes confusion; -ed = feels confused",ex:"The instructions were confusing. I was confused."},
+{word:"embarrassing/embarrassed",type:"gradable",cat:"participial",def:"-ing = causes embarrassment; -ed = feels embarrassed",ex:"It was embarrassing. She was embarrassed."},
+{word:"shocking/shocked",type:"gradable",cat:"participial",def:"-ing = causes shock; -ed = feels shocked",ex:"The news was shocking. They were shocked."},
+// ── ADDITIONAL ENTRIES ────────────────────────────────────────────────────
+// EMOTIONS: Happiness (extended)
+{word:"jubilant",type:"strong",gradable:"happy",cat:"happiness",def:"Feeling or expressing great happiness and triumph",ex:"The crowd was jubilant after the victory.",coll:"absolutely jubilant"},
+{word:"gleeful",type:"gradable",cat:"happiness",def:"Exuberantly or triumphantly joyful",ex:"She was gleeful when she heard the news.",coll:"absolutely gleeful"},
+{word:"blissful",type:"strong",gradable:"happy",cat:"happiness",def:"Extremely happy; perfectly content",ex:"They spent a blissful week in the countryside.",coll:"absolutely blissful, blissfully unaware"},
+{word:"content",type:"gradable",cat:"happiness",def:"In a state of peaceful happiness",ex:"She felt quietly content with her life.",prep:"with",coll:"perfectly content, deeply content"},
+{word:"smug",type:"gradable",cat:"happiness",def:"Excessively self-satisfied; often negative",ex:"He had a smug look on his face.",coll:"very smug, insufferably smug"},
+{word:"pleased",type:"gradable",cat:"happiness",def:"Feeling or showing pleasure and satisfaction",ex:"I'm really pleased with the results.",prep:"with/about",coll:"really pleased, very pleased"},
+{word:"satisfied",type:"gradable",cat:"happiness",def:"Contented; having one's expectations met",ex:"She wasn't fully satisfied with the outcome.",prep:"with",coll:"perfectly satisfied, deeply satisfied"},
+{word:"cheerful",type:"gradable",cat:"happiness",def:"Noticeably happy and optimistic",ex:"She was incredibly cheerful despite everything.",coll:"incredibly cheerful"},
+{word:"upbeat",type:"gradable",cat:"happiness",def:"Optimistic; positive",ex:"Try to stay upbeat about the situation.",coll:"very upbeat, surprisingly upbeat"},
+{word:"buoyant",type:"gradable",cat:"happiness",def:"Cheerful and optimistic; also describes economic confidence",ex:"She was in a buoyant mood.",coll:"remarkably buoyant"},
+{word:"radiant",type:"gradable",cat:"happiness",def:"Clearly very happy; glowing",ex:"She looked radiant on her wedding day.",coll:"absolutely radiant"},
+{word:"on cloud nine",type:"strong",gradable:"happy",cat:"happiness",def:"Extremely happy; informal",ex:"He was on cloud nine after the proposal.",coll:"absolutely on cloud nine"},
+// EMOTIONS: Sadness (extended)
+{word:"sorrowful",type:"gradable",cat:"sadness",def:"Feeling or showing sorrow; literary register",ex:"She gave him a sorrowful look.",coll:"deeply sorrowful"},
+{word:"forlorn",type:"gradable",cat:"sadness",def:"Pitifully sad and abandoned",ex:"He looked forlorn sitting alone.",coll:"looking forlorn"},
+{word:"dejected",type:"gradable",cat:"sadness",def:"Sad and dispirited",ex:"She looked dejected after the interview.",coll:"deeply dejected"},
+{word:"crestfallen",type:"gradable",cat:"sadness",def:"Sad and disappointed",ex:"He was crestfallen when he didn't get the part.",coll:"looking crestfallen"},
+{word:"downcast",type:"gradable",cat:"sadness",def:"Feeling despondent",ex:"She seemed downcast after the meeting.",coll:"a bit downcast"},
+{word:"low",type:"gradable",cat:"sadness",def:"Unhappy and lacking energy; informal",ex:"I've been feeling really low lately.",coll:"feeling low, quite low"},
+{word:"blue",type:"gradable",cat:"sadness",def:"Sad or depressed; informal",ex:"She's been feeling a bit blue.",coll:"feeling blue, a bit blue"},
+{word:"down",type:"gradable",cat:"sadness",def:"Sad or depressed; informal",ex:"He's been quite down lately.",coll:"feeling down, a bit down"},
+{word:"tearful",type:"gradable",cat:"sadness",def:"Crying or about to cry",ex:"She became tearful during the speech.",coll:"quite tearful"},
+{word:"bereft",type:"strong",gradable:"sad",cat:"sadness",def:"Sad and lonely, especially after a loss",ex:"He was utterly bereft after she died.",prep:"of",coll:"utterly bereft, bereft of"},
+{word:"inconsolable",type:"strong",gradable:"sad",cat:"sadness",def:"Not able to be comforted; extremely upset",ex:"The child was inconsolable.",coll:"absolutely inconsolable"},
+// EMOTIONS: Anger (extended)
+{word:"bitter",type:"gradable",cat:"anger",def:"Angry and resentful about being treated unfairly",ex:"She was still bitter about the sacking.",prep:"about",coll:"deeply bitter, intensely bitter"},
+{word:"resentful",type:"gradable",cat:"anger",def:"Feeling anger because of unfair treatment",ex:"He was resentful of her promotion.",prep:"of/about",coll:"deeply resentful"},
+{word:"incensed",type:"strong",gradable:"angry",cat:"anger",def:"Very angry",ex:"He was incensed by the false accusation.",prep:"by/at",coll:"absolutely incensed"},
+{word:"indignant",type:"gradable",cat:"anger",def:"Feeling anger at unfair or unjust treatment",ex:"She was indignant at the suggestion.",prep:"at/about",coll:"quite indignant, deeply indignant"},
+{word:"exasperated",type:"gradable",cat:"anger",def:"Intensely irritated and frustrated",ex:"She was exasperated by his lateness.",prep:"by/with",coll:"absolutely exasperated"},
+{word:"hostile",type:"gradable",cat:"anger",def:"Unfriendly; opposed",ex:"The crowd turned hostile.",prep:"to/towards",coll:"openly hostile, deeply hostile"},
+{word:"cross",type:"gradable",cat:"anger",def:"Annoyed or angry; British informal",ex:"She was really cross about it.",coll:"really cross, quite cross"},
+{word:"ratty",type:"gradable",cat:"anger",def:"Irritable; British informal",ex:"He gets really ratty when he's tired.",coll:"a bit ratty, really ratty"},
+{word:"stroppy",type:"gradable",cat:"anger",def:"Angry and difficult to deal with; British informal",ex:"She went all stroppy when I said no.",coll:"a bit stroppy, really stroppy"},
+{word:"shirty",type:"gradable",cat:"anger",def:"Angry or annoyed; British informal",ex:"He got a bit shirty when I challenged him.",coll:"a bit shirty, quite shirty"},
+{word:"in a huff",type:"gradable",cat:"anger",def:"Silently angry and offended; informal",ex:"She stormed off in a huff.",coll:"in a huff, a bit huffy"},
+{word:"hot-headed",type:"gradable",cat:"anger",def:"Quick to become angry or act rashly",ex:"He's too hot-headed to handle negotiations.",coll:"incredibly hot-headed"},
+// EMOTIONS: Fear (extended)
+{word:"dread",type:"gradable",cat:"fear",def:"Anticipating something with great fear; as adj: dreaded",ex:"She had a dreadful sense of dread.",coll:"pure dread, sheer dread"},
+{word:"unnerved",type:"gradable",cat:"fear",def:"Made to lose composure or confidence",ex:"She was clearly unnerved by the question.",prep:"by",coll:"deeply unnerved, visibly unnerved"},
+{word:"alarmed",type:"gradable",cat:"fear",def:"Frightened or worried",ex:"She was alarmed by the sudden change.",prep:"by/at",coll:"deeply alarmed, visibly alarmed"},
+{word:"wary",type:"gradable",cat:"fear",def:"Cautious or suspicious about possible dangers",ex:"She was wary of his motives.",prep:"of",coll:"extremely wary, understandably wary"},
+{word:"shaken",type:"gradable",cat:"fear",def:"Disturbed or unsettled by something frightening",ex:"He was visibly shaken by the incident.",prep:"by",coll:"visibly shaken, quite shaken"},
+{word:"timid",type:"gradable",cat:"fear",def:"Lacking in confidence or courage",ex:"She was too timid to speak up.",coll:"incredibly timid, rather timid"},
+{word:"sheepish",type:"gradable",cat:"fear",def:"Embarrassed or ashamed; showing a lack of confidence",ex:"He gave a sheepish grin.",coll:"a bit sheepish, rather sheepish"},
+// EMOTIONS: Disgust
+{word:"disgusted",type:"strong",gradable:"revolted",cat:"disgust",def:"Filled with strong disapproval or revulsion",ex:"She was absolutely disgusted by the behaviour.",prep:"by/at",coll:"absolutely disgusted"},
+{word:"revolted",type:"strong",gradable:"disgusted",cat:"disgust",def:"Feeling strong disgust",ex:"He was revolted by the conditions.",prep:"by",coll:"absolutely revolted"},
+{word:"repulsed",type:"strong",gradable:"disgusted",cat:"disgust",def:"Feeling strong distaste",ex:"She was repulsed by the idea.",prep:"by",coll:"absolutely repulsed"},
+{word:"nauseated",type:"gradable",cat:"disgust",def:"Feeling nausea or strong disgust",ex:"The smell left him feeling nauseated.",prep:"by",coll:"completely nauseated"},
+{word:"put off",type:"gradable",cat:"disgust",def:"Made to feel reluctant or disgusted; British informal",ex:"I was completely put off by his attitude.",prep:"by",coll:"completely put off"},
+// EMOTIONS: Loneliness / Isolation
+{word:"lonely",type:"gradable",cat:"loneliness",def:"Sad because of lack of companions",ex:"She felt incredibly lonely in the new city.",coll:"incredibly lonely, deeply lonely"},
+{word:"isolated",type:"gradable",cat:"loneliness",def:"Feeling cut off from others",ex:"He felt isolated from his colleagues.",prep:"from",coll:"deeply isolated, completely isolated"},
+{word:"alienated",type:"gradable",cat:"loneliness",def:"Feeling that you don't belong",ex:"Young people often feel alienated from politics.",prep:"from",coll:"deeply alienated, completely alienated"},
+{word:"withdrawn",type:"gradable",cat:"loneliness",def:"Not wanting to communicate with others",ex:"He became increasingly withdrawn after the loss.",coll:"increasingly withdrawn"},
+// EMOTIONS: Guilt / Shame
+{word:"guilty",type:"gradable",cat:"guilt",def:"Feeling that you have done something wrong",ex:"She felt incredibly guilty about it.",prep:"about",coll:"incredibly guilty, deeply guilty"},
+{word:"ashamed",type:"gradable",cat:"guilt",def:"Embarrassed or guilty about something",ex:"He was deeply ashamed of his behaviour.",prep:"of",coll:"deeply ashamed, profoundly ashamed"},
+{word:"remorseful",type:"gradable",cat:"guilt",def:"Feeling deep regret for wrongdoing",ex:"She seemed genuinely remorseful.",coll:"genuinely remorseful, deeply remorseful"},
+{word:"regretful",type:"gradable",cat:"guilt",def:"Feeling regret",ex:"He was regretful about the decision.",prep:"about",coll:"deeply regretful"},
+{word:"contrite",type:"gradable",cat:"guilt",def:"Sincerely sorry and penitent",ex:"He appeared genuinely contrite.",coll:"genuinely contrite"},
+// EMOTIONS: Boredom
+{word:"bored",type:"gradable",cat:"boredom",def:"Feeling weary and impatient due to lack of interest",ex:"She was absolutely bored out of her mind.",prep:"of/with",coll:"absolutely bored, bored stiff, bored to tears"},
+{word:"restless",type:"gradable",cat:"boredom",def:"Unable to rest or relax; needing activity",ex:"He was restless after two days at home.",coll:"incredibly restless, growing restless"},
+{word:"fed up",type:"gradable",cat:"boredom",def:"Bored or annoyed with something; British informal",ex:"I'm absolutely fed up with this situation.",prep:"with",coll:"absolutely fed up, totally fed up"},
+// EMOTIONS: Nostalgia / Longing
+{word:"nostalgic",type:"gradable",cat:"nostalgia",def:"Feeling sentimental longing for the past",ex:"This music makes me really nostalgic.",prep:"for/about",coll:"deeply nostalgic, intensely nostalgic"},
+{word:"wistful",type:"gradable",cat:"nostalgia",def:"Having a feeling of vague longing",ex:"She had a wistful look in her eyes.",coll:"slightly wistful, deeply wistful"},
+{word:"homesick",type:"gradable",cat:"nostalgia",def:"Longing for one's home when away",ex:"She was incredibly homesick in the first few weeks.",prep:"for",coll:"incredibly homesick, terribly homesick"},
+{word:"yearning",type:"gradable",cat:"nostalgia",def:"Having an intense feeling of longing",ex:"She had a yearning desire to go back.",prep:"for",coll:"deeply yearning"},
+// PERSONALITY: Positive (extended)
+{word:"ambitious",type:"gradable",cat:"personality",def:"Having or showing a strong desire to succeed",ex:"She's incredibly ambitious.",prep:"for",coll:"incredibly ambitious, fiercely ambitious"},
+{word:"determined",type:"gradable",cat:"personality",def:"Having made a firm decision and resolved to follow it",ex:"She was absolutely determined to succeed.",prep:"to",coll:"absolutely determined, fiercely determined"},
+{word:"disciplined",type:"gradable",cat:"personality",def:"Having or showing controlled behaviour",ex:"He's remarkably disciplined in his work.",coll:"remarkably disciplined, highly disciplined"},
+{word:"dedicated",type:"gradable",cat:"personality",def:"Devoted to a task or purpose",ex:"She's incredibly dedicated to her work.",prep:"to",coll:"incredibly dedicated, totally dedicated"},
+{word:"hardworking",type:"gradable",cat:"personality",def:"Tending to work with energy and commitment",ex:"She's one of the most hardworking people I know.",coll:"incredibly hardworking"},
+{word:"diligent",type:"gradable",cat:"personality",def:"Having or showing care and conscientiousness in work",ex:"He was diligent in his research.",coll:"remarkably diligent, highly diligent"},
+{word:"conscientious",type:"gradable",cat:"personality",def:"Wishing to do one's work thoroughly",ex:"She's incredibly conscientious about detail.",coll:"incredibly conscientious, remarkably conscientious"},
+{word:"reliable",type:"gradable",cat:"personality",def:"Consistently good; dependable",ex:"He's the most reliable person on the team.",coll:"incredibly reliable, completely reliable"},
+{word:"trustworthy",type:"gradable",cat:"personality",def:"Deserving of trust or confidence",ex:"She's completely trustworthy.",coll:"completely trustworthy"},
+{word:"loyal",type:"gradable",cat:"personality",def:"Giving firm and constant support",ex:"He's fiercely loyal to his friends.",prep:"to",coll:"fiercely loyal, deeply loyal"},
+{word:"diplomatic",type:"gradable",cat:"personality",def:"Dealing with people sensitively and tactfully",ex:"She's very diplomatic in difficult situations.",coll:"very diplomatic, extremely diplomatic"},
+{word:"tactful",type:"gradable",cat:"personality",def:"Having or showing skill in dealing with sensitive matters",ex:"That was a very tactful way to put it.",coll:"very tactful"},
+{word:"generous",type:"gradable",cat:"personality",def:"Showing readiness to give more than is expected",ex:"She's incredibly generous with her time.",prep:"with",coll:"incredibly generous, immensely generous"},
+{word:"compassionate",type:"gradable",cat:"personality",def:"Feeling or showing sympathy for others",ex:"She's one of the most compassionate people I know.",prep:"towards",coll:"deeply compassionate, incredibly compassionate"},
+{word:"humble",type:"gradable",cat:"personality",def:"Having a modest view of one's own importance",ex:"Despite his success, he remained incredibly humble.",coll:"incredibly humble, genuinely humble"},
+{word:"witty",type:"gradable",cat:"personality",def:"Showing quick and clever humour",ex:"She's incredibly witty.",coll:"incredibly witty, razor-sharp witty"},
+{word:"gregarious",type:"gradable",cat:"personality",def:"Fond of company; sociable",ex:"She's naturally gregarious.",coll:"naturally gregarious"},
+{word:"outgoing",type:"gradable",cat:"personality",def:"Friendly and socially confident",ex:"He's very outgoing at parties.",coll:"very outgoing, extremely outgoing"},
+{word:"sociable",type:"gradable",cat:"personality",def:"Willing to talk and engage with others",ex:"She's very sociable.",coll:"very sociable, naturally sociable"},
+{word:"warm",type:"gradable",cat:"personality",def:"Friendly and affectionate",ex:"She has a really warm personality.",coll:"incredibly warm, genuinely warm"},
+{word:"open-minded",type:"gradable",cat:"personality",def:"Willing to consider different ideas or opinions",ex:"She's very open-minded about new approaches.",prep:"about",coll:"very open-minded, genuinely open-minded"},
+{word:"broad-minded",type:"gradable",cat:"personality",def:"Tolerant of different views; liberal",ex:"His parents were surprisingly broad-minded.",coll:"very broad-minded"},
+{word:"inquisitive",type:"gradable",cat:"personality",def:"Curious; eager to know or learn",ex:"She's naturally inquisitive about everything.",coll:"naturally inquisitive"},
+{word:"intuitive",type:"gradable",cat:"personality",def:"Using or based on what one feels to be true",ex:"She has an intuitive understanding of people.",coll:"incredibly intuitive, highly intuitive"},
+{word:"spontaneous",type:"gradable",cat:"personality",def:"Acting without being forced; natural and unplanned",ex:"She's wonderfully spontaneous.",coll:"wonderfully spontaneous"},
+{word:"adventurous",type:"gradable",cat:"personality",def:"Willing to try new or risky things",ex:"She's incredibly adventurous.",coll:"incredibly adventurous"},
+// PERSONALITY: Negative (extended)
+{word:"stubborn",type:"gradable",cat:"personality",def:"Unwilling to change despite argument or reason",ex:"He can be incredibly stubborn.",coll:"incredibly stubborn, utterly stubborn"},
+{word:"pig-headed",type:"gradable",cat:"personality",def:"Stupidly obstinate; British informal",ex:"He's absolutely pig-headed.",coll:"absolutely pig-headed"},
+{word:"selfish",type:"gradable",cat:"personality",def:"Lacking consideration for others; concerned chiefly with one's own profit",ex:"That was a really selfish thing to do.",coll:"incredibly selfish, deeply selfish"},
+{word:"self-centred",type:"gradable",cat:"personality",def:"Preoccupied with oneself and one's affairs",ex:"He's incredibly self-centred.",coll:"incredibly self-centred"},
+{word:"vain",type:"gradable",cat:"personality",def:"Having too high an opinion of one's appearance",ex:"She's incredibly vain.",coll:"incredibly vain"},
+{word:"narcissistic",type:"gradable",cat:"personality",def:"Having excessive admiration of oneself",ex:"His behaviour was increasingly narcissistic.",coll:"deeply narcissistic"},
+{word:"jealous",type:"gradable",cat:"personality",def:"Feeling resentment towards someone's achievements",ex:"She couldn't help feeling jealous.",prep:"of",coll:"incredibly jealous, deeply jealous"},
+{word:"envious",type:"gradable",cat:"personality",def:"Feeling discontent at someone else's advantages",ex:"He was envious of her success.",prep:"of",coll:"incredibly envious, deeply envious"},
+{word:"spiteful",type:"gradable",cat:"personality",def:"Deliberately hurtful",ex:"That was a spiteful thing to say.",coll:"incredibly spiteful"},
+{word:"vindictive",type:"gradable",cat:"personality",def:"Having a strong desire for revenge",ex:"She became vindictive after the break-up.",coll:"deeply vindictive"},
+{word:"deceitful",type:"gradable",cat:"personality",def:"Tending to deceive; dishonest",ex:"He was deeply deceitful.",coll:"deeply deceitful"},
+{word:"dishonest",type:"gradable",cat:"personality",def:"Intended to mislead or deceive",ex:"That was completely dishonest.",coll:"completely dishonest"},
+{word:"hypocritical",type:"gradable",cat:"personality",def:"Claiming virtues one doesn't actually possess",ex:"It would be hypocritical not to admit that.",coll:"deeply hypocritical, utterly hypocritical"},
+{word:"cowardly",type:"gradable",cat:"personality",def:"Lacking courage",ex:"It was a cowardly thing to do.",coll:"incredibly cowardly"},
+{word:"ruthless",type:"gradable",cat:"personality",def:"Having no pity; merciless",ex:"She was ruthless in her ambition.",coll:"incredibly ruthless, utterly ruthless"},
+{word:"cold",type:"gradable",cat:"personality",def:"Lacking affection or warmth",ex:"She came across as cold and distant.",coll:"rather cold, quite cold"},
+{word:"aloof",type:"gradable",cat:"personality",def:"Not friendly or forthcoming; distant",ex:"He seemed aloof and unapproachable.",coll:"rather aloof, incredibly aloof"},
+{word:"dismissive",type:"gradable",cat:"personality",def:"Treating as unworthy of consideration",ex:"She was dismissive of his suggestions.",prep:"of",coll:"quite dismissive, deeply dismissive"},
+{word:"patronising",type:"gradable",cat:"personality",def:"Treating with apparent kindness that shows superiority",ex:"His tone was incredibly patronising.",coll:"incredibly patronising, deeply patronising"},
+{word:"overbearing",type:"gradable",cat:"personality",def:"Unpleasantly overpowering; domineering",ex:"His overbearing manner put people off.",coll:"incredibly overbearing"},
+{word:"controlling",type:"gradable",cat:"personality",def:"Exerting control over others' behaviour",ex:"She found him increasingly controlling.",coll:"incredibly controlling, very controlling"},
+{word:"neurotic",type:"gradable",cat:"personality",def:"Abnormally sensitive or anxious; informal",ex:"She can be a bit neurotic about details.",coll:"a bit neurotic, incredibly neurotic"},
+{word:"volatile",type:"gradable",cat:"personality",def:"Liable to change rapidly and unpredictably; quick to anger",ex:"His moods were incredibly volatile.",coll:"incredibly volatile, extremely volatile"},
+{word:"unreliable",type:"gradable",cat:"personality",def:"Not trustworthy or consistent",ex:"He's notoriously unreliable.",coll:"notoriously unreliable, completely unreliable"},
+{word:"flaky",type:"gradable",cat:"personality",def:"Tending to not follow through; informal",ex:"She's a bit flaky when it comes to plans.",coll:"a bit flaky, incredibly flaky"},
+{word:"clingy",type:"gradable",cat:"personality",def:"Too dependent on others emotionally",ex:"He can get really clingy in relationships.",coll:"really clingy, quite clingy"},
+{word:"needy",type:"gradable",cat:"personality",def:"Demanding too much attention; informal",ex:"She was finding him a bit too needy.",coll:"a bit needy, incredibly needy"},
+// INTELLIGENCE (extended)
+{word:"intelligent",type:"gradable",cat:"intelligence",def:"Having good understanding and mental ability",ex:"She's incredibly intelligent.",coll:"incredibly intelligent, highly intelligent"},
+{word:"clever",type:"gradable",cat:"intelligence",def:"Quick to understand; mentally sharp",ex:"He's very clever but lacks common sense.",coll:"very clever, incredibly clever"},
+{word:"smart",type:"gradable",cat:"intelligence",def:"Mentally quick; informal",ex:"She's really smart.",coll:"really smart, incredibly smart"},
+{word:"bright",type:"gradable",cat:"intelligence",def:"Intelligent; quick to learn",ex:"She's an incredibly bright student.",coll:"incredibly bright, very bright"},
+{word:"gifted",type:"gradable",cat:"intelligence",def:"Having exceptional talent or natural ability",ex:"He's genuinely gifted at languages.",prep:"at/in",coll:"genuinely gifted, incredibly gifted"},
+{word:"astute",type:"gradable",cat:"intelligence",def:"Shrewd and discerning; quick to identify advantages",ex:"She made an astute observation.",coll:"remarkably astute, politically astute"},
+{word:"shrewd",type:"gradable",cat:"intelligence",def:"Having sharp powers of judgement",ex:"He's a shrewd businessman.",coll:"remarkably shrewd, politically shrewd"},
+{word:"savvy",type:"gradable",cat:"intelligence",def:"Knowledgeable about practical matters; informal",ex:"She's very tech savvy.",prep:"about",coll:"very savvy, street savvy, tech savvy"},
+{word:"analytical",type:"gradable",cat:"intelligence",def:"Relating to analysis; systematic and logical",ex:"She has a very analytical mind.",coll:"very analytical, highly analytical"},
+{word:"logical",type:"gradable",cat:"intelligence",def:"Using or based on clear reasoning",ex:"He's very logical in his thinking.",coll:"very logical, completely logical"},
+{word:"academic",type:"gradable",cat:"intelligence",def:"Relating to education; scholarly",ex:"She's very academic.",coll:"very academic, highly academic"},
+{word:"bookish",type:"gradable",cat:"intelligence",def:"Devoted to reading and studying; sometimes used pejoratively",ex:"He was a bookish child.",coll:"rather bookish"},
+{word:"naive",type:"gradable",cat:"intelligence",def:"Lacking experience or judgement; innocently simple",ex:"She was a bit naive about how business works.",coll:"a bit naive, incredibly naive"},
+{word:"gullible",type:"gradable",cat:"intelligence",def:"Easily deceived or tricked",ex:"He was too gullible to spot the scam.",coll:"incredibly gullible, rather gullible"},
+{word:"oblivious",type:"gradable",cat:"intelligence",def:"Unaware of what is happening",ex:"She was completely oblivious to the tension.",prep:"to",coll:"completely oblivious, totally oblivious"},
+{word:"dim",type:"gradable",cat:"intelligence",def:"Stupid; British informal",ex:"He's a bit dim, to be honest.",coll:"a bit dim, rather dim"},
+{word:"dense",type:"gradable",cat:"intelligence",def:"Slow to understand; informal",ex:"He can be incredibly dense sometimes.",coll:"incredibly dense, rather dense"},
+// APPEARANCE (extended)
+{word:"beautiful",type:"gradable",cat:"appearance",def:"Pleasing the senses greatly; attractive",ex:"She's absolutely beautiful.",coll:"absolutely beautiful, strikingly beautiful"},
+{word:"attractive",type:"gradable",cat:"appearance",def:"Pleasing or appealing to look at",ex:"He's very attractive.",coll:"very attractive, incredibly attractive"},
+{word:"handsome",type:"gradable",cat:"appearance",def:"Good-looking, typically used of men",ex:"He's undeniably handsome.",coll:"very handsome, strikingly handsome"},
+{word:"pretty",type:"gradable",cat:"appearance",def:"Attractive in a delicate way",ex:"She looked really pretty.",coll:"really pretty, very pretty"},
+{word:"cute",type:"gradable",cat:"appearance",def:"Attractive in a pretty or endearing way",ex:"That's absolutely cute.",coll:"absolutely cute, really cute"},
+{word:"elegant",type:"gradable",cat:"appearance",def:"Graceful and stylish in appearance",ex:"She looked incredibly elegant.",coll:"incredibly elegant, effortlessly elegant"},
+{word:"stylish",type:"gradable",cat:"appearance",def:"Fashionably elegant",ex:"He's very stylish.",coll:"very stylish, incredibly stylish"},
+{word:"chic",type:"gradable",cat:"appearance",def:"Elegantly fashionable",ex:"The restaurant looks very chic.",coll:"very chic, effortlessly chic"},
+{word:"glamorous",type:"gradable",cat:"appearance",def:"Attractive and exciting in a showy way",ex:"She looked incredibly glamorous.",coll:"incredibly glamorous, undeniably glamorous"},
+{word:"shabby",type:"gradable",cat:"appearance",def:"In poor condition through long use or lack of care",ex:"His coat was looking a bit shabby.",coll:"a bit shabby, rather shabby"},
+{word:"gaunt",type:"gradable",cat:"appearance",def:"Lean and haggard, especially from illness",ex:"He looked gaunt and tired.",coll:"quite gaunt, looking gaunt"},
+{word:"pale",type:"gradable",cat:"appearance",def:"Light in colour; of little colour, often due to illness",ex:"She looked incredibly pale.",coll:"incredibly pale, deathly pale"},
+{word:"tanned",type:"gradable",cat:"appearance",def:"Made brown by the sun",ex:"She was deeply tanned after the holiday.",coll:"deeply tanned, gorgeously tanned"},
+{word:"lanky",type:"gradable",cat:"appearance",def:"Tall and thin",ex:"He was tall and lanky.",coll:"incredibly lanky"},
+{word:"stocky",type:"gradable",cat:"appearance",def:"Short and sturdy in build",ex:"He was stocky and muscular.",coll:"quite stocky"},
+{word:"portly",type:"gradable",cat:"appearance",def:"Fat in a stately way; formal",ex:"He was a rather portly gentleman.",coll:"rather portly"},
+{word:"wiry",type:"gradable",cat:"appearance",def:"Thin but strong and flexible",ex:"She was small and wiry.",coll:"quite wiry"},
+{word:"haggard",type:"gradable",cat:"appearance",def:"Looking exhausted and unwell",ex:"He looked haggard after the ordeal.",coll:"looking haggard"},
+{word:"frumpy",type:"gradable",cat:"appearance",def:"Dowdy and unfashionable",ex:"That outfit looks a bit frumpy.",coll:"a bit frumpy, quite frumpy"},
+{word:"unkempt",type:"gradable",cat:"appearance",def:"Not neat or combed; untidy in appearance",ex:"His hair was unkempt.",coll:"rather unkempt"},
+// PHYSICAL STATES (extended)
+{word:"fit",type:"gradable",cat:"health",def:"In good health; physically strong",ex:"She's really fit.",coll:"incredibly fit, super fit"},
+{word:"healthy",type:"gradable",cat:"health",def:"In good health",ex:"She looks incredibly healthy.",coll:"incredibly healthy, perfectly healthy"},
+{word:"unwell",type:"gradable",cat:"health",def:"Not in good health; ill",ex:"He's been feeling unwell all week.",coll:"feeling unwell"},
+{word:"ill",type:"gradable",cat:"health",def:"Not in full health; sick",ex:"She's been seriously ill.",coll:"seriously ill, critically ill"},
+{word:"sick",type:"gradable",cat:"health",def:"Affected by illness; unwell",ex:"He's been sick all week.",coll:"very sick, seriously sick"},
+{word:"queasy",type:"gradable",cat:"health",def:"Feeling slightly sick",ex:"That smell makes me queasy.",coll:"feeling queasy, a bit queasy"},
+{word:"nauseous",type:"gradable",cat:"health",def:"Feeling an urge to vomit",ex:"She felt nauseous on the boat.",coll:"feeling nauseous, incredibly nauseous"},
+{word:"feverish",type:"gradable",cat:"health",def:"Having a fever; unnaturally hot",ex:"He was feeling feverish.",coll:"feeling feverish, slightly feverish"},
+{word:"light-headed",type:"gradable",cat:"health",def:"Dizzy; slightly faint",ex:"I felt light-headed after standing up.",coll:"feeling light-headed, a bit light-headed"},
+{word:"under the weather",type:"gradable",cat:"health",def:"Slightly ill; informal",ex:"She's been feeling under the weather.",coll:"feeling under the weather"},
+{word:"sore",type:"gradable",cat:"health",def:"Aching; painful",ex:"My legs are really sore.",coll:"really sore, incredibly sore"},
+{word:"tender",type:"gradable",cat:"health",def:"Sensitive to pain when touched",ex:"The area is still a bit tender.",coll:"a bit tender, quite tender"},
+// BEHAVIOUR / DEMEANOUR
+{word:"rude",type:"gradable",cat:"behaviour",def:"Offensively impolite",ex:"That was incredibly rude.",coll:"incredibly rude, unbelievably rude"},
+{word:"polite",type:"gradable",cat:"behaviour",def:"Respectful and considerate",ex:"She was incredibly polite.",coll:"incredibly polite, scrupulously polite"},
+{word:"courteous",type:"gradable",cat:"behaviour",def:"Polite, respectful; slightly formal",ex:"He was unfailingly courteous.",coll:"unfailingly courteous"},
+{word:"cheeky",type:"gradable",cat:"behaviour",def:"Impudent but amusing; British informal",ex:"That was a bit cheeky.",coll:"a bit cheeky, rather cheeky"},
+{word:"brazen",type:"gradable",cat:"behaviour",def:"Bold and without shame",ex:"She was brazen about the whole thing.",coll:"completely brazen, utterly brazen"},
+{word:"blunt",type:"gradable",cat:"behaviour",def:"Uncompromisingly direct in speech; not subtle",ex:"He's very blunt about what he thinks.",coll:"very blunt, brutally blunt"},
+{word:"frank",type:"gradable",cat:"behaviour",def:"Open and honest in expression",ex:"She was very frank about her concerns.",coll:"very frank, completely frank"},
+{word:"forthright",type:"gradable",cat:"behaviour",def:"Direct and outspoken in a confident way",ex:"She was remarkably forthright.",coll:"remarkably forthright"},
+{word:"reserved",type:"gradable",cat:"behaviour",def:"Slow to reveal emotions; restrained",ex:"He's quite reserved in public.",coll:"quite reserved, rather reserved"},
+{word:"introverted",type:"gradable",cat:"behaviour",def:"Concerned chiefly with one's own thoughts; shy",ex:"She's quite introverted.",coll:"quite introverted, very introverted"},
+{word:"extroverted",type:"gradable",cat:"behaviour",def:"Outgoing; socially confident",ex:"He's very extroverted.",coll:"very extroverted"},
+{word:"brash",type:"gradable",cat:"behaviour",def:"Offensively self-assertive; impudent",ex:"He came across as brash and overconfident.",coll:"incredibly brash"},
+{word:"boisterous",type:"gradable",cat:"behaviour",def:"Noisy, energetic, and cheerful",ex:"The children were incredibly boisterous.",coll:"incredibly boisterous"},
+{word:"rowdy",type:"gradable",cat:"behaviour",def:"Noisy and disorderly",ex:"The crowd got quite rowdy.",coll:"quite rowdy, incredibly rowdy"},
+{word:"unruly",type:"gradable",cat:"behaviour",def:"Difficult to control",ex:"The class was incredibly unruly.",coll:"incredibly unruly"},
+{word:"docile",type:"gradable",cat:"behaviour",def:"Ready to accept control; easily managed",ex:"The dog was surprisingly docile.",coll:"surprisingly docile"},
+{word:"compliant",type:"gradable",cat:"behaviour",def:"Inclined to agree; yielding",ex:"She was too compliant with their demands.",prep:"with",coll:"overly compliant, fully compliant"},
+{word:"confrontational",type:"gradable",cat:"behaviour",def:"Tending to deal with things aggressively",ex:"His approach was confrontational.",coll:"very confrontational, needlessly confrontational"},
+{word:"evasive",type:"gradable",cat:"behaviour",def:"Tending to avoid questions or commitment",ex:"She was deliberately evasive.",coll:"deliberately evasive, incredibly evasive"},
+{word:"cagey",type:"gradable",cat:"behaviour",def:"Reluctant to give information; informal",ex:"He was being very cagey about the details.",prep:"about",coll:"very cagey, quite cagey"},
+// MENTAL / PSYCHOLOGICAL
+{word:"confused",type:"gradable",cat:"mental",def:"Unable to think clearly; bewildered",ex:"I'm completely confused by this.",prep:"by/about",coll:"completely confused, totally confused"},
+{word:"bewildered",type:"strong",gradable:"confused",cat:"mental",def:"Perplexed and confused; strongly disoriented",ex:"She looked utterly bewildered.",coll:"utterly bewildered, completely bewildered"},
+{word:"perplexed",type:"gradable",cat:"mental",def:"Completely baffled; puzzled",ex:"He looked completely perplexed.",coll:"completely perplexed"},
+{word:"dazed",type:"gradable",cat:"mental",def:"Unable to think clearly after a shock",ex:"She seemed dazed by the news.",prep:"by",coll:"slightly dazed, completely dazed"},
+{word:"distracted",type:"gradable",cat:"mental",def:"Unable to concentrate",ex:"He was visibly distracted during the meeting.",coll:"visibly distracted, easily distracted"},
+{word:"preoccupied",type:"gradable",cat:"mental",def:"Absorbed in thought; not paying attention",ex:"She seemed preoccupied.",prep:"with",coll:"deeply preoccupied"},
+{word:"focused",type:"gradable",cat:"mental",def:"Paying particular attention; concentrated",ex:"She was incredibly focused on the task.",prep:"on",coll:"incredibly focused, laser-focused"},
+{word:"absent-minded",type:"gradable",cat:"mental",def:"Forgetful and lacking concentration",ex:"He's quite absent-minded.",coll:"quite absent-minded, rather absent-minded"},
+{word:"scattered",type:"gradable",cat:"mental",def:"Disorganised in thought; informal",ex:"I've been feeling really scattered lately.",coll:"really scattered, feeling scattered"},
+{word:"sharp-minded",type:"gradable",cat:"mental",def:"Having a quick and alert mind",ex:"She's incredibly sharp-minded.",coll:"incredibly sharp-minded"},
+{word:"narrow-minded",type:"gradable",cat:"mental",def:"Unwilling to consider different ideas; intolerant",ex:"He's incredibly narrow-minded.",coll:"incredibly narrow-minded"},
+{word:"strong-minded",type:"gradable",cat:"mental",def:"Determined and having a strong will",ex:"She's very strong-minded.",coll:"very strong-minded"},
+{word:"weak-willed",type:"gradable",cat:"mental",def:"Lacking determination",ex:"He's far too weak-willed.",coll:"far too weak-willed"},
+// SOCIAL ATTITUDES
+{word:"judgemental",type:"gradable",cat:"attitudes",def:"Having opinions about others without enough knowledge",ex:"Try not to be so judgemental.",coll:"incredibly judgemental, overly judgemental"},
+{word:"prejudiced",type:"gradable",cat:"attitudes",def:"Having preconceived opinions; biased",ex:"His views were clearly prejudiced.",prep:"against",coll:"deeply prejudiced"},
+{word:"biased",type:"gradable",cat:"attitudes",def:"Showing unfair support for one group",ex:"The coverage was heavily biased.",prep:"towards/against",coll:"heavily biased, deeply biased"},
+{word:"tolerant",type:"gradable",cat:"attitudes",def:"Willing to accept different opinions or behaviours",ex:"She's very tolerant of different views.",prep:"of",coll:"very tolerant, incredibly tolerant"},
+{word:"intolerant",type:"gradable",cat:"attitudes",def:"Not willing to accept different views",ex:"He's incredibly intolerant of criticism.",prep:"of",coll:"incredibly intolerant"},
+{word:"cynical",type:"gradable",cat:"attitudes",def:"Believing people are motivated only by self-interest",ex:"She's become increasingly cynical.",prep:"about",coll:"deeply cynical, increasingly cynical"},
+{word:"sceptical",type:"gradable",cat:"attitudes",def:"Not easily convinced; questioning",ex:"I'm quite sceptical about these claims.",prep:"about/of",coll:"quite sceptical, deeply sceptical"},
+{word:"idealistic",type:"gradable",cat:"attitudes",def:"Believing that ideal conditions can be achieved",ex:"She's a bit idealistic about how it works.",coll:"a bit idealistic, incredibly idealistic"},
+{word:"pragmatic",type:"gradable",cat:"attitudes",def:"Dealing with things practically rather than theoretically",ex:"She's very pragmatic in her approach.",coll:"very pragmatic, thoroughly pragmatic"},
+{word:"optimistic",type:"gradable",cat:"attitudes",def:"Hopeful and confident about the future",ex:"She's incredibly optimistic about the outcome.",prep:"about",coll:"incredibly optimistic, cautiously optimistic"},
+{word:"pessimistic",type:"gradable",cat:"attitudes",def:"Tending to see the worst in situations",ex:"He's incredibly pessimistic about the future.",prep:"about",coll:"incredibly pessimistic, deeply pessimistic"},
+{word:"apathetic",type:"gradable",cat:"attitudes",def:"Showing no interest or concern",ex:"She seemed completely apathetic about the election.",prep:"about",coll:"completely apathetic, deeply apathetic"},
+{word:"indifferent",type:"gradable",cat:"attitudes",def:"Having no particular interest in something",ex:"She was completely indifferent to criticism.",prep:"to",coll:"completely indifferent, utterly indifferent"},
+{word:"complacent",type:"gradable",cat:"attitudes",def:"Too satisfied with the current situation; not alert to danger",ex:"We can't afford to be complacent.",coll:"dangerously complacent, incredibly complacent"},
+{word:"smug",type:"gradable",cat:"attitudes",def:"Excessively pleased with oneself",ex:"He had a smug look on his face.",coll:"incredibly smug, deeply smug"},
+// WORK / PROFESSIONAL
+{word:"efficient",type:"gradable",cat:"professional",def:"Achieving maximum productivity with minimum waste",ex:"She's incredibly efficient.",coll:"incredibly efficient, highly efficient"},
+{word:"productive",type:"gradable",cat:"professional",def:"Achieving a significant amount",ex:"It was a really productive meeting.",coll:"incredibly productive, highly productive"},
+{word:"capable",type:"gradable",cat:"professional",def:"Having the ability to do something effectively",ex:"She's very capable.",prep:"of",coll:"very capable, highly capable"},
+{word:"competent",type:"gradable",cat:"professional",def:"Having the necessary skill; adequate",ex:"He's perfectly competent.",coll:"perfectly competent, highly competent"},
+{word:"incompetent",type:"gradable",cat:"professional",def:"Not having the necessary skill",ex:"That was completely incompetent.",coll:"completely incompetent, wholly incompetent"},
+{word:"meticulous",type:"gradable",cat:"professional",def:"Taking or showing extreme care about detail",ex:"She's incredibly meticulous.",prep:"about",coll:"incredibly meticulous, painstakingly meticulous"},
+{word:"thorough",type:"gradable",cat:"professional",def:"Complete and careful in every detail",ex:"He was very thorough in his research.",coll:"very thorough, incredibly thorough"},
+{word:"methodical",type:"gradable",cat:"professional",def:"Done according to a systematic plan",ex:"She's very methodical in her approach.",coll:"very methodical, highly methodical"},
+{word:"organised",type:"gradable",cat:"professional",def:"Arranged systematically; planned",ex:"She's incredibly organised.",coll:"incredibly organised, meticulously organised"},
+{word:"proactive",type:"gradable",cat:"professional",def:"Creating or controlling a situation rather than responding",ex:"She's very proactive.",coll:"very proactive, incredibly proactive"},
+{word:"innovative",type:"gradable",cat:"professional",def:"Introducing new ideas; original",ex:"Her approach is incredibly innovative.",coll:"incredibly innovative, truly innovative"},
+{word:"creative",type:"gradable",cat:"professional",def:"Relating to imagination and original ideas",ex:"She's incredibly creative.",coll:"incredibly creative, genuinely creative"},
+{word:"strategic",type:"gradable",cat:"professional",def:"Relating to planned advantage",ex:"She's very strategic in her thinking.",coll:"very strategic, highly strategic"},
+{word:"visionary",type:"gradable",cat:"professional",def:"Thinking about the future with imagination",ex:"He's a visionary leader.",coll:"truly visionary"},
+{word:"entrepreneurial",type:"gradable",cat:"professional",def:"Relating to setting up businesses; risk-taking",ex:"She has an entrepreneurial mindset.",coll:"very entrepreneurial, highly entrepreneurial"},
+// ACADEMIC / INTELLECTUAL QUALITIES
+{word:"curious",type:"gradable",cat:"intellectual",def:"Eager to know or learn",ex:"She's incredibly curious about everything.",prep:"about",coll:"incredibly curious, deeply curious"},
+{word:"thoughtful",type:"gradable",cat:"intellectual",def:"Absorbed in thought; showing consideration",ex:"That's a really thoughtful question.",coll:"really thoughtful, deeply thoughtful"},
+{word:"insightful",type:"gradable",cat:"intellectual",def:"Having a deep understanding",ex:"Her analysis was incredibly insightful.",coll:"incredibly insightful, remarkably insightful"},
+{word:"profound",type:"gradable",cat:"intellectual",def:"Very deep; intense",ex:"That's a profoundly profound question.",coll:"profoundly profound, deeply profound"},
+{word:"nuanced",type:"gradable",cat:"intellectual",def:"Characterised by subtle distinctions",ex:"His analysis was very nuanced.",coll:"very nuanced, highly nuanced"},
+{word:"eloquent",type:"gradable",cat:"intellectual",def:"Fluent or persuasive in speaking or writing",ex:"She's incredibly eloquent.",coll:"incredibly eloquent, remarkably eloquent"},
+{word:"articulate",type:"gradable",cat:"intellectual",def:"Able to express ideas clearly",ex:"She's incredibly articulate.",coll:"incredibly articulate, highly articulate"},
+{word:"verbose",type:"gradable",cat:"intellectual",def:"Using more words than necessary",ex:"His essay was rather verbose.",coll:"rather verbose"},
+{word:"concise",type:"gradable",cat:"intellectual",def:"Giving much information clearly and briefly",ex:"Her summary was very concise.",coll:"very concise, incredibly concise"},
+{word:"coherent",type:"gradable",cat:"intellectual",def:"Logical and consistent",ex:"The argument wasn't very coherent.",coll:"very coherent, perfectly coherent"},
+{word:"lucid",type:"gradable",cat:"intellectual",def:"Expressed clearly; easy to understand",ex:"Her explanation was very lucid.",coll:"very lucid, remarkably lucid"},
+{word:"pedantic",type:"gradable",cat:"intellectual",def:"Overly concerned with minor details or rules",ex:"He can be incredibly pedantic.",coll:"incredibly pedantic, rather pedantic"},
+// SOCIAL / MODERN SLANG (extended)
+{word:"salty",type:"gradable",cat:"slang",def:"Bitter or upset about something; informal",ex:"He's still salty about losing.",prep:"about",coll:"really salty, totally salty"},
+{word:"triggered",type:"gradable",cat:"slang",def:"Strongly upset or offended; modern slang",ex:"She got really triggered by that comment.",prep:"by",coll:"really triggered, completely triggered"},
+{word:"pressed",type:"gradable",cat:"slang",def:"Bothered or upset; slang",ex:"Why are you so pressed about it?",coll:"so pressed, really pressed"},
+{word:"shook",type:"gradable",cat:"slang",def:"Shocked or disturbed; slang",ex:"I'm shook by that revelation.",coll:"completely shook, absolutely shook"},
+{word:"lowkey",type:"gradable",cat:"slang",def:"Slightly or quietly; used as adverb or adjective; slang",ex:"I'm lowkey obsessed with that show.",coll:"lowkey obsessed"},
+{word:"highkey",type:"gradable",cat:"slang",def:"Openly; quite openly; slang",ex:"I'm highkey annoyed about this.",coll:"highkey annoyed"},
+{word:"sus",type:"gradable",cat:"slang",def:"Suspicious or untrustworthy; slang from gaming",ex:"That looks really sus.",coll:"really sus, super sus"},
+{word:"sketchy",type:"gradable",cat:"slang",def:"Suspicious; of doubtful quality; informal",ex:"That area is really sketchy.",coll:"really sketchy, pretty sketchy"},
+{word:"cringey",type:"gradable",cat:"slang",def:"Causing embarrassment; informal",ex:"That was so cringey.",coll:"so cringey, absolutely cringey"},
+{word:"mid",type:"gradable",cat:"slang",def:"Average or mediocre; slang",ex:"That film was kind of mid.",coll:"kind of mid, pretty mid"},
+{word:"bussin",type:"strong",gradable:"good",cat:"slang",def:"Extremely good, especially food; slang from African American English",ex:"This food is bussin.",coll:"absolutely bussin"},
+{word:"no cap",type:"gradable",cat:"slang",def:"Genuinely; truthfully; slang",ex:"That was amazing, no cap.",coll:"no cap"},
+{word:"slay",type:"gradable",cat:"slang",def:"Excellent performance; to do something impressively; slang",ex:"She absolutely slayed that performance.",coll:"absolutely slaying"},
+{word:"periodt",type:"gradable",cat:"slang",def:"Emphatic agreement; end of discussion; slang",ex:"That is the truth, periodt.",coll:"and that's that, periodt"},
+{word:"unhinged",type:"gradable",cat:"slang",def:"Erratic or unstable in a way that may be entertaining; slang",ex:"That plot twist was absolutely unhinged.",coll:"absolutely unhinged, completely unhinged"},
+{word:"chaotic",type:"gradable",cat:"slang",def:"Wildly unpredictable; used positively or negatively; informal",ex:"Her energy is chaotic and I love it.",coll:"absolutely chaotic, chaotic energy"},
+{word:"delulu",type:"gradable",cat:"slang",def:"Deluded; living in fantasy; slang",ex:"She's being a bit delulu about it.",coll:"a bit delulu, totally delulu"},
+{word:"ate",type:"gradable",cat:"slang",def:"Did something exceptionally well; slang",ex:"She absolutely ate that performance.",coll:"she ate, absolutely ate"},
+{word:"iconic",type:"strong",cat:"slang",def:"Memorable in a defining or admirable way; modern informal",ex:"That look is iconic.",coll:"absolutely iconic, genuinely iconic"},
+{word:"snatched",type:"gradable",cat:"slang",def:"Looking extremely attractive or stylish; slang",ex:"Her outfit is absolutely snatched.",coll:"absolutely snatched"},
+{word:"drip",type:"gradable",cat:"slang",def:"Having excellent fashion sense; slang",ex:"His drip is immaculate.",coll:"on drip, major drip"},
+{word:"clean",type:"gradable",cat:"slang",def:"Neat, stylish, impressive; informal",ex:"Those trainers are clean.",coll:"super clean, really clean"},
+{word:"fresh",type:"gradable",cat:"slang",def:"Stylish and attractive; informal",ex:"He's looking fresh today.",coll:"super fresh, really fresh"},
+{word:"on point",type:"gradable",cat:"slang",def:"Exactly right; excellent; informal",ex:"Your timing was absolutely on point.",coll:"absolutely on point, totally on point"},
+{word:"dead",type:"gradable",cat:"slang",def:"Extremely funny; used adjectivally; informal",ex:"I'm dead — that was hilarious.",coll:"I'm dead, absolutely dead"},
+{word:"big",type:"gradable",cat:"slang",def:"Impressive or important; informal",ex:"That's a big achievement.",coll:"that's big, so big"},
+{word:"elite",type:"gradable",cat:"slang",def:"The best; of top quality; slang",ex:"That move was elite.",coll:"totally elite, straight elite"},
+{word:"different",type:"gradable",cat:"slang",def:"Unique in a positive way; slang",ex:"She's just built different.",coll:"built different"},
+// DESCRIPTIONS OF THINGS / SITUATIONS (extended)
+{word:"remarkable",type:"gradable",cat:"description",def:"Worthy of attention; extraordinary",ex:"It was a truly remarkable achievement.",coll:"truly remarkable, absolutely remarkable"},
+{word:"extraordinary",type:"strong",gradable:"remarkable",cat:"description",def:"Very unusual or notable",ex:"That was an extraordinary achievement.",coll:"absolutely extraordinary, truly extraordinary"},
+{word:"exceptional",type:"strong",gradable:"good",cat:"description",def:"Unusually good; outstanding",ex:"Her work is of exceptional quality.",coll:"truly exceptional, quite exceptional"},
+{word:"notable",type:"gradable",cat:"description",def:"Worthy of attention or notice",ex:"There's a notable difference.",coll:"quite notable, particularly notable"},
+{word:"significant",type:"gradable",cat:"description",def:"Sufficiently great to be of consequence",ex:"There's been a significant change.",coll:"very significant, highly significant"},
+{word:"substantial",type:"gradable",cat:"description",def:"Of considerable importance or size",ex:"There's been a substantial improvement.",coll:"very substantial, quite substantial"},
+{word:"considerable",type:"gradable",cat:"description",def:"Notably large",ex:"That required considerable effort.",coll:"quite considerable, very considerable"},
+{word:"negligible",type:"gradable",cat:"description",def:"So small as to be unimportant",ex:"The difference was negligible.",coll:"almost negligible"},
+{word:"marginal",type:"gradable",cat:"description",def:"Minor; not central",ex:"The improvement was marginal.",coll:"relatively marginal"},
+{word:"dramatic",type:"gradable",cat:"description",def:"Sudden and striking",ex:"There's been a dramatic improvement.",coll:"truly dramatic, quite dramatic"},
+{word:"radical",type:"gradable",cat:"description",def:"Far-reaching or thorough",ex:"They made radical changes.",coll:"truly radical, quite radical"},
+{word:"drastic",type:"gradable",cat:"description",def:"Extreme in effect; severe",ex:"Drastic measures were needed.",coll:"absolutely drastic, quite drastic"},
+{word:"gradual",type:"gradable",cat:"description",def:"Taking place slowly over time",ex:"There was a gradual improvement.",coll:"very gradual, quite gradual"},
+{word:"swift",type:"gradable",cat:"description",def:"Moving or capable of moving at high speed",ex:"They made a swift decision.",coll:"very swift, remarkably swift"},
+{word:"abrupt",type:"gradable",cat:"description",def:"Sudden and unexpected",ex:"The change was quite abrupt.",coll:"rather abrupt, quite abrupt"},
+{word:"erratic",type:"gradable",cat:"description",def:"Not regular or even; unpredictable",ex:"His behaviour has been erratic.",coll:"increasingly erratic, completely erratic"},
+{word:"consistent",type:"gradable",cat:"description",def:"Acting the same way over time; not contradicting",ex:"She's incredibly consistent.",prep:"with",coll:"incredibly consistent, remarkably consistent"},
+{word:"persistent",type:"gradable",cat:"description",def:"Continuing firmly despite obstacles",ex:"The problem has been persistent.",coll:"particularly persistent"},
+{word:"intermittent",type:"gradable",cat:"description",def:"Occurring at irregular intervals",ex:"There have been intermittent outages.",coll:"quite intermittent"},
+{word:"chronic",type:"gradable",cat:"description",def:"Persisting for a long time; of long duration",ex:"She has chronic back pain.",coll:"deeply chronic"},
+{word:"acute",type:"gradable",cat:"description",def:"Severe or intense; of rapid onset",ex:"There's an acute shortage of housing.",coll:"particularly acute, increasingly acute"},
+{word:"stark",type:"gradable",cat:"description",def:"Severe or bare in appearance or outline",ex:"The contrast was stark.",coll:"quite stark, absolutely stark"},
+{word:"blunt",type:"gradable",cat:"description",def:"Not having a sharp edge; also: abruptly direct",ex:"She was very blunt.",coll:"very blunt, brutally blunt"},
+{word:"raw",type:"gradable",cat:"description",def:"Unprocessed; exposed and sensitive; emotionally real",ex:"The emotion in her performance was raw.",coll:"incredibly raw, brutally raw"},
+// WEATHER / PHYSICAL ENVIRONMENT
+{word:"blustery",type:"gradable",cat:"weather",def:"Characterized by strong winds",ex:"It was a blustery autumn day.",coll:"quite blustery"},
+{word:"overcast",type:"gradable",cat:"weather",def:"Covered with cloud; dull",ex:"The sky was completely overcast.",coll:"completely overcast"},
+{word:"muggy",type:"gradable",cat:"weather",def:"Warm, damp, and unpleasant",ex:"It was incredibly muggy.",coll:"incredibly muggy"},
+{word:"humid",type:"gradable",cat:"weather",def:"Having high moisture content in the air",ex:"The climate was very humid.",coll:"very humid, incredibly humid"},
+{word:"arid",type:"gradable",cat:"weather",def:"Dry; lacking water",ex:"The landscape was arid and barren.",coll:"extremely arid"},
+{word:"brisk",type:"gradable",cat:"weather",def:"Active and energetic; also: pleasantly cold",ex:"It's brisk but sunny today.",coll:"quite brisk"},
+{word:"gloomy",type:"gradable",cat:"weather",def:"Dark and depressing; also used figuratively",ex:"The weather has been incredibly gloomy.",coll:"incredibly gloomy"},
+// TASTE / FOOD
+{word:"delicious",type:"strong",gradable:"tasty",cat:"taste",def:"Highly pleasant to the taste",ex:"That was absolutely delicious.",coll:"absolutely delicious"},
+{word:"scrumptious",type:"strong",gradable:"tasty",cat:"taste",def:"Extremely appetising; informal",ex:"This cake is scrumptious.",coll:"absolutely scrumptious"},
+{word:"mouth-watering",type:"gradable",cat:"taste",def:"Making one feel very hungry",ex:"The smell was mouth-watering.",coll:"absolutely mouth-watering"},
+{word:"bland",type:"gradable",cat:"taste",def:"Lacking strong flavour",ex:"The food was incredibly bland.",coll:"incredibly bland, rather bland"},
+{word:"rich",type:"gradable",cat:"taste",def:"Having a strong or intense flavour",ex:"The sauce is incredibly rich.",coll:"incredibly rich, very rich"},
+{word:"bitter",type:"gradable",cat:"taste",def:"Having a sharp, pungent taste",ex:"The coffee is quite bitter.",coll:"quite bitter, very bitter"},
+{word:"tangy",type:"gradable",cat:"taste",def:"Having a sharp, piquant flavour",ex:"The dressing is deliciously tangy.",coll:"quite tangy, deliciously tangy"},
+{word:"pungent",type:"gradable",cat:"taste",def:"Having a sharply strong smell or taste",ex:"The smell was incredibly pungent.",coll:"incredibly pungent"},
+// MORAL / ETHICAL
+{word:"ethical",type:"gradable",cat:"moral",def:"Morally correct",ex:"Was that really ethical?",coll:"fully ethical, deeply ethical"},
+{word:"unethical",type:"gradable",cat:"moral",def:"Not morally correct",ex:"That was completely unethical.",coll:"completely unethical"},
+{word:"moral",type:"gradable",cat:"moral",def:"Concerned with the principles of right and wrong",ex:"She took a highly moral stance.",coll:"highly moral, deeply moral"},
+{word:"immoral",type:"gradable",cat:"moral",def:"Not conforming to accepted moral standards",ex:"That was deeply immoral.",coll:"deeply immoral, completely immoral"},
+{word:"virtuous",type:"gradable",cat:"moral",def:"Having or showing high moral standards",ex:"She led a virtuous life.",coll:"deeply virtuous"},
+{word:"corrupt",type:"gradable",cat:"moral",def:"Willing to act dishonestly in return for gain",ex:"The system is deeply corrupt.",coll:"deeply corrupt, completely corrupt"},
+{word:"honourable",type:"gradable",cat:"moral",def:"Deserving respect and esteem",ex:"He acted in an honourable way.",coll:"completely honourable, deeply honourable"},
+{word:"despicable",type:"strong",gradable:"awful",cat:"moral",def:"Deserving hatred and contempt",ex:"His behaviour was absolutely despicable.",coll:"absolutely despicable"},
+{word:"contemptible",type:"strong",gradable:"awful",cat:"moral",def:"Deserving contempt",ex:"That was a contemptible act.",coll:"absolutely contemptible"},
+{word:"reprehensible",type:"strong",gradable:"awful",cat:"moral",def:"Deserving censure or condemnation",ex:"His behaviour was reprehensible.",coll:"absolutely reprehensible"},
+// SPEED / TIME
+{word:"rapid",type:"gradable",cat:"speed",def:"Happening in a short time; fast",ex:"The change was rapid.",coll:"very rapid, extremely rapid"},
+{word:"sluggish",type:"gradable",cat:"speed",def:"Slow-moving; lacking energy",ex:"The economy is sluggish.",coll:"incredibly sluggish"},
+{word:"prompt",type:"gradable",cat:"speed",def:"Done without delay",ex:"The response was prompt.",coll:"very prompt"},
+{word:"belated",type:"gradable",cat:"speed",def:"Coming or happening later than expected",ex:"A belated happy birthday.",coll:"very belated"},
+{word:"overdue",type:"gradable",cat:"speed",def:"Not done or arrived by the expected time",ex:"This change is long overdue.",coll:"long overdue"},
+{word:"premature",type:"gradable",cat:"speed",def:"Happening before expected or the right time",ex:"It's premature to celebrate.",coll:"quite premature"},
+{word:"imminent",type:"gradable",cat:"speed",def:"About to happen",ex:"A decision seems imminent.",coll:"quite imminent"},
+{word:"urgent",type:"gradable",cat:"speed",def:"Requiring immediate attention",ex:"This is incredibly urgent.",coll:"incredibly urgent, extremely urgent"},
+// RELIABILITY / CERTAINTY
+{word:"certain",type:"gradable",cat:"certainty",def:"Known for sure; beyond doubt",ex:"She was absolutely certain.",prep:"about/of",coll:"absolutely certain, completely certain"},
+{word:"uncertain",type:"gradable",cat:"certainty",def:"Not known or definite",ex:"The outcome remains deeply uncertain.",coll:"deeply uncertain, highly uncertain"},
+{word:"definite",type:"nongrad",cat:"certainty",def:"Clearly decided; not doubtful",ex:"We need a definite answer.",coll:"perfectly definite"},
+{word:"ambiguous",type:"gradable",cat:"certainty",def:"Open to more than one interpretation",ex:"His answer was deliberately ambiguous.",coll:"deliberately ambiguous, deeply ambiguous"},
+{word:"vague",type:"gradable",cat:"certainty",def:"Not clearly expressed or understood",ex:"He was deliberately vague.",coll:"incredibly vague, deliberately vague"},
+{word:"dubious",type:"gradable",cat:"certainty",def:"Hesitating or doubting; of questionable quality",ex:"I'm a bit dubious about this.",coll:"a bit dubious, highly dubious"},
+{word:"questionable",type:"gradable",cat:"certainty",def:"Doubtful in quality; not clearly acceptable",ex:"His methods are questionable.",coll:"highly questionable"},
+{word:"undeniable",type:"nongrad",cat:"certainty",def:"Unable to be denied or disputed",ex:"His talent is undeniable.",coll:"truly undeniable"},
+{word:"indisputable",type:"nongrad",cat:"certainty",def:"Not able to be challenged or denied",ex:"The evidence is indisputable.",coll:"absolutely indisputable"},
+// COMPLEXITY / CLARITY
+{word:"complex",type:"gradable",cat:"complexity",def:"Consisting of many interconnected parts",ex:"The situation is incredibly complex.",coll:"incredibly complex, highly complex"},
+{word:"complicated",type:"gradable",cat:"complexity",def:"Consisting of many interconnected parts; involving many variables",ex:"It's really complicated.",coll:"really complicated, incredibly complicated"},
+{word:"straightforward",type:"gradable",cat:"complexity",def:"Simple and easy to understand",ex:"The process is pretty straightforward.",coll:"pretty straightforward, fairly straightforward"},
+{word:"convoluted",type:"gradable",cat:"complexity",def:"Extremely complex; difficult to follow",ex:"The explanation was incredibly convoluted.",coll:"incredibly convoluted"},
+{word:"intricate",type:"gradable",cat:"complexity",def:"Very detailed or complicated",ex:"The design is incredibly intricate.",coll:"incredibly intricate"},
+{word:"elaborate",type:"gradable",cat:"complexity",def:"Involving many carefully arranged parts",ex:"The plan was incredibly elaborate.",coll:"incredibly elaborate"},
+{word:"obscure",type:"gradable",cat:"complexity",def:"Not known to many people; hard to understand",ex:"The reference is a bit obscure.",coll:"rather obscure, very obscure"},
+// IMPORTANCE / VALUE
+{word:"crucial",type:"gradable",cat:"importance",def:"Decisive and of the greatest importance",ex:"This is absolutely crucial.",coll:"absolutely crucial"},
+{word:"vital",type:"gradable",cat:"importance",def:"Absolutely necessary; essential",ex:"Your support is absolutely vital.",coll:"absolutely vital"},
+{word:"essential",type:"gradable",cat:"importance",def:"Absolutely necessary; extremely important",ex:"This skill is absolutely essential.",coll:"absolutely essential"},
+{word:"critical",type:"gradable",cat:"importance",def:"Having a decisive importance; expressing criticism",ex:"This is critically important.",coll:"critically important"},
+{word:"indispensable",type:"gradable",cat:"importance",def:"Absolutely necessary",ex:"She's become indispensable.",coll:"absolutely indispensable"},
+{word:"irrelevant",type:"gradable",cat:"importance",def:"Not connected to the matter at hand",ex:"That's completely irrelevant.",coll:"completely irrelevant, totally irrelevant"},
+{word:"insignificant",type:"gradable",cat:"importance",def:"Too small or unimportant to be of concern",ex:"The difference is insignificant.",coll:"completely insignificant"},
+{word:"trivial",type:"gradable",cat:"importance",def:"Of little value or importance",ex:"Don't worry about such trivial matters.",coll:"completely trivial"},
+{word:"paramount",type:"nongrad",cat:"importance",def:"More important than anything else",ex:"Safety is paramount.",coll:"of paramount importance"},
+{word:"secondary",type:"gradable",cat:"importance",def:"Coming after or less important than",ex:"That's secondary to the main issue.",prep:"to",coll:"of secondary importance"},
+// ADJECTIVE + PREPOSITION: Common Dependent Adjectives
+{word:"interested",type:"gradable",cat:"dependent-prep",def:"Having curiosity or concern about something",ex:"Are you interested in art?",prep:"in",coll:"deeply interested, very interested"},
+{word:"bored",type:"gradable",cat:"dependent-prep",def:"Weary and impatient; the experiencer of boredom",ex:"She was bored with the routine.",prep:"of/with",coll:"bored stiff, bored to tears"},
+{word:"worried",type:"gradable",cat:"dependent-prep",def:"Feeling troubled by potential problems",ex:"She was worried about the results.",prep:"about",coll:"deeply worried, very worried"},
+{word:"concerned",type:"gradable",cat:"dependent-prep",def:"Worried; or: relating to",ex:"She was concerned about his health.",prep:"about/with",coll:"deeply concerned, genuinely concerned"},
+{word:"disappointed",type:"gradable",cat:"dependent-prep",def:"Sad that expectations were not met",ex:"He was disappointed with the result.",prep:"with/by/at",coll:"deeply disappointed, bitterly disappointed"},
+{word:"satisfied",type:"gradable",cat:"dependent-prep",def:"Content; having met one's expectations",ex:"I'm satisfied with the outcome.",prep:"with",coll:"perfectly satisfied, very satisfied"},
+{word:"pleased",type:"gradable",cat:"dependent-prep",def:"Feeling pleasure or satisfaction",ex:"I'm pleased with the results.",prep:"with/about",coll:"very pleased, genuinely pleased"},
+{word:"shocked",type:"gradable",cat:"dependent-prep",def:"Feeling surprise and distress",ex:"She was shocked by the news.",prep:"by/at",coll:"deeply shocked, visibly shocked"},
+{word:"surprised",type:"gradable",cat:"dependent-prep",def:"Feeling mild shock or astonishment",ex:"I was surprised by the outcome.",prep:"by/at",coll:"quite surprised, very surprised"},
+{word:"amazed",type:"strong",gradable:"surprised",cat:"dependent-prep",def:"Greatly surprised",ex:"I was amazed by what happened.",prep:"by/at",coll:"absolutely amazed"},
+{word:"impressed",type:"gradable",cat:"dependent-prep",def:"Having a strong positive reaction",ex:"I was impressed by her work.",prep:"by/with",coll:"deeply impressed, very impressed"},
+{word:"bored",type:"gradable",cat:"dependent-prep",def:"Weary and impatient",ex:"She was bored with the routine.",prep:"of/with",coll:"bored stiff, bored to tears"},
+{word:"fed up",type:"gradable",cat:"dependent-prep",def:"Tired and annoyed",ex:"I'm fed up with waiting.",prep:"with",coll:"absolutely fed up, thoroughly fed up"},
+{word:"sick",type:"gradable",cat:"dependent-prep",def:"Tired of; disgusted by; informal",ex:"I'm sick of waiting.",prep:"of",coll:"sick and tired of, absolutely sick of"},
+{word:"tired",type:"gradable",cat:"dependent-prep",def:"In the sense: bored or annoyed by",ex:"I'm tired of the excuses.",prep:"of",coll:"tired of, absolutely tired of"},
+{word:"aware",type:"gradable",cat:"dependent-prep",def:"Having knowledge or perception",ex:"Are you aware of the risks?",prep:"of",coll:"fully aware, acutely aware"},
+{word:"conscious",type:"gradable",cat:"dependent-prep",def:"Aware of and responsive to",ex:"She was conscious of the risk.",prep:"of",coll:"fully conscious, acutely conscious"},
+{word:"afraid",type:"gradable",cat:"dependent-prep",def:"Feeling fear or anxiety",ex:"She's afraid of flying.",prep:"of",coll:"terribly afraid, desperately afraid"},
+{word:"frightened",type:"gradable",cat:"dependent-prep",def:"Afraid; scared",ex:"She was frightened of the dark.",prep:"of/by",coll:"deeply frightened, terribly frightened"},
+{word:"scared",type:"gradable",cat:"dependent-prep",def:"Feeling fear",ex:"She was scared of spiders.",prep:"of/by",coll:"really scared, incredibly scared"},
+{word:"envious",type:"gradable",cat:"dependent-prep",def:"Feeling envy",ex:"I was envious of her success.",prep:"of",coll:"deeply envious"},
+{word:"jealous",type:"gradable",cat:"dependent-prep",def:"Feeling jealousy",ex:"He was jealous of her promotion.",prep:"of",coll:"deeply jealous"},
+{word:"proud",type:"gradable",cat:"dependent-prep",def:"Feeling pride",ex:"She's proud of her achievements.",prep:"of",coll:"incredibly proud, deeply proud"},
+{word:"ashamed",type:"gradable",cat:"dependent-prep",def:"Feeling shame",ex:"He was ashamed of his behaviour.",prep:"of",coll:"deeply ashamed"},
+{word:"capable",type:"gradable",cat:"dependent-prep",def:"Having the ability",ex:"She's capable of much more.",prep:"of",coll:"perfectly capable"},
+{word:"incapable",type:"gradable",cat:"dependent-prep",def:"Lacking the ability",ex:"He seems incapable of change.",prep:"of",coll:"apparently incapable, seemingly incapable"},
+{word:"fond",type:"gradable",cat:"dependent-prep",def:"Having affection for",ex:"She's very fond of jazz.",prep:"of",coll:"very fond, extremely fond"},
+{word:"keen",type:"gradable",cat:"dependent-prep",def:"Enthusiastic about",ex:"He's keen on photography.",prep:"on",coll:"very keen, incredibly keen"},
+{word:"good",type:"gradable",cat:"dependent-prep",def:"Skilled at; having ability in",ex:"She's very good at maths.",prep:"at",coll:"very good, incredibly good"},
+{word:"bad",type:"gradable",cat:"dependent-prep",def:"Lacking skill at",ex:"I'm really bad at maths.",prep:"at",coll:"really bad, pretty bad"},
+{word:"brilliant",type:"gradable",cat:"dependent-prep",def:"Having exceptional ability in",ex:"She's brilliant at languages.",prep:"at",coll:"absolutely brilliant at"},
+{word:"hopeless",type:"gradable",cat:"dependent-prep",def:"Having no ability at all; informal",ex:"I'm hopeless at cooking.",prep:"at",coll:"absolutely hopeless at"},
+{word:"similar",type:"nongrad",cat:"dependent-prep",def:"Resembling without being identical",ex:"This is similar to what we discussed.",prep:"to",coll:"very similar to"},
+{word:"different",type:"gradable",cat:"dependent-prep",def:"Not the same; unlike",ex:"This is very different from what I expected.",prep:"from/to",coll:"completely different, totally different"},
+{word:"dependent",type:"gradable",cat:"dependent-prep",def:"Relying on",ex:"He's still dependent on his parents.",prep:"on",coll:"fully dependent, completely dependent"},
+{word:"independent",type:"gradable",cat:"dependent-prep",def:"Free from outside control",ex:"She became increasingly independent.",prep:"of/from",coll:"completely independent, fiercely independent"},
+{word:"responsible",type:"gradable",cat:"dependent-prep",def:"Having obligation or duty",ex:"Who is responsible for this?",prep:"for",coll:"directly responsible, ultimately responsible"},
+{word:"suitable",type:"gradable",cat:"dependent-prep",def:"Right or appropriate for",ex:"Is this suitable for children?",prep:"for",coll:"perfectly suitable"},
+{word:"appropriate",type:"gradable",cat:"dependent-prep",def:"Suitable for the purpose",ex:"Is that really appropriate in this context?",prep:"for",coll:"perfectly appropriate"},
+{word:"relevant",type:"gradable",cat:"dependent-prep",def:"Closely connected to the matter",ex:"Is this relevant to the discussion?",prep:"to",coll:"directly relevant, highly relevant"},
+{word:"related",type:"gradable",cat:"dependent-prep",def:"Connected to",ex:"These issues are related to funding.",prep:"to",coll:"closely related, directly related"},
+{word:"committed",type:"gradable",cat:"dependent-prep",def:"Dedicated to",ex:"She's committed to making it work.",prep:"to",coll:"deeply committed, fully committed"},
+{word:"devoted",type:"gradable",cat:"dependent-prep",def:"Very loving and loyal; very dedicated",ex:"He's devoted to his family.",prep:"to",coll:"deeply devoted, completely devoted"},
+{word:"opposed",type:"gradable",cat:"dependent-prep",def:"In conflict with or against",ex:"She was opposed to the idea.",prep:"to",coll:"firmly opposed, strongly opposed"},
+{word:"sensitive",type:"gradable",cat:"dependent-prep",def:"Quick to detect or respond to",ex:"She's very sensitive to criticism.",prep:"to",coll:"very sensitive, incredibly sensitive"},
+{word:"immune",type:"nongrad",cat:"dependent-prep",def:"Protected against; not affected by",ex:"Nobody is immune to criticism.",prep:"to",coll:"seemingly immune"},
+{word:"allergic",type:"gradable",cat:"dependent-prep",def:"Having allergy; informal: strongly opposed to",ex:"She's allergic to hard work.",prep:"to",coll:"allergic to"},
+{word:"accustomed",type:"gradable",cat:"dependent-prep",def:"Familiar with; used to",ex:"She was accustomed to long hours.",prep:"to",coll:"well accustomed to"},
+{word:"used to",type:"gradable",cat:"dependent-prep",def:"Familiar with through habit",ex:"I'm not used to this heat.",prep:"to",coll:"perfectly used to"},
+{word:"prone",type:"gradable",cat:"dependent-prep",def:"Likely to do or be affected by",ex:"He's prone to exaggeration.",prep:"to",coll:"highly prone, particularly prone"},
+{word:"subject",type:"gradable",cat:"dependent-prep",def:"Likely to be affected by",ex:"We're all subject to the same rules.",prep:"to",coll:"subject to change"},
+{word:"suspicious",type:"gradable",cat:"dependent-prep",def:"Having doubt about honesty",ex:"She was suspicious of his motives.",prep:"of",coll:"deeply suspicious, highly suspicious"},
+{word:"critical",type:"gradable",cat:"dependent-prep",def:"Expressing disapproval",ex:"He was critical of the decision.",prep:"of",coll:"deeply critical, highly critical"},
+{word:"grateful",type:"gradable",cat:"dependent-prep",def:"Feeling thankfulness",ex:"I'm incredibly grateful for your help.",prep:"for/to",coll:"incredibly grateful, deeply grateful"},
+{word:"thankful",type:"gradable",cat:"dependent-prep",def:"Expressing gratitude",ex:"I'm thankful for this opportunity.",prep:"for",coll:"deeply thankful, very thankful"},
+{word:"indebted",type:"gradable",cat:"dependent-prep",def:"Owing gratitude to",ex:"I'm deeply indebted to you.",prep:"to",coll:"deeply indebted"},
+{word:"equal",type:"nongrad",cat:"dependent-prep",def:"The same in quality or quantity",ex:"They're not equal in experience.",prep:"to",coll:"perfectly equal"},
+{word:"superior",type:"gradable",cat:"dependent-prep",def:"Higher in rank or quality",ex:"She feels superior to everyone.",prep:"to",coll:"clearly superior"},
+{word:"inferior",type:"gradable",cat:"dependent-prep",def:"Lower in rank or quality",ex:"He felt inferior to his peers.",prep:"to",coll:"clearly inferior"},
+{word:"familiar",type:"gradable",cat:"dependent-prep",def:"Having knowledge of",ex:"Are you familiar with this system?",prep:"with",coll:"very familiar with"},
+{word:"consistent",type:"gradable",cat:"dependent-prep",def:"Compatible with; not contradicting",ex:"This is consistent with the evidence.",prep:"with",coll:"perfectly consistent with"},
+{word:"associated",type:"gradable",cat:"dependent-prep",def:"Connected with",ex:"This is closely associated with stress.",prep:"with",coll:"closely associated with"},
+{word:"obsessed",type:"gradable",cat:"dependent-prep",def:"Preoccupied with to an excessive degree",ex:"She's obsessed with detail.",prep:"with/by",coll:"completely obsessed, totally obsessed"},
+{word:"baffled",type:"gradable",cat:"dependent-prep",def:"Totally bewildered",ex:"I was completely baffled by the answer.",prep:"by",coll:"completely baffled, utterly baffled"},
+{word:"fascinated",type:"gradable",cat:"dependent-prep",def:"Strongly attracted and interested",ex:"She was fascinated by the subject.",prep:"by/with",coll:"absolutely fascinated, deeply fascinated"},
+{word:"absorbed",type:"gradable",cat:"dependent-prep",def:"Intensely engaged in",ex:"She was absorbed in her work.",prep:"in",coll:"deeply absorbed, completely absorbed"},
+{word:"engrossed",type:"gradable",cat:"dependent-prep",def:"Completely absorbed in",ex:"He was engrossed in the book.",prep:"in",coll:"completely engrossed, totally engrossed"},
+// ── BATCH 3 ────────────────────────────────────────────────────────────────
+// COLOUR / VISUAL
+{word:"vivid",type:"gradable",cat:"visual",def:"Producing powerful mental images; intensely bright",ex:"The colours were incredibly vivid.",coll:"incredibly vivid"},
+{word:"vibrant",type:"gradable",cat:"visual",def:"Full of energy and colour",ex:"The market was incredibly vibrant.",coll:"incredibly vibrant"},
+{word:"dull",type:"gradable",cat:"visual",def:"Lacking brightness or colour",ex:"The colours look incredibly dull.",coll:"incredibly dull"},
+{word:"muted",type:"gradable",cat:"visual",def:"Subdued in colour; not intense",ex:"The palette is muted and elegant.",coll:"rather muted"},
+{word:"translucent",type:"gradable",cat:"visual",def:"Allowing light to pass through; not fully transparent",ex:"The skin looked almost translucent.",coll:"almost translucent"},
+{word:"opaque",type:"gradable",cat:"visual",def:"Not transparent; also: hard to understand",ex:"The writing style is rather opaque.",coll:"completely opaque"},
+// TEXTURE
+{word:"rough",type:"gradable",cat:"texture",def:"Having an uneven surface",ex:"The texture is really rough.",coll:"really rough"},
+{word:"smooth",type:"gradable",cat:"texture",def:"Having an even surface",ex:"The surface is incredibly smooth.",coll:"incredibly smooth"},
+{word:"coarse",type:"gradable",cat:"texture",def:"Rough; of large particles",ex:"The fabric feels quite coarse.",coll:"quite coarse"},
+{word:"silky",type:"gradable",cat:"texture",def:"Smooth and soft like silk",ex:"Her hair was incredibly silky.",coll:"incredibly silky"},
+{word:"velvety",type:"gradable",cat:"texture",def:"Soft and smooth like velvet",ex:"The sauce had a velvety texture.",coll:"perfectly velvety"},
+{word:"crispy",type:"gradable",cat:"texture",def:"Firm and making a crunch sound",ex:"The skin was perfectly crispy.",coll:"perfectly crispy"},
+{word:"soggy",type:"gradable",cat:"texture",def:"Wet and soft; too moist",ex:"The bread went completely soggy.",coll:"completely soggy"},
+{word:"fluffy",type:"gradable",cat:"texture",def:"Light and soft",ex:"The omelette was incredibly fluffy.",coll:"incredibly fluffy"},
+// SOUND
+{word:"loud",type:"gradable",cat:"sound",def:"Producing much noise",ex:"The music was incredibly loud.",coll:"incredibly loud"},
+{word:"deafening",type:"strong",gradable:"loud",cat:"sound",def:"Extremely loud",ex:"The noise was absolutely deafening.",coll:"absolutely deafening"},
+{word:"piercing",type:"gradable",cat:"sound",def:"Very high and sharp; penetrating",ex:"She let out a piercing scream.",coll:"absolutely piercing"},
+{word:"shrill",type:"gradable",cat:"sound",def:"High-pitched and unpleasant",ex:"The alarm was incredibly shrill.",coll:"incredibly shrill"},
+{word:"melodious",type:"gradable",cat:"sound",def:"Pleasant-sounding",ex:"Her voice is incredibly melodious.",coll:"incredibly melodious"},
+{word:"grating",type:"gradable",cat:"sound",def:"Having an irritating sound",ex:"His voice is incredibly grating.",coll:"incredibly grating"},
+{word:"muffled",type:"gradable",cat:"sound",def:"Not clearly heard; deadened in sound",ex:"We heard muffled voices.",coll:"completely muffled"},
+// LIGHT
+{word:"bright",type:"gradable",cat:"light",def:"Giving out much light",ex:"The room was incredibly bright.",coll:"incredibly bright"},
+{word:"dim",type:"gradable",cat:"light",def:"Not bright; giving little light",ex:"The lighting was incredibly dim.",coll:"incredibly dim"},
+{word:"blinding",type:"strong",gradable:"bright",cat:"light",def:"Extremely bright; cannot be looked at directly",ex:"The light was absolutely blinding.",coll:"absolutely blinding"},
+{word:"dazzling",type:"strong",gradable:"bright",cat:"light",def:"Blindingly bright; also: impressively impressive",ex:"Her smile was absolutely dazzling.",coll:"absolutely dazzling"},
+// AGE / NEWNESS
+{word:"ancient",type:"gradable",cat:"age",def:"Very old; belonging to a remote period",ex:"The building is absolutely ancient.",coll:"absolutely ancient"},
+{word:"dated",type:"gradable",cat:"age",def:"Old-fashioned; no longer current",ex:"The design looks a bit dated.",coll:"a bit dated"},
+{word:"obsolete",type:"gradable",cat:"age",def:"No longer produced or used",ex:"The technology is completely obsolete.",coll:"completely obsolete"},
+{word:"contemporary",type:"gradable",cat:"age",def:"Living or occurring at the same time; modern",ex:"The decor is very contemporary.",coll:"very contemporary"},
+{word:"timeless",type:"nongrad",cat:"age",def:"Not affected by the passage of time",ex:"The design is truly timeless.",coll:"truly timeless"},
+{word:"cutting-edge",type:"gradable",cat:"age",def:"At the forefront of innovation",ex:"The technology is cutting-edge.",coll:"truly cutting-edge"},
+{word:"state-of-the-art",type:"nongrad",cat:"age",def:"Using the latest and most sophisticated techniques",ex:"The facilities are state-of-the-art.",coll:"completely state-of-the-art"},
+{word:"vintage",type:"gradable",cat:"age",def:"Of high quality and lasting value; old but excellent",ex:"That is a truly vintage performance.",coll:"truly vintage"},
+// ECONOMICS
+{word:"expensive",type:"gradable",cat:"economics",def:"Costing a lot of money",ex:"It is incredibly expensive.",coll:"incredibly expensive"},
+{word:"affordable",type:"gradable",cat:"economics",def:"Inexpensive; reasonably priced",ex:"The prices are very affordable.",coll:"very affordable"},
+{word:"cheap",type:"gradable",cat:"economics",def:"Low in price; sometimes implies poor quality",ex:"The materials are incredibly cheap.",coll:"incredibly cheap"},
+{word:"exorbitant",type:"strong",gradable:"expensive",cat:"economics",def:"Unreasonably high in price",ex:"The prices are absolutely exorbitant.",coll:"absolutely exorbitant"},
+{word:"extravagant",type:"gradable",cat:"economics",def:"Lacking restraint in spending; excessive",ex:"That was an extravagant purchase.",coll:"incredibly extravagant"},
+{word:"frugal",type:"gradable",cat:"economics",def:"Economical with money",ex:"She has always been incredibly frugal.",coll:"incredibly frugal"},
+{word:"lucrative",type:"gradable",cat:"economics",def:"Producing much money; profitable",ex:"It is a very lucrative business.",coll:"very lucrative"},
+{word:"viable",type:"gradable",cat:"economics",def:"Capable of working successfully; feasible",ex:"Is it a viable option?",coll:"perfectly viable"},
+// POWER / POLITICS
+{word:"powerful",type:"gradable",cat:"power",def:"Having great power or strength",ex:"She is incredibly powerful.",coll:"incredibly powerful"},
+{word:"influential",type:"gradable",cat:"power",def:"Having great influence on others",ex:"She is incredibly influential in her field.",coll:"incredibly influential"},
+{word:"authoritative",type:"gradable",cat:"power",def:"Having authority; commanding",ex:"He spoke in an authoritative tone.",coll:"deeply authoritative"},
+{word:"dominant",type:"gradable",cat:"power",def:"Most important or powerful",ex:"They are the dominant force.",coll:"completely dominant"},
+{word:"oppressive",type:"gradable",cat:"power",def:"Unjustly cruel or harsh",ex:"The regime was deeply oppressive.",coll:"deeply oppressive"},
+{word:"authoritarian",type:"gradable",cat:"power",def:"Favouring strict obedience to authority",ex:"His style was increasingly authoritarian.",coll:"deeply authoritarian"},
+// RISK / DANGER
+{word:"dangerous",type:"gradable",cat:"risk",def:"Likely to cause harm",ex:"This is incredibly dangerous.",coll:"incredibly dangerous"},
+{word:"risky",type:"gradable",cat:"risk",def:"Full of risk; potentially dangerous",ex:"That is a very risky strategy.",coll:"very risky"},
+{word:"hazardous",type:"gradable",cat:"risk",def:"Risky; involving danger",ex:"The conditions are incredibly hazardous.",coll:"incredibly hazardous"},
+{word:"treacherous",type:"gradable",cat:"risk",def:"Guilty of betrayal; dangerously unstable",ex:"The roads were incredibly treacherous.",coll:"incredibly treacherous"},
+{word:"precarious",type:"gradable",cat:"risk",def:"Not securely held; dependent on chance",ex:"His position is increasingly precarious.",coll:"increasingly precarious"},
+{word:"vulnerable",type:"gradable",cat:"risk",def:"Exposed to harm; susceptible",ex:"She is incredibly vulnerable right now.",prep:"to",coll:"incredibly vulnerable, deeply vulnerable"},
+{word:"resilient",type:"gradable",cat:"risk",def:"Able to withstand or recover from difficulties",ex:"The economy is surprisingly resilient.",coll:"surprisingly resilient"},
+{word:"robust",type:"gradable",cat:"risk",def:"Strong and healthy; sturdy",ex:"The system is incredibly robust.",coll:"incredibly robust"},
+// COMMUNICATION
+{word:"persuasive",type:"gradable",cat:"communication",def:"Good at persuading people",ex:"She is incredibly persuasive.",coll:"incredibly persuasive"},
+{word:"compelling",type:"gradable",cat:"communication",def:"Evoking interest or admiration; convincing",ex:"The argument was incredibly compelling.",coll:"incredibly compelling"},
+{word:"convincing",type:"gradable",cat:"communication",def:"Able to persuade; believable",ex:"That was not very convincing.",coll:"very convincing"},
+{word:"misleading",type:"gradable",cat:"communication",def:"Giving a wrong impression",ex:"That headline is incredibly misleading.",coll:"incredibly misleading"},
+{word:"cryptic",type:"gradable",cat:"communication",def:"Having a hidden meaning; mysterious",ex:"He gave a cryptic response.",coll:"rather cryptic"},
+{word:"candid",type:"gradable",cat:"communication",def:"Truthful and straightforward",ex:"She was incredibly candid about her concerns.",prep:"about",coll:"incredibly candid"},
+{word:"tactless",type:"gradable",cat:"communication",def:"Lacking sensitivity or tact",ex:"That was incredibly tactless.",coll:"incredibly tactless"},
+{word:"succinct",type:"gradable",cat:"communication",def:"Briefly and clearly expressed",ex:"Her summary was incredibly succinct.",coll:"incredibly succinct"},
+{word:"poignant",type:"gradable",cat:"communication",def:"Evoking a keen sense of sadness or regret",ex:"The ending was incredibly poignant.",coll:"incredibly poignant"},
+{word:"evocative",type:"gradable",cat:"communication",def:"Bringing strong images or feelings to mind",ex:"The description is incredibly evocative.",prep:"of",coll:"incredibly evocative"},
+// CREATIVITY / ARTS
+{word:"imaginative",type:"gradable",cat:"creativity",def:"Having a lively imagination",ex:"Her approach is incredibly imaginative.",coll:"incredibly imaginative"},
+{word:"inventive",type:"gradable",cat:"creativity",def:"Having the ability to create new things",ex:"He is incredibly inventive.",coll:"incredibly inventive"},
+{word:"original",type:"gradable",cat:"creativity",def:"Not dependent on others; new and creative",ex:"Her work is incredibly original.",coll:"incredibly original, truly original"},
+{word:"derivative",type:"gradable",cat:"creativity",def:"Imitative of another work; lacking originality",ex:"The style is a bit derivative.",coll:"a bit derivative"},
+{word:"bold",type:"gradable",cat:"creativity",def:"Showing willingness to take risks; striking",ex:"It was an incredibly bold design choice.",coll:"incredibly bold"},
+{word:"avant-garde",type:"gradable",cat:"creativity",def:"Favouring experimental ideas in the arts",ex:"The exhibition was incredibly avant-garde.",coll:"incredibly avant-garde"},
+{word:"understated",type:"gradable",cat:"creativity",def:"Presented with little emphasis; subtle",ex:"The design is elegantly understated.",coll:"elegantly understated"},
+{word:"minimalist",type:"gradable",cat:"creativity",def:"Using the minimum necessary; simple",ex:"The aesthetic is very minimalist.",coll:"very minimalist"},
+{word:"flamboyant",type:"gradable",cat:"creativity",def:"Tending to attract attention; showy",ex:"His style is incredibly flamboyant.",coll:"incredibly flamboyant"},
+{word:"eccentric",type:"gradable",cat:"creativity",def:"Unconventional and strange",ex:"She is wonderfully eccentric.",coll:"wonderfully eccentric"},
+{word:"quirky",type:"gradable",cat:"creativity",def:"Characterized by peculiar or unexpected traits",ex:"Her sense of humour is incredibly quirky.",coll:"incredibly quirky"},
+{word:"whimsical",type:"gradable",cat:"creativity",def:"Playfully quaint or fanciful",ex:"The design is wonderfully whimsical.",coll:"wonderfully whimsical"},
+// NATURE
+{word:"breathtaking",type:"strong",gradable:"beautiful",cat:"nature",def:"Astonishing in beauty or scale",ex:"The view was absolutely breathtaking.",coll:"absolutely breathtaking"},
+{word:"picturesque",type:"gradable",cat:"nature",def:"Visually attractive, especially in a quaint way",ex:"The village is incredibly picturesque.",coll:"incredibly picturesque"},
+{word:"serene",type:"gradable",cat:"nature",def:"Calm and peaceful",ex:"The lake was incredibly serene.",coll:"incredibly serene, perfectly serene"},
+{word:"tranquil",type:"gradable",cat:"nature",def:"Free from disturbance; peaceful",ex:"The setting was incredibly tranquil.",coll:"incredibly tranquil"},
+{word:"barren",type:"gradable",cat:"nature",def:"Too poor to produce vegetation; unproductive",ex:"The landscape was incredibly barren.",coll:"incredibly barren"},
+{word:"rugged",type:"gradable",cat:"nature",def:"Having a rough surface; also: robust",ex:"The coastline is incredibly rugged.",coll:"incredibly rugged"},
+{word:"desolate",type:"gradable",cat:"nature",def:"Bleakly empty or bare",ex:"The landscape looked desolate.",coll:"utterly desolate"},
+// RELATIONSHIPS
+{word:"close",type:"gradable",cat:"relationships",def:"On very good and familiar terms",ex:"They are incredibly close.",coll:"incredibly close"},
+{word:"distant",type:"gradable",cat:"relationships",def:"Emotionally remote; not close",ex:"She seemed very distant.",coll:"very distant"},
+{word:"intimate",type:"gradable",cat:"relationships",def:"Closely acquainted; very private",ex:"They share an incredibly intimate bond.",coll:"incredibly intimate"},
+{word:"estranged",type:"gradable",cat:"relationships",def:"No longer close or affectionate",ex:"He has been estranged from his family.",prep:"from",coll:"completely estranged"},
+{word:"compatible",type:"gradable",cat:"relationships",def:"Able to exist together harmoniously",ex:"They are incredibly compatible.",prep:"with",coll:"incredibly compatible"},
+{word:"incompatible",type:"gradable",cat:"relationships",def:"Not able to coexist harmoniously",ex:"They are completely incompatible.",prep:"with",coll:"completely incompatible"},
+{word:"supportive",type:"gradable",cat:"relationships",def:"Providing encouragement and help",ex:"She is incredibly supportive.",prep:"of",coll:"incredibly supportive"},
+{word:"possessive",type:"gradable",cat:"relationships",def:"Demanding total attention and love",ex:"He can get quite possessive.",prep:"of",coll:"quite possessive"},
+// DIFFICULTY
+{word:"challenging",type:"gradable",cat:"difficulty",def:"Requiring effort and skill",ex:"That was incredibly challenging.",coll:"incredibly challenging"},
+{word:"demanding",type:"gradable",cat:"difficulty",def:"Requiring a lot of skill or effort",ex:"It is an incredibly demanding job.",coll:"incredibly demanding"},
+{word:"arduous",type:"gradable",cat:"difficulty",def:"Requiring strenuous effort",ex:"The climb was incredibly arduous.",coll:"incredibly arduous"},
+{word:"gruelling",type:"strong",gradable:"hard",cat:"difficulty",def:"Extremely tiring and demanding",ex:"The training was absolutely gruelling.",coll:"absolutely gruelling"},
+{word:"taxing",type:"gradable",cat:"difficulty",def:"Physically or mentally demanding",ex:"It has been an incredibly taxing week.",coll:"incredibly taxing"},
+{word:"manageable",type:"gradable",cat:"difficulty",def:"Able to be dealt with",ex:"The workload is very manageable.",coll:"very manageable, perfectly manageable"},
+{word:"daunting",type:"gradable",cat:"difficulty",def:"Seeming difficult and making you feel less confident",ex:"The task is incredibly daunting.",coll:"incredibly daunting"},
+{word:"intimidating",type:"gradable",cat:"difficulty",def:"Making you feel nervous or frightened",ex:"She can be incredibly intimidating.",coll:"incredibly intimidating"},
+// GENERAL POSITIVE
+{word:"wonderful",type:"strong",gradable:"good",cat:"general-positive",def:"Inspiring delight or admiration",ex:"It was absolutely wonderful.",coll:"absolutely wonderful"},
+{word:"marvellous",type:"strong",gradable:"good",cat:"general-positive",def:"Extremely good; British English",ex:"That was absolutely marvellous.",coll:"absolutely marvellous"},
+{word:"fantastic",type:"strong",gradable:"good",cat:"general-positive",def:"Extraordinarily good; informal",ex:"That was absolutely fantastic.",coll:"absolutely fantastic"},
+{word:"magnificent",type:"strong",gradable:"good",cat:"general-positive",def:"Impressively beautiful or elaborate",ex:"The view was absolutely magnificent.",coll:"absolutely magnificent"},
+{word:"splendid",type:"strong",gradable:"good",cat:"general-positive",def:"Magnificent; very good; slightly formal",ex:"That was absolutely splendid.",coll:"absolutely splendid"},
+{word:"glorious",type:"strong",gradable:"good",cat:"general-positive",def:"Having or worthy of glory; wonderful",ex:"What a glorious day.",coll:"absolutely glorious"},
+{word:"admirable",type:"gradable",cat:"general-positive",def:"Deserving respect and approval",ex:"Her commitment is truly admirable.",coll:"truly admirable"},
+{word:"impressive",type:"gradable",cat:"general-positive",def:"Evoking admiration through size or quality",ex:"That was incredibly impressive.",coll:"incredibly impressive"},
+{word:"decent",type:"gradable",cat:"general-positive",def:"Conforming to accepted standards; acceptable",ex:"That is a really decent attempt.",coll:"really decent, perfectly decent"},
+{word:"solid",type:"gradable",cat:"general-positive",def:"Dependable; of good quality; informal",ex:"That was a solid performance.",coll:"really solid"},
+// GENERAL NEGATIVE
+{word:"awful",type:"strong",gradable:"bad",cat:"general-negative",def:"Very bad or unpleasant",ex:"That was absolutely awful.",coll:"absolutely awful"},
+{word:"terrible",type:"strong",gradable:"bad",cat:"general-negative",def:"Extremely bad",ex:"That was absolutely terrible.",coll:"absolutely terrible"},
+{word:"horrendous",type:"strong",gradable:"bad",cat:"general-negative",def:"Extremely unpleasant; horrible",ex:"The traffic was absolutely horrendous.",coll:"absolutely horrendous"},
+{word:"horrific",type:"strong",gradable:"bad",cat:"general-negative",def:"Causing horror",ex:"The accident was absolutely horrific.",coll:"absolutely horrific"},
+{word:"ghastly",type:"strong",gradable:"bad",cat:"general-negative",def:"Extremely unpleasant; British English",ex:"What a ghastly idea.",coll:"absolutely ghastly"},
+{word:"hideous",type:"strong",gradable:"ugly",cat:"general-negative",def:"Extremely ugly; very unpleasant",ex:"That design is absolutely hideous.",coll:"absolutely hideous"},
+{word:"vile",type:"strong",gradable:"bad",cat:"general-negative",def:"Morally bad; unpleasant",ex:"That was absolutely vile.",coll:"absolutely vile"},
+{word:"abysmal",type:"strong",gradable:"bad",cat:"general-negative",def:"Extremely bad; informal",ex:"The service was absolutely abysmal.",coll:"absolutely abysmal"},
+{word:"pitiful",type:"strong",gradable:"bad",cat:"general-negative",def:"Deserving or causing pity",ex:"That attempt was pitiful.",coll:"absolutely pitiful"},
+{word:"pathetic",type:"strong",gradable:"bad",cat:"general-negative",def:"Miserably inadequate; informal",ex:"That excuse is absolutely pathetic.",coll:"absolutely pathetic"},
+{word:"lamentable",type:"strong",gradable:"bad",cat:"general-negative",def:"Regrettably bad; deplorable",ex:"The results were absolutely lamentable.",coll:"absolutely lamentable"},
+{word:"repugnant",type:"strong",gradable:"bad",cat:"general-negative",def:"Extremely distasteful",ex:"I find that idea absolutely repugnant.",prep:"to",coll:"absolutely repugnant"},
+// UNUSUAL
+{word:"peculiar",type:"gradable",cat:"unusual",def:"Different from what is normal; strange",ex:"There is something peculiar about it.",coll:"quite peculiar"},
+{word:"bizarre",type:"gradable",cat:"unusual",def:"Very strange or unusual",ex:"That is absolutely bizarre.",coll:"absolutely bizarre"},
+{word:"absurd",type:"strong",gradable:"ridiculous",cat:"unusual",def:"Wildly unreasonable or illogical",ex:"That is absolutely absurd.",coll:"absolutely absurd"},
+{word:"preposterous",type:"strong",gradable:"ridiculous",cat:"unusual",def:"Utterly absurd; contrary to reason",ex:"That is completely preposterous.",coll:"completely preposterous"},
+{word:"ludicrous",type:"strong",gradable:"ridiculous",cat:"unusual",def:"So foolish as to be amusing",ex:"That is absolutely ludicrous.",coll:"absolutely ludicrous"},
+{word:"outlandish",type:"gradable",cat:"unusual",def:"Bizarre or unfamiliar",ex:"Her fashion choices are a bit outlandish.",coll:"a bit outlandish"},
+{word:"unconventional",type:"gradable",cat:"unusual",def:"Not based on what is usual",ex:"His approach is incredibly unconventional.",coll:"incredibly unconventional"},
+{word:"surreal",type:"gradable",cat:"unusual",def:"Having the quality of a dream; bizarre",ex:"The whole experience was incredibly surreal.",coll:"incredibly surreal"},
+{word:"uncanny",type:"gradable",cat:"unusual",def:"Strange and mysterious; beyond normal",ex:"The resemblance is uncanny.",coll:"absolutely uncanny"},
+{word:"eerie",type:"gradable",cat:"unusual",def:"Strange and frightening",ex:"The silence was incredibly eerie.",coll:"incredibly eerie"},
+{word:"baffling",type:"gradable",cat:"unusual",def:"Totally bewildering",ex:"The result was completely baffling.",coll:"completely baffling"},
+{word:"paradoxical",type:"gradable",cat:"unusual",def:"Seemingly contradictory but possibly true",ex:"It is paradoxical but it works.",coll:"deeply paradoxical"},
+// PERSONALITY: MORE
+{word:"warm-hearted",type:"gradable",cat:"personality",def:"Kind and sympathetic",ex:"She is incredibly warm-hearted.",coll:"incredibly warm-hearted"},
+{word:"cold-hearted",type:"gradable",cat:"personality",def:"Lacking empathy or warmth",ex:"That was a cold-hearted thing to do.",coll:"incredibly cold-hearted"},
+{word:"good-natured",type:"gradable",cat:"personality",def:"Kind; easy-going",ex:"He is incredibly good-natured.",coll:"incredibly good-natured"},
+{word:"easy-going",type:"gradable",cat:"personality",def:"Relaxed; not easily upset",ex:"He is very easy-going.",coll:"very easy-going"},
+{word:"level-headed",type:"gradable",cat:"personality",def:"Calm and sensible",ex:"She is remarkably level-headed.",coll:"remarkably level-headed"},
+{word:"hot-tempered",type:"gradable",cat:"personality",def:"Easily made angry",ex:"He is notoriously hot-tempered.",coll:"notoriously hot-tempered"},
+{word:"even-tempered",type:"gradable",cat:"personality",def:"Calm; not easily upset",ex:"She is incredibly even-tempered.",coll:"incredibly even-tempered"},
+{word:"single-minded",type:"gradable",cat:"personality",def:"Pursuing one goal with determination",ex:"She is incredibly single-minded.",coll:"incredibly single-minded"},
+{word:"attentive",type:"gradable",cat:"personality",def:"Paying close attention",ex:"She is incredibly attentive to detail.",prep:"to",coll:"incredibly attentive"},
+{word:"considerate",type:"gradable",cat:"personality",def:"Careful not to cause inconvenience to others",ex:"He is always incredibly considerate.",coll:"incredibly considerate"},
+{word:"inconsiderate",type:"gradable",cat:"personality",def:"Thoughtlessly causing inconvenience to others",ex:"That was incredibly inconsiderate.",coll:"incredibly inconsiderate"},
+{word:"principled",type:"gradable",cat:"personality",def:"Acting according to moral rules",ex:"She is remarkably principled.",coll:"remarkably principled"},
+{word:"thick-skinned",type:"gradable",cat:"personality",def:"Not easily upset by criticism",ex:"You need to be thick-skinned in this job.",coll:"incredibly thick-skinned"},
+{word:"thin-skinned",type:"gradable",cat:"personality",def:"Easily upset by criticism",ex:"He is far too thin-skinned for management.",coll:"incredibly thin-skinned"},
+// MODERN SLANG: MORE
+{word:"salty",type:"gradable",cat:"slang",def:"Bitter or upset about something; informal",ex:"He is still salty about losing.",prep:"about",coll:"really salty"},
+{word:"triggered",type:"gradable",cat:"slang",def:"Strongly upset or offended; modern slang",ex:"She got really triggered by that comment.",prep:"by",coll:"really triggered"},
+{word:"shook",type:"gradable",cat:"slang",def:"Shocked or disturbed; slang",ex:"I am shook by that revelation.",coll:"completely shook"},
+{word:"sus",type:"gradable",cat:"slang",def:"Suspicious or untrustworthy; slang from gaming",ex:"That looks really sus.",coll:"really sus"},
+{word:"sketchy",type:"gradable",cat:"slang",def:"Suspicious; of doubtful quality",ex:"That area is really sketchy.",coll:"really sketchy"},
+{word:"mid",type:"gradable",cat:"slang",def:"Average or mediocre; slang",ex:"That film was kind of mid.",coll:"kind of mid"},
+{word:"bussin",type:"strong",gradable:"good",cat:"slang",def:"Extremely good especially food; African American English now mainstream",ex:"This food is bussin.",coll:"absolutely bussin"},
+{word:"slay",type:"gradable",cat:"slang",def:"Excellent performance; doing something impressively; slang",ex:"She absolutely slayed that performance.",coll:"absolutely slaying"},
+{word:"unhinged",type:"gradable",cat:"slang",def:"Erratic or unstable in an entertaining way; slang",ex:"That plot twist was absolutely unhinged.",coll:"absolutely unhinged"},
+{word:"delulu",type:"gradable",cat:"slang",def:"Deluded; living in fantasy; slang",ex:"She is being a bit delulu about it.",coll:"a bit delulu"},
+{word:"iconic",type:"strong",cat:"slang",def:"Memorable in a defining or admirable way",ex:"That look is iconic.",coll:"absolutely iconic"},
+{word:"snatched",type:"gradable",cat:"slang",def:"Looking extremely attractive or stylish; slang",ex:"Her outfit is absolutely snatched.",coll:"absolutely snatched"},
+{word:"clean",type:"gradable",cat:"slang",def:"Neat, stylish, impressive; informal",ex:"Those trainers are clean.",coll:"super clean"},
+{word:"fresh",type:"gradable",cat:"slang",def:"Stylish and attractive; informal",ex:"He is looking fresh today.",coll:"super fresh"},
+{word:"on point",type:"gradable",cat:"slang",def:"Exactly right; excellent; informal",ex:"Your timing was absolutely on point.",coll:"absolutely on point"},
+{word:"elite",type:"gradable",cat:"slang",def:"The best; of top quality; slang",ex:"That move was elite.",coll:"totally elite"},
+{word:"based",type:"gradable",cat:"slang",def:"Confident in own beliefs; respected opinion; internet slang",ex:"That take is actually pretty based.",coll:"pretty based"},
+{word:"cracked",type:"gradable",cat:"slang",def:"Extremely skilled; at top of game; gaming slang",ex:"She is absolutely cracked at this game.",coll:"absolutely cracked"},
+{word:"cooked",type:"gradable",cat:"slang",def:"In a bad or hopeless situation; slang",ex:"We are absolutely cooked.",coll:"absolutely cooked"},
+{word:"peak",type:"gradable",cat:"slang",def:"The worst or most unfortunate; British slang",ex:"That is peak behaviour.",coll:"that is peak"},
+{word:"bare",type:"gradable",cat:"slang",def:"Very; a lot; British youth slang",ex:"That is bare annoying.",coll:"bare annoying"},
+{word:"nang",type:"gradable",cat:"slang",def:"Excellent; British slang",ex:"That was absolutely nang.",coll:"absolutely nang"},
+{word:"jarring",type:"gradable",cat:"slang",def:"Irritating; annoying behaviour; British slang",ex:"That is so jarring.",coll:"so jarring"},
+{word:"long",type:"gradable",cat:"slang",def:"Unnecessarily complicated or annoying; British slang",ex:"That process is so long.",coll:"so long"},
+{word:"butters",type:"gradable",cat:"slang",def:"Unattractive; British slang",ex:"He thinks he is fit but he is butters.",coll:"a bit butters"},
+{word:"ick",type:"gradable",cat:"slang",def:"Causing sudden romantic repulsion; slang",ex:"He gave me the ick.",coll:"giving the ick"},
+{word:"rizz",type:"gradable",cat:"slang",def:"Natural charm or ability to attract; slang from charisma",ex:"He has got serious rizz.",coll:"rizz unmatched"},
+{word:"glazed",type:"gradable",cat:"slang",def:"Overwhelmingly admiring someone; slang",ex:"He is completely glazed over her.",coll:"completely glazed"},
+{word:"vibing",type:"gradable",cat:"slang",def:"Getting along well; experiencing something positive",ex:"We were really vibing at the event.",coll:"really vibing"},
+// ACADEMIC / EXAM
+{word:"pertinent",type:"gradable",cat:"academic",def:"Relevant or applicable to a particular matter",ex:"That is a very pertinent point.",prep:"to",coll:"very pertinent"},
+{word:"plausible",type:"gradable",cat:"academic",def:"Seeming reasonable or probable",ex:"That is a plausible explanation.",coll:"quite plausible"},
+{word:"contentious",type:"gradable",cat:"academic",def:"Causing or likely to cause argument",ex:"This is a highly contentious issue.",coll:"highly contentious"},
+{word:"controversial",type:"gradable",cat:"academic",def:"Giving rise to public debate",ex:"The decision was highly controversial.",coll:"highly controversial"},
+{word:"hypothetical",type:"gradable",cat:"academic",def:"Supposed but not necessarily real or true",ex:"Let us take a hypothetical example.",coll:"purely hypothetical"},
+{word:"empirical",type:"gradable",cat:"academic",def:"Based on observation or experiment",ex:"We need empirical evidence.",coll:"purely empirical"},
+{word:"subjective",type:"gradable",cat:"academic",def:"Based on personal feelings rather than facts",ex:"That judgement is entirely subjective.",coll:"entirely subjective"},
+{word:"objective",type:"gradable",cat:"academic",def:"Based on facts rather than feelings",ex:"Try to be more objective.",coll:"completely objective"},
+{word:"abstract",type:"gradable",cat:"academic",def:"Existing in thought but not concrete reality",ex:"The concept is very abstract.",coll:"quite abstract"},
+{word:"concrete",type:"gradable",cat:"academic",def:"Specific and definite; based on fact",ex:"We need concrete examples.",coll:"very concrete"},
+{word:"inherent",type:"gradable",cat:"academic",def:"Existing as a permanent or essential attribute",ex:"There is an inherent risk.",prep:"in",coll:"deeply inherent"},
+{word:"intrinsic",type:"gradable",cat:"academic",def:"Belonging naturally; essential",ex:"The value is intrinsic.",prep:"to",coll:"intrinsic to"},
+{word:"implicit",type:"gradable",cat:"academic",def:"Implied but not directly stated",ex:"There is an implicit assumption.",coll:"deeply implicit"},
+{word:"explicit",type:"gradable",cat:"academic",def:"Stated clearly and in detail",ex:"The instructions are very explicit.",coll:"very explicit"},
+{word:"pervasive",type:"gradable",cat:"academic",def:"Spreading widely throughout",ex:"The problem is pervasive.",coll:"deeply pervasive"},
+{word:"ubiquitous",type:"gradable",cat:"academic",def:"Present or found everywhere",ex:"Mobile phones are now ubiquitous.",coll:"seemingly ubiquitous"},
+{word:"systemic",type:"gradable",cat:"academic",def:"Relating to a whole system",ex:"The problems are systemic.",coll:"deeply systemic"},
+{word:"fundamental",type:"gradable",cat:"academic",def:"Forming a necessary base; central",ex:"This is a fundamental issue.",coll:"absolutely fundamental"},
+{word:"superficial",type:"gradable",cat:"academic",def:"Existing only on the surface; not thorough",ex:"That analysis is incredibly superficial.",coll:"incredibly superficial"},
+{word:"comprehensive",type:"gradable",cat:"academic",def:"Including all or nearly all elements",ex:"The report is incredibly comprehensive.",coll:"incredibly comprehensive"},
+{word:"exhaustive",type:"gradable",cat:"academic",def:"Examining all possibilities; thorough",ex:"The research was exhaustive.",coll:"utterly exhaustive"},
+{word:"rigorous",type:"gradable",cat:"academic",def:"Extremely thorough; precise",ex:"The methodology was incredibly rigorous.",coll:"incredibly rigorous"},
+{word:"seminal",type:"gradable",cat:"academic",def:"Strongly influencing later developments",ex:"That was a seminal moment.",coll:"truly seminal"},
+{word:"groundbreaking",type:"strong",gradable:"significant",cat:"academic",def:"Innovative; pioneering",ex:"The research was absolutely groundbreaking.",coll:"absolutely groundbreaking"},
+{word:"pioneering",type:"gradable",cat:"academic",def:"Developing new areas of knowledge",ex:"Her work was truly pioneering.",coll:"truly pioneering"},
+];
+
+// ── STATE ────────────────────────────────────────────────────────────────────
+let db = {};
+let deleted = {};
+let selected = new Set();
+let filterFreq = 'all';
+
+function initDB(){
+  MASTER.forEach(a => {
+    if(!db[a.word]) db[a.word] = {freq:'unset'};
+  });
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function getVisible(){
+  const q = document.getElementById('searchBox').value.toLowerCase();
+  const cat = document.getElementById('catFilter').value;
+  const type = document.getElementById('typeFilter').value;
+  return MASTER.filter(a => {
+    if(deleted[a.word]) return false;
+    const freq = db[a.word]?.freq || 'unset';
+    if(filterFreq !== 'all' && freq !== filterFreq) return false;
+    if(cat !== 'all' && a.cat !== cat) return false;
+    if(type !== 'all' && a.type !== type) return false;
+    if(q && !a.word.toLowerCase().includes(q) && !a.def.toLowerCase().includes(q) && !(a.cat||'').toLowerCase().includes(q)) return false;
+    return true;
+  });
+}
+
+function render(){
+  const items = getVisible();
+  const grid = document.getElementById('grid');
+  document.getElementById('filterCount').textContent = items.length + ' shown';
+  updateStats();
+
+  if(!items.length){
+    grid.innerHTML = '<div class="empty-state">No adjectives match this filter.</div>';
+    return;
+  }
+
+  grid.innerHTML = items.map(a => {
+    const freq = db[a.word]?.freq || 'unset';
+    const sel = selected.has(a.word);
+    return `<div class="adj-card fc-${freq}${sel?' selected':''}" data-word="${a.word}" onclick="cardClick(event,'${a.word}')">
+      <div class="card-check">${sel?'&#10003;':''}</div>
+      <button class="delete-btn" onclick="event.stopPropagation();deleteAdj('${a.word}')" title="Delete">&#10005;</button>
+      <div class="card-top" style="padding-left:20px">
+        <div class="card-word">${a.word}</div>
+        <span class="card-type ${a.type}">${a.type}</span>
+      </div>
+      <div class="card-cat">${a.cat}${a.gradable?' · from: '+a.gradable:''}</div>
+      <div class="card-def">${a.def}</div>
+      <div class="freq-btns">
+        <button class="freq-btn fb-common${freq==='common'?' active':''}" onclick="event.stopPropagation();setFreq('${a.word}','common')">Common</button>
+        <button class="freq-btn fb-somewhat${freq==='somewhat'?' active':''}" onclick="event.stopPropagation();setFreq('${a.word}','somewhat')">Somewhat</button>
+        <button class="freq-btn fb-less${freq==='less'?' active':''}" onclick="event.stopPropagation();setFreq('${a.word}','less')">Less</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function updateStats(){
+  const active = MASTER.filter(a => !deleted[a.word]);
+  document.getElementById('s-total').textContent = active.length;
+  document.getElementById('s-common').textContent = active.filter(a => db[a.word]?.freq==='common').length;
+  document.getElementById('s-somewhat').textContent = active.filter(a => db[a.word]?.freq==='somewhat').length;
+  document.getElementById('s-less').textContent = active.filter(a => db[a.word]?.freq==='less').length;
+  document.getElementById('s-deleted').textContent = Object.keys(deleted).length;
+  // bulk bar
+  const bulkBar = document.getElementById('bulkBar');
+  if(selected.size > 0){
+    bulkBar.classList.add('show');
+    document.getElementById('bulkLabel').textContent = selected.size + ' selected';
+  } else {
+    bulkBar.classList.remove('show');
+  }
+  // deleted panel
+  const del = Object.keys(deleted);
+  const panel = document.getElementById('deletedPanel');
+  const chips = document.getElementById('deletedChips');
+  if(del.length && panel.classList.contains('show')){
+    chips.innerHTML = del.map(w => `<div class="deleted-chip" onclick="restoreAdj('${w}')">${w} <span>restore</span></div>`).join('');
+  }
+}
+
+// ── INTERACTIONS ──────────────────────────────────────────────────────────────
+function cardClick(e, word){
+  if(e.shiftKey || e.ctrlKey || e.metaKey){
+    if(selected.has(word)) selected.delete(word);
+    else selected.add(word);
+    render();
+  }
+}
+
+function setFreq(word, freq){
+  if(!db[word]) db[word] = {};
+  db[word].freq = db[word].freq === freq ? 'unset' : freq;
+  render();
+}
+
+function deleteAdj(word){
+  deleted[word] = true;
+  selected.delete(word);
+  render();
+  const panel = document.getElementById('deletedPanel');
+  if(panel.classList.contains('show')) updateStats();
+}
+
+function restoreAdj(word){
+  delete deleted[word];
+  render();
+}
+
+function setFilter(f, btn){
+  filterFreq = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  render();
+}
+
+function bulkSet(freq){
+  selected.forEach(w => { if(!db[w]) db[w]={}; db[w].freq = freq; });
+  clearSelection();
+}
+
+function bulkDelete(){
+  selected.forEach(w => { deleted[w] = true; });
+  clearSelection();
+}
+
+function clearSelection(){
+  selected.clear();
+  render();
+}
+
+function resetAll(){
+  if(!confirm('Reset all frequency assignments? This cannot be undone.')) return;
+  db = {};
+  deleted = {};
+  selected.clear();
+  initDB();
+  render();
+}
+
+function toggleDeleted(){
+  const panel = document.getElementById('deletedPanel');
+  panel.classList.toggle('show');
+  const del = Object.keys(deleted);
+  if(panel.classList.contains('show') && del.length){
+    document.getElementById('deletedChips').innerHTML = del.map(w => `<div class="deleted-chip" onclick="restoreAdj('${w}')">${w} <span>restore</span></div>`).join('');
+  }
+}
+
+// ── EXPORT ────────────────────────────────────────────────────────────────────
+function openExport(){
+  const active = MASTER.filter(a => !deleted[a.word]);
+  const out = active.map(a => {
+    const freq = db[a.word]?.freq || 'unset';
+    const obj = {...a, freq};
+    return JSON.stringify(obj);
+  });
+  document.getElementById('exportText').value = '[\n' + out.join(',\n') + '\n]';
+  document.getElementById('exportModal').classList.add('open');
+}
+
+function closeExport(){ document.getElementById('exportModal').classList.remove('open'); }
+
+function copyExport(){
+  const ta = document.getElementById('exportText');
+  ta.select();
+  document.execCommand('copy');
+  const btn = event.target;
+  btn.textContent = 'Copied!';
+  setTimeout(() => btn.textContent = 'Copy to clipboard', 1800);
+}
+
+// ── CATEGORY FILTER POPULATE ──────────────────────────────────────────────────
+function populateCatFilter(){
+  const cats = [...new Set(MASTER.map(a => a.cat))].sort();
+  const sel = document.getElementById('catFilter');
+  cats.forEach(c => {
+    const o = document.createElement('option');
+    o.value = c; o.textContent = c.replace(/-/g,' ');
+    sel.appendChild(o);
+  });
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+initDB();
+populateCatFilter();
+render();
+</script>
+</body>
+</html>
