@@ -341,9 +341,23 @@ footer { text-align:center;padding:20px 16px;color:var(--muted);font-size:.73rem
       <div class="sep"></div>
     </div>
 
-    <div class="field" style="margin-bottom:13px;">
+    <div class="field" style="margin-bottom:6px;">
       <label>Food item</label>
       <input type="text" id="foodInput" placeholder="e.g. courgette, chicken breast, oats…" autocomplete="off" />
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:13px;align-items:center;">
+      <div class="field" style="flex:1;margin:0;">
+        <label>Browse by category</label>
+        <select id="catSelect" onchange="onCatChange()" style="font-size:.84rem;">
+          <option value="">— Choose category —</option>
+        </select>
+      </div>
+      <div class="field" id="foodSelectWrap" style="flex:1.3;margin:0;display:none;">
+        <label>Pick food</label>
+        <select id="foodSelect" onchange="onFoodPick()" style="font-size:.84rem;">
+          <option value="">— Select —</option>
+        </select>
+      </div>
     </div>
 
     <div class="mode-toggle">
@@ -636,7 +650,29 @@ document.addEventListener('DOMContentLoaded', () => {
     if (el) el.addEventListener('keydown', e => { if (e.key==='Enter') analyse(); });
   });
   renderFavs(); renderHist(); renderLog();
+  // Populate category dropdown
+  const cats = [...new Set(FOOD_DB.map(f=>f.category))].sort();
+  const catSel = document.getElementById('catSelect');
+  cats.forEach(c => { const o=document.createElement('option'); o.value=c; o.textContent=`${c} (${FOOD_DB.filter(f=>f.category===c).length})`; catSel.appendChild(o); });
 });
+
+function onCatChange() {
+  const cat = document.getElementById('catSelect').value;
+  const wrap = document.getElementById('foodSelectWrap');
+  const sel = document.getElementById('foodSelect');
+  if (!cat) { wrap.style.display='none'; return; }
+  wrap.style.display='block';
+  const items = FOOD_DB.filter(f=>f.category===cat).sort((a,b)=>a.name.localeCompare(b.name));
+  sel.innerHTML = '<option value="">— Select —</option>';
+  items.forEach(f => { const o=document.createElement('option'); o.value=f.name; o.textContent=f.name.charAt(0).toUpperCase()+f.name.slice(1); sel.appendChild(o); });
+}
+
+function onFoodPick() {
+  const name = document.getElementById('foodSelect').value;
+  if (!name) return;
+  document.getElementById('foodInput').value = name;
+  document.getElementById('foodInput').focus();
+}
 
 // DARK MODE
 function toggleDark() {
@@ -689,12 +725,10 @@ async function analyse() {
         grams = singleWeight * amount;
         unit = 'grams';
       } else {
-        // Convert unit to grams
         const conversions = {grams:1, ml:1, oz:28.35, cups:240, tbsp:15, tsp:5};
         grams = amount * (conversions[unit]||1);
       }
       const d = buildResultFromDB(dbMatch, grams, 'grams', selCook);
-      // Clean up the serving description
       if (mode==='whole') {
         const qty = Number(document.getElementById('wholeQty').value.trim()||'1');
         d.serving_description = `${qty} ${selSize} ${selCook} ${food} (${Math.round(grams)}g)`;
@@ -704,14 +738,10 @@ async function analyse() {
       lastResult = d;
       renderResults(d);
       addToHist(d);
-      btn.disabled=false; document.getElementById('loading').classList.remove('active');
       return;
     }
-  } catch(localErr) {
-    console.error('Local DB error:', localErr);
-  }
 
-  // 2) Fallback to API
+    // 2) Not in local DB — try API
     let serving;
     if (mode==='weighed') {
       serving = `${amount} ${unit} of ${selCook} ${food}`;
@@ -722,23 +752,19 @@ async function analyse() {
 
     const prompt = `You are a precise nutrition database. Give the nutritional breakdown for: "${serving}".
 Respond ONLY with a valid JSON object, no preamble, no markdown, no backticks:
-{"food_name":"string","serving_description":"string","calories":number,"protein_g":number,"carbs_g":number,"fat_g":number,"fiber_g":number,"sugar_g":number,"sodium_mg":number,"saturated_fat_g":number,"potassium_mg":number,"cholesterol_mg":number,"vitamin_c_mg":number,"calcium_mg":number,"iron_mg":number,"highlights":["3-5 health insight strings max 12 words each"],"cooking_tips":["3-4 practical diet-friendly cooking tips for this specific food, each max 15 words, focused on reducing calories, fat or retaining nutrients"],"muscle_tips":["3-4 practical tips for using this food to support muscle building, each max 15 words, covering protein timing, pairing, or preparation"]}
+{"food_name":"string","serving_description":"string","calories":number,"protein_g":number,"carbs_g":number,"fat_g":number,"fiber_g":number,"sugar_g":number,"sodium_mg":number,"saturated_fat_g":number,"potassium_mg":number,"cholesterol_mg":number,"vitamin_c_mg":number,"calcium_mg":number,"iron_mg":number,"magnesium_mg":number,"zinc_mg":number,"vitamin_d_mcg":number,"vitamin_a_mcg":number,"folate_mcg":number,"highlights":["3-5 health insight strings max 12 words each"],"cooking_tips":["3-4 practical diet-friendly cooking tips for this specific food, each max 15 words, focused on reducing calories, fat or retaining nutrients"],"muscle_tips":["3-4 practical tips for using this food to support muscle building, each max 15 words, covering protein timing, pairing, or preparation"]}
 All numbers rounded to 1 decimal. Use 0 for negligible/unknown.`;
 
-    try {
-      const r = await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-haiku-4-5-20251001",max_tokens:1000,messages:[{role:"user",content:prompt}]})});
-      const data = await r.json();
-      const d = JSON.parse(data.content.map(b=>b.text||'').join('').replace(/```json|```/g,'').trim());
-      lastResult = d;
-      renderResults(d);
-      addToHist(d);
-    } catch(apiErr) {
-      err.textContent=`"${food}" not found in local database (${FOOD_DB.length} foods). API unavailable — try a different spelling.`;
-      err.classList.add('on');
-      console.error('API fallback failed:', apiErr);
-    }
+    const r = await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-haiku-4-5-20251001",max_tokens:1000,messages:[{role:"user",content:prompt}]})});
+    const data = await r.json();
+    const d = JSON.parse(data.content.map(b=>b.text||'').join('').replace(/```json|```/g,'').trim());
+    lastResult = d;
+    renderResults(d);
+    addToHist(d);
   } catch(e) {
-    err.textContent='Something went wrong. Please try again.'; err.classList.add('on'); console.error(e);
+    err.textContent=`"${food}" not found in local database (${FOOD_DB.length} foods). Try a different spelling or check the Browse menu.`;
+    err.classList.add('on');
+    console.error(e);
   } finally {
     btn.disabled=false; document.getElementById('loading').classList.remove('active');
   }
