@@ -8,16 +8,23 @@
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{--sun:#FFB347;--sky:#2176FF;--sky-light:#E8EEFF;--sea:#1DD3B0;--coral:#FF6B6B;--lavender:#9B72CF;--mint:#5DDEA0;--sand:#FFF5E6;--cream:#F7F6F3;--ink:#2D3047;--muted:#7A7D8E;--border:#E8E5DF;--card:#fff;--radius:14px;--sidebar-w:220px;--sidebar-collapsed:52px;--font-display:'Outfit',sans-serif;--font-body:'Outfit',sans-serif;--bg:#F7F6F3;--bg-card:#FFFFFF;--text-primary:#2D3047;--text-secondary:#7A7D8E;--text-muted:#7A7D8E;--accent-teal:#1DD3B0;--accent-coral:#FF6B6B;--accent-amber:#FFB347;--accent-violet:#9B72CF;--accent-green:#5DDEA0;--accent-blue:#2176FF;--accent-pink:#D96BA0;--accent-navy:#2D3047;--highlight-bg:#E8F2FD;--tab-active:#1DD3B0;--sidebar-active-bg:#1DD3B0;--sidebar-active-text:#FFFFFF;--shadow-sm:0 1px 3px rgba(45,48,71,0.06);--shadow-md:0 4px 12px rgba(45,48,71,0.08)}
-*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
-body{font-family:var(--font-body);background:var(--cream);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,var(--border) 1px,transparent 1px);background-size:28px 28px;opacity:.4;pointer-events:none;z-index:0}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth;overflow-y:scroll;overflow-x:hidden}
+body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
 
-.page-header{padding:5.5rem 2rem 0;max-width:960px;margin:0 auto;position:relative;z-index:1}
-.back-link{display:inline-flex;align-items:center;gap:6px;font-size:.92rem;color:var(--text-muted);text-decoration:none;font-weight:500;transition:color .2s;margin-bottom:28px}
+.topnav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(255,252,247,.88);backdrop-filter:blur(16px);border-bottom:1.5px solid #E8E5DF;padding:0 2rem;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-family:'Outfit',sans-serif;font-size:1.3rem;color:#2D3047;text-decoration:none;font-weight:800;letter-spacing:-.02em}
+.nav-logo span{color:#2176FF}
+.topnav-links{display:flex;gap:1.2rem;align-items:center}
+.topnav-links a{font-size:.8rem;font-weight:600;color:#7A7D8E;text-decoration:none;transition:color .2s}
+.topnav-links a:hover{color:#2176FF}
+@media(max-width:640px){.topnav{padding:0 1rem}.topnav-links{gap:.9rem}.topnav-links a{font-size:.75rem}.nav-logo{font-size:1.15rem}}
+
+.page-header{padding:5.5rem 2rem 4rem;max-width:960px;margin:0 auto;position:relative;z-index:1}
+.back-link{display:inline-flex;align-items:center;gap:.4rem;font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:600;color:#7A7D8E;text-decoration:none;margin-bottom:1.2rem;transition:color .2s}
 .back-link:hover{color:var(--text-primary)}
 .category-label{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--sea);margin-bottom:10px}
-.page-title{font-family:var(--font-display);font-size:clamp(2rem,5vw,3rem);font-weight:900;color:var(--ink);line-height:1.1;margin-bottom:12px}
-.page-subtitle{font-size:1.05rem;color:var(--muted);font-weight:400;margin-bottom:36px;max-width:640px;line-height:1.7}
+.page-title{font-family:'Outfit',sans-serif;font-size:clamp(2rem,5vw,3rem);font-weight:900;color:var(--ink);line-height:1.1;margin-bottom:12px}
+.page-subtitle{font-family:'Outfit',sans-serif;font-size:1.05rem;color:var(--muted);font-weight:400;margin-bottom:36px;max-width:640px;line-height:1.7}
 
 /* Tabs */
 .page-container{max-width:960px;margin:0 auto;padding:0 2rem 4rem;position:relative;z-index:1}
@@ -146,7 +153,8 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .pv-print-btn{margin-left:auto;font-family:var(--font-body);font-size:.88rem;font-weight:600;padding:.55rem 1rem;border:1.5px solid var(--border);border-radius:10px;background:var(--bg-card);color:var(--text-primary);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:.45rem}
 .pv-print-btn:hover{border-color:var(--text-primary);background:var(--cream)}
 .guide-print-row{display:flex;justify-content:flex-end;padding:0 0 .75rem}
-@media print{.guide-print-btn,.guide-print-row{display:none!important}}
+@media print{
+  .topnav{display:none !important}.guide-print-btn,.guide-print-row{display:none!important}}
 .pv-print-btn svg{flex-shrink:0}
 
 /* ── PRINT MODAL ── */
@@ -548,10 +556,19 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 </style>
 </head>
 <body>
+<div class="topnav">
+  <a href="index.html" class="nav-logo">john<span>+</span>english</a>
+  <div class="topnav-links">
+    <a href="index.html">Home</a>
+    <a href="index.html#about">About</a>
+    <a href="index.html#contact">Contact</a>
+  </div>
+</div>
+
 
 <div class="page-header">
   <a href="index.html" class="back-link">← Back to Home</a>
-  <div class="category-label">Study Tool</div>
+  <div class="category-label">Study &amp; Practice</div>
   <h1 class="page-title">Idioms</h1>
   <p class="page-subtitle">Learn what idioms are, explore 1,172 British English idioms organised by frequency and theme, and test yourself.</p>
 </div>
