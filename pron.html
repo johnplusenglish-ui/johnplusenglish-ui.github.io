@@ -278,7 +278,9 @@
     font-size: 14px;
     font-weight: 400;
     color: var(--text-secondary);
-    line-height: 1.6;
+    line-height: 1.65;
+    white-space: normal;
+    word-wrap: break-word;
   }
 
   /* ── Loading ── */
@@ -338,8 +340,8 @@
     display: grid;
     grid-template-columns: 130px 150px 1fr;
     gap: 8px;
-    align-items: baseline;
-    padding: 9px 14px;
+    align-items: start;
+    padding: 10px 14px;
     border-radius: 10px;
     background: var(--surface);
     border: 0.5px solid var(--border);
@@ -353,7 +355,7 @@
 
   .log-word { font-weight: 600; color: var(--m800); }
   .log-ipa { font-weight: 300; color: var(--m600); letter-spacing: 0.04em; }
-  .log-guide { color: var(--text-secondary); font-weight: 300; font-size: 13px; }
+  .log-guide { color: var(--text-secondary); font-weight: 300; font-size: 13px; line-height: 1.55; white-space: normal; word-wrap: break-word; }
 
   /* ── Error toast ── */
   #toast {
@@ -535,9 +537,14 @@
         body: JSON.stringify({
           model: 'claude-haiku-4-5-20251001',
           max_tokens: 300,
-          system: `You are a phonetics assistant for an English language teacher. Given a word or short phrase, respond ONLY with valid JSON (no markdown, no backticks) in this exact shape:
-{"ipa":"/…/","guide":"plain-English breakdown: syllables, stress, tricky sounds. 1–2 sentences max. Useful for non-native speakers."}
-Use standard IPA. No extra keys.`,
+          system: `You are a phonetics assistant for an English language teacher working with adult non-native speakers (B2–C2 level). Given a word or short phrase, respond ONLY with valid JSON (no markdown, no backticks) in this exact shape:
+{"ipa":"/…/","guide":"…"}
+Rules for the guide:
+- Start with the phonetic respelling: split into syllables, STRESSED syllable in ALL CAPS, e.g. "KLOHZ", "HAP-ee", "MOWN-tin", "kon-TRIB-yoot"
+- Then give a clear, teacher-style explanation of how to pronounce it: number of syllables, which syllable is stressed, how specific sounds are made, voiced/unvoiced distinctions, silent letters, common mispronunciation traps, and anything else a non-native speaker at B2–C2 level would benefit from knowing
+- Write in full sentences, conversationally, as a teacher would explain it aloud in class
+- Aim for 2–4 sentences. Be thorough but not padded. Never use IPA symbols in the guide.
+Use standard British IPA in the ipa field. No extra JSON keys.`,
           messages: [{ role: 'user', content: word }]
         })
       });
@@ -571,19 +578,98 @@ Use standard IPA. No extra keys.`,
     btn.disabled = false;
   }
 
-  /* ── Export ── */
+  /* ── Export PNG ── */
   function exportLog() {
     const entries = sessions[currentSession] || [];
     if (!entries.length) { toast('Nothing to export yet'); return; }
-    const lines = [
-      `Phonetics log — ${currentSession}`,
-      '─'.repeat(60),
-      ...entries.map(e => `${e.word.padEnd(22)}${e.ipa.padEnd(20)}${e.guide}`)
-    ].join('\n');
+
+    const DPR = 2, PAD = 40, W = 700, ROW_H = 64, HEADER_H = 90, FOOTER_H = 52;
+    const H = HEADER_H + entries.length * ROW_H + FOOTER_H + PAD;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = W * DPR;
+    canvas.height = H * DPR;
+    const ctx = canvas.getContext('2d');
+    ctx.scale(DPR, DPR);
+
+    ctx.fillStyle = '#FAFCFB';
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.fillStyle = '#0E7D6A';
+    ctx.fillRect(0, 0, W, 5);
+
+    ctx.fillStyle = '#0A5A4C';
+    ctx.font = '700 22px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('Phonetics', PAD, 44);
+
+    ctx.fillStyle = '#8AADA8';
+    ctx.font = '300 14px sans-serif';
+    ctx.fillText('John + English', PAD, 64);
+
+    ctx.fillStyle = '#0E7D6A';
+    ctx.font = '400 13px sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText(currentSession, W - PAD, 44);
+    ctx.textAlign = 'left';
+
+    ctx.strokeStyle = '#D6EDE9';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(PAD, HEADER_H - 10);
+    ctx.lineTo(W - PAD, HEADER_H - 10);
+    ctx.stroke();
+
+    const COL1 = PAD, COL2 = PAD + 175, COL3 = PAD + 335;
+
+    ctx.fillStyle = '#8AADA8';
+    ctx.font = '600 11px sans-serif';
+    ctx.fillText('WORD', COL1, HEADER_H + 4);
+    ctx.fillText('IPA', COL2, HEADER_H + 4);
+    ctx.fillText('PRONUNCIATION', COL3, HEADER_H + 4);
+
+    entries.forEach(function(e, i) {
+      const y = HEADER_H + 18 + i * ROW_H;
+      if (i % 2 === 0) {
+        ctx.fillStyle = '#E6F5F2';
+        ctx.beginPath();
+        ctx.roundRect(PAD - 12, y - 2, W - (PAD - 12) * 2, ROW_H - 8, 8);
+        ctx.fill();
+      }
+      ctx.fillStyle = '#0A5A4C';
+      ctx.font = '600 15px sans-serif';
+      ctx.fillText(e.word, COL1, y + 26);
+      ctx.fillStyle = '#0E7D6A';
+      ctx.font = '300 14px sans-serif';
+      ctx.fillText(e.ipa, COL2, y + 26);
+      ctx.fillStyle = '#4A6B66';
+      ctx.font = '400 13px sans-serif';
+      let guide = e.guide;
+      const maxW = W - COL3 - PAD;
+      if (ctx.measureText(guide).width > maxW) {
+        while (ctx.measureText(guide + '…').width > maxW && guide.length > 0) guide = guide.slice(0, -1);
+        guide += '…';
+      }
+      ctx.fillText(guide, COL3, y + 26);
+    });
+
+    const footerY = HEADER_H + 18 + entries.length * ROW_H + 20;
+    ctx.strokeStyle = '#D6EDE9';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(PAD, footerY);
+    ctx.lineTo(W - PAD, footerY);
+    ctx.stroke();
+
+    ctx.fillStyle = '#B3E0D8';
+    ctx.font = '300 12px sans-serif';
+    ctx.fillText(entries.length + ' word' + (entries.length !== 1 ? 's' : '') + '  ·  johnplusenglish.com', PAD, footerY + 22);
+
     const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([lines], { type: 'text/plain' }));
-    a.download = `phonetics-${currentSession.replace(/[^a-z0-9]/gi, '-').toLowerCase()}.txt`;
+    a.href = canvas.toDataURL('image/png');
+    a.download = 'phonetics-' + currentSession.replace(/[^a-z0-9]/gi, '-').toLowerCase() + '.png';
     a.click();
+    toast('PNG exported ↓');
   }
 
   /* ── Clear ── */
