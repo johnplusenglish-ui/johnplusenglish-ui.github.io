@@ -124,29 +124,22 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
 .adj-legend{display:flex;gap:1.2rem;margin-bottom:1.2rem;flex-wrap:wrap;font-size:.8rem;color:var(--text-muted)}
 .adj-legend-item{display:flex;align-items:center;gap:.35rem}
 
-.adj-alpha-layout{display:grid;grid-template-columns:200px 1fr;gap:1.2rem;align-items:start}
+.adj-alpha-layout{display:grid;grid-template-columns:minmax(160px,max-content) 1fr;gap:1.2rem;align-items:start}
 .adj-alpha-header{font-family:'Outfit',sans-serif;font-size:1.8rem;font-weight:700;color:var(--lavender);margin:0 0 .8rem;padding-bottom:.4rem;border-bottom:2px solid var(--lavender);scroll-margin-top:80px}
 .adj-alpha-header:not(:first-child){margin-top:2rem}
-.adj-sb-wrap{background:var(--bg-card);border:1.5px solid var(--border);border-radius:var(--radius);padding:.8rem;max-height:70vh;overflow-y:auto;position:sticky;top:80px}
+.adj-sb-wrap{min-width:160px;max-width:260px;background:var(--bg-card);border:1.5px solid var(--border);border-radius:var(--radius);padding:.8rem;max-height:70vh;overflow-y:auto;position:sticky;top:80px}
 .adj-sb-wrap::-webkit-scrollbar{width:4px}
 .adj-sb-wrap::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
-.adj-sb-item{font-size:.9rem;font-weight:500;padding:11px 14px;border-radius:8px;cursor:pointer;transition:background .2s,color .15s;display:flex;align-items:center;gap:12px;color:var(--text-muted);margin-bottom:2px}
-.adj-sb-item:hover{background:rgba(155,114,207,.06);color:var(--text-primary)}
-.adj-sb-item::before{content:'';width:5px;min-width:5px;height:22px;border-radius:3px;background:var(--lavender)}
-.adj-sb-item:nth-child(7n+2)::before{background:var(--accent-coral)}
-.adj-sb-item:nth-child(7n+3)::before{background:var(--accent-amber)}
-.adj-sb-item:nth-child(7n+4)::before{background:var(--accent-teal)}
-.adj-sb-item:nth-child(7n+5)::before{background:var(--accent-blue)}
-.adj-sb-item:nth-child(7n+6)::before{background:var(--accent-green)}
-.adj-sb-item:nth-child(7n+7)::before{background:var(--accent-pink)}
-.adj-sb-item.active{background:var(--lavender);color:#fff;font-weight:600}
-.adj-sb-item.active::before{background:rgba(255,255,255,0.5)}
+.adj-sb-item{font-size:.8rem;font-weight:700;padding:.55rem .9rem;border-radius:100px;cursor:pointer;transition:all .15s;display:flex;align-items:center;color:var(--text-secondary);margin-bottom:.3rem;border:1.5px solid var(--border);background:#fff}
+.adj-sb-item:hover{transform:translateX(2px);color:var(--text-primary);border-color:var(--text-muted)}
+.adj-sb-item::before{display:none}
+.adj-sb-item.active{background:var(--lavender);color:#fff;border-color:var(--lavender);transform:translateX(2px);box-shadow:0 2px 8px rgba(45,48,71,.15)}
 .adj-sb-item-name{flex:1;line-height:1.3;min-width:0}
 .adj-sb-count{font-family:'JetBrains Mono',monospace;font-size:.65rem;opacity:.5;padding:.1rem .4rem;border-radius:8px;flex-shrink:0;background:rgba(0,0,0,.05);color:var(--text-muted)}
 .adj-sb-item.active .adj-sb-count{background:rgba(255,255,255,.2);color:#fff;opacity:.8}
 
-.adj-cat-layout{display:grid;grid-template-columns:200px 1fr;gap:1.2rem;min-height:400px}
-.adj-cat-sidebar{background:var(--bg-card);border:1.5px solid var(--border);border-radius:var(--radius);padding:.6rem;max-height:70vh;overflow-y:auto;position:sticky;top:80px}
+.adj-cat-layout{display:grid;grid-template-columns:minmax(160px,max-content) 1fr;gap:1.2rem;min-height:400px}
+.adj-cat-sidebar{min-width:180px;max-width:260px;background:var(--bg-card);border:1.5px solid var(--border);border-radius:var(--radius);padding:.6rem;max-height:70vh;overflow-y:auto;position:sticky;top:80px}
 .adj-cat-sidebar::-webkit-scrollbar{width:4px}
 .adj-cat-sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
 .adj-sb-cat{font-size:.8rem;font-weight:700;padding:.55rem .9rem;border-radius:100px;cursor:pointer;transition:all .15s;display:flex;justify-content:space-between;align-items:center;color:var(--text-secondary);margin-bottom:.3rem;text-transform:capitalize;border:1.5px solid var(--border);background:#fff}
@@ -676,7 +669,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
       <button class="pv-ff" data-type="common" onclick="adjSetType('common',this)"><span class="fdot" style="background:#16A34A"></span>Common <span class="pv-ff-count" id="count-common"></span></button>
       <button class="pv-ff" data-type="somewhat" onclick="adjSetType('somewhat',this)"><span class="fdot" style="background:#D97706"></span>Somewhat common <span class="pv-ff-count" id="count-somewhat"></span></button>
       <button class="pv-ff" data-type="less" onclick="adjSetType('less',this)"><span class="fdot" style="background:#9CA3AF"></span>Less common <span class="pv-ff-count" id="count-less"></span></button>
-      <button class="pv-ff" data-type="unset" onclick="adjSetType('unset',this)"><span class="fdot" style="background:#CBD5E1"></span>Unreviewed <span class="pv-ff-count" id="count-unset"></span></button>
+
     </div>
     <input class="pv-search" id="adjSearch" placeholder="Search adjectives, definitions, or examples&#8230;" oninput="adjRender()">
     <div class="pv-search-count" id="adjCount"></div>
@@ -2397,15 +2390,9 @@ function adjGetFiltered(){
 }
 
 function adjBuildRow(a){
-  const tags=[];
-  if(a.type==='strong'){tags.push('<span class="tag-strong">strong</span>');if(a.gradable)tags.push('<span class="tag-grad">gradable: '+a.gradable+'</span>');}
-  else if(a.type==='nongrad')tags.push('<span class="tag-nongrad">non-gradable</span>');
-  else tags.push('<span class="tag-grad">gradable</span>');
-  if(a.prep)tags.push('<span class="tag-prep">'+a.prep+'</span>');
-  if(a.coll){a.coll.split(',').slice(0,2).forEach(p=>tags.push('<span class="tag-coll">'+p.trim()+'</span>'));}
   const freqColour={'common':'#16A34A','somewhat':'#D97706','less':'#9CA3AF','unset':'#CBD5E1'}[a.freq||'unset'];
   const freqDot='<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:'+freqColour+'"></span>';
-  return '<div class="adj-entry"><div class="adj-entry-name">'+a.word+'</div><div>'+freqDot+'</div><div class="adj-entry-right"><div class="adj-entry-def">'+a.def+'</div><div class="adj-entry-ex">'+a.ex+'</div><div class="adj-entry-meta">'+tags.join('')+'</div></div></div>';
+  return '<div class="adj-entry"><div class="adj-entry-name">'+a.word+'</div><div>'+freqDot+'</div><div class="adj-entry-right"><div class="adj-entry-def">'+a.def+'</div><div class="adj-entry-ex">'+a.ex+'</div></div></div>';
 }
 
 function adjRender(){
@@ -2427,19 +2414,27 @@ function renderAlpha(data){
   const letters=Object.keys(byL).sort();
   const layout=document.createElement('div');layout.className='adj-alpha-layout';
   const sb=document.createElement('div');sb.className='adj-sb-wrap';
+  const content=document.createElement('div');content.className='adj-alpha-content';
+
+  // Only render on letter click — empty state by default
+  let activeLetter=null;
+  function showLetter(l){
+    activeLetter=l;
+    document.querySelectorAll('.adj-sb-item').forEach(x=>x.classList.remove('active'));
+    sb.querySelectorAll('.adj-sb-item').forEach(x=>{if(x.dataset.l===l)x.classList.add('active');});
+    let html='<div class="adj-alpha-header">'+l+'</div>';
+    byL[l].forEach(a=>{html+=adjBuildRow(a);});
+    content.innerHTML=html;
+  }
+
   letters.forEach(l=>{
-    const count=byL[l].length;
-    const item=document.createElement('div');item.className='adj-sb-item';
-    item.innerHTML='<span class="adj-sb-item-name">'+l+'</span><span class="adj-sb-count">'+count+'</span>';
-    item.onclick=()=>{document.querySelectorAll('.adj-sb-item').forEach(x=>x.classList.remove('active'));item.classList.add('active');const t=document.getElementById('adj-letter-'+l);if(t)t.scrollIntoView({behavior:'smooth',block:'start'});};
+    const item=document.createElement('div');item.className='adj-sb-item';item.dataset.l=l;
+    item.innerHTML='<span class="adj-sb-item-name">'+l+'</span>';
+    item.onclick=()=>showLetter(l);
     sb.appendChild(item);
   });
-  const content=document.createElement('div');
-  letters.forEach(l=>{
-    const hdr=document.createElement('div');hdr.className='adj-alpha-header';hdr.id='adj-letter-'+l;hdr.textContent=l;
-    content.appendChild(hdr);
-    byL[l].forEach(a=>{content.innerHTML+=adjBuildRow(a);});
-  });
+
+  content.innerHTML='<div class="adj-cat-empty"><span>🔤</span>Select a letter from the sidebar</div>';
   layout.appendChild(sb);layout.appendChild(content);main.innerHTML='';main.appendChild(layout);
 }
 
@@ -2455,7 +2450,7 @@ function renderCat(data){
   content.innerHTML='<div class="adj-cat-empty"><span>&#128218;</span>Select a category from the sidebar</div>';
   cats.forEach(cat=>{
     const item=document.createElement('div');item.className='adj-sb-cat';
-    item.innerHTML='<span class="adj-sb-cat-name">'+cat.replace(/-/g,' ')+'</span><span class="adj-sb-cat-count">'+byC[cat].length+'</span>';
+    item.innerHTML='<span class="adj-sb-cat-name">'+cat.replace(/-/g,' ')+'</span>';
     item.onclick=()=>{
       document.querySelectorAll('.adj-sb-cat').forEach(x=>x.classList.remove('active'));item.classList.add('active');
       content.innerHTML='<h3>'+cat.replace(/-/g,' ')+'</h3><div class="adj-cat-content-count">'+byC[cat].length+' adjective'+(byC[cat].length!==1?'s':'')+'</div>';
@@ -2477,6 +2472,7 @@ document.querySelectorAll('.tab').forEach(tab=>{
     tab.classList.add('active');
     const panel=document.getElementById('tab-'+tab.dataset.tab);
     if(panel)panel.classList.add('active');
+    if(tab.dataset.tab==='list')adjRender();
   });
 });
 
@@ -2490,7 +2486,8 @@ document.querySelectorAll('.sidebar-item').forEach(item=>{
   });
 });
 
-adjRender();
+// Defer initial render so the page paints first
+setTimeout(adjRender, 0);
 
 /* ── FLASHCARDS ──────────────────────────────────────────────────────────── */
 (function(){
