@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -108,7 +109,11 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
 .pb-level-toggle{display:flex;gap:0;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;width:fit-content;margin-bottom:1.5rem}
 .pb-lvl{font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:600;padding:.5rem 1.4rem;background:var(--card);color:var(--muted);border:none;cursor:pointer;transition:all .15s}
 .pb-lvl:hover{color:var(--ink)}
-.pb-lvl.on{background:var(--ink);color:var(--cream)}
+.pb-lvl.on{color:#fff}
+.pb-lvl.on[data-lv="B1"]{background:#FF6B6B}
+.pb-lvl.on[data-lv="B2"]{background:#16A88D}
+.pb-lvl.on[data-lv="C1"]{background:#2176FF}
+.pb-lvl.on[data-lv="C2"]{background:#9B72CF}
 .pb-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
 .pb-category{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:1.2rem 1.4rem;transition:box-shadow .2s}
 .pb-category:hover{box-shadow:0 4px 14px rgba(45,48,71,.06)}
@@ -116,7 +121,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
 .pb-cat-title .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .pb-chips{display:flex;flex-wrap:wrap;gap:5px}
 .pb-chip{font-size:.8rem;font-weight:600;background:var(--cream);border:1.5px solid var(--border);border-radius:100px;padding:4px 12px;color:var(--ink);transition:all .2s;cursor:pointer;user-select:none}
-.pb-chip:hover{background:var(--sky-light);border-color:var(--sky);color:var(--sky);transform:translateY(-1px);box-shadow:0 1px 3px rgba(45,48,71,.06)}
+.pb-chip:hover{border-color:var(--pb-color, var(--sky));color:var(--pb-color, var(--sky));transform:translateY(-1px);box-shadow:0 1px 3px rgba(45,48,71,.06)}
 .pb-chip.used{text-decoration:line-through;opacity:.35;transform:none;box-shadow:none;border-color:var(--border);background:var(--cream);color:var(--muted)}
 .pb-chip.used:hover{background:var(--cream);border-color:var(--border);color:var(--muted);transform:none;box-shadow:none}
 
@@ -257,10 +262,10 @@ footer{text-align:center;padding:3rem 2rem;font-size:.8rem;color:var(--muted);bo
 <div class="phrase-bank" id="phraseBank">
 <div style="display:flex;align-items:center;gap:.8rem;margin-bottom:1.5rem">
 <div class="pb-level-toggle" style="margin-bottom:0">
-<button class="pb-lvl on" onclick="setPBLevel('B1',this)">B1</button>
-<button class="pb-lvl" onclick="setPBLevel('B2',this)">B2</button>
-<button class="pb-lvl" onclick="setPBLevel('C1',this)">C1</button>
-<button class="pb-lvl" onclick="setPBLevel('C2',this)">C2</button>
+<button class="pb-lvl on" data-lv="B1" onclick="setPBLevel('B1',this)">B1</button>
+<button class="pb-lvl" data-lv="B2" onclick="setPBLevel('B2',this)">B2</button>
+<button class="pb-lvl" data-lv="C1" onclick="setPBLevel('C1',this)">C1</button>
+<button class="pb-lvl" data-lv="C2" onclick="setPBLevel('C2',this)">C2</button>
 </div>
 <button class="action-btn" onclick="window.print()" title="Print phrase bank"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></button>
 </div>
@@ -624,14 +629,16 @@ function setPBLevel(lvl, btn) {
 function renderPB() {
   var data = phraseBank[pbLevel];
   var cats = Object.keys(data);
+  var levelColors = {'B1':'#FF6B6B','B2':'#16A88D','C1':'#2176FF','C2':'#9B72CF'};
+  var col = levelColors[pbLevel] || '#2176FF';
+  document.getElementById('pbGrid').style.setProperty('--pb-color', col);
   var h = '';
   cats.forEach(function(cat, ci) {
-    var col = colors[ci % colors.length];
     h += '<div class="pb-category">';
     h += '<div class="pb-cat-title"><span class="dot" style="background:' + col + '"></span>' + cat + '</div>';
     h += '<div class="pb-chips">';
     data[cat].forEach(function(p) { h += '<span class="pb-chip" onclick="this.classList.toggle(\'used\')">' + p + '</span>'; });
-    h += '</div>';
+    h += '</div></div>';
   });
   document.getElementById('pbGrid').innerHTML = h;
 }
