@@ -84,7 +84,45 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
 .pv-print-btn{margin-left:auto;font-family:var(--font-body);font-size:.88rem;font-weight:600;padding:.55rem 1rem;border:1.5px solid var(--border);border-radius:10px;background:var(--bg-card);color:var(--text-primary);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:.45rem}
 .pv-print-btn:hover{border-color:var(--text-primary);background:var(--cream)}
 .pv-print-btn svg{flex-shrink:0}
-@media print{.pv-print-btn{display:none!important}}
+.print-modal-backdrop{position:fixed;inset:0;background:rgba(45,48,71,.5);backdrop-filter:blur(3px);z-index:1000;display:none;align-items:center;justify-content:center;padding:1rem}
+.print-modal-backdrop.open{display:flex;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.print-modal{background:var(--bg-card);border-radius:var(--radius);max-width:440px;width:100%;padding:1.8rem;box-shadow:0 20px 60px rgba(45,48,71,.25);animation:modalIn .25s ease}
+@keyframes modalIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.print-modal h3{font-family:var(--font-display);font-size:1.4rem;font-weight:400;color:var(--ink);margin-bottom:.3rem}
+.print-modal-desc{font-size:.85rem;color:var(--muted);margin-bottom:1.4rem}
+.print-field{margin-bottom:1.1rem}
+.print-field-label{font-family:'JetBrains Mono',monospace;font-size:.65rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;display:block}
+.print-opts{display:flex;flex-direction:column;gap:.4rem}
+.print-opt{display:flex;align-items:flex-start;gap:.6rem;padding:.65rem .8rem;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;transition:all .15s;background:#fff}
+.print-opt:hover{border-color:var(--muted);background:var(--cream)}
+.print-opt input{margin:.15rem 0 0 0;accent-color:var(--lavender);cursor:pointer;flex-shrink:0}
+.print-opt-content{flex:1;display:flex;flex-direction:column;gap:.1rem}
+.print-opt-title{font-size:.9rem;font-weight:700;color:var(--ink);line-height:1.3}
+.print-opt-desc{font-size:.78rem;color:var(--muted);line-height:1.4}
+.print-opt input:checked ~ .print-opt-content .print-opt-title{color:var(--lavender)}
+.print-opt:has(input:checked){border-color:var(--lavender);background:#F3EEF9}
+.print-toggle{display:flex;align-items:center;gap:.6rem;font-size:.88rem;color:var(--ink);font-weight:600;cursor:pointer;user-select:none}
+.print-toggle input{accent-color:var(--lavender);cursor:pointer;width:16px;height:16px}
+.print-actions{display:flex;gap:.6rem;margin-top:1.4rem;justify-content:flex-end}
+.print-btn{font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;padding:.6rem 1.2rem;border-radius:10px;cursor:pointer;transition:all .15s;border:1.5px solid}
+.print-btn-cancel{background:#fff;border-color:var(--border);color:var(--muted)}
+.print-btn-cancel:hover{border-color:var(--muted);color:var(--ink)}
+.print-btn-go{background:var(--lavender);border-color:var(--lavender);color:#fff}
+.print-btn-go:hover{opacity:.9}
+@media print{
+  .print-modal-backdrop{display:none!important}
+  #printArea{display:block!important}
+  .print-ec-section-head{font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:400;margin:0 0 .7rem;padding-bottom:.3rem;border-bottom:1px solid #999;color:#000}
+  .print-ec-pagebreak{break-before:page;page-break-before:always}
+  .print-cloze-passage{font-family:'Outfit',sans-serif;font-size:.95rem;line-height:2.2;color:#000;margin-top:.5rem}
+  .print-cloze-gap{display:inline-block;min-width:70px;border-bottom:1.5px solid #333;text-align:center;padding:0 .3rem;margin:0 .2rem}
+  .print-cloze-gap .num{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:#666;vertical-align:super}
+  .print-cloze-gap.filled{border-bottom:none;font-weight:700;color:#15803D;background:#dcfce7;border-radius:3px;padding:.05rem .45rem}
+  .print-header{margin-bottom:1.2rem;padding-bottom:.8rem;border-bottom:2px solid #000}
+  .print-header h1{font-family:'Outfit',sans-serif;font-size:1.6rem;font-weight:400;margin-bottom:.2rem;color:#000}
+  .print-header .meta{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:#555;letter-spacing:.05em}
+.pv-print-btn{display:none!important}}
 
 .pv-controls{display:flex;gap:.8rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem}
 .pv-view-btn{font-family:var(--font-body);font-size:.88rem;font-weight:600;padding:.55rem 1.2rem;border:1.5px solid var(--border);border-radius:10px;background:var(--bg-card);color:var(--text-primary);cursor:pointer;transition:all .15s}
@@ -124,10 +162,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
 .adj-legend{display:flex;gap:1.2rem;margin-bottom:1.2rem;flex-wrap:wrap;font-size:.8rem;color:var(--text-muted)}
 .adj-legend-item{display:flex;align-items:center;gap:.35rem}
 
-.adj-alpha-layout{display:grid;grid-template-columns:minmax(160px,max-content) 1fr;gap:1.2rem;align-items:start}
+.adj-alpha-layout{display:grid;grid-template-columns:80px 1fr;gap:1.2rem;align-items:start}
 .adj-alpha-header{font-family:'Outfit',sans-serif;font-size:1.8rem;font-weight:700;color:var(--lavender);margin:0 0 .8rem;padding-bottom:.4rem;border-bottom:2px solid var(--lavender);scroll-margin-top:80px}
 .adj-alpha-header:not(:first-child){margin-top:2rem}
-.adj-sb-wrap{min-width:160px;max-width:260px;background:var(--bg-card);border:1.5px solid var(--border);border-radius:var(--radius);padding:.8rem;max-height:70vh;overflow-y:auto;position:sticky;top:80px}
+.adj-sb-wrap{width:80px;background:var(--bg-card);border:1.5px solid var(--border);border-radius:var(--radius);padding:.8rem;max-height:70vh;overflow-y:auto;position:sticky;top:80px}
 .adj-sb-wrap::-webkit-scrollbar{width:4px}
 .adj-sb-wrap::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
 .adj-sb-item{font-size:.8rem;font-weight:700;padding:.55rem .9rem;border-radius:100px;cursor:pointer;transition:all .15s;display:flex;align-items:center;color:var(--text-secondary);margin-bottom:.3rem;border:1.5px solid var(--border);background:#fff}
@@ -184,6 +222,69 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
   .content-panel{padding:28px 24px 40px}
   .type-grid{grid-template-columns:1fr}
 }
+/* ── REGISTER SORT ──────────────────────────────────────────────────────── */
+.rs-set-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.75rem;margin-bottom:.5rem}
+.rs-set-card{border:1.5px solid var(--border);border-radius:12px;padding:1.1rem 1.25rem;cursor:pointer;transition:all .15s;background:#fff}
+.rs-set-card:hover{border-color:var(--lavender);transform:translateY(-2px);box-shadow:0 4px 12px rgba(155,114,207,.12)}
+.rs-set-card-num{font-family:'JetBrains Mono',monospace;font-size:.65rem;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.3rem}
+.rs-set-card-title{font-weight:700;font-size:.95rem;color:var(--text-primary);margin-bottom:.5rem;line-height:1.3}
+.rs-set-card-done{display:inline-flex;align-items:center;gap:.3rem;font-size:.75rem;color:var(--accent-teal);font-weight:600}
+.rs-set-card.completed{border-color:var(--accent-teal);background:#E8FBF8}
+.rs-info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem}
+.rs-info-card{border-radius:12px;padding:1rem 1.1rem;border:1.5px solid var(--border)}
+.rs-info-label{font-weight:800;font-size:.85rem;margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.06em}
+.rs-info-desc{font-size:.82rem;color:var(--text-muted);line-height:1.5}
+.rs-formal .rs-info-label{color:#1a5fd4}.rs-formal{background:#EEF3FF;border-color:#C7D9FF}
+.rs-neutral .rs-info-label{color:#0A8A76}.rs-neutral{background:#E8FBF8;border-color:#B3EDE6}
+.rs-informal .rs-info-label{color:#A86618}.rs-informal{background:#FEF9F0;border-color:#FDDFA0}
+.rs-slang .rs-info-label{color:#C54545}.rs-slang{background:#FFF0F0;border-color:#FFC7C7}
+.rs-word-bank{display:flex;flex-wrap:wrap;gap:.5rem;padding:1rem;background:var(--bg-card);border:1.5px solid var(--border);border-radius:12px;min-height:64px;margin-bottom:1rem}
+.rs-chip{display:inline-flex;align-items:center;padding:.4rem .85rem;border-radius:100px;font-size:.82rem;font-weight:700;cursor:grab;border:1.5px solid var(--border);background:#fff;color:var(--text-primary);transition:all .15s;user-select:none}
+.rs-chip:hover{border-color:var(--lavender);color:var(--lavender);transform:translateY(-1px);box-shadow:0 2px 8px rgba(155,114,207,.15)}
+.rs-chip.dragging{opacity:.4;cursor:grabbing}
+.rs-chip.placed-correct{background:#E8FBF8;border-color:#0A8A76;color:#0A8A76;cursor:default}
+.rs-chip.placed-wrong{background:#FFF0F0;border-color:#C54545;color:#C54545;animation:rs-shake .3s}
+.rs-chip.revealed{opacity:.7;cursor:default}
+.rs-chip[data-reg="formal"].placed-correct,.rs-chip[data-reg="formal"].revealed{background:#EEF3FF;border-color:#1a5fd4;color:#1a5fd4}
+.rs-chip[data-reg="neutral"].placed-correct,.rs-chip[data-reg="neutral"].revealed{background:#E8FBF8;border-color:#0A8A76;color:#0A8A76}
+.rs-chip[data-reg="informal"].placed-correct,.rs-chip[data-reg="informal"].revealed{background:#FEF9F0;border-color:#A86618;color:#A86618}
+.rs-chip[data-reg="slang"].placed-correct,.rs-chip[data-reg="slang"].revealed{background:#FFF0F0;border-color:#C54545;color:#C54545}
+@keyframes rs-shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.rs-columns{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem}
+.rs-col-head{padding:.6rem 1rem;border-radius:10px 10px 0 0;font-weight:800;font-size:.82rem;text-transform:uppercase;letter-spacing:.07em;display:flex;align-items:center;gap:.5rem}
+.rs-col-head.rs-formal{background:#EEF3FF;color:#1a5fd4}
+.rs-col-head.rs-neutral{background:#E8FBF8;color:#0A8A76}
+.rs-col-head.rs-informal{background:#FEF9F0;color:#A86618}
+.rs-col-head.rs-slang{background:#FFF0F0;color:#C54545}
+.rs-drop-zone{min-height:200px;border:1.5px dashed var(--border);border-top:none;border-radius:0 0 10px 10px;padding:.6rem;display:flex;flex-direction:column;gap:.4rem;transition:background .15s;background:var(--bg)}
+.rs-drop-zone.drag-over{background:rgba(155,114,207,.06);border-color:var(--lavender)}
+.rs-result-icon{font-size:2.5rem;margin-bottom:.25rem}
+@media(max-width:700px){.rs-columns{grid-template-columns:1fr}.rs-info-grid{grid-template-columns:1fr}}
+@media print{#tab-regsort{display:none!important}}
+/* ── SYNONYM GROUPS ──────────────────────────────────────────────────────── */
+.syn-layout{display:grid;grid-template-columns:235px 1fr;gap:1.5rem;align-items:start}
+.syn-sidebar{position:sticky;top:4.5rem;background:var(--bg-card);border:1.5px solid var(--border);border-radius:14px;padding:.5rem;max-height:calc(100vh - 6rem);overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start}
+.syn-sb-item{font-size:.82rem;font-weight:700;padding:.7rem 1rem;border-radius:100px;cursor:pointer;transition:all .15s;color:var(--text-secondary);border:1.5px solid var(--border);background:#fff;margin-bottom:.5rem;display:flex;align-items:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%;box-sizing:border-box;text-transform:lowercase;line-height:1.3;min-height:42px}
+.syn-sb-item:hover{color:var(--text-primary);border-color:var(--text-muted)}
+.syn-sb-item.active{background:var(--lavender);color:#fff;border-color:var(--lavender)}
+.syn-group{margin-bottom:1.5rem}
+.syn-group:last-child{margin-bottom:0}
+.syn-group-label{font-family:var(--font-mono);font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--lavender);margin-bottom:.5rem;padding-left:.75rem}
+.syn-panel{background:var(--bg-card);border:1.5px solid var(--border);border-radius:14px;padding:1.5rem}
+.syn-concept{font-family:var(--font-display);font-size:1.5rem;font-weight:800;color:var(--text-primary);margin-bottom:.25rem;text-transform:lowercase}
+.syn-count{font-family:var(--font-mono);font-size:.72rem;color:var(--text-muted);margin-bottom:1.25rem}
+.syn-table{width:100%;border-collapse:collapse;font-size:.9rem}
+.syn-table thead tr{border-bottom:2px solid var(--border)}
+.syn-table th{font-family:var(--font-mono);font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);font-weight:500;padding:.5rem .75rem;text-align:left}
+.syn-table td{padding:.65rem .75rem;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.45}
+.syn-table tr:last-child td{border-bottom:none}
+.syn-table tr:hover td{background:rgba(155,114,207,.04)}
+.syn-word{font-weight:800;color:var(--text-primary);white-space:nowrap}
+.syn-shade{color:var(--text-secondary)}
+.syn-ctx{font-family:var(--font-mono);font-size:.72rem;color:var(--text-muted)}
+.syn-reg{display:inline-flex;align-items:center;padding:.2rem .55rem;border-radius:100px;font-size:.68rem;font-weight:600;white-space:nowrap;background:rgba(45,48,71,.06);color:var(--text-muted);border:1px solid var(--border)}
+@media(max-width:700px){.syn-layout{grid-template-columns:1fr}.syn-sidebar{position:static;max-height:none;flex-direction:row;overflow-x:auto;overflow-y:hidden;gap:.35rem;padding:.5rem;-webkit-overflow-scrolling:touch}.syn-sb-item{flex-shrink:0;white-space:nowrap;width:auto;margin-bottom:0}}
+@media print{#tab-synonyms{display:none!important}}
 /* ── FLASHCARDS ──────────────────────────────────────────────────────────── */
 .fc-setup{max-width:620px;margin:0 auto;background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:2rem 2rem 1.75rem}
 .fc-setup-title{font-family:'Outfit',sans-serif;font-size:1.6rem;color:var(--ink);margin:0 0 .35rem;font-weight:700}
@@ -318,10 +419,12 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
 <div class="page-container">
   <div class="tabs" role="tablist">
     <button class="tab active" data-tab="guide" role="tab">Guide</button>
-    <button class="tab" data-tab="list" role="tab">Adjectives List</button>
+    <button class="tab" data-tab="list" role="tab">List</button>
+    <button class="tab" data-tab="synonyms" role="tab">Synonyms</button>
     <span class="tab-sep" aria-hidden="true"></span>
-    <button class="tab" data-tab="flashcards" role="tab">Flashcards</button>
     <button class="tab" data-tab="practice" role="tab">Gap Fill</button>
+    <button class="tab" data-tab="regsort" role="tab">Register Sort</button>
+    <button class="tab" data-tab="flashcards" role="tab">Flashcards</button>
   </div>
 
   <!-- GUIDE TAB -->
@@ -788,15 +891,129 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
 
   <!-- PRACTICE TAB (placeholder) -->
   <div class="tab-content" id="tab-practice">
-    <p class="oc-intro">Read each passage and fill in the missing adjectives using the word bank. 6 gaps per text.</p>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:1.25rem;flex-wrap:wrap;">
+      <p class="oc-intro" style="margin-bottom:0;flex:1;">Read each passage and fill in the missing adjectives using the word bank. 6 gaps per text.</p>
+      <button class="pv-print-btn" id="adjOcPrintBtn" onclick="adjOcOpenPrint()" aria-label="Print options">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+        Print
+      </button>
+    </div>
     <div class="oc-layout">
       <nav class="oc-sidebar" id="adj-oc-sidebar"></nav>
       <div class="oc-content" id="adj-oc-content"></div>
     </div>
   </div>
 
+  <!-- REGISTER SORT TAB -->
+  <div class="tab-content" id="tab-regsort">
+    <div id="rs-setup">
+      <h2 style="font-family:var(--font-display);font-size:1.4rem;font-weight:800;margin-bottom:.3rem;">Register Sort</h2>
+      <p style="color:var(--text-muted);font-size:.95rem;margin-bottom:1.5rem;">Sort adjectives into the correct register. 24 words per set, 8 per column.</p>
+      <div class="rs-info-grid" style="margin-bottom:1.75rem;">
+        <div class="rs-info-card rs-formal"><div class="rs-info-label">Formal</div><div class="rs-info-desc">Academic, professional, official writing. Avoids contractions and colloquial language.</div></div>
+        <div class="rs-info-card rs-neutral"><div class="rs-info-label">Neutral</div><div class="rs-info-desc">Standard everyday English. Appropriate in most spoken and written contexts.</div></div>
+        <div class="rs-info-card rs-informal"><div class="rs-info-label">Informal</div><div class="rs-info-desc">Conversational and colloquial. Fine in speech and casual writing; avoid in formal or academic work.</div></div>
+      </div>
+      <div class="rs-set-grid" id="rs-set-grid"></div>
+    </div>
+
+    <div id="rs-game" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:.75rem;">
+        <div id="rs-progress-text" style="font-family:var(--font-mono);font-size:.82rem;color:var(--text-muted);"></div>
+        <div style="display:flex;gap:.6rem;">
+          <button class="pv-print-btn" onclick="rsPDF(false)" title="Download worksheet PDF"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> PDF</button>
+          <button class="pv-print-btn" onclick="rsPDF(true)" title="Download answer key PDF"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Answers PDF</button>
+          <button class="pv-print-btn" onclick="rsPrint(false)" title="Print worksheet"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg> Print</button>
+          <button class="pv-print-btn" onclick="rsPrint(true)" title="Print answer key"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg> Answers</button>
+          <button class="pv-print-btn" onclick="rsRevealAll()" id="rs-reveal-btn" style="border-color:var(--accent-teal);color:var(--accent-teal);">Reveal All</button>
+          <button class="pv-print-btn" onclick="rsReset()">Restart</button>
+        </div>
+      </div>
+      <div class="rs-word-bank" id="rs-bank"></div>
+      <div class="rs-columns" id="rs-columns">
+        <div class="rs-col" data-reg="formal">
+          <div class="rs-col-head rs-formal"><span>Formal</span></div>
+          <div class="rs-drop-zone" id="rs-drop-formal"></div>
+        </div>
+        <div class="rs-col" data-reg="neutral">
+          <div class="rs-col-head rs-neutral"><span>Neutral</span></div>
+          <div class="rs-drop-zone" id="rs-drop-neutral"></div>
+        </div>
+        <div class="rs-col" data-reg="informal">
+          <div class="rs-col-head rs-informal"><span>Informal</span></div>
+          <div class="rs-drop-zone" id="rs-drop-informal"></div>
+        </div>
+
+      </div>
+      <div id="rs-result" style="display:none;margin-top:1.5rem;text-align:center;">
+        <div class="rs-result-icon">🎯</div>
+        <div style="font-family:var(--font-display);font-size:1.5rem;font-weight:700;color:var(--text-primary);margin:.25rem 0;">Done!</div>
+        <div id="rs-result-score" style="color:var(--text-muted);font-size:.95rem;margin-bottom:1rem;"></div>
+        <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;">
+          <button class="fc-start-btn" onclick="rsReset()">Try again</button>
+          <button class="fc-exit-btn" onclick="rsBackToSets()">All sets</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SYNONYM GROUPS TAB -->
+  <div class="tab-content" id="tab-synonyms">
+    <div class="syn-layout">
+      <nav class="syn-sidebar" id="syn-sidebar"></nav>
+      <div id="syn-panel" class="syn-panel"></div>
+    </div>
+  </div>
 </div>
 <div id="printArea" style="display:none"></div>
+
+<!-- Gap Fill Print Modal -->
+<div class="print-modal-backdrop" id="adjOcPrintModal" onclick="adjOcClosePrint(event)">
+  <div class="print-modal" onclick="event.stopPropagation()">
+    <h3>Print passages</h3>
+    <p class="print-modal-desc">Choose which passages to print and the format.</p>
+    <div class="print-field">
+      <label class="print-field-label">Passages</label>
+      <div id="adjOcPassageList" class="print-opts" style="max-height:200px;overflow-y:auto;gap:.3rem;"></div>
+      <div style="margin-top:.5rem;">
+        <label class="print-toggle">
+          <input type="checkbox" id="adjOcSelectAll" onchange="adjOcToggleAll(this.checked)">
+          Select all
+        </label>
+      </div>
+    </div>
+    <div class="print-field">
+      <label class="print-field-label">Format</label>
+      <div class="print-opts">
+        <label class="print-opt">
+          <input type="radio" name="adjOcFormat" value="worksheet" checked>
+          <div class="print-opt-content">
+            <span class="print-opt-title">Worksheet</span>
+            <span class="print-opt-desc">Passage with numbered blank gaps</span>
+          </div>
+        </label>
+        <label class="print-opt">
+          <input type="radio" name="adjOcFormat" value="answer_key">
+          <div class="print-opt-content">
+            <span class="print-opt-title">Answer key</span>
+            <span class="print-opt-desc">Passage with all answers filled in</span>
+          </div>
+        </label>
+        <label class="print-opt">
+          <input type="radio" name="adjOcFormat" value="both">
+          <div class="print-opt-content">
+            <span class="print-opt-title">Both</span>
+            <span class="print-opt-desc">Worksheet then answer key, one per page</span>
+          </div>
+        </label>
+      </div>
+    </div>
+    <div class="print-actions">
+      <button class="print-btn print-btn-cancel" onclick="adjOcClosePrint()">Cancel</button>
+      <button class="print-btn print-btn-go" onclick="adjOcDoPrint()">Print</button>
+    </div>
+  </div>
+</div>
 
 <script>
 const ADJ_DATA = [
@@ -856,6 +1073,7 @@ const ADJ_DATA = [
 // EMOTIONS: Anxiety / Stress
 {word:"anxious",type:"gradable",cat:"anxiety",def:"Worried and nervous",ex:"She felt anxious about the results.",prep:"about",coll:"deeply anxious, incredibly anxious",freq:"common"},
 {word:"stressed",type:"gradable",cat:"anxiety",def:"Under mental or emotional pressure",ex:"She's been really stressed this week.",prep:"about",coll:"really stressed, massively stressed",freq:"common"},
+{word:"stressed out",type:"strong",gradable:"stressed",cat:"anxiety",def:"Completely overwhelmed by stress; more emphatic than stressed",ex:"I was completely stressed out by the end of the week.",coll:"completely stressed out, totally stressed out",freq:"common"},
 {word:"overwhelmed",type:"strong",gradable:"stressed",cat:"anxiety",def:"Buried by too much to cope with",ex:"She felt completely overwhelmed by the workload.",coll:"completely overwhelmed, totally overwhelmed",freq:"common"},
 {word:"frazzled",type:"strong",gradable:"stressed",cat:"anxiety",def:"Completely exhausted by stress; informal",ex:"I'm absolutely frazzled after that week.",coll:"absolutely frazzled, completely frazzled",freq:"less"},
 {word:"burnt out",type:"strong",gradable:"tired",cat:"anxiety",def:"Completely exhausted from overwork",ex:"She was totally burnt out by the end of term.",coll:"totally burnt out, completely burnt out",freq:"common"},
@@ -2463,7 +2681,39 @@ function renderCat(data){
 
 function adjSetView(v,btn){adjView=v;document.querySelectorAll('.pv-view-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');adjRender();}
 function adjSetType(t,btn){adjType=t;document.querySelectorAll('.pv-ff').forEach(b=>b.classList.remove('on'));btn.classList.add('on');adjRender();}
-function adjOpenPrint(){alert('Print modal — coming soon.');}
+function adjOpenPrint(){
+  var active = document.querySelector('#tab-guide .section-content.active');
+  if(!active){ alert('No guide section is active.'); return; }
+  var pw = window.open('','','width=820,height=700');
+  pw.document.write('<!DOCTYPE html><html><head><meta charset="utf-8">');
+  pw.document.write('<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">');
+  pw.document.write('<title>Adjectives Guide</title>');
+  pw.document.write('<style>');
+  pw.document.write('*{box-sizing:border-box;margin:0;padding:0}');
+  pw.document.write('body{font-family:Outfit,sans-serif;padding:2.5rem 3rem;color:#2D3047;background:#fff;font-size:.95rem;line-height:1.65}');
+  pw.document.write('h2{font-size:1.5rem;font-weight:800;margin-bottom:.75rem;color:#2D3047}');
+  pw.document.write('h3{font-size:1.1rem;font-weight:700;margin:1.25rem 0 .5rem;color:#2D3047}');
+  pw.document.write('p{margin-bottom:.85rem;color:#4B5563}');
+  pw.document.write('strong,b{font-weight:700;color:#2D3047}');
+  pw.document.write('em{font-style:italic}');
+  pw.document.write('.example-box,.info-box,.warning-box{border-radius:10px;padding:1rem 1.25rem;margin:1rem 0;font-size:.9rem}');
+  pw.document.write('.example-box{background:#F3EEF9;border-left:4px solid #9B72CF}');
+  pw.document.write('.info-box{background:#EEF3FF;border-left:4px solid #4A90D9}');
+  pw.document.write('.warning-box{background:#FFF0F0;border-left:4px solid #FF6B6B}');
+  pw.document.write('table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.88rem}');
+  pw.document.write('th{text-align:left;background:#F9F9F9;padding:.5rem .75rem;border-bottom:2px solid #E5E7EB;font-weight:700}');
+  pw.document.write('td{padding:.5rem .75rem;border-bottom:1px solid #F3F4F6}');
+  pw.document.write('.tag{display:inline-block;padding:.15rem .55rem;border-radius:100px;font-size:.72rem;font-weight:700;margin:.1rem}');
+  pw.document.write('.footer{margin-top:2rem;padding-top:.75rem;border-top:1px solid #E5E7EB;font-family:monospace;font-size:.68rem;color:#9CA3AF}');
+  pw.document.write('@media print{body{padding:1.5rem 2rem}}');
+  pw.document.write('</style></head><body>');
+  pw.document.write(active.innerHTML);
+  pw.document.write('<div class="footer">johnplusenglish.com — Adjectives Guide</div>');
+  pw.document.write('</body></html>');
+  pw.document.close();
+  pw.focus();
+  setTimeout(function(){ pw.print(); }, 600);
+}
 
 document.querySelectorAll('.tab').forEach(tab=>{
   tab.addEventListener('click',()=>{
@@ -2873,6 +3123,525 @@ const ADJ_PASSAGES = [
   STATE.activeId = ADJ_PASSAGES[0].id;
   renderSidebar();
   renderContent();
+})();
+
+/* ── GAP FILL PRINT ──────────────────────────────────────────────────────── */
+function adjOcEsc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function adjOcOpenPrint(){
+  const list = document.getElementById('adjOcPassageList');
+  list.innerHTML = ADJ_PASSAGES.map(p=>
+    `<label class="print-opt" style="padding:.45rem .8rem;">
+      <input type="checkbox" class="adj-oc-cb" value="${adjOcEsc(p.id)}" checked>
+      <div class="print-opt-content">
+        <span class="print-opt-title" style="font-size:.88rem;">${adjOcEsc(p.title)}</span>
+        <span class="print-opt-desc">${adjOcEsc(p.theme)}</span>
+      </div></label>`
+  ).join('');
+  document.getElementById('adjOcSelectAll').checked = true;
+  document.getElementById('adjOcPrintModal').classList.add('open');
+}
+function adjOcClosePrint(e){
+  if(e && e.target && e.target.id && e.target.id !== 'adjOcPrintModal') return;
+  document.getElementById('adjOcPrintModal').classList.remove('open');
+}
+function adjOcToggleAll(checked){
+  document.querySelectorAll('.adj-oc-cb').forEach(cb=>{ cb.checked = checked; });
+}
+function adjOcDoPrint(){
+  const format = document.querySelector('input[name="adjOcFormat"]:checked').value;
+  const selected = Array.from(document.querySelectorAll('.adj-oc-cb:checked')).map(cb=>cb.value);
+  if(!selected.length){ alert('Please select at least one passage.'); return; }
+  const passages = ADJ_PASSAGES.filter(p=>selected.includes(p.id));
+
+  function parseGaps(p){
+    const re = /\{\{([^}]+)\}\}/g;
+    const tokens = []; let last=0, match, idx=0;
+    while((match=re.exec(p.body))!==null){
+      if(match.index>last) tokens.push({isGap:false,text:p.body.slice(last,match.index)});
+      const parts=match[1].split('|');
+      tokens.push({isGap:true,canonical:parts[0].trim(),display:(parts[1]||parts[0]).trim(),idx:idx++});
+      last=re.lastIndex;
+    }
+    if(last<p.body.length) tokens.push({isGap:false,text:p.body.slice(last)});
+    return tokens;
+  }
+  function renderPassage(p, withAnswers){
+    return parseGaps(p).map(t=>{
+      if(!t.isGap) return adjOcEsc(t.text);
+      return withAnswers
+        ? `<span class="print-cloze-gap filled">${adjOcEsc(t.display)}</span>`
+        : `<span class="print-cloze-gap"><span class="num">${t.idx+1}</span></span>`;
+    }).join('');
+  }
+  function buildWorksheet(p,tokens){
+    const answers = tokens.filter(t=>t.isGap).map(t=>adjOcEsc(t.display));
+    return `<h2 class="print-ec-section-head">${adjOcEsc(p.title)} <span style="font-size:.85rem;font-weight:400;font-family:Outfit,sans-serif;">(${adjOcEsc(p.theme)})</span></h2>
+      <p style="font-size:.82rem;color:#555;margin-bottom:.8rem;font-family:Outfit,sans-serif;">Read the passage and fill in the missing adjectives.</p>
+      <div class="print-cloze-passage">${renderPassage(p,false)}</div>
+      <div style="margin-top:.7rem;font-family:Outfit,sans-serif;font-size:.78rem;color:#666;"><b>Word bank:</b> ${answers.sort().join(' &nbsp;·&nbsp; ')}</div>`;
+  }
+  function buildAnswerKey(p,tokens){
+    const answers = tokens.filter(t=>t.isGap);
+    return `<h2 class="print-ec-section-head">Answer Key — ${adjOcEsc(p.title)}</h2>
+      <div class="print-cloze-passage">${renderPassage(p,true)}</div>
+      <div style="margin-top:.9rem;font-family:Outfit,sans-serif;font-size:.82rem;color:#333;"><b>Answers:</b> ${answers.map((a,i)=>`${i+1}. ${adjOcEsc(a.display)}`).join(' &nbsp;·&nbsp; ')}</div>`;
+  }
+
+  const today = new Date().toLocaleDateString('en-GB',{year:'numeric',month:'long',day:'numeric'});
+  let html = `<div class="print-header"><h1>Gap Fill — Adjectives</h1><div class="meta">${selected.length} passage${selected.length>1?'s':''} · ${today} · johnplusenglish.com</div></div>`;
+  passages.forEach((p,i)=>{
+    if(i>0) html += '<div class="print-ec-pagebreak"></div>';
+    const tokens = parseGaps(p);
+    if(format==='worksheet') html += buildWorksheet(p,tokens);
+    else if(format==='answer_key') html += buildAnswerKey(p,tokens);
+    else { html += buildWorksheet(p,tokens); html += '<div class="print-ec-pagebreak"></div>'; html += buildAnswerKey(p,tokens); }
+  });
+
+  document.getElementById('printArea').innerHTML = html;
+  document.body.setAttribute('data-print-mode','cloze-'+format);
+  document.getElementById('adjOcPrintModal').classList.remove('open');
+  setTimeout(()=>{ window.print(); setTimeout(()=>{ document.body.removeAttribute('data-print-mode'); document.getElementById('printArea').innerHTML=''; },500); },250);
+}
+window.synPrint = function(){
+  var panel = document.getElementById('syn-panel');
+  if(!panel || !panel.innerHTML) return;
+  var pw = window.open('','','width=800,height=600');
+  pw.document.write('<html><head><title>Synonym Group</title>');
+  pw.document.write('<style>');
+  pw.document.write('body{font-family:Outfit,sans-serif;padding:2rem;color:#222}');
+  pw.document.write('h1{font-size:1.4rem;font-weight:700;margin-bottom:.25rem;text-transform:lowercase}');
+  pw.document.write('.meta{font-family:monospace;font-size:.72rem;color:#888;margin-bottom:1.5rem}');
+  pw.document.write('.group-label{font-family:monospace;font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:#9B72CF;margin:1.2rem 0 .4rem;padding-left:.5rem}');
+  pw.document.write('table{width:100%;border-collapse:collapse;font-size:.88rem;margin-bottom:.5rem}');
+  pw.document.write('th{text-align:left;font-family:monospace;font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:#888;padding:.4rem .6rem;border-bottom:2px solid #ccc}');
+  pw.document.write('td{padding:.5rem .6rem;border-bottom:1px solid #eee;vertical-align:top}');
+  pw.document.write('.word{font-weight:800}.reg{font-size:.7rem;color:#888}');
+  pw.document.write('.ctx{font-family:monospace;font-size:.72rem;color:#888}');
+  pw.document.write('.footer{margin-top:1.5rem;font-size:.7rem;color:#aaa;border-top:1px solid #ddd;padding-top:.5rem}');
+  pw.document.write('</style></head><body>');
+  pw.document.write(panel.innerHTML.replace(/class="syn-concept"/g,'').replace(/class="syn-count"/g,'class="meta"').replace(/class="syn-group-label"/g,'class="group-label"').replace(/class="syn-word"/g,'class="word"').replace(/class="syn-reg"/g,'class="reg"').replace(/class="syn-ctx"/g,'class="ctx"'));
+  pw.document.write('<div class="footer">johnplusenglish.com</div>');
+  pw.document.write('</body></html>');
+  pw.document.close();
+  pw.focus();
+  setTimeout(function(){pw.print();},300);
+};
+window.rsPrint = function(withAnswers){
+  if(!rsCurrentSet) return;
+  var pw = window.open('','','width=800,height=600');
+  pw.document.write('<html><head><title>Register Sort</title>');
+  pw.document.write('<style>');
+  pw.document.write('body{font-family:Outfit,sans-serif;padding:2rem;color:#222}');
+  pw.document.write('h1{font-size:1.3rem;font-weight:700;margin-bottom:.2rem}');
+  pw.document.write('.meta{font-family:monospace;font-size:.72rem;color:#888;margin-bottom:1rem}');
+  pw.document.write('.instructions{font-size:.9rem;color:#555;margin-bottom:1.2rem}');
+  pw.document.write('.bank{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1.5rem;padding:1rem;border:1.5px solid #ddd;border-radius:10px}');
+  pw.document.write('.chip{padding:.35rem .7rem;border:1.5px solid #ccc;border-radius:100px;font-size:.82rem;font-weight:700}');
+  pw.document.write('.cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem}');
+  pw.document.write('.col-head{font-weight:800;font-size:.82rem;text-transform:uppercase;letter-spacing:.07em;padding:.5rem .7rem;border-radius:8px 8px 0 0;border-bottom:2px solid #999}');
+  pw.document.write('.col-head.formal{background:#EEF3FF;color:#1a5fd4}');
+  pw.document.write('.col-head.neutral{background:#E8FBF8;color:#0A8A76}');
+  pw.document.write('.col-head.informal{background:#FEF9F0;color:#A86618}');
+  pw.document.write('.col-body{min-height:200px;border:1px solid #ddd;border-top:none;border-radius:0 0 8px 8px;padding:.5rem}');
+  pw.document.write('.ans{font-size:.82rem;padding:.3rem .6rem;margin:.2rem 0;font-weight:700}');
+  pw.document.write('.footer{margin-top:1.5rem;font-size:.7rem;color:#aaa;border-top:1px solid #ddd;padding-top:.5rem}');
+  pw.document.write('</style></head><body>');
+  pw.document.write('<h1>Register Sort — '+rsCurrentSet.title+'</h1>');
+  pw.document.write('<div class="meta">24 words · 8 per column · johnplusenglish.com</div>');
+  if(!withAnswers){
+    pw.document.write('<div class="instructions">Sort each adjective into the correct column: Formal, Neutral, or Informal.</div>');
+    var shuffled = rsCurrentSet.words.slice().sort(function(){return Math.random()-.5;});
+    pw.document.write('<div class="bank">');
+    shuffled.forEach(function(w){pw.document.write('<span class="chip">'+w.word+'</span>');});
+    pw.document.write('</div>');
+  }
+  pw.document.write('<div class="cols">');
+  ['formal','neutral','informal'].forEach(function(reg){
+    var label = reg.charAt(0).toUpperCase()+reg.slice(1);
+    pw.document.write('<div><div class="col-head '+reg+'">'+label+'</div><div class="col-body">');
+    if(withAnswers){
+      rsCurrentSet.words.filter(function(w){return w.reg===reg;}).forEach(function(w){
+        pw.document.write('<div class="ans">'+w.word+'</div>');
+      });
+    }
+    pw.document.write('</div></div>');
+  });
+  pw.document.write('</div>');
+  pw.document.write('<div class="footer">johnplusenglish.com</div>');
+  pw.document.write('</body></html>');
+  pw.document.close();
+  pw.focus();
+  setTimeout(function(){pw.print();},300);
+};
+window.synPDF = function(){
+  var panel = document.getElementById('syn-panel');
+  if(!panel || !panel.innerHTML) return;
+
+  // Build a self-contained styled div
+  var wrapper = document.createElement('div');
+  wrapper.style.cssText = 'font-family:Outfit,sans-serif;padding:2rem;background:#FFFCF7;color:#2D3047;max-width:720px;';
+
+  // Header
+  var hdr = document.createElement('div');
+  hdr.style.cssText = 'display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.5rem;padding-bottom:.75rem;border-bottom:2px solid #2D3047;';
+  var concept = panel.querySelector('.syn-concept');
+  var count = panel.querySelector('.syn-count');
+  hdr.innerHTML = '<div><div style="font-size:1.6rem;font-weight:800;color:#2D3047;text-transform:lowercase;line-height:1.2;">'+(concept?concept.textContent:'')+'</div>'+'<div style="font-size:.72rem;font-family:monospace;color:#9CA3AF;margin-top:.2rem;">'+(count?count.textContent:'')+'</div></div>'+'<div style="font-size:.65rem;font-family:monospace;color:#9CA3AF;text-align:right;line-height:1.6;">johnplusenglish.com</div>';
+  wrapper.appendChild(hdr);
+
+  // Groups
+  var groups = panel.querySelectorAll('.syn-group');
+  groups.forEach(function(g){
+    var groupDiv = document.createElement('div');
+    groupDiv.style.cssText = 'margin-bottom:1.4rem;';
+
+    var lbl = g.querySelector('.syn-group-label');
+    if(lbl){
+      var labelEl = document.createElement('div');
+      labelEl.style.cssText = 'font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#9B72CF;margin-bottom:.5rem;padding-left:.25rem;';
+      labelEl.textContent = lbl.textContent;
+      groupDiv.appendChild(labelEl);
+    }
+
+    var tbl = document.createElement('table');
+    tbl.style.cssText = 'width:100%;border-collapse:collapse;font-size:.85rem;';
+
+    // Header row
+    var thead = document.createElement('thead');
+    thead.innerHTML = '<tr><th style="text-align:left;font-family:monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:#9CA3AF;padding:.4rem .6rem;border-bottom:1.5px solid #E5E7EB;font-weight:500;">Word</th><th style="text-align:left;font-family:monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:#9CA3AF;padding:.4rem .6rem;border-bottom:1.5px solid #E5E7EB;font-weight:500;">Meaning / nuance</th><th style="text-align:left;font-family:monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:#9CA3AF;padding:.4rem .6rem;border-bottom:1.5px solid #E5E7EB;font-weight:500;">Typical context</th><th style="text-align:left;font-family:monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:#9CA3AF;padding:.4rem .6rem;border-bottom:1.5px solid #E5E7EB;font-weight:500;">Register</th></tr>';
+    tbl.appendChild(thead);
+
+    var tbody = document.createElement('tbody');
+    var srcRows = g.querySelectorAll('tbody tr');
+    var regStyles = {formal:'background:#EEF3FF;color:#1a5fd4;',neutral:'background:#F3EEF9;color:#6B46A0;',informal:'background:#FEF9F0;color:#A86618;'};
+    srcRows.forEach(function(row, i){
+      var cells = row.querySelectorAll('td');
+      if(!cells.length) return;
+      var tr = document.createElement('tr');
+      tr.style.background = i%2===0 ? '#fff' : '#FAFAF9';
+      var word = cells[0]?cells[0].textContent:'';
+      var shade = cells[1]?cells[1].textContent:'';
+      var ctx = cells[2]?cells[2].textContent:'';
+      var reg = cells[3]?cells[3].textContent.trim():'';
+      var regKey = reg.toLowerCase();
+      var regStyle = regStyles[regKey] || 'background:#f5f5f5;color:#666;';
+      tr.innerHTML = '<td style="padding:.5rem .6rem;border-bottom:1px solid #F3F4F6;font-weight:800;color:#2D3047;white-space:nowrap;">'+word+'</td>'
+        +'<td style="padding:.5rem .6rem;border-bottom:1px solid #F3F4F6;color:#4B5563;">'+shade+'</td>'
+        +'<td style="padding:.5rem .6rem;border-bottom:1px solid #F3F4F6;font-family:monospace;font-size:.72rem;color:#9CA3AF;">'+ctx+'</td>'
+        +'<td style="padding:.5rem .6rem;border-bottom:1px solid #F3F4F6;"><span style="display:inline-block;padding:.2rem .5rem;border-radius:100px;font-size:.65rem;font-weight:700;'+regStyle+'">'+reg+'</span></td>';
+      tbody.appendChild(tr);
+    });
+    tbl.appendChild(tbody);
+    groupDiv.appendChild(tbl);
+    wrapper.appendChild(groupDiv);
+  });
+
+  var concept2 = panel.querySelector('.syn-concept');
+  var filename = concept2 ? concept2.textContent.trim().replace(/[^a-z0-9]/gi,'_').replace(/_+/g,'_').toLowerCase() : 'synonyms';
+
+  html2pdf().set({
+    margin:[10,10,10,10],
+    filename: filename+'.pdf',
+    image:{type:'jpeg',quality:0.99},
+    html2canvas:{scale:3,useCORS:true,backgroundColor:'#FFFCF7',letterRendering:true},
+    jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
+    pagebreak:{mode:['avoid-all','css']}
+  }).from(wrapper).save();
+};
+window.rsPDF = function(withAnswers){
+  if(!rsCurrentSet) return;
+  var container = document.createElement('div');
+  container.style.cssText = 'font-family:Outfit,sans-serif;padding:1.5rem;color:#222;max-width:720px;';
+  var title = '<div style="font-size:1.3rem;font-weight:800;margin-bottom:.2rem;">Register Sort — '+rsCurrentSet.title+'</div>';
+  title += '<div style="font-family:monospace;font-size:.72rem;color:#888;margin-bottom:1rem;">24 words · 8 per column · johnplusenglish.com</div>';
+  container.innerHTML = title;
+  if(!withAnswers){
+    var instr = document.createElement('div');
+    instr.style.cssText = 'font-size:.9rem;color:#555;margin-bottom:1rem;';
+    instr.textContent = 'Sort each adjective into the correct column: Formal, Neutral, or Informal.';
+    container.appendChild(instr);
+    var bank = document.createElement('div');
+    bank.style.cssText = 'display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1.5rem;padding:.8rem;border:1.5px solid #ddd;border-radius:10px;';
+    var shuffled = rsCurrentSet.words.slice().sort(function(){return Math.random()-.5;});
+    shuffled.forEach(function(w){
+      var chip = document.createElement('span');
+      chip.style.cssText = 'padding:.3rem .65rem;border:1.5px solid #ccc;border-radius:100px;font-size:.8rem;font-weight:700;';
+      chip.textContent = w.word;
+      bank.appendChild(chip);
+    });
+    container.appendChild(bank);
+  }
+  var cols = document.createElement('div');
+  cols.style.cssText = 'display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem;';
+  var headStyles = {formal:'background:#EEF3FF;color:#1a5fd4',neutral:'background:#E8FBF8;color:#0A8A76',informal:'background:#FEF9F0;color:#A86618'};
+  ['formal','neutral','informal'].forEach(function(reg){
+    var col = document.createElement('div');
+    var label = reg.charAt(0).toUpperCase()+reg.slice(1);
+    var head = document.createElement('div');
+    head.style.cssText = 'font-weight:800;font-size:.8rem;text-transform:uppercase;letter-spacing:.07em;padding:.45rem .6rem;border-radius:8px 8px 0 0;border-bottom:2px solid #999;'+headStyles[reg];
+    head.textContent = label;
+    col.appendChild(head);
+    var body = document.createElement('div');
+    body.style.cssText = 'min-height:180px;border:1px solid #ddd;border-top:none;border-radius:0 0 8px 8px;padding:.4rem;';
+    if(withAnswers){
+      rsCurrentSet.words.filter(function(w){return w.reg===reg;}).forEach(function(w){
+        var item = document.createElement('div');
+        item.style.cssText = 'font-size:.8rem;padding:.25rem .5rem;font-weight:700;';
+        item.textContent = w.word;
+        body.appendChild(item);
+      });
+    }
+    col.appendChild(body);
+    cols.appendChild(col);
+  });
+  container.appendChild(cols);
+  var footer = document.createElement('div');
+  footer.style.cssText = 'margin-top:1.5rem;font-size:.7rem;color:#aaa;border-top:1px solid #ddd;padding-top:.5rem;font-family:monospace;';
+  footer.textContent = 'johnplusenglish.com';
+  container.appendChild(footer);
+  var filename = 'register_sort_'+rsCurrentSet.title.replace(/[^a-z0-9]/gi,'_').replace(/_+/g,'_');
+  if(withAnswers) filename += '_answers';
+  html2pdf().set({
+    margin: [12, 12, 12, 12],
+    filename: filename + '.pdf',
+    image: {type:'jpeg', quality:0.98},
+    html2canvas: {scale:2, useCORS:true},
+    jsPDF: {unit:'mm', format:'a4', orientation:'portrait'}
+  }).from(container).save();
+};
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') adjOcClosePrint(); });
+
+/* ── SYNONYM GROUPS ──────────────────────────────────────────────────────── */
+(function(){
+  const SYN_CLUSTERS = [{"id": "careful", "concept": "careful / precise", "groups": [{"label": "Positive", "words": [{"word": "careful", "shade": "taking care to avoid mistakes", "reg": "neutral", "ctx": "careful planning"}, {"word": "thorough", "shade": "covers every aspect completely", "reg": "neutral", "ctx": "thorough research"}, {"word": "diligent", "shade": "hardworking and careful over time", "reg": "formal", "ctx": "diligent student"}, {"word": "meticulous", "shade": "extremely precise about every detail", "reg": "formal", "ctx": "meticulous records"}, {"word": "scrupulous", "shade": "careful to act morally and correctly", "reg": "formal", "ctx": "scrupulous honesty"}, {"word": "painstaking", "shade": "done with great effort and patience", "reg": "formal", "ctx": "painstaking research"}]}, {"label": "Excessive / negative", "words": [{"word": "fastidious", "shade": "very particular; hard to satisfy", "reg": "formal", "ctx": "fastidious about hygiene"}, {"word": "pedantic", "shade": "obsessed with minor rules — always negative", "reg": "formal", "ctx": "pedantic corrections"}, {"word": "fussy", "shade": "hard to please; overly particular", "reg": "informal", "ctx": "fussy eater"}, {"word": "picky", "shade": "selective about small things", "reg": "informal", "ctx": "picky about food"}]}]}, {"id": "reliable", "concept": "reliable / trustworthy", "groups": [{"label": "Core meaning", "words": [{"word": "reliable", "shade": "consistently does what is expected", "reg": "neutral", "ctx": "reliable colleague"}, {"word": "trustworthy", "shade": "can be trusted with sensitive things", "reg": "neutral", "ctx": "trustworthy source"}, {"word": "dependable", "shade": "always there when needed", "reg": "neutral", "ctx": "dependable support"}, {"word": "consistent", "shade": "same quality every time", "reg": "neutral", "ctx": "consistent results"}, {"word": "solid", "shade": "dependable; unlikely to fail", "reg": "informal", "ctx": "a solid friend"}]}, {"label": "Loyalty / commitment", "words": [{"word": "loyal", "shade": "faithful to a person or cause", "reg": "neutral", "ctx": "loyal friend"}, {"word": "steadfast", "shade": "firm and unwavering", "reg": "formal", "ctx": "steadfast belief"}, {"word": "accountable", "shade": "accepts responsibility for actions", "reg": "formal", "ctx": "held accountable"}]}]}, {"id": "angry", "concept": "angry — mild to extreme", "groups": [{"label": "Mild", "words": [{"word": "irritated", "shade": "mildly annoyed", "reg": "neutral", "ctx": "irritated by the delay"}, {"word": "annoyed", "shade": "noticeably bothered", "reg": "neutral", "ctx": "annoyed at the noise"}, {"word": "cross", "shade": "noticeably angry — British", "reg": "informal", "ctx": "don't be cross with me"}]}, {"label": "Moderate", "words": [{"word": "angry", "shade": "the standard, unmarked word", "reg": "neutral", "ctx": "angry about the decision"}, {"word": "frustrated", "shade": "annoyed because blocked from something", "reg": "neutral", "ctx": "frustrated with the process"}, {"word": "wound up", "shade": "tense and agitated", "reg": "informal", "ctx": "all wound up about it"}]}, {"label": "Strong", "words": [{"word": "furious", "shade": "very angry", "reg": "neutral", "ctx": "absolutely furious"}, {"word": "livid", "shade": "extremely angry; almost beyond control", "reg": "neutral", "ctx": "absolutely livid"}, {"word": "incandescent", "shade": "so angry as to be speechless", "reg": "formal", "ctx": "incandescent with rage"}]}, {"label": "Lingering", "words": [{"word": "bitter", "shade": "angry about past injustice; won't let go", "reg": "neutral", "ctx": "still bitter years later"}, {"word": "resentful", "shade": "suppressed anger about unfair treatment", "reg": "neutral", "ctx": "resentful of their success"}]}]}, {"id": "happy", "concept": "happy — mild to extreme", "groups": [{"label": "Mild / quiet", "words": [{"word": "content", "shade": "quietly satisfied; not seeking more", "reg": "neutral", "ctx": "content with her life"}, {"word": "pleased", "shade": "happy about a specific outcome", "reg": "neutral", "ctx": "pleased with the result"}, {"word": "satisfied", "shade": "needs have been met", "reg": "neutral", "ctx": "satisfied customer"}]}, {"label": "Moderate", "words": [{"word": "happy", "shade": "the standard, unmarked word", "reg": "neutral", "ctx": "happy to help"}, {"word": "cheerful", "shade": "generally bright and positive", "reg": "neutral", "ctx": "cheerful disposition"}, {"word": "upbeat", "shade": "optimistic and positive", "reg": "neutral", "ctx": "upbeat about the future"}]}, {"label": "Strong", "words": [{"word": "elated", "shade": "very happy; lifted up", "reg": "neutral", "ctx": "elated at the news"}, {"word": "ecstatic", "shade": "overwhelmingly happy", "reg": "neutral", "ctx": "absolutely ecstatic"}, {"word": "over the moon", "shade": "extremely happy — idiom", "reg": "informal", "ctx": "she was over the moon"}]}, {"label": "Informal", "words": [{"word": "chuffed", "shade": "very pleased — British", "reg": "informal", "ctx": "well chuffed with that"}, {"word": "stoked", "shade": "very excited and enthusiastic", "reg": "informal", "ctx": "absolutely stoked"}, {"word": "buzzing", "shade": "full of excited energy", "reg": "informal", "ctx": "buzzing after the match"}]}]}, {"id": "sad", "concept": "sad / unhappy", "groups": [{"label": "Mild", "words": [{"word": "sad", "shade": "the standard, unmarked word", "reg": "neutral", "ctx": "feeling sad"}, {"word": "disappointed", "shade": "sad because expectations weren't met", "reg": "neutral", "ctx": "disappointed with the result"}, {"word": "unhappy", "shade": "generally not happy", "reg": "neutral", "ctx": "unhappy with the decision"}, {"word": "down", "shade": "low in spirits", "reg": "informal", "ctx": "feeling a bit down"}, {"word": "blue", "shade": "mildly sad", "reg": "informal", "ctx": "feeling a bit blue"}]}, {"label": "Strong", "words": [{"word": "miserable", "shade": "very unhappy; uncomfortable", "reg": "neutral", "ctx": "feeling miserable"}, {"word": "dejected", "shade": "dispirited after a setback", "reg": "neutral", "ctx": "looked dejected"}, {"word": "heartbroken", "shade": "overwhelmed by grief or loss", "reg": "neutral", "ctx": "absolutely heartbroken"}, {"word": "gutted", "shade": "devastated — British informal", "reg": "informal", "ctx": "absolutely gutted"}]}, {"label": "Deep / reflective", "words": [{"word": "melancholy", "shade": "deep, reflective sadness", "reg": "formal", "ctx": "a melancholy mood"}, {"word": "despondent", "shade": "losing hope; deep sadness", "reg": "formal", "ctx": "despondent about the future"}]}]}, {"id": "intelligent", "concept": "intelligent / clever", "groups": [{"label": "General", "words": [{"word": "intelligent", "shade": "high general mental ability", "reg": "neutral", "ctx": "an intelligent person"}, {"word": "clever", "shade": "quick to learn; can imply cunning", "reg": "neutral", "ctx": "clever solution"}, {"word": "smart", "shade": "quick-thinking", "reg": "neutral", "ctx": "smart move"}, {"word": "bright", "shade": "quick and alert; often for young people", "reg": "neutral", "ctx": "bright student"}, {"word": "brilliant", "shade": "exceptionally intelligent", "reg": "neutral", "ctx": "absolutely brilliant"}]}, {"label": "Specific types", "words": [{"word": "sharp", "shade": "quick to read situations", "reg": "informal", "ctx": "sharp as a tack"}, {"word": "astute", "shade": "accurate judge of situations", "reg": "formal", "ctx": "astute observation"}, {"word": "shrewd", "shade": "practical intelligence about people/money", "reg": "neutral", "ctx": "shrewd investor"}, {"word": "analytical", "shade": "good at breaking problems apart", "reg": "formal", "ctx": "analytical mind"}, {"word": "gifted", "shade": "naturally talented", "reg": "neutral", "ctx": "gifted musician"}]}]}, {"id": "nervous", "concept": "nervous / anxious", "groups": [{"label": "Mild", "words": [{"word": "nervous", "shade": "general unease before an event", "reg": "neutral", "ctx": "nervous before the exam"}, {"word": "anxious", "shade": "worried about what might happen", "reg": "neutral", "ctx": "anxious about results"}, {"word": "apprehensive", "shade": "mild anxiety about the near future", "reg": "neutral", "ctx": "apprehensive about the interview"}, {"word": "worried", "shade": "troubled by a specific concern", "reg": "neutral", "ctx": "worried about her health"}]}, {"label": "Moderate", "words": [{"word": "stressed", "shade": "under pressure; mentally strained", "reg": "neutral", "ctx": "stressed about work"}, {"word": "on edge", "shade": "tense and unable to relax", "reg": "informal", "ctx": "on edge all day"}, {"word": "jumpy", "shade": "startled easily; very tense", "reg": "informal", "ctx": "jumpy after the incident"}, {"word": "stressed out", "shade": "emphatic form of stressed", "reg": "informal", "ctx": "completely stressed out"}]}, {"label": "Extreme", "words": [{"word": "terrified", "shade": "intensely frightened", "reg": "neutral", "ctx": "absolutely terrified"}, {"word": "petrified", "shade": "frozen with fear", "reg": "neutral", "ctx": "absolutely petrified"}]}]}, {"id": "friendly", "concept": "friendly / sociable", "groups": [{"label": "Everyday", "words": [{"word": "friendly", "shade": "pleasant and easy to talk to", "reg": "neutral", "ctx": "friendly smile"}, {"word": "warm", "shade": "shows genuine affection", "reg": "neutral", "ctx": "warm welcome"}, {"word": "welcoming", "shade": "makes others feel comfortable", "reg": "neutral", "ctx": "welcoming atmosphere"}, {"word": "approachable", "shade": "easy to talk to; not intimidating", "reg": "neutral", "ctx": "approachable teacher"}, {"word": "chatty", "shade": "likes talking a lot", "reg": "informal", "ctx": "very chatty"}]}, {"label": "Actively social", "words": [{"word": "sociable", "shade": "enjoys being with others", "reg": "neutral", "ctx": "sociable person"}, {"word": "outgoing", "shade": "proactively social and confident", "reg": "neutral", "ctx": "outgoing personality"}, {"word": "extroverted", "shade": "energised by social interaction", "reg": "formal", "ctx": "extroverted type"}, {"word": "gregarious", "shade": "loves being in groups", "reg": "formal", "ctx": "gregarious character"}, {"word": "affable", "shade": "easy to talk to; good-natured", "reg": "formal", "ctx": "affable manner"}]}]}, {"id": "boring", "concept": "boring / dull", "groups": [{"label": "Mild", "words": [{"word": "boring", "shade": "not interesting or exciting", "reg": "neutral", "ctx": "boring film"}, {"word": "dull", "shade": "lacking interest or liveliness", "reg": "neutral", "ctx": "dull conversation"}, {"word": "bland", "shade": "without interesting qualities", "reg": "neutral", "ctx": "bland personality"}, {"word": "dry", "shade": "without emotion or liveliness", "reg": "neutral", "ctx": "dry lecture"}, {"word": "mid", "shade": "average; unremarkable", "reg": "informal", "ctx": "that film was mid"}]}, {"label": "Strong", "words": [{"word": "tedious", "shade": "long and slow; tiring to endure", "reg": "neutral", "ctx": "tedious meeting"}, {"word": "monotonous", "shade": "lacking variety; same throughout", "reg": "formal", "ctx": "monotonous routine"}, {"word": "repetitive", "shade": "the same thing over and over", "reg": "neutral", "ctx": "repetitive work"}, {"word": "uninspiring", "shade": "fails to generate enthusiasm", "reg": "formal", "ctx": "uninspiring speech"}, {"word": "mind-numbing", "shade": "so boring it stops you thinking", "reg": "informal", "ctx": "mind-numbing task"}]}]}, {"id": "rude", "concept": "rude / impolite", "groups": [{"label": "General", "words": [{"word": "rude", "shade": "shows lack of basic manners", "reg": "neutral", "ctx": "rude comment"}, {"word": "impolite", "shade": "not following rules of politeness", "reg": "formal", "ctx": "impolite to interrupt"}, {"word": "disrespectful", "shade": "shows lack of respect", "reg": "neutral", "ctx": "disrespectful attitude"}]}, {"label": "Specific types", "words": [{"word": "dismissive", "shade": "treats something as unworthy", "reg": "formal", "ctx": "dismissive of her ideas"}, {"word": "condescending", "shade": "treats others as inferior", "reg": "formal", "ctx": "condescending tone"}, {"word": "patronising", "shade": "treats someone as less capable", "reg": "formal", "ctx": "patronising remark"}, {"word": "tactless", "shade": "says things without thinking of feelings", "reg": "informal", "ctx": "tactless comment"}]}, {"label": "Attitude", "words": [{"word": "arrogant", "shade": "exaggerated sense of own importance", "reg": "formal", "ctx": "arrogant attitude"}, {"word": "cheeky", "shade": "slightly rude but amusing", "reg": "informal", "ctx": "cheeky grin"}, {"word": "brash", "shade": "confidently rude or aggressive", "reg": "informal", "ctx": "brash behaviour"}]}]}, {"id": "strange", "concept": "strange / unusual", "groups": [{"label": "Mild", "words": [{"word": "unusual", "shade": "not common or expected", "reg": "neutral", "ctx": "unusual request"}, {"word": "odd", "shade": "strange in a mild way", "reg": "neutral", "ctx": "odd behaviour"}, {"word": "peculiar", "shade": "hard to explain", "reg": "neutral", "ctx": "peculiar smell"}, {"word": "quirky", "shade": "unusually different — often positive", "reg": "neutral", "ctx": "quirky humour"}]}, {"label": "Strong", "words": [{"word": "bizarre", "shade": "very strange; hard to understand", "reg": "neutral", "ctx": "bizarre situation"}, {"word": "outlandish", "shade": "strangely unusual; shocking", "reg": "formal", "ctx": "outlandish claim"}, {"word": "eccentric", "shade": "unconventional in an interesting way", "reg": "neutral", "ctx": "eccentric professor"}, {"word": "unconventional", "shade": "not following normal expectations", "reg": "formal", "ctx": "unconventional approach"}]}, {"label": "Very informal", "words": [{"word": "unhinged", "shade": "erratically strange", "reg": "informal", "ctx": "completely unhinged"}, {"word": "chaotic", "shade": "wildly disorganised", "reg": "informal", "ctx": "totally chaotic"}]}]}, {"id": "confident", "concept": "confident / arrogant", "groups": [{"label": "Positive", "words": [{"word": "confident", "shade": "certain about one's abilities", "reg": "neutral", "ctx": "confident speaker"}, {"word": "assertive", "shade": "states needs and views clearly", "reg": "formal", "ctx": "assertive in negotiations"}, {"word": "self-assured", "shade": "secure without needing approval", "reg": "formal", "ctx": "self-assured manner"}, {"word": "bold", "shade": "willing to take risks; not shy", "reg": "neutral", "ctx": "bold decision"}, {"word": "outspoken", "shade": "says what one thinks openly", "reg": "neutral", "ctx": "outspoken critic"}]}, {"label": "Negative / excessive", "words": [{"word": "cocky", "shade": "overconfident in an annoying way", "reg": "informal", "ctx": "cocky attitude"}, {"word": "brazen", "shade": "bold in a shameless way", "reg": "informal", "ctx": "brazen lie"}, {"word": "arrogant", "shade": "exaggerated self-importance", "reg": "formal", "ctx": "arrogant manner"}, {"word": "smug", "shade": "irritatingly pleased with oneself", "reg": "neutral", "ctx": "smug expression"}, {"word": "pompous", "shade": "self-important and overly grand", "reg": "formal", "ctx": "pompous speech"}]}]}, {"id": "generous", "concept": "generous / mean", "groups": [{"label": "Generous", "words": [{"word": "generous", "shade": "freely gives time, money or help", "reg": "neutral", "ctx": "generous donation"}, {"word": "charitable", "shade": "giving to those in need", "reg": "formal", "ctx": "charitable nature"}, {"word": "lavish", "shade": "gives in an extravagant way", "reg": "neutral", "ctx": "lavish gifts"}]}, {"label": "Careful with money", "words": [{"word": "frugal", "shade": "careful with money — not negative", "reg": "neutral", "ctx": "frugal lifestyle"}, {"word": "thrifty", "shade": "careful in a positive way", "reg": "neutral", "ctx": "thrifty shopper"}]}, {"label": "Mean with money", "words": [{"word": "mean", "shade": "unkind or ungenerous", "reg": "neutral", "ctx": "mean with money"}, {"word": "stingy", "shade": "unwilling to spend or give", "reg": "informal", "ctx": "stingy with tips"}, {"word": "tight-fisted", "shade": "very reluctant to spend", "reg": "informal", "ctx": "notoriously tight-fisted"}, {"word": "miserly", "shade": "excessively unwilling to spend", "reg": "formal", "ctx": "miserly behaviour"}, {"word": "broke", "shade": "having no money — not a choice", "reg": "informal", "ctx": "completely broke"}]}]}, {"id": "ambitious", "concept": "ambitious / driven", "groups": [{"label": "Positive", "words": [{"word": "ambitious", "shade": "strong drive to succeed", "reg": "neutral", "ctx": "ambitious plan"}, {"word": "driven", "shade": "highly motivated by internal goals", "reg": "neutral", "ctx": "driven professional"}, {"word": "determined", "shade": "resolved despite obstacles", "reg": "neutral", "ctx": "determined to win"}, {"word": "tenacious", "shade": "persistent; doesn't give up", "reg": "formal", "ctx": "tenacious negotiator"}]}, {"label": "Neutral", "words": [{"word": "competitive", "shade": "strong desire to beat others", "reg": "neutral", "ctx": "competitive spirit"}, {"word": "single-minded", "shade": "focused on one goal above all", "reg": "neutral", "ctx": "single-minded pursuit"}, {"word": "opportunistic", "shade": "takes advantage of any situation", "reg": "formal", "ctx": "opportunistic move"}]}, {"label": "Negative", "words": [{"word": "ruthless", "shade": "will do anything to succeed", "reg": "neutral", "ctx": "ruthless in business"}, {"word": "pushy", "shade": "too forceful about goals", "reg": "informal", "ctx": "pushy salesperson"}, {"word": "go-getting", "shade": "energetically ambitious", "reg": "informal", "ctx": "go-getting attitude"}]}]}, {"id": "honest", "concept": "honest / dishonest", "groups": [{"label": "Honest", "words": [{"word": "honest", "shade": "tells the truth; doesn't deceive", "reg": "neutral", "ctx": "honest answer"}, {"word": "candid", "shade": "truthful even when uncomfortable", "reg": "formal", "ctx": "candid assessment"}, {"word": "sincere", "shade": "genuinely means what is said", "reg": "neutral", "ctx": "sincere apology"}, {"word": "straightforward", "shade": "direct and easy to understand", "reg": "neutral", "ctx": "straightforward person"}, {"word": "transparent", "shade": "open about intentions", "reg": "formal", "ctx": "transparent process"}]}, {"label": "Dishonest", "words": [{"word": "deceptive", "shade": "creates a false impression", "reg": "formal", "ctx": "deceptive advertising"}, {"word": "misleading", "shade": "gives an incorrect impression", "reg": "formal", "ctx": "misleading statistics"}, {"word": "manipulative", "shade": "uses dishonesty to control others", "reg": "formal", "ctx": "manipulative behaviour"}, {"word": "two-faced", "shade": "says one thing, does another", "reg": "informal", "ctx": "completely two-faced"}, {"word": "dodgy", "shade": "not to be trusted", "reg": "informal", "ctx": "dodgy dealer"}]}]}, {"id": "exciting", "concept": "exciting / impressive", "groups": [{"label": "Moderate", "words": [{"word": "exciting", "shade": "causes enthusiasm and eagerness", "reg": "neutral", "ctx": "exciting news"}, {"word": "thrilling", "shade": "a sudden rush of excitement", "reg": "neutral", "ctx": "thrilling finish"}, {"word": "gripping", "shade": "so interesting you can't stop", "reg": "neutral", "ctx": "gripping novel"}]}, {"label": "Strong", "words": [{"word": "exhilarating", "shade": "makes you feel intensely alive", "reg": "formal", "ctx": "exhilarating experience"}, {"word": "compelling", "shade": "powerfully interesting; hard to ignore", "reg": "formal", "ctx": "compelling argument"}, {"word": "captivating", "shade": "holds your attention completely", "reg": "formal", "ctx": "captivating performance"}, {"word": "electrifying", "shade": "sudden and intense excitement", "reg": "neutral", "ctx": "electrifying atmosphere"}]}, {"label": "Informal", "words": [{"word": "mind-blowing", "shade": "astonishingly impressive", "reg": "informal", "ctx": "mind-blowing revelation"}, {"word": "insane", "shade": "incredibly impressive", "reg": "informal", "ctx": "insane performance"}, {"word": "fire", "shade": "excellent; very impressive — slang", "reg": "informal", "ctx": "that track is fire"}]}]}, {"id": "serious", "concept": "serious / light-hearted", "groups": [{"label": "Serious", "words": [{"word": "serious", "shade": "not joking; focused", "reg": "neutral", "ctx": "serious expression"}, {"word": "solemn", "shade": "formal and grave", "reg": "formal", "ctx": "solemn occasion"}, {"word": "earnest", "shade": "sincere and deeply committed", "reg": "formal", "ctx": "earnest attempt"}, {"word": "grave", "shade": "extremely serious; often alarming", "reg": "formal", "ctx": "grave situation"}, {"word": "stern", "shade": "serious and strict in manner", "reg": "neutral", "ctx": "stern warning"}]}, {"label": "Not serious", "words": [{"word": "light-hearted", "shade": "cheerful and not serious", "reg": "neutral", "ctx": "light-hearted approach"}, {"word": "playful", "shade": "fond of fun and games", "reg": "neutral", "ctx": "playful manner"}, {"word": "tongue-in-cheek", "shade": "meant to be humorous, not literal", "reg": "neutral", "ctx": "tongue-in-cheek remark"}, {"word": "flippant", "shade": "not serious when you should be", "reg": "informal", "ctx": "flippant remark"}, {"word": "laid-back", "shade": "relaxed and easygoing", "reg": "informal", "ctx": "laid-back attitude"}]}]}, {"id": "lazy", "concept": "lazy / unmotivated", "groups": [{"label": "General", "words": [{"word": "lazy", "shade": "unwilling to work or make effort", "reg": "neutral", "ctx": "lazy student"}, {"word": "idle", "shade": "not working; avoiding effort", "reg": "neutral", "ctx": "sitting idle"}, {"word": "workshy", "shade": "deliberately avoiding work", "reg": "informal", "ctx": "workshy attitude"}, {"word": "half-hearted", "shade": "done without real effort", "reg": "neutral", "ctx": "half-hearted attempt"}]}, {"label": "Low energy", "words": [{"word": "lethargic", "shade": "sluggish; lacking energy", "reg": "formal", "ctx": "lethargic after illness"}, {"word": "sluggish", "shade": "moving slowly; lacking energy", "reg": "neutral", "ctx": "sluggish start"}]}, {"label": "Attitude", "words": [{"word": "apathetic", "shade": "showing no interest or enthusiasm", "reg": "formal", "ctx": "apathetic response"}, {"word": "complacent", "shade": "satisfied; not seeing the need to try", "reg": "formal", "ctx": "complacent about risks"}, {"word": "indifferent", "shade": "without care or interest", "reg": "formal", "ctx": "indifferent to criticism"}, {"word": "laid-back", "shade": "relaxed to the point of not caring", "reg": "informal", "ctx": "too laid-back about it"}]}]}, {"id": "scared", "concept": "scared / frightened", "groups": [{"label": "Mild", "words": [{"word": "nervous", "shade": "general unease", "reg": "neutral", "ctx": "nervous about the exam"}, {"word": "wary", "shade": "cautiously worried about a risk", "reg": "neutral", "ctx": "wary of strangers"}, {"word": "timid", "shade": "lacking courage; easily scared", "reg": "neutral", "ctx": "timid child"}, {"word": "on edge", "shade": "tense; anticipating something bad", "reg": "informal", "ctx": "on edge all day"}]}, {"label": "Moderate", "words": [{"word": "scared", "shade": "the standard, unmarked word", "reg": "neutral", "ctx": "scared of the dark"}, {"word": "frightened", "shade": "feeling fear", "reg": "neutral", "ctx": "frightened of heights"}, {"word": "afraid", "shade": "having fear about something specific", "reg": "neutral", "ctx": "afraid of failure"}, {"word": "alarmed", "shade": "suddenly frightened by something unexpected", "reg": "neutral", "ctx": "alarmed by the news"}, {"word": "shaken", "shade": "disturbed after a shock", "reg": "neutral", "ctx": "visibly shaken"}]}, {"label": "Extreme", "words": [{"word": "terrified", "shade": "intensely frightened", "reg": "neutral", "ctx": "terrified of spiders"}, {"word": "petrified", "shade": "frozen with fear", "reg": "neutral", "ctx": "absolutely petrified"}]}]}, {"id": "arrogant", "concept": "humble / arrogant", "groups": [{"label": "Humble", "words": [{"word": "humble", "shade": "low estimate of own importance", "reg": "neutral", "ctx": "humble manner"}, {"word": "modest", "shade": "not boastful; understates achievements", "reg": "neutral", "ctx": "modest about success"}, {"word": "self-deprecating", "shade": "belittles oneself, often humorously", "reg": "formal", "ctx": "self-deprecating humour"}, {"word": "down-to-earth", "shade": "unpretentious and practical", "reg": "informal", "ctx": "very down-to-earth"}]}, {"label": "Arrogant", "words": [{"word": "smug", "shade": "irritatingly pleased with oneself", "reg": "neutral", "ctx": "smug expression"}, {"word": "conceited", "shade": "excessively proud of abilities", "reg": "neutral", "ctx": "conceited attitude"}, {"word": "vain", "shade": "excessively proud of appearance", "reg": "neutral", "ctx": "vain about looks"}, {"word": "arrogant", "shade": "exaggerated sense of own importance", "reg": "formal", "ctx": "arrogant manner"}, {"word": "pompous", "shade": "self-important and overly grand", "reg": "formal", "ctx": "pompous speech"}, {"word": "pretentious", "shade": "claims more importance than warranted", "reg": "formal", "ctx": "pretentious art"}]}]}];
+
+  const regLabel = {formal:'Formal',neutral:'Neutral',informal:'Informal'};
+
+  function buildSidebar(activeId){
+    const sb = document.getElementById('syn-sidebar');
+    if(!sb) return;
+    sb.innerHTML = SYN_CLUSTERS.map(c=>{
+      const active = c.id===activeId?' active':'';
+      return '<div class="syn-sb-item'+active+'" onclick="synShow(\''+c.id+'\')">'+c.concept+'</div>';
+    }).join('');
+  }
+
+  function buildPanel(cluster){
+    const totalWords = cluster.groups.reduce(function(s,g){return s+g.words.length;},0);
+    var groupsHtml = cluster.groups.map(function(g){
+      var rows = g.words.map(function(w){
+        return '<tr><td><span class="syn-word">'+w.word+'</span></td><td class="syn-shade">'+w.shade+'</td><td><span class="syn-ctx">'+w.ctx+'</span></td><td><span class="syn-reg">'+regLabel[w.reg]+'</span></td></tr>';
+      }).join('');
+      return '<div class="syn-group"><div class="syn-group-label">'+g.label+'</div><table class="syn-table"><thead><tr><th>Word</th><th>Meaning / nuance</th><th>Typical context</th><th>Register</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+    }).join('');
+    document.getElementById('syn-panel').innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;"><div class="syn-concept">'+cluster.concept+'</div><button class="pv-print-btn" onclick="synPrint()" style="flex-shrink:0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg> Print</button></div><div class="syn-count">'+totalWords+' adjectives</div>'+groupsHtml;
+  }
+
+  window.synShow = function(id){
+    const cluster = SYN_CLUSTERS.find(c=>c.id===id);
+    if(!cluster) return;
+    buildSidebar(id);
+    buildPanel(cluster);
+  };
+
+  // Init when synonyms tab becomes active
+  document.querySelectorAll('.tab').forEach(function(btn){
+    if(btn.dataset.tab === 'synonyms'){
+      btn.addEventListener('click', function(){
+        setTimeout(function(){ synShow(SYN_CLUSTERS[0].id); }, 0);
+      });
+    }
+  });
+})();
+
+/* ── REGISTER SORT ──────────────────────────────────────────────────────── */
+(function(){
+  const REG_SORT_SETS = [{"id": 1, "title": "Set 1 — The Basics", "words": [{"word": "pertinent", "reg": "formal", "def": "Directly relevant to the matter"}, {"word": "plausible", "reg": "formal", "def": "Seeming reasonable or probable"}, {"word": "dubious", "reg": "formal", "def": "Questionable; not to be relied on"}, {"word": "ambiguous", "reg": "formal", "def": "Open to more than one interpretation"}, {"word": "contentious", "reg": "formal", "def": "Likely to cause disagreement"}, {"word": "meticulous", "reg": "formal", "def": "Very careful and precise"}, {"word": "candid", "reg": "formal", "def": "Truthful and straightforward"}, {"word": "lucid", "reg": "formal", "def": "Clear and easy to understand"}, {"word": "worried", "reg": "neutral", "def": "Feeling troubled about something"}, {"word": "pleased", "reg": "neutral", "def": "Happy about something"}, {"word": "nervous", "reg": "neutral", "def": "Feeling tense or uneasy"}, {"word": "honest", "reg": "neutral", "def": "Truthful; not likely to cheat"}, {"word": "stubborn", "reg": "neutral", "def": "Refusing to change one's mind"}, {"word": "cheerful", "reg": "neutral", "def": "Noticeably happy and optimistic"}, {"word": "clumsy", "reg": "neutral", "def": "Tending to move awkwardly"}, {"word": "polite", "reg": "neutral", "def": "Respectful and well-mannered"}, {"word": "gutted", "reg": "informal", "def": "Devastated; deeply disappointed"}, {"word": "chuffed", "reg": "informal", "def": "Very pleased"}, {"word": "dodgy", "reg": "informal", "def": "Dishonest or of poor quality"}, {"word": "cheeky", "reg": "informal", "def": "Slightly rude but amusing"}, {"word": "grumpy", "reg": "informal", "def": "Irritable and in a bad mood"}, {"word": "nosy", "reg": "informal", "def": "Showing too much curiosity"}, {"word": "stingy", "reg": "informal", "def": "Unwilling to spend money"}, {"word": "knackered", "reg": "informal", "def": "Extremely tired; worn out"}]}, {"id": 2, "title": "Set 2 — Personality", "words": [{"word": "tenacious", "reg": "formal", "def": "Holding firm; not giving up easily"}, {"word": "eloquent", "reg": "formal", "def": "Fluent and persuasive in expression"}, {"word": "vindictive", "reg": "formal", "def": "Having a desire for revenge"}, {"word": "paramount", "reg": "formal", "def": "More important than anything else"}, {"word": "superficial", "reg": "formal", "def": "Not deep or thorough; only on the surface"}, {"word": "subjective", "reg": "formal", "def": "Based on personal feelings rather than facts"}, {"word": "pedantic", "reg": "formal", "def": "Overly concerned with minor details or rules"}, {"word": "condescending", "reg": "formal", "def": "Behaving as if others are inferior"}, {"word": "reliable", "reg": "neutral", "def": "Consistently trustworthy"}, {"word": "sensitive", "reg": "neutral", "def": "Easily upset; aware of others' feelings"}, {"word": "creative", "reg": "neutral", "def": "Having original ideas; imaginative"}, {"word": "strict", "reg": "neutral", "def": "Demanding that rules are followed"}, {"word": "patient", "reg": "neutral", "def": "Able to wait without becoming annoyed"}, {"word": "curious", "reg": "neutral", "def": "Eager to know or learn about something"}, {"word": "generous", "reg": "neutral", "def": "Giving freely to others"}, {"word": "ambitious", "reg": "neutral", "def": "Having a strong desire to succeed"}, {"word": "stroppy", "reg": "informal", "def": "Bad-tempered and argumentative"}, {"word": "pushy", "reg": "informal", "def": "Excessively forceful in getting what you want"}, {"word": "uptight", "reg": "informal", "def": "Tense and unable to relax"}, {"word": "laid-back", "reg": "informal", "def": "Relaxed and easygoing"}, {"word": "posh", "reg": "informal", "def": "Elegant or upper-class"}, {"word": "clueless", "reg": "informal", "def": "Knowing nothing about something"}, {"word": "naff", "reg": "informal", "def": "Lacking taste or style"}, {"word": "tacky", "reg": "informal", "def": "In poor taste; cheap-looking"}]}, {"id": 3, "title": "Set 3 — Opinions & Reactions", "words": [{"word": "sceptical", "reg": "formal", "def": "Having doubts; not easily convinced"}, {"word": "indignant", "reg": "formal", "def": "Angry about something unfair or wrong"}, {"word": "pompous", "reg": "formal", "def": "Self-important; overly grand in manner"}, {"word": "sanctimonious", "reg": "formal", "def": "Making a show of being morally superior"}, {"word": "patronising", "reg": "formal", "def": "Treating someone as if less capable"}, {"word": "dismissive", "reg": "formal", "def": "Showing that something is not worth attention"}, {"word": "compelling", "reg": "formal", "def": "Evoking interest or conviction"}, {"word": "provocative", "reg": "formal", "def": "Deliberately causing annoyance or reaction"}, {"word": "surprised", "reg": "neutral", "def": "Feeling astonishment at something unexpected"}, {"word": "disappointed", "reg": "neutral", "def": "Sad because something wasn't as expected"}, {"word": "frustrated", "reg": "neutral", "def": "Feeling annoyed when unable to achieve something"}, {"word": "confused", "reg": "neutral", "def": "Unable to think clearly; bewildered"}, {"word": "proud", "reg": "neutral", "def": "Feeling satisfaction from one's achievements"}, {"word": "embarrassed", "reg": "neutral", "def": "Feeling awkward or ashamed"}, {"word": "jealous", "reg": "neutral", "def": "Feeling envious of someone"}, {"word": "exhausted", "reg": "neutral", "def": "Extremely tired physically or mentally"}, {"word": "salty", "reg": "informal", "def": "Bitter or upset about something"}, {"word": "extra", "reg": "informal", "def": "Over the top; excessive"}, {"word": "basic", "reg": "informal", "def": "Predictable; following mainstream trends"}, {"word": "cringe", "reg": "informal", "def": "Embarrassingly awkward"}, {"word": "sus", "reg": "informal", "def": "Suspicious or untrustworthy"}, {"word": "mid", "reg": "informal", "def": "Average; unremarkable"}, {"word": "toxic", "reg": "informal", "def": "Very unpleasant or harmful to be around"}, {"word": "iconic", "reg": "informal", "def": "Outstanding; a perfect example of something"}]}, {"id": 4, "title": "Set 4 — Feelings", "words": [{"word": "indignant", "reg": "formal", "def": "Angry about something unfair or wrong"}, {"word": "apathetic", "reg": "formal", "def": "Showing no interest or enthusiasm"}, {"word": "cynical", "reg": "formal", "def": "Distrustful of people's motives"}, {"word": "complacent", "reg": "formal", "def": "Smugly satisfied; unaware of danger"}, {"word": "vulnerable", "reg": "formal", "def": "Exposed to harm; lacking protection"}, {"word": "resilient", "reg": "formal", "def": "Able to recover quickly from difficulty"}, {"word": "manipulative", "reg": "formal", "def": "Controlling others for one's own benefit"}, {"word": "assertive", "reg": "formal", "def": "Confident in stating one's views or needs"}, {"word": "frightened", "reg": "neutral", "def": "Feeling fear or anxiety"}, {"word": "grateful", "reg": "neutral", "def": "Feeling thankful for something received"}, {"word": "lonely", "reg": "neutral", "def": "Sad because of being alone"}, {"word": "guilty", "reg": "neutral", "def": "Feeling responsible for a wrongdoing"}, {"word": "ashamed", "reg": "neutral", "def": "Feeling embarrassment or shame"}, {"word": "hopeful", "reg": "neutral", "def": "Feeling optimistic about the future"}, {"word": "brave", "reg": "neutral", "def": "Ready to face danger without fear"}, {"word": "proud", "reg": "neutral", "def": "Feeling satisfaction from achievements"}, {"word": "shook", "reg": "informal", "def": "Shocked or disturbed"}, {"word": "triggered", "reg": "informal", "def": "Strongly upset or offended"}, {"word": "obsessed", "reg": "informal", "def": "Excessively devoted to something"}, {"word": "gutted", "reg": "informal", "def": "Devastated; deeply disappointed"}, {"word": "chuffed", "reg": "informal", "def": "Very pleased"}, {"word": "wild", "reg": "informal", "def": "Exciting and out of control"}, {"word": "lit", "reg": "informal", "def": "Exciting and excellent"}, {"word": "bussin", "reg": "informal", "def": "Excellent; very good"}]}, {"id": 5, "title": "Set 5 — Quality & Value", "words": [{"word": "rigorous", "reg": "formal", "def": "Extremely thorough and careful"}, {"word": "coherent", "reg": "formal", "def": "Logical and consistent; easy to follow"}, {"word": "concise", "reg": "formal", "def": "Giving information clearly in few words"}, {"word": "explicit", "reg": "formal", "def": "Stated clearly and in detail"}, {"word": "implicit", "reg": "formal", "def": "Suggested but not directly expressed"}, {"word": "objective", "reg": "formal", "def": "Not influenced by personal feelings"}, {"word": "empirical", "reg": "formal", "def": "Based on observation and evidence"}, {"word": "hypothetical", "reg": "formal", "def": "Based on a possible situation, not fact"}, {"word": "helpful", "reg": "neutral", "def": "Giving or ready to give help"}, {"word": "fair", "reg": "neutral", "def": "Treating people equally and without bias"}, {"word": "kind", "reg": "neutral", "def": "Caring and gentle toward others"}, {"word": "mean", "reg": "neutral", "def": "Unkind or unpleasant"}, {"word": "silly", "reg": "neutral", "def": "Lacking sense; playfully foolish"}, {"word": "calm", "reg": "neutral", "def": "Not showing anxiety; peaceful"}, {"word": "organised", "reg": "neutral", "def": "Arranged in a structured way"}, {"word": "confident", "reg": "neutral", "def": "Certain about one's own abilities"}, {"word": "overrated", "reg": "informal", "def": "Not as good as people claim"}, {"word": "sketchy", "reg": "informal", "def": "Suspicious; of doubtful quality"}, {"word": "rubbish", "reg": "informal", "def": "Of very poor quality; terrible"}, {"word": "pants", "reg": "informal", "def": "Very bad or of poor quality"}, {"word": "dire", "reg": "informal", "def": "Extremely bad"}, {"word": "grim", "reg": "informal", "def": "Unpleasant and depressing"}, {"word": "iconic", "reg": "informal", "def": "Outstanding; a perfect example"}, {"word": "mid", "reg": "informal", "def": "Average; unremarkable"}]}, {"id": 6, "title": "Set 6 — Money & Status", "words": [{"word": "pretentious", "reg": "formal", "def": "Attempting to impress with false importance"}, {"word": "verbose", "reg": "formal", "def": "Using more words than necessary"}, {"word": "vague", "reg": "formal", "def": "Not clearly expressed or defined"}, {"word": "pragmatic", "reg": "formal", "def": "Dealing with things practically"}, {"word": "erratic", "reg": "formal", "def": "Unpredictable; not consistent"}, {"word": "methodical", "reg": "formal", "def": "Done in a careful, systematic way"}, {"word": "irrational", "reg": "formal", "def": "Not based on logic or reason"}, {"word": "rational", "reg": "formal", "def": "Based on clear logical thinking"}, {"word": "jealous", "reg": "neutral", "def": "Feeling envious of someone"}, {"word": "confused", "reg": "neutral", "def": "Unable to think clearly; bewildered"}, {"word": "frustrated", "reg": "neutral", "def": "Annoyed when unable to achieve something"}, {"word": "disappointed", "reg": "neutral", "def": "Sad because something wasn't as expected"}, {"word": "lonely", "reg": "neutral", "def": "Sad because of being alone"}, {"word": "helpful", "reg": "neutral", "def": "Giving or ready to give help"}, {"word": "brave", "reg": "neutral", "def": "Ready to face danger without fear"}, {"word": "organised", "reg": "neutral", "def": "Arranged in a structured, efficient way"}, {"word": "minted", "reg": "informal", "def": "Very wealthy"}, {"word": "loaded", "reg": "informal", "def": "Very rich; having a lot of money"}, {"word": "skint", "reg": "informal", "def": "Having no money"}, {"word": "broke", "reg": "informal", "def": "Having no money"}, {"word": "posh", "reg": "informal", "def": "Elegant or upper-class"}, {"word": "stingy", "reg": "informal", "def": "Unwilling to spend money"}, {"word": "brash", "reg": "informal", "def": "Confident in an aggressive or rude way"}, {"word": "tacky", "reg": "informal", "def": "In poor taste; cheap-looking"}]}, {"id": 7, "title": "Set 7 — Character", "words": [{"word": "evasive", "reg": "formal", "def": "Avoiding giving clear answers"}, {"word": "misleading", "reg": "formal", "def": "Giving a false impression"}, {"word": "complacent", "reg": "formal", "def": "Smugly satisfied; unaware of risk"}, {"word": "cynical", "reg": "formal", "def": "Distrustful of others' good motives"}, {"word": "pompous", "reg": "formal", "def": "Self-important; overly grand in manner"}, {"word": "sanctimonious", "reg": "formal", "def": "Making a show of moral superiority"}, {"word": "condescending", "reg": "formal", "def": "Behaving as if others are inferior"}, {"word": "dismissive", "reg": "formal", "def": "Treating something as unworthy of attention"}, {"word": "fair", "reg": "neutral", "def": "Treating people equally and without bias"}, {"word": "kind", "reg": "neutral", "def": "Caring and gentle toward others"}, {"word": "calm", "reg": "neutral", "def": "Not showing anxiety; peaceful"}, {"word": "silly", "reg": "neutral", "def": "Lacking sense; playfully foolish"}, {"word": "confident", "reg": "neutral", "def": "Certain about one's own abilities"}, {"word": "guilty", "reg": "neutral", "def": "Responsible for a wrongdoing"}, {"word": "grateful", "reg": "neutral", "def": "Feeling thankful for something received"}, {"word": "ashamed", "reg": "neutral", "def": "Feeling embarrassment or shame"}, {"word": "flaky", "reg": "informal", "def": "Unreliable; tends to let people down"}, {"word": "cagey", "reg": "informal", "def": "Reluctant to give information"}, {"word": "blunt", "reg": "informal", "def": "Saying exactly what you think, without tact"}, {"word": "tactless", "reg": "informal", "def": "Saying things without thinking of others' feelings"}, {"word": "reckless", "reg": "informal", "def": "Acting without thought for consequences"}, {"word": "brazen", "reg": "informal", "def": "Bold and shameless"}, {"word": "clueless", "reg": "informal", "def": "Knowing nothing about something"}, {"word": "nosy", "reg": "informal", "def": "Showing too much curiosity"}]}, {"id": 8, "title": "Set 8 — Appearance & State", "words": [{"word": "resilient", "reg": "formal", "def": "Able to recover quickly from difficulty"}, {"word": "vulnerable", "reg": "formal", "def": "Exposed to harm; lacking protection"}, {"word": "apathetic", "reg": "formal", "def": "Showing no interest or enthusiasm"}, {"word": "assertive", "reg": "formal", "def": "Confident in stating one's views"}, {"word": "provocative", "reg": "formal", "def": "Deliberately causing a reaction"}, {"word": "compelling", "reg": "formal", "def": "Evoking interest or strong argument"}, {"word": "eloquent", "reg": "formal", "def": "Fluent and persuasive in expression"}, {"word": "tenacious", "reg": "formal", "def": "Holding firm; not giving up easily"}, {"word": "hopeful", "reg": "neutral", "def": "Feeling optimistic about the future"}, {"word": "frightened", "reg": "neutral", "def": "Feeling fear or anxiety"}, {"word": "proud", "reg": "neutral", "def": "Feeling satisfaction from achievements"}, {"word": "mean", "reg": "neutral", "def": "Unkind or unpleasant"}, {"word": "frustrated", "reg": "neutral", "def": "Annoyed when unable to achieve something"}, {"word": "confused", "reg": "neutral", "def": "Unable to think clearly"}, {"word": "disappointed", "reg": "neutral", "def": "Sad because something wasn't as expected"}, {"word": "jealous", "reg": "neutral", "def": "Feeling envious of someone"}, {"word": "grubby", "reg": "informal", "def": "Dirty; covered in grime"}, {"word": "manky", "reg": "informal", "def": "Very dirty or unpleasant"}, {"word": "grotty", "reg": "informal", "def": "Unpleasant; of poor quality"}, {"word": "grim", "reg": "informal", "def": "Unpleasant and depressing"}, {"word": "rotten", "reg": "informal", "def": "Very unpleasant or bad"}, {"word": "naff", "reg": "informal", "def": "Lacking taste or style"}, {"word": "dodgy", "reg": "informal", "def": "Suspicious or of poor quality"}, {"word": "grumpy", "reg": "informal", "def": "Irritable and in a bad mood"}]}, {"id": 9, "title": "Set 9 — Mixed Challenge", "words": [{"word": "indignant", "reg": "formal", "def": "Angry about something unfair"}, {"word": "patronising", "reg": "formal", "def": "Treating someone as if less capable"}, {"word": "verbose", "reg": "formal", "def": "Using more words than necessary"}, {"word": "pretentious", "reg": "formal", "def": "Attempting to impress with false importance"}, {"word": "manipulative", "reg": "formal", "def": "Controlling others for one's own benefit"}, {"word": "misleading", "reg": "formal", "def": "Giving a false impression"}, {"word": "erratic", "reg": "formal", "def": "Unpredictable; not consistent"}, {"word": "methodical", "reg": "formal", "def": "Done in a careful, systematic way"}, {"word": "brave", "reg": "neutral", "def": "Ready to face danger without fear"}, {"word": "lonely", "reg": "neutral", "def": "Sad because of being alone"}, {"word": "silly", "reg": "neutral", "def": "Lacking sense; playfully foolish"}, {"word": "fair", "reg": "neutral", "def": "Treating people equally"}, {"word": "kind", "reg": "neutral", "def": "Caring and gentle toward others"}, {"word": "ashamed", "reg": "neutral", "def": "Feeling embarrassment or shame"}, {"word": "guilty", "reg": "neutral", "def": "Responsible for a wrongdoing"}, {"word": "calm", "reg": "neutral", "def": "Not showing anxiety; peaceful"}, {"word": "salty", "reg": "informal", "def": "Bitter or upset about something"}, {"word": "extra", "reg": "informal", "def": "Over the top; excessive"}, {"word": "basic", "reg": "informal", "def": "Predictable; following mainstream trends"}, {"word": "cringe", "reg": "informal", "def": "Embarrassingly awkward"}, {"word": "sus", "reg": "informal", "def": "Suspicious or untrustworthy"}, {"word": "toxic", "reg": "informal", "def": "Very unpleasant or harmful to be around"}, {"word": "shook", "reg": "informal", "def": "Shocked or deeply disturbed"}, {"word": "overrated", "reg": "informal", "def": "Not as good as people claim"}]}, {"id": 10, "title": "Set 10 — Work & Thinking", "words": [{"word": "competent", "reg": "formal", "def": "Having the required skill or ability"}, {"word": "thorough", "reg": "formal", "def": "Complete and careful in every detail"}, {"word": "proactive", "reg": "formal", "def": "Creating or controlling situations rather than reacting"}, {"word": "innovative", "reg": "formal", "def": "Introducing new ideas or methods"}, {"word": "strategic", "reg": "formal", "def": "Designed to achieve a long-term goal"}, {"word": "articulate", "reg": "formal", "def": "Able to express ideas clearly and effectively"}, {"word": "nuanced", "reg": "formal", "def": "Showing subtle distinctions and shades of meaning"}, {"word": "insightful", "reg": "formal", "def": "Having or showing a deep understanding"}, {"word": "content", "reg": "neutral", "def": "In a state of peaceful happiness"}, {"word": "miserable", "reg": "neutral", "def": "Very unhappy or uncomfortable"}, {"word": "irritated", "reg": "neutral", "def": "Made to feel slightly angry"}, {"word": "anxious", "reg": "neutral", "def": "Worried and nervous about something"}, {"word": "focused", "reg": "neutral", "def": "Paying close attention to something"}, {"word": "relaxed", "reg": "neutral", "def": "Free from tension; at ease"}, {"word": "distracted", "reg": "neutral", "def": "Unable to concentrate on something"}, {"word": "troubled", "reg": "neutral", "def": "Feeling worried or anxious"}, {"word": "savvy", "reg": "informal", "def": "Having practical knowledge and ability"}, {"word": "ditsy", "reg": "informal", "def": "Silly and scatterbrained"}, {"word": "scattered", "reg": "informal", "def": "Disorganised; unable to focus"}, {"word": "sharp", "reg": "informal", "def": "Quick to understand; intelligent"}, {"word": "on point", "reg": "informal", "def": "Exactly right; perfectly executed"}, {"word": "no cap", "reg": "informal", "def": "Honestly; without exaggeration"}, {"word": "unhinged", "reg": "informal", "def": "Mentally unstable; out of control"}, {"word": "chaotic", "reg": "informal", "def": "Completely disorganised and unpredictable"}]}, {"id": 11, "title": "Set 11 — Social Life", "words": [{"word": "controversial", "reg": "formal", "def": "Giving rise to disagreement or debate"}, {"word": "divisive", "reg": "formal", "def": "Causing disagreement between people"}, {"word": "empathetic", "reg": "formal", "def": "Showing an ability to understand others' feelings"}, {"word": "charismatic", "reg": "formal", "def": "Having a compelling charm that inspires others"}, {"word": "arrogant", "reg": "formal", "def": "Having an exaggerated sense of one's importance"}, {"word": "passive-aggressive", "reg": "formal", "def": "Expressing negativity indirectly rather than openly"}, {"word": "two-faced", "reg": "formal", "def": "Insincere; saying one thing and doing another"}, {"word": "resourceful", "reg": "formal", "def": "Able to find solutions in difficult situations"}, {"word": "supportive", "reg": "neutral", "def": "Providing encouragement or help"}, {"word": "possessive", "reg": "neutral", "def": "Wanting to control someone you care about"}, {"word": "compatible", "reg": "neutral", "def": "Able to exist together without conflict"}, {"word": "genuine", "reg": "neutral", "def": "Truly what it appears to be; authentic"}, {"word": "close", "reg": "neutral", "def": "Having a strong relationship with someone"}, {"word": "distant", "reg": "neutral", "def": "Not warm or friendly; emotionally remote"}, {"word": "intimate", "reg": "neutral", "def": "Having a close personal relationship"}, {"word": "estranged", "reg": "neutral", "def": "No longer friendly or close to someone"}, {"word": "down-to-earth", "reg": "informal", "def": "Sensible and practical; not pretentious"}, {"word": "grounded", "reg": "informal", "def": "Sensible and realistic about life"}, {"word": "highkey", "reg": "informal", "def": "Very much; obviously or openly"}, {"word": "lowkey", "reg": "informal", "def": "Subtly; not drawing attention"}, {"word": "pressed", "reg": "informal", "def": "Desperate or too eager about something"}, {"word": "slay", "reg": "informal", "def": "Looking or doing something impressively well"}, {"word": "delulu", "reg": "informal", "def": "Deluded; having unrealistic beliefs"}, {"word": "narrow-minded", "reg": "informal", "def": "Unwilling to consider other views"}]}, {"id": 12, "title": "Set 12 — How Things Feel", "words": [{"word": "fundamental", "reg": "formal", "def": "Of central importance; forming the base"}, {"word": "comprehensive", "reg": "formal", "def": "Including all or nearly all elements"}, {"word": "pervasive", "reg": "formal", "def": "Spreading widely through something"}, {"word": "inherent", "reg": "formal", "def": "Existing as a natural or essential part"}, {"word": "abstract", "reg": "formal", "def": "Existing in thought rather than concrete reality"}, {"word": "theoretical", "reg": "formal", "def": "Based on theory rather than experience"}, {"word": "credible", "reg": "formal", "def": "Able to be believed; convincing"}, {"word": "profound", "reg": "formal", "def": "Very deep or intense; showing great insight"}, {"word": "upbeat", "reg": "neutral", "def": "Cheerful and optimistic"}, {"word": "dejected", "reg": "neutral", "def": "Sad and depressed; dispirited"}, {"word": "resentful", "reg": "neutral", "def": "Feeling bitterness about being treated unfairly"}, {"word": "apprehensive", "reg": "neutral", "def": "Slightly anxious about something in the future"}, {"word": "wary", "reg": "neutral", "def": "Cautious about possible danger or problems"}, {"word": "shaken", "reg": "neutral", "def": "Disturbed or upset by something shocking"}, {"word": "satisfied", "reg": "neutral", "def": "Pleased because a need has been met"}, {"word": "smug", "reg": "neutral", "def": "Irritatingly pleased with oneself"}, {"word": "under the weather", "reg": "informal", "def": "Slightly ill; not feeling well"}, {"word": "wound up", "reg": "informal", "def": "Anxious and unable to relax"}, {"word": "in a huff", "reg": "informal", "def": "Quietly angry and offended"}, {"word": "worn out", "reg": "informal", "def": "Completely exhausted"}, {"word": "wiped out", "reg": "informal", "def": "Completely exhausted"}, {"word": "gassed", "reg": "informal", "def": "Excited and enthusiastic"}, {"word": "buzzing", "reg": "informal", "def": "Full of excitement and energy"}, {"word": "stoked", "reg": "informal", "def": "Very excited and enthusiastic"}]}];
+  let rsCurrentSet = null;
+  let rsState = {placed:{},correct:0,total:0};
+  let dragWord = null;
+  const rsCompleted = new Set();
+
+  function rsBuildSetGrid(){
+    const grid = document.getElementById('rs-set-grid');
+    if(!grid) return;
+    grid.innerHTML = REG_SORT_SETS.map(s=>{
+      const done = rsCompleted.has(s.id);
+      return `<div class="rs-set-card${done?' completed':''}" onclick="rsStartSet(${s.id})">
+        <div class="rs-set-card-num">Set ${s.id}</div>
+        <div class="rs-set-card-title">${s.title.replace(/^Set \d+ — /,'')}</div>
+        ${done?'<div class="rs-set-card-done">✓ Completed</div>':'<div style="font-size:.78rem;color:var(--text-muted)">24 words · 8 per column</div>'}
+      </div>`;
+    }).join('');
+  }
+  rsBuildSetGrid();
+
+  window.rsStartSet = function(setId){
+    rsCurrentSet = REG_SORT_SETS.find(s=>s.id===setId);
+    document.getElementById('rs-setup').style.display='none';
+    document.getElementById('rs-game').style.display='block';
+    rsInit();
+  };
+
+  window.rsStart = window.rsStartSet.bind(null, 1);
+
+  function rsInit(){
+    rsState = {placed:{},correct:0,total:rsCurrentSet.words.length};
+    document.getElementById('rs-result').style.display='none';
+    // Shuffle bank
+    const shuffled = [...rsCurrentSet.words].sort(()=>Math.random()-.5);
+    const bank = document.getElementById('rs-bank');
+    bank.innerHTML='';
+    shuffled.forEach(d=>{
+      const chip = makeChip(d);
+      bank.appendChild(chip);
+    });
+    // Clear drop zones
+    ['formal','neutral','informal','slang'].forEach(r=>{
+      document.getElementById('rs-drop-'+r).innerHTML='';
+    });
+    rsUpdateProgress();
+  }
+
+  function makeChip(d, inZone=false){
+    const chip = document.createElement('div');
+    chip.className='rs-chip';
+    chip.textContent=d.word;
+    chip.dataset.word=d.word;
+    chip.dataset.reg=d.reg;
+    chip.title=d.def;
+    if(!inZone){
+      chip.draggable=true;
+      chip.addEventListener('dragstart',e=>{
+        dragWord=d.word;
+        chip.classList.add('dragging');
+        e.dataTransfer.effectAllowed='move';
+      });
+      chip.addEventListener('dragend',()=>chip.classList.remove('dragging'));
+      // Touch support
+      chip.addEventListener('click',()=>rsChipClick(chip,d));
+    }
+    return chip;
+  }
+
+  // Click-based placement (mobile + desktop alt)
+  let selectedChip = null;
+  function rsChipClick(chip, d){
+    if(rsState.placed[d.word]) return;
+    if(selectedChip === chip){
+      chip.style.boxShadow='';
+      selectedChip=null;
+      return;
+    }
+    if(selectedChip){ selectedChip.style.boxShadow=''; }
+    selectedChip=chip;
+    chip.style.boxShadow='0 0 0 2.5px var(--lavender)';
+  }
+
+  // Set up drop zones
+  ['formal','neutral','informal','slang'].forEach(reg=>{
+    const zone = document.getElementById('rs-drop-'+reg);
+    zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('drag-over');});
+    zone.addEventListener('dragleave',()=>zone.classList.remove('drag-over'));
+    zone.addEventListener('drop',e=>{
+      e.preventDefault();
+      zone.classList.remove('drag-over');
+      if(dragWord) rsPlace(dragWord, reg);
+      dragWord=null;
+    });
+    zone.addEventListener('click',()=>{
+      if(selectedChip){
+        const word = selectedChip.dataset.word;
+        selectedChip.style.boxShadow='';
+        selectedChip=null;
+        rsPlace(word, reg);
+      }
+    });
+  });
+
+  function rsPlace(word, placedReg){
+    const d = rsCurrentSet.words.find(x=>x.word===word);
+    if(!d || rsState.placed[word]) return;
+    // Remove from bank
+    const bankChip = document.querySelector('#rs-bank .rs-chip[data-word="'+word+'"]');
+    if(bankChip) bankChip.remove();
+    rsState.placed[word] = placedReg;
+    const correct = placedReg === d.reg;
+    if(correct) rsState.correct++;
+    // Add to zone
+    const zone = document.getElementById('rs-drop-'+placedReg);
+    const placed = document.createElement('div');
+    placed.className='rs-chip '+(correct?'placed-correct':'placed-wrong');
+    placed.textContent=d.word;
+    placed.title=d.def;
+    placed.dataset.word=word;
+    placed.dataset.reg=d.reg;
+    if(!correct){
+      // Bounce back to bank after delay
+      zone.appendChild(placed);
+      setTimeout(()=>{
+        placed.remove();
+        delete rsState.placed[word];
+        if(rsState.correct > 0 && placed.classList.contains('placed-wrong')) rsState.correct = Math.max(0,rsState.correct);
+        const chip = makeChip(d);
+        document.getElementById('rs-bank').appendChild(chip);
+        rsUpdateProgress();
+      }, 700);
+    } else {
+      zone.appendChild(placed);
+    }
+    rsUpdateProgress();
+    rsCheckComplete();
+  }
+
+  function rsUpdateProgress(){
+    const done = Object.values(rsState.placed).length;
+    // Only count currently-placed (not bounced back)
+    const placed = document.querySelectorAll('.rs-drop-zone .rs-chip').length;
+    document.getElementById('rs-progress-text').textContent = placed + ' / ' + rsState.total + ' placed · ' + rsState.correct + ' correct';
+  }
+
+  function rsCheckComplete(){
+    const placed = document.querySelectorAll('.rs-drop-zone .rs-chip').length;
+    if(placed === rsState.total){
+      setTimeout(()=>{
+        rsCompleted.add(rsCurrentSet.id);
+        document.getElementById('rs-result').style.display='block';
+        const pct = Math.round(rsState.correct/rsState.total*100);
+        document.getElementById('rs-result-score').textContent = rsState.correct + ' / ' + rsState.total + ' correct (' + pct + '%)';
+        document.getElementById('rs-bank').innerHTML='';
+      }, 400);
+    }
+  }
+
+  window.rsRevealAll = function(){
+    // Place all remaining bank chips in correct zones
+    document.querySelectorAll('#rs-bank .rs-chip').forEach(chip=>{
+      const word = chip.dataset.word;
+      const d = rsCurrentSet.words.find(x=>x.word===word);
+      if(!d) return;
+      chip.remove();
+      const zone = document.getElementById('rs-drop-'+d.reg);
+      const placed = document.createElement('div');
+      placed.className='rs-chip revealed';
+      placed.textContent=d.word;
+      placed.title=d.def;
+      placed.dataset.reg=d.reg;
+      zone.appendChild(placed);
+    });
+    rsUpdateProgress();
+  };
+
+  window.rsReset = function(){
+    rsInit();
+    document.getElementById('rs-result').style.display='none';
+  };
+  window.rsBackToSets = function(){
+    document.getElementById('rs-game').style.display='none';
+    document.getElementById('rs-setup').style.display='block';
+    rsBuildSetGrid();
+  };
 })();
 </script>
 </body>
