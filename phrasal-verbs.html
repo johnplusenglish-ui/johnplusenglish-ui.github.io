@@ -1020,16 +1020,15 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
 
       <!-- Content -->
       <div class="content-panel">
-        <div style="display:flex;justify-content:flex-end;margin-bottom:.75rem">
-          <button class="pv-print-btn" onclick="guideOpenPrint()" aria-label="Print options">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-            Print
-          </button>
-        </div>
-
         <!-- Section: What Are Phrasal Verbs? -->
         <div class="section-content active" id="what-are-phrasal-verbs">
-          <h2>What Are Phrasal Verbs?</h2>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:.75rem">
+            <h2 style="margin:0">What Are Phrasal Verbs?</h2>
+            <button class="pv-print-btn" onclick="guideOpenPrint()" aria-label="Print options" style="flex-shrink:0">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+              Print
+            </button>
+          </div>
           <p>A phrasal verb is a combination of a <strong>verb</strong> and one or more <strong>particles</strong> (an adverb, a preposition, or both) that together create a meaning different from the individual words. Words like <strong>up, out, on, off, in, down, away, over, through</strong>, and <strong>back</strong> are all common particles.</p>
 
           <div class="example-box">
@@ -1492,6 +1491,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
                 <span class="fc-face-tag" id="pvfc-back-tag">Definition</span>
                 <div class="fc-face-text" id="pvfc-back-text"></div>
                 <div class="fc-face-example" id="pvfc-back-example"></div>
+                <div class="fc-face-coll" id="pvfc-back-coll"></div>
               </div>
             </div>
           </div>
@@ -1521,6 +1521,10 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
           <div class="fc-complete-stat">
             <span class="fc-complete-num" id="pvfc-complete-unknown">0</span>
             <span class="fc-complete-lbl">Reviewed</span>
+          </div>
+          <div class="fc-complete-stat">
+            <span class="fc-complete-num" id="pvfc-complete-total">0</span>
+            <span class="fc-complete-lbl">Total seen</span>
           </div>
         </div>
         <div class="fc-complete-actions">
@@ -2652,6 +2656,8 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     el('pvfc-back-tag').textContent = isPV2D ? 'Definition' : 'Phrasal Verb';
     el('pvfc-back-text').textContent = isPV2D ? item.def : item.pv;
     el('pvfc-back-example').textContent = item.ex;
+    const pvColl=el('pvfc-back-coll');
+    if(pvColl){ if(item.coll){ pvColl.textContent='e.g. '+item.coll; pvColl.style.display=''; } else { pvColl.style.display='none'; } }
 
     el('pvfc-stat-pos').textContent = state.pos + 1;
     el('pvfc-stat-known').textContent = state.known;
@@ -2675,6 +2681,8 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     el('pvfc-complete').hidden = false;
     el('pvfc-complete-known').textContent = state.known;
     el('pvfc-complete-unknown').textContent = state.unknown;
+    const pvTotal=el('pvfc-complete-total');
+    if(pvTotal) pvTotal.textContent = state.seen ? state.seen.size : (state.known + state.unknown);
   }
 
   /* Flip */
