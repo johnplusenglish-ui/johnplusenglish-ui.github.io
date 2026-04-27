@@ -180,8 +180,8 @@ a.tab{text-decoration:none}
 .ex-practice-view.active{display:block}
 
 /* Sidebar category layout */
-.study-sidebar-layout{display:grid;grid-template-columns:280px 1fr;gap:32px;min-height:400px;align-items:start}
-.study-sidebar{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px;max-height:70vh;overflow-y:auto;position:sticky;top:4rem;box-shadow:0 1px 3px rgba(45,48,71,0.06)}
+.study-sidebar-layout{display:grid;grid-template-columns:minmax(160px,max-content) 1fr;gap:32px;min-height:400px;align-items:start}
+.study-sidebar{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px;max-height:70vh;overflow-y:auto;position:sticky;top:4rem;box-shadow:0 1px 3px rgba(45,48,71,0.06);min-width:180px;max-width:280px}
 .study-sidebar::-webkit-scrollbar{width:4px}
 .study-sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
 .sb-item{font-size:.9rem;font-weight:500;padding:11px 14px;border-radius:8px;cursor:pointer;transition:background .2s,color .15s;display:flex;align-items:center;gap:12px;color:var(--muted);margin-bottom:2px;text-decoration:none}
@@ -197,6 +197,10 @@ a.tab{text-decoration:none}
 .sb-item:nth-child(8n+8)::before{background:var(--coral)}
 .sb-item.active{background:var(--sea);color:#fff;font-weight:600}
 .sb-item.active::before{background:rgba(255,255,255,0.5)}
+.dep-sb-item{font-size:.8rem;font-weight:700;padding:.55rem .9rem;border-radius:100px;cursor:pointer;transition:all .15s;display:flex;align-items:center;color:var(--ink);margin-bottom:.3rem;text-decoration:none;border:1.5px solid var(--border);background:#fff}
+.dep-sb-item:hover{transform:translateX(2px);color:var(--ink);border-color:var(--muted)}
+.dep-sb-item.active{background:var(--sea);color:#fff;border-color:var(--sea);transform:translateX(2px);box-shadow:0 2px 8px rgba(45,48,71,.15)}
+.dep-sb-item-name{flex:1;line-height:1.3}
 .sb-count{font-family:'JetBrains Mono',monospace;font-size:.65rem;opacity:.5;background:rgba(0,0,0,.05);padding:.1rem .4rem;border-radius:8px}
 .sb-item.active .sb-count{background:rgba(255,255,255,.2);opacity:.8}
 .sb-item-name{flex:1;margin-right:.5rem;line-height:1.3;min-width:0}
@@ -822,11 +826,11 @@ footer{text-align:center;padding:3rem 2rem;font-size:.8rem;color:var(--muted);bo
         <div class="sb-item" onclick="guideNav(this,'tips')" style="border-left-color:var(--sky)"><span class="sb-item-name">Common Mistakes & Tips</span></div>
       </div>
       <div class="study-content" id="guide_content">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:.75rem">
+          <button class="print-btn" onclick="guidePrintModalOpen()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg> Print</button>
+        </div>
         <div id="guide_intro">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:.75rem">
-            <h3 style="margin:0">What Are Prepositions?</h3>
-            <button class="print-btn" onclick="guidePrintModalOpen()" style="flex-shrink:0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg> Print</button>
-          </div>
+          <h3>What Are Prepositions?</h3>
           <p class="guide-text">Prepositions are small words that show the relationship between things — where something is, when it happens, how it moves, or how ideas connect. Words like <b>in</b>, <b>on</b>, <b>at</b>, <b>to</b>, <b>for</b>, <b>with</b>, <b>by</b>, <b>from</b>, <b>about</b>, and <b>of</b> are all prepositions.</p>
           <div class="guide-example-box">
             <div class="guide-ex">The book is <b>on</b> the table.</div>
@@ -1619,9 +1623,9 @@ function depBuildSidebar(){
     if(filter && name.toLowerCase().indexOf(filter)===-1) return;
     var cnt=0;dep_D[cat].forEach(function(e){if(e[4]&&e[4].length>0)cnt++});
     var item=document.createElement('div');
-    item.className='sb-item'+(depCatSel.has(cat)?' active':'');
+    item.className='dep-sb-item'+(depCatSel.has(cat)?' active':'');
     item.dataset.cat=cat;
-    item.innerHTML='<span class="sb-item-name">'+name+'</span><span class="sb-count">'+cnt+'</span>';
+    item.innerHTML='<span class="dep-sb-item-name">'+name+'</span>';
     item.onclick=function(){
       if(depCatSel.has(cat)){depCatSel.delete(cat);item.classList.remove('active')}
       else{depCatSel.add(cat);item.classList.add('active')}
@@ -1634,12 +1638,12 @@ function depBuildSidebar(){
 function depCatSelAll(){
   depCatSel.clear();
   Object.keys(dep_D).forEach(function(c){depCatSel.add(c)});
-  document.querySelectorAll('#dep_sidebar .sb-item').forEach(function(s){s.classList.add('active')});
+  document.querySelectorAll('#dep_sidebar .dep-sb-item').forEach(function(s){s.classList.add('active')});
   depShowSelectedCats();
 }
 function depCatSelNone(){
   depCatSel.clear();
-  document.querySelectorAll('#dep_sidebar .sb-item').forEach(function(s){s.classList.remove('active')});
+  document.querySelectorAll('#dep_sidebar .dep-sb-item').forEach(function(s){s.classList.remove('active')});
   depShowSelectedCats();
 }
 
@@ -1707,9 +1711,9 @@ function depRender(){
   
   var html='<div class="search-count">'+filtered.length+' entries shown</div>';
   html+='<div class="study-sidebar-layout"><div class="study-sidebar" id="dep_alphaSidebar">';
-  html+='<div class="sb-item" onclick="depShowAll(this)" data-letter="all"><span class="sb-item-name" style="font-weight:700">A\u2013Z</span><span class="sb-count">'+filtered.length+'</span></div>';
+  html+='<div class="dep-sb-item" onclick="depShowAll(this)" data-letter="all"><span class="dep-sb-item-name" style="font-weight:700">A\u2013Z</span></div>';
   sortedLetters.forEach(function(l){
-    html+='<div class="sb-item" onclick="depShowLetter(this,\''+l+'\')" data-letter="'+l+'"><span class="sb-item-name" style="font-family:\'Outfit\',sans-serif;font-size:1.1rem">'+l+'</span><span class="sb-count">'+letters[l].length+'</span></div>';
+    html+='<div class="dep-sb-item" onclick="depShowLetter(this,\'"'+l+'\')" data-letter="'+l+'"><span class="dep-sb-item-name" style="font-family:\'Outfit\',sans-serif;font-size:1.1rem">'+l+'</span></div>';
   });
   html+='</div><div class="study-content" id="dep_alphaContent"></div></div>';
   
@@ -1719,12 +1723,12 @@ function depRender(){
   window.depFilteredEntries=filtered;
   window.depSortedLetters=sortedLetters;
   
-  var first=document.querySelector('#dep_alphaSidebar .sb-item');
+  var first=document.querySelector('#dep_alphaSidebar .dep-sb-item');
   if(first){first.classList.add('active');depShowAll(first);}
 }
 
 function depShowAll(el){
-  document.querySelectorAll('#dep_alphaSidebar .sb-item').forEach(function(s){s.classList.remove('active')});
+  document.querySelectorAll('#dep_alphaSidebar .dep-sb-item').forEach(function(s){s.classList.remove('active')});
   el.classList.add('active');
   var html='<h3>All Entries (A\u2013Z)</h3><div class="study-content-count">'+window.depFilteredEntries.length+' entries</div>';
   window.depSortedLetters.forEach(function(l){
@@ -1735,7 +1739,7 @@ function depShowAll(el){
 }
 
 function depShowLetter(el,letter){
-  document.querySelectorAll('#dep_alphaSidebar .sb-item').forEach(function(s){s.classList.remove('active')});
+  document.querySelectorAll('#dep_alphaSidebar .dep-sb-item').forEach(function(s){s.classList.remove('active')});
   el.classList.add('active');
   var entries=window.depLetters[letter]||[];
   var html='<h3>'+letter+'</h3><div class="study-content-count">'+entries.length+' entries</div>';
@@ -1795,9 +1799,9 @@ function ppBuildSidebar(){
     if(filter && name.toLowerCase().indexOf(filter)===-1) return;
     var cnt=0;pp_D[cat].forEach(function(e){if(e[4]&&e[4].length>0)cnt++});
     var item=document.createElement('div');
-    item.className='sb-item'+(ppCatSel.has(cat)?' active':'');
+    item.className='dep-sb-item'+(ppCatSel.has(cat)?' active':'');
     item.dataset.cat=cat;
-    item.innerHTML='<span class="sb-item-name">'+name+'</span><span class="sb-count">'+cnt+'</span>';
+    item.innerHTML='<span class="dep-sb-item-name">'+name+'</span>';
     item.onclick=function(){
       if(ppCatSel.has(cat)){ppCatSel.delete(cat);item.classList.remove('active')}
       else{ppCatSel.add(cat);item.classList.add('active')}
@@ -1810,12 +1814,12 @@ function ppBuildSidebar(){
 function ppCatSelAll(){
   ppCatSel.clear();
   Object.keys(pp_D).forEach(function(c){ppCatSel.add(c)});
-  document.querySelectorAll('#pp_sidebar .sb-item').forEach(function(s){s.classList.add('active')});
+  document.querySelectorAll('#pp_sidebar .dep-sb-item').forEach(function(s){s.classList.add('active')});
   ppShowSelectedCats();
 }
 function ppCatSelNone(){
   ppCatSel.clear();
-  document.querySelectorAll('#pp_sidebar .sb-item').forEach(function(s){s.classList.remove('active')});
+  document.querySelectorAll('#pp_sidebar .dep-sb-item').forEach(function(s){s.classList.remove('active')});
   ppShowSelectedCats();
 }
 
@@ -1873,24 +1877,24 @@ function ppRender(){
   
   var html='<div class="search-count">'+total+' entries shown</div>';
   html+='<div class="study-sidebar-layout"><div class="study-sidebar" id="pp_alphaSidebar">';
-  html+='<div class="sb-item" onclick="ppShowAllPreps(this)" data-letter="all"><span class="sb-item-name" style="font-weight:700">All</span><span class="sb-count">'+total+'</span></div>';
+  html+='<div class="dep-sb-item" onclick="ppShowAllPreps(this)" data-letter="all"><span class="dep-sb-item-name" style="font-weight:700">All</span></div>';
   cats.forEach(function(cat){
     var filtered=[];
     pp_D[cat].forEach(function(e){if(ppMatchesFilter({co:e[0],ty:e[1],df:e[2],ex:e[3],an:e[4]}))filtered.push(e)});
     if(filtered.length===0)return;
-    html+='<div class="sb-item" onclick="ppShowPrep(this,\''+cat.replace(/'/g,"\\'")+'\')"><span class="sb-item-name">'+cat+'</span><span class="sb-count">'+filtered.length+'</span></div>';
+    html+='<div class="dep-sb-item" onclick="ppShowPrep(this,\''+cat.replace(/'/g,"\\'")+'\')"><span class="dep-sb-item-name">'+cat+'</span></div>';
   });
   html+='</div><div class="study-content" id="pp_alphaContent"></div></div>';
   
   container.innerHTML=html;
   document.getElementById('pp_searchCount').textContent='';
   
-  var first=document.querySelector('#pp_alphaSidebar .sb-item');
+  var first=document.querySelector('#pp_alphaSidebar .dep-sb-item');
   if(first){first.classList.add('active');ppShowAllPreps(first);}
 }
 
 function ppShowAllPreps(el){
-  document.querySelectorAll('#pp_alphaSidebar .sb-item').forEach(function(s){s.classList.remove('active')});
+  document.querySelectorAll('#pp_alphaSidebar .dep-sb-item').forEach(function(s){s.classList.remove('active')});
   el.classList.add('active');
   var total=0;
   var html='<h3>All Prepositional Phrases</h3>';
@@ -1908,7 +1912,7 @@ function ppShowAllPreps(el){
 }
 
 function ppShowPrep(el,cat){
-  document.querySelectorAll('#pp_alphaSidebar .sb-item').forEach(function(s){s.classList.remove('active')});
+  document.querySelectorAll('#pp_alphaSidebar .dep-sb-item').forEach(function(s){s.classList.remove('active')});
   el.classList.add('active');
   var entries=pp_D[cat];
   var filtered=[];
