@@ -582,8 +582,44 @@ Use standard British IPA in the ipa field. No extra JSON keys.`,
     const entries = sessions[currentSession] || [];
     if (!entries.length) { toast('Nothing to export yet'); return; }
 
-    const DPR = 2, PAD = 40, W = 700, ROW_H = 64, HEADER_H = 90, FOOTER_H = 52;
-    const H = HEADER_H + entries.length * ROW_H + FOOTER_H + PAD;
+    const DPR = 2, PAD = 40, W = 700, HEADER_H = 90, FOOTER_H = 52;
+    const LINE_H = 18, ROW_PAD_V = 16;
+    const COL1 = PAD, COL2 = PAD + 175, COL3 = PAD + 335;
+    const GUIDE_MAX_W = W - COL3 - PAD;
+
+    /* helper: wrap text into lines */
+    function wrapText(ctx, text, maxWidth) {
+      const words = text.split(' ');
+      const lines = [];
+      let line = '';
+      for (let i = 0; i < words.length; i++) {
+        const test = line ? line + ' ' + words[i] : words[i];
+        if (ctx.measureText(test).width > maxWidth && line) {
+          lines.push(line);
+          line = words[i];
+        } else {
+          line = test;
+        }
+      }
+      if (line) lines.push(line);
+      return lines;
+    }
+
+    /* pre-measure canvas to get correct height */
+    const offscreen = document.createElement('canvas');
+    offscreen.width = W * DPR;
+    offscreen.height = 10;
+    const octx = offscreen.getContext('2d');
+    octx.scale(DPR, DPR);
+    octx.font = '400 13px sans-serif';
+
+    const rowHeights = entries.map(function(e) {
+      const lines = wrapText(octx, e.guide, GUIDE_MAX_W);
+      return Math.max(50, lines.length * LINE_H + ROW_PAD_V * 2);
+    });
+
+    const totalRowH = rowHeights.reduce(function(a, b) { return a + b; }, 0);
+    const H = HEADER_H + totalRowH + FOOTER_H + PAD;
 
     const canvas = document.createElement('canvas');
     canvas.width = W * DPR;
@@ -591,12 +627,15 @@ Use standard British IPA in the ipa field. No extra JSON keys.`,
     const ctx = canvas.getContext('2d');
     ctx.scale(DPR, DPR);
 
+    /* background */
     ctx.fillStyle = '#FAFCFB';
     ctx.fillRect(0, 0, W, H);
 
+    /* top bar */
     ctx.fillStyle = '#0E7D6A';
     ctx.fillRect(0, 0, W, 5);
 
+    /* header */
     ctx.fillStyle = '#0A5A4C';
     ctx.font = '700 22px sans-serif';
     ctx.textAlign = 'left';
@@ -612,6 +651,7 @@ Use standard British IPA in the ipa field. No extra JSON keys.`,
     ctx.fillText(currentSession, W - PAD, 44);
     ctx.textAlign = 'left';
 
+    /* header divider */
     ctx.strokeStyle = '#D6EDE9';
     ctx.lineWidth = 1;
     ctx.beginPath();
@@ -619,40 +659,49 @@ Use standard British IPA in the ipa field. No extra JSON keys.`,
     ctx.lineTo(W - PAD, HEADER_H - 10);
     ctx.stroke();
 
-    const COL1 = PAD, COL2 = PAD + 175, COL3 = PAD + 335;
-
+    /* column labels */
     ctx.fillStyle = '#8AADA8';
     ctx.font = '600 11px sans-serif';
     ctx.fillText('WORD', COL1, HEADER_H + 4);
     ctx.fillText('IPA', COL2, HEADER_H + 4);
     ctx.fillText('PRONUNCIATION', COL3, HEADER_H + 4);
 
+    /* rows */
+    let curY = HEADER_H + 18;
     entries.forEach(function(e, i) {
-      const y = HEADER_H + 18 + i * ROW_H;
+      const rh = rowHeights[i];
+
       if (i % 2 === 0) {
         ctx.fillStyle = '#E6F5F2';
         ctx.beginPath();
-        ctx.roundRect(PAD - 12, y - 2, W - (PAD - 12) * 2, ROW_H - 8, 8);
+        ctx.roundRect(PAD - 12, curY - 4, W - (PAD - 12) * 2, rh, 8);
         ctx.fill();
       }
+
+      const midY = curY + rh / 2;
+
       ctx.fillStyle = '#0A5A4C';
       ctx.font = '600 15px sans-serif';
-      ctx.fillText(e.word, COL1, y + 26);
+      ctx.fillText(e.word, COL1, midY + 5);
+
       ctx.fillStyle = '#0E7D6A';
       ctx.font = '300 14px sans-serif';
-      ctx.fillText(e.ipa, COL2, y + 26);
+      ctx.fillText(e.ipa, COL2, midY + 5);
+
       ctx.fillStyle = '#4A6B66';
       ctx.font = '400 13px sans-serif';
-      let guide = e.guide;
-      const maxW = W - COL3 - PAD;
-      if (ctx.measureText(guide).width > maxW) {
-        while (ctx.measureText(guide + '…').width > maxW && guide.length > 0) guide = guide.slice(0, -1);
-        guide += '…';
-      }
-      ctx.fillText(guide, COL3, y + 26);
+      const guideLines = wrapText(ctx, e.guide, GUIDE_MAX_W);
+      const textBlockH = guideLines.length * LINE_H;
+      const textStartY = curY + (rh - textBlockH) / 2 + LINE_H - 2;
+      guideLines.forEach(function(line, li) {
+        ctx.fillText(line, COL3, textStartY + li * LINE_H);
+      });
+
+      curY += rh;
     });
 
-    const footerY = HEADER_H + 18 + entries.length * ROW_H + 20;
+    /* footer */
+    const footerY = curY + 20;
     ctx.strokeStyle = '#D6EDE9';
     ctx.lineWidth = 1;
     ctx.beginPath();
