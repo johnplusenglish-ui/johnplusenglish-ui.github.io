@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Phonetics — John + English</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --m50:  #E6F5F2;
+    --m100: #B3E0D8;
+    --m200: #80CBBF;
+    --m600: #0E7D6A;
+    --m800: #0E7D6A;
+    --m900: #0A5A4C;
+    --bg:   #FAFCFB;
+    --surface: #FFFFFF;
+    --border: #D6EDE9;
+    --text-primary: #0F1F1D;
+    --text-secondary: #4A6B66;
+    --text-muted: #8AADA8;
+  }
+
+  html, body {
+    height: 100%;
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2.5rem 1.25rem 3rem;
+    min-height: 100vh;
+  }
+
+  .wrapper {
+    width: 100%;
+    max-width: 580px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  /* ── Header ── */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+  }
+
+  .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  .brand-title {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--m800);
+  }
+
+  .brand-sub {
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+  }
+
+  /* ── API key banner ── */
+  #api-banner {
+    background: #FFF8E6;
+    border: 1px solid #FDDFA0;
+    border-radius: 12px;
+    padding: 0.9rem 1.1rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  #api-banner.hidden { display: none; }
+
+  .banner-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .banner-text {
+    font-size: 13px;
+    color: #7A5C00;
+    flex: 1;
+    line-height: 1.5;
+  }
+
+  .banner-input-row {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .banner-input-row input {
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px;
+    flex: 1;
+    padding: 6px 10px;
+    border: 1px solid #FDDFA0;
+    border-radius: 8px;
+    background: #FFFDF5;
+    color: #3D2E00;
+    outline: none;
+  }
+  .banner-input-row input:focus { border-color: #E8B800; }
+
+  .banner-input-row button {
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: none;
+    background: #B88A00;
+    color: #FFF8E6;
+    cursor: pointer;
+  }
+  .banner-input-row button:hover { background: #9A7300; }
+
+  /* ── Session bar ── */
+  .session-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 1.25rem;
+  }
+
+  .session-bar select {
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--m100);
+    background: var(--m50);
+    color: var(--m800);
+    cursor: pointer;
+    outline: none;
+    flex: 1;
+    max-width: 240px;
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%230E7D6A' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 28px;
+  }
+
+  .btn-ghost {
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--m200);
+    background: transparent;
+    color: var(--m600);
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+  .btn-ghost:hover { background: var(--m50); }
+
+  .btn-danger-ghost {
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid #F0C0B8;
+    background: transparent;
+    color: #C0392B;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+  .btn-danger-ghost:hover { background: #FDF0EE; }
+
+  /* ── Input row ── */
+  .input-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 1rem;
+  }
+
+  #word-input {
+    font-family: 'Outfit', sans-serif;
+    font-size: 20px;
+    font-weight: 400;
+    flex: 1;
+    padding: 11px 18px;
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface);
+    color: var(--text-primary);
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    letter-spacing: 0.01em;
+  }
+  #word-input:focus {
+    border-color: var(--m200);
+    box-shadow: 0 0 0 3px rgba(14,125,106,0.08);
+  }
+  #word-input::placeholder { color: var(--text-muted); font-weight: 300; }
+
+  #lookup-btn {
+    font-family: 'Outfit', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 11px 24px;
+    border-radius: 14px;
+    border: none;
+    background: var(--m800);
+    color: #E6F5F2;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    letter-spacing: 0.02em;
+    flex-shrink: 0;
+  }
+  #lookup-btn:hover { background: var(--m900); }
+  #lookup-btn:active { transform: scale(0.97); }
+  #lookup-btn:disabled { opacity: 0.45; cursor: default; transform: none; }
+
+  /* ── Result card ── */
+  #result-card {
+    border-radius: 16px;
+    background: var(--m50);
+    border: 1px solid var(--m100);
+    padding: 1.25rem 1.4rem;
+    margin-bottom: 1.5rem;
+    min-height: 88px;
+    display: flex;
+    align-items: center;
+    transition: background 0.2s;
+  }
+
+  .result-placeholder {
+    font-size: 14px;
+    color: var(--text-muted);
+    font-weight: 300;
+  }
+
+  .result-content { width: 100%; }
+
+  .result-word {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--m900);
+    margin-bottom: 3px;
+    letter-spacing: 0.01em;
+  }
+
+  .result-ipa {
+    font-size: 18px;
+    font-weight: 300;
+    color: var(--m600);
+    margin-bottom: 10px;
+    letter-spacing: 0.06em;
+  }
+
+  .result-guide {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  /* ── Loading ── */
+  .dots {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+  }
+  .dots span {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--m200);
+    animation: dot 0.9s infinite ease-in-out;
+  }
+  .dots span:nth-child(2) { animation-delay: 0.15s; }
+  .dots span:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes dot {
+    0%, 80%, 100% { transform: translateY(0); opacity: 0.6; }
+    40% { transform: translateY(-7px); opacity: 1; }
+  }
+
+  /* ── Log ── */
+  .log-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.65rem;
+  }
+
+  .log-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .log-actions { display: flex; gap: 6px; }
+
+  #log-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .log-empty {
+    font-size: 13px;
+    color: var(--text-muted);
+    text-align: center;
+    padding: 1.25rem 0;
+    font-weight: 300;
+    border: 1px dashed var(--border);
+    border-radius: 12px;
+  }
+
+  .log-item {
+    display: grid;
+    grid-template-columns: 130px 150px 1fr;
+    gap: 8px;
+    align-items: baseline;
+    padding: 9px 14px;
+    border-radius: 10px;
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    font-size: 13.5px;
+    animation: slideIn 0.2s ease;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  .log-word { font-weight: 600; color: var(--m800); }
+  .log-ipa { font-weight: 300; color: var(--m600); letter-spacing: 0.04em; }
+  .log-guide { color: var(--text-secondary); font-weight: 300; font-size: 13px; }
+
+  /* ── Error toast ── */
+  #toast {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #2D2D2D;
+    color: #FFF;
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px;
+    padding: 10px 18px;
+    border-radius: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+    white-space: nowrap;
+    z-index: 100;
+  }
+  #toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+
+  <header>
+    <div class="brand">
+      <span class="brand-title">Phonetics</span>
+      <span class="brand-sub">John + English</span>
+    </div>
+  </header>
+
+  <!-- API key banner -->
+  <div id="api-banner">
+    <span class="banner-icon">🔑</span>
+    <div>
+      <div class="banner-text">Enter your Anthropic API key to enable lookups. It's saved locally in your browser and never sent anywhere else.</div>
+      <div class="banner-input-row">
+        <input type="password" id="api-key-input" placeholder="sk-ant-..." />
+        <button onclick="saveApiKey()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Session bar -->
+  <div class="session-bar">
+    <select id="session-select" onchange="switchSession(this.value)"></select>
+    <button class="btn-ghost" onclick="newSession()">+ New class</button>
+  </div>
+
+  <!-- Lookup -->
+  <div class="input-row">
+    <input id="word-input" type="text" placeholder="Enter a word…" autocomplete="off" autocorrect="off" spellcheck="false" />
+    <button id="lookup-btn" onclick="lookupWord()">Look up</button>
+  </div>
+
+  <!-- Result -->
+  <div id="result-card">
+    <span class="result-placeholder">Results will appear here</span>
+  </div>
+
+  <!-- Log -->
+  <div class="log-header">
+    <span class="log-label">Class log</span>
+    <div class="log-actions">
+      <button class="btn-ghost" style="font-size:12px;padding:4px 12px;" onclick="exportLog()">Export</button>
+      <button class="btn-danger-ghost" style="font-size:12px;padding:4px 12px;" onclick="clearLog()">Clear</button>
+    </div>
+  </div>
+
+  <div id="log-list">
+    <div class="log-empty">No words looked up yet</div>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+  const SESSIONS_KEY = 'jpe_phonetics_sessions_v2';
+  const APIKEY_KEY   = 'jpe_phonetics_apikey';
+
+  let sessions = {};
+  let currentSession = '';
+
+  /* ── Persistence ── */
+  function load() {
+    try { sessions = JSON.parse(localStorage.getItem(SESSIONS_KEY) || '{}'); } catch(e) { sessions = {}; }
+  }
+  function save() {
+    try { localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions)); } catch(e) {}
+  }
+  function getApiKey() { return localStorage.getItem(APIKEY_KEY) || ''; }
+  function saveApiKey() {
+    const val = document.getElementById('api-key-input').value.trim();
+    if (!val.startsWith('sk-')) { toast('Key should start with sk-ant-…'); return; }
+    localStorage.setItem(APIKEY_KEY, val);
+    document.getElementById('api-banner').classList.add('hidden');
+    toast('API key saved');
+  }
+
+  /* ── Sessions ── */
+  function dateName() {
+    return new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  function newSession() {
+    const base = dateName();
+    let name = base, i = 2;
+    while (sessions[name]) name = `${base} (${i++})`;
+    sessions[name] = [];
+    save();
+    currentSession = name;
+    renderSelect();
+    renderLog();
+  }
+
+  function switchSession(name) {
+    currentSession = name;
+    renderLog();
+  }
+
+  function renderSelect() {
+    const sel = document.getElementById('session-select');
+    const names = Object.keys(sessions).reverse();
+    sel.innerHTML = names.map(n =>
+      `<option value="${n}" ${n === currentSession ? 'selected' : ''}>${n}</option>`
+    ).join('');
+  }
+
+  /* ── Log rendering ── */
+  function renderLog() {
+    const list = document.getElementById('log-list');
+    const entries = sessions[currentSession] || [];
+    if (!entries.length) {
+      list.innerHTML = '<div class="log-empty">No words looked up yet</div>';
+      return;
+    }
+    list.innerHTML = entries.slice().reverse().map(e =>
+      `<div class="log-item">
+        <span class="log-word">${e.word}</span>
+        <span class="log-ipa">${e.ipa}</span>
+        <span class="log-guide">${e.guide}</span>
+      </div>`
+    ).join('');
+  }
+
+  /* ── Lookup ── */
+  async function lookupWord() {
+    const input = document.getElementById('word-input');
+    const word  = input.value.trim();
+    if (!word) return;
+
+    const key = getApiKey();
+    if (!key) {
+      document.getElementById('api-banner').classList.remove('hidden');
+      toast('Add your API key first');
+      return;
+    }
+
+    const btn  = document.getElementById('lookup-btn');
+    const card = document.getElementById('result-card');
+    btn.disabled = true;
+    card.innerHTML = '<div class="dots"><span></span><span></span><span></span></div>';
+
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': key,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 300,
+          system: `You are a phonetics assistant for an English language teacher. Given a word or short phrase, respond ONLY with valid JSON (no markdown, no backticks) in this exact shape:
+{"ipa":"/…/","guide":"plain-English breakdown: syllables, stress, tricky sounds. 1–2 sentences max. Useful for non-native speakers."}
+Use standard IPA. No extra keys.`,
+          messages: [{ role: 'user', content: word }]
+        })
+      });
+
+      const data = await res.json();
+      if (data.error) throw new Error(data.error.message);
+
+      const text   = data.content?.find(b => b.type === 'text')?.text || '';
+      const parsed = JSON.parse(text.replace(/```json|```/g, '').trim());
+
+      card.innerHTML = `<div class="result-content">
+        <div class="result-word">${word}</div>
+        <div class="result-ipa">${parsed.ipa}</div>
+        <div class="result-guide">${parsed.guide}</div>
+      </div>`;
+
+      if (currentSession) {
+        sessions[currentSession].push({ word, ipa: parsed.ipa, guide: parsed.guide });
+        save();
+        renderLog();
+      }
+
+      input.value = '';
+      input.focus();
+
+    } catch(err) {
+      card.innerHTML = '<span class="result-placeholder">Something went wrong — check your API key or try again.</span>';
+      console.error(err);
+    }
+
+    btn.disabled = false;
+  }
+
+  /* ── Export ── */
+  function exportLog() {
+    const entries = sessions[currentSession] || [];
+    if (!entries.length) { toast('Nothing to export yet'); return; }
+    const lines = [
+      `Phonetics log — ${currentSession}`,
+      '─'.repeat(60),
+      ...entries.map(e => `${e.word.padEnd(22)}${e.ipa.padEnd(20)}${e.guide}`)
+    ].join('\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([lines], { type: 'text/plain' }));
+    a.download = `phonetics-${currentSession.replace(/[^a-z0-9]/gi, '-').toLowerCase()}.txt`;
+    a.click();
+  }
+
+  /* ── Clear ── */
+  function clearLog() {
+    if (!currentSession) return;
+    if (!confirm(`Clear all words from "${currentSession}"?`)) return;
+    sessions[currentSession] = [];
+    save();
+    renderLog();
+  }
+
+  /* ── Toast ── */
+  function toast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 2800);
+  }
+
+  /* ── Keyboard ── */
+  document.getElementById('word-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') lookupWord();
+  });
+
+  /* ── Init ── */
+  load();
+
+  if (getApiKey()) {
+    document.getElementById('api-banner').classList.add('hidden');
+  }
+
+  const names = Object.keys(sessions);
+  if (names.length) {
+    currentSession = names[names.length - 1];
+  } else {
+    const n = dateName();
+    sessions[n] = [];
+    save();
+    currentSession = n;
+  }
+
+  renderSelect();
+  renderLog();
+</script>
+</body>
+</html>
