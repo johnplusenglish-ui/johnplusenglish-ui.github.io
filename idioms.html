@@ -162,7 +162,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
 /* ── PRINT BUTTON ── */
 .pv-print-btn{margin-left:auto;font-family:var(--font-body);font-size:.88rem;font-weight:600;padding:.55rem 1rem;border:1.5px solid var(--border);border-radius:10px;background:var(--bg-card);color:var(--text-primary);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:.45rem}
 .pv-print-btn:hover{border-color:var(--text-primary);background:var(--cream)}
-.guide-print-row{display:flex;justify-content:flex-end;padding:0 0 .75rem}
+.guide-print-row{display:none}
 @media print{
   .topnav{display:none !important}.guide-print-btn,.guide-print-row{display:none!important}}
 .pv-print-btn svg{flex-shrink:0}
@@ -627,12 +627,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
       </nav>
 
       <div class="content-panel">
-        <div class="guide-print-row">
-          <button class="pv-print-btn guide-print-btn" id="guide-print-open-btn">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-            Print
-          </button>
-        </div>
+
 
         <!-- Guide Print Modal -->
         <div id="guide-print-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:none;align-items:center;justify-content:center;">
@@ -676,7 +671,13 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
         </div>
         <!-- What Are Idioms? -->
         <div class="section-content active" data-section="what-are-idioms">
-          <h2>What Are Idioms?</h2>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:.75rem">
+            <h2 style="margin:0">What Are Idioms?</h2>
+            <button class="pv-print-btn guide-print-btn" id="guide-print-open-btn" style="flex-shrink:0">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+              Print
+            </button>
+          </div>
           <p>An <strong>idiom</strong> is a fixed expression whose meaning cannot be understood from the individual words. When a British person says <em>"it's raining cats and dogs"</em>, they don't mean that animals are falling from the sky — they mean it's raining very heavily.</p>
           <p>Idioms are a natural part of everyday English. Native speakers use them constantly, often without realising it, in conversation, on TV, in the news, and in workplaces.</p>
           <div class="example-box">
@@ -957,6 +958,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
                 <span class="fc-face-tag" id="fc-back-tag">Definition</span>
                 <div class="fc-face-text" id="fc-back-text"></div>
                 <div class="fc-face-example" id="fc-back-example"></div>
+                <div class="fc-face-coll" id="fc-back-coll"></div>
               </div>
             </div>
           </div>
@@ -1995,6 +1997,8 @@ function ocDoPrint(){
     }
     $('fc-back-example').textContent = d.e || '';
     $('fc-back-example').style.display = d.e ? '' : 'none';
+    const fcColl=$('fc-back-coll');
+    if(fcColl){ if(d.c){ fcColl.textContent='e.g. '+d.c; fcColl.style.display=''; } else { fcColl.style.display='none'; } }
 
     $('fc-stat-pos').textContent = (state.pos + 1);
     $('fc-stat-total').textContent = state.queue.length;
