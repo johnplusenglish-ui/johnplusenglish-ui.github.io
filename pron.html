@@ -452,13 +452,18 @@
   function save() {
     try { localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions)); } catch(e) {}
   }
-  function getApiKey() { return localStorage.getItem(APIKEY_KEY) || ''; }
+  let _apiKeyMemory = '';
+  function getApiKey() {
+    if (_apiKeyMemory) return _apiKeyMemory;
+    try { return localStorage.getItem(APIKEY_KEY) || ''; } catch(e) { return ''; }
+  }
   function saveApiKey() {
     const val = document.getElementById('api-key-input').value.trim();
-    if (!val.startsWith('sk-')) { toast('Key should start with sk-ant-…'); return; }
-    localStorage.setItem(APIKEY_KEY, val);
+    if (!val) { toast('Please enter your API key'); return; }
+    _apiKeyMemory = val;
+    try { localStorage.setItem(APIKEY_KEY, val); } catch(e) {}
     document.getElementById('api-banner').classList.add('hidden');
-    toast('API key saved');
+    toast('API key saved ✓');
   }
 
   /* ── Sessions ── */
@@ -743,7 +748,9 @@ Use standard British IPA in the ipa field. No extra JSON keys.`,`,
   /* ── Init ── */
   load();
 
-  if (getApiKey()) {
+  const _savedKey = getApiKey();
+  if (_savedKey) {
+    _apiKeyMemory = _savedKey;
     document.getElementById('api-banner').classList.add('hidden');
   }
 
