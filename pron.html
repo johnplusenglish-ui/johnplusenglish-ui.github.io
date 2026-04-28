@@ -71,7 +71,7 @@
 
   .brand-sub {
     font-size: 13px;
-    font-weight: 300;
+    font-weight: 400;
     color: var(--text-muted);
     letter-spacing: 0.02em;
   }
@@ -268,7 +268,7 @@
 
   .result-ipa {
     font-size: 18px;
-    font-weight: 300;
+    font-weight: 500;
     color: var(--m600);
     margin-bottom: 10px;
     letter-spacing: 0.06em;
@@ -276,7 +276,7 @@
 
   .result-guide {
     font-size: 14px;
-    font-weight: 400;
+    font-weight: 500;
     color: var(--text-secondary);
     line-height: 1.65;
     white-space: normal;
@@ -353,9 +353,9 @@
     to { opacity: 1; transform: none; }
   }
 
-  .log-word { font-weight: 600; color: var(--m800); }
-  .log-ipa { font-weight: 300; color: var(--m600); letter-spacing: 0.04em; }
-  .log-guide { color: var(--text-secondary); font-weight: 300; font-size: 13px; line-height: 1.55; white-space: normal; word-wrap: break-word; }
+  .log-word { font-weight: 700; color: var(--m800); }
+  .log-ipa { font-weight: 500; color: var(--m600); letter-spacing: 0.04em; }
+  .log-guide { color: var(--text-secondary); font-weight: 500; font-size: 13px; line-height: 1.55; white-space: normal; word-wrap: break-word; }
 
   /* ── Error toast ── */
   #toast {
@@ -537,13 +537,15 @@
         body: JSON.stringify({
           model: 'claude-haiku-4-5-20251001',
           max_tokens: 300,
-          system: `You are a phonetics assistant for an English language teacher working with adult non-native speakers (B2–C2 level). Given a word or short phrase, respond ONLY with valid JSON (no markdown, no backticks) in this exact shape:
+          system: `You are a phonetics assistant for an English language teacher. Given a word or short phrase, respond ONLY with valid JSON (no markdown, no backticks):
 {"ipa":"/…/","guide":"…"}
-Rules for the guide:
-- Start with the phonetic respelling: syllables split by hyphens, STRESSED syllable in ALL CAPS, e.g. "KLOHZ", "HAP-ee", "MOWN-tin", "kon-TRIB-yoot"
-- Then add ONE short sentence (20 words max) covering only the single most important thing for a non-native speaker — stress placement, a commonly mispronounced sound, or a silent letter. Only mention something if it is genuinely noteworthy and 100% accurate. Do not invent tricky features that do not exist. If the word is straightforward, just give the respelling and nothing else.
-- Never use IPA symbols in the guide. Never exceed 25 words total.
-Use standard British IPA in the ipa field. No extra JSON keys.`,
+ACCURACY IS PARAMOUNT. Only produce IPA you are certain is correct. Do not add sounds, letters, or syllables that are not in the word.
+Guide rules:
+- Give ONLY the phonetic respelling with stressed syllable in ALL CAPS, e.g. "CHOK-lit", "LOH-kul", "MILK", "PAY-streez"
+- No extra sentences. No explanations. Just the respelling.
+- If a sound is genuinely likely to trip up learners (e.g. silent letter, voiced/unvoiced th), add a maximum of 5 words after a dash, e.g. "KLOHZ — voiced th, like 'this'"
+- Never use IPA in the guide. Never exceed 15 words total.
+Use standard British IPA in the ipa field. No extra JSON keys.`,`,
           messages: [{ role: 'user', content: word }]
         })
       });
