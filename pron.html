@@ -395,11 +395,11 @@
   <!-- API key banner -->
   <div id="api-banner">
     <span class="banner-icon">🔑</span>
-    <div>
-      <div class="banner-text">Enter your Anthropic API key to enable lookups. It's saved locally in your browser and never sent anywhere else.</div>
+    <div style="flex:1">
+      <div class="banner-text">Enter your Anthropic API key. It stays in your browser only.</div>
       <div class="banner-input-row">
-        <input type="password" id="api-key-input" placeholder="sk-ant-..." />
-        <button onclick="saveApiKey()">Save</button>
+        <input type="text" id="api-key-input" placeholder="sk-ant-api03-..." autocomplete="off" spellcheck="false" />
+        <button type="button" id="save-key-btn">Save</button>
       </div>
     </div>
   </div>
@@ -444,24 +444,43 @@
 
   let sessions = {};
   let currentSession = '';
+  let _apiKeyMemory = '';
+
+  /* ── Storage: tries localStorage, falls back to cookies ── */
+  function storageSet(key, val) {
+    try { localStorage.setItem(key, val); return; } catch(e) {}
+    const d = new Date(); d.setFullYear(d.getFullYear() + 2);
+    document.cookie = encodeURIComponent(key) + '=' + encodeURIComponent(val) + ';expires=' + d.toUTCString() + ';path=/';
+  }
+  function storageGet(key) {
+    try {
+      const v = localStorage.getItem(key);
+      if (v !== null) return v;
+    } catch(e) {}
+    const name = encodeURIComponent(key) + '=';
+    const parts = document.cookie.split(';');
+    for (let i = 0; i < parts.length; i++) {
+      const c = parts[i].trim();
+      if (c.indexOf(name) === 0) return decodeURIComponent(c.substring(name.length));
+    }
+    return '';
+  }
 
   /* ── Persistence ── */
   function load() {
-    try { sessions = JSON.parse(localStorage.getItem(SESSIONS_KEY) || '{}'); } catch(e) { sessions = {}; }
+    try { sessions = JSON.parse(storageGet(SESSIONS_KEY) || '{}'); } catch(e) { sessions = {}; }
   }
   function save() {
-    try { localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions)); } catch(e) {}
+    try { storageSet(SESSIONS_KEY, JSON.stringify(sessions)); } catch(e) {}
   }
-  let _apiKeyMemory = '';
   function getApiKey() {
-    if (_apiKeyMemory) return _apiKeyMemory;
-    try { return localStorage.getItem(APIKEY_KEY) || ''; } catch(e) { return ''; }
+    return _apiKeyMemory || storageGet(APIKEY_KEY) || '';
   }
   function saveApiKey() {
     const val = document.getElementById('api-key-input').value.trim();
     if (!val) { toast('Please enter your API key'); return; }
     _apiKeyMemory = val;
-    try { localStorage.setItem(APIKEY_KEY, val); } catch(e) {}
+    storageSet(APIKEY_KEY, val);
     document.getElementById('api-banner').classList.add('hidden');
     toast('API key saved ✓');
   }
@@ -745,10 +764,15 @@ Use standard British IPA in the ipa field. No extra JSON keys.`,`,
     if (e.key === 'Enter') lookupWord();
   });
 
+  document.getElementById('save-key-btn').addEventListener('click', saveApiKey);
+  document.getElementById('api-key-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') saveApiKey();
+  });
+
   /* ── Init ── */
   load();
 
-  const _savedKey = getApiKey();
+  const _savedKey = storageGet(APIKEY_KEY);
   if (_savedKey) {
     _apiKeyMemory = _savedKey;
     document.getElementById('api-banner').classList.add('hidden');
