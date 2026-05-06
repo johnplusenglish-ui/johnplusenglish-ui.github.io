@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Technology — Word Bank — John + English</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sky:#2176FF;--sky-light:#E8EEFF;--sea:#1DD3B0;--sea-light:#E4FBF7;
+  --coral:#FF6B6B;--coral-light:#FFE8E8;--lavender:#9B72CF;--lavender-light:#F0E8FA;
+  --cream:#F7F6F3;--ink:#2D3047;--muted:#7A7D8E;--border:#E8E5DF;--card:#fff;
+  --radius:14px;--radius-sm:10px;
+  --shadow-sm:0 1px 3px rgba(45,48,71,.06);--shadow-md:0 4px 14px rgba(45,48,71,.08);
+  --accent:#9B72CF;--accent-light:#F0E8FA;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,var(--border) 1px,transparent 1px);background-size:28px 28px;opacity:.4;pointer-events:none;z-index:0}
+.topnav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,.88);backdrop-filter:blur(16px);border-bottom:1.5px solid var(--border);height:52px;padding:0 2rem;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-family:'Outfit',sans-serif;font-size:1.3rem;font-weight:800;letter-spacing:-.02em;color:var(--ink);text-decoration:none}
+.nav-logo span{color:var(--sky)}
+.topnav-links{display:flex;gap:1.2rem;align-items:center}
+.topnav-links a{font-size:.85rem;font-weight:600;color:var(--muted);text-decoration:none;transition:color .2s}
+.topnav-links a:hover{color:var(--sky)}
+.page-header{padding:5.5rem 2rem 1.5rem;max-width:900px;margin:0 auto;position:relative;z-index:1}
+.back-link{display:inline-flex;align-items:center;gap:.4rem;font-size:.85rem;font-weight:600;color:var(--muted);text-decoration:none;margin-bottom:1.2rem;transition:color .2s}
+.back-link:hover{color:var(--sky)}
+.back-link svg{width:14px;height:14px}
+.topic-hero{display:flex;align-items:flex-start;gap:1.2rem}
+.topic-icon{width:52px;height:52px;border-radius:12px;background:var(--accent-light);color:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.topic-icon svg{width:24px;height:24px;stroke-width:1.8;fill:none;stroke:currentColor}
+.section-label{font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:.3rem}
+.page-header h1{font-family:'Outfit',sans-serif;font-size:clamp(1.8rem,4vw,2.6rem);font-weight:900;letter-spacing:-.01em;line-height:1.1;margin-bottom:.4rem}
+.page-header p{color:var(--muted);font-size:.9rem;max-width:540px;line-height:1.6}
+.header-meta{margin-top:.8rem}
+.meta-count{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted)}
+.tabs-wrap{max-width:900px;margin:0 auto;padding:0 2rem;position:relative;z-index:1}
+.tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:2rem;align-items:center}
+.tab{font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;padding:.7rem 1.4rem;border:none;background:none;color:var(--muted);cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-2px;transition:color .2s}
+.tab:hover{color:var(--ink)}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.main{max-width:900px;margin:0 auto;padding:0 2rem 4rem;position:relative;z-index:1}
+.panel{display:none}
+.panel.active{display:block}
+.filter-bar{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.5rem}
+.cat-btn{font-family:'Outfit',sans-serif;font-size:.8rem;font-weight:700;padding:.4rem 1rem;border:1.5px solid var(--border);border-radius:20px;background:var(--card);color:var(--muted);cursor:pointer;transition:all .18s}
+.cat-btn:hover{border-color:var(--accent);color:var(--accent)}
+.cat-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.cat-section{margin-bottom:1.4rem;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm)}
+.cat-header{display:flex;align-items:center;justify-content:space-between;gap:.7rem;padding:.5rem 1rem;background:var(--accent-light);border-bottom:1.5px solid var(--border);border-left:3px solid var(--accent);cursor:pointer;user-select:none}
+.cat-header:hover{filter:brightness(.97)}
+.cat-title{font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--accent)}
+.cat-chevron{color:var(--accent);transition:transform .2s;font-size:.75rem;opacity:.7;flex-shrink:0}
+.cat-section.collapsed .cat-chevron{transform:rotate(-90deg)}
+.cat-section.collapsed .cat-body{display:none}
+.pos-group{margin-bottom:.1rem}
+.pos-subhead{font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;padding:.38rem 1rem .3rem;border-bottom:1px solid var(--border);border-top:1px solid var(--border);border-left:3px solid transparent;cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none}
+.pos-subhead:hover{filter:brightness(.96)}
+.pos-chevron{transition:transform .2s;font-size:.65rem;opacity:.6;flex-shrink:0}
+.pos-group.collapsed .pos-chevron{transform:rotate(-90deg)}
+.pos-group.collapsed .pos-body{display:none}
+.pos-group:first-child .pos-subhead{border-top:none}
+.word-list{width:100%}
+.word-row{border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;padding:.5rem 1rem}
+.word-row:last-child{border-bottom:none}
+.word-row:hover{background:var(--accent-light)}
+.word-row.open{background:var(--accent-light)}
+.wr-main{display:flex;align-items:center;gap:.5rem}
+.wr-term{font-weight:800;font-size:.88rem;line-height:1.4}
+.wr-arr{margin-left:auto;font-size:1rem;color:var(--border);transition:transform .15s,color .15s;flex-shrink:0;padding-left:.5rem}
+.word-row.open .wr-arr{transform:rotate(90deg);color:var(--muted)}
+.wr-def{font-size:.8rem;color:var(--muted);line-height:1.4;margin-top:.15rem}
+.wr-ex{display:none;font-size:.78rem;font-style:italic;color:var(--muted);margin-top:.25rem;padding:.3rem .5rem;border-left:2px solid var(--border);line-height:1.5}
+.word-row.open .wr-ex{display:block}
+.conv-controls{display:flex;align-items:center;gap:.5rem;margin-bottom:1.2rem}
+.conv-ctrl-label{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-right:.2rem}
+.conv-hide-btn{font-family:'Outfit',sans-serif;font-size:.8rem;font-weight:700;padding:.35rem .8rem;border:1.5px solid var(--border);border-radius:20px;background:var(--card);color:var(--muted);cursor:pointer;transition:all .18s}
+.conv-hide-btn:hover{border-color:var(--ink);color:var(--ink)}
+.conv-hide-btn.active-a{background:var(--sky);border-color:var(--sky);color:#fff}
+.conv-hide-btn.active-b{background:var(--sea);border-color:var(--sea);color:#fff}
+.hide-a .conv-speaker-a ~ span{visibility:hidden}
+.hide-b .conv-speaker-b ~ span{visibility:hidden}
+.conv-section{margin-bottom:1.4rem;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm)}
+.conv-section.collapsed .cat-body{display:none}
+.conv-section.collapsed .cat-chevron{transform:rotate(-90deg)}
+.conv-header{display:flex;align-items:center;justify-content:space-between;gap:.7rem;padding:.5rem 1rem;background:var(--sea-light);border-bottom:1.5px solid var(--border);border-left:3px solid var(--sea);cursor:pointer;user-select:none}
+.conv-title{font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--sea)}
+.conv-entry{border-bottom:1px solid var(--border);padding:.65rem 1rem}
+.conv-entry:last-child{border-bottom:none}
+.conv-dialogue{display:flex;flex-direction:column;gap:.25rem;margin-bottom:.35rem}
+.conv-line{font-size:.82rem;line-height:1.5;display:grid;grid-template-columns:16px 1fr;gap:.5rem}
+.conv-speaker{font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:700;padding-top:.18rem}
+.conv-speaker-a{color:var(--sky)}
+.conv-speaker-b{color:var(--sea)}
+.conv-note{font-size:.73rem;color:var(--muted);font-style:italic;padding-left:24px}
+.print-btn{margin-left:auto;display:inline-flex;align-items:center;gap:.45rem;font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:600;padding:.45rem .9rem;border:1.5px solid var(--border);border-radius:10px;background:var(--card);color:var(--ink);cursor:pointer;transition:all .18s;flex-shrink:0}
+.print-btn:hover{border-color:var(--ink);background:var(--ink);color:var(--cream)}
+@media print{.print-btn{display:none}}
+.print-modal-backdrop{position:fixed;inset:0;background:rgba(45,48,71,.5);backdrop-filter:blur(3px);z-index:1000;display:none;align-items:center;justify-content:center;padding:1rem}
+.print-modal-backdrop.open{display:flex}
+.print-modal{background:var(--card);border-radius:var(--radius);max-width:440px;width:100%;padding:1.8rem;box-shadow:0 20px 60px rgba(45,48,71,.25);max-height:90vh;overflow-y:auto}
+.print-modal h3{font-family:'Outfit',sans-serif;font-size:1.4rem;font-weight:800;color:var(--ink);margin-bottom:.3rem}
+.print-modal-desc{font-size:.85rem;color:var(--muted);margin-bottom:1.4rem}
+.print-field{margin-bottom:1.1rem}
+.print-field-label{font-family:'JetBrains Mono',monospace;font-size:.65rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;display:block}
+.print-opts{display:flex;flex-direction:column;gap:.4rem}
+.print-opt{display:flex;align-items:flex-start;gap:.6rem;padding:.65rem .8rem;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;transition:all .15s;background:#fff}
+.print-opt:hover{border-color:var(--muted);background:var(--cream)}
+.print-opt input{margin:.15rem 0 0 0;accent-color:var(--accent);cursor:pointer;flex-shrink:0}
+.print-opt-content{flex:1;display:flex;flex-direction:column;gap:.1rem}
+.print-opt-title{font-size:.9rem;font-weight:700;color:var(--ink);line-height:1.3}
+.print-opt-desc{font-size:.78rem;color:var(--muted);line-height:1.4}
+.print-opt:has(input:checked){border-color:var(--accent);background:var(--accent-light)}
+.print-opt:has(input:checked) .print-opt-title{color:var(--accent)}
+.print-actions{display:flex;gap:.6rem;margin-top:1.4rem;justify-content:flex-end}
+.print-btn-cancel{font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;padding:.6rem 1.2rem;border-radius:10px;cursor:pointer;background:var(--card);border:1.5px solid var(--border);color:var(--muted);transition:all .15s}
+.print-btn-cancel:hover{border-color:var(--muted);color:var(--ink)}
+.print-btn-go{font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;padding:.6rem 1.2rem;border-radius:10px;cursor:pointer;background:var(--accent);border:1.5px solid var(--accent);color:#fff;transition:opacity .15s}
+.print-btn-go:hover{opacity:.85}
+.empty-state{text-align:center;padding:3rem;color:var(--muted);font-size:.9rem}
+.tap-hint{font-size:.75rem;color:var(--muted);margin-bottom:.8rem;font-style:italic}
+@media(max-width:600px){.page-header{padding:5rem 1.2rem 1.2rem}.main,.tabs-wrap{padding:0 1.2rem 3rem}}
+</style>
+</head>
+<body>
+<div class="topnav">
+  <a class="nav-logo" href="index.html">john<span>+</span>english</a>
+  <div class="topnav-links">
+    <a href="index.html">Home</a>
+    <a href="word-banks.html">Word Banks</a>
+  </div>
+</div>
+<div class="page-header">
+  <a class="back-link" href="word-banks.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    Word Banks
+  </a>
+  <div class="topic-hero">
+    <div class="topic-icon"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+    <div>
+      <div class="section-label">Word Bank</div>
+      <h1>Technology</h1>
+      <p>Key language for talking about devices, the internet, AI, and digital life — from everyday tech chat to C1/C2 level vocabulary.</p>
+      <div class="header-meta"><span class="meta-count" id="totalCount"></span></div>
+    </div>
+  </div>
+</div>
+<div class="tabs-wrap">
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('browse',this)">Browse</button>
+    <button class="tab" onclick="switchTab('conversation',this)">Conversation</button>
+    <button class="print-btn" onclick="openPrintModal()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      Print
+    </button>
+  </div>
+</div>
+<div class="main">
+  <div class="panel active" id="panel-browse">
+    <div class="filter-bar">
+      <button class="cat-btn active" onclick="filterCat('all',this)">All</button>
+      <button class="cat-btn" onclick="filterCat('tier1',this)">Tier 1 — Essential</button>
+      <button class="cat-btn" onclick="filterCat('tier2',this)">Tier 2 — Intermediate</button>
+      <button class="cat-btn" onclick="filterCat('tier3',this)">Tier 3 — Advanced</button>
+    </div>
+    <div id="browse-content"></div>
+  </div>
+  <div class="panel" id="panel-conversation">
+    <div class="conv-controls">
+      <span class="conv-ctrl-label">Practise</span>
+      <button class="conv-hide-btn" id="conv-hide-a" onclick="toggleHide('A')">Hide A</button>
+      <button class="conv-hide-btn" id="conv-hide-b" onclick="toggleHide('B')">Hide B</button>
+    </div>
+    <div id="conv-content"></div>
+  </div>
+</div>
+<script>
+const CATEGORIES = [
+  { key: 'tier1', label: 'Tier 1 — Essential' },
+  { key: 'tier2', label: 'Tier 2 — Intermediate' },
+  { key: 'tier3', label: 'Tier 3 — Advanced' },
+];
+const DATA = {
+  tier1: [
+    ['device','n.','a piece of electronic equipment such as a phone, tablet, or laptop','She forgot her device at home and couldn\'t check her emails.'],
+    ['app','n.','a software application, especially one downloaded onto a phone','There\'s an app for almost everything these days.'],
+    ['software','n.','programs and operating systems used by a computer','The software needs updating — it\'s running very slowly.'],
+    ['network','n.','a system of connected computers, servers, or devices','The whole office network went down for two hours.'],
+    ['password','n.','a secret word or string of characters used to gain access to a system','She changed her password after the security breach.'],
+    ['data','n.','information stored or processed by a computer','All the data is backed up to the cloud automatically.'],
+    ['screen','n.','the flat display surface of a phone, computer, or television','He stared at the screen for so long his eyes began to hurt.'],
+    ['connection','n.','a link between a device and the internet or another device','The connection is terrible out here — barely one bar.'],
+    ['battery','n.','the power source in a portable device','My battery is nearly dead — have you got a charger?'],
+    ['update','n.','a new version of software that improves or fixes the existing version','There\'s a system update available — you should install it.'],
+    ['virus','n.','malicious software designed to damage or disrupt a computer system','His laptop got a virus after he opened a suspicious email.'],
+    ['online','adj.','connected to the internet; happening over the internet','She does most of her shopping online now.'],
+    ['wireless','adj.','using radio waves rather than cables to transmit data','The whole building has wireless internet access.'],
+    ['digital','adj.','relating to data stored or transmitted electronically','He prefers a digital calendar to a paper one.'],
+    ['search','v.','to look for information online using a search engine','She searched online for reviews before buying.'],
+    ['download','v.','to transfer data from the internet to your device','He downloaded the app and set it up in five minutes.'],
+    ['upload','v.','to transfer data from your device to the internet or a server','She uploaded the photos to the shared folder.'],
+    ['charge','v.','to supply a device with electrical power','I forgot to charge my phone overnight and it died this morning.'],
+    ['log in','phr.v.','to enter your username and password to access a system or account','I couldn\'t log in because I\'d forgotten my password.'],
+    ['log out','phr.v.','to end a session by signing out of a system','Always log out when using a shared computer.'],
+    ['plug in','phr.v.','to connect a device to a power supply or another device','Plug in the charger and leave it overnight.'],
+    ['set up','phr.v.','to install and configure a device or application','It took him about ten minutes to set up the new router.'],
+    ['sign up','phr.v.','to register for an online account or service','She signed up for the newsletter and immediately regretted it.'],
+    ['lose signal','colloc.','to lose mobile or internet connectivity','We kept losing signal as the train went through the tunnel.'],
+    ['run out of battery','colloc.','(of a device) to have no power remaining','Her phone ran out of battery just as they were trying to find the address.'],
+  ],
+  tier2: [
+    ['algorithm','n.','a set of rules a computer follows to solve a problem or complete a task','The recommendation algorithm learns from what you watch.'],
+    ['browser','n.','a program used to access and navigate the internet','She cleared her browser history and cache.'],
+    ['cache','n.','temporary data stored to speed up access to frequently used content','Clearing the cache sometimes fixes loading problems.'],
+    ['interface','n.','the visual layout through which a user interacts with software','The new interface is much cleaner and easier to navigate.'],
+    ['server','n.','a computer that provides data and services to other computers on a network','The server crashed, taking the whole website down with it.'],
+    ['platform','n.','a software environment or online service on which applications run','The platform launched a new creator monetisation scheme.'],
+    ['bandwidth','n.','the capacity of a network connection to transmit data','Streaming in HD uses a lot of bandwidth.'],
+    ['notification','n.','an automatic alert from an app or system about new activity','He turned off all his notifications to focus on work.'],
+    ['glitch','n.','a small software or hardware fault causing unexpected behaviour','There was a glitch in the checkout process and the payment failed.'],
+    ['backup','n.','a copy of data stored separately in case the original is lost','Always keep a backup of important files.'],
+    ['subscription','n.','a recurring payment for access to a digital service','She cancelled her subscription after the price went up.'],
+    ['laggy','adj.','slow to respond, especially due to a weak connection or overloaded system','The game was really laggy — the connection couldn\'t handle it.'],
+    ['stream','v.','to watch or listen to media content over the internet without downloading it','They streamed the concert live from their living room.'],
+    ['hack','v.','to gain unauthorised access to a computer system','Someone tried to hack into her email account.'],
+    ['crash','v.','(of software or hardware) to stop working suddenly','The app kept crashing every time she tried to open it.'],
+    ['sync','v.','to ensure data is identical across multiple devices or platforms','Your contacts sync automatically across all your devices.'],
+    ['automate','v.','to make a process run automatically without manual input','They automated the data entry process to save time.'],
+    ['scroll','v.','to move up or down through content on a screen','She scrolled through her feed for twenty minutes without realising.'],
+    ['back up','phr.v.','to make a copy of data to prevent it from being lost','Make sure you back up your files before updating the system.'],
+    ['switch off','phr.v.','to turn off a device; also to stop thinking about work and relax','She found it impossible to switch off in the evenings.'],
+    ['cut out','phr.v.','(of a signal or connection) to stop suddenly and unexpectedly','The call kept cutting out — the signal was terrible.'],
+    ['freeze','v.','(of a device or screen) to stop responding and become unresponsive','My laptop froze in the middle of saving and I lost everything.'],
+    ['go viral','colloc.','to spread rapidly and widely on the internet','The video went viral overnight and had ten million views by morning.'],
+    ['digital detox','colloc.','a period of deliberately avoiding all electronic devices and screens','She did a full digital detox for a week and said it changed her life.'],
+    ['OTP','n.','a one-time password; a single-use code sent to verify your identity','Enter the OTP that was sent to your phone to complete the login.'],
+    ['ghost','slang','to suddenly stop responding to someone online without explanation','He ghosted her after three months of messaging.'],
+    ['doomscroll','slang','to compulsively scroll through negative news or social media','She found herself doomscrolling late into the night.'],
+    ['catfish','slang','to create a fake online identity to deceive others','She was catfished by someone pretending to be a photographer.'],
+  ],
+  tier3: [
+    ['cybersecurity','n.','the practice of protecting systems and networks from digital attacks','The company invested heavily in cybersecurity after the data breach.'],
+    ['artificial intelligence','n.','computer systems able to perform tasks that normally require human intelligence','Artificial intelligence is transforming how we interact with technology.'],
+    ['machine learning','n.','a branch of AI where systems learn from data without being explicitly programmed','The spam filter uses machine learning to improve over time.'],
+    ['cloud computing','n.','the delivery of computing services over the internet rather than local hardware','Most of their infrastructure has moved to cloud computing.'],
+    ['roll out','phr.v.','to gradually release a new product, feature, or update to users','The update will be rolled out to all users over the next two weeks.'],
+    ['opt out','phr.v.','to choose not to participate in a system or data-sharing agreement','You can opt out of data collection in the privacy settings.'],
+  ],
+};
+const CONV_DATA = [
+  {
+    group: 'Talking about devices and tech habits',
+    entries: [
+      { lines: [['A','<b>Are you glued to your phone</b> as much as everyone else these days?'],['B','Honestly, yes. I try to put it down after nine but I always end up picking it back up.']], note: '"Glued to your phone" = unable to stop using it. Very natural, slightly judgmental phrase.' },
+      { lines: [['A','<b>What do you use it for mostly</b>?'],['B','Podcasts, mainly. And I check the news obsessively — probably too much.']], note: 'Simple open question. Invites a natural, extended response.' },
+      { lines: [['A','<b>Do you pay for any subscriptions</b>?'],['B','Too many. I keep meaning to cancel half of them but never get round to it.']], note: '"Get round to" = find the time to do something. Very common in this context.' },
+      { lines: [['A','<b>Do you use the cloud for everything</b>?'],['B','Pretty much. It means I can access my files from any device.']], note: '"Pretty much" = more or less, almost entirely. Very common informal qualifier.' },
+    ]
+  },
+  {
+    group: 'Tech problems',
+    entries: [
+      { lines: [['A','My laptop keeps <b>crashing</b> — it\'s driving me mad.'],['B','Have you tried clearing the cache? That usually fixes it.']], note: '"Driving me mad" = making me very frustrated. Very common with tech problems.' },
+      { lines: [['A','I <b>can\'t log in</b> — it\'s saying my password is wrong.'],['B','Did you try resetting it? The link goes to your email.']], note: 'Basic but essential — very common support/help desk language.' },
+      { lines: [['A','The app just <b>glitched</b> and deleted everything I\'d typed.'],['B','Nightmare. I always copy text before submitting anything important now.']], note: '"Glitch" used as a verb is now very common in informal tech talk.' },
+      { lines: [['A','My signal is terrible here.'],['B','Try turning <b>aeroplane mode</b> on and off — it sometimes forces a reconnect.']], note: '"Turn on/off" and "force a reconnect" — practical, natural troubleshooting language.' },
+    ]
+  },
+  {
+    group: 'Social media and online life',
+    entries: [
+      { lines: [['A','Did you see that video <b>going viral</b>?'],['B','The one with the dog? It had thirty million views by this morning.']], note: '"Go viral" is now standard everyday vocabulary, not just tech jargon.' },
+      { lines: [['A','He completely <b>ghosted</b> me after we matched on the app.'],['B','That\'s so common now. People just disappear without a word.']], note: '"Ghost" as a verb. Originally dating app slang, now used in any context.' },
+      { lines: [['A','I\'ve been trying to <b>doomscroll</b> less — it\'s affecting my sleep.'],['B','Same. I put my phone in another room at ten and it\'s made a real difference.']], note: '"Doomscroll" is now widely understood, especially among younger speakers.' },
+      { lines: [['A','<b>Do you post much on social media</b>?'],['B','Not really. I mostly just lurk — I prefer reading to posting.']], note: '"Lurk" = read/observe without participating. Common internet vocabulary.' },
+    ]
+  },
+  {
+    group: 'AI and the future',
+    entries: [
+      { lines: [['A','<b>What do you think about AI</b>? Are you worried about it?'],['B','It depends. For creative work, yes. But for repetitive tasks, it\'s genuinely useful.']], note: 'Open opinion question. Expect disagreement — good for debate practice.' },
+      { lines: [['A','<b>Do you use any AI tools</b> in your work?'],['B','I use one to help me draft emails. It saves me about an hour a day, honestly.']], note: 'Practical angle. Most students now have some experience with AI tools.' },
+      { lines: [['A','Are you worried about AI <b>taking over jobs</b>?'],['B','Some jobs, yes. But I think new ones will emerge — that\'s what always happens with technology.']], note: '"Take over" + jobs. Common phrase in AI / future of work discussions.' },
+    ]
+  },
+];
+const POS_COLORS = {"n.":["#2176FF","#F0EFEC"],"adj.":["#FF9100","#F0EFEC"],"v.":["#0FA67F","#F0EFEC"],"phr.v.":["#D946A8","#F0EFEC"],"colloc.":["#D4A017","#F0EFEC"],"idiom":["#CC2936","#F0EFEC"],"phrase":["#7A7D8E","#F0EFEC"],"slang":["#7B3FF2","#F0EFEC"]};
+const POS_ORDER = ['n.','adj.','v.','phr.v.','colloc.','idiom','phrase','slang'];
+const POS_LABELS = {'n.':'Nouns','adj.':'Adjectives','v.':'Verbs','phr.v.':'Phrasal Verbs','colloc.':'Collocations','idiom':'Idioms','phrase':'Set Phrases','slang':'Modern Slang'};
+let activeCat = 'all';
+let hiddenSpeaker = null;
+function renderBrowse() {
+  const container = document.getElementById('browse-content');
+  const cats = activeCat === 'all' ? CATEGORIES : CATEGORIES.filter(c=>c.key===activeCat);
+  let html = ''; let total = 0;
+  const groups = {};
+  cats.forEach(cat => {
+    const entries = DATA[cat.key]||[];
+    if (!entries.length) return;
+    total += entries.length;
+    entries.forEach(function(e){ var pos=e[1]; if(!groups[pos]) groups[pos]=[]; groups[pos].push(e); });
+  });
+  html += '<div class="cat-section"><div class="cat-body">';
+  POS_ORDER.forEach(function(pos){
+    if (!groups[pos]) return;
+    var label = POS_LABELS[pos]||pos;
+    var fg = (POS_COLORS[pos]||['var(--muted)'])[0];
+    var bg = (POS_COLORS[pos]||['','var(--cream)'])[1];
+    html += '<div class="pos-group collapsed">'
+      + '<div class="pos-subhead" style="color:var(--muted);background:'+bg+';border-left-color:'+fg+'" onclick="togglePos(this)">'
+      + label + '<span class="pos-chevron">&#9660;</span>'
+      + '</div>'
+      + '<div class="pos-body">';
+    groups[pos].forEach(function(e){
+      var term=e[0], def=e[2], ex=e[3]||'';
+      html += '<div class="word-row" onclick="toggleRow(this)">'
+        + '<div class="wr-main"><span class="wr-term">'+term+'</span><span class="wr-arr">&#8250;</span></div>'
+        + '<div class="wr-def">'+def+'</div>'
+        + (ex ? '<div class="wr-ex">'+ex+'</div>' : '')
+        + '</div>';
+    });
+    html += '</div></div>';
+  });
+  html += '</div></div>';
+  html = '<p class="tap-hint">Tap any word to see an example sentence.</p>' + html;
+  if (!total) html = '<div class="empty-state">No items.</div>';
+  container.innerHTML = html;
+  document.getElementById('totalCount').textContent = total + ' items';
+}
+
+function toggleRow(row){ row.classList.toggle('open'); }
+function filterCat(cat, btn) {
+  activeCat = cat;
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderBrowse();
+}
+function renderConversation() {
+  const container = document.getElementById('conv-content');
+  let html = '';
+  CONV_DATA.forEach(section => {
+    html += '<div class="conv-section collapsed"><div class="conv-header" onclick="toggleCat(this)"><span class="conv-title">'+section.group+'</span><span class="cat-chevron" style="color:var(--sea)">&#9660;</span></div><div class="cat-body">';
+    section.entries.forEach(e => {
+      const lines = e.lines.map((l,i) => {
+        const scls = i===0?'conv-speaker-a':'conv-speaker-b';
+        const lbl = i===0?'A':'B';
+        return '<div class="conv-line"><span class="conv-speaker '+scls+'">'+lbl+'</span><span>'+l[1]+'</span></div>';
+      }).join('');
+      html += '<div class="conv-entry"><div class="conv-dialogue">'+lines+'</div><div class="conv-note">'+e.note+'</div></div>';
+    });
+    html += '</div></div>';
+  });
+  container.innerHTML = html;
+}
+function toggleHide(speaker) {
+  const container = document.getElementById('conv-content');
+  if (hiddenSpeaker === speaker) {
+    hiddenSpeaker = null;
+    container.classList.remove('hide-a','hide-b');
+    document.getElementById('conv-hide-a').classList.remove('active-a');
+    document.getElementById('conv-hide-b').classList.remove('active-b');
+  } else {
+    hiddenSpeaker = speaker;
+    container.classList.remove('hide-a','hide-b');
+    container.classList.add('hide-'+speaker.toLowerCase());
+    document.getElementById('conv-hide-a').classList.remove('active-a');
+    document.getElementById('conv-hide-b').classList.remove('active-b');
+    document.getElementById('conv-hide-'+speaker.toLowerCase()).classList.add('active-'+speaker.toLowerCase());
+  }
+}
+function switchTab(id, btn) {
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+function toggleCat(hdr) { hdr.parentElement.classList.toggle('collapsed'); }
+function togglePos(hdr) { hdr.parentElement.classList.toggle('collapsed'); }
+function openPrintModal() {
+  var scope = document.querySelector('input[name="wbScope"]:checked').value;
+  document.getElementById('print-format-field').style.display = scope === 'conversation' ? 'none' : '';
+  document.getElementById('printModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closePrintModal(e) {
+  if (e && e.target !== document.getElementById('printModal')) return;
+  document.getElementById('printModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('change', function(e) {
+  if (e.target.name === 'wbScope') document.getElementById('print-format-field').style.display = e.target.value === 'conversation' ? 'none' : '';
+});
+function executePrint() {
+  var scope = document.querySelector('input[name="wbScope"]:checked').value;
+  var format = document.querySelector('input[name="wbFormat"]:checked').value;
+  var topic = 'Technology';
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+topic+' — Word Bank</title>'
+    + '<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">'
+    + '<style>@page{margin:1.4cm 1.8cm}*{margin:0;padding:0;box-sizing:border-box}'
+    + 'body{font-family:Outfit,sans-serif;color:#2D3047;font-size:10pt;line-height:1.5}'
+    + '.header{display:flex;align-items:baseline;justify-content:space-between;border-bottom:2pt solid #E8E5DF;padding-bottom:4pt;margin-bottom:10pt}'
+    + 'h1{font-family:Outfit,sans-serif;font-size:17pt;font-weight:900}'
+    + '.meta{font-family:"JetBrains Mono",monospace;font-size:7.5pt;color:#7A7D8E}'
+    + '.tier{margin-bottom:16pt}'
+    + '.tier-name{font-family:"JetBrains Mono",monospace;font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9B72CF;padding:3pt 0;border-bottom:1.5pt solid #E8E5DF;margin-bottom:4pt}'
+    + '.pos-name{font-family:"JetBrains Mono",monospace;font-size:6.5pt;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#7A7D8E;margin:6pt 0 2pt;padding-top:4pt;border-top:0.5pt solid #f0ede8}'
+    + '.pos-name:first-child{border-top:none;margin-top:0}'
+    + 'table{width:100%;border-collapse:collapse;margin-bottom:4pt}'
+    + 'td{padding:3pt 5pt;vertical-align:top;border-bottom:0.5pt solid #f5f3ef;font-size:10pt}'
+    + 'td.term{font-weight:800;width:26%}td.def{color:#555;width:40%}td.ex{font-style:italic;color:#888;width:34%}'
+    + 'td.ws-line{border-bottom:1pt solid #bbb;min-width:200pt}'
+    + '.conv-group{margin-bottom:14pt}'
+    + '.conv-group-name{font-family:"JetBrains Mono",monospace;font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#1DD3B0;padding:3pt 0;border-bottom:1.5pt solid #E8E5DF;margin-bottom:6pt}'
+    + '.conv-entry{margin-bottom:8pt}'
+    + '.conv-line{display:grid;grid-template-columns:14pt 1fr;gap:3pt;font-size:10pt;line-height:1.6}'
+    + '.spk{font-family:"JetBrains Mono",monospace;font-size:7pt;font-weight:700;padding-top:2pt}'
+    + '.spk-a{color:#2176FF}.spk-b{color:#1DD3B0}'
+    + '.conv-note{font-size:8.5pt;font-style:italic;color:#7A7D8E;margin-top:2pt;padding-left:17pt}'
+    + '</style></head><body>'
+    + '<div class="header"><h1>'+topic+'</h1>'
+    + '<span class="meta">'+(scope==='conversation'?'Conversation Exchanges':(scope==='all'?'All Tiers':CATEGORIES.find(function(c){return c.key===scope;}).label))+'</span></div>';
+  if (scope === 'conversation') {
+    CONV_DATA.forEach(function(section) {
+      html += '<div class="conv-group"><div class="conv-group-name">'+section.group+'</div>';
+      section.entries.forEach(function(e) {
+        html += '<div class="conv-entry">';
+        e.lines.forEach(function(l,i) {
+          html += '<div class="conv-line"><span class="spk '+(i===0?'spk-a':'spk-b')+'">'+(i===0?'A':'B')+'</span><span>'+l[1]+'</span></div>';
+        });
+        html += '<div class="conv-note">'+e.note+'</div></div>';
+      });
+      html += '</div>';
+    });
+  } else {
+    var tiers = scope === 'all' ? ['tier1','tier2','tier3'] : [scope];
+    tiers.forEach(function(tk) {
+      var cat = CATEGORIES.find(function(c){return c.key===tk;});
+      if (!cat) return;
+      var entries = DATA[tk]||[];
+      if (!entries.length) return;
+      html += '<div class="tier"><div class="tier-name">'+cat.label+'</div>';
+      var groups = {};
+      entries.forEach(function(e){ if(!groups[e[1]]) groups[e[1]]=[]; groups[e[1]].push(e); });
+      ['n.','adj.','v.','phr.v.','colloc.','idiom','phrase','slang'].forEach(function(pos) {
+        if (!groups[pos]) return;
+        var pl = {'n.':'Nouns','adj.':'Adjectives','v.':'Verbs','phr.v.':'Phrasal Verbs','colloc.':'Collocations','idiom':'Idioms','phrase':'Set Phrases','slang':'Modern Slang'};
+        html += '<div class="pos-name">'+pl[pos]+'</div><table>';
+        groups[pos].forEach(function(e) {
+          if (format==='full') html += '<tr><td class="term">'+e[0]+'</td><td class="def">'+e[2]+'</td><td class="ex">'+(e[3]||'')+'</td></tr>';
+          else if (format==='compact') html += '<tr><td class="term">'+e[0]+'</td><td class="def">'+e[2]+'</td></tr>';
+          else html += '<tr><td class="term">'+e[0]+'</td><td class="ws-line"></td></tr>';
+        });
+        html += '</table>';
+      });
+      html += '</div>';
+    });
+  }
+  html += '</body></html>';
+  var win = window.open('','_blank');
+  win.document.write(html);
+  win.document.close();
+  win.onload = function(){ win.focus(); win.print(); };
+  document.getElementById('printModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+renderBrowse();
+renderConversation();
+</script>
+<div class="print-modal-backdrop" id="printModal" onclick="closePrintModal(event)">
+  <div class="print-modal" onclick="event.stopPropagation()">
+    <h3>Print word bank</h3>
+    <p class="print-modal-desc">Choose what to print.</p>
+    <div class="print-field">
+      <label class="print-field-label">Scope</label>
+      <div class="print-opts">
+        <label class="print-opt"><input type="radio" name="wbScope" value="all" checked><div class="print-opt-content"><span class="print-opt-title">All tiers</span><span class="print-opt-desc">Everything — Tier 1, 2, and 3</span></div></label>
+        <label class="print-opt"><input type="radio" name="wbScope" value="tier1"><div class="print-opt-content"><span class="print-opt-title">Tier 1 only</span><span class="print-opt-desc">Essential vocabulary</span></div></label>
+        <label class="print-opt"><input type="radio" name="wbScope" value="tier2"><div class="print-opt-content"><span class="print-opt-title">Tier 2 only</span><span class="print-opt-desc">Intermediate vocabulary</span></div></label>
+        <label class="print-opt"><input type="radio" name="wbScope" value="tier3"><div class="print-opt-content"><span class="print-opt-title">Tier 3 only</span><span class="print-opt-desc">Advanced vocabulary</span></div></label>
+        <label class="print-opt"><input type="radio" name="wbScope" value="conversation"><div class="print-opt-content"><span class="print-opt-title">Conversation exchanges</span><span class="print-opt-desc">Dialogues and usage notes only</span></div></label>
+      </div>
+    </div>
+    <div class="print-field" id="print-format-field">
+      <label class="print-field-label">Format</label>
+      <div class="print-opts">
+        <label class="print-opt"><input type="radio" name="wbFormat" value="full" checked><div class="print-opt-content"><span class="print-opt-title">Full reference</span><span class="print-opt-desc">Term, definition, and example sentence</span></div></label>
+        <label class="print-opt"><input type="radio" name="wbFormat" value="compact"><div class="print-opt-content"><span class="print-opt-title">Compact</span><span class="print-opt-desc">Term and definition only</span></div></label>
+        <label class="print-opt"><input type="radio" name="wbFormat" value="worksheet"><div class="print-opt-content"><span class="print-opt-title">Worksheet</span><span class="print-opt-desc">Terms listed with blank lines for definitions</span></div></label>
+      </div>
+    </div>
+    <div class="print-actions">
+      <button class="print-btn-cancel" onclick="closePrintModal()">Cancel</button>
+      <button class="print-btn-go" onclick="executePrint()">Print</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
