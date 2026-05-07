@@ -55,13 +55,16 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .cat-chevron{color:var(--accent);transition:transform .2s;font-size:.75rem;opacity:.7;flex-shrink:0}
 .cat-section.collapsed .cat-chevron{transform:rotate(-90deg)}
 .cat-section.collapsed .cat-body{display:none}
-.pos-group{margin-bottom:.1rem}
-.pos-subhead{font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;padding:.38rem 1rem .3rem;border-bottom:1px solid var(--border);border-top:1px solid var(--border);border-left:3px solid transparent;cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none}
-.pos-subhead:hover{filter:brightness(.96)}
-.pos-chevron{transition:transform .2s;font-size:.65rem;opacity:.6;flex-shrink:0}
+.pos-group{margin-bottom:0}
+.pos-head{display:flex;align-items:center;gap:.6rem;padding:.65rem 1rem;border-bottom:1px solid var(--border);cursor:pointer;user-select:none;transition:background .12s}
+.pos-head:hover{background:var(--cream)}
+.pos-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.pos-label{font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.pos-count{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--muted);margin-left:.2rem}
+.pos-chevron{margin-left:auto;font-size:.65rem;color:var(--muted);transition:transform .2s;opacity:.5}
 .pos-group.collapsed .pos-chevron{transform:rotate(-90deg)}
 .pos-group.collapsed .pos-body{display:none}
-.pos-group:first-child .pos-subhead{border-top:none}
+.pos-group:last-child .pos-head{border-bottom:none}
 .word-list{width:100%}
 .word-row{border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;padding:.5rem 1rem}
 .word-row:last-child{border-bottom:none}
@@ -221,6 +224,8 @@ tier1: [
     ['a level playing field','idiom','a situation where everyone has an equal chance','All we\'re asking for is a level playing field.'],
     ['the tip of the iceberg','idiom','a small visible part of a much larger hidden problem','The cases we hear about are just the tip of the iceberg.'],
     ['a hot topic','colloc.','a subject that is widely discussed and often controversial','Immigration has always been a hot topic in election campaigns.'],
+    ['woke','slang','aware of and actively attentive to social and racial justice issues','The term woke has become politically charged in recent years.'],
+    ['cancel culture','slang','the practice of publicly rejecting or boycotting someone for offensive behaviour','Cancel culture is one of the most divisive topics in modern debate.'],
   ],
   tier3: [
     ['systemic','adj.','relating to or affecting an entire system rather than individual parts','Systemic racism cannot be solved by individual acts of kindness alone.'],
@@ -234,7 +239,31 @@ tier1: [
   ],
 };
 
-const CONV_DATA = [];
+const CONV_DATA = [
+  {
+    group: 'Discussing social issues',
+    entries: [
+      { lines: [['A','<b>Do you think there\'s more inequality now</b> than there used to be?'],['B','Definitely. The gap between rich and poor has widened massively.']], note: '"The gap between rich and poor" — a very common collocation in this topic.' },
+      { lines: [['A','<b>What do you think the government should do</b> about homelessness?'],['B','More social housing, for a start. Turning a blind eye isn\'t working.']], note: '"Turn a blind eye" = to deliberately ignore a problem.' },
+      { lines: [['A','<b>Do you ever donate to charity</b>?'],['B','Monthly, yes. I think even small amounts can make a difference.']], note: '"Make a difference" — essential collocation for this topic.' },
+    ]
+  },
+  {
+    group: 'Talking about rights and fairness',
+    entries: [
+      { lines: [['A','<b>Do you think everyone gets a fair chance</b> in life?'],['B','Not really. Where you\'re born still matters more than it should.']], note: '"A fair chance" = an equal opportunity. Common in discussions of equality.' },
+      { lines: [['A','<b>Have you ever spoken out</b> about something you disagreed with?'],['B','Once, at work. It was uncomfortable but I\'m glad I did it.']], note: '"Speak out" = to publicly express your opinion, especially against injustice.' },
+      { lines: [['A','<b>What\'s your view on protests</b>? Do they actually change anything?'],['B','Sometimes. The civil rights movement proves they can bring about real change.']], note: '"Bring about change" = to cause change to happen. Key collocation.' },
+    ]
+  },
+  {
+    group: 'Community and belonging',
+    entries: [
+      { lines: [['A','<b>Do you feel part of a community</b> where you live?'],['B','More so since the pandemic, actually. People really came together.']], note: '"Come together" = to unite or cooperate as a group.' },
+      { lines: [['A','<b>What makes a good community</b>, do you think?'],['B','People looking out for each other, especially the more vulnerable members.']], note: '"Look out for" = to take care of or protect someone.' },
+    ]
+  },
+];
 
 const POS_COLORS = {"n.":["#2176FF","#F0EFEC"],"adj.":["#FF9100","#F0EFEC"],"v.":["#0FA67F","#F0EFEC"],"phr.v.":["#D946A8","#F0EFEC"],"colloc.":["#D4A017","#F0EFEC"],"idiom":["#CC2936","#F0EFEC"],"phrase":["#7A7D8E","#F0EFEC"],"slang":["#7B3FF2","#F0EFEC"]};
 const POS_ORDER = ['n.','adj.','v.','phr.v.','colloc.','idiom','phrase','slang'];
@@ -256,11 +285,14 @@ function renderBrowse() {
   POS_ORDER.forEach(function(pos){
     if (!groups[pos]) return;
     var label = POS_LABELS[pos]||pos;
-    var fg = (POS_COLORS[pos]||['var(--muted)'])[0];
-    var bg = (POS_COLORS[pos]||['','var(--cream)'])[1];
+    var dotColor = (POS_COLORS[pos]||['var(--muted)'])[0];
+    var count = groups[pos].length;
     html += '<div class="pos-group collapsed">'
-      + '<div class="pos-subhead" style="color:var(--muted);background:'+bg+';border-left-color:'+fg+'" onclick="togglePos(this)">'
-      + label + '<span class="pos-chevron">&#9660;</span>'
+      + '<div class="pos-head" onclick="togglePos(this)">'
+      + '<span class="pos-dot" style="background:' + dotColor + '"></span>'
+      + '<span class="pos-label">' + label + '</span>'
+      + '<span class="pos-count">' + count + '</span>'
+      + '<span class="pos-chevron">&#9660;</span>'
       + '</div>'
       + '<div class="pos-body">';
     groups[pos].forEach(function(e){
