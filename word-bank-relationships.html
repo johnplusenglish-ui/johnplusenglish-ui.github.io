@@ -55,13 +55,16 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .cat-chevron{color:var(--accent);transition:transform .2s;font-size:.75rem;opacity:.7;flex-shrink:0}
 .cat-section.collapsed .cat-chevron{transform:rotate(-90deg)}
 .cat-section.collapsed .cat-body{display:none}
-.pos-group{margin-bottom:.1rem}
-.pos-subhead{font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;padding:.38rem 1rem .3rem;border-bottom:1px solid var(--border);border-top:1px solid var(--border);border-left:3px solid transparent;cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none}
-.pos-subhead:hover{filter:brightness(.96)}
-.pos-chevron{transition:transform .2s;font-size:.65rem;opacity:.6;flex-shrink:0}
+.pos-group{margin-bottom:0}
+.pos-head{display:flex;align-items:center;gap:.6rem;padding:.65rem 1rem;border-bottom:1px solid var(--border);cursor:pointer;user-select:none;transition:background .12s}
+.pos-head:hover{background:var(--cream)}
+.pos-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.pos-label{font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.pos-count{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--muted);margin-left:.2rem}
+.pos-chevron{margin-left:auto;font-size:.65rem;color:var(--muted);transition:transform .2s;opacity:.5}
 .pos-group.collapsed .pos-chevron{transform:rotate(-90deg)}
 .pos-group.collapsed .pos-body{display:none}
-.pos-group:first-child .pos-subhead{border-top:none}
+.pos-group:last-child .pos-head{border-bottom:none}
 .word-list{width:100%}
 .word-row{border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;padding:.5rem 1rem}
 .word-row:last-child{border-bottom:none}
@@ -233,7 +236,31 @@ tier1: [
   ],
 };
 
-const CONV_DATA = [];
+const CONV_DATA = [
+  {
+    group: 'Friendships',
+    entries: [
+      { lines: [['A','<b>How did you two meet</b>?'],['B','Through work, actually. We hit it off straight away.']], note: '"Hit it off" = to get along well immediately with someone you\'ve just met.' },
+      { lines: [['A','<b>Are you still in touch with your school friends</b>?'],['B','A couple. Most of us just drifted apart after university.']], note: '"Drift apart" = to slowly lose contact without a specific cause.' },
+      { lines: [['A','<b>What makes a good friendship</b>?'],['B','Being there through thick and thin — not just the good times.']], note: '"Through thick and thin" = in both good times and bad times.' },
+    ]
+  },
+  {
+    group: 'Romantic relationships',
+    entries: [
+      { lines: [['A','<b>How long have you been together</b>?'],['B','Six years. We settled down quite young compared to our friends.']], note: '"Settle down" = to begin a stable life, often with a partner.' },
+      { lines: [['A','<b>Do you two ever argue</b>?'],['B','Of course. But we always make up quickly — we never go to bed angry.']], note: '"Make up" = to become friends again after an argument.' },
+      { lines: [['A','I heard Tom and Laura <b>broke up</b>.'],['B','Again? They\'re always on the rocks. They\'ll probably get back together next week.']], note: '"On the rocks" = in serious difficulty. "Break up" = to end a relationship.' },
+    ]
+  },
+  {
+    group: 'Family dynamics',
+    entries: [
+      { lines: [['A','<b>Do you get on with your siblings</b>?'],['B','Now, yes. We used to fall out constantly as teenagers.']], note: '"Fall out" = to have a serious argument that damages a relationship.' },
+      { lines: [['A','<b>Who do you look up to</b> in your family?'],['B','My grandmother. She\'s been a shoulder to cry on my whole life.']], note: '"Look up to" = to admire. "A shoulder to cry on" = someone who offers comfort.' },
+    ]
+  },
+];
 
 const POS_COLORS = {"n.":["#2176FF","#F0EFEC"],"adj.":["#FF9100","#F0EFEC"],"v.":["#0FA67F","#F0EFEC"],"phr.v.":["#D946A8","#F0EFEC"],"colloc.":["#D4A017","#F0EFEC"],"idiom":["#CC2936","#F0EFEC"],"phrase":["#7A7D8E","#F0EFEC"],"slang":["#7B3FF2","#F0EFEC"]};
 const POS_ORDER = ['n.','adj.','v.','phr.v.','colloc.','idiom','phrase','slang'];
@@ -255,11 +282,14 @@ function renderBrowse() {
   POS_ORDER.forEach(function(pos){
     if (!groups[pos]) return;
     var label = POS_LABELS[pos]||pos;
-    var fg = (POS_COLORS[pos]||['var(--muted)'])[0];
-    var bg = (POS_COLORS[pos]||['','var(--cream)'])[1];
+    var dotColor = (POS_COLORS[pos]||['var(--muted)'])[0];
+    var count = groups[pos].length;
     html += '<div class="pos-group collapsed">'
-      + '<div class="pos-subhead" style="color:var(--muted);background:'+bg+';border-left-color:'+fg+'" onclick="togglePos(this)">'
-      + label + '<span class="pos-chevron">&#9660;</span>'
+      + '<div class="pos-head" onclick="togglePos(this)">'
+      + '<span class="pos-dot" style="background:' + dotColor + '"></span>'
+      + '<span class="pos-label">' + label + '</span>'
+      + '<span class="pos-count">' + count + '</span>'
+      + '<span class="pos-chevron">&#9660;</span>'
       + '</div>'
       + '<div class="pos-body">';
     groups[pos].forEach(function(e){
