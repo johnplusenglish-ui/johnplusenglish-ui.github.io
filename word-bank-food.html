@@ -55,13 +55,16 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .cat-chevron{color:var(--accent);transition:transform .2s;font-size:.75rem;opacity:.7;flex-shrink:0}
 .cat-section.collapsed .cat-chevron{transform:rotate(-90deg)}
 .cat-section.collapsed .cat-body{display:none}
-.pos-group{margin-bottom:.1rem}
-.pos-subhead{font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;padding:.38rem 1rem .3rem;border-bottom:1px solid var(--border);border-top:1px solid var(--border);border-left:3px solid transparent;cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none}
-.pos-subhead:hover{filter:brightness(.96)}
-.pos-chevron{transition:transform .2s;font-size:.65rem;opacity:.6;flex-shrink:0}
+.pos-group{margin-bottom:0}
+.pos-head{display:flex;align-items:center;gap:.6rem;padding:.65rem 1rem;border-bottom:1px solid var(--border);cursor:pointer;user-select:none;transition:background .12s}
+.pos-head:hover{background:var(--cream)}
+.pos-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.pos-label{font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.pos-count{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--muted);margin-left:.2rem}
+.pos-chevron{margin-left:auto;font-size:.65rem;color:var(--muted);transition:transform .2s;opacity:.5}
 .pos-group.collapsed .pos-chevron{transform:rotate(-90deg)}
 .pos-group.collapsed .pos-body{display:none}
-.pos-group:first-child .pos-subhead{border-top:none}
+.pos-group:last-child .pos-head{border-bottom:none}
 .word-list{width:100%}
 .word-row{border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;padding:.5rem 1rem}
 .word-row:last-child{border-bottom:none}
@@ -222,6 +225,8 @@ tier1: [
     ['an acquired taste','idiom','something that you learn to enjoy over time, not immediately','Blue cheese is definitely an acquired taste.'],
     ['too many cooks spoil the broth','idiom','too many people involved in something can ruin it','Let her do it alone — too many cooks spoil the broth.'],
     ['peckish','adj.','slightly hungry (British informal)','I\'m a bit peckish — shall we grab something?'],
+    ['foodie','slang','a person who is enthusiastic about food and cooking','She\'s a real foodie — she\'ll travel an hour for a good restaurant.'],
+    ['grub','slang','food (informal, especially British)','Fancy some grub? I\'m starving.'],
   ],
   tier3: [
     ['gastronomy','n.','the art and science of good food and cooking','The region is famous for its gastronomy and wine.'],
@@ -237,7 +242,31 @@ tier1: [
   ],
 };
 
-const CONV_DATA = [];
+const CONV_DATA = [
+  {
+    group: 'Eating habits',
+    entries: [
+      { lines: [['A','<b>Do you cook much</b>?'],['B','Most nights, yeah. I try to make things from scratch when I can.']], note: '"From scratch" = made entirely from basic ingredients, not pre-made.' },
+      { lines: [['A','<b>Are you a foodie</b>?'],['B','Definitely. I\'ll travel across town for a good restaurant.']], note: '"A foodie" (slang) = someone who is enthusiastic about food.' },
+      { lines: [['A','<b>Do you eat out much</b>?'],['B','Less than I used to. We\'ve been cutting down on eating out to save money.']], note: '"Eat out" = to have a meal at a restaurant. "Cut down on" = to reduce.' },
+    ]
+  },
+  {
+    group: 'Describing food',
+    entries: [
+      { lines: [['A','<b>How was the meal</b>?'],['B','The starter was mouth-watering but the main was a bit bland, to be honest.']], note: '"Mouth-watering" = extremely appetising. "Bland" = lacking flavour.' },
+      { lines: [['A','<b>Do you have a sweet tooth</b>?'],['B','Absolutely. I can\'t resist chocolate — it\'s my weakness.']], note: '"Have a sweet tooth" = to have a strong liking for sweet food.' },
+      { lines: [['A','<b>What\'s your favourite cuisine</b>?'],['B','Japanese, without question. The freshness and the flavours are incredible.']], note: '"Cuisine" = a style of cooking associated with a country or region.' },
+    ]
+  },
+  {
+    group: 'Cooking and recipes',
+    entries: [
+      { lines: [['A','<b>Can you whip up a meal quickly</b>?'],['B','Pasta, yes. Anything more ambitious and I need a recipe.']], note: '"Whip up" = to quickly and easily prepare a meal.' },
+      { lines: [['A','How was dinner at your mum\'s?'],['B','Amazing, as always. We polished off the entire lasagne in about ten minutes.']], note: '"Polish off" = to finish all of a meal quickly.' },
+    ]
+  },
+];
 
 const POS_COLORS = {"n.":["#2176FF","#F0EFEC"],"adj.":["#FF9100","#F0EFEC"],"v.":["#0FA67F","#F0EFEC"],"phr.v.":["#D946A8","#F0EFEC"],"colloc.":["#D4A017","#F0EFEC"],"idiom":["#CC2936","#F0EFEC"],"phrase":["#7A7D8E","#F0EFEC"],"slang":["#7B3FF2","#F0EFEC"]};
 const POS_ORDER = ['n.','adj.','v.','phr.v.','colloc.','idiom','phrase','slang'];
@@ -259,11 +288,14 @@ function renderBrowse() {
   POS_ORDER.forEach(function(pos){
     if (!groups[pos]) return;
     var label = POS_LABELS[pos]||pos;
-    var fg = (POS_COLORS[pos]||['var(--muted)'])[0];
-    var bg = (POS_COLORS[pos]||['','var(--cream)'])[1];
+    var dotColor = (POS_COLORS[pos]||['var(--muted)'])[0];
+    var count = groups[pos].length;
     html += '<div class="pos-group collapsed">'
-      + '<div class="pos-subhead" style="color:var(--muted);background:'+bg+';border-left-color:'+fg+'" onclick="togglePos(this)">'
-      + label + '<span class="pos-chevron">&#9660;</span>'
+      + '<div class="pos-head" onclick="togglePos(this)">'
+      + '<span class="pos-dot" style="background:' + dotColor + '"></span>'
+      + '<span class="pos-label">' + label + '</span>'
+      + '<span class="pos-count">' + count + '</span>'
+      + '<span class="pos-chevron">&#9660;</span>'
       + '</div>'
       + '<div class="pos-body">';
     groups[pos].forEach(function(e){
