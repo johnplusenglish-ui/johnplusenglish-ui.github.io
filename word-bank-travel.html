@@ -55,13 +55,16 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .cat-chevron{color:var(--accent);transition:transform .2s;font-size:.75rem;opacity:.7;flex-shrink:0}
 .cat-section.collapsed .cat-chevron{transform:rotate(-90deg)}
 .cat-section.collapsed .cat-body{display:none}
-.pos-group{margin-bottom:.1rem}
-.pos-subhead{font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;padding:.38rem 1rem .3rem;border-bottom:1px solid var(--border);border-top:1px solid var(--border);border-left:3px solid transparent;cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none}
-.pos-subhead:hover{filter:brightness(.96)}
-.pos-chevron{transition:transform .2s;font-size:.65rem;opacity:.6;flex-shrink:0}
+.pos-group{margin-bottom:0}
+.pos-head{display:flex;align-items:center;gap:.6rem;padding:.65rem 1rem;border-bottom:1px solid var(--border);cursor:pointer;user-select:none;transition:background .12s}
+.pos-head:hover{background:var(--cream)}
+.pos-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.pos-label{font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.pos-count{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--muted);margin-left:.2rem}
+.pos-chevron{margin-left:auto;font-size:.65rem;color:var(--muted);transition:transform .2s;opacity:.5}
 .pos-group.collapsed .pos-chevron{transform:rotate(-90deg)}
 .pos-group.collapsed .pos-body{display:none}
-.pos-group:first-child .pos-subhead{border-top:none}
+.pos-group:last-child .pos-head{border-bottom:none}
 .word-list{width:100%}
 .word-row{border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;padding:.5rem 1rem}
 .word-row:last-child{border-bottom:none}
@@ -229,6 +232,8 @@ const DATA = {
     ['off the beaten track','idiom','away from popular tourist routes; in a remote or unusual place','They preferred destinations off the beaten track — away from the crowds.'],
     ['itchy feet','idiom','a strong desire to travel or move to a new place','She\'s had itchy feet since she was a teenager — she can\'t stay still for long.'],
     ['a hidden gem','idiom','a place or thing that is not well known but is of great quality or beauty','The restaurant was a real hidden gem — tucked away in a back street.'],
+    ['staycation','slang','a holiday spent at home or in your own country rather than abroad','We couldn\'t afford to fly anywhere, so we had a staycation instead.'],
+    ['FOMO','slang','fear of missing out — anxiety that others are having experiences you\'re not','Seeing everyone\'s holiday photos gives me serious FOMO.'],
   ],
   tier3: [
     ['infrastructure','n.','the basic physical systems of a country, such as roads, railways, and airports','The country\'s transport infrastructure was crumbling after decades of underinvestment.'],
@@ -299,11 +304,14 @@ function renderBrowse() {
   POS_ORDER.forEach(function(pos){
     if (!groups[pos]) return;
     var label = POS_LABELS[pos]||pos;
-    var fg = (POS_COLORS[pos]||['var(--muted)'])[0];
-    var bg = (POS_COLORS[pos]||['','var(--cream)'])[1];
+    var dotColor = (POS_COLORS[pos]||['var(--muted)'])[0];
+    var count = groups[pos].length;
     html += '<div class="pos-group collapsed">'
-      + '<div class="pos-subhead" style="color:var(--muted);background:'+bg+';border-left-color:'+fg+'" onclick="togglePos(this)">'
-      + label + '<span class="pos-chevron">&#9660;</span>'
+      + '<div class="pos-head" onclick="togglePos(this)">'
+      + '<span class="pos-dot" style="background:' + dotColor + '"></span>'
+      + '<span class="pos-label">' + label + '</span>'
+      + '<span class="pos-count">' + count + '</span>'
+      + '<span class="pos-chevron">&#9660;</span>'
       + '</div>'
       + '<div class="pos-body">';
     groups[pos].forEach(function(e){
