@@ -55,13 +55,16 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .cat-chevron{color:var(--accent);transition:transform .2s;font-size:.75rem;opacity:.7;flex-shrink:0}
 .cat-section.collapsed .cat-chevron{transform:rotate(-90deg)}
 .cat-section.collapsed .cat-body{display:none}
-.pos-group{margin-bottom:.1rem}
-.pos-subhead{font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;padding:.38rem 1rem .3rem;border-bottom:1px solid var(--border);border-top:1px solid var(--border);border-left:3px solid transparent;cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none}
-.pos-subhead:hover{filter:brightness(.96)}
-.pos-chevron{transition:transform .2s;font-size:.65rem;opacity:.6;flex-shrink:0}
+.pos-group{margin-bottom:0}
+.pos-head{display:flex;align-items:center;gap:.6rem;padding:.65rem 1rem;border-bottom:1px solid var(--border);cursor:pointer;user-select:none;transition:background .12s}
+.pos-head:hover{background:var(--cream)}
+.pos-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.pos-label{font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.pos-count{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--muted);margin-left:.2rem}
+.pos-chevron{margin-left:auto;font-size:.65rem;color:var(--muted);transition:transform .2s;opacity:.5}
 .pos-group.collapsed .pos-chevron{transform:rotate(-90deg)}
 .pos-group.collapsed .pos-body{display:none}
-.pos-group:first-child .pos-subhead{border-top:none}
+.pos-group:last-child .pos-head{border-bottom:none}
 .word-list{width:100%}
 .word-row{border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;padding:.5rem 1rem}
 .word-row:last-child{border-bottom:none}
@@ -219,6 +222,8 @@ tier1: [
     ['wear your heart on your sleeve','idiom','to show your emotions openly rather than hiding them','She\'s never been able to hide how she feels — she wears her heart on her sleeve.'],
     ['get on someone\'s nerves','idiom','to irritate or annoy someone','His constant humming really gets on my nerves.'],
     ['flaky','adj.','unreliable and often cancelling plans at the last moment (informal)','Don\'t count on him — he\'s incredibly flaky.'],
+    ['salty','slang','feeling bitter or resentful about something, often unfairly','He\'s still salty about not getting invited to the party.'],
+    ['vibe','slang','the general mood or atmosphere of a person, place, or situation','The restaurant had a really good vibe — very relaxed.'],
   ],
   tier3: [
     ['catharsis','n.','the process of releasing strong emotions to achieve emotional relief','Writing the letter was a kind of catharsis — she felt much better afterwards.'],
@@ -233,7 +238,31 @@ tier1: [
   ],
 };
 
-const CONV_DATA = [];
+const CONV_DATA = [
+  {
+    group: 'Describing feelings',
+    entries: [
+      { lines: [['A','<b>How are you feeling today</b>?'],['B','A bit out of sorts, to be honest. I didn\'t sleep well.']], note: '"Out of sorts" = slightly unwell or in a bad mood.' },
+      { lines: [['A','You seem really happy — <b>what\'s happened</b>?'],['B','I got the job! I\'m over the moon.']], note: '"Over the moon" = extremely happy and excited.' },
+      { lines: [['A','<b>Were you nervous</b> before the presentation?'],['B','I was a bundle of nerves. My hands were shaking.']], note: '"A bundle of nerves" = a person who is extremely anxious.' },
+    ]
+  },
+  {
+    group: 'Dealing with emotions',
+    entries: [
+      { lines: [['A','<b>How do you cope when you\'re stressed</b>?'],['B','I try not to bottle things up. Talking about it usually helps.']], note: '"Bottle up" = to suppress emotions rather than expressing them.' },
+      { lines: [['A','<b>Do you lose your temper easily</b>?'],['B','More than I should. I\'m trying to keep my cool, especially at work.']], note: '"Lose your temper" = to become very angry. "Keep your cool" = to stay calm.' },
+      { lines: [['A','He really <b>gets on my nerves</b> sometimes.'],['B','I know. But he\'s got a heart of gold underneath all that.']], note: '"Get on someone\'s nerves" = to irritate. "A heart of gold" = a very kind nature.' },
+    ]
+  },
+  {
+    group: 'Personality and character',
+    entries: [
+      { lines: [['A','<b>How would you describe yourself</b>?'],['B','Laid-back, mostly. It takes a lot to wind me up.']], note: '"Laid-back" = calm and relaxed. "Wind up" = to deliberately annoy.' },
+      { lines: [['A','<b>Is she always that stubborn</b>?'],['B','Always. Once she\'s made up her mind, there\'s no changing it.']], note: '"Stubborn" = refusing to change. "Made up her mind" = decided firmly.' },
+    ]
+  },
+];
 
 const POS_COLORS = {"n.":["#2176FF","#F0EFEC"],"adj.":["#FF9100","#F0EFEC"],"v.":["#0FA67F","#F0EFEC"],"phr.v.":["#D946A8","#F0EFEC"],"colloc.":["#D4A017","#F0EFEC"],"idiom":["#CC2936","#F0EFEC"],"phrase":["#7A7D8E","#F0EFEC"],"slang":["#7B3FF2","#F0EFEC"]};
 const POS_ORDER = ['n.','adj.','v.','phr.v.','colloc.','idiom','phrase','slang'];
@@ -255,11 +284,14 @@ function renderBrowse() {
   POS_ORDER.forEach(function(pos){
     if (!groups[pos]) return;
     var label = POS_LABELS[pos]||pos;
-    var fg = (POS_COLORS[pos]||['var(--muted)'])[0];
-    var bg = (POS_COLORS[pos]||['','var(--cream)'])[1];
+    var dotColor = (POS_COLORS[pos]||['var(--muted)'])[0];
+    var count = groups[pos].length;
     html += '<div class="pos-group collapsed">'
-      + '<div class="pos-subhead" style="color:var(--muted);background:'+bg+';border-left-color:'+fg+'" onclick="togglePos(this)">'
-      + label + '<span class="pos-chevron">&#9660;</span>'
+      + '<div class="pos-head" onclick="togglePos(this)">'
+      + '<span class="pos-dot" style="background:' + dotColor + '"></span>'
+      + '<span class="pos-label">' + label + '</span>'
+      + '<span class="pos-count">' + count + '</span>'
+      + '<span class="pos-chevron">&#9660;</span>'
       + '</div>'
       + '<div class="pos-body">';
     groups[pos].forEach(function(e){
