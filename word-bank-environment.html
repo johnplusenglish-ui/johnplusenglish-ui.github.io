@@ -55,13 +55,16 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .cat-chevron{color:var(--accent);transition:transform .2s;font-size:.75rem;opacity:.7;flex-shrink:0}
 .cat-section.collapsed .cat-chevron{transform:rotate(-90deg)}
 .cat-section.collapsed .cat-body{display:none}
-.pos-group{margin-bottom:.1rem}
-.pos-subhead{font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;padding:.38rem 1rem .3rem;border-bottom:1px solid var(--border);border-top:1px solid var(--border);border-left:3px solid transparent;cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none}
-.pos-subhead:hover{filter:brightness(.96)}
-.pos-chevron{transition:transform .2s;font-size:.65rem;opacity:.6;flex-shrink:0}
+.pos-group{margin-bottom:0}
+.pos-head{display:flex;align-items:center;gap:.6rem;padding:.65rem 1rem;border-bottom:1px solid var(--border);cursor:pointer;user-select:none;transition:background .12s}
+.pos-head:hover{background:var(--cream)}
+.pos-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.pos-label{font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.pos-count{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--muted);margin-left:.2rem}
+.pos-chevron{margin-left:auto;font-size:.65rem;color:var(--muted);transition:transform .2s;opacity:.5}
 .pos-group.collapsed .pos-chevron{transform:rotate(-90deg)}
 .pos-group.collapsed .pos-body{display:none}
-.pos-group:first-child .pos-subhead{border-top:none}
+.pos-group:last-child .pos-head{border-bottom:none}
 .word-list{width:100%}
 .word-row{border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;padding:.5rem 1rem}
 .word-row:last-child{border-bottom:none}
@@ -215,6 +218,7 @@ tier1: [
     ['wipe out','phr.v.','to completely destroy a population or species','Pollution has wiped out fish populations in several rivers.'],
     ['raise awareness','colloc.','to help people understand an environmental issue','The documentary raised awareness of plastic pollution in the oceans.'],
     ['the tip of the iceberg','idiom','a small visible part of a much larger hidden problem','The visible litter is just the tip of the iceberg.'],
+    ['tree hugger','slang','a person who is passionate about protecting the environment (often mildly mocking)','He called her a tree hugger, but she took it as a compliment.'],
   ],
   tier3: [
     ['carbon offset','n.','a reduction in emissions to compensate for emissions produced elsewhere','She paid for a carbon offset when booking her long-haul flight.'],
@@ -229,7 +233,24 @@ tier1: [
   ],
 };
 
-const CONV_DATA = [];
+const CONV_DATA = [
+  {
+    group: 'Climate and pollution',
+    entries: [
+      { lines: [['A','<b>Do you worry about climate change</b>?'],['B','Constantly. It\'s the defining issue of our generation.']], note: '"The defining issue" = the most important topic characterising an era.' },
+      { lines: [['A','<b>What\'s the biggest environmental problem</b> where you live?'],['B','Air pollution. The city centre is terrible, especially in summer.']], note: 'A natural open question for discussion. Leads well into follow-ups.' },
+      { lines: [['A','<b>Do you think enough is being done</b>?'],['B','Not nearly. Individual recycling is a drop in the ocean compared to what industry does.']], note: '"A drop in the ocean" = a very small and inadequate amount.' },
+    ]
+  },
+  {
+    group: 'Personal habits',
+    entries: [
+      { lines: [['A','<b>Have you tried to go green</b>?'],['B','A bit. I recycle, I take the train when I can, but I still fly too much.']], note: '"Go green" = to adopt more environmentally friendly habits.' },
+      { lines: [['A','<b>Do you think about your carbon footprint</b>?'],['B','More than I used to. I\'ve cut down on meat and I try not to throw away food.']], note: '"Carbon footprint" = total greenhouse gas emissions. "Cut down on" = reduce.' },
+      { lines: [['A','Would you call yourself a <b>tree hugger</b>?'],['B','Not exactly, but I do care. I just think the solutions need to be systemic, not individual.']], note: '"Tree hugger" (slang, often mildly mocking) = someone passionate about the environment.' },
+    ]
+  },
+];
 
 const POS_COLORS = {"n.":["#2176FF","#F0EFEC"],"adj.":["#FF9100","#F0EFEC"],"v.":["#0FA67F","#F0EFEC"],"phr.v.":["#D946A8","#F0EFEC"],"colloc.":["#D4A017","#F0EFEC"],"idiom":["#CC2936","#F0EFEC"],"phrase":["#7A7D8E","#F0EFEC"],"slang":["#7B3FF2","#F0EFEC"]};
 const POS_ORDER = ['n.','adj.','v.','phr.v.','colloc.','idiom','phrase','slang'];
@@ -251,11 +272,14 @@ function renderBrowse() {
   POS_ORDER.forEach(function(pos){
     if (!groups[pos]) return;
     var label = POS_LABELS[pos]||pos;
-    var fg = (POS_COLORS[pos]||['var(--muted)'])[0];
-    var bg = (POS_COLORS[pos]||['','var(--cream)'])[1];
+    var dotColor = (POS_COLORS[pos]||['var(--muted)'])[0];
+    var count = groups[pos].length;
     html += '<div class="pos-group collapsed">'
-      + '<div class="pos-subhead" style="color:var(--muted);background:'+bg+';border-left-color:'+fg+'" onclick="togglePos(this)">'
-      + label + '<span class="pos-chevron">&#9660;</span>'
+      + '<div class="pos-head" onclick="togglePos(this)">'
+      + '<span class="pos-dot" style="background:' + dotColor + '"></span>'
+      + '<span class="pos-label">' + label + '</span>'
+      + '<span class="pos-count">' + count + '</span>'
+      + '<span class="pos-chevron">&#9660;</span>'
       + '</div>'
       + '<div class="pos-body">';
     groups[pos].forEach(function(e){
