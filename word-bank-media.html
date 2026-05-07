@@ -55,13 +55,16 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .cat-chevron{color:var(--accent);transition:transform .2s;font-size:.75rem;opacity:.7;flex-shrink:0}
 .cat-section.collapsed .cat-chevron{transform:rotate(-90deg)}
 .cat-section.collapsed .cat-body{display:none}
-.pos-group{margin-bottom:.1rem}
-.pos-subhead{font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;padding:.38rem 1rem .3rem;border-bottom:1px solid var(--border);border-top:1px solid var(--border);border-left:3px solid transparent;cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none}
-.pos-subhead:hover{filter:brightness(.96)}
-.pos-chevron{transition:transform .2s;font-size:.65rem;opacity:.6;flex-shrink:0}
+.pos-group{margin-bottom:0}
+.pos-head{display:flex;align-items:center;gap:.6rem;padding:.65rem 1rem;border-bottom:1px solid var(--border);cursor:pointer;user-select:none;transition:background .12s}
+.pos-head:hover{background:var(--cream)}
+.pos-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.pos-label{font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.pos-count{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--muted);margin-left:.2rem}
+.pos-chevron{margin-left:auto;font-size:.65rem;color:var(--muted);transition:transform .2s;opacity:.5}
 .pos-group.collapsed .pos-chevron{transform:rotate(-90deg)}
 .pos-group.collapsed .pos-body{display:none}
-.pos-group:first-child .pos-subhead{border-top:none}
+.pos-group:last-child .pos-head{border-bottom:none}
 .word-list{width:100%}
 .word-row{border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;padding:.5rem 1rem}
 .word-row:last-child{border-bottom:none}
@@ -213,6 +216,8 @@ tier1: [
     ['freedom of the press','colloc.','the right of journalists to report without government interference','Freedom of the press is a cornerstone of any democracy.'],
     ['take with a pinch of salt','idiom','to not fully believe something because it may be exaggerated','Anything you read in the tabloids should be taken with a pinch of salt.'],
     ['no smoke without fire','idiom','if something is being said, there is probably some truth to it','I\'m not sure I believe all of it, but there\'s no smoke without fire.'],
+    ['clickbait','slang','online content with a misleading headline designed to attract clicks','The article was pure clickbait — the headline had nothing to do with the story.'],
+    ['troll','slang','a person who deliberately posts provocative or offensive content online','Don\'t feed the trolls — just ignore them.'],
   ],
   tier3: [
     ['propaganda','n.','information used to promote a particular political viewpoint, often misleadingly','The documentary explored how propaganda was used during the war.'],
@@ -226,7 +231,24 @@ tier1: [
   ],
 };
 
-const CONV_DATA = [];
+const CONV_DATA = [
+  {
+    group: 'News and media habits',
+    entries: [
+      { lines: [['A','<b>How do you keep up with the news</b>?'],['B','Mostly online. I scroll through a couple of apps in the morning.']], note: '"Keep up with" = to stay informed about current events.' },
+      { lines: [['A','<b>Do you trust the media</b>?'],['B','Some outlets more than others. You have to take a lot of it with a pinch of salt.']], note: '"Take with a pinch of salt" = to not fully believe something.' },
+      { lines: [['A','<b>Do you think the news is too negative</b>?'],['B','Definitely. It\'s all doom and gloom — no wonder people switch off.']], note: '"Doom and gloom" = a feeling of hopelessness. "Switch off" = to stop paying attention.' },
+    ]
+  },
+  {
+    group: 'Social media and misinformation',
+    entries: [
+      { lines: [['A','<b>Do you worry about fake news</b>?'],['B','A lot, actually. It spreads like wildfire before anyone fact-checks it.']], note: '"Spread like wildfire" = to become known very quickly. "Fact-check" = to verify accuracy.' },
+      { lines: [['A','<b>Have you ever fallen for clickbait</b>?'],['B','More times than I\'d like to admit. The headlines are designed to mislead.']], note: '"Clickbait" (slang) = content with misleading headlines to attract clicks.' },
+      { lines: [['A','<b>What do you think about online trolls</b>?'],['B','They\'re a real problem. The anonymity brings out the worst in people.']], note: '"Troll" (slang) = someone who posts provocative content to upset others.' },
+    ]
+  },
+];
 
 const POS_COLORS = {"n.":["#2176FF","#F0EFEC"],"adj.":["#FF9100","#F0EFEC"],"v.":["#0FA67F","#F0EFEC"],"phr.v.":["#D946A8","#F0EFEC"],"colloc.":["#D4A017","#F0EFEC"],"idiom":["#CC2936","#F0EFEC"],"phrase":["#7A7D8E","#F0EFEC"],"slang":["#7B3FF2","#F0EFEC"]};
 const POS_ORDER = ['n.','adj.','v.','phr.v.','colloc.','idiom','phrase','slang'];
@@ -248,11 +270,14 @@ function renderBrowse() {
   POS_ORDER.forEach(function(pos){
     if (!groups[pos]) return;
     var label = POS_LABELS[pos]||pos;
-    var fg = (POS_COLORS[pos]||['var(--muted)'])[0];
-    var bg = (POS_COLORS[pos]||['','var(--cream)'])[1];
+    var dotColor = (POS_COLORS[pos]||['var(--muted)'])[0];
+    var count = groups[pos].length;
     html += '<div class="pos-group collapsed">'
-      + '<div class="pos-subhead" style="color:var(--muted);background:'+bg+';border-left-color:'+fg+'" onclick="togglePos(this)">'
-      + label + '<span class="pos-chevron">&#9660;</span>'
+      + '<div class="pos-head" onclick="togglePos(this)">'
+      + '<span class="pos-dot" style="background:' + dotColor + '"></span>'
+      + '<span class="pos-label">' + label + '</span>'
+      + '<span class="pos-count">' + count + '</span>'
+      + '<span class="pos-chevron">&#9660;</span>'
       + '</div>'
       + '<div class="pos-body">';
     groups[pos].forEach(function(e){
