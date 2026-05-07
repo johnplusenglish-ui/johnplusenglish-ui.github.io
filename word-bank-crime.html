@@ -55,13 +55,16 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .cat-chevron{color:var(--accent);transition:transform .2s;font-size:.75rem;opacity:.7;flex-shrink:0}
 .cat-section.collapsed .cat-chevron{transform:rotate(-90deg)}
 .cat-section.collapsed .cat-body{display:none}
-.pos-group{margin-bottom:.1rem}
-.pos-subhead{font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;padding:.38rem 1rem .3rem;border-bottom:1px solid var(--border);border-top:1px solid var(--border);border-left:3px solid transparent;cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none}
-.pos-subhead:hover{filter:brightness(.96)}
-.pos-chevron{transition:transform .2s;font-size:.65rem;opacity:.6;flex-shrink:0}
+.pos-group{margin-bottom:0}
+.pos-head{display:flex;align-items:center;gap:.6rem;padding:.65rem 1rem;border-bottom:1px solid var(--border);cursor:pointer;user-select:none;transition:background .12s}
+.pos-head:hover{background:var(--cream)}
+.pos-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.pos-label{font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.pos-count{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--muted);margin-left:.2rem}
+.pos-chevron{margin-left:auto;font-size:.65rem;color:var(--muted);transition:transform .2s;opacity:.5}
 .pos-group.collapsed .pos-chevron{transform:rotate(-90deg)}
 .pos-group.collapsed .pos-body{display:none}
-.pos-group:first-child .pos-subhead{border-top:none}
+.pos-group:last-child .pos-head{border-bottom:none}
 .word-list{width:100%}
 .word-row{border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;padding:.5rem 1rem}
 .word-row:last-child{border-bottom:none}
@@ -218,6 +221,8 @@ tier1: [
     ['take the law into your own hands','idiom','to punish someone yourself instead of calling the police','You can\'t take the law into your own hands, however angry you are.'],
     ['behind bars','idiom','in prison','He spent ten years behind bars before being released.'],
     ['above the law','idiom','not subject to the same rules as everyone else','Nobody should be above the law, regardless of their status.'],
+    ['dodgy','slang','suspicious, dishonest, or of poor quality (British informal)','The whole deal sounded dodgy — I wouldn\'t trust him.'],
+    ['grass','slang','to inform the police about someone\'s criminal activity (British informal)','Someone grassed on him and he got arrested the next day.'],
   ],
   tier3: [
     ['rehabilitation','n.','the process of helping someone reintegrate into society after prison','The programme focuses on rehabilitation rather than punishment.'],
@@ -231,7 +236,24 @@ tier1: [
   ],
 };
 
-const CONV_DATA = [];
+const CONV_DATA = [
+  {
+    group: 'Talking about crime',
+    entries: [
+      { lines: [['A','<b>Do you think crime is getting worse</b>?'],['B','Petty crime, maybe. But violent crime has actually dropped in most countries.']], note: '"Petty crime" = minor, non-violent crime like shoplifting or vandalism.' },
+      { lines: [['A','Did you hear about the <b>robbery</b> on the high street?'],['B','Yes — broad daylight, apparently. They got away with it too.']], note: '"Get away with" = to avoid punishment. "Broad daylight" = in the middle of the day.' },
+      { lines: [['A','<b>Have you ever been a victim of crime</b>?'],['B','My phone was stolen on the metro once. I didn\'t even notice until later.']], note: 'A sensitive but natural conversation topic at B2+ level.' },
+    ]
+  },
+  {
+    group: 'Justice and punishment',
+    entries: [
+      { lines: [['A','<b>Do you think prison works</b>?'],['B','For dangerous people, yes. But for minor offences, rehabilitation makes more sense.']], note: '"Rehabilitation" = helping someone reintegrate into society after prison.' },
+      { lines: [['A','<b>Should the punishment always fit the crime</b>?'],['B','In theory. But some people are let off far too lightly.']], note: '"Let off" = to give someone little or no punishment.' },
+      { lines: [['A','<b>What about white-collar crime</b>?'],['B','It\'s rarely punished properly. People behind bars for theft while fraudsters walk free.']], note: '"White-collar crime" = non-violent crime by professionals. "Behind bars" = in prison.' },
+    ]
+  },
+];
 
 const POS_COLORS = {"n.":["#2176FF","#F0EFEC"],"adj.":["#FF9100","#F0EFEC"],"v.":["#0FA67F","#F0EFEC"],"phr.v.":["#D946A8","#F0EFEC"],"colloc.":["#D4A017","#F0EFEC"],"idiom":["#CC2936","#F0EFEC"],"phrase":["#7A7D8E","#F0EFEC"],"slang":["#7B3FF2","#F0EFEC"]};
 const POS_ORDER = ['n.','adj.','v.','phr.v.','colloc.','idiom','phrase','slang'];
@@ -253,11 +275,14 @@ function renderBrowse() {
   POS_ORDER.forEach(function(pos){
     if (!groups[pos]) return;
     var label = POS_LABELS[pos]||pos;
-    var fg = (POS_COLORS[pos]||['var(--muted)'])[0];
-    var bg = (POS_COLORS[pos]||['','var(--cream)'])[1];
+    var dotColor = (POS_COLORS[pos]||['var(--muted)'])[0];
+    var count = groups[pos].length;
     html += '<div class="pos-group collapsed">'
-      + '<div class="pos-subhead" style="color:var(--muted);background:'+bg+';border-left-color:'+fg+'" onclick="togglePos(this)">'
-      + label + '<span class="pos-chevron">&#9660;</span>'
+      + '<div class="pos-head" onclick="togglePos(this)">'
+      + '<span class="pos-dot" style="background:' + dotColor + '"></span>'
+      + '<span class="pos-label">' + label + '</span>'
+      + '<span class="pos-count">' + count + '</span>'
+      + '<span class="pos-chevron">&#9660;</span>'
       + '</div>'
       + '<div class="pos-body">';
     groups[pos].forEach(function(e){
