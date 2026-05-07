@@ -55,13 +55,16 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .cat-chevron{color:var(--accent);transition:transform .2s;font-size:.75rem;opacity:.7;flex-shrink:0}
 .cat-section.collapsed .cat-chevron{transform:rotate(-90deg)}
 .cat-section.collapsed .cat-body{display:none}
-.pos-group{margin-bottom:.1rem}
-.pos-subhead{font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;padding:.38rem 1rem .3rem;border-bottom:1px solid var(--border);border-top:1px solid var(--border);border-left:3px solid transparent;cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none}
-.pos-subhead:hover{filter:brightness(.96)}
-.pos-chevron{transition:transform .2s;font-size:.65rem;opacity:.6;flex-shrink:0}
+.pos-group{margin-bottom:0}
+.pos-head{display:flex;align-items:center;gap:.6rem;padding:.65rem 1rem;border-bottom:1px solid var(--border);cursor:pointer;user-select:none;transition:background .12s}
+.pos-head:hover{background:var(--cream)}
+.pos-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.pos-label{font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.pos-count{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--muted);margin-left:.2rem}
+.pos-chevron{margin-left:auto;font-size:.65rem;color:var(--muted);transition:transform .2s;opacity:.5}
 .pos-group.collapsed .pos-chevron{transform:rotate(-90deg)}
 .pos-group.collapsed .pos-body{display:none}
-.pos-group:first-child .pos-subhead{border-top:none}
+.pos-group:last-child .pos-head{border-bottom:none}
 .word-list{width:100%}
 .word-row{border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;padding:.5rem 1rem}
 .word-row:last-child{border-bottom:none}
@@ -222,6 +225,8 @@ tier1: [
     ['money doesn\'t grow on trees','idiom','used to say that money is limited and should not be wasted','I can\'t buy you everything — money doesn\'t grow on trees.'],
     ['cost an arm and a leg','idiom','to be extremely expensive','The hotel was beautiful but it cost an arm and a leg.'],
     ['break the bank','idiom','to be very expensive; to use up all your money','A weekend away doesn\'t have to break the bank.'],
+    ['skint','slang','having no money at all (British informal)','I can\'t come out tonight — I\'m completely skint.'],
+    ['a rip-off','slang','something that is outrageously overpriced','Eight euros for a coffee? What a rip-off.'],
   ],
   tier3: [
     ['austerity','n.','a policy of reduced government spending and economic restriction','Years of austerity left public services severely underfunded.'],
@@ -236,7 +241,31 @@ tier1: [
   ],
 };
 
-const CONV_DATA = [];
+const CONV_DATA = [
+  {
+    group: 'Everyday money talk',
+    entries: [
+      { lines: [['A','<b>How do you manage your money</b>?'],['B','I try to put aside a bit each month, but it\'s hard with the bills.']], note: '"Put aside" = to save regularly for future use.' },
+      { lines: [['A','<b>Do you stick to a budget</b>?'],['B','I try. We\'ve had to tighten our belts since the rent went up.']], note: '"Tighten your belt" = to spend less because you have less money.' },
+      { lines: [['A','<b>Are you a saver or a spender</b>?'],['B','A spender, unfortunately. Money burns a hole in my pocket.']], note: '"Burns a hole in your pocket" = makes you want to spend it immediately.' },
+    ]
+  },
+  {
+    group: 'Cost of living',
+    entries: [
+      { lines: [['A','<b>Have you noticed prices going up</b>?'],['B','Everything\'s gone through the roof. The weekly shop costs a fortune now.']], note: '"Gone through the roof" = increased dramatically. "Cost a fortune" = be very expensive.' },
+      { lines: [['A','<b>How do people manage on a low income</b>?'],['B','A lot of families are struggling to make ends meet.']], note: '"Make ends meet" = to have just enough money to cover basic needs.' },
+      { lines: [['A','I\'m completely <b>skint</b> until payday.'],['B','Same. I\'ve been living off pasta for three days.']], note: '"Skint" (British slang) = having no money at all.' },
+    ]
+  },
+  {
+    group: 'Big purchases and debt',
+    entries: [
+      { lines: [['A','<b>Are you thinking about buying a flat</b>?'],['B','I\'d love to, but a mortgage feels terrifying. The deposits cost an arm and a leg.']], note: '"Cost an arm and a leg" = to be extremely expensive.' },
+      { lines: [['A','<b>Do you have any debt</b>?'],['B','Student loan, mostly. I\'m paying it off slowly but it\'ll take years.']], note: '"Pay off" = to finish paying a debt in full.' },
+    ]
+  },
+];
 
 const POS_COLORS = {"n.":["#2176FF","#F0EFEC"],"adj.":["#FF9100","#F0EFEC"],"v.":["#0FA67F","#F0EFEC"],"phr.v.":["#D946A8","#F0EFEC"],"colloc.":["#D4A017","#F0EFEC"],"idiom":["#CC2936","#F0EFEC"],"phrase":["#7A7D8E","#F0EFEC"],"slang":["#7B3FF2","#F0EFEC"]};
 const POS_ORDER = ['n.','adj.','v.','phr.v.','colloc.','idiom','phrase','slang'];
@@ -258,11 +287,14 @@ function renderBrowse() {
   POS_ORDER.forEach(function(pos){
     if (!groups[pos]) return;
     var label = POS_LABELS[pos]||pos;
-    var fg = (POS_COLORS[pos]||['var(--muted)'])[0];
-    var bg = (POS_COLORS[pos]||['','var(--cream)'])[1];
+    var dotColor = (POS_COLORS[pos]||['var(--muted)'])[0];
+    var count = groups[pos].length;
     html += '<div class="pos-group collapsed">'
-      + '<div class="pos-subhead" style="color:var(--muted);background:'+bg+';border-left-color:'+fg+'" onclick="togglePos(this)">'
-      + label + '<span class="pos-chevron">&#9660;</span>'
+      + '<div class="pos-head" onclick="togglePos(this)">'
+      + '<span class="pos-dot" style="background:' + dotColor + '"></span>'
+      + '<span class="pos-label">' + label + '</span>'
+      + '<span class="pos-count">' + count + '</span>'
+      + '<span class="pos-chevron">&#9660;</span>'
       + '</div>'
       + '<div class="pos-body">';
     groups[pos].forEach(function(e){
