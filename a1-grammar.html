@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A1 Grammar — JohnPlusEnglish</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --sky:#2176FF;--sea:#1DD3B0;--coral:#FF6B6B;--sun:#FFB347;--lav:#9B72CF;
+  --cream:#F7F6F3;--ink:#2D3047;--ink2:#4A4E6B;--ink3:#8B8FA8;
+  --a1:#2176FF;--a1bg:#EEF4FF;--a1dark:#0C44A0;
+  --radius:14px;--radius-sm:8px;
+  --card-shadow:0 1px 3px rgba(45,48,71,.07),0 4px 16px rgba(45,48,71,.05);
+}
+body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;font-size:15px}
+.topnav{display:flex;align-items:center;justify-content:space-between;padding:13px 32px;background:#fff;border-bottom:1px solid #E8E6E0;position:sticky;top:0;z-index:200;}
+.logo{font-weight:900;font-size:17px;letter-spacing:-0.02em}
+.logo span{color:var(--sky)}
+.nav-back{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--ink3);cursor:pointer;padding:6px 12px;border-radius:20px;border:1px solid #E8E6E0;background:transparent;transition:all .15s;font-family:'Outfit',sans-serif;}
+.nav-back:hover{background:var(--cream);color:var(--ink)}
+.nav-breadcrumb{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink3)}
+.nav-breadcrumb span{color:var(--sky);font-weight:600}
+.nav-breadcrumb .sep{opacity:.4;color:var(--ink3)}
+.layout{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 53px)}
+.sidebar{background:#fff;border-right:1px solid #E8E6E0;position:sticky;top:53px;height:calc(100vh - 53px);overflow-y:auto;display:flex;flex-direction:column;}
+.sidebar-head{padding:20px 20px 14px;border-bottom:1px solid #F0EEE8;}
+.level-pill{display:inline-flex;align-items:center;gap:5px;background:var(--a1bg);color:var(--a1);font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:4px 10px;border-radius:20px;margin-bottom:10px;}
+.sidebar-head h2{font-size:16px;font-weight:700;letter-spacing:-.02em;color:var(--ink)}
+.sidebar-head p{font-size:12px;color:var(--ink3);margin-top:3px;line-height:1.45}
+.topic-nav{padding:8px 0;flex:1}
+.topic-link{display:flex;align-items:center;gap:10px;padding:10px 20px;cursor:pointer;transition:background .12s;border:none;background:transparent;width:100%;text-align:left;font-family:'Outfit',sans-serif;}
+.topic-link:hover{background:#F7F6F3}
+.topic-link.active{background:var(--a1bg)}
+.topic-link.done .tl-check{background:var(--sea);border-color:var(--sea);color:#fff}
+.tl-num{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink3);width:16px;flex-shrink:0}
+.tl-check{width:18px;height:18px;border-radius:50%;border:1.5px solid #D4D2CA;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;color:var(--sea);transition:all .2s;}
+.topic-link.active .tl-check{border-color:var(--a1)}
+.tl-name{font-size:13px;color:var(--ink2);font-weight:400;line-height:1.3}
+.topic-link.active .tl-name{color:var(--a1);font-weight:600}
+.topic-link.done .tl-name{color:var(--ink3)}
+.sidebar-foot{padding:14px 20px;border-top:1px solid #F0EEE8;display:flex;align-items:center;justify-content:space-between;}
+.prog-bar{flex:1;height:4px;background:#E8E6E0;border-radius:2px;margin-right:10px;overflow:hidden}
+.prog-fill{height:100%;background:var(--sea);border-radius:2px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.prog-text{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--ink3);white-space:nowrap}
+.main{padding:0;overflow:hidden}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.lesson-hero{padding:36px 40px 28px;border-bottom:1px solid #E8E6E0;background:linear-gradient(135deg,#fff 0%,#F2F7FF 100%);}
+.lesson-meta{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.tag{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 10px;border-radius:20px}
+.tag-a1{background:var(--a1bg);color:var(--a1)}
+.lesson-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink3)}
+.lesson-hero h1{font-size:32px;font-weight:900;letter-spacing:-.03em;color:var(--ink);line-height:1.1;margin-bottom:8px}
+.lesson-hero p{font-size:15px;color:var(--ink2);line-height:1.6;max-width:580px}
+.lesson-toolbar{display:flex;align-items:center;gap:8px;margin-top:20px;}
+.btn{font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;padding:8px 18px;border-radius:20px;border:none;cursor:pointer;transition:all .15s}
+.btn-primary{background:var(--sky);color:#fff}
+.btn-primary:hover{background:#1a6ae8;transform:translateY(-1px)}
+.btn-ghost{background:#fff;color:var(--ink2);border:1px solid #E0DED8}
+.btn-ghost:hover{background:var(--cream)}
+.btn-done{background:var(--sea);color:#fff}
+.btn-done:hover{background:#17b89e;transform:translateY(-1px)}
+.lesson-body{padding:32px 40px;display:flex;flex-direction:column;gap:8px}
+.section-label{display:flex;align-items:center;gap:10px;margin-bottom:0;margin-top:8px;padding:9px 14px;background:var(--ink);border-radius:6px;cursor:pointer;user-select:none;transition:background .15s;}
+.section-label:hover{background:#2D3047}
+.btn-toggle-all{font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;color:var(--ink3);background:transparent;border:1px solid #D8D6D0;border-radius:20px;padding:5px 14px;cursor:pointer;transition:all .15s;}
+.btn-toggle-all:hover{background:var(--cream);color:var(--ink);border-color:#B0AEA6;}
+.section-label-chevron{margin-left:auto;display:flex;align-items:center;color:rgba(255,255,255,.5);transition:transform .2s;}
+.section-label.collapsed .section-label-chevron{transform:rotate(-90deg)}
+.section-body{overflow:hidden;transition:max-height .25s ease,opacity .2s ease,margin-top .2s ease;max-height:2000px;opacity:1;margin-top:14px;}
+.section-body.collapsed{max-height:0;opacity:0;margin-top:0;}
+.section-label-icon{display:flex;align-items:center;color:#fff;flex-shrink:0}
+.section-label h2{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#fff}
+.explain-card{background:#fff;border-radius:var(--radius);border:1px solid #E8E6E0;padding:22px 24px;box-shadow:var(--card-shadow);}
+.explain-lead{font-size:16px;font-weight:600;color:var(--ink);line-height:1.55;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid #F0EEE8;}
+.explain-lead em{font-style:normal;color:var(--sky);font-weight:700}
+.explain-body{font-size:14px;color:var(--ink2);line-height:1.7}
+.explain-body p{margin-bottom:10px}
+.explain-body p:last-child{margin-bottom:0}
+.form-table{width:100%;border-collapse:collapse;font-size:14px}
+.form-table th{background:#EEF2FF;color:var(--ink);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.06em;padding:10px 14px;text-align:left;}
+.form-table th:first-child{border-radius:8px 0 0 0}
+.form-table th:last-child{border-radius:0 8px 0 0}
+.form-table td{padding:11px 14px;border-bottom:1px solid #F0EEE8;color:var(--ink2);font-size:14px}
+.form-table tr:last-child td{border-bottom:none}
+.form-table tr:nth-child(even) td{background:#FAFAF8}
+.form-table .subject{font-weight:700;color:var(--ink)}
+.form-table .form{color:var(--ink2)}
+.form-table .neg{color:var(--ink2)}
+.form-table .example{color:var(--ink2);font-style:italic}
+.form-table .example{color:var(--ink2);font-style:italic}
+.examples-grid{display:grid;gap:10px}
+.example-item{background:#fff;border-radius:var(--radius-sm);border:1px solid #E8E6E0;padding:14px 16px;display:flex;align-items:flex-start;gap:12px;}
+.ex-marker{width:22px;height:22px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-top:1px;}
+.ex-marker.pos{background:#E8F8F5;color:var(--sea)}
+.ex-marker.neg{background:#FFF0F0;color:var(--coral)}
+.ex-marker.q{background:var(--a1bg);color:var(--sky)}
+.ex-eng{font-size:14px;font-weight:600;color:var(--ink)}
+.ex-note{font-size:12px;color:var(--ink3);margin-top:2px}
+.error-card{background:#fff;border-radius:var(--radius);padding:20px 22px;border:1px solid #E0DED8;}
+.error-card h3{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--ink3);margin-bottom:14px}
+.error-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px}
+.error-bad,.error-good{border-radius:var(--radius-sm);padding:11px 14px}
+.error-bad{background:#FFF5F5;border:1px solid #FCDADA}
+.error-good{background:#F0FBF8;border:1px solid #C0EDE4}
+.error-label{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px;display:flex;align-items:center;gap:5px}
+.error-bad .error-label{color:var(--coral)}
+.error-good .error-label{color:#0F7A6A}
+.error-text{font-size:14px;color:var(--ink);font-weight:500;font-style:italic}
+.error-bad .error-text{color:#B84040}
+.error-good .error-text{color:#0F5A4A}
+.error-reason{font-size:13px;color:var(--ink3);margin-top:10px;margin-bottom:4px;grid-column:1/-1;padding:0 2px}
+.exercise-card{background:#fff;border-radius:var(--radius);border:1px solid #E8E6E0;overflow:hidden;box-shadow:var(--card-shadow);}
+.ex-card-header{padding:16px 20px;border-bottom:1px solid #F0EEE8;display:flex;align-items:center;justify-content:space-between;}
+.ex-card-title{font-size:14px;font-weight:700;color:var(--ink)}
+.ex-card-sub{font-size:12px;color:var(--ink3);margin-top:2px}
+.ex-type-badge{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 10px;border-radius:20px;background:#F0F0F0;color:var(--ink3)}
+.ex-card-body{padding:20px}
+.gap-sentence{font-size:15px;color:var(--ink);line-height:2.4;margin-bottom:4px;display:flex;align-items:baseline;flex-wrap:wrap;gap:4px;}
+.gap-sentence:last-child{margin-bottom:0}
+.gap-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink3);margin-right:4px}
+.gap-input{display:inline-block;border:none;border-bottom:2px dashed #BBAEF0;background:transparent;font-family:'Outfit',sans-serif;font-weight:600;font-size:15px;color:var(--ink);outline:none;padding:2px 6px;transition:all .15s;text-align:center;vertical-align:baseline;}
+.gap-input:focus{border-bottom-color:var(--sky);background:rgba(33,118,255,.05);}
+.gap-input.correct{color:#3FB87A;border-bottom-color:var(--sea);border-bottom-style:solid;background:rgba(29,211,176,.08);}
+.gap-input.wrong{color:var(--coral);border-bottom-color:var(--coral);border-bottom-style:solid;background:rgba(239,35,60,.06);}
+.gap-wrap{display:inline-flex;flex-direction:column;align-items:center;gap:0;vertical-align:baseline}
+.gap-reveal{font-size:11px;color:var(--sea);font-weight:600;font-family:'JetBrains Mono',monospace;height:14px;opacity:0;transition:opacity .2s}
+.gap-reveal.show{opacity:1}
+.mc-question{margin-bottom:20px}
+.mc-question:last-child{margin-bottom:0}
+.mc-text{font-size:14px;color:var(--ink);margin-bottom:10px;font-weight:500}
+.mc-options{display:flex;flex-wrap:wrap;gap:8px}
+.mc-opt{font-family:'Outfit',sans-serif;font-size:13px;padding:7px 16px;border-radius:20px;border:1.5px solid #E0DED8;background:#fff;cursor:pointer;transition:all .15s;color:var(--ink2);}
+.mc-opt:hover{border-color:var(--sky);color:var(--sky);background:var(--a1bg)}
+.mc-opt.correct-ans{border-color:var(--sea);background:#E8F8F5;color:#0F7A6A;font-weight:600}
+.mc-opt.wrong-ans{border-color:var(--coral);background:#FFF0F0;color:#B84040}
+.mc-feedback{font-size:12px;margin-top:8px;padding:8px 12px;border-radius:6px;display:none}
+.mc-feedback.show{display:block}
+.mc-feedback.ok{background:#E8F8F5;color:#0F7A6A}
+.mc-feedback.bad{background:#FFF0F0;color:#B84040}
+.ec-item{margin-bottom:16px}
+.ec-item:last-child{margin-bottom:0}
+.ec-sentence{font-size:14px;background:#FFF8F0;border:1px solid #FFD8B0;border-radius:var(--radius-sm);padding:11px 14px;color:var(--ink);font-weight:500;margin-bottom:8px;}
+.ec-input-row{display:flex;gap:8px;align-items:center}
+.ec-input{flex:1;border:1.5px solid #E0DED8;border-radius:var(--radius-sm);padding:9px 13px;font-family:'Outfit',sans-serif;font-size:14px;color:var(--ink);outline:none;transition:border-color .15s;background:#fff;}
+.ec-input:focus{border-color:var(--sky)}
+.ec-input.correct{border-color:var(--sea);background:#F0FBF8}
+.ec-input.wrong{border-color:var(--coral);background:#FFF5F5}
+.check-row{display:flex;gap:8px;margin-top:16px}
+.btn-check{background:var(--sky);color:#fff;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;padding:9px 20px;border-radius:20px;border:none;cursor:pointer;transition:all .15s}
+.btn-check:hover{background:#1a6ae8}
+.btn-reset{background:var(--cream);color:var(--ink3);font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;padding:9px 16px;border-radius:20px;border:1px solid #E0DED8;cursor:pointer;transition:all .15s}
+.btn-reset:hover{background:#EDEBE5;color:var(--ink)}
+.score-badge{display:none;align-items:center;gap:6px;font-size:13px;font-weight:700;padding:6px 14px;border-radius:20px;margin-top:12px;}
+.score-badge.show{display:inline-flex}
+.score-badge.full{background:#E8F8F5;color:#0F7A6A}
+.score-badge.partial{background:#FFF8E8;color:#8B6000}
+.score-badge.low{background:#FFF0F0;color:#B84040}
+.lesson-footer{padding:24px 40px;border-top:1px solid #E8E6E0;display:flex;align-items:center;justify-content:space-between;background:#fff;}
+.footer-hint{font-size:12px;color:var(--ink3)}
+.footer-nav{display:flex;gap:8px}
+.real-use{background:linear-gradient(135deg,var(--a1bg) 0%,#F8F0FF 100%);border-radius:var(--radius);border:1px solid #C8DEFF;padding:20px 24px;}
+.real-use h3{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--sky);margin-bottom:12px}
+.real-use ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.real-use li{font-size:13px;color:var(--ink2);line-height:1.6;padding-left:20px;position:relative;}
+.real-use li::before{content:'→';position:absolute;left:0;color:var(--sky);font-weight:700}
+
+/* ── JOHN\'S TIP ── */
+.johns-tip{
+  background:#FFFBF0;border:1.5px solid #FFD97A;border-radius:var(--radius);
+  padding:18px 20px;display:flex;gap:14px;align-items:flex-start;
+}
+.tip-avatar{
+  width:36px;height:36px;border-radius:50%;background:var(--sky);color:#fff;
+  font-size:14px;font-weight:900;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;letter-spacing:-.02em;
+}
+.tip-body{}
+.tip-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#B8860B;margin-bottom:5px}
+.tip-text{font-size:13px;color:#5A4500;line-height:1.65}
+.tip-text strong{color:#3A2D00;font-weight:700}
+
+@media(max-width:768px){
+  .layout{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .lesson-hero{padding:24px 20px 20px}
+  .lesson-body{padding:24px 20px}
+  .lesson-footer{padding:16px 20px}
+  .error-row{grid-template-columns:1fr}
+}
+
+/* ── SENTENCE BUILDER ── */
+.sb-bank{display:flex;flex-wrap:wrap;gap:8px;min-height:44px;padding:12px;background:var(--cream);border-radius:var(--radius-sm);border:1px solid #E0DED8;margin-bottom:12px;}
+.sb-word{font-family:'Outfit',sans-serif;font-size:14px;font-weight:500;padding:6px 14px;background:#fff;border:1.5px solid #E0DED8;border-radius:20px;cursor:pointer;transition:all .15s;color:var(--ink2);user-select:none;}
+.sb-word:hover{border-color:var(--sky);color:var(--sky)}
+.sb-word.used{opacity:.3;pointer-events:none;}
+.sb-slot{display:flex;flex-wrap:wrap;gap:8px;min-height:48px;padding:10px 12px;border:2px dashed #C8DEFF;border-radius:var(--radius-sm);background:#FAFCFF;margin-bottom:12px;align-items:center;}
+.sb-placed{font-family:'Outfit',sans-serif;font-size:14px;font-weight:500;padding:6px 14px;background:var(--a1bg);border:1.5px solid var(--sky);border-radius:20px;cursor:pointer;color:var(--sky);user-select:none;transition:all .15s;}
+.sb-placed:hover{background:#FFE8E8;border-color:var(--coral);color:var(--coral)}
+.sb-sentence{margin-bottom:20px}
+.sb-sentence:last-child{margin-bottom:0}
+.sb-sentence-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink3);margin-bottom:6px}
+.sb-context{font-size:13px;color:var(--ink3);margin-bottom:8px;font-style:italic}
+.sb-result{font-size:12px;margin-top:6px;padding:6px 12px;border-radius:6px;display:none}
+.sb-result.show{display:block}
+.sb-result.ok{background:#E8F8F5;color:#0F7A6A}
+.sb-result.bad{background:#FFF0F0;color:#B84040}
+
+/* ── MATCHING ── */
+.match-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.match-col-head{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink3);margin-bottom:8px;}
+.match-item{font-size:13px;padding:10px 14px;border-radius:var(--radius-sm);border:1.5px solid #E0DED8;cursor:pointer;transition:all .15s;background:#fff;color:var(--ink2);font-family:'Outfit',sans-serif;text-align:left;width:100%;margin-bottom:6px;display:block;}
+.match-item:last-child{margin-bottom:0}
+.match-item:hover{border-color:var(--sky);color:var(--sky)}
+.match-item.selected{border-color:var(--sky);background:var(--a1bg);color:var(--sky);font-weight:600}
+.match-item.matched{border-color:var(--sea);background:#E8F8F5;color:#0F7A6A;font-weight:600;pointer-events:none;cursor:default;}
+.match-item.wrong-flash{border-color:var(--coral)!important;background:#FFF0F0!important;color:var(--coral)!important}
+.match-pairs{margin-top:12px;}
+.match-pair-line{font-size:12px;display:flex;gap:6px;align-items:center;padding:5px 0;border-bottom:1px solid #F0EEE8;color:var(--ink3);}
+.match-pair-line:last-child{border-bottom:none}
+
+/* ── TRANSFORMATION ── */
+.transform-item{margin-bottom:16px;background:#fff;border-radius:var(--radius-sm);border:1px solid #E8E6E0;padding:14px 16px;}
+.transform-item:last-child{margin-bottom:0}
+.transform-original{font-size:14px;color:var(--ink);font-weight:500;margin-bottom:8px;line-height:1.5}
+.transform-keyword{display:inline-block;background:var(--sky);color:#fff;font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;margin:0 2px;}
+.transform-input{width:100%;border:1.5px solid #E0DED8;border-radius:var(--radius-sm);padding:9px 13px;font-family:'Outfit',sans-serif;font-size:14px;color:var(--ink);outline:none;transition:border-color .15s;background:#fff;}
+.transform-input:focus{border-color:var(--sky)}
+.transform-input.correct{border-color:var(--sea);background:#F0FBF8}
+.transform-input.wrong{border-color:var(--coral);background:#FFF5F5}
+.transform-reveal{font-size:11px;color:var(--sea);font-weight:600;font-family:'JetBrains Mono',monospace;margin-top:5px;opacity:0;transition:opacity .2s;min-height:16px}
+.transform-reveal.show{opacity:1}
+
+/* ── CATEGORISATION ── */
+.cat-bank{display:flex;flex-wrap:wrap;gap:8px;padding:12px;background:var(--cream);border-radius:var(--radius-sm);border:1px solid #E0DED8;margin-bottom:14px;min-height:48px;}
+.cat-word{font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;padding:6px 14px;background:#fff;border:1.5px solid #E0DED8;border-radius:20px;cursor:pointer;transition:all .15s;color:var(--ink2);user-select:none;}
+.cat-word:hover{border-color:var(--sky);color:var(--sky)}
+.cat-word.placed{opacity:.3;pointer-events:none;}
+.cat-columns{display:grid;gap:10px;margin-bottom:12px;}
+.cat-col{border-radius:var(--radius-sm);border:2px dashed #D0CEC8;padding:10px 12px;min-height:80px;transition:border-color .2s;}
+.cat-col-head{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #E0DED8;}
+.cat-placed{font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;padding:4px 11px;border-radius:20px;border:1.5px solid #E0DED8;background:#fff;cursor:pointer;user-select:none;transition:all .15s;display:inline-block;margin:3px;}
+.cat-placed:hover{opacity:.65}
+.cat-col.checked-correct .cat-col-head{color:#0F7A6A}
+.cat-col.checked-correct{border-color:var(--sea);border-style:solid;}
+.cat-col.checked-wrong{border-color:var(--coral);border-style:solid;}
+
+/* ── CONVERSATION FILL ── */
+.convo-wrap{background:#fff;border-radius:var(--radius-sm);border:1px solid #E8E6E0;overflow:hidden;margin-bottom:12px;}
+.convo-line{display:flex;align-items:flex-start;gap:10px;padding:11px 16px;border-bottom:1px solid #F5F3EF;}
+.convo-line:last-child{border-bottom:none}
+.convo-speaker{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;width:28px;flex-shrink:0;padding-top:3px;}
+.convo-speaker.a{color:var(--sky)}
+.convo-speaker.b{color:var(--lav)}
+.convo-text{font-size:14px;color:var(--ink);line-height:1.7;flex:1}
+.convo-input{border:none;border-bottom:2px dashed #BBAEF0;background:transparent;font-family:'Outfit',sans-serif;font-weight:600;font-size:14px;color:var(--ink);outline:none;padding:2px 6px;transition:all .15s;text-align:center;vertical-align:baseline;}
+.convo-input:focus{border-bottom-color:var(--sky);background:rgba(33,118,255,.05);}
+.convo-input.correct{color:#3FB87A;border-bottom-color:var(--sea);border-bottom-style:solid;background:rgba(29,211,176,.08);}
+.convo-input.wrong{color:var(--coral);border-bottom-color:var(--coral);border-bottom-style:solid;background:rgba(239,35,60,.06);}
+.convo-gwrap{display:inline-flex;flex-direction:column;align-items:center;gap:0;vertical-align:middle}
+.convo-reveal{font-size:11px;color:var(--sea);font-weight:600;font-family:'JetBrains Mono',monospace;height:14px;opacity:0;transition:opacity .2s}
+.convo-reveal.show{opacity:1}
+
+/* ── TRUE / FALSE / NOT GIVEN ── */
+.tf-item{margin-bottom:10px;background:#fff;border-radius:var(--radius-sm);border:1px solid #E8E6E0;padding:14px 16px;}
+.tf-item:last-child{margin-bottom:0}
+.tf-context{font-size:12px;color:var(--ink3);margin-bottom:6px;font-style:italic;line-height:1.5}
+.tf-statement{font-size:14px;color:var(--ink);font-weight:500;margin-bottom:10px;line-height:1.5}
+.tf-options{display:flex;gap:8px;flex-wrap:wrap;}
+.tf-btn{font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;padding:6px 16px;border-radius:20px;border:1.5px solid #E0DED8;background:#fff;cursor:pointer;transition:all .15s;color:var(--ink2);}
+.tf-btn:hover{border-color:var(--sky);background:var(--a1bg);color:var(--sky)}
+.tf-btn.correct-ans{border-color:var(--sea);background:#E8F8F5;color:#0F7A6A}
+.tf-btn.wrong-ans{border-color:var(--coral);background:#FFF0F0;color:#B84040}
+.tf-feedback{font-size:12px;margin-top:8px;padding:6px 10px;border-radius:6px;display:none}
+.tf-feedback.show{display:block}
+.tf-feedback.ok{background:#E8F8F5;color:#0F7A6A}
+.tf-feedback.bad{background:#FFF0F0;color:#B84040}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="logo">John<span>+</span>English</div>
+  <div class="nav-breadcrumb">
+    <span>Grammar</span><span class="sep">›</span>
+    <span>A1 — Beginner</span><span class="sep">›</span>
+    <span id="breadcrumb-topic">Verb to be</span>
+  </div>
+  <button class="nav-back" onclick="history.back()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Back to Grammar</button>
+</nav>
+
+<div class="layout">
+<aside class="sidebar">
+  <div class="sidebar-head">
+    <div class="level-pill"><svg width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg> A1 · Beginner</div>
+    <h2>Survival grammar</h2>
+    <p>15 topics. Everything you need to start communicating in English.</p>
+  </div>
+  <nav class="topic-nav" id="topic-nav"></nav>
+  <div class="sidebar-foot">
+    <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+    <div class="prog-text" id="prog-text">0/15</div>
+  </div>
+</aside>
+<main class="main" id="main"></main>
+</div>
+
+<script>
+// ── HELPER ──
+const tip = (t) => `<div class="johns-tip"><div class="tip-avatar">J</div><div class="tip-body"><div class="tip-label">John's tip</div><div class="tip-text">${t}</div></div></div>`;
+
+// ── LESSON DATA ──
+const lessons = [
+{id:"be",title:"Verb to be",subtitle:"am / is / are",intro:"The single most important verb in English. Everything starts here.",desc:"Before you can say anything in English \u2014 introduce yourself, describe things, talk about your job or feelings \u2014 you need the verb <em>to be</em>. It has three present tense forms.",tip:"Watch out for short answers. If someone asks <strong>\"Are you ready?\"</strong> \u2014 say <strong>\"Yes, I am.\"</strong> Not \"Yes, I'm.\" You can't use a contraction in a short answer.",explanation:"<p>The verb <em>to be</em> is used to <strong>identify people and things</strong>, describe <strong>states, feelings and characteristics</strong>, and talk about <strong>jobs, nationalities and origins</strong>.</p><p>Unlike most verbs, <em>to be</em> has three completely different present tense forms: <strong>am, is</strong> and <strong>are</strong>. These are not interchangeable.</p>",table:{headers:["Subject","Full form","Contraction","Negative","Short negative"],rows:[["I","I am","I'm","I am not","I'm not"],["You","You are","You're","You are not","You aren't"],["He / She / It","He is","He's","He is not","He isn't"],["We","We are","We're","We are not","We aren't"],["They","They are","They're","They are not","They aren't"]]},examples:[{type:"pos",eng:"I'm a student.",note:"Contraction is more natural in speech."},{type:"pos",eng:"She is from Spain.",note:"Full form \u2014 also correct, slightly more formal."},{type:"neg",eng:"He isn't tired.",note:"Contraction of is + not."},{type:"neg",eng:"We aren't teachers.",note:"Contraction of are + not."},{type:"q",eng:"Are you ready?",note:"Invert subject and verb for questions."},{type:"q",eng:"Is she a doctor?",note:"Same inversion rule for he/she/it."}],errors:[{bad:"She teacher.",good:"She is a teacher.",reason:"The verb to be cannot be omitted in English."},{bad:"My name are John.",good:"My name is John.",reason:"\"My name\" is singular \u2014 always use \"is\"."},{bad:"He are my friend.",good:"He is my friend.",reason:"He/she/it always take is."},{bad:"Are you tired? Yes, I'm.",good:"Yes, I am.",reason:"Short answers with to be never use contractions."}],realUse:["\"I'm exhausted.\" / \"She's brilliant.\" \u2014 feelings and qualities","\"Where are you from?\" / \"I'm from Ukraine.\" \u2014 the most common A1 exchange","Contractions (I'm, you're, he's) are the default in spoken English","\"That's crazy.\" \u2014 \"that's\" = that is, used constantly in spoken English"],exercises:[{type:"gap",title:"Choose the correct form",sub:"Fill each gap with am, is, or are.",items:[{answer:"am",before:"I ",after:" a student."},{answer:"is",before:"She ",after:" from Spain."},{answer:"are",before:"They ",after:" my friends."},{answer:"is",before:"My dog ",after:" very friendly."},{answer:"are",before:"We ",after:" in the same class."},{answer:"is",before:"The weather ",after:" beautiful today."},{answer:"am",before:"I ",after:" not tired."},{answer:"are",before:"You ",after:" very kind."}]},{type:"gap",title:"Positives, negatives and questions",sub:"Fill each gap with the correct form of to be \u2014 positive, negative or question.",items:[{answer:"isn't",before:"He ",after:" at home. (negative)"},{answer:"aren't",before:"They ",after:" ready yet. (negative)"},{answer:"Is",before:"",after:" she a teacher? (question)"},{answer:"Are",before:"",after:" you from Italy? (question)"},{answer:"am not",before:"I ",after:" very happy today. (negative)"},{answer:"Is",before:"",after:" it cold outside? (question)"}]},{type:"mc",title:"Short answers",sub:"Choose the correct short answer.",items:[{q:"Are you from Spain? \u2014 ___",opts:["Yes, I'm.","Yes, I am.","Yes, am.","Yes, I is."],answer:"Yes, I am.",explanation:"Short answers with to be never use contractions \u2014 always the full form."},{q:"Is she a doctor? \u2014 ___",opts:["No, she isn't.","No, she aren't.","No, she not.","No, isn't."],answer:"No, she isn't.",explanation:"Negative short answer for she: No, she isn't."},{q:"Are they at home? \u2014 ___",opts:["Yes, they're.","Yes, are.","Yes, they are.","Yes, they is."],answer:"Yes, they are.",explanation:"Short answers with to be never use contractions."},{q:"Is it far? \u2014 ___",opts:["No, it not.","No, it isn't.","No, it aren't.","No, isn't it."],answer:"No, it isn't.",explanation:"No, it isn't. \u2014 correct negative short answer for it."}]},{type:"builder",title:"Sentence builder",sub:"Put the words in the correct order.",items:[{words:["she","is","not","a","teacher"],answer:"she is not a teacher",context:"Make a negative sentence."},{words:["are","you","ready","?"],answer:"are you ready ?",context:"Make a yes/no question."},{words:["where","are","you","from","?"],answer:"where are you from ?",context:"Make a wh- question with to be."},{words:["he","is","not","at","home"],answer:"he is not at home",context:"Make a negative sentence."},{words:["they","are","very","tired"],answer:"they are very tired",context:"Make a positive sentence."}]},{type:"ec",title:"Error correction",sub:"Each sentence has one error. Write the correct sentence.",items:[{wrong:"My name are John.",correct:"My name is John.",hint:"What is the subject \u2014 singular or plural?"},{wrong:"He are from Brazil.",correct:"He is from Brazil.",hint:"He/she/it \u2192 is."},{wrong:"Are you tired? Yes, I'm.",correct:"Yes, I am.",hint:"Short answers don't contract."},{wrong:"She not happy.",correct:"She is not happy.",hint:"The verb can't be omitted."},{wrong:"We is very busy.",correct:"We are very busy.",hint:"We \u2192 are."},{wrong:"Is they at school?",correct:"Are they at school?",hint:"They \u2192 are, not is."}]}]},
+
+{id:"pronouns",title:"Subject pronouns",subtitle:"I, you, he, she, it, we, they",intro:"Every English sentence needs a subject. These seven words are the foundation.",desc:"In English, the subject must always be stated explicitly \u2014 you cannot drop it, even when it seems obvious. This trips up speakers of Spanish, Italian, Russian and many other languages.",tip:"Don't forget <strong>it</strong>! In many languages you can drop the subject \u2014 \"Is raining\", \"Is cold.\" In English, you always need it: <strong>\"It's raining.\"</strong> No subject = not a complete sentence.",explanation:"<p>Subject pronouns replace a noun as the <strong>subject of a verb</strong>. English requires an explicit subject in almost every sentence.</p><p><strong>It</strong> is used as a dummy subject for <em>time, weather, distance and impersonal statements</em> \u2014 there is no equivalent word in many other languages.</p>",table:{headers:["Pronoun","Refers to","Example"],rows:[["I","the speaker","I live in Madrid."],["you","singular or plural listener","You speak really well."],["he","male person","He is my brother."],["she","female person","She works at a hospital."],["it","thing, animal, or impersonal subject","It is cold today."],["we","speaker + others","We are from Ukraine."],["they","group not including speaker","They are in the garden."]]},examples:[{type:"pos",eng:"It's raining.",note:"\"It\" as a weather subject \u2014 no equivalent noun."},{type:"pos",eng:"She and I are both teachers.",note:"When combining with I, put the other person first."},{type:"pos",eng:"They are my students.",note:"Can refer to a group of people or things."},{type:"neg",eng:"He isn't here today.",note:"\"He\" for a named male person."},{type:"q",eng:"Is it far from here?",note:"\"It\" for distance \u2014 impersonal use."},{type:"q",eng:"Do they speak English?",note:"\"They\" for a group previously mentioned."}],errors:[{bad:"Is cold.",good:"It is cold.",reason:"English needs a subject pronoun for weather and time."},{bad:"Me and John are friends.",good:"John and I are friends.",reason:"As a subject, use \"I\" not \"me\". Put the other person first."},{bad:"My dog, he is friendly.",good:"My dog is friendly.",reason:"Don't use a pronoun AND a noun as subject \u2014 it's redundant."},{bad:"The company, they decided...",good:"The company decided...",reason:"Remove the redundant pronoun."}],realUse:["\"It's me.\" \u2014 answering a knock at the door. \"It\" has no real referent.","\"They said the weather will improve.\" \u2014 impersonal they.","\"You\" is both singular and plural in English.","\"One should always be polite.\" \u2014 formal impersonal subject."],exercises:[{type:"gap",title:"Subject pronouns",sub:"Fill each gap with the correct subject pronoun.",items:[{answer:"She",before:"My sister is a doctor. ",after:" works at a hospital."},{answer:"They",before:"John and Maria are Spanish. ",after:" live in Madrid."},{answer:"It",before:"",after:" is five o'clock."},{answer:"I",before:"My brother and ",after:" are very close."},{answer:"We",before:"",after:" are all from Ukraine."},{answer:"It",before:"The book is on the table. ",after:" is very interesting."},{answer:"He",before:"That's my teacher. ",after:" is very funny."},{answer:"They",before:"I have two cats. ",after:" are very lazy."}]},{type:"categorise",title:"Categorise the pronouns",sub:"Click a pronoun, then click the correct column.",categories:[{name:"Singular",items:["I","you","he","she","it"]},{name:"Plural",items:["we","they"]},{name:"Both singular and plural",items:["you (pl.)"]}]},{type:"mc",title:"Choose the correct pronoun",sub:"Choose the correct subject pronoun.",items:[{q:"___ is raining outside.",opts:["He","She","It","They"],answer:"It",explanation:"\"It\" is used as a dummy subject for weather."},{q:"___ and I are best friends. (Anna)",opts:["Me","Her","She","Hers"],answer:"She",explanation:"Subject pronoun needed \u2014 she, not her. And other person first."},{q:"The company announced ___ new strategy.",opts:["their","they","it","its"],answer:"its",explanation:"Possessive pronoun for a company/institution is its."},{q:"My parents called. ___ want me to come home.",opts:["It","He","She","They"],answer:"They",explanation:"My parents = a group \u2192 they."}]},{type:"tf",title:"True, False, or Not given",sub:"Read the sentence. Is the statement true, false, or not given?",items:[{context:"It's raining.",statement:"\"It\" in this sentence refers to the sky.",answer:"False",explanation:"\"It\" here is a dummy subject with no real referent."},{context:"Me and Anna are best friends.",statement:"This sentence contains a grammar error.",answer:"True",explanation:"Correct form is \"Anna and I\" \u2014 subject pronoun, other person first."},{context:"They are coming to the party.",statement:"We know exactly who they are.",answer:"Not given",explanation:"Without context, we can't know who they refers to."},{context:"She and I are both teachers.",statement:"The speaker is a teacher.",answer:"True",explanation:"\"I\" is the speaker \u2014 confirmed as a teacher."}]},{type:"ec",title:"Error correction",sub:"One error per sentence. Write the correct version.",items:[{wrong:"Is cold today.",correct:"It is cold today.",hint:"What subject is missing?"},{wrong:"Me and Carlos are friends.",correct:"Carlos and I are friends.",hint:"Subject pronoun + other person first."},{wrong:"My brother, he works in London.",correct:"My brother works in London.",hint:"Don't use both a noun and a pronoun as subject."},{wrong:"The team, they won the match.",correct:"The team won the match.",hint:"Remove the redundant pronoun."},{wrong:"Is very far from here.",correct:"It is very far from here.",hint:"Distance expressions need it as subject."}]}]},
+
+{id:"articles",title:"Articles",subtitle:"a, an, the \u2014 and zero article",intro:"Three small words that cause enormous difficulty. Learn the core logic here.",desc:"Articles are among the hardest things in English for speakers of languages without them \u2014 Russian, Ukrainian, Polish, Turkish, Chinese. But there is a clear logic.",tip:"The biggest problem for most students is <strong>no article at all</strong>. \"I love music.\" \"Life is short.\" \"She's from Spain.\" Don't add <em>the</em> when you're talking about things in general.",explanation:"<p>English has three article choices: <strong>a/an</strong> (indefinite), <strong>the</strong> (definite), and <strong>zero article</strong>. The choice depends on whether the noun is specific or general, countable or uncountable.</p><p><strong>A/an</strong> = one unspecified member of a category. <em>A</em> before consonant sounds, <em>an</em> before vowel sounds \u2014 it's about <strong>sound, not spelling</strong>.</p>",table:{headers:["Article","Use","Example"],rows:[["a","First mention, singular countable","I saw a dog in the street."],["an","Same \u2014 noun starts with vowel sound","She is an engineer. It's an hour."],["the","Specific noun already known or unique","The dog was barking all night."],["the","Unique things in the world","the sun, the internet, the government"],["\u00d8","Uncountable / plural used generally","I love music. Dogs are friendly."],["\u00d8","Most proper nouns","I live in Spain. She's from Kyiv."]]},examples:[{type:"pos",eng:"I bought a book. The book was excellent.",note:"A on first mention \u2192 the when already known."},{type:"pos",eng:"She's an honest person.",note:"\"An\" before silent h \u2014 \"an hour\", \"an honour\"."},{type:"pos",eng:"The moon is bright tonight.",note:"Unique \u2014 only one moon. Always the."},{type:"neg",eng:"I don't like the coffee here.",note:"\"The\" = this specific coffee in this place."},{type:"q",eng:"Is there a bank near here?",note:"Unspecified \u2014 any bank. Use a."},{type:"q",eng:"Can you close the window?",note:"\"The\" = the specific window we can both see."}],errors:[{bad:"She is teacher.",good:"She is a teacher.",reason:"Jobs and roles need \"a\" or \"an\"."},{bad:"I need an information.",good:"I need some information.",reason:"\"Information\" is uncountable. Never \"an information\"."},{bad:"The life is short.",good:"Life is short.",reason:"Abstract uncountable nouns used generally take zero article."},{bad:"I live in the France.",good:"I live in France.",reason:"Most country names take zero article."}],realUse:["\"Have you got a pen?\" \u2014 any pen. \"Have you got the pen I lent you?\" \u2014 that specific pen.","Headlines drop \"the\": \"President visits Spain\".","\"The\" with instruments: \"She plays the piano.\"","First mention \u2192 the: \"A man walked in. The man sat down.\""],exercises:[{type:"gap",title:"a, an, the, or nothing?",sub:"Fill each gap with a, an, the, or \u2014 (write \u2014 for no article).",items:[{answer:"a",before:"I want ",after:" coffee, please."},{answer:"an",before:"She is ",after:" architect."},{answer:"\u2014",before:"I love ",after:" music."},{answer:"the",before:"Can you open ",after:" door?"},{answer:"the",before:"He works in ",after:" United States."},{answer:"an",before:"I need ",after:" hour to finish."},{answer:"\u2014",before:"She lives in ",after:" Paris."},{answer:"the",before:"Who invented ",after:" telephone?"}]},{type:"mc",title:"First mention vs second mention",sub:"Choose the correct article.",items:[{q:"I saw ___ dog in the park. ___ dog was very big.",opts:["a / A","the / The","a / The","the / A"],answer:"a / The",explanation:"First mention = a (unspecified). Second mention = the (now we know which dog)."},{q:"She plays ___ piano every evening.",opts:["a","an","the","\u2014"],answer:"the",explanation:"Musical instruments always use the."},{q:"___ sun is very strong today.",opts:["A","An","The","\u2014"],answer:"The",explanation:"The sun is unique \u2014 there is only one. Always the."},{q:"I'm looking for ___ job.",opts:["the","a","an","\u2014"],answer:"a",explanation:"Any job, not a specific one \u2192 a."}]},{type:"categorise",title:"Which article?",sub:"Click a phrase, then click the correct column.",categories:[{name:"a / an",items:["an umbrella","a job","an engineer","a university","an hour","a book"]},{name:"the",items:["the moon","the internet","the Nile","the same thing","the best one"]},{name:"no article (\u00d8)",items:["music","France","water","love","Kyiv","happiness"]}]},{type:"transform",title:"Sentence transformation",sub:"Rewrite the sentence using the article in brackets.",items:[{original:"She is teacher. (a)",keyword:"a",answer:"She is a teacher."},{original:"I play guitar. (the)",keyword:"the",answer:"I play the guitar."},{original:"The love is complicated. (\u00d8)",keyword:"\u00d8",answer:"Love is complicated."},{original:"I need advice. (some)",keyword:"some",answer:"I need some advice."}]},{type:"ec",title:"Error correction",sub:"One error per sentence.",items:[{wrong:"She is a honest woman.",correct:"She is an honest woman.",hint:"The h in \"honest\" is silent."},{wrong:"I live in the France.",correct:"I live in France.",hint:"Most country names take zero article."},{wrong:"He gave me an advice.",correct:"He gave me some advice.",hint:"\"Advice\" is uncountable."},{wrong:"The music is a powerful force.",correct:"Music is a powerful force.",hint:"General abstract noun \u2014 zero article."},{wrong:"Can I have water? I want a water.",correct:"Can I have some water?",hint:"\"Water\" is uncountable \u2014 use \"some\", not \"a\"."},{wrong:"She plays a piano.",correct:"She plays the piano.",hint:"Musical instruments always use the."}]}]},
+
+{id:"plurals",title:"Plural nouns",subtitle:"Regular and common irregular forms",intro:"Adding -s is just the start. English plurals have more rules than most learners expect.",desc:"Forming plurals in English is mostly predictable \u2014 but there are important spelling rules and irregular forms every A1 learner needs to control.",tip:"Three plurals come up in almost every class: <strong>child \u2192 children</strong>, <strong>woman \u2192 women</strong>, <strong>person \u2192 people</strong>. Learn these three first. \"Childrens\" and \"womans\" are not words in English.",explanation:"<p>The basic rule is: add <strong>-s</strong> to most nouns. But several spelling rules modify this, and some nouns are completely irregular.</p><p>Some nouns are <strong>uncountable</strong> \u2014 they have no plural form and cannot be used with <em>a/an</em>.</p>",table:{headers:["Rule","Singular","Plural","Notes"],rows:[["Most nouns + s","cat / book","cats / books","Default rule"],["-s/-sh/-ch/-x + es","bus / church","buses / churches","Adds a syllable"],["Consonant + y \u2192 ies","city / baby","cities / babies","Vowel + y = just add s: boys"],["-f/-fe \u2192 ves","knife / leaf","knives / leaves","Not all: roofs, chiefs"],["Irregular","man / woman / child","men / women / children","Must be memorised"],["Same form","sheep / fish","sheep / fish","No change"]]},examples:[{type:"pos",eng:"The children are playing in the park.",note:"\"Children\" is the plural of \"child\" \u2014 not \"childs\"."},{type:"pos",eng:"There are three women in the meeting.",note:"\"Women\" \u2014 not \"womans\"."},{type:"pos",eng:"The leaves are falling.",note:"\"Leaf\" \u2192 \"leaves\": f/fe \u2192 ves."},{type:"neg",eng:"There aren't any buses on Sundays.",note:"\"Buses\" = bus + es."},{type:"q",eng:"How many people were there?",note:"\"People\" is already plural."},{type:"q",eng:"Are there any fish in this lake?",note:"\"Fish\" \u2014 same singular and plural form."}],errors:[{bad:"I have three childs.",good:"I have three children.",reason:"\"Children\" is the irregular plural of \"child\"."},{bad:"The informations are...",good:"The information is...",reason:"\"Information\" is uncountable \u2014 no plural."},{bad:"Two womans applied.",good:"Two women applied.",reason:"\"Women\" is the plural of \"woman\"."},{bad:"She gave me good advices.",good:"She gave me some good advice.",reason:"\"Advice\" is uncountable."}],realUse:["\"People\" is almost always used as plural: \"People say...\", \"A lot of people think...\"","Collective nouns (team, family) can take plural verbs in British English.","\"Data\" is now commonly used as uncountable singular in everyday English.","\"The media are reporting...\" (plural) vs \"The media is biased\" (singular) \u2014 both used."],exercises:[{type:"gap",title:"Write the plural",sub:"Write the plural form of the word in brackets.",items:[{answer:"children",before:"She has three ",after:" (child)."},{answer:"women",before:"How many ",after:" (woman) are in the class?"},{answer:"leaves",before:"All the ",after:" (leaf) have fallen."},{answer:"buses",before:"There are two ",after:" (bus) per hour."},{answer:"people",before:"A lot of ",after:" (person) were waiting."},{answer:"teeth",before:"The ",after:" (tooth) are very white."},{answer:"cities",before:"How many ",after:" (city) have you visited?"},{answer:"shelves",before:"The ",after:" (shelf) are full of books."}]},{type:"categorise",title:"Categorise",sub:"Click a word, then click the correct column.",categories:[{name:"Regular plural (-s / -es)",items:["book","bus","day","girl","church","box"]},{name:"Irregular plural",items:["child","woman","tooth","foot","mouse"]},{name:"Uncountable (no plural)",items:["information","advice","music","water","homework"]}]},{type:"mc",title:"Multiple choice",sub:"Choose the correct option.",items:[{q:"She has five _____ in her bag.",opts:["knife","knifes","knives","knifeies"],answer:"knives",explanation:"\"Knife\" ends in -fe \u2192 change to -ves: knives."},{q:"There are many _____ in the park.",opts:["childs","children","childrens","child"],answer:"children",explanation:"\"Children\" is the only correct irregular plural of \"child\"."},{q:"How many _____ do you have?",opts:["informations","information","an information","informings"],answer:"information",explanation:"\"Information\" is uncountable \u2014 no plural."},{q:"Two _____ applied for the job.",opts:["man","mans","men","mens"],answer:"men",explanation:"\"Man\" \u2192 \"men\". Completely irregular."}]},{type:"match",title:"Match singular to plural",sub:"Match each singular noun to its correct plural form.",leftHead:"Singular",rightHead:"Plural",pairs:[{left:"child",right:"children"},{left:"woman",right:"women"},{left:"foot",right:"feet"},{left:"tooth",right:"teeth"},{left:"mouse",right:"mice"},{left:"leaf",right:"leaves"}]},{type:"ec",title:"Error correction",sub:"One error per sentence.",items:[{wrong:"I have three childs.",correct:"I have three children.",hint:"Irregular plural."},{wrong:"Can you give me an advice?",correct:"Can you give me some advice?",hint:"Uncountable noun \u2014 no article a/an."},{wrong:"She bought two new furnitures.",correct:"She bought some new furniture.",hint:"\"Furniture\" is uncountable."},{wrong:"There are a lot of peoples here.",correct:"There are a lot of people here.",hint:"\"People\" is already plural."},{wrong:"I need some informations.",correct:"I need some information.",hint:"\"Information\" is uncountable."}]}]},
+
+{id:"demonstratives",title:"Demonstratives",subtitle:"this, that, these, those",intro:"Four words that point. Distance in space \u2014 and sometimes in time.",desc:"Demonstratives allow speakers to point at things physically or reference things in conversation. The two-way system (near/far) is simple but very productive.",tip:"On the phone, always say <strong>\"This is John.\"</strong> \u2014 not \"I am John.\" It sounds strange, but it's what English speakers say every time. Try it!",explanation:"<p>English demonstratives work on two axes: <strong>distance</strong> (near vs far) and <strong>number</strong> (singular vs plural).</p><p><strong>This/these</strong> = near the speaker. <strong>That/those</strong> = away from the speaker. Distance can also be psychological.</p>",table:{headers:["","Near (here)","Far (there)"],rows:[["Singular","this","that"],["Plural","these","those"],["Example (sing.)","This book is mine.","That book is yours."],["Example (pl.)","These bags are heavy.","Those bags are hers."]]},examples:[{type:"pos",eng:"This is my friend, Maria.",note:"\"This\" draws them into the conversation space."},{type:"pos",eng:"Those mountains are beautiful.",note:"The mountains are far away \u2014 use those."},{type:"pos",eng:"These days, everything is expensive.",note:"\"These days\" = the present period \u2014 temporal use."},{type:"neg",eng:"I don't like this weather.",note:"\"This\" because the weather is immediate and current."},{type:"q",eng:"Is this seat taken?",note:"The seat is right here \u2014 use this."},{type:"q",eng:"What's that smell?",note:"Smell noticed at slight distance or uncertainty."}],errors:[{bad:"These is my book.",good:"This is my book.",reason:"\"This\" = singular. \"These\" must be followed by a plural noun."},{bad:"I want those one.",good:"I want that one.",reason:"\"That one\" = singular. \"Those\" is plural."},{bad:"This are my friends.",good:"These are my friends.",reason:"\"Friends\" is plural \u2014 use \"these\", not \"this\"."},{bad:"That book over here is mine.",good:"This book over here is mine.",reason:"If it's physically near you, use this/these."}],realUse:["\"Hello? This is John.\" \u2014 on the phone. Always \"this is\", never \"I am\".","\"That's a great point.\" \u2014 \"that\" to acknowledge something just said.","\"Those were the days.\" \u2014 \"those\" for a distant past period.","In shops: \"I'll take this one.\" vs \"Can I see that one?\""],exercises:[{type:"gap",title:"This, that, these or those?",sub:"Fill each gap with the correct demonstrative.",items:[{answer:"This",before:"",after:" is my sister. (She's standing next to me.)"},{answer:"those",before:"Can you see ",after:" birds up in the sky?"},{answer:"those",before:"I love ",after:" shoes you're wearing."},{answer:"These",before:"",after:" days, everyone uses a smartphone."},{answer:"that",before:"What's ",after:" smell? It's wonderful!"},{answer:"those",before:"Are ",after:" your keys on the table?"},{answer:"this",before:"Is ",after:" seat free? (asking about the seat next to you)"},{answer:"that",before:"Who is ",after:" woman over there?"}]},{type:"mc",title:"Near or far?",sub:"Choose the correct demonstrative.",items:[{q:"___ is my coat. (You're holding it.)",opts:["This","That","These","Those"],answer:"This",explanation:"You're holding it \u2014 it's near. Use this (singular)."},{q:"___ buildings over there are very old.",opts:["This","That","These","Those"],answer:"Those",explanation:"Over there = far away. Plural buildings \u2192 those."},{q:"___ were the days! (a happy memory)",opts:["This","That","These","Those"],answer:"Those",explanation:"\"Those were the days\" \u2014 fixed expression for a distant happy past."},{q:"Can I try on ___ shoes in the window?",opts:["this","that","these","those"],answer:"those",explanation:"The shoes are in the shop window \u2014 not near you. Plural \u2192 those."}]},{type:"builder",title:"Sentence builder",sub:"Put the words in the correct order.",items:[{words:["this","is","my","sister"],answer:"this is my sister",context:"Introduce someone standing next to you."},{words:["those","are","my","keys"],answer:"those are my keys",context:"The keys are on the table across the room."},{words:["these","days","everything","is","expensive"],answer:"these days everything is expensive",context:"Make a sentence about the present period."},{words:["is","that","your","bag","?"],answer:"is that your bag ?",context:"Ask about a bag on the floor near the door."},{words:["I","don't","like","this","weather"],answer:"I don't like this weather",context:"Talk about the current weather."}]},{type:"tf",title:"True, False, or Not given",sub:"Is the statement true, false, or not given?",items:[{context:"This is my coat.",statement:"The coat is near the speaker.",answer:"True",explanation:"\"This\" = near the speaker."},{context:"Those were the days.",statement:"The speaker is talking about the present.",answer:"False",explanation:"\"Those were the days\" refers to a happy time in the past."},{context:"These shoes are comfortable.",statement:"The speaker is wearing the shoes.",answer:"Not given",explanation:"The shoes are nearby (\"these\"), but we don't know if they're being worn."},{context:"That's a great idea.",statement:"The idea was just mentioned by someone else.",answer:"True",explanation:"\"That\" acknowledges something just said."}]},{type:"ec",title:"Error correction",sub:"One error per sentence.",items:[{wrong:"These is my book.",correct:"This is my book.",hint:"\"This\" = singular."},{wrong:"I want those one, please.",correct:"I want that one, please.",hint:"Singular \u2192 that, not those."},{wrong:"This are my friends.",correct:"These are my friends.",hint:"Plural noun \u2192 these."},{wrong:"Look at those tree over there.",correct:"Look at that tree over there.",hint:"Singular noun \u2192 that."},{wrong:"These days is very stressful.",correct:"These days are very stressful.",hint:"\"These days\" is plural \u2014 needs are."}]}]},
+
+{id:"presentsimple",title:"Present simple",subtitle:"I work, she works, do/does",intro:"The workhorse tense. Habits, routines, facts, and scheduled events.",desc:"The present simple is used far more than most learners realise \u2014 not just for daily routines, but for facts, general truths, and timetabled future events.",tip:"Don't forget the <strong>-s</strong> for he, she, and it. <em>She works. He plays. It starts.</em> And if you use <em>does</em> in a question, the main verb has no -s: <strong>\"Does she work?\"</strong> \u2014 not \"Does she works?\"",explanation:"<p>The present simple has two main uses: <strong>habitual or repeated actions</strong> and <strong>general truths and facts</strong>.</p><p>The key rule: add <strong>-s</strong> (or -es) to the verb for <em>he/she/it</em>. Questions and negatives use <strong>do/does</strong> \u2014 once you use \"does\", the main verb has NO -s.</p>",table:{headers:["Form","I / You / We / They","He / She / It"],rows:[["Positive","I work / you play","She works / he plays"],["Negative","I don't work","She doesn't work"],["Question","Do you work?","Does she work?"],["Short answer","Yes, I do. / No, I don't.","Yes, she does. / No, she doesn't."]]},examples:[{type:"pos",eng:"She works in a hospital.",note:"-s added for she. Irregular: go \u2192 goes, do \u2192 does, have \u2192 has."},{type:"pos",eng:"We have English class on Mondays.",note:"Scheduled, regular event."},{type:"neg",eng:"He doesn't like coffee.",note:"\"Doesn't\" = does + not. Main verb stays base form."},{type:"neg",eng:"They don't watch TV.",note:"\"Don't\" = do + not."},{type:"q",eng:"Does she speak French?",note:"\"Does\" takes the -s so the main verb doesn't."},{type:"q",eng:"What time do you start work?",note:"\"Do\" in questions with I/you/we/they."}],errors:[{bad:"She work in a bank.",good:"She works in a bank.",reason:"He/she/it always need the -s ending."},{bad:"Does she works here?",good:"Does she work here?",reason:"\"Does\" already carries the third person \u2014 main verb must be base form."},{bad:"He don't like it.",good:"He doesn't like it.",reason:"\"Don't\" is for I/you/we/they. He/she/it use \"doesn't\"."},{bad:"I'm not understand.",good:"I don't understand.",reason:"\"Understand\" is a state verb \u2014 not used in continuous form."}],realUse:["\"She teaches English.\" / \"He runs his own business.\" \u2014 jobs.","\"The train leaves at 6.\" \u2014 timetabled future.","\"I don't understand.\" / \"I agree.\" \u2014 state verbs.","\"He passes to Mbapp\u00e9 \u2014 scores!\" \u2014 live sports commentary."],exercises:[{type:"gap",title:"Positive sentences",sub:"Fill each gap with the correct present simple form.",items:[{answer:"works",before:"She ",after:" in a hospital. (work)"},{answer:"goes",before:"He ",after:" to the gym every day. (go)"},{answer:"have",before:"We ",after:" English class on Mondays. (have)"},{answer:"starts",before:"The film ",after:" at eight. (start)"},{answer:"speak",before:"They ",after:" three languages. (speak)"},{answer:"studies",before:"She ",after:" medicine at university. (study)"},{answer:"finishes",before:"He ",after:" work at six. (finish)"},{answer:"live",before:"I ",after:" near the city centre. (live)"}]},{type:"gap",title:"Negatives and questions",sub:"Fill each gap with the correct negative or question form.",items:[{answer:"doesn't eat",before:"He ",after:" meat. (not eat)"},{answer:"don't understand",before:"I ",after:" the question. (not understand)"},{answer:"Do",before:"",after:" you speak Spanish? (question)"},{answer:"Does",before:"",after:" he live near here? (question)"},{answer:"don't like",before:"They ",after:" cold weather. (not like)"},{answer:"doesn't have",before:"She ",after:" a car. (not have)"}]},{type:"mc",title:"Short answers",sub:"Choose the correct short answer.",items:[{q:"Do you like coffee? \u2014 ___",opts:["Yes, I like.","Yes, I do.","Yes, do I.","Yes, I does."],answer:"Yes, I do.",explanation:"Short answer with do/does: Yes, I do."},{q:"Does she work here? \u2014 ___",opts:["No, she doesn't.","No, she don't.","No, she doesn't work.","No, doesn't she."],answer:"No, she doesn't.",explanation:"Short answer for she: No, she doesn't."},{q:"Do they speak English? \u2014 ___",opts:["Yes, they speak.","Yes, they does.","Yes, they do.","Yes, do they."],answer:"Yes, they do.",explanation:"Short answer for they: Yes, they do."},{q:"Does he have a brother? \u2014 ___",opts:["Yes, he has.","Yes, he does.","Yes, does he.","Yes, he do."],answer:"Yes, he does.",explanation:"Short answer for he: Yes, he does."}]},{type:"transform",title:"Sentence transformation",sub:"Rewrite the sentence using the keyword.",items:[{original:"Maria works in a bank.",keyword:"doesn't",answer:"Maria doesn't work in a bank."},{original:"They play tennis every Sunday.",keyword:"Do",answer:"Do they play tennis every Sunday?"},{original:"She doesn't like coffee.",keyword:"likes",answer:"She likes coffee."},{original:"He lives near here.",keyword:"Does",answer:"Does he live near here?"},{original:"I understand the question.",keyword:"don't",answer:"I don't understand the question."}]},{type:"ec",title:"Error correction",sub:"One error per sentence.",items:[{wrong:"He work in a restaurant.",correct:"He works in a restaurant.",hint:"He/she/it \u2192 add -s."},{wrong:"Does she works here?",correct:"Does she work here?",hint:"\"Does\" + base form, no -s."},{wrong:"They doesn't have a car.",correct:"They don't have a car.",hint:"\"They\" \u2192 \"don't\", not \"doesn't\"."},{wrong:"I'm not understand.",correct:"I don't understand.",hint:"State verb \u2014 simple form only."},{wrong:"She go to work by bus.",correct:"She goes to work by bus.",hint:"She \u2192 add -es to go."},{wrong:"Do he speak French?",correct:"Does he speak French?",hint:"He/she/it \u2192 does in questions."}]}]},
+
+{id:"presentcontinuous",title:"Present continuous",subtitle:"I'm working, she's reading",intro:"What's happening right now \u2014 or around now.",desc:"The present continuous describes actions happening at the moment of speaking, or temporary situations in the current period.",tip:"Some verbs don't normally use the -ing form. The most common: <strong>know, love, understand, want, need</strong>. Say <strong>\"I know\"</strong> \u2014 not \"I'm knowing.\" <strong>\"I understand\"</strong> \u2014 not \"I'm understanding.\"",explanation:"<p>The present continuous is formed with <strong>be + verb-ing</strong>. It is used for actions happening right now and temporary situations around the present.</p><p>Important: <strong>state verbs</strong> (know, like, love, need, want, understand, believe) are not normally used in the continuous form.</p>",table:{headers:["Form","Example","Notes"],rows:[["Positive","I am working / She is eating","Contraction: I'm, she's, they're"],["Negative","He isn't listening","= is not listening"],["Question","Are you coming?","Invert subject and be"],["Spelling: -e","come \u2192 coming","Drop the -e before -ing"],["Spelling: CVC","run \u2192 running","Double the final consonant"]]},examples:[{type:"pos",eng:"I'm studying English.",note:"Happening right now."},{type:"pos",eng:"She's staying with friends this week.",note:"Temporary situation."},{type:"neg",eng:"He isn't listening to me.",note:"Be + not + -ing."},{type:"neg",eng:"We aren't going to the party.",note:"Future arrangement being cancelled."},{type:"q",eng:"What are you doing?",note:"The most common present continuous question."},{type:"q",eng:"Is it raining?",note:"Weather happening now."}],errors:[{bad:"I'm knowing the answer.",good:"I know the answer.",reason:"\"Know\" is a state verb."},{bad:"She's haveing lunch.",good:"She's having lunch.",reason:"Drop the final -e before -ing."},{bad:"He is run to work.",good:"He is running to work.",reason:"Must use the -ing form."},{bad:"They are not understanding.",good:"They don't understand.",reason:"\"Understand\" is a state verb."}],realUse:["\"What are you up to?\" / \"Just watching TV.\"","\"And she's crossing the finish line...\" \u2014 live events.","\"You're always losing your keys!\" \u2014 with \"always\" = annoying habit.","\"Things are getting better.\" \u2014 ongoing change."],exercises:[{type:"gap",title:"Present continuous \u2014 positive",sub:"Fill each gap with the present continuous form. Use contractions where possible.",items:[{answer:"is raining",before:"It ",after:" outside. (rain)"},{answer:"'m studying",before:"I ",after:" for an exam right now. (study)"},{answer:"are watching",before:"They ",after:" a film at the moment. (watch)"},{answer:"is cooking",before:"She ",after:" dinner. (cook)"},{answer:"'m working",before:"I ",after:" from home this week. (work)"},{answer:"is getting",before:"The weather ",after:" better. (get)"},{answer:"are playing",before:"The children ",after:" in the garden. (play)"},{answer:"is sitting",before:"He ",after:" next to me. (sit)"}]},{type:"gap",title:"Negatives and questions",sub:"Fill each gap \u2014 negative or question form of the present continuous.",items:[{answer:"isn't listening",before:"He ",after:" to me. (not listen)"},{answer:"aren't coming",before:"They ",after:" to the party. (not come)"},{answer:"Are",before:"",after:" you coming tomorrow? (question)"},{answer:"Is",before:"",after:" she still working? (question)"},{answer:"aren't sleeping",before:"The children ",after:" \u2014 they're playing! (not sleep)"}]},{type:"categorise",title:"Action verb or state verb?",sub:"Click a verb, then click the correct column.",categories:[{name:"Action verb \u2713 (can use -ing)",items:["run","eat","talk","sleep","write","watch","cook","study"]},{name:"State verb \u2717 (avoid -ing)",items:["know","love","understand","want","believe","need","hate","prefer"]}]},{type:"mc",title:"Present simple or present continuous?",sub:"Choose the correct form.",items:[{q:"She _____ a great book at the moment.",opts:["reads","is reading","read","reading"],answer:"is reading",explanation:"Temporary activity in progress right now \u2192 present continuous."},{q:"I _____ what you mean.",opts:["'m not understanding","don't understand","not understand","isn't understanding"],answer:"don't understand",explanation:"\"Understand\" is a state verb \u2014 always use simple form."},{q:"He _____ in London temporarily.",opts:["lives","is living","living","live"],answer:"is living",explanation:"Temporary situation \u2192 present continuous."},{q:"She _____ tennis every Saturday.",opts:["is playing","plays","playing","play"],answer:"plays",explanation:"Regular, repeated activity \u2192 present simple."}]},{type:"ec",title:"Error correction",sub:"One error per sentence.",items:[{wrong:"I'm knowing the answer.",correct:"I know the answer.",hint:"State verb \u2014 no -ing."},{wrong:"She's haveing lunch.",correct:"She's having lunch.",hint:"Drop the -e before -ing."},{wrong:"They runing in the park.",correct:"They are running in the park.",hint:"Need be + -ing. Double the n in run."},{wrong:"He is not understand.",correct:"He doesn't understand.",hint:"State verb \u2014 use simple, not continuous."},{wrong:"Is she work today?",correct:"Is she working today?",hint:"Present continuous question needs -ing."}]}]},
+
+{id:"imperatives",title:"Imperatives",subtitle:"Do this. Don't do that.",intro:"Short, direct, and powerful. Imperatives do a lot of work in English.",desc:"Imperatives are formed from the base verb \u2014 no subject, no auxiliary. They're used for instructions, requests, commands, warnings, advice, and invitations.",tip:"A short imperative can sound rude. Just add <strong>please</strong> to make it polite: \"Sit down.\" \u2192 \"Please sit down.\" Very easy, very important \u2014 especially in English.",explanation:"<p>The imperative uses the <strong>base form of the verb</strong> with no subject and no auxiliary.</p><p>To make it negative, use <strong>don't + base verb</strong>. To suggest a joint action, use <strong>let's + base verb</strong>.</p>",table:{headers:["Form","Example","Use"],rows:[["Positive imperative","Sit down. / Open your books.","Instructions, commands"],["Negative imperative","Don't move. / Don't be late.","Prohibitions, warnings"],["With please","Please be quiet.","Polite requests"],["With do","Do sit down!","Emphasis or warmth"],["With let's","Let's go! / Let's have a break.","First person plural suggestion"]]},examples:[{type:"pos",eng:"Turn left at the traffic lights.",note:"Giving directions."},{type:"pos",eng:"Don't forget your passport!",note:"Reminder/warning."},{type:"pos",eng:"Let's meet at seven.",note:"\"Let's\" = let us \u2014 a shared suggestion."},{type:"neg",eng:"Don't be so hard on yourself.",note:"Giving emotional advice."},{type:"q",eng:"Could you open the window?",note:"Polite alternative to bare imperative."},{type:"q",eng:"Would you mind closing the door?",note:"Most polite form."}],errors:[{bad:"You go straight on.",good:"Go straight on.",reason:"Imperatives have no subject \u2014 drop you."},{bad:"Don't to smoke here.",good:"Don't smoke here.",reason:"\"Don't\" + base verb, no \"to\"."},{bad:"Let's to go to the beach.",good:"Let's go to the beach.",reason:"\"Let's\" + base verb, no \"to\"."},{bad:"Please to sit down.",good:"Please sit down.",reason:"\"Please\" + base verb, no \"to\"."}],realUse:["Recipes: \"Add the onions. Stir for two minutes.\"","Signs: \"Push.\" / \"Keep out.\" / \"Do not disturb.\"","\"Come on!\" / \"Look out!\" / \"Hang on.\" \u2014 high-frequency spoken imperatives.","\"Get some rest.\" / \"Don't overthink it.\" \u2014 advice."],exercises:[{type:"gap",title:"Positive and negative imperatives",sub:"Fill each gap with the correct imperative form of the verb in brackets.",items:[{answer:"Turn",before:"",after:" right at the traffic lights. (turn)"},{answer:"Don't forget",before:"",after:" your keys! (not forget)"},{answer:"Sit",before:"",after:" down, please. (sit)"},{answer:"Don't be",before:"",after:" late! (not be)"},{answer:"Open",before:"",after:" your books to page ten. (open)"},{answer:"Don't touch",before:"",after:" that! It's hot! (not touch)"}]},{type:"match",title:"Match imperative to function",sub:"Match each imperative sentence to its function.",leftHead:"Sentence",rightHead:"Function",pairs:[{left:"Turn left at the lights.",right:"Giving directions"},{left:"Don't touch that!",right:"Warning / prohibition"},{left:"Let's have a break.",right:"Suggestion (we)"},{left:"Please come in.",right:"Polite invitation"},{left:"Add the onions and stir.",right:"Recipe instruction"},{left:"Get some rest.",right:"Giving advice"}]},{type:"builder",title:"Sentence builder",sub:"Put the words in the correct order.",items:[{words:["turn","right","at","the","corner"],answer:"turn right at the corner",context:"Giving directions."},{words:["don't","be","late","!"],answer:"don't be late !",context:"A warning."},{words:["let's","go","to","the","cinema"],answer:"let's go to the cinema",context:"A suggestion."},{words:["please","don't","make","noise"],answer:"please don't make noise",context:"A polite prohibition."},{words:["always","check","your","work"],answer:"always check your work",context:"Advice with 'always'."}]},{type:"mc",title:"Polite or direct?",sub:"Choose the most appropriate form.",items:[{q:"You're in a meeting. You want someone to be quiet. You say:",opts:["Shut up!","Please be quiet.","You be quiet.","Don't to talk."],answer:"Please be quiet.",explanation:"Please + imperative = polite request. Much more appropriate in a professional context."},{q:"You want to suggest going to lunch together. You say:",opts:["Go to lunch.","You go to lunch.","Let's go to lunch.","Don't go to lunch."],answer:"Let's go to lunch.",explanation:"Let's = joint suggestion including yourself."},{q:"You see someone about to touch a hot pan. You say:",opts:["Please don't touch it.","Don't touch it!","You don't touch it.","Not touch it!"],answer:"Don't touch it!",explanation:"Urgent warning \u2014 no 'please' needed. Direct is correct here."},{q:"A guest arrives. You want them to enter. You say:",opts:["Enter!","You come in.","Please come in.","Come in please you."],answer:"Please come in.",explanation:"Please come in \u2014 polite invitation to enter."}]},{type:"ec",title:"Error correction",sub:"One error per sentence.",items:[{wrong:"Don't to worry about it.",correct:"Don't worry about it.",hint:"Don't + base verb, no \"to\"."},{wrong:"Let's to have a break.",correct:"Let's have a break.",hint:"Let's + base verb, no \"to\"."},{wrong:"You turn left at the lights.",correct:"Turn left at the lights.",hint:"Imperatives have no subject."},{wrong:"Please to come in.",correct:"Please come in.",hint:"Please + base verb, no \"to\"."},{wrong:"Don't forgot your keys.",correct:"Don't forget your keys.",hint:"Don't + base form. Not past tense."}]}]},
+
+{id:"thereisare",title:"There is / There are",subtitle:"Saying something exists",intro:"How to say that something exists \u2014 or doesn't \u2014 in a place.",desc:"There is and there are are used to introduce or confirm the existence of something. The choice depends on whether the noun that follows is singular or plural.",tip:"\"There's a park near here.\" This is how English says something exists. Don't say \"It is a park near here.\" That's a translation. Use <strong>there is / there are</strong> to introduce new information.",explanation:"<p>We use <strong>there is</strong> (singular/uncountable) and <strong>there are</strong> (plural) to say that something exists.</p><p>Note: <em>there</em> here is a dummy subject \u2014 the real subject comes AFTER the verb. This is why the verb agrees with what comes after it.</p>",table:{headers:["Form","Singular","Plural"],rows:[["Positive","There is a park. / There's...","There are three bedrooms."],["Negative","There isn't a bus stop here.","There aren't any seats left."],["Question","Is there a chemist nearby?","Are there any restaurants?"],["Short answer","Yes, there is. / No, there isn't.","Yes, there are. / No, there aren't."]]},examples:[{type:"pos",eng:"There's a great cafe on the corner.",note:"Introducing new information."},{type:"pos",eng:"There are twenty students in the class.",note:"Plural noun \u2192 there are."},{type:"neg",eng:"There isn't any milk in the fridge.",note:"Uncountable noun \u2192 there isn't."},{type:"neg",eng:"There aren't any tickets left.",note:"Plural noun \u2192 there aren't."},{type:"q",eng:"Is there a pharmacy near here?",note:"Singular question \u2014 answer: \"Yes, there is.\""},{type:"q",eng:"Are there any messages for me?",note:"Plural question with any."}],errors:[{bad:"It is a bank near here.",good:"There is a bank near here.",reason:"Use \"there is\" to introduce the existence of something."},{bad:"There is five people waiting.",good:"There are five people waiting.",reason:"\"Five people\" is plural \u2014 use \"there are\"."},{bad:"Are there a swimming pool?",good:"Is there a swimming pool?",reason:"\"A swimming pool\" is singular \u2014 use \"is there\"."},{bad:"There are a lot of noise.",good:"There is a lot of noise.",reason:"\"Noise\" is uncountable \u2014 use \"there is\"."}],realUse:["\"There's been an accident.\" \u2014 present perfect form.","\"Are there any questions?\" \u2014 standard way to close a presentation.","\"Was there a message for me?\" \u2014 past form.","\"There will be delays.\" \u2014 future form with will."],exercises:[{type:"gap",title:"There is or there are?",sub:"Fill each gap with there is, there are, there isn't, or there aren't.",items:[{answer:"There's",before:"",after:" a great park near my house."},{answer:"There are",before:"",after:" twenty students in this class."},{answer:"There isn't",before:"",after:" any milk in the fridge."},{answer:"Is there",before:"",after:" a pharmacy near here?"},{answer:"There aren't",before:"",after:" any tickets left."},{answer:"There are",before:"",after:" a lot of people waiting."},{answer:"Are there",before:"",after:" any seats available?"},{answer:"There is",before:"",after:" a problem with my order."}]},{type:"convo",title:"Fill the conversation",sub:"Complete the dialogue \u2014 use there is, there are, is there or are there.",lines:[{speaker:"A",text:"Excuse me, [is there] a pharmacy near here?"},{speaker:"B",text:"Yes, [there is] one on the next street."},{speaker:"A",text:"And [are there] any cash machines nearby?"},{speaker:"B",text:"[There are] two \u2014 one in the supermarket and one outside the bank."},{speaker:"A",text:"Great. [Is there] a cafe too? I need a coffee."},{speaker:"B",text:"Of course! [There are] three cafes on the main square."}]},{type:"mc",title:"Short answers",sub:"Choose the correct short answer.",items:[{q:"Is there a bank near here? \u2014 ___",opts:["Yes, there's.","Yes, there is.","Yes, is there.","Yes, there are."],answer:"Yes, there is.",explanation:"Short answers with there is never contract."},{q:"Are there any questions? \u2014 ___",opts:["No, there isn't.","No, aren't.","No, there aren't.","No, there aren't any."],answer:"No, there aren't.",explanation:"Short answer for there are: No, there aren't."},{q:"___ any milk in the fridge?",opts:["Is there","Are there","There is","There are"],answer:"Is there",explanation:"Milk is uncountable (singular) \u2192 is there."},{q:"___ a lot of noise outside.",opts:["There are","Are there","There is","Is there"],answer:"There is",explanation:"Noise is uncountable \u2192 there is."}]},{type:"transform",title:"Sentence transformation",sub:"Rewrite each sentence using the keyword.",items:[{original:"A bank is on the corner.",keyword:"there",answer:"There is a bank on the corner."},{original:"Are any seats available?",keyword:"there",answer:"Are there any seats available?"},{original:"No milk is in the fridge.",keyword:"there",answer:"There is no milk in the fridge."},{original:"Twenty students are in the class.",keyword:"there",answer:"There are twenty students in the class."},{original:"Were any problems?",keyword:"there",answer:"Were there any problems?"}]},{type:"ec",title:"Error correction",sub:"One error per sentence.",items:[{wrong:"It is a bank near here.",correct:"There is a bank near here.",hint:"Use \"there is\" not \"it is\" to say something exists."},{wrong:"There is five people waiting.",correct:"There are five people waiting.",hint:"Five people = plural \u2192 there are."},{wrong:"Are there a swimming pool?",correct:"Is there a swimming pool?",hint:"Singular noun \u2192 is there."},{wrong:"There are a lot of noise.",correct:"There is a lot of noise.",hint:"Noise is uncountable \u2192 there is."},{wrong:"Yes, there's.",correct:"Yes, there is.",hint:"Short answers with there is never contract."}]}]},
+
+{id:"possessives",title:"Possessive adjectives & pronouns",subtitle:"my/your/his... and mine/yours/his...",intro:"Whose is it? Two overlapping systems \u2014 adjectives before nouns, pronouns that stand alone.",desc:"English has two ways to express possession. Possessive adjectives (my, your, his) always come before a noun. Possessive pronouns (mine, yours, his) stand alone.",tip:"Very common mistake: <strong>\"This bag is my.\"</strong> Wrong. You need <strong>\"This bag is mine.\"</strong> When the word stands alone \u2014 no noun after it \u2014 use <em>mine, yours, hers, his, ours, theirs</em>.",explanation:"<p><strong>Possessive adjectives</strong> (my, your, his, her, its, our, their) come BEFORE a noun.</p><p><strong>Possessive pronouns</strong> (mine, yours, his, hers, ours, theirs) replace the whole noun phrase and stand alone.</p><p>Note: no apostrophe in <em>its</em> (possessive). <em>It's</em> = it is.</p>",table:{headers:["Subject","Possessive adjective","Possessive pronoun"],rows:[["I","my \u2014 my book","mine \u2014 the book is mine"],["you","your \u2014 your car","yours \u2014 the car is yours"],["he","his \u2014 his coat","his \u2014 the coat is his"],["she","her \u2014 her bag","hers \u2014 the bag is hers"],["it","its \u2014 its tail","(its \u2014 rarely used alone)"],["we","our \u2014 our house","ours \u2014 the house is ours"],["they","their \u2014 their children","theirs \u2014 the children are theirs"]]},examples:[{type:"pos",eng:"That's my coat.",note:"Possessive adjective before noun."},{type:"pos",eng:"The blue one is mine.",note:"Possessive pronoun \u2014 stands alone."},{type:"pos",eng:"Their house is bigger than ours.",note:"Two possessive pronouns in one sentence."},{type:"neg",eng:"That bag isn't hers.",note:"Possessive pronoun after negative be."},{type:"q",eng:"Is this your passport?",note:"Possessive adjective in a question."},{type:"q",eng:"Whose coat is this? \u2014 It's mine.",note:"Possessive pronoun as a standalone answer."}],errors:[{bad:"This is my.",good:"This is mine.",reason:"Possessive adjectives cannot stand alone."},{bad:"It's dog is friendly.",good:"Its dog is friendly.",reason:"\"It's\" = it is. \"Its\" (no apostrophe) = possessive."},{bad:"Their house is bigger than our.",good:"Their house is bigger than ours.",reason:"Possessive pronoun needed, not adjective."},{bad:"The bag is her.",good:"The bag is hers.",reason:"Possessive pronoun \"hers\" needed."}],realUse:["\"Is this yours?\" / \"No, it's hers.\" \u2014 everyday conversation.","\"Mind your own business.\" \u2014 fixed expression.","\"John's car\" / \"Spain's capital\" \u2014 proper nouns + apostrophe-s.","\"Ours is bigger.\" \u2014 possessive pronoun replacing a whole noun phrase."],exercises:[{type:"gap",title:"Possessive adjectives",sub:"Fill each gap with the correct possessive adjective.",items:[{answer:"my",before:"I forgot ",after:" keys again."},{answer:"their",before:"They are visiting ",after:" parents this weekend."},{answer:"her",before:"Maria loves ",after:" job."},{answer:"its",before:"The dog wagged ",after:" tail."},{answer:"our",before:"We love ",after:" new apartment."},{answer:"his",before:"He left ",after:" phone at home."},{answer:"your",before:"Is this ",after:" bag?"},{answer:"their",before:"The children forgot ",after:" lunch."}]},{type:"gap",title:"Possessive pronouns",sub:"Fill each gap with the correct possessive pronoun.",items:[{answer:"yours",before:"That's not my coat \u2014 it must be ",after:"."},{answer:"hers",before:"The red bag is ",after:"."},{answer:"ours",before:"Their garden is smaller than ",after:"."},{answer:"his",before:"I have my ticket. Does he have ",after:"?"},{answer:"mine",before:"This is not your problem \u2014 it's ",after:"."},{answer:"theirs",before:"Our car is new. ",after:" is old."}]},{type:"match",title:"Adjective to pronoun",sub:"Match each possessive adjective to its pronoun form.",leftHead:"Adjective (+ noun)",rightHead:"Pronoun (alone)",pairs:[{left:"my book",right:"mine"},{left:"your car",right:"yours"},{left:"his coat",right:"his"},{left:"her bag",right:"hers"},{left:"our house",right:"ours"},{left:"their children",right:"theirs"}]},{type:"mc",title:"Adjective or pronoun?",sub:"Choose the correct possessive form.",items:[{q:"This is not your coat \u2014 it's ___.",opts:["my","mine","me","I"],answer:"mine",explanation:"Stands alone (no noun after it) \u2192 possessive pronoun: mine."},{q:"The cat hurt ___ paw.",opts:["it's","its","their","hers"],answer:"its",explanation:"\"Its\" (no apostrophe) = possessive adjective for it."},{q:"Our team won. ___ team lost.",opts:["Their","Theirs","They","Them"],answer:"Their",explanation:"Before a noun (team) \u2192 possessive adjective: their."},{q:"Whose keys are these? \u2014 They're ___.",opts:["her","hers","she","herself"],answer:"hers",explanation:"Stands alone \u2014 possessive pronoun: hers."}]},{type:"ec",title:"Error correction",sub:"One error per sentence.",items:[{wrong:"This bag is my.",correct:"This bag is mine.",hint:"Stands alone \u2192 possessive pronoun."},{wrong:"It's tail is wagging.",correct:"Its tail is wagging.",hint:"\"Its\" (no apostrophe) = possessive."},{wrong:"Their apartment is bigger than our.",correct:"Their apartment is bigger than ours.",hint:"Possessive pronoun needed."},{wrong:"I have my ticket. Do you have your?",correct:"Do you have yours?",hint:"Stands alone \u2192 yours, not your."},{wrong:"She lost her bag. The bag is her.",correct:"The bag is hers.",hint:"Stands alone \u2192 hers."}]}]},
+
+{id:"preposplace",title:"Prepositions of place",subtitle:"in, on, at, above, under, next to...",intro:"Where is it? English has a rich system for locating things in space.",desc:"Prepositions of place are one of those areas where direct translation from other languages regularly fails. The in/on/at trio alone causes problems for years if not understood from the beginning.",tip:"Think of the three main ones like this: <strong>in</strong> = inside something. <strong>On</strong> = on a surface. <strong>At</strong> = at a point or place. \"I'm in the kitchen.\" \"The keys are on the table.\" \"See you at the station.\"",explanation:"<p>The three key prepositions are <strong>in</strong>, <strong>on</strong>, and <strong>at</strong>.</p><p><strong>In</strong> = enclosed or surrounded: in a room, in a city.</p><p><strong>On</strong> = surface or line: on the table, on the bus, on the third floor.</p><p><strong>At</strong> = a point (often a destination): at the station, at school, at home.</p>",table:{headers:["Preposition","Use","Examples"],rows:[["in","enclosed, inside","in the room, in London, in a box"],["on","surface, line","on the table, on the bus, on the third floor"],["at","point, destination","at home, at work, at the station"],["above","higher than","the picture above the fireplace"],["under / below","lower than","under the table, below sea level"],["next to / beside","immediately to the side","next to the door, beside me"],["between","in the middle of two things","between the bank and the caf\u00e9"]]},examples:[{type:"pos",eng:"She's in the kitchen.",note:"Enclosed space \u2192 in."},{type:"pos",eng:"The keys are on the table.",note:"Surface \u2192 on."},{type:"pos",eng:"I'll meet you at the station.",note:"Destination point \u2192 at."},{type:"pos",eng:"The cat is under the sofa.",note:"Below and in contact \u2192 under."},{type:"q",eng:"Where's the remote control?",note:"Asking for location."},{type:"q",eng:"Is there a pharmacy at the airport?",note:"\"At\" the airport \u2014 a destination point."}],errors:[{bad:"She is on the kitchen.",good:"She is in the kitchen.",reason:"Rooms and enclosed spaces use in."},{bad:"I live in the third floor.",good:"I live on the third floor.",reason:"Floors in buildings use on."},{bad:"I'm in home.",good:"I'm at home.",reason:"\"At home\" is a fixed expression."},{bad:"The book is in the shelf.",good:"The book is on the shelf.",reason:"A shelf is a surface \u2192 on."}],realUse:["\"I'm on the bus.\" / \"I'm in a taxi.\" \u2014 on for public transport, in for private vehicles.","\"I'll be there in five minutes.\" \u2014 \"in\" + time period.","\"She's at the doctor's.\" \u2014 \"at\" for appointments.","\"The meeting is on Tuesday, at 3pm, in the conference room.\" \u2014 all three."],exercises:[{type:"gap",title:"In, on or at?",sub:"Fill each gap with in, on, or at.",items:[{answer:"in",before:"She's ",after:" the kitchen."},{answer:"on",before:"The book is ",after:" the table."},{answer:"at",before:"I'll see you ",after:" the station."},{answer:"on",before:"My office is ",after:" the third floor."},{answer:"in",before:"I'm ",after:" a taxi right now."},{answer:"at",before:"She's ",after:" work today."},{answer:"on",before:"They met ",after:" the bus."},{answer:"in",before:"He was born ",after:" Rome."}]},{type:"gap",title:"More prepositions of place",sub:"Fill each gap with under, above, next to, between, or behind.",items:[{answer:"under",before:"The cat is sleeping ",after:" the sofa."},{answer:"next to",before:"The bank is ",after:" the supermarket."},{answer:"above",before:"There's a shelf ",after:" the desk."},{answer:"between",before:"The caf\u00e9 is ",after:" the bank and the post office."},{answer:"behind",before:"The car park is ",after:" the shopping centre."}]},{type:"categorise",title:"Categorise",sub:"Click a phrase, then click the correct column.",categories:[{name:"in",items:["the kitchen","a taxi","London","a box","the sky","the fridge"]},{name:"on",items:["the table","the bus","the third floor","the wall","the right"]},{name:"at",items:["home","work","the station","school","the airport","the doctor's"]}]},{type:"mc",title:"Choose the correct preposition",sub:"Choose the correct preposition.",items:[{q:"I'm ___ the bus, I'll be there soon.",opts:["in","on","at","under"],answer:"on",explanation:"Public transport uses on: on the bus, on the train, on the plane."},{q:"She's waiting ___ the bus stop.",opts:["in","on","at","next to"],answer:"at",explanation:"A bus stop is a point/destination \u2192 at."},{q:"He works ___ a hospital.",opts:["on","in","at","under"],answer:"in",explanation:"A hospital is an enclosed space/building \u2192 in."},{q:"The keys are ___ your coat pocket.",opts:["on","at","in","above"],answer:"in",explanation:"Inside a pocket \u2192 in."}]},{type:"ec",title:"Error correction",sub:"One error per sentence.",items:[{wrong:"She is on the kitchen.",correct:"She is in the kitchen.",hint:"Rooms use in."},{wrong:"I live in the third floor.",correct:"I live on the third floor.",hint:"Floors use on."},{wrong:"I'm in home.",correct:"I'm at home.",hint:"\"At home\" is fixed."},{wrong:"The book is in the shelf.",correct:"The book is on the shelf.",hint:"Surfaces use on."},{wrong:"He's at the garden.",correct:"He's in the garden.",hint:"The garden is an enclosed space \u2192 in."}]}]},
+
+{id:"prepostime",title:"Prepositions of time",subtitle:"at, in, on \u2014 with time expressions",intro:"At three o'clock. On Monday. In January. Three prepositions cover most time reference at A1.",desc:"The same three prepositions (at, in, on) that locate things in space also locate them in time \u2014 but with different rules.",tip:"Simple guide: <strong>at</strong> for times (at 6pm), <strong>on</strong> for days (on Monday), <strong>in</strong> for months and years (in March, in 2019). And no preposition with <em>next, last, this</em>: \"See you next Monday\" \u2014 not \"on next Monday.\"",explanation:"<p><strong>At</strong>: specific clock times and fixed time points (at 3pm, at midnight, at Christmas).</p><p><strong>On</strong>: days and dates (on Monday, on 5th March, on my birthday).</p><p><strong>In</strong>: months, years, seasons, times of day (in January, in 2020, in winter, in the morning).</p>",table:{headers:["Preposition","Use","Examples"],rows:[["at","Clock times + fixed points","at 6pm, at noon, at midnight, at Christmas, at the weekend"],["on","Days and dates","on Monday, on 12th April, on my birthday, on New Year's Day"],["in","Months, years, seasons, times of day","in March, in 2019, in winter, in the morning"],["no prep.","This / next / last + time word","this Monday, next week, last year"]]},examples:[{type:"pos",eng:"The class starts at half past nine.",note:"\"At\" + clock time."},{type:"pos",eng:"We met on a cold Tuesday in November.",note:"Day (on) + month (in) \u2014 both in one sentence."},{type:"pos",eng:"I was born in 1990.",note:"\"In\" + year."},{type:"neg",eng:"I don't work on Sundays.",note:"\"On\" + day of the week."},{type:"q",eng:"What time does it start?",note:"Answer: \"At seven o'clock.\""},{type:"q",eng:"When do you have English class?",note:"Answer: \"On Tuesdays, at six in the evening.\""}],errors:[{bad:"The party is in Friday.",good:"The party is on Friday.",reason:"Days of the week use on."},{bad:"I was born on 1992.",good:"I was born in 1992.",reason:"Years use in."},{bad:"She arrived at the morning.",good:"She arrived in the morning.",reason:"Parts of the day use in. Exception: at night."},{bad:"See you on next Monday.",good:"See you next Monday.",reason:"No preposition with next, last, this + time word."}],realUse:["\"At the moment\" / \"at present\" \u2014 common discourse markers.","\"In time\" = with enough time to spare. \"On time\" = exactly at the scheduled time.","\"At the weekend\" (British) / \"on the weekend\" (American).","\"In the end\" = finally. \"At the end\" = at the final point of something."],exercises:[{type:"categorise",title:"At, in or on?",sub:"Click a time expression, then click the correct column.",categories:[{name:"at",items:["6 o'clock","midnight","Christmas","the weekend","noon","night"]},{name:"on",items:["Monday","14th April","my birthday","New Year's Day","a Tuesday","Saturday morning"]},{name:"in",items:["March","2019","winter","the morning","the 20th century","the evening"]}]},{type:"gap",title:"Fill the gaps",sub:"Fill each blank with at, in, on, or \u2014 (no preposition).",items:[{answer:"on",before:"The meeting is ",after:" Tuesday."},{answer:"in",before:"I was born ",after:" 1988."},{answer:"at",before:"The class starts ",after:" nine o'clock."},{answer:"in",before:"She always goes jogging ",after:" the morning."},{answer:"\u2014",before:"I'll see you ",after:" next Friday."},{answer:"at",before:"We always have dinner together ",after:" Christmas."},{answer:"on",before:"She started university ",after:" 5th September."},{answer:"in",before:"It gets dark early ",after:" winter."}]},{type:"mc",title:"At, in, on \u2014 or nothing?",sub:"Choose the correct option.",items:[{q:"I'll call you ___ the morning.",opts:["at","on","in","\u2014"],answer:"in",explanation:"Times of day (morning, afternoon, evening) use in."},{q:"We met ___ a Thursday evening in July.",opts:["at","on","in","\u2014"],answer:"on",explanation:"Specific day \u2192 on. The month and time of day follow separately."},{q:"She always works late ___ night.",opts:["in","on","at","\u2014"],answer:"at",explanation:"At night is a fixed expression \u2014 unlike other times of day which use in."},{q:"See you ___ next week.",opts:["in","on","at","\u2014"],answer:"\u2014",explanation:"No preposition before next/last/this + time word."}]},{type:"convo",title:"Fill the conversation",sub:"Complete the dialogue with at, in, on, or \u2014 (no preposition).",lines:[{speaker:"A",text:"When is the party? [On] Saturday?"},{speaker:"B",text:"Yes, [on] Saturday evening. It starts [at] eight."},{speaker:"A",text:"And where exactly? I know it's [in] the city centre."},{speaker:"B",text:"Yes, [at] the Grand Hotel. I'll send you the address [in] the morning."},{speaker:"A",text:"Great. See you [\u2014] Saturday then!"}]},{type:"ec",title:"Error correction",sub:"One error per sentence.",items:[{wrong:"The concert is in Saturday.",correct:"The concert is on Saturday.",hint:"Days of the week \u2192 on."},{wrong:"I started this job on 2019.",correct:"I started this job in 2019.",hint:"Years \u2192 in."},{wrong:"She arrived at the morning.",correct:"She arrived in the morning.",hint:"Morning/afternoon/evening \u2192 in."},{wrong:"See you on next Tuesday.",correct:"See you next Tuesday.",hint:"No preposition with next/last/this."},{wrong:"I usually go to the gym in Monday.",correct:"I usually go to the gym on Monday.",hint:"Days of the week \u2192 on."}]}]},
+
+{id:"quantifiers",title:"Quantifiers",subtitle:"some, any, much, many, a lot of",intro:"How much? How many? The key words for talking about quantity at A1.",desc:"Quantifiers express quantity without using numbers. The some/any distinction alone accounts for a huge number of errors among beginners.",tip:"Simple rule: <strong>some</strong> in positive sentences, <strong>any</strong> in negatives and questions. \"I have some milk.\" \"I don't have any milk.\" One exception: offers. \"Would you like <strong>some</strong> coffee?\" \u2014 because you expect yes.",explanation:"<p><strong>Some</strong> is used in positive statements and questions where an offer or request is being made.</p><p><strong>Any</strong> is used in negative sentences and most questions.</p><p><strong>Much</strong> is used with uncountable nouns, <strong>many</strong> with countable nouns \u2014 mainly in negatives and questions.</p>",table:{headers:["Quantifier","With","Use / example"],rows:[["some","count (pl.) + uncount","I need some milk. / There are some students."],["any","count (pl.) + uncount","I don't have any money. / Are there any seats?"],["much","uncountable","There isn't much time. / How much does it cost?"],["many","countable (plural)","There aren't many people. / How many students?"],["a lot of","both","I have a lot of work. / There are a lot of people."],]},examples:[{type:"pos",eng:"There's some coffee in the kitchen.",note:"\"Some\" in a positive statement."},{type:"pos",eng:"I have a lot of homework tonight.",note:"\"A lot of\" in positive sentences."},{type:"neg",eng:"There isn't any bread left.",note:"\"Any\" in a negative sentence."},{type:"neg",eng:"There aren't many students today.",note:"\"Many\" with plural countable noun."},{type:"q",eng:"Have you got any questions?",note:"\"Any\" in a standard question."},{type:"q",eng:"Would you like some tea?",note:"\"Some\" in an offer \u2014 we expect yes."}],errors:[{bad:"I need some informations.",good:"I need some information.",reason:"\"Information\" is uncountable \u2014 no plural."},{bad:"There are much people here.",good:"There are many people here.",reason:"\"Much\" is for uncountable nouns. \"People\" is plural countable \u2192 many."},{bad:"I don't have some money.",good:"I don't have any money.",reason:"\"Any\" is used in negative sentences."},{bad:"How many money do you have?",good:"How much money do you have?",reason:"\"Money\" is uncountable \u2192 how much."}],realUse:["\"Can I have some water, please?\" \u2014 polite request.","\"Is there any news?\" \u2014 singular uncountable noun with any."],exercises:[{type:"categorise",title:"Countable or uncountable?",sub:"Click a word, then click the correct column.",categories:[{name:"Countable",items:["students","books","cars","questions","friends","bottles"]},{name:"Uncountable",items:["information","music","water","advice","homework","money"]}]},{type:"gap",title:"Some, any, much or many?",sub:"Fill each gap with some, any, much, or many.",items:[{answer:"some",before:"There's ",after:" coffee in the kitchen."},{answer:"any",before:"Is there ",after:" milk left?"},{answer:"any",before:"I don't have ",after:" money."},{answer:"many",before:"How ",after:" students are in your class?"},{answer:"much",before:"There isn't ",after:" time before the exam."},{answer:"some",before:"Would you like ",after:" tea?"},{answer:"any",before:"There aren't ",after:" seats left."},{answer:"many",before:"There aren't ",after:" people here today."}]},{type:"mc",title:"Multiple choice",sub:"Choose the correct quantifier.",items:[{q:"I don't have _____ money.",opts:["some","any","much","many"],answer:"any",explanation:"Negative sentence \u2192 any."},{q:"How _____ people came to the party?",opts:["much","many","some","any"],answer:"many",explanation:"\"People\" is plural countable \u2192 how many."},{q:"Would you like _____ coffee?",opts:["any","some","many","much"],answer:"some",explanation:"Offer \u2192 use some, not any."},{q:"There isn't _____ time before the exam.",opts:["many","some","much","any"],answer:"much",explanation:"\"Time\" is uncountable \u2192 much in negatives."}]},{type:"convo",title:"Fill the conversation",sub:"Complete the dialogue with some, any, much, or many.",lines:[{speaker:"A",text:"Is there [any] milk in the fridge?"},{speaker:"B",text:"Yes, there's [some] \u2014 not [much] though. Why?"},{speaker:"A",text:"I want to make coffee. How [many] cups do you want?"},{speaker:"B",text:"Just one for me. And are there [any] biscuits left?"},{speaker:"A",text:"No, there aren't [any]. I need to go shopping."},{speaker:"B",text:"Can you get [some] eggs too? We don't have [many]."}]},{type:"ec",title:"Error correction",sub:"One error per sentence.",items:[{wrong:"I need some informations.",correct:"I need some information.",hint:"\"Information\" is uncountable \u2014 no plural."},{wrong:"There are much people here.",correct:"There are many people here.",hint:"\"People\" is countable \u2192 many."},{wrong:"I don't have some money.",correct:"I don't have any money.",hint:"\"Any\" in negative sentences."},{wrong:"How many money do you have?",correct:"How much money do you have?",hint:"\"Money\" is uncountable \u2192 much."},{wrong:"There isn't many milk.",correct:"There isn't much milk.",hint:"\"Milk\" is uncountable \u2192 much."}]}]},
+
+{id:"wh",title:"Wh- questions",subtitle:"who, what, where, when, why, how",intro:"Six question words that unlock almost every conversation.",desc:"Wh- questions are the engine of real communication. At A1, students need to produce them accurately and fast \u2014 not just recognise them. Word order is the key challenge.",tip:"The most common mistake: <strong>\"What means this word?\"</strong> Wrong. It should be <strong>\"What does this word mean?\"</strong> With do/does questions, the verb goes at the end: question word + does/do + subject + verb.",explanation:"<p>Wh- questions are formed by placing a question word at the start, followed by the auxiliary verb, then the subject, then the main verb.</p><p>Exception: when the question word IS the subject (e.g. \"Who called?\"), there is no inversion and no auxiliary needed.</p>",table:{headers:["Question word","Asks about","Example"],rows:[["Who","person","Who is she? / Who did you meet?"],["What","thing, action","What is this? / What do you do?"],["Where","place","Where do you live?"],["When","time","When does the class start?"],["Why","reason","Why are you late?"],["How","manner, degree","How are you? / How far is it?"],["Which","choice","Which one do you prefer?"],["Whose","possession","Whose bag is this?"]]},examples:[{type:"q",eng:"What do you do for a living?",note:"Asking about job. \"Do\" is both auxiliary and main verb here."},{type:"q",eng:"Where does she work?",note:"\"Does\" for she + base verb."},{type:"q",eng:"Who called last night?",note:"\"Who\" is the subject \u2014 no inversion, no auxiliary."},{type:"q",eng:"How many languages do you speak?",note:"\"How\" + adjective/adverb = more specific question."},{type:"q",eng:"Why are you laughing?",note:"Present continuous question \u2014 invert be and subject."},{type:"q",eng:"What time is it?",note:"Fixed expression."}],errors:[{bad:"What means this word?",good:"What does this word mean?",reason:"With do/does, use auxiliary + subject + verb."},{bad:"Where you live?",good:"Where do you live?",reason:"Need auxiliary \"do\"."},{bad:"How old you are?",good:"How old are you?",reason:"With be, invert subject and verb."},{bad:"Why did she left?",good:"Why did she leave?",reason:"After \"did\", base form."}],realUse:["\"What do you do?\" = What is your job?","\"How come?\" = informal why.","\"What's it like?\" = asking for a description.","\"Who knows?\" = rhetorical question meaning nobody knows."],exercises:[{type:"gap",title:"Question words",sub:"Fill each gap with the correct question word (what, where, when, who, why, how).",items:[{answer:"Where",before:"",after:" do you live?"},{answer:"What",before:"",after:" do you do? (asking about job)"},{answer:"When",before:"",after:" does the class start?"},{answer:"Why",before:"",after:" are you laughing?"},{answer:"Who",before:"",after:" is your favourite teacher?"},{answer:"How",before:"",after:" are you?"},{answer:"Which",before:"",after:" one do you prefer \u2014 tea or coffee?"},{answer:"Whose",before:"",after:" bag is this?"}]},{type:"gap",title:"Full question formation",sub:"Fill each gap to complete the question correctly.",items:[{answer:"does",before:"Where ",after:" she work?"},{answer:"do",before:"What time ",after:" you usually wake up?"},{answer:"are",before:"How old ",after:" you?"},{answer:"did",before:"Why ",after:" she leave early?"},{answer:"does",before:"How many languages ",after:" he speak?"},{answer:"is",before:"Where ",after:" your brother from?"}]},{type:"builder",title:"Sentence builder",sub:"Put the words in the correct order to make a wh- question.",items:[{words:["where","do","you","live","?"],answer:"where do you live ?",context:"Asking about location."},{words:["what","does","she","do","?"],answer:"what does she do ?",context:"Asking about someone's job."},{words:["why","are","you","laughing","?"],answer:"why are you laughing ?",context:"Asking for a reason."},{words:["how","many","students","are","in","your","class","?"],answer:"how many students are in your class ?",context:"Asking about quantity."},{words:["what","time","does","the","film","start","?"],answer:"what time does the film start ?",context:"Asking about time."}]},{type:"match",title:"Match question to answer",sub:"Match the question to the most natural answer.",leftHead:"Question",rightHead:"Answer",pairs:[{left:"Where do you live?",right:"In Madrid, near the centre."},{left:"What do you do?",right:"I'm a teacher."},{left:"How many languages do you speak?",right:"Three \u2014 Spanish, English, French."},{left:"When does the class start?",right:"At half past six."},{left:"Why are you learning English?",right:"For my job."},{left:"Whose bag is this?",right:"It's mine."}]},{type:"ec",title:"Error correction",sub:"One error per sentence.",items:[{wrong:"What means this word?",correct:"What does this word mean?",hint:"Auxiliary + subject + verb after wh- word."},{wrong:"Where you live?",correct:"Where do you live?",hint:"Need auxiliary \"do\"."},{wrong:"How old you are?",correct:"How old are you?",hint:"Invert subject and \"be\"."},{wrong:"Why did she left early?",correct:"Why did she leave early?",hint:"After \"did\", base form \u2014 not past tense."},{wrong:"What time starts the film?",correct:"What time does the film start?",hint:"Use do/does + subject + verb."}]}]},
+
+{id:"can",title:"Can and can't",subtitle:"Ability and permission at A1",intro:"The most important modal verb. Simple, versatile, and everywhere.",desc:"Can is probably the most useful modal verb at A1. It covers ability, permission, and requests.",tip:"Never use <strong>to</strong> after <em>can</em>: <strong>\"I can swim.\"</strong> Not \"I can to swim.\" And <em>can</em> never adds -s: \"She <strong>can</strong>\" \u2014 not \"she cans.\" Same rule for all modal verbs.",explanation:"<p><strong>Can</strong> is a modal verb followed by the <strong>base form</strong> \u2014 never the infinitive with \"to\", never the -ing form.</p><p>Key uses at A1: <strong>ability</strong> (\"I can swim\"), <strong>permission</strong> (\"Can I open the window?\"), and <strong>requests</strong> (\"Can you help me?\").</p>",table:{headers:["Form","Example","Use"],rows:[["can + base verb","I can speak French.","Ability"],["can't + base verb","She can't drive yet.","Inability"],["Can + subject...?","Can I use your phone?","Permission / request"],["Could + subject...?","Could you help me?","More polite request"],["Short answer","Yes, I can. / No, I can't.","Always base form"]]},examples:[{type:"pos",eng:"He can play three instruments.",note:"Natural ability."},{type:"pos",eng:"Can I sit here?",note:"Asking for permission \u2014 very common at A1."},{type:"neg",eng:"I can't find my keys.",note:"\"Can't\" = can + not, always contracted in speech."},{type:"neg",eng:"Sorry, you can't park here.",note:"Denying permission."},{type:"q",eng:"Can you help me with this?",note:"Request \u2014 polite and common."},{type:"q",eng:"What can I do for you?",note:"Offering help \u2014 fixed expression."}],errors:[{bad:"I can to swim.",good:"I can swim.",reason:"Modal verbs never followed by \"to\" + infinitive."},{bad:"She cans speak English.",good:"She can speak English.",reason:"\"Can\" never adds -s."},{bad:"I can't to understand.",good:"I can't understand.",reason:"No \"to\" after modal verbs."},{bad:"Can you to pass the salt?",good:"Can you pass the salt?",reason:"No \"to\" in requests."}],realUse:["\"Can I have the bill, please?\" \u2014 natural restaurant request.","\"You can't be serious!\" \u2014 expressing disbelief.","\"Can you hear me?\" \u2014 checking in video calls.","\"Could you...?\" \u2014 slightly more polite than \"Can you...?\""],exercises:[{type:"gap",title:"Can or can't?",sub:"Fill each gap with can or can't.",items:[{answer:"can",before:"She ",after:" play the guitar really well."},{answer:"can't",before:"I ",after:" find my passport anywhere."},{answer:"can't",before:"Sorry, you ",after:" park here."},{answer:"can",before:"What ",after:" I do for you?"},{answer:"can",before:"He ",after:" speak four languages."},{answer:"can't",before:"I ",after:" come to the party \u2014 I'm busy."},{answer:"can",before:"",after:" you help me with this?"},{answer:"can't",before:"She ",after:" drive yet. She's only sixteen."}]},{type:"gap",title:"Requests and permission",sub:"Fill each gap with Can or Could.",items:[{answer:"Can",before:"",after:" I use your charger for a minute?"},{answer:"Could",before:"Excuse me, ",after:" you help me with this? (more polite)"},{answer:"Can",before:"",after:" I open the window? It's very hot."},{answer:"Could",before:"",after:" you speak more slowly, please? (more polite)"}]},{type:"mc",title:"Short answers and structures",sub:"Choose the correct option.",items:[{q:"Can you swim? \u2014 ___",opts:["Yes, I can.","Yes, I can swim.","Yes, can.","Yes, I could."],answer:"Yes, I can.",explanation:"Short answer with can: Yes, I can. (no main verb repeated)"},{q:"Can she drive? \u2014 ___",opts:["No, she can't drive.","No, she can't.","No, can't she.","No, she couldn't."],answer:"No, she can't.",explanation:"Short negative answer: No, she can't."},{q:"He ___ play the piano \u2014 he's amazing!",opts:["can to","cans","can","is can"],answer:"can",explanation:"Can + base verb. No -s, no to."},{q:"___ you speak up? I can't hear you.",opts:["Are","Do","Can","Is"],answer:"Can",explanation:"Can you...? = polite request."}]},{type:"transform",title:"Sentence transformation",sub:"Rewrite using the keyword given.",items:[{original:"She is able to speak three languages.",keyword:"can",answer:"She can speak three languages."},{original:"It is not permitted to park here.",keyword:"can't",answer:"You can't park here."},{original:"Is it possible for me to sit here?",keyword:"Can",answer:"Can I sit here?"},{original:"He is not able to drive yet.",keyword:"can't",answer:"He can't drive yet."},{original:"Is it possible for you to call me later?",keyword:"Could",answer:"Could you call me later?"}]},{type:"ec",title:"Error correction",sub:"One error per sentence.",items:[{wrong:"I can to drive.",correct:"I can drive.",hint:"No \"to\" after modal verbs."},{wrong:"She cans swim very fast.",correct:"She can swim very fast.",hint:"\"Can\" never takes -s."},{wrong:"He can't to sleep.",correct:"He can't sleep.",hint:"No \"to\" even in negatives."},{wrong:"Can you to help me?",correct:"Can you help me?",hint:"No \"to\" in requests."},{wrong:"Can she swims?",correct:"Can she swim?",hint:"After can, use the base form \u2014 no -s."}]}]}
+
+]; // end lessons array
+
+// ── PRINT ──
+function printLesson(){
+  const labels = document.querySelectorAll('.section-label');
+  const wasCollapsed = [];
+  labels.forEach((label,i)=>{
+    const body = label.nextElementSibling;
+    wasCollapsed[i] = label.classList.contains('collapsed');
+    if(wasCollapsed[i]){
+      label.classList.remove('collapsed');
+      if(body) body.classList.remove('collapsed');
+    }
+  });
+  setTimeout(()=>{
+    window.print();
+    setTimeout(()=>{
+      labels.forEach((label,i)=>{
+        if(wasCollapsed[i]){
+          label.classList.add('collapsed');
+          const body = label.nextElementSibling;
+          if(body) body.classList.add('collapsed');
+        }
+      });
+    }, 500);
+  }, 150);
+}
+
+// ── COLLAPSIBLE SECTIONS ──
+function toggleAllSections(btn){
+  const isOpen = btn.textContent === 'Open all';
+  document.querySelectorAll('.section-label').forEach(label=>{
+    const body = label.nextElementSibling;
+    if(body && body.classList.contains('section-body')){
+      if(isOpen){ label.classList.remove('collapsed'); body.classList.remove('collapsed'); }
+      else { label.classList.add('collapsed'); body.classList.add('collapsed'); }
+    }
+  });
+  btn.textContent = isOpen ? 'Close all' : 'Open all';
+}
+
+function toggleSection(label){
+  label.classList.toggle('collapsed');
+  const body = label.nextElementSibling;
+  if(body && body.classList.contains('section-body')){
+    body.classList.toggle('collapsed');
+  }
+}
+// ── DONE STATE ──
+const done = JSON.parse(localStorage.getItem('jpe-a1-done')||'[]');
+let current = 0;
+
+// ── SIDEBAR ──
+function buildSidebar(){
+  const nav = document.getElementById('topic-nav');
+  nav.innerHTML = lessons.map((l,i)=>`
+    <button class="topic-link${i===current?' active':''}${done.includes(l.id)?' done':''}" onclick="goto(${i})">
+      <span class="tl-num">${String(i+1).padStart(2,'0')}</span>
+      <span class="tl-check">${done.includes(l.id)?'✓':''}</span>
+      <span class="tl-name">${l.title}<br><small style="font-size:11px;opacity:.6">${l.subtitle}</small></span>
+    </button>`).join('');
+  const pct = (done.length/lessons.length)*100;
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('prog-text').textContent=`${done.length}/${lessons.length}`;
+}
+
+// ── BUILD LESSON ──
+function buildLesson(l, idx){
+  const isLast = idx===lessons.length-1;
+  const isDone = done.includes(l.id);
+
+  const tableHTML = `<table class="form-table">
+    <thead><tr>${l.table.headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+    <tbody>${l.table.rows.map(r=>`<tr>${r.map((c,ci)=>`<td class="${ci===0?'subject':ci===1?'form':ci===2?'neg':'example'}">${c}</td>`).join('')}</tr>`).join('')}</tbody>
+  </table>`;
+
+  const exHTML = l.examples.map(e=>`
+    <div class="example-item">
+      <div class="ex-marker ${e.type}">${e.type==='pos'?'+':e.type==='neg'?'−':'?'}</div>
+      <div><div class="ex-eng">${e.eng}</div><div class="ex-note">${e.note}</div></div>
+    </div>`).join('');
+
+  const errHTML = l.errors.map(e=>`
+    <div class="error-row">
+      <div class="error-bad"><div class="error-label"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Wrong</div><div class="error-text">${e.bad}</div></div>
+      <div class="error-good"><div class="error-label"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Correct</div><div class="error-text">${e.good}</div></div>
+    </div>
+    `).join('');
+
+  const realHTML = l.realUse.map(r=>`<li>${r}</li>`).join('');
+
+  const exerciseHTML = l.exercises.map((ex,ei)=>{
+
+    // ── GAP FILL ──
+    if(ex.type==='gap'){
+      const items = ex.items.map((it,ii)=>`
+        <div class="gap-sentence">
+          <span class="gap-num">${ii+1}.</span>
+          <span>${(it.before||'').replace(/_+\s*$/,'').trimEnd()}</span>
+          <span class="gap-wrap">
+            <input class="gap-input" id="gap-${l.id}-${ei}-${ii}" data-answer="${it.answer}" placeholder="" autocomplete="off" style="width:${Math.max(4,it.answer.length+1)}ch">
+            <span class="gap-reveal" id="gap-rev-${l.id}-${ei}-${ii}"></span>
+          </span>
+          <span>${(it.after||'').replace(/^\s*_+/,'').trimStart()}</span>
+        </div>`).join('');
+      return `<div class="exercise-card">
+        <div class="ex-card-header">
+          <div><div class="ex-card-title">${ex.title}</div><div class="ex-card-sub">${ex.sub}</div></div>
+          <span class="ex-type-badge">Gap fill</span>
+        </div>
+        <div class="ex-card-body">${items}
+          <div class="check-row">
+            <button class="btn-check" onclick="checkGap('${l.id}',${ei},${ex.items.length})">Check answers</button>
+            <button class="btn-reset" onclick="resetGap('${l.id}',${ei},${ex.items.length})">Reset</button>
+          </div>
+          <div class="score-badge" id="score-gap-${l.id}-${ei}"></div>
+        </div></div>`;
+    }
+
+    // ── MULTIPLE CHOICE ──
+    if(ex.type==='mc'){
+      const items = ex.items.map((it,ii)=>`
+        <div class="mc-question" id="mc-${l.id}-${ei}-${ii}">
+          <div class="mc-text">${ii+1}. ${it.q}</div>
+          <div class="mc-options">${it.opts.map(o=>`<button class="mc-opt" onclick="pickMC('${l.id}',${ei},${ii},'${o.replace(/'/g,"'")}','${it.answer.replace(/'/g,"'")}','${it.explanation.replace(/'/g,"'")}')" data-opt="${o}">${o}</button>`).join('')}</div>
+          <div class="mc-feedback" id="mcfb-${l.id}-${ei}-${ii}"></div>
+        </div>`).join('');
+      return `<div class="exercise-card">
+        <div class="ex-card-header">
+          <div><div class="ex-card-title">${ex.title}</div><div class="ex-card-sub">${ex.sub}</div></div>
+          <span class="ex-type-badge">Multiple choice</span>
+        </div>
+        <div class="ex-card-body">${items}</div></div>`;
+    }
+
+    // ── ERROR CORRECTION ──
+    if(ex.type==='ec'){
+      const items = ex.items.map((it,ii)=>`
+        <div class="ec-item">
+          <div class="ec-sentence">✗ ${it.wrong}</div>
+          <div class="ec-input-row">
+            <input class="ec-input" id="ec-${l.id}-${ei}-${ii}" data-answer="${it.correct}" placeholder="Write the correct sentence…">
+          </div>
+          <div style="font-size:11px;color:var(--ink3);margin-top:4px">Hint: ${it.hint}</div>
+        </div>`).join('');
+      return `<div class="exercise-card">
+        <div class="ex-card-header">
+          <div><div class="ex-card-title">${ex.title}</div><div class="ex-card-sub">${ex.sub}</div></div>
+          <span class="ex-type-badge">Error correction</span>
+        </div>
+        <div class="ex-card-body">${items}
+          <div class="check-row">
+            <button class="btn-check" onclick="checkEC('${l.id}',${ei},${ex.items.length})">Check answers</button>
+            <button class="btn-reset" onclick="resetEC('${l.id}',${ei},${ex.items.length})">Reset</button>
+          </div>
+          <div class="score-badge" id="score-ec-${l.id}-${ei}"></div>
+        </div></div>`;
+    }
+
+    // ── SENTENCE BUILDER ──
+    if(ex.type==='builder'){
+      const sid = `${l.id}-${ei}`;
+      const items = ex.items.map((it,ii)=>{
+        const shuffled = [...it.words].sort(()=>Math.random()-.5);
+        const wordBtns = shuffled.map((w,wi)=>`<button class="sb-word" id="sbw-${sid}-${ii}-${wi}" data-word="${w}" onclick="sbClick('${sid}',${ii},${wi})">${w}</button>`).join('');
+        return `<div class="sb-sentence" id="sb-sent-${sid}-${ii}">
+          <div class="sb-sentence-num">${ii+1}.</div>
+          ${it.context?`<div class="sb-context">${it.context}</div>`:''}
+          <div class="sb-slot" id="sb-slot-${sid}-${ii}"></div>
+          <div class="sb-bank" id="sb-bank-${sid}-${ii}">${wordBtns}</div>
+          <div class="sb-result" id="sb-res-${sid}-${ii}"></div>
+        </div>`;
+      }).join('');
+      return `<div class="exercise-card">
+        <div class="ex-card-header">
+          <div><div class="ex-card-title">${ex.title}</div><div class="ex-card-sub">${ex.sub}</div></div>
+          <span class="ex-type-badge">Sentence builder</span>
+        </div>
+        <div class="ex-card-body">${items}
+          <div class="check-row">
+            <button class="btn-check" onclick="checkBuilder('${sid}',${ex.items.length},${JSON.stringify(ex.items.map(i=>i.answer)).replace(/"/g,'&quot;')})">Check answers</button>
+            <button class="btn-reset" onclick="resetBuilder('${sid}',${ex.items.length},${JSON.stringify(ex.items.map(i=>i.words)).replace(/"/g,'&quot;')})">Reset</button>
+          </div>
+          <div class="score-badge" id="score-sb-${sid}"></div>
+        </div></div>`;
+    }
+
+    // ── MATCHING ──
+    if(ex.type==='match'){
+      const mid = `${l.id}-${ei}`;
+      const leftBtns = ex.pairs.map((p,pi)=>`<button class="match-item" id="ml-${mid}-${pi}" data-idx="${pi}" data-side="left" onclick="matchClick('${mid}',${pi},'left')">${p.left}</button>`).join('');
+      const rightShuffled = ex.pairs.map((p,pi)=>({text:p.right,idx:pi})).sort(()=>Math.random()-.5);
+      const rightBtns = rightShuffled.map((p,ri)=>`<button class="match-item" id="mr-${mid}-${ri}" data-idx="${p.idx}" data-side="right" onclick="matchClick('${mid}',${ri},'right')">${p.text}</button>`).join('');
+      return `<div class="exercise-card">
+        <div class="ex-card-header">
+          <div><div class="ex-card-title">${ex.title}</div><div class="ex-card-sub">${ex.sub}</div></div>
+          <span class="ex-type-badge">Matching</span>
+        </div>
+        <div class="ex-card-body">
+          <div class="match-cols">
+            <div><div class="match-col-head">${ex.leftHead||'A'}</div>${leftBtns}</div>
+            <div><div class="match-col-head">${ex.rightHead||'B'}</div>${rightBtns}</div>
+          </div>
+          <div class="score-badge" id="score-match-${mid}"></div>
+        </div></div>`;
+    }
+
+    // ── TRANSFORMATION ──
+    if(ex.type==='transform'){
+      const tid = `${l.id}-${ei}`;
+      const items = ex.items.map((it,ii)=>`
+        <div class="transform-item">
+          <div class="transform-original">${ii+1}. ${it.original}<br><span style="font-size:12px;color:var(--ink3)">Use: <span class="transform-keyword">${it.keyword}</span></span></div>
+          <input class="transform-input" id="tr-${tid}-${ii}" data-answer="${it.answer}" placeholder="Rewrite the sentence…">
+          <div class="transform-reveal" id="tr-rev-${tid}-${ii}"></div>
+        </div>`).join('');
+      return `<div class="exercise-card">
+        <div class="ex-card-header">
+          <div><div class="ex-card-title">${ex.title}</div><div class="ex-card-sub">${ex.sub}</div></div>
+          <span class="ex-type-badge">Transformation</span>
+        </div>
+        <div class="ex-card-body">${items}
+          <div class="check-row">
+            <button class="btn-check" onclick="checkTransform('${tid}',${ex.items.length})">Check answers</button>
+            <button class="btn-reset" onclick="resetTransform('${tid}',${ex.items.length})">Reset</button>
+          </div>
+          <div class="score-badge" id="score-tr-${tid}"></div>
+        </div></div>`;
+    }
+
+    // ── CATEGORISATION ──
+    if(ex.type==='categorise'){
+      const cid = `${l.id}-${ei}`;
+      const allWords = ex.categories.flatMap((c,ci)=>c.items.map(w=>({w,ci}))).sort(()=>Math.random()-.5);
+      const wordBtns = allWords.map((item,wi)=>`<button class="cat-word" id="cw-${cid}-${wi}" data-cat="${item.ci}" onclick="catClick('${cid}',${wi})">${item.w}</button>`).join('');
+      const cols = ex.categories.map((c,ci)=>`
+        <div class="cat-col" id="cc-${cid}-${ci}" onclick="catColClick('${cid}',${ci})" style="cursor:pointer">
+          <div class="cat-col-head" style="color:${['var(--sky)','var(--sea)','var(--sun)','var(--lav)'][ci]||'var(--ink3)'}">${c.name}</div>
+          <div class="cat-col-items" id="cc-items-${cid}-${ci}"></div>
+        </div>`).join('');
+      const colStyle = `grid-template-columns:repeat(${ex.categories.length},1fr)`;
+      return `<div class="exercise-card">
+        <div class="ex-card-header">
+          <div><div class="ex-card-title">${ex.title}</div><div class="ex-card-sub">${ex.sub}</div></div>
+          <span class="ex-type-badge">Categorise</span>
+        </div>
+        <div class="ex-card-body">
+          <div class="cat-bank" id="cb-${cid}">${wordBtns}</div>
+          <div class="cat-columns" style="${colStyle}">${cols}</div>
+          <div class="check-row">
+            <button class="btn-check" onclick="checkCat('${cid}',${ex.categories.length})">Check answers</button>
+            <button class="btn-reset" onclick="resetCat('${cid}',${ex.categories.length})">Reset</button>
+          </div>
+          <div class="score-badge" id="score-cat-${cid}"></div>
+        </div></div>`;
+    }
+
+    // ── CONVERSATION FILL ──
+    if(ex.type==='convo'){
+      const cvid = `${l.id}-${ei}`;
+      let gapCount = 0;
+      const lines = ex.lines.map((line,li)=>{
+        const spk = line.speaker==='A'?'a':'b';
+        const text = line.text.replace(/\[([^\]]+)\]/g,(match,ans)=>{
+          const gi = gapCount++;
+          return `<span class="convo-gwrap"><input class="convo-input" id="cv-${cvid}-${gi}" data-answer="${ans}" autocomplete="off" style="width:${Math.max(4,ans.replace(/\//g,'').split('/')[0].length+1)}ch"><span class="convo-reveal" id="cv-rev-${cvid}-${gi}"></span></span>`;
+        });
+        return `<div class="convo-line"><span class="convo-speaker ${spk}">${line.speaker}</span><span class="convo-text">${text}</span></div>`;
+      }).join('');
+      const total = gapCount;
+      return `<div class="exercise-card">
+        <div class="ex-card-header">
+          <div><div class="ex-card-title">${ex.title}</div><div class="ex-card-sub">${ex.sub}</div></div>
+          <span class="ex-type-badge">Conversation</span>
+        </div>
+        <div class="ex-card-body">
+          <div class="convo-wrap">${lines}</div>
+          <div class="check-row">
+            <button class="btn-check" onclick="checkConvo('${cvid}',${total})">Check answers</button>
+            <button class="btn-reset" onclick="resetConvo('${cvid}',${total})">Reset</button>
+          </div>
+          <div class="score-badge" id="score-cv-${cvid}"></div>
+        </div></div>`;
+    }
+
+    // ── TRUE / FALSE / NOT GIVEN ──
+    if(ex.type==='tf'){
+      const tfid = `${l.id}-${ei}`;
+      const items = ex.items.map((it,ii)=>`
+        <div class="tf-item">
+          ${it.context?`<div class="tf-context">"${it.context}"</div>`:''}
+          <div class="tf-statement">${ii+1}. ${it.statement}</div>
+          <div class="tf-options">
+            ${['True','False','Not given'].map(opt=>`<button class="tf-btn" onclick="pickTF('${tfid}',${ii},'${opt}','${it.answer}','${it.explanation.replace(/'/g,"'")}') ">${opt}</button>`).join('')}
+          </div>
+          <div class="tf-feedback" id="tf-fb-${tfid}-${ii}"></div>
+        </div>`).join('');
+      return `<div class="exercise-card">
+        <div class="ex-card-header">
+          <div><div class="ex-card-title">${ex.title}</div><div class="ex-card-sub">${ex.sub}</div></div>
+          <span class="ex-type-badge">True / False</span>
+        </div>
+        <div class="ex-card-body">${items}</div></div>`;
+    }
+
+  }).join('');
+
+  return `
+  <div class="lesson-hero">
+    <div class="lesson-meta">
+      <span class="tag tag-a1">A1</span>
+      <span class="lesson-num">Topic ${idx+1} of ${lessons.length}</span>
+    </div>
+    <h1>${l.title} <span style="color:var(--ink3);font-weight:400;font-size:22px">— ${l.subtitle}</span></h1>
+    <p>${l.desc}</p>
+    <div class="lesson-toolbar">
+      <button class="btn ${isDone?'btn-done':'btn-primary'}" onclick="markDone('${l.id}',${idx})" id="done-btn-${l.id}">
+        ${isDone?'✓ Completed':'Mark as complete'}
+      </button>
+      <button class="btn btn-ghost" onclick="printLesson()">Print lesson</button>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <div>
+      <div class="section-label collapsed" onclick="toggleSection(this)"><span class="section-label-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span><h2>Explanation</h2><span class="section-label-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span></div>
+      <div class="section-body collapsed">
+        <div class="explain-card">
+          <div class="explain-lead">${l.intro}</div>
+          <div class="explain-body">${l.explanation}</div>
+        </div>
+        ${tip(l.tip)}
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label collapsed" onclick="toggleSection(this)"><span class="section-label-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span><h2>Form & structure</h2><span class="section-label-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span></div>
+      <div class="section-body collapsed">
+        <div class="explain-card" style="padding:0;overflow:hidden">${tableHTML}</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label collapsed" onclick="toggleSection(this)"><span class="section-label-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><h2>Examples</h2><span class="section-label-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span></div>
+      <div class="section-body collapsed">
+        <div class="examples-grid">${exHTML}</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label collapsed" onclick="toggleSection(this)"><span class="section-label-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span><h2>Common errors</h2><span class="section-label-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span></div>
+      <div class="section-body collapsed">
+        <div class="error-card"><h3>What learners get wrong — and why</h3>${errHTML}</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label collapsed" onclick="toggleSection(this)"><span class="section-label-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"/></svg></span><h2>In real use</h2><span class="section-label-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span></div>
+      <div class="section-body collapsed">
+        <div class="real-use"><h3>Native speaker patterns</h3><ul>${realHTML}</ul></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label collapsed" onclick="toggleSection(this)"><span class="section-label-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="14 2 18 6 7 17 3 17 3 13 14 2"/><line x1="3" y1="22" x2="21" y2="22"/></svg></span><h2>Practice</h2><span class="section-label-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span></div>
+      <div class="section-body collapsed">
+        <div style="display:flex;flex-direction:column;gap:16px">${exerciseHTML}</div>
+      </div>
+    </div>
+
+  </div>
+  <div class="lesson-footer">
+    <div class="footer-hint">${isDone?"✓ You've completed this topic.":"Complete the exercises above, then mark this topic as done."}</div>
+    <div class="footer-nav">
+      ${idx>0?`<button class="btn btn-ghost" onclick="goto(${idx-1})">← Previous</button>`:''}
+      ${!isLast?`<button class="btn btn-primary" onclick="goto(${idx+1})">Next topic →</button>`:`<button class="btn btn-done" onclick="alert('You\'ve completed the full A1 course! 🎉')">Finish A1 🎉</button>`}
+    </div>
+  </div>`;
+}
+
+// ── NAVIGATION ──
+function goto(i){
+  current=i;
+  const main=document.getElementById('main');
+  main.innerHTML=buildLesson(lessons[i],i);
+  main.style.animation='none';
+  main.offsetHeight;
+  main.style.animation='fadeUp .25s ease forwards';
+  document.getElementById('breadcrumb-topic').textContent=lessons[i].title;
+  buildSidebar();
+  window.scrollTo(0,0);
+}
+
+// ── MARK DONE ──
+function markDone(id,idx){
+  if(!done.includes(id)){done.push(id);localStorage.setItem('jpe-a1-done',JSON.stringify(done));}
+  goto(idx);
+}
+
+// ── GAP FILL ──
+function checkGap(lid,ei,count){
+  let correct=0;
+  for(let i=0;i<count;i++){
+    const inp=document.getElementById(`gap-${lid}-${ei}-${i}`);
+    const rev=document.getElementById(`gap-rev-${lid}-${ei}-${i}`);
+    const accepted=inp.dataset.answer.toLowerCase().split('/').map(a=>a.trim());
+    const val=inp.value.toLowerCase().trim();
+    const ok=accepted.includes(val)||(val===''&&accepted.includes('—'));
+    if(ok){inp.className='gap-input correct';rev.className='gap-reveal';correct++;}
+    else{inp.className='gap-input wrong';rev.textContent='→ '+inp.dataset.answer;rev.className='gap-reveal show';}
+  }
+  const badge=document.getElementById(`score-gap-${lid}-${ei}`);
+  const pct=Math.round((correct/count)*100);
+  badge.textContent=`${correct}/${count} correct (${pct}%)`;
+  badge.className=`score-badge show ${pct===100?'full':pct>=50?'partial':'low'}`;
+}
+function resetGap(lid,ei,count){
+  for(let i=0;i<count;i++){
+    const inp=document.getElementById(`gap-${lid}-${ei}-${i}`);
+    const rev=document.getElementById(`gap-rev-${lid}-${ei}-${i}`);
+    inp.value='';inp.className='gap-input';rev.textContent='';rev.className='gap-reveal';
+  }
+  document.getElementById(`score-gap-${lid}-${ei}`).className='score-badge';
+}
+
+// ── MULTIPLE CHOICE ──
+function pickMC(lid,ei,qi,choice,answer,explanation){
+  const container=document.getElementById(`mc-${lid}-${ei}-${qi}`);
+  container.querySelectorAll('.mc-opt').forEach(o=>{
+    o.classList.remove('correct-ans','wrong-ans');
+    if(o.dataset.opt===answer) o.classList.add('correct-ans');
+    if(o.dataset.opt===choice&&choice!==answer) o.classList.add('wrong-ans');
+  });
+  const fb=document.getElementById(`mcfb-${lid}-${ei}-${qi}`);
+  fb.textContent=explanation;
+  fb.className=`mc-feedback show ${choice===answer?'ok':'bad'}`;
+}
+
+// ── ERROR CORRECTION ──
+function checkEC(lid,ei,count){
+  let correct=0;
+  for(let i=0;i<count;i++){
+    const inp=document.getElementById(`ec-${lid}-${ei}-${i}`);
+    const ans=inp.dataset.answer.toLowerCase().replace(/[.!?,]/g,'').trim();
+    const val=inp.value.toLowerCase().replace(/[.!?,]/g,'').trim();
+    if(val===ans){inp.className='ec-input correct';correct++;}
+    else inp.className='ec-input wrong';
+  }
+  const badge=document.getElementById(`score-ec-${lid}-${ei}`);
+  const pct=Math.round((correct/count)*100);
+  badge.textContent=`${correct}/${count} correct (${pct}%)`;
+  badge.className=`score-badge show ${pct===100?'full':pct>=50?'partial':'low'}`;
+}
+function resetEC(lid,ei,count){
+  for(let i=0;i<count;i++){const inp=document.getElementById(`ec-${lid}-${ei}-${i}`);inp.value='';inp.className='ec-input';}
+  document.getElementById(`score-ec-${lid}-${ei}`).className='score-badge';
+}
+
+// ── SENTENCE BUILDER ──
+const sbState={};
+function sbClick(sid,si,wi){
+  if(!sbState[sid]) sbState[sid]={};
+  if(!sbState[sid][si]) sbState[sid][si]=[];
+  const wordEl=document.getElementById(`sbw-${sid}-${si}-${wi}`);
+  const word=wordEl.dataset.word;
+  sbState[sid][si].push({word,wi});
+  wordEl.classList.add('used');
+  const slot=document.getElementById(`sb-slot-${sid}-${si}`);
+  const placed=document.createElement('button');
+  placed.className='sb-placed';
+  placed.textContent=word;
+  placed.onclick=()=>sbRemove(sid,si,wi,placed);
+  slot.appendChild(placed);
+}
+function sbRemove(sid,si,wi,el){
+  const wordEl=document.getElementById(`sbw-${sid}-${si}-${wi}`);
+  wordEl.classList.remove('used');
+  sbState[sid][si]=sbState[sid][si].filter(x=>x.wi!==wi);
+  el.remove();
+}
+function checkBuilder(sid,count,answersJson){
+  const answers=JSON.parse(answersJson.replace(/&quot;/g,'"'));
+  let correct=0;
+  for(let i=0;i<count;i++){
+    const placed=(sbState[sid]&&sbState[sid][i])||[];
+    const built=placed.map(x=>x.word).join(' ').toLowerCase().trim();
+    const ans=answers[i].toLowerCase().trim();
+    const res=document.getElementById(`sb-res-${sid}-${i}`);
+    if(built===ans){res.textContent='✓ Correct!';res.className='sb-result show ok';correct++;}
+    else{res.textContent=`✗ Answer: ${answers[i]}`;res.className='sb-result show bad';}
+  }
+  const badge=document.getElementById(`score-sb-${sid}`);
+  const pct=Math.round((correct/count)*100);
+  badge.textContent=`${correct}/${count} correct (${pct}%)`;
+  badge.className=`score-badge show ${pct===100?'full':pct>=50?'partial':'low'}`;
+}
+function resetBuilder(sid,count,wordsJson){
+  const words=JSON.parse(wordsJson.replace(/&quot;/g,'"'));
+  sbState[sid]={};
+  for(let i=0;i<count;i++){
+    document.getElementById(`sb-slot-${sid}-${i}`).innerHTML='';
+    document.getElementById(`sb-res-${sid}-${i}`).className='sb-result';
+    const bank=document.getElementById(`sb-bank-${sid}-${i}`);
+    const shuffled=[...words[i]].sort(()=>Math.random()-.5);
+    bank.innerHTML=shuffled.map((w,wi)=>`<button class="sb-word" id="sbw-${sid}-${i}-${wi}" data-word="${w}" onclick="sbClick('${sid}',${i},${wi})">${w}</button>`).join('');
+  }
+  document.getElementById(`score-sb-${sid}`).className='score-badge';
+}
+
+// ── MATCHING ──
+const matchState={};
+function matchClick(mid,idx,side){
+  if(!matchState[mid]) matchState[mid]={left:null,right:null};
+  const elId=side==='left'?`ml-${mid}-${idx}`:`mr-${mid}-${idx}`;
+  const el=document.getElementById(elId);
+  if(el.classList.contains('matched')) return;
+  // deselect same side
+  document.querySelectorAll(`[id^="m${side==='left'?'l':'r'}-${mid}-"]`).forEach(e=>{if(!e.classList.contains('matched'))e.classList.remove('selected')});
+  el.classList.add('selected');
+  matchState[mid][side]={idx,elId};
+  const ms=matchState[mid];
+  if(ms.left&&ms.right){
+    const leftEl=document.getElementById(ms.left.elId);
+    const rightEl=document.getElementById(ms.right.elId);
+    const leftDataIdx=leftEl.dataset.idx;
+    const rightDataIdx=rightEl.dataset.idx;
+    if(leftDataIdx===rightDataIdx){
+      leftEl.classList.remove('selected');rightEl.classList.remove('selected');
+      leftEl.classList.add('matched');rightEl.classList.add('matched');
+      // check if all matched
+      const total=document.querySelectorAll(`[id^="ml-${mid}-"]`).length;
+      const matched=document.querySelectorAll(`[id^="ml-${mid}-"].matched`).length;
+      const badge=document.getElementById(`score-match-${mid}`);
+      if(matched===total){badge.textContent=`${total}/${total} — all matched! 🎉`;badge.className='score-badge show full';}
+    } else {
+      leftEl.classList.add('wrong-flash');rightEl.classList.add('wrong-flash');
+      setTimeout(()=>{leftEl.classList.remove('wrong-flash','selected');rightEl.classList.remove('wrong-flash','selected');},600);
+    }
+    matchState[mid]={left:null,right:null};
+  }
+}
+
+// ── TRANSFORMATION ──
+function checkTransform(tid,count){
+  let correct=0;
+  for(let i=0;i<count;i++){
+    const inp=document.getElementById(`tr-${tid}-${i}`);
+    const rev=document.getElementById(`tr-rev-${tid}-${i}`);
+    const ans=inp.dataset.answer.toLowerCase().replace(/[.!?,]/g,'').trim();
+    const val=inp.value.toLowerCase().replace(/[.!?,]/g,'').trim();
+    if(val===ans){inp.className='transform-input correct';rev.className='transform-reveal';correct++;}
+    else{inp.className='transform-input wrong';rev.textContent='→ '+inp.dataset.answer;rev.className='transform-reveal show';}
+  }
+  const badge=document.getElementById(`score-tr-${tid}`);
+  const pct=Math.round((correct/count)*100);
+  badge.textContent=`${correct}/${count} correct (${pct}%)`;
+  badge.className=`score-badge show ${pct===100?'full':pct>=50?'partial':'low'}`;
+}
+function resetTransform(tid,count){
+  for(let i=0;i<count;i++){
+    const inp=document.getElementById(`tr-${tid}-${i}`);
+    const rev=document.getElementById(`tr-rev-${tid}-${i}`);
+    inp.value='';inp.className='transform-input';rev.textContent='';rev.className='transform-reveal';
+  }
+  document.getElementById(`score-tr-${tid}`).className='score-badge';
+}
+
+// ── CATEGORISATION ──
+const catState={};
+function catClick(cid,wi){
+  if(!catState[cid]) catState[cid]={selected:null,placed:{}};
+  const cs=catState[cid];
+  const wordEl=document.getElementById(`cw-${cid}-${wi}`);
+  if(wordEl.classList.contains('placed')) return;
+  // find which column was most recently clicked (use a pending col)
+  if(cs.pendingCol===undefined||cs.pendingCol===null){
+    // first select the word
+    document.querySelectorAll(`[id^="cw-${cid}-"]`).forEach(e=>e.style.outline='');
+    wordEl.style.outline='2px solid var(--sky)';
+    cs.selectedWord={wi,word:wordEl.textContent,cat:parseInt(wordEl.dataset.cat)};
+  }
+}
+function catColClick(cid,ci){
+  if(!catState[cid]) catState[cid]={selectedWord:null,placed:{}};
+  const cs=catState[cid];
+  if(!cs.selectedWord) return;
+  const {wi,word}=cs.selectedWord;
+  const wordEl=document.getElementById(`cw-${cid}-${wi}`);
+  wordEl.classList.add('placed');
+  wordEl.style.outline='';
+  const colItems=document.getElementById(`cc-items-${cid}-${ci}`);
+  const placed=document.createElement('button');
+  placed.className='cat-placed';
+  placed.textContent=word;
+  placed.dataset.wi=wi;
+  placed.dataset.ci=String(ci);
+  placed.dataset.correctCat=String(cs.selectedWord.cat);
+  placed.style.background='var(--a1bg)';placed.style.borderColor='var(--sky)';placed.style.color='var(--sky)';
+  placed.onclick=()=>{
+    wordEl.classList.remove('placed');wordEl.style.outline='';
+    placed.remove();
+    if(catState[cid].placed[wi]) delete catState[cid].placed[wi];
+  };
+  colItems.appendChild(placed);
+  cs.placed[wi]={ci,correctCat:cs.selectedWord.cat};
+  cs.selectedWord=null;
+  document.querySelectorAll(`[id^="cw-${cid}-"]`).forEach(e=>e.style.outline='');
+}
+function checkCat(cid,numCols){
+  const cs=catState[cid]||{placed:{}};
+  let correct=0,total=0;
+  // check each placed item
+  for(const wi in cs.placed){
+    const {ci,correctCat}=cs.placed[wi];
+    const wordEl=document.getElementById(`cw-${cid}-${wi}`);
+    total++;
+    if(ci===correctCat) correct++;
+  }
+  // also count unplaced items (wrong — left in bank)
+  document.querySelectorAll(`[id^="cw-${cid}-"]:not(.placed)`).forEach(()=>total++);
+  // colour the columns
+  for(let ci=0;ci<numCols;ci++){
+    const col=document.getElementById(`cc-${cid}-${ci}`);
+    const items=document.getElementById(`cc-items-${cid}-${ci}`);
+    let colCorrect=true;
+    items.querySelectorAll('.cat-placed').forEach(p=>{
+      const correctCat=parseInt(p.dataset.correctCat);
+      const placedIn=parseInt(p.dataset.ci);
+      if(correctCat!==placedIn){colCorrect=false;p.style.background='#FFF0F0';p.style.borderColor='var(--coral)';p.style.color='var(--coral)';}
+      else{p.style.background='#E8F8F5';p.style.borderColor='var(--sea)';p.style.color='#0F7A6A';}
+    });
+  }
+  const badge=document.getElementById(`score-cat-${cid}`);
+  const pct=total>0?Math.round((correct/total)*100):0;
+  badge.textContent=`${correct}/${total} correct (${pct}%)`;
+  badge.className=`score-badge show ${pct===100?'full':pct>=50?'partial':'low'}`;
+}
+function resetCat(cid,numCols){
+  catState[cid]={selectedWord:null,placed:{}};
+  document.querySelectorAll(`[id^="cw-${cid}-"]`).forEach(e=>{e.classList.remove('placed');e.style.outline='';});
+  for(let ci=0;ci<numCols;ci++) document.getElementById(`cc-items-${cid}-${ci}`).innerHTML='';
+  document.getElementById(`score-cat-${cid}`).className='score-badge';
+}
+
+// ── CONVERSATION FILL ──
+function checkConvo(cvid,count){
+  let correct=0;
+  for(let i=0;i<count;i++){
+    const inp=document.getElementById(`cv-${cvid}-${i}`);
+    const rev=document.getElementById(`cv-rev-${cvid}-${i}`);
+    const accepted=inp.dataset.answer.toLowerCase().split('/').map(a=>a.trim());
+    const val=inp.value.toLowerCase().trim();
+    if(accepted.includes(val)){inp.className='convo-input correct';rev.className='convo-reveal';correct++;}
+    else{inp.className='convo-input wrong';rev.textContent='→ '+inp.dataset.answer;rev.className='convo-reveal show';}
+  }
+  const badge=document.getElementById(`score-cv-${cvid}`);
+  const pct=Math.round((correct/count)*100);
+  badge.textContent=`${correct}/${count} correct (${pct}%)`;
+  badge.className=`score-badge show ${pct===100?'full':pct>=50?'partial':'low'}`;
+}
+function resetConvo(cvid,count){
+  for(let i=0;i<count;i++){
+    const inp=document.getElementById(`cv-${cvid}-${i}`);
+    const rev=document.getElementById(`cv-rev-${cvid}-${i}`);
+    inp.value='';inp.className='convo-input';rev.textContent='';rev.className='convo-reveal';
+  }
+  document.getElementById(`score-cv-${cvid}`).className='score-badge';
+}
+
+// ── TRUE / FALSE / NOT GIVEN ──
+function pickTF(tfid,qi,choice,answer,explanation){
+  const item=document.getElementById(`tf-fb-${tfid}-${qi}`).parentElement;
+  item.querySelectorAll('.tf-btn').forEach(b=>{
+    b.classList.remove('correct-ans','wrong-ans');
+    if(b.textContent===answer) b.classList.add('correct-ans');
+    if(b.textContent===choice&&choice!==answer) b.classList.add('wrong-ans');
+  });
+  const fb=document.getElementById(`tf-fb-${tfid}-${qi}`);
+  fb.textContent=explanation;
+  fb.className=`tf-feedback show ${choice===answer?'ok':'bad'}`;
+}
+
+// ── INIT ──
+buildSidebar();
+goto(0);
+
+</script>
+</body>
+</html>
