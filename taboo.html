@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Taboo Cards · John+English</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sun:#FFB347;--sky:#2176FF;--sky-light:#E8EEFF;
+  --sea:#1DD3B0;--sea-light:#E4FBF7;
+  --coral:#FF6B6B;--coral-light:#FFE8E8;
+  --lavender:#9B72CF;--lavender-light:#F0E8FA;
+  --mint:#5DDEA0;--sand:#FFF5E6;
+  --cream:#F7F6F3;--ink:#2D3047;--muted:#7A7D8E;
+  --border:#E8E5DF;--card:#fff;--radius:14px;
+  --shadow-sm:0 1px 3px rgba(45,48,71,.06);
+  --shadow-md:0 4px 12px rgba(45,48,71,.08);
+  --shadow-lg:0 8px 32px rgba(45,48,71,.12)
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,var(--border) 1px,transparent 1px);background-size:28px 28px;opacity:.4;pointer-events:none;z-index:0}
+
+/* NAV */
+.topnav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(247,246,243,.88);backdrop-filter:blur(16px);border-bottom:1.5px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-family:'Outfit',sans-serif;font-size:1.3rem;font-weight:800;letter-spacing:-.02em;color:var(--ink);text-decoration:none}
+.nav-logo span{color:var(--sky)}
+.topnav-links{display:flex;gap:1.2rem;align-items:center}
+.topnav-links a{font-size:.8rem;font-weight:600;color:var(--muted);text-decoration:none;transition:color .2s}
+.topnav-links a:hover{color:var(--sky)}
+
+/* BACK + HERO */
+.back-link-wrap{max-width:860px;margin:0 auto;padding:4.2rem 2rem 0;position:relative;z-index:1}
+.wf-back-link{display:inline-flex;align-items:center;gap:.35rem;font-size:.82rem;font-weight:600;color:var(--muted);text-decoration:none;transition:color .15s}
+.wf-back-link:hover{color:var(--ink)}
+.hero{padding:1.4rem 2rem 1.2rem;max-width:860px;margin:0 auto;text-align:center;position:relative;z-index:1}
+.hero-badge{display:inline-flex;align-items:center;gap:.4rem;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.3rem .9rem;border-radius:20px;margin-bottom:.7rem;color:var(--sun);background:var(--sand);border:1px solid rgba(255,179,71,.25)}
+.hero h1{font-family:'Outfit',sans-serif;font-size:clamp(1.8rem,3.6vw,2.6rem);line-height:1.1;letter-spacing:-.02em;margin-bottom:.6rem;font-weight:900;color:var(--ink)}
+.hero-sub{font-size:.95rem;color:var(--muted);max-width:480px;margin:0 auto;line-height:1.6}
+
+/* CONTROLS BAR */
+.controls-bar{position:sticky;top:52px;z-index:100;background:var(--cream);padding:1rem 2rem .8rem;border-bottom:1px solid var(--border);margin-bottom:2rem}
+.controls-inner{max-width:860px;margin:0 auto;display:flex;flex-wrap:wrap;gap:.8rem;align-items:center;justify-content:space-between}
+.filter-group{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}
+.filter-label{font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-right:.2rem}
+.filter-pill{font-family:'Outfit',sans-serif;font-size:.8rem;font-weight:600;padding:.35rem .8rem;border-radius:100px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap}
+.filter-pill:hover{border-color:var(--ink);color:var(--ink)}
+.filter-pill.active.level-b2{background:#2EC4B6;color:#fff;border-color:#2EC4B6}
+.filter-pill.active.level-c1{background:var(--sky);color:#fff;border-color:var(--sky)}
+.filter-pill.active.topic{background:var(--ink);color:#fff;border-color:var(--ink)}
+.card-count{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--muted);font-weight:500}
+
+/* MAIN AREA */
+.main{max-width:860px;margin:0 auto;padding:0 2rem 4rem;position:relative;z-index:1}
+
+/* TABOO CARD */
+.card-wrap{display:flex;justify-content:center;margin-bottom:2rem}
+.taboo-card{width:100%;max-width:480px;background:var(--card);border-radius:20px;box-shadow:var(--shadow-lg);border:2px solid var(--border);overflow:hidden;position:relative}
+.card-header{padding:.7rem 1.2rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1.5px solid var(--border)}
+.card-level{font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:.2rem .55rem;border-radius:6px}
+.card-level.b2{background:#2EC4B626;color:#2EC4B6}
+.card-level.c1{background:var(--sky-light);color:var(--sky)}
+.card-topic{font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.card-num{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--muted)}
+
+.card-target-wrap{background:#2EC4B6;padding:2rem 2rem 1.8rem;text-align:center}
+.card-target-label{font-family:'JetBrains Mono',monospace;font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.65);margin-bottom:.6rem}
+.card-target{font-family:'Outfit',sans-serif;font-size:2.8rem;font-weight:900;color:#fff;line-height:1.1;letter-spacing:-.02em}
+.taboo-card.c1 .card-target-wrap{background:var(--sky)}
+
+.card-taboo{padding:1.4rem 1.6rem 1.6rem}
+.taboo-label{font-family:'JetBrains Mono',monospace;font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--coral);margin-bottom:.8rem;display:flex;align-items:center;gap:.4rem}
+.taboo-label::before{content:'';display:block;width:10px;height:10px;background:var(--coral);border-radius:2px;flex-shrink:0}
+.taboo-list{list-style:none;display:flex;flex-direction:column;gap:.4rem}
+.taboo-word{font-family:'Outfit',sans-serif;font-size:1.15rem;font-weight:700;color:var(--ink);padding:.45rem .8rem;background:var(--coral-light);border-radius:8px;border-left:3px solid var(--coral)}
+
+/* TIMER */
+.timer-wrap{display:flex;justify-content:center;margin-bottom:1.5rem}
+.timer-ring{position:relative;width:120px;height:120px;cursor:pointer}
+.timer-ring svg{transform:rotate(-90deg)}
+.timer-ring circle{fill:none;stroke-width:6}
+.timer-bg{stroke:var(--border)}
+.timer-progress{stroke:var(--ink);stroke-linecap:round;transition:stroke-dashoffset .1s linear;stroke-dasharray:320;stroke-dashoffset:0}
+.timer-ring.running .timer-progress{stroke:var(--ink)}
+.timer-ring.warning .timer-progress{stroke:var(--sun)}
+.timer-ring.danger .timer-progress{stroke:var(--coral)}
+.timer-display{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.timer-secs{font-family:'JetBrains Mono',monospace;font-size:2rem;font-weight:700;color:var(--ink);line-height:1}
+.timer-hint{font-size:.65rem;color:var(--muted);margin-top:.15rem;font-weight:600}
+
+/* TIMER PRESETS */
+.timer-presets{display:flex;justify-content:center;gap:.5rem;margin-bottom:1.5rem;flex-wrap:wrap}
+.preset-btn{font-family:'JetBrains Mono',monospace;font-size:.65rem;font-weight:700;padding:.28rem .7rem;border-radius:6px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s}
+.preset-btn:hover{border-color:var(--ink);color:var(--ink)}
+.preset-btn.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+/* ACTION BUTTONS */
+.action-row{display:flex;gap:.8rem;justify-content:center;margin-bottom:1rem;flex-wrap:wrap}
+.btn{font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;padding:.65rem 1.6rem;border-radius:12px;border:none;cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:.45rem}
+.btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.btn-correct{background:#22c55e;color:#fff;box-shadow:0 4px 14px rgba(34,197,94,.3)}
+.btn-correct:hover{background:#16a34a;transform:translateY(-1px)}
+.btn-pass{background:var(--card);color:var(--muted);border:1.5px solid var(--border)}
+.btn-pass:hover{border-color:var(--coral);color:var(--coral)}
+.btn-start{background:var(--sky);color:#fff;box-shadow:0 4px 14px rgba(33,118,255,.3);font-size:1rem;padding:.75rem 2.2rem}
+.btn-start:hover{background:#1a5fd4;transform:translateY(-1px)}
+.btn-reset{background:var(--card);color:var(--muted);border:1.5px solid var(--border);font-size:.82rem;padding:.45rem 1rem}
+.btn-reset:hover{border-color:var(--ink);color:var(--ink)}
+
+/* PASS COUNTER */
+.pass-row{display:flex;justify-content:center;gap:.35rem;margin-bottom:1.2rem}
+.pass-dot{width:10px;height:10px;border-radius:50%;background:var(--border);transition:background .2s}
+.pass-dot.used{background:var(--coral)}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:4rem 2rem;color:var(--muted)}
+.empty-state h3{font-size:1.1rem;font-weight:700;color:var(--ink);margin-bottom:.5rem}
+.empty-state p{font-size:.9rem}
+
+/* END CARD */
+.end-card{background:var(--card);border-radius:20px;border:2px solid var(--border);padding:3rem 2rem;text-align:center;box-shadow:var(--shadow-md);max-width:480px;margin:0 auto}
+.end-card h2{font-size:1.8rem;font-weight:900;color:var(--ink);margin-bottom:.5rem}
+.end-card p{color:var(--muted);margin-bottom:1.5rem;font-size:.95rem}
+
+@media(max-width:600px){
+  .topnav{padding:0 1.2rem}
+  .back-link-wrap,.hero,.main{padding-left:1.2rem;padding-right:1.2rem}
+  .controls-bar{padding:.8rem 1.2rem}
+  .card-target{font-size:2.2rem}
+  .taboo-word{font-size:1rem}
+  .btn{font-size:.88rem;padding:.6rem 1.2rem}
+}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="index.html" class="nav-logo">john<span>+</span>english</a>
+  <div class="topnav-links">
+    <a href="index.html">Home</a>
+    <a href="index.html#group-fun">Fun Tools</a>
+  </div>
+</nav>
+
+<div class="back-link-wrap">
+  <a href="index.html" class="wf-back-link">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    Back to Home
+  </a>
+</div>
+
+<section class="hero">
+  <span class="hero-badge">Fun Tools</span>
+  <h1>Taboo Cards</h1>
+  <p class="hero-sub">Describe the word without saying any of the forbidden words. B2 and C1 vocabulary across a range of topics.</p>
+</section>
+
+<div class="controls-bar">
+  <div class="controls-inner">
+    <div style="display:flex;gap:1.2rem;flex-wrap:wrap;align-items:center">
+      <div class="filter-group">
+        <span class="filter-label">Level</span>
+        <button class="filter-pill level-b2 active" onclick="toggleLevel('b2',this)">B2</button>
+        <button class="filter-pill level-c1 active" onclick="toggleLevel('c1',this)">C1</button>
+      </div>
+      <div class="filter-group" id="topicFilters"></div>
+    </div>
+    <span class="card-count" id="cardCount"></span>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- Timer -->
+  <div class="timer-wrap">
+    <div class="timer-ring" id="timerRing" onclick="toggleTimer()">
+      <svg width="120" height="120" viewBox="0 0 120 120">
+        <circle class="timer-bg" cx="60" cy="60" r="51"/>
+        <circle class="timer-progress" id="timerArc" cx="60" cy="60" r="51"/>
+      </svg>
+      <div class="timer-display">
+        <div class="timer-secs" id="timerDisplay">60</div>
+        <div class="timer-hint" id="timerHint">tap to start</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="timer-presets">
+    <span class="filter-label">Timer</span>
+    <button class="preset-btn" onclick="setDuration(30,this)">30s</button>
+    <button class="preset-btn active" onclick="setDuration(60,this)">60s</button>
+    <button class="preset-btn" onclick="setDuration(90,this)">90s</button>
+    <button class="preset-btn" onclick="setDuration(120,this)">2 min</button>
+    <button class="preset-btn" onclick="setDuration(0,this)">No timer</button>
+  </div>
+
+  <!-- Card -->
+  <div class="card-wrap" id="cardWrap"></div>
+
+  <!-- Pass dots -->
+  <div class="pass-row" id="passRow">
+    <div class="pass-dot" id="p0"></div>
+    <div class="pass-dot" id="p1"></div>
+    <div class="pass-dot" id="p2"></div>
+  </div>
+
+  <!-- Actions -->
+  <div class="action-row" id="actionRow">
+    <button class="btn btn-pass" onclick="passCard()">
+      <svg viewBox="0 0 24 24"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>
+      Pass
+    </button>
+    <button class="btn btn-correct" onclick="nextCard()">
+      <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      Got it!
+    </button>
+  </div>
+
+  <div style="display:flex;justify-content:center;gap:.6rem;flex-wrap:wrap">
+    <button class="btn btn-reset" onclick="resetDeck()">
+      <svg viewBox="0 0 24 24" style="width:13px;height:13px"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.03"/></svg>
+      Shuffle &amp; restart
+    </button>
+  </div>
+
+</div>
+
+<script>
+var CARDS = [
+  // ── B2 ─────────────────────────────────────────────────────────────
+  // Work
+  {w:'deadline',t:['time','due','submit','finish','date'],l:'b2',topic:'Work'},
+  {w:'promotion',t:['job','higher','salary','raise','boss'],l:'b2',topic:'Work'},
+  {w:'colleague',t:['work','office','co-worker','job','team'],l:'b2',topic:'Work'},
+  {w:'interview',t:['job','questions','apply','answer','HR'],l:'b2',topic:'Work'},
+  {w:'resignation',t:['quit','leave','job','letter','notice'],l:'b2',topic:'Work'},
+  {w:'overtime',t:['extra','hours','work','late','pay'],l:'b2',topic:'Work'},
+  {w:'salary',t:['money','pay','earn','job','wage'],l:'b2',topic:'Work'},
+  {w:'meeting',t:['office','talk','discuss','room','agenda'],l:'b2',topic:'Work'},
+  {w:'complaint',t:['unhappy','problem','manager','report','tell'],l:'b2',topic:'Work'},
+  {w:'feedback',t:['tell','opinion','review','good','bad'],l:'b2',topic:'Work'},
+  {w:'contract',t:['sign','document','job','legal','agree'],l:'b2',topic:'Work'},
+  {w:'commute',t:['travel','work','daily','train','bus'],l:'b2',topic:'Work'},
+
+  // Social
+  {w:'gossip',t:['talk','people','secret','rumour','hear'],l:'b2',topic:'Social'},
+  {w:'awkward',t:['uncomfortable','silence','embarrassed','strange','social'],l:'b2',topic:'Social'},
+  {w:'cancel',t:['plans','call off','not','going','meet'],l:'b2',topic:'Social'},
+  {w:'hangover',t:['drink','alcohol','morning','head','sick'],l:'b2',topic:'Social'},
+  {w:'invite',t:['come','party','ask','event','join'],l:'b2',topic:'Social'},
+  {w:'bored',t:['nothing','interesting','fun','tired','dull'],l:'b2',topic:'Social'},
+  {w:'catch up',t:['talk','meet','friend','long','news'],l:'b2',topic:'Social'},
+  {w:'rumour',t:['hear','people','say','true','gossip'],l:'b2',topic:'Social'},
+  {w:'stranger',t:['know','person','meet','unfamiliar','new'],l:'b2',topic:'Social'},
+  {w:'crowd',t:['people','many','together','busy','lots'],l:'b2',topic:'Social'},
+
+  // Home
+  {w:'landlord',t:['rent','flat','house','owner','property'],l:'b2',topic:'Home'},
+  {w:'flatmate',t:['live','share','house','room','together'],l:'b2',topic:'Home'},
+  {w:'rent',t:['pay','flat','monthly','live','money'],l:'b2',topic:'Home'},
+  {w:'chores',t:['clean','house','do','dishes','hoover'],l:'b2',topic:'Home'},
+  {w:'mortgage',t:['house','bank','buy','loan','pay'],l:'b2',topic:'Home'},
+  {w:'clutter',t:['mess','stuff','things','tidy','pile'],l:'b2',topic:'Home'},
+  {w:'neighbourhood',t:['area','street','local','live','near'],l:'b2',topic:'Home'},
+  {w:'utility bill',t:['pay','electric','water','gas','monthly'],l:'b2',topic:'Home'},
+  {w:'noisy neighbour',t:['next','loud','complaint','night','wall'],l:'b2',topic:'Home'},
+
+  // Relationships
+  {w:'jealous',t:['feel','want','envious','other','have'],l:'b2',topic:'Relationships'},
+  {w:'argument',t:['fight','shout','disagree','row','angry'],l:'b2',topic:'Relationships'},
+  {w:'apology',t:['sorry','wrong','say','forgive','mistake'],l:'b2',topic:'Relationships'},
+  {w:'trust',t:['believe','honest','rely','faith','confident'],l:'b2',topic:'Relationships'},
+  {w:'first date',t:['meet','romantic','dinner','nervous','new'],l:'b2',topic:'Relationships'},
+  {w:'break up',t:['end','relationship','together','split','finish'],l:'b2',topic:'Relationships'},
+  {w:'ex',t:['past','relationship','used to','together','former'],l:'b2',topic:'Relationships'},
+  {w:'crush',t:['like','fancy','feelings','romantic','secret'],l:'b2',topic:'Relationships'},
+  {w:'commitment',t:['serious','relationship','promise','stay','long'],l:'b2',topic:'Relationships'},
+  {w:'loyal',t:['faithful','friend','trust','always','side'],l:'b2',topic:'Relationships'},
+
+  // Travel
+  {w:'passport',t:['travel','document','country','border','ID'],l:'b2',topic:'Travel'},
+  {w:'jet lag',t:['tired','flight','time zone','long','sleep'],l:'b2',topic:'Travel'},
+  {w:'delayed',t:['late','wait','flight','train','time'],l:'b2',topic:'Travel'},
+  {w:'luggage',t:['bag','suitcase','travel','carry','airport'],l:'b2',topic:'Travel'},
+  {w:'hostel',t:['cheap','sleep','travel','dorm','budget'],l:'b2',topic:'Travel'},
+  {w:'souvenir',t:['buy','gift','holiday','bring','home'],l:'b2',topic:'Travel'},
+  {w:'customs',t:['airport','border','check','declare','enter'],l:'b2',topic:'Travel'},
+  {w:'visa',t:['travel','country','document','apply','enter'],l:'b2',topic:'Travel'},
+
+  // Food
+  {w:'leftovers',t:['food','eat','yesterday','fridge','cook'],l:'b2',topic:'Food'},
+  {w:'allergic',t:['food','eat','react','nuts','ill'],l:'b2',topic:'Food'},
+  {w:'recipe',t:['cook','food','ingredients','make','steps'],l:'b2',topic:'Food'},
+  {w:'vegetarian',t:['eat','meat','food','diet','animals'],l:'b2',topic:'Food'},
+  {w:'takeaway',t:['order','food','delivery','home','restaurant'],l:'b2',topic:'Food'},
+  {w:'fussy eater',t:['food','like','won\'t','child','picky'],l:'b2',topic:'Food'},
+  {w:'portion',t:['food','size','amount','plate','big'],l:'b2',topic:'Food'},
+
+  // Health
+  {w:'exhausted',t:['tired','very','sleep','energy','rest'],l:'b2',topic:'Health'},
+  {w:'diet',t:['eat','food','weight','healthy','calories'],l:'b2',topic:'Health'},
+  {w:'symptom',t:['ill','feel','sign','doctor','body'],l:'b2',topic:'Health'},
+  {w:'prescription',t:['doctor','medicine','pharmacy','drugs','paper'],l:'b2',topic:'Health'},
+  {w:'allergic reaction',t:['body','food','skin','rash','medicine'],l:'b2',topic:'Health'},
+  {w:'check-up',t:['doctor','health','visit','test','annual'],l:'b2',topic:'Health'},
+
+  // Technology
+  {w:'password',t:['login','account','secret','type','characters'],l:'b2',topic:'Technology'},
+  {w:'update',t:['install','new','version','software','phone'],l:'b2',topic:'Technology'},
+  {w:'stream',t:['watch','online','video','Netflix','internet'],l:'b2',topic:'Technology'},
+  {w:'download',t:['internet','file','save','get','computer'],l:'b2',topic:'Technology'},
+  {w:'Wi-Fi',t:['internet','connect','wireless','signal','router'],l:'b2',topic:'Technology'},
+  {w:'scroll',t:['phone','screen','up','down','feed'],l:'b2',topic:'Technology'},
+  {w:'selfie',t:['photo','yourself','phone','camera','take'],l:'b2',topic:'Technology'},
+  {w:'notification',t:['phone','alert','ping','app','message'],l:'b2',topic:'Technology'},
+
+  // Money
+  {w:'budget',t:['money','spend','plan','limit','save'],l:'b2',topic:'Money'},
+  {w:'debt',t:['owe','money','bank','pay back','loan'],l:'b2',topic:'Money'},
+  {w:'bargain',t:['cheap','price','good deal','buy','sale'],l:'b2',topic:'Money'},
+  {w:'overdraft',t:['bank','minus','spend','account','money'],l:'b2',topic:'Money'},
+  {w:'insurance',t:['pay','protect','car','health','company'],l:'b2',topic:'Money'},
+  {w:'savings',t:['money','bank','keep','future','put away'],l:'b2',topic:'Money'},
+  {w:'receipt',t:['shop','buy','paper','proof','pay'],l:'b2',topic:'Money'},
+
+  // Feelings
+  {w:'embarrassed',t:['feel','face','go red','mistake','social'],l:'b2',topic:'Feelings'},
+  {w:'relieved',t:['feel','over','good','stress','finally'],l:'b2',topic:'Feelings'},
+  {w:'frustrated',t:['feel','annoyed','can\'t','difficult','blocked'],l:'b2',topic:'Feelings'},
+  {w:'nervous',t:['feel','before','scared','worry','shake'],l:'b2',topic:'Feelings'},
+  {w:'overwhelmed',t:['too much','feel','can\'t cope','stress','many'],l:'b2',topic:'Feelings'},
+  {w:'grateful',t:['thank','appreciate','feel','lucky','kind'],l:'b2',topic:'Feelings'},
+  {w:'homesick',t:['miss','home','away','country','family'],l:'b2',topic:'Feelings'},
+  {w:'confident',t:['sure','believe','yourself','strong','self'],l:'b2',topic:'Feelings'},
+
+  // Education
+  {w:'revise',t:['study','exam','notes','prepare','go over'],l:'b2',topic:'Education'},
+  {w:'essay',t:['write','university','argue','words','academic'],l:'b2',topic:'Education'},
+  {w:'plagiarism',t:['copy','work','someone else\'s','cheating','submit'],l:'b2',topic:'Education'},
+  {w:'tutor',t:['teach','private','lesson','help','one-to-one'],l:'b2',topic:'Education'},
+  {w:'fail',t:['exam','pass','grade','result','not enough'],l:'b2',topic:'Education'},
+  {w:'scholarship',t:['money','study','university','award','free'],l:'b2',topic:'Education'},
+
+  // ── C1 ─────────────────────────────────────────────────────────────
+  // Work
+  {w:'procrastinate',t:['delay','later','avoid','task','put off'],l:'c1',topic:'Work'},
+  {w:'redundancy',t:['lose','job','company','cut','fired'],l:'c1',topic:'Work'},
+  {w:'burnout',t:['work','tired','stress','exhausted','mental'],l:'c1',topic:'Work'},
+  {w:'micromanage',t:['boss','control','check','every','detail'],l:'c1',topic:'Work'},
+  {w:'whistleblower',t:['report','wrong','company','secret','expose'],l:'c1',topic:'Work'},
+  {w:'nepotism',t:['family','job','unfair','hire','connections'],l:'c1',topic:'Work'},
+  {w:'incentive',t:['reason','motivate','reward','do','encourage'],l:'c1',topic:'Work'},
+  {w:'liable',t:['responsible','law','fault','legal','blame'],l:'c1',topic:'Work'},
+  {w:'mediator',t:['between','two','sides','resolve','neutral'],l:'c1',topic:'Work'},
+  {w:'restructure',t:['company','change','organisation','jobs','new'],l:'c1',topic:'Work'},
+
+  // Social
+  {w:'ulterior motive',t:['real','reason','hidden','want','secret'],l:'c1',topic:'Social'},
+  {w:'passive aggressive',t:['angry','not say','indirect','hint','cold'],l:'c1',topic:'Social'},
+  {w:'confrontation',t:['face','argue','directly','conflict','uncomfortable'],l:'c1',topic:'Social'},
+  {w:'icebreaker',t:['start','conversation','game','first','meet'],l:'c1',topic:'Social'},
+  {w:'clique',t:['group','exclusive','friends','closed','school'],l:'c1',topic:'Social'},
+  {w:'ostracise',t:['exclude','group','leave out','ignore','social'],l:'c1',topic:'Social'},
+  {w:'nostalgia',t:['past','memory','miss','old','good times'],l:'c1',topic:'Social'},
+  {w:'etiquette',t:['rules','polite','social','behaviour','correct'],l:'c1',topic:'Social'},
+  {w:'dynamic',t:['relationship','between','group','how','interact'],l:'c1',topic:'Social'},
+  {w:'reciprocate',t:['back','same','do in return','give','respond'],l:'c1',topic:'Social'},
+
+  // Relationships
+  {w:'platonic',t:['friendship','not romantic','just friends','love','sexual'],l:'c1',topic:'Relationships'},
+  {w:'infatuation',t:['love','intense','short','obsessed','feelings'],l:'c1',topic:'Relationships'},
+  {w:'manipulation',t:['control','use','make','feel','guilt'],l:'c1',topic:'Relationships'},
+  {w:'vulnerability',t:['open','honest','feelings','show','weak'],l:'c1',topic:'Relationships'},
+  {w:'resentment',t:['angry','feel','over time','build up','unfair'],l:'c1',topic:'Relationships'},
+  {w:'toxic',t:['bad','relationship','unhealthy','harmful','negative'],l:'c1',topic:'Relationships'},
+  {w:'unconditional love',t:['always','no matter what','accept','family','conditions'],l:'c1',topic:'Relationships'},
+  {w:'estranged',t:['family','not speaking','distance','cut off','apart'],l:'c1',topic:'Relationships'},
+  {w:'reconcile',t:['make up','after argument','friends again','forgive','repair'],l:'c1',topic:'Relationships'},
+
+  // Feelings
+  {w:'ambivalent',t:['mixed','feelings','not sure','both','uncertain'],l:'c1',topic:'Feelings'},
+  {w:'apprehensive',t:['worried','nervous','before','something','dread'],l:'c1',topic:'Feelings'},
+  {w:'despondent',t:['very sad','hopeless','down','low','no hope'],l:'c1',topic:'Feelings'},
+  {w:'exhilarated',t:['very excited','rush','feel','alive','energy'],l:'c1',topic:'Feelings'},
+  {w:'melancholy',t:['sad','thoughtful','quiet','mood','reflective'],l:'c1',topic:'Feelings'},
+  {w:'indignant',t:['angry','unfair','outraged','treated','wrong'],l:'c1',topic:'Feelings'},
+  {w:'remorse',t:['guilt','regret','wrong','did','feel bad'],l:'c1',topic:'Feelings'},
+  {w:'contentment',t:['happy','satisfied','peaceful','enough','calm'],l:'c1',topic:'Feelings'},
+
+  // Society
+  {w:'inequality',t:['fair','rich','poor','gap','society'],l:'c1',topic:'Society'},
+  {w:'prejudice',t:['judge','before','know','opinion','unfair'],l:'c1',topic:'Society'},
+  {w:'stereotype',t:['group','assume','all','same','unfair'],l:'c1',topic:'Society'},
+  {w:'bureaucracy',t:['government','forms','rules','slow','official'],l:'c1',topic:'Society'},
+  {w:'gentrification',t:['area','rich','move in','change','prices'],l:'c1',topic:'Society'},
+  {w:'scapegoat',t:['blame','someone','else\'s fault','unfair','problem'],l:'c1',topic:'Society'},
+  {w:'taboo',t:['not talk about','social','forbidden','topic','uncomfortable'],l:'c1',topic:'Society'},
+  {w:'consensus',t:['agree','everyone','together','decision','group'],l:'c1',topic:'Society'},
+
+  // Language & Communication
+  {w:'sarcasm',t:['mean opposite','funny','tone','not literal','mock'],l:'c1',topic:'Language'},
+  {w:'imply',t:['suggest','not say directly','hint','mean','between'],l:'c1',topic:'Language'},
+  {w:'rhetoric',t:['speech','persuade','language','political','effect'],l:'c1',topic:'Language'},
+  {w:'eloquent',t:['speak','well','clearly','express','articulate'],l:'c1',topic:'Language'},
+  {w:'condescending',t:['talk down','superior','treat','less than','tone'],l:'c1',topic:'Language'},
+  {w:'articulate',t:['speak','clearly','express','words','well'],l:'c1',topic:'Language'},
+  {w:'understatement',t:['less than','actually','British','minimise','really'],l:'c1',topic:'Language'},
+  {w:'innuendo',t:['suggest','indirect','sexual','hint','meaning'],l:'c1',topic:'Language'},
+
+  // Money & Economy
+  {w:'austerity',t:['government','cut','spending','money','public'],l:'c1',topic:'Money'},
+  {w:'deficit',t:['spend','more than','government','money','owe'],l:'c1',topic:'Money'},
+  {w:'inflation',t:['prices','rise','money','worth less','cost'],l:'c1',topic:'Money'},
+  {w:'recession',t:['economy','bad','jobs','shrink','financial'],l:'c1',topic:'Money'},
+  {w:'speculation',t:['invest','risk','future','price','guess'],l:'c1',topic:'Money'},
+  {w:'disposable income',t:['money','left','after','bills','spend freely'],l:'c1',topic:'Money'},
+
+  // Health & Mental Health
+  {w:'therapy',t:['talk','mental health','psychologist','session','help'],l:'c1',topic:'Health'},
+  {w:'resilience',t:['bounce back','difficult','cope','strong','recover'],l:'c1',topic:'Health'},
+  {w:'chronic',t:['long term','illness','always','condition','ongoing'],l:'c1',topic:'Health'},
+  {w:'insomnia',t:['sleep','can\'t','night','awake','tired'],l:'c1',topic:'Health'},
+  {w:'placebo',t:['medicine','fake','think','work','mind'],l:'c1',topic:'Health'},
+  {w:'compulsion',t:['can\'t stop','urge','feel must','repeat','behaviour'],l:'c1',topic:'Health'},
+
+  // Technology & Media
+  {w:'algorithm',t:['computer','shows','social media','decide','content'],l:'c1',topic:'Technology'},
+  {w:'disinformation',t:['false','spread','news','deliberate','believe'],l:'c1',topic:'Technology'},
+  {w:'surveillance',t:['watch','cameras','government','monitor','data'],l:'c1',topic:'Technology'},
+  {w:'anonymous',t:['name','hide','internet','identity','unknown'],l:'c1',topic:'Technology'},
+  {w:'viral',t:['spread','internet','everyone','share','video'],l:'c1',topic:'Technology'},
+  {w:'filter bubble',t:['internet','only','see','agree','algorithm'],l:'c1',topic:'Technology'},
+
+  // Education
+  {w:'curriculum',t:['school','subjects','teach','official','plan'],l:'c1',topic:'Education'},
+  {w:'peer pressure',t:['friends','same','do','everyone','influence'],l:'c1',topic:'Education'},
+  {w:'critical thinking',t:['question','analyse','not just accept','think','evaluate'],l:'c1',topic:'Education'},
+  {w:'extracurricular',t:['school','outside','class','activity','sport'],l:'c1',topic:'Education'},
+  {w:'dissertation',t:['university','long','write','research','final'],l:'c1',topic:'Education'},
+
+  // Travel & Culture
+  {w:'culture shock',t:['new','country','different','surprised','customs'],l:'c1',topic:'Travel'},
+  {w:'expatriate',t:['live','another','country','long term','abroad'],l:'c1',topic:'Travel'},
+  {w:'itinerary',t:['travel','plan','places','schedule','trip'],l:'c1',topic:'Travel'},
+  {w:'xenophobia',t:['fear','foreigners','hate','other','countries'],l:'c1',topic:'Travel'},
+  {w:'assimilate',t:['fit in','new','culture','country','become'],l:'c1',topic:'Travel'}
+];
+
+var TOPICS = ['All'];
+CARDS.forEach(function(c){ if (TOPICS.indexOf(c.topic) === -1) TOPICS.push(c.topic); });
+TOPICS.sort(function(a,b){ return a==='All'?-1:b==='All'?1:a.localeCompare(b); });
+
+var activeLevels = {b2:true, c1:true};
+var activeTopic = 'All';
+var deck = [];
+var currentIdx = 0;
+var passes = 0;
+var MAX_PASSES = 3;
+var timerDuration = 60;
+var timerRemaining = 60;
+var timerInterval = null;
+var timerRunning = false;
+
+function buildTopicFilters() {
+  var el = document.getElementById('topicFilters');
+  var html = '<span class="filter-label">Topic</span>';
+  TOPICS.forEach(function(t) {
+    html += '<button class="filter-pill topic'+(t===activeTopic?' active':'')+'" onclick="setTopic(\''+t+'\',this)">'+t+'</button>';
+  });
+  el.innerHTML = html;
+}
+
+function toggleLevel(lv, btn) {
+  activeLevels[lv] = !activeLevels[lv];
+  if (!activeLevels.b2 && !activeLevels.c1) { activeLevels[lv] = true; return; }
+  btn.classList.toggle('active', activeLevels[lv]);
+  rebuildDeck();
+}
+
+function setTopic(t, btn) {
+  activeTopic = t;
+  document.querySelectorAll('.filter-pill.topic').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  rebuildDeck();
+}
+
+function getFilteredCards() {
+  return CARDS.filter(function(c) {
+    var lvOk = activeLevels[c.l];
+    var tOk = activeTopic === 'All' || c.topic === activeTopic;
+    return lvOk && tOk;
+  });
+}
+
+function shuffle(arr) {
+  for (var i = arr.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+  }
+  return arr;
+}
+
+function rebuildDeck() {
+  stopTimer();
+  timerRemaining = timerDuration;
+  updateTimerDisplay();
+  deck = shuffle(getFilteredCards().slice());
+  currentIdx = 0;
+  passes = 0;
+  updatePassDots();
+  renderCard();
+  document.getElementById('cardCount').textContent = deck.length + ' cards';
+}
+
+function renderCard() {
+  var wrap = document.getElementById('cardWrap');
+  var actionRow = document.getElementById('actionRow');
+  if (!deck.length) {
+    wrap.innerHTML = '<div class="empty-state"><h3>No cards match that filter</h3><p>Try selecting a different level or topic.</p></div>';
+    actionRow.style.display = 'none';
+    return;
+  }
+  if (currentIdx >= deck.length) {
+    wrap.innerHTML = '<div class="end-card"><h2>All done! 🎉</h2><p>You\'ve been through all '+deck.length+' cards in this set.</p><button class="btn btn-start" onclick="rebuildDeck()">Play again</button></div>';
+    actionRow.style.display = 'none';
+    stopTimer();
+    return;
+  }
+  actionRow.style.display = 'flex';
+  var c = deck[currentIdx];
+  var tabooHtml = c.t.map(function(w){ return '<li class="taboo-word">'+w+'</li>'; }).join('');
+  wrap.innerHTML = '<div class="taboo-card '+c.l+'">'
+    + '<div class="card-header">'
+    + '<span class="card-level '+c.l+'">'+(c.l==='b2'?'B2':'C1')+'</span>'
+    + '<span class="card-topic">'+c.topic+'</span>'
+    + '<span class="card-num">'+(currentIdx+1)+' / '+deck.length+'</span>'
+    + '</div>'
+    + '<div class="card-target-wrap"><div class="card-target-label">Describe this word</div><div class="card-target">'+c.w+'</div></div>'
+    + '<div class="card-taboo"><div class="taboo-label">Forbidden words</div><ul class="taboo-list">'+tabooHtml+'</ul></div>'
+    + '</div>';
+}
+
+function nextCard() {
+  currentIdx++;
+  passes = 0;
+  updatePassDots();
+  renderCard();
+}
+
+function passCard() {
+  if (passes >= MAX_PASSES) return;
+  passes++;
+  updatePassDots();
+  // Move current card to later in deck
+  var card = deck.splice(currentIdx, 1)[0];
+  var insertAt = Math.min(currentIdx + 3 + Math.floor(Math.random()*3), deck.length);
+  deck.splice(insertAt, 0, card);
+  renderCard();
+}
+
+function updatePassDots() {
+  for (var i = 0; i < MAX_PASSES; i++) {
+    var dot = document.getElementById('p'+i);
+    if (dot) dot.classList.toggle('used', i < passes);
+  }
+}
+
+function resetDeck() {
+  rebuildDeck();
+}
+
+// Timer
+function setDuration(secs, btn) {
+  timerDuration = secs;
+  timerRemaining = secs === 0 ? 0 : secs;
+  document.querySelectorAll('.preset-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  stopTimer();
+  updateTimerDisplay();
+  var ring = document.getElementById('timerRing');
+  ring.classList.remove('running','warning','danger');
+  if (secs === 0) {
+    document.getElementById('timerDisplay').textContent = '--';
+    document.getElementById('timerHint').textContent = 'no timer';
+  }
+}
+
+function toggleTimer() {
+  if (timerDuration === 0) return;
+  if (timerRunning) { stopTimer(); }
+  else { startTimer(); }
+}
+
+function startTimer() {
+  if (timerDuration === 0) return;
+  if (timerRemaining <= 0) { timerRemaining = timerDuration; }
+  timerRunning = true;
+  document.getElementById('timerRing').classList.add('running');
+  document.getElementById('timerHint').textContent = 'tap to pause';
+  timerInterval = setInterval(function() {
+    timerRemaining--;
+    updateTimerDisplay();
+    if (timerRemaining <= 0) {
+      stopTimer();
+      timerExpired();
+    }
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  var ring = document.getElementById('timerRing');
+  ring.classList.remove('running');
+  if (timerRemaining > 0 && timerDuration > 0) {
+    document.getElementById('timerHint').textContent = 'tap to start';
+  }
+}
+
+function timerExpired() {
+  var ring = document.getElementById('timerRing');
+  ring.classList.add('danger');
+  document.getElementById('timerHint').textContent = 'time\'s up!';
+  document.getElementById('timerDisplay').textContent = '0';
+  // Flash
+  var flashes = 0;
+  var flash = setInterval(function() {
+    ring.style.opacity = ring.style.opacity === '0.4' ? '1' : '0.4';
+    if (++flashes > 5) { clearInterval(flash); ring.style.opacity = '1'; }
+  }, 200);
+}
+
+function updateTimerDisplay() {
+  if (timerDuration === 0) return;
+  var el = document.getElementById('timerDisplay');
+  var arc = document.getElementById('timerArc');
+  var ring = document.getElementById('timerRing');
+  el.textContent = timerRemaining;
+  var ratio = timerDuration > 0 ? timerRemaining / timerDuration : 1;
+  var circumference = 320;
+  arc.style.strokeDashoffset = circumference * (1 - ratio);
+  ring.classList.remove('warning','danger');
+  if (ratio <= 0.25) ring.classList.add('danger');
+  else if (ratio <= 0.5) ring.classList.add('warning');
+}
+
+// Init
+buildTopicFilters();
+rebuildDeck();
+</script>
+</body>
+</html>
