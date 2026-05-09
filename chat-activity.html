@@ -1,0 +1,1791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chat Activity · John+English</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sun:#FFB347;--sky:#2176FF;--sky-light:#E8EEFF;--sea:#1DD3B0;--sea-light:#E4FBF7;
+  --coral:#FF6B6B;--coral-light:#FFE8E8;--lavender:#9B72CF;--lavender-light:#F0E8FA;
+  --mint:#5DDEA0;--sand:#FFF5E6;--cream:#F7F6F3;--ink:#2D3047;--muted:#7A7D8E;
+  --border:#E8E5DF;--card:#fff;--radius:14px;
+  --shadow-sm:0 1px 3px rgba(45,48,71,.06);--shadow-md:0 4px 12px rgba(45,48,71,.08)
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,var(--border) 1px,transparent 1px);background-size:28px 28px;opacity:.4;pointer-events:none;z-index:0}
+
+/* TOPNAV */
+.topnav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(247,246,243,.88);backdrop-filter:blur(16px);border-bottom:1.5px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-family:'Outfit',sans-serif;font-size:1.3rem;font-weight:800;letter-spacing:-.02em;color:var(--ink);text-decoration:none}
+.nav-logo span{color:var(--sky)}
+.topnav-links{display:flex;gap:1.2rem;align-items:center}
+.topnav-links a{font-size:.8rem;font-weight:600;color:var(--muted);text-decoration:none;transition:color .2s}
+.topnav-links a:hover{color:var(--sky)}
+
+/* BACK + HERO */
+.back-link-wrap{max-width:1200px;margin:0 auto;padding:4.2rem 2rem 0;position:relative;z-index:1}
+.wf-back-link{display:inline-flex;align-items:center;gap:.35rem;font-size:.82rem;font-weight:600;color:var(--muted);text-decoration:none;transition:color .15s}
+.wf-back-link:hover{color:var(--ink)}
+.hero{position:relative;padding:1.4rem 2rem 1.2rem;max-width:1200px;margin:0 auto;text-align:center;z-index:1}
+.hero-badge{display:inline-flex;align-items:center;gap:.4rem;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.3rem .9rem;border-radius:20px;margin-bottom:.7rem;color:var(--sea);background:var(--sea-light)}
+.hero h1{font-family:'Outfit',sans-serif;font-size:clamp(1.8rem,3.6vw,2.6rem);line-height:1.1;letter-spacing:-.02em;margin-bottom:.6rem;font-weight:900;color:var(--ink)}
+.hero-sub{font-size:.95rem;color:var(--muted);max-width:520px;margin:0 auto;line-height:1.6}
+
+/* MAIN LAYOUT */
+.main-wrap{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:0 2rem 4rem;display:grid;grid-template-columns:260px 1fr 260px;gap:0;align-items:start}
+
+/* LEFT SIDEBAR */
+.sidebar{padding:0 1.5rem 0 0}
+.sidebar-inner{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);overflow-y:auto;max-height:calc(100vh - 80px);box-shadow:var(--shadow-sm);position:sticky;top:68px}
+.sb-head{padding:1.1rem 1.4rem .8rem;border-bottom:1px solid var(--border)}
+.sb-label{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+.pack-header{font-family:'JetBrains Mono',monospace;font-size:.64rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding:.9rem 1.4rem .4rem;display:flex;align-items:center;gap:.5rem}
+.pack-header::after{content:'';flex:1;height:1px;background:var(--border)}
+.sc-list{padding:.6rem .9rem .9rem}
+.scenario-card{border:1.5px solid var(--border);border-radius:10px;padding:.85rem 1rem;margin-bottom:.45rem;cursor:pointer;transition:all .15s;background:var(--cream)}
+.scenario-card:hover{border-color:var(--sea);background:var(--sea-light)}
+.scenario-card.active{border-color:var(--sea);background:var(--sea-light)}
+.sc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:.5rem;margin-bottom:.35rem}
+.sc-title{font-size:1rem;font-weight:700;color:var(--ink);line-height:1.3}
+.sc-level{font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:700;padding:.2rem .5rem;border-radius:4px;flex-shrink:0;margin-top:2px}
+.sc-level.b2{background:var(--sky-light);color:var(--sky)}
+.sc-level.c1{background:var(--lavender-light);color:var(--lavender)}
+.sc-desc{font-size:.87rem;color:var(--muted);line-height:1.5}
+
+/* PHONE COLUMN */
+.phone-col{display:flex;flex-direction:column;align-items:center;gap:1.6rem}
+.phone-row{display:flex;align-items:flex-start;gap:10px}
+
+
+/* PHONE FRAME — iPhone 17 style */
+.phone-frame{
+  width:375px;
+  border-radius:54px;
+  border:3px solid #3a3a3c;
+  background:#1c1c1e;
+  box-shadow:
+    0 0 0 1px #555 inset,
+    0 0 0 2px #1c1c1e inset,
+    0 32px 80px rgba(0,0,0,.5),
+    0 4px 16px rgba(0,0,0,.3);
+  flex-shrink:0;
+  position:relative;
+  /* NO overflow:hidden here — lets pseudo buttons render outside */
+}
+/* Clip the screen content inside frame */
+.phone-inner{
+  border-radius:51px;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  height:780px;
+}
+/* Side buttons — left: silent + vol */
+.phone-frame::before{
+  content:'';
+  position:absolute;
+  left:-5px;top:100px;
+  width:3px;height:34px;
+  background:#3a3a3c;
+  border-radius:2px 0 0 2px;
+  box-shadow:0 52px 0 #3a3a3c, 0 100px 0 #3a3a3c
+}
+/* Side button — right: power */
+.phone-frame::after{
+  content:'';
+  position:absolute;
+  right:-5px;top:140px;
+  width:3px;height:72px;
+  background:#3a3a3c;
+  border-radius:0 2px 2px 0
+}
+
+/* iOS status bar area with Dynamic Island */
+.ios-statusbar{
+  height:54px;
+  background:#000;
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  padding:16px 24px 0;
+  flex-shrink:0;
+  position:relative
+}
+.ios-time{
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',sans-serif;
+  font-size:15px;
+  font-weight:600;
+  color:#fff;
+  letter-spacing:-.01em;
+  line-height:1
+}
+.dynamic-island{
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  top:11px;
+  width:126px;
+  height:36px;
+  background:#000;
+  border-radius:20px;
+  box-shadow:0 0 0 1.5px #222 inset
+}
+.ios-status-icons{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  line-height:1;
+  margin-top:1px
+}
+.ios-status-icons svg{fill:#fff}
+
+/* Screen area — fills remaining height */
+.phone-screen{
+  background:#fff;
+  display:flex;
+  flex-direction:column;
+  flex:1;
+  min-height:0;
+  overflow:hidden;
+}
+.phone-screen-scroll{overflow-y:scroll;flex:1;scrollbar-width:none;min-height:0}
+.phone-screen-scroll::-webkit-scrollbar{display:none}
+.phone-home-bar{
+  height:30px;
+  background:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0
+}
+.home-bar-pill{width:130px;height:5px;background:#1a1a1a;border-radius:5px;opacity:.22}
+
+
+.hint-strip{text-align:center;font-size:.85rem;font-weight:500;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:.6rem;letter-spacing:.01em}
+.hint-line{width:20px;height:0;border-bottom:1.5px dotted rgba(45,48,71,.3)}
+
+/* SCROLL TRACK */
+.scroll-track{width:14px;display:flex;flex-direction:column;align-items:center;height:780px;flex-shrink:0;padding:2px 0;align-self:flex-start}
+.scroll-rail{width:8px;height:100%;background:var(--border);border-radius:6px;position:relative;cursor:pointer}
+.scroll-thumb{width:8px;background:var(--sea);border-radius:6px;position:absolute;top:0;left:0;min-height:36px;transition:top .06s linear;cursor:grab}
+.scroll-thumb:active{cursor:grabbing}
+
+/* WA HEADER */
+.wa-header{background:#075E54;padding:10px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.wa-back{color:rgba(255,255,255,.8);font-size:20px;line-height:1;flex-shrink:0}
+.wa-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif}
+.wa-info{flex:1}
+.wa-name{font-size:15px;font-weight:600;color:#fff;line-height:1.2;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif}
+.wa-status{font-size:11px;color:rgba(255,255,255,.7);margin-top:1px;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif}
+.wa-icons{display:flex;gap:16px}
+.wa-icons svg{width:20px;height:20px;stroke:rgba(255,255,255,.85);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* CHAT */
+.chat-window{padding:8px 8px 16px;display:flex;flex-direction:column;gap:2px;background-color:#E9F0EB}
+.date-chip{align-self:center;background:rgba(255,255,255,.82);border-radius:8px;padding:5px 14px;font-size:12.5px;color:#555;margin:6px 0 8px;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.msg-row{display:flex;align-items:flex-end;gap:0;max-width:88%;margin-bottom:2px}
+.msg-row.them{align-self:flex-start}
+.msg-row.me{align-self:flex-end;flex-direction:row-reverse}
+.msg-row.grouped{margin-bottom:1px}
+.sender-label{font-size:13px;font-weight:600;color:#075E54;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;margin:6px 0 2px;padding-left:14px}
+.bubble-wrap{display:flex;flex-direction:column}
+.msg-row.them .bubble-wrap{align-items:flex-start}
+.msg-row.me .bubble-wrap{align-items:flex-end}
+
+/* Bubble */
+.bubble{
+  position:relative;
+  padding:7px 10px 6px 12px;
+  border-radius:18px;
+  font-size:16px;
+  line-height:1.42;
+  word-break:break-word;
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',sans-serif;
+  letter-spacing:-.01em;
+  max-width:100%;
+  overflow:hidden
+}
+.bubble.them{
+  background:#fff;
+  border-bottom-left-radius:0;
+  color:#1a1a1a;
+  box-shadow:0 1px 1px rgba(0,0,0,.1)
+}
+.bubble.me{
+  background:#DCF8C6;
+  border-bottom-right-radius:0;
+  color:#1a1a1a;
+  box-shadow:0 1px 1px rgba(0,0,0,.08)
+}
+/* Grouped bubbles — restore radius on all corners when no tail */
+.bubble.them.grouped-top{border-bottom-left-radius:18px}
+.bubble.me.grouped-top{border-bottom-right-radius:18px}
+
+/* Timestamp block — sits after text, pushed to bottom-right */
+.bubble-time{
+  display:inline-flex;
+  align-items:center;
+  gap:3px;
+  float:right;
+  margin-left:6px;
+  margin-bottom:-3px;
+  position:relative;
+  bottom:-1px;
+  line-height:1
+}
+.btime{font-size:11.5px;color:rgba(0,0,0,.38);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;white-space:nowrap}
+.bticks svg{width:18px;height:11px;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;display:block}
+.bticks.blue svg{stroke:#53BDEB}
+.bticks.grey svg{stroke:#aaa}
+
+/* CLICKABLE PHRASES */
+.hl{
+  border-bottom:1px dotted rgba(0,0,0,.35);
+  cursor:pointer;
+  padding-bottom:0px;
+  text-decoration:none
+}
+.bubble.me .hl{border-bottom-color:rgba(0,0,0,.28)}
+
+/* DEFINITION PANEL */
+.def-col{padding:0 0 0 1.4rem;width:260px;flex-shrink:0;position:relative}
+.def-panel{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-md);padding:1.6rem 1.6rem 1.4rem;position:fixed;top:80px;width:250px;opacity:0;pointer-events:none;transition:opacity .18s;z-index:50}
+.def-panel.show{opacity:1;pointer-events:auto}
+.def-phrase{font-family:'JetBrains Mono',monospace;font-size:.9rem;font-weight:700;color:#0a7d6a;text-transform:lowercase;margin-bottom:1rem;letter-spacing:.02em}
+.def-body{font-size:1rem;color:var(--ink);line-height:1.7;margin-bottom:1rem}
+.def-ex{font-size:.93rem;color:var(--muted);line-height:1.65;font-style:italic;border-left:3px solid var(--border);padding-left:.8rem;margin-top:.2rem}
+.def-close{display:flex;justify-content:flex-end;margin-top:1.2rem}
+.def-close-btn{font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:600;color:var(--muted);background:none;border:1.5px solid var(--border);border-radius:8px;padding:.35rem .8rem;cursor:pointer;transition:all .15s}
+.def-close-btn:hover{border-color:var(--ink);color:var(--ink)}
+
+/* Phrase dropdown under phone */
+.phrase-dropdown{width:100%;max-width:399px}
+.phrase-toggle{width:100%;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:.75rem 1.1rem;display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-family:'Outfit',sans-serif;font-size:.87rem;font-weight:600;color:var(--ink);transition:border-color .15s;box-shadow:var(--shadow-sm)}
+.phrase-toggle:hover{border-color:#0a7d6a}
+.phrase-toggle-label{display:flex;align-items:center;gap:.5rem}
+.phrase-toggle-count{font-family:'JetBrains Mono',monospace;font-size:.65rem;font-weight:700;background:var(--sea-light);color:#0a7d6a;padding:.15rem .45rem;border-radius:4px}
+.phrase-toggle-chevron{color:var(--muted);font-size:.75rem;transition:transform .2s;flex-shrink:0}
+.phrase-toggle-chevron.open{transform:rotate(180deg)}
+.phrase-body{display:none;background:var(--card);border:1.5px solid var(--border);border-top:none;border-radius:0 0 var(--radius) var(--radius);padding:.5rem 0;box-shadow:var(--shadow-sm)}
+.phrase-body.open{display:block}
+.pi-item{padding:.9rem 1.4rem;border-bottom:1px solid rgba(232,229,223,.5);cursor:pointer;transition:background .12s}
+.pi-item:last-child{border-bottom:none}
+.pi-item:hover{background:var(--cream)}
+.pi-phrase{font-size:.95rem;font-weight:700;color:#0a7d6a;margin-bottom:.3rem}
+.pi-def{font-size:.84rem;color:var(--muted);line-height:1.5}
+
+/* Topic filter chips */
+.filter-row{padding:.7rem 1rem .5rem;border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;gap:.3rem}
+.filter-chip{font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:.3rem .65rem;border-radius:100px;border:1.5px solid var(--border);background:var(--cream);color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap}
+.filter-chip:hover{border-color:#0a7d6a;color:#0a7d6a}
+.filter-chip.active{background:#0a7d6a;color:#fff;border-color:#0a7d6a}
+.sc-hidden{display:none}
+
+/* Print button */
+.print-btn-wrap{display:flex;justify-content:flex-end;gap:.5rem;width:100%;max-width:399px;margin-bottom:.5rem}
+.print-btn{display:inline-flex;align-items:center;gap:.4rem;font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:600;color:var(--muted);background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:.45rem .9rem;cursor:pointer;transition:all .15s}
+.print-btn:hover{border-color:var(--ink);color:var(--ink)}
+.print-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+@media print{
+  .topnav,.back-link-wrap,.hero,.sidebar,.scroll-track,.hint-strip,.phrase-dropdown,.def-col,.print-btn-wrap,.ios-statusbar,.phone-home-bar,.wa-icons,.wa-back{display:none!important}
+  body,html{background:#fff!important}
+  body::before{display:none!important}
+  .main-wrap{display:block!important;padding:0!important;max-width:none!important}
+  .phone-col{align-items:flex-start}
+  .phone-frame{border:none!important;box-shadow:none!important;border-radius:0!important;width:100%!important}
+  .phone-inner{border-radius:0!important;height:auto!important}
+  .phone-screen{overflow:visible!important}
+  .phone-screen-scroll{overflow:visible!important;height:auto!important;max-height:none!important}
+  .chat-window{background:#E9F0EB!important;padding:12px!important}
+  .wa-header{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .bubble.me{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .hl{border-bottom:none!important}
+}
+
+@media(max-width:1100px){
+  .main-wrap{grid-template-columns:230px 1fr 230px}
+  .def-col{width:230px}
+}
+@media(max-width:900px){
+  .main-wrap{grid-template-columns:1fr;gap:1.5rem}
+  .sidebar{padding:0}
+  .sidebar-inner{position:static}
+  .phone-col{position:static}
+  .def-col{width:100%;padding:0}
+  .def-panel{position:static;opacity:1;pointer-events:auto}
+  .def-panel:not(.show){display:none}
+}
+@media(max-width:500px){
+  .topnav{padding:0 1.2rem}
+  .back-link-wrap,.hero,.main-wrap{padding-left:1.2rem;padding-right:1.2rem}
+  .phone-frame{width:100%;max-width:340px}
+}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="index.html" class="nav-logo">john<span>+</span>english</a>
+  <div class="topnav-links">
+    <a href="index.html">Home</a>
+    <a href="index.html#group-fun">Fun Tools</a>
+  </div>
+</nav>
+
+<div class="back-link-wrap">
+  <a href="index.html" class="wf-back-link">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    Back to Home
+  </a>
+</div>
+
+<section class="hero">
+  <span class="hero-badge">Fun Tools</span>
+  <h1>Chat Activity</h1>
+  <p class="hero-sub">Read real WhatsApp conversations. Tap any underlined phrase to see what it means and how it is used.</p>
+</section>
+
+<div class="main-wrap">
+
+  <!-- LEFT: scenario list -->
+  <div class="sidebar">
+    <div class="sidebar-inner">
+      <div class="sb-head"><div class="sb-label">Scenarios</div></div>
+      <div class="filter-row" id="filterRow"></div>
+      <div class="sc-list" id="scenarioList"></div>
+    </div>
+  </div>
+
+  <!-- CENTRE: phone -->
+  <div class="phone-col">
+    <div class="phone-row">
+      <div class="phone-frame">
+        <div class="phone-inner">
+        <!-- iOS status bar with Dynamic Island -->
+        <div class="ios-statusbar">
+          <div class="ios-time">9:41</div>
+          <div class="dynamic-island"></div>
+          <div class="ios-status-icons">
+            <!-- Signal bars -->
+            <svg width="17" height="12" viewBox="0 0 17 12"><rect x="0" y="4" width="3" height="8" rx=".8"/><rect x="4.5" y="2.5" width="3" height="9.5" rx=".8"/><rect x="9" y="1" width="3" height="11" rx=".8"/><rect x="13.5" y="0" width="3" height="12" rx=".8"/></svg>
+            <!-- WiFi -->
+            <svg width="16" height="12" viewBox="0 0 16 12"><path d="M8 10a1.5 1.5 0 100 3 1.5 1.5 0 000-3z"/><path d="M4.5 7.5a5 5 0 017 0" stroke="#fff" stroke-width="1.5" stroke-linecap="round" fill="none"/><path d="M1.5 4.5a9 9 0 0113 0" stroke="#fff" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
+            <!-- Battery -->
+            <svg width="25" height="12" viewBox="0 0 25 12"><rect x="0" y="1" width="22" height="10" rx="3" stroke="#fff" stroke-width="1.2" fill="none"/><rect x="1.5" y="2.5" width="18" height="7" rx="2" fill="#fff"/><path d="M23.5 4v4a2 2 0 000-4z" fill="#fff"/></svg>
+          </div>
+        </div>
+        <div class="phone-screen">
+          <div class="wa-header">
+            <div class="wa-back">&#8592;</div>
+            <div class="wa-avatar" id="wa-avatar">S</div>
+            <div class="wa-info">
+              <div class="wa-name" id="wa-name">Sara</div>
+              <div class="wa-status" id="wa-status">online</div>
+            </div>
+            <div class="wa-icons">
+              <svg viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.6 1.21h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+            </div>
+          </div>
+          <div class="phone-screen-scroll" id="phoneScroll">
+            <div class="chat-window" id="chatWindow"></div>
+          </div>
+        </div>
+        <div class="phone-home-bar"><div class="home-bar-pill"></div></div>
+        </div><!-- /phone-inner -->
+      </div>
+      <div class="scroll-track">
+        <div class="scroll-rail" id="scrollRail">
+          <div class="scroll-thumb" id="scrollThumb"></div>
+        </div>
+      </div>
+    </div>
+    <div class="hint-strip"><div class="hint-line"></div>tap underlined phrases for definitions<div class="hint-line"></div></div>
+    <div class="print-btn-wrap">
+      <button class="print-btn" id="exportPngBtn" onclick="exportPng()">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Save as PNG
+      </button>
+      <button class="print-btn" onclick="window.print()">
+        <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Print this chat
+      </button>
+    </div>
+    <div class="phrase-dropdown">
+      <button class="phrase-toggle" id="phraseToggleBtn" onclick="togglePhraseDropdown()">
+        <span class="phrase-toggle-label">Phrases in this chat <span class="phrase-toggle-count" id="phraseCount">0</span></span>
+        <span class="phrase-toggle-chevron" id="phraseChevron">&#9660;</span>
+      </button>
+      <div class="phrase-body" id="phraseBody"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT: definition panel only -->
+  <div class="def-col">
+    <div class="def-panel" id="defPanel">
+      <div class="def-phrase" id="def-phrase"></div>
+      <div class="def-body" id="def-body"></div>
+      <div class="def-ex" id="def-ex"></div>
+      <div class="def-close"><button class="def-close-btn" onclick="hideDefinition()">close</button></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+var SCENARIOS = [
+  {
+    id: 0,
+    title: 'Last-minute bail',
+    level: 'b2', levelLabel: 'B2',
+    desc: 'Tom cancels on Lena an hour before they were supposed to meet.',
+    tags: ['Informal', 'Plans'],
+    nameA: 'Tom', nameB: 'Lena', avatarColor: '#2176FF',
+    status: 'online',
+    ticks: 'blue',
+    messages: [
+      {who:'A', text:[{t:'Ok please don\'t hate me 😭😭'}], time:'18:58'},
+      {who:'B', text:[{t:'...why do I feel like I know exactly what\'s coming 😒😒'}], time:'18:59'},
+      {who:'A', text:[{t:'Something came up 😬😩 I am SO sorry. Tonight is '},{p:'off',k:'off'},{t:' 💀'}], time:'19:00'},
+      {who:'B', text:[{t:'Tom. Are you '},{p:'bailing on',k:'bail on'},{t:' me AGAIN??? That\'s literally three times this month 🙃'}], time:'19:01'},
+      {who:'A', text:[{t:'I know, i know, i\'m the worst 😩😩 I\'ll '},{p:'make it up to you',k:'make it up to someone'},{t:', I swear. Saturday?'}], time:'19:03'},
+      {who:'B', text:[{t:'Honestly '},{p:'I\'m done',k:"I'm done"},{t:' 😭😭😭 f**king hell Tom. Saturday is fine but you properly owe me one'}], time:'19:04'},
+      {who:'A', text:[{t:'You are an absolute '},{p:'lifesaver',k:'lifesaver'},{t:' 🙏✨ I promise I won\'t let you down'}], time:'19:05'},
+      {who:'B', text:[{t:'Yeah yeah. '},{p:'fair enough',k:'fair enough'},{t:' but don\'t make a habit of it 😑'}], time:'19:06'},
+      {who:'A', text:[{t:'🙏🙏🙏 literally the best person alive'}], time:'19:07'},
+      {who:'B', text:[{t:'I know 😌 See you Saturday. Don\'t you dare cancel 😤'}], time:'19:08'}
+    ],
+    vocab: {
+      'bail on': {def:'to cancel plans on someone at the last minute', ex:'She bailed on us the night before the concert.'},
+      'off': {def:'cancelled. Used informally to say something is no longer happening.', ex:'"Is the party still on?" "No, it\'s off."'},
+      'make it up to someone': {def:'to do something good for someone to compensate for a mistake or disappointment', ex:'"I missed your birthday." "You can make it up to me with dinner."'},
+      "I'm done": {def:'informal expression of exasperation. Means: I\'ve had enough of this person or situation.', ex:'"He was two hours late again." "I\'m done with him."'},
+      'lifesaver': {def:'someone who helps you out of a difficult situation', ex:'You fixed my laptop? You\'re a lifesaver!'},
+      'fair enough': {def:'used to accept something even if it\'s not ideal. Means: OK, I understand.', ex:'"I can\'t make Tuesday." "Fair enough, what about Thursday?"'}
+    }
+  },
+  {
+    id: 1,
+    title: 'Passive-aggressive flatmate',
+    level: 'b2', levelLabel: 'B2',
+    desc: 'The dishes have been in the sink for three days. Alex decides to say something.',
+    tags: ['Home', 'Conflict'],
+    nameA: 'Alex', nameB: 'Jamie', avatarColor: '#D97706',
+    status: 'online',
+    ticks: 'blue',
+    messages: [
+      {who:'A', text:[{t:'Hey... So I don\'t want to make this weird 😬'}], time:'20:14'},
+      {who:'B', text:[{t:'Uh oh 😅😬 what did i do'}], time:'20:16'},
+      {who:'A', text:[{t:'It\'s the kitchen thing again. Like... '},{p:'it\'s been building up',k:'build up'},{t:' for a while and I thought I should just say something'}], time:'20:17'},
+      {who:'B', text:[{t:'Ok '},{p:'fair enough',k:'fair enough'},{t:' 😬😬 i\'ve been a bit all over the place this week. No excuse though'}], time:'20:19'},
+      {who:'A', text:[{t:'I\'m not trying to be annoying about it — I just think we need to '},{p:'sort it out',k:'sort it out'},{t:' before it becomes a bigger thing, you know?'}], time:'20:20'},
+      {who:'B', text:[{t:'Yeah no, you\'re right. '},{p:'tbh',k:'tbh'},{t:' i\'ve been meaning to say something too... The bins as well 😅'}], time:'20:21'},
+      {who:'A', text:[{t:'Haha ok yeah the bins too 😂😂 Look, shall we just '},{p:'draw a line under it',k:'draw a line under it'},{t:' and start fresh?'}], time:'20:22'},
+      {who:'B', text:[{t:'100%. I\'ll do the dishes tonight. Genuinely 🫡💪'}], time:'20:23'},
+      {who:'A', text:[{t:'I\'ll believe it when I see it 😂 but thank you'}], time:'20:24'},
+      {who:'B', text:[{t:'Watch me. I\'m a changed man 💪✨'}], time:'20:25'}
+    ],
+    vocab: {
+      'build up': {def:'to gradually accumulate over time. Used for feelings, tension, frustration.', ex:'Resentment had been building up between them for months.'},
+      'fair enough': {def:'used to accept a point or reason, even a bit reluctantly', ex:'"I forgot, I was stressed." "Fair enough, but let me know next time."'},
+      'sort it out': {def:'to resolve or deal with a problem', ex:'Can you two please just sort it out between yourselves?'},
+      'tbh': {def:'to be honest. Introduces something candid, sometimes a little awkward.', ex:'"Tbh I\'ve been avoiding that conversation for weeks."'},
+      'draw a line under it': {def:'to agree that something is finished and move on without dwelling on it', ex:'Let\'s draw a line under the whole argument and start again.'}
+    }
+  },
+  {
+    id: 2,
+    title: 'Spill the tea',
+    level: 'b2', levelLabel: 'B2',
+    desc: 'Bea has news. Big news. Soph needs to know everything.',
+    tags: ['Gossip', 'Informal'],
+    nameA: 'Bea', nameB: 'Soph', avatarColor: '#B7791F',
+    status: 'online',
+    ticks: 'blue',
+    messages: [
+      {who:'A', text:[{t:'Ok so. I have NEWS 👀👀'}], time:'21:11'},
+      {who:'B', text:[{t:'WHAT. '},{p:'Spill.',k:'spill'},{t:' Right now. I mean it 😤👇'}], time:'21:12'},
+      {who:'A', text:[{t:'Ok so you know how I mentioned that guy from the gym like a month ago...'}], time:'21:13'},
+      {who:'B', text:[{t:'NO WAY. '},{p:'Shut up',k:'shut up'},{t:' 😭😭 what happened???'}], time:'21:14'},
+      {who:'A', text:[{t:'He asked for my number '},{p:'out of nowhere',k:'out of nowhere'},{t:' after spin class and we\'ve literally been texting all week 🥺🥺'}], time:'21:16'},
+      {who:'B', text:[{t:'BEA. I am '},{p:'dead',k:'dead (informal)'},{t:' 😭💀 Why didn\'t you tell me sooner?! I\'m your best friend!!'}], time:'21:17'},
+      {who:'A', text:[{t:'I didn\'t want to '},{p:'jinx it',k:'jinx it'},{t:' 😅🤞 you know how I am'}], time:'21:18'},
+      {who:'B', text:[{t:'Ok ok ok. Do you '},{p:'like him',k:'like someone'},{t:' like him or is it just a vibe 👀'}], time:'21:19'},
+      {who:'A', text:[{t:'I mean... He\'s '},{p:'not exactly hard to look at',k:'not hard to look at'},{t:' 😳😳 and he\'s actually funny??'}], time:'21:20'},
+      {who:'B', text:[{t:'SCREAMING 😭😭 Ok you need to update me on literally everything in real time from now on 📲'}], time:'21:21'},
+      {who:'A', text:[{t:'Haha ok ok 😂 don\'t make it weird'}], time:'21:22'},
+      {who:'B', text:[{t:'It\'s already weird, this is the best day of my week 😭❤️'}], time:'21:22'}
+    ],
+    vocab: {
+      'spill': {def:'short for "spill the tea". Means: tell me the gossip or the full story.', ex:'"I heard something happened at the party." "Spill!"'},
+      'shut up': {def:'informal exclamation of disbelief or excitement. Not literally telling someone to be quiet.', ex:'"She got the job!" "Shut up, seriously?!"'},
+      'out of nowhere': {def:'completely unexpectedly, with no prior warning', ex:'He turned up at my door out of nowhere.'},
+      'dead (informal)': {def:'"I\'m dead" means: I can\'t cope with how funny or surprising this is. Used when something is overwhelming.', ex:'"He fell off his chair in the meeting." "I\'m dead 😭"'},
+      'jinx it': {def:'to bring bad luck by talking about something good before it has happened', ex:'Don\'t say we\'ll win, you\'ll jinx it.'},
+      'like someone': {def:'"do you like him like him" uses the repetition to signal romantic interest specifically', ex:'"Do you like her, or like like her?"'},
+      'not hard to look at': {def:'attractive. A deliberately understated British way of saying someone is good-looking.', ex:'"What\'s he like?" "Well, he\'s not exactly hard to look at."'}
+    }
+  },
+  {
+    id: 3,
+    title: 'Venting after a bad meeting',
+    level: 'b2', levelLabel: 'B2',
+    desc: 'The meeting ended twenty minutes ago. The messages start immediately.',
+    tags: ['Work', 'Venting'],
+    nameA: 'Nina', nameB: 'Reza', avatarColor: '#C05621',
+    status: 'last seen today at 15:11',
+    ticks: 'grey',
+    messages: [
+      {who:'A', text:[{t:'That was genuinely one of the worst hours of my entire life 😩😩'}], time:'15:02'},
+      {who:'B', text:[{t:'SAME. I had my camera off for the last fifteen minutes. Could not. 😐'}], time:'15:03'},
+      {who:'A', text:[{t:'What was Marcus even saying for that last half hour?? It completely '},{p:'went over my head',k:'go over someone\'s head'},{t:' 🤦🤦 absolute b**locks'}], time:'15:04'},
+      {who:'B', text:[{t:'He genuinely loves the sound of his own voice. I '},{p:'can\'t be bothered',k:"can't be bothered"},{t:' anymore, honestly 😮‍💨'}], time:'15:05'},
+      {who:'A', text:[{t:'And then Sarah '},{p:'piled on',k:'pile on'},{t:' at the end 😤 I was absolutely '},{p:'fuming',k:'fuming'},{t:' 🤬 could have screamed'}], time:'15:06'},
+      {who:'B', text:[{t:'She always does that. '},{p:'At this rate',k:'at this rate'},{t:', I\'m going to start blocking Thursdays in my calendar permanently 😂😂'}], time:'15:07'},
+      {who:'A', text:[{t:'Haha honestly. Ok I need coffee before I completely '},{p:'lose the plot',k:'lose the plot'},{t:' 😵💫'}], time:'15:09'},
+      {who:'B', text:[{t:'Get the coffee. You\'ve earned it. This week can do one 😩☕'}], time:'15:10'},
+      {who:'A', text:[{t:'Lol "this week can do one"... Saving that 😂😂'}], time:'15:11'},
+      {who:'B', text:[{t:'Copyright Reza, 2024 🙃✌️'}], time:'15:11'}
+    ],
+    vocab: {
+      'go over someone\'s head': {def:'to be too complicated to understand', ex:'The technical stuff went completely over my head.'},
+      "can't be bothered": {def:'to not have the energy or motivation to do something', ex:'I can\'t be bothered cooking, let\'s just order in.'},
+      'pile on': {def:'to join in criticising someone who is already under pressure', ex:'When he made one mistake, everyone piled on.'},
+      'fuming': {def:'extremely angry', ex:'She was absolutely fuming when she found out what he\'d said.'},
+      'at this rate': {def:'if things continue as they are. Usually signals a complaint or warning about the future.', ex:'At this rate, we\'ll never finish on time.'},
+      'lose the plot': {def:'to lose control, become very stressed, or stop thinking clearly', ex:'He completely lost the plot when the server went down.'}
+    }
+  },
+  {
+    id: 4,
+    title: 'Old friend resurfaces',
+    level: 'c1', levelLabel: 'C1',
+    desc: 'Marco texts after nearly a year of silence. Warm, but there\'s a slight awkwardness.',
+    tags: ['Relationships', 'Nuance'],
+    nameA: 'You', nameB: 'Marco', avatarColor: '#553C9A',
+    status: 'last seen yesterday at 14:45',
+    ticks: 'grey',
+    messages: [
+      {who:'B', text:[{t:'Hey stranger 👋 It\'s been a while...'}], time:'14:22'},
+      {who:'A', text:[{t:'Marco! Ha, yeah, it really has 😅'}], time:'14:35'},
+      {who:'B', text:[{t:'I know, I know. I\'m terrible. How are you doing, actually?'}], time:'14:36'},
+      {who:'A', text:[{t:'Good! Busy, but good. This is a bit '},{p:'out of the blue',k:'out of the blue'},{t:'... Not complaining though 😊'}], time:'14:38'},
+      {who:'B', text:[{t:'Yeah, sorry. '},{p:'Life kind of got in the way',k:'life gets in the way'},{t:'. No excuse really.'}], time:'14:40'},
+      {who:'A', text:[{t:'No, I get it. Look, it\'s '},{p:'water under the bridge',k:'water under the bridge'},{t:' as far as I\'m concerned 🙂'}], time:'14:41'},
+      {who:'B', text:[{t:'That\'s very generous of you 😅 I\'ve genuinely been meaning to '},{p:'reach out',k:'reach out'},{t:' for months.'}], time:'14:42'},
+      {who:'A', text:[{t:'Well, you did. Shall we actually '},{p:'catch up properly',k:'catch up properly'},{t:' at some point? Coffee or something?'}], time:'14:43'},
+      {who:'B', text:[{t:'I\'d love that. Let\'s not leave it another year 😅'}], time:'14:44'},
+      {who:'A', text:[{t:'Ha, deal. I\'ll hold you to it 😄'}], time:'14:45'}
+    ],
+    vocab: {
+      'out of the blue': {def:'unexpectedly, with no warning. Like something falling from a clear sky.', ex:'The job offer came completely out of the blue.'},
+      'life gets in the way': {def:'everyday demands and responsibilities prevent you from doing what you intended', ex:'"Why did you stop calling?" "Life just got in the way, honestly."'},
+      'water under the bridge': {def:'something from the past that is now forgotten or forgiven. No longer worth dwelling on.', ex:'"I\'m sorry about the argument." "It\'s water under the bridge, honestly forget it."'},
+      'reach out': {def:'to contact someone, especially after a period of not being in touch', ex:'I\'ve been meaning to reach out ever since I heard the news.'},
+      'catch up properly': {def:'to have a real, unhurried conversation after time apart. Not just a quick exchange.', ex:'"We must catch up properly soon." "Yes, coffee, not just texts."'}
+    }
+  },
+  {
+    id: 5,
+    title: 'The situationship',
+    level: 'c1', levelLabel: 'C1',
+    desc: 'Eli has been texting someone for months. No label. No clarity. Cam has opinions.',
+    tags: ['Dating', 'Advice'],
+    nameA: 'Eli', nameB: 'Cam', avatarColor: '#9B72CF',
+    status: '',
+    ticks: 'none',
+    messages: [
+      {who:'A', text:[{t:'Ok so. I need your honest opinion about something 😬'}], time:'23:01'},
+      {who:'B', text:[{t:'...About him again? 😂'}], time:'23:02'},
+      {who:'A', text:[{t:'Yes, I know, I know. But he texted this morning and I genuinely don\'t know what to do with it.'}], time:'23:02'},
+      {who:'B', text:[{t:'What did he say this time?'}], time:'23:03'},
+      {who:'A', text:[{t:'"hey, been thinking about you" -- like what does that '},{p:'even mean',k:'even'},{t:' 😭'}], time:'23:04'},
+      {who:'B', text:[{t:'Eli. He\'s '},{p:'stringing you along',k:'string along'},{t:'. That\'s what it means. I say this with love 💙'}], time:'23:05'},
+      {who:'A', text:[{t:'But what if I\'m just '},{p:'reading into it',k:'read into it'},{t:' too much? He\'s not great at texting'}], time:'23:06'},
+      {who:'B', text:[{t:'You\'ve been saying that for four months. At some point you have to stop '},{p:'getting your hopes up',k:'get your hopes up'},{t:' every time he reappears'}], time:'23:07'},
+      {who:'A', text:[{t:'I know... I just genuinely '},{p:'fancy',k:'fancy'},{t:' him, that\'s the problem 😩'}], time:'23:09'},
+      {who:'B', text:[{t:'I know you do. But he\'s '},{p:'left you on read',k:'leave on read'},{t:' twice this week alone. That\'s not someone who\'s unsure.'}], time:'23:10'},
+      {who:'A', text:[{t:'Ugh. You\'re right. I hate that you\'re right'}], time:'23:11'},
+      {who:'B', text:[{t:'I\'m always right 😂 Just '},{p:'move on',k:'move on'},{t:'. You deserve better than "been thinking about you" every two weeks 🙄'}], time:'23:12'},
+      {who:'A', text:[{t:'Ok. Ok. You\'re right. Deleting the thread 😤'}], time:'23:14'},
+      {who:'B', text:[{t:'THERE she is 💪 get in the bin, mate 🗑️ absolute d**khead energy from start to finish'}], time:'23:14'}
+    ],
+    vocab: {
+      'even': {def:'used for emphasis in questions. Signals frustration or disbelief.', ex:'"What does that even mean?" / "Why does he even bother?"'},
+      'string along': {def:'to keep someone in a situation, usually romantic, without being honest about your intentions', ex:'She realised he\'d been stringing her along for months.'},
+      'read into it': {def:'to find more meaning in something than is actually there', ex:'Don\'t read into it, it was probably just a friendly message.'},
+      'get your hopes up': {def:'to let yourself expect something good that may not happen', ex:'Don\'t get your hopes up until you have the offer in writing.'},
+      'fancy': {def:'British English. To find someone attractive; to be romantically interested in them.', ex:'"Do you fancy him?" "Yeah, kind of."'},
+      'leave on read': {def:'to open and read someone\'s message but deliberately not reply', ex:'He left me on read for two days.'},
+      'move on': {def:'to stop thinking about a person or situation from the past and direct your energy elsewhere', ex:'It took a while, but she finally moved on.'}
+    }
+  },
+  {
+    id: 6,
+    title: 'Checking in on a friend',
+    level: 'c1', levelLabel: 'C1',
+    desc: 'Sara notices Mia has gone quiet. A careful, warm conversation unfolds.',
+    tags: ['Empathy', 'Support'],
+    nameA: 'Mia', nameB: 'Sara', avatarColor: '#E53E3E',
+    status: 'online',
+    ticks: 'blue',
+    messages: [
+      {who:'B', text:[{t:'Mia 👋 Haven\'t heard from you in a while. Everything ok?'}], time:'18:42'},
+      {who:'A', text:[{t:'Yeah, sorry. Just been a bit '},{p:'off',k:'off (feeling)'},{t:' lately. Hard to explain 😕'}], time:'18:43'},
+      {who:'B', text:[{t:'You don\'t have to explain anything. I\'m just glad you\'re there. Here if you want to talk 💙'}], time:'18:44'},
+      {who:'A', text:[{t:'I know. I think I\'ve just been '},{p:'bottling it all up',k:'bottle up'},{t:' and it\'s starting to '},{p:'get to me',k:'get to someone'},{t:' a bit'}], time:'18:46'},
+      {who:'B', text:[{t:'That sounds exhausting. Are you sleeping ok?'}], time:'18:47'},
+      {who:'A', text:[{t:'Not really. I\'m fine, it\'s nothing serious... Just a bit '},{p:'down in the dumps',k:'down in the dumps'},{t:' if I\'m honest 😔'}], time:'18:49'},
+      {who:'B', text:[{t:'That\'s ok. You\'re allowed to be. Do you want to talk about it properly, or would you rather just '},{p:'take your mind off it',k:'take your mind off it'},{t:' for a bit?'}], time:'18:51'},
+      {who:'A', text:[{t:'The second one, honestly 😅 Distract me. Tell me something good.'}], time:'18:52'},
+      {who:'B', text:[{t:'Ok... Have you seen what happened in the group chat today 😂 buckle up'}], time:'18:52'},
+      {who:'A', text:[{t:'Oh god. Already feel better 😂'}], time:'18:53'}
+    ],
+    vocab: {
+      'off (feeling)': {def:'not quite right. Slightly unwell, tired, or emotionally low without a clear reason.', ex:'"You seem a bit off today." / "I\'ve been feeling off all week."'},
+      'bottle up': {def:'to suppress emotions rather than expressing or dealing with them', ex:'He bottles everything up and then one day just explodes.'},
+      'get to someone': {def:'to have a strong negative emotional effect on someone over time', ex:'The constant criticism was starting to really get to her.'},
+      'down in the dumps': {def:'feeling sad, low, or a bit depressed. Informal and common in spoken British English.', ex:'She\'s been a bit down in the dumps since the breakup.'},
+      'take your mind off it': {def:'to distract yourself from something worrying or upsetting', ex:'I went for a long walk to take my mind off the situation.'},
+      'put on a brave face': {def:'to pretend to feel happier or more confident than you really are', ex:'She put on a brave face but everyone could see she was struggling.'},
+      'wear your heart on your sleeve': {def:'to show your emotions openly and without hiding them', ex:'He wears his heart on his sleeve, you always know exactly how he feels.'},
+      'reach a breaking point': {def:'to get to the stage where you can no longer cope with a difficult situation', ex:'After months of overwork, she finally reached her breaking point.'},
+      'open up': {def:'to start talking honestly about your feelings, especially after keeping them to yourself', ex:'It took a while, but he finally opened up about what had been going on.'},
+      'give someone space': {def:'to allow someone time and room to deal with their feelings without pressure', ex:'"Should I text her?" "I\'d give her some space for now."'}
+    }
+  },
+  {
+    id: 7,
+    title: 'The group chat nightmare',
+    level: 'b2', levelLabel: 'B2',
+    desc: 'Three friends try to agree on a date. It goes nowhere fast.',
+    tags: ['Plans', 'Group'],
+    nameA: 'You', nameB: 'The group', avatarColor: '#0E7D6A',
+    status: 'online',
+    ticks: 'blue',
+    messages: [
+      {who:'B', text:[{t:'RIGHT. We are doing this. Who\'s free in the next two weeks? 😤😤'}], time:'11:02'},
+      {who:'A', text:[{t:'Finally!! I\'m free most weekends tbh 🙌'}], time:'11:04'},
+      {who:'B', text:[{t:'Ok what about the 15th? Dan says that '},{p:'works for him',k:'work for someone'},{t:''}], time:'11:05'},
+      {who:'A', text:[{t:'The 15th is tricky for me... Could we '},{p:'push it back',k:'push back'},{t:' to the 22nd?'}], time:'11:07'},
+      {who:'B', text:[{t:'Dan says the 22nd he\'s got a wedding. Classic Dan 🙄🙄'}], time:'11:09'},
+      {who:'A', text:[{t:'Oh for f**k\'s sake 😂😂 ok let\'s just '},{p:'pencil in',k:'pencil in'},{t:' the 29th and see who drops out'}], time:'11:11'},
+      {who:'B', text:[{t:'Haha ok. I\'ll '},{p:'put it out there',k:'put it out there'},{t:' in the main group and see what happens 🤞'}], time:'11:13'},
+      {who:'A', text:[{t:'Someone always has an excuse. It\'s been like this for months, we need to just '},{p:'commit to it',k:'commit to something'},{t:' 😤'}], time:'11:15'},
+      {who:'B', text:[{t:'100%. I\'m going to '},{p:'take the lead',k:'take the lead'},{t:' and just book something. If people can\'t make it, tough 😂✌️'}], time:'11:17'},
+      {who:'A', text:[{t:'YES finally some leadership 🙌 '},{p:'leave it with me',k:'leave it with me'},{t:' actually, I\'ll find a place'}], time:'11:19'},
+      {who:'B', text:[{t:'Ok but if you '},{p:'drop the ball',k:'drop the ball'},{t:' on this I will never forgive you 😂😂'}], time:'11:21'},
+      {who:'A', text:[{t:'Zero chance. Watch this space 👀👀'}], time:'11:22'}
+    ],
+    vocab: {
+      'work for someone': {def:'to be convenient or suitable for someone, usually about times or plans', ex:'"Does Thursday work for you?" "Yeah, that works."'},
+      'push back': {def:'to move something to a later time', ex:'Can we push the meeting back to 3pm?'},
+      'pencil in': {def:'to make a provisional arrangement that might change later', ex:'Let\'s pencil in Friday and confirm by Wednesday.'},
+      'put it out there': {def:'to suggest something to a group or in public to see how people react', ex:'I\'ll put it out there and see if anyone\'s interested.'},
+      'commit to something': {def:'to firmly decide to do something and follow through with it', ex:'We need to commit to a date and stop changing plans.'},
+      'take the lead': {def:'to be the person who takes charge and makes decisions', ex:'Someone needs to take the lead on this project.'},
+      'leave it with me': {def:'I will handle it. Used to take responsibility for sorting something out.', ex:'"We need someone to book the venue." "Leave it with me."'},
+      'drop the ball': {def:'to fail to do something you were responsible for', ex:'He dropped the ball on the booking and now we have nowhere to go.'},
+      'watch this space': {def:'wait and see, something is going to happen soon', ex:'"Any news on the promotion?" "Watch this space."'},
+      'tough': {def:'informal way of saying: that is unfortunate, but there is nothing to be done about it. Can be blunt.', ex:'"I can\'t come on Friday." "Tough, we\'ve already booked it."'}
+    }
+  },
+  {
+    id: 8,
+    title: 'The morning after',
+    level: 'b2', levelLabel: 'B2',
+    desc: 'Two friends recap what happened at the party last night.',
+    tags: ['Social', 'Gossip'],
+    nameA: 'Zara', nameB: 'Phoebe', avatarColor: '#E53E3E',
+    status: 'online',
+    ticks: 'blue',
+    messages: [
+      {who:'A', text:[{t:'PHOEBE. Are you alive 😭😭'}], time:'10:14'},
+      {who:'B', text:[{t:'Barely. I am absolutely '},{p:'hanging',k:'hanging'},{t:' 🪦😵 feel like absolute s**t'}], time:'10:22'},
+      {who:'A', text:[{t:'Same 💀 ok we need to '},{p:'debrief',k:'debrief'},{t:' on last night immediately'}], time:'10:24'},
+      {who:'B', text:[{t:'Did Tom actually '},{p:'make a move',k:'make a move'},{t:' on Chloe or did I imagine that 👀'}], time:'10:25'},
+      {who:'A', text:[{t:'You did NOT imagine it. I '},{p:'witnessed',k:'witness'},{t:' the whole thing 😭😭😭'}], time:'10:26'},
+      {who:'B', text:[{t:'Oh god. And then what happened?? I lost track of everyone after we went to the bar 😬'}], time:'10:28'},
+      {who:'A', text:[{t:'Ok so things '},{p:'kicked off',k:'kick off'},{t:' around midnight. Apparently Jake said something to Marcus and it all went a bit sideways 🫠'}], time:'10:30'},
+      {who:'B', text:[{t:'WHAT 😭 I completely '},{p:'missed that',k:'miss something'},{t:'. What did Jake say??'}], time:'10:32'},
+      {who:'A', text:[{t:'No idea, but Marcus was '},{p:'not impressed',k:'not impressed'},{t:'. He left early 😐'}], time:'10:34'},
+      {who:'B', text:[{t:'Honestly that whole group needs to '},{p:'sort themselves out',k:'sort yourself out'},{t:'. Every time 🙄🙄'}], time:'10:36'},
+      {who:'A', text:[{t:'Lol '},{p:'tell me about it',k:'tell me about it'},{t:'. Anyway are you free later? I need a '},{p:'greasy spoon',k:'greasy spoon'},{t:' and someone to moan at 😂'}], time:'10:38'},
+      {who:'B', text:[{t:'Give me an hour. I cannot function until I\'ve had eggs 🍳🍳'}], time:'10:39'}
+    ],
+    vocab: {
+      'hanging': {def:'British slang for feeling very unwell after drinking too much the night before. Same as "hungover".', ex:'"How are you feeling?" "Absolutely hanging."'},
+      'debrief': {def:'to discuss and review what happened in a situation, usually immediately afterwards', ex:'We need to debrief after that meeting.'},
+      'make a move': {def:'to do or say something to show romantic interest in someone', ex:'I think he\'s going to make a move on her tonight.'},
+      'witness': {def:'to see something happen directly. Used informally for emphasis.', ex:'I witnessed the whole thing. It was chaos.'},
+      'kick off': {def:'to start, especially something unpleasant like an argument or a fight', ex:'Things kicked off when someone spilled a drink on him.'},
+      'miss something': {def:'to not be present for or aware of something that happened', ex:'"Did you hear what she said?" "No, I missed it."'},
+      'not impressed': {def:'disappointed or annoyed by something. A classic British understatement.', ex:'"He turned up two hours late." "She was not impressed."'},
+      'sort yourself out': {def:'to get your behaviour or situation under control. Can be used as advice or criticism.', ex:'"He keeps starting arguments." "He really needs to sort himself out."'},
+      'greasy spoon': {def:'a cheap, informal British cafe that serves fried food. Especially associated with curing a hangover.', ex:'There\'s a great greasy spoon on the corner if you need a fry-up.'},
+      'tell me about it': {def:'used to show strong agreement with a complaint. Means: I know exactly what you mean, I feel the same.', ex:'"This commute is a nightmare." "Tell me about it."'}
+    }
+  },
+  {
+    id: 9,
+    title: 'Job interview debrief',
+    level: 'b2', levelLabel: 'B2',
+    desc: 'Nat messages Jess the second the interview ends.',
+    tags: ['Work', 'Anxiety'],
+    nameA: 'Nat', nameB: 'Jess', avatarColor: '#285E61',
+    status: 'last seen today at 14:47',
+    ticks: 'grey',
+    messages: [
+      {who:'A', text:[{t:'Ok I\'m out 😵💫'}], time:'14:32'},
+      {who:'B', text:[{t:'FINALLY. How did it go?? I\'ve been '},{p:'on edge',k:'on edge'},{t:' all morning 😬'}], time:'14:33'},
+      {who:'A', text:[{t:'I don\'t know. I think ok? I completely '},{p:'blanked',k:'blank'},{t:' on one question though 😬😩'}], time:'14:34'},
+      {who:'B', text:[{t:'Which question? 👀'}], time:'14:35'},
+      {who:'A', text:[{t:'"where do you see yourself in five years" -- I just '},{p:'went blank',k:'go blank'},{t:' 😭😭 said something about growth and kind of '},{p:'trailed off',k:'trail off'},{t:''}], time:'14:36'},
+      {who:'B', text:[{t:'Honestly that question is so '},{p:'generic',k:'generic'},{t:', they probably didn\'t even care about the answer 😂'}], time:'14:38'},
+      {who:'A', text:[{t:'Maybe. The rest felt good though. I clicked with the interviewer which helped 🙏'}], time:'14:39'},
+      {who:'B', text:[{t:'That\'s the main thing. Honestly you always '},{p:'sell yourself short',k:'sell yourself short'},{t:', you\'re so much better than you think 💪'}], time:'14:41'},
+      {who:'A', text:[{t:'Aw thank you 🥺🥺 I just always '},{p:'second-guess myself',k:'second-guess yourself'},{t:' after these things'}], time:'14:43'},
+      {who:'B', text:[{t:'That\'s normal. Now just '},{p:'put it out of your mind',k:'put something out of your mind'},{t:' until you hear back. Nothing you can do now'}], time:'14:44'},
+      {who:'A', text:[{t:'You\'re right. I\'m going to get a coffee and try not to '},{p:'read into',k:'read into'},{t:' everything they said 😂'}], time:'14:46'},
+      {who:'B', text:[{t:'Good. Fingers crossed 🤞🤞 let me know the second you hear anything'}], time:'14:47'}
+    ],
+    vocab: {
+      'on edge': {def:'feeling anxious or nervous, often while waiting for something', ex:'I\'ve been on edge all day waiting for the results.'},
+      'blank': {def:'to suddenly be unable to remember or think of something', ex:'I completely blanked on her name even though I\'ve met her ten times.'},
+      'go blank': {def:'when your mind suddenly goes empty, especially in a stressful moment', ex:'My mind just went blank in the middle of the presentation.'},
+      'trail off': {def:'to gradually stop speaking, usually because you lose your train of thought or confidence', ex:'He started to explain but trailed off when he realised no one was listening.'},
+      'generic': {def:'not specific or original. Describes something predictable or lacking individuality.', ex:'His answer was so generic it could have applied to any job.'},
+      'sell yourself short': {def:'to undervalue your own abilities or achievements', ex:'Stop selling yourself short, your experience is genuinely impressive.'},
+      'second-guess yourself': {def:'to doubt your own decisions or abilities after the fact', ex:'I always second-guess myself after interviews.'},
+      'put something out of your mind': {def:'to stop thinking about something, especially something you cannot change', ex:'Just put it out of your mind until you hear back.'},
+      'read into': {def:'to look for hidden meanings in something that may not be there', ex:'Don\'t read into the fact they ended the call quickly.'},
+      'fingers crossed': {def:'an expression of hope, wishing for a good outcome', ex:'"I\'ve applied." "Fingers crossed!"'}
+    }
+  },
+  {
+    id: 10,
+    title: 'New relationship energy',
+    level: 'b2', levelLabel: 'B2',
+    desc: 'Mia tells her friend about the guy she just started seeing.',
+    tags: ['Dating', 'Informal'],
+    nameA: 'Mia', nameB: 'Rosa', avatarColor: '#9B72CF',
+    status: 'online',
+    ticks: 'blue',
+    messages: [
+      {who:'A', text:[{t:'Ok so I saw him again last night 🥺🥺'}], time:'22:10'},
+      {who:'B', text:[{t:'OBVIOUSLY you did. Ok spill. How was it 👀👀'}], time:'22:11'},
+      {who:'A', text:[{t:'Honestly it was so good. We just '},{p:'hit it off',k:'hit it off'},{t:' again, like properly 😭'}], time:'22:12'},
+      {who:'B', text:[{t:'Ok I need details. What did you do'}], time:'22:13'},
+      {who:'A', text:[{t:'Dinner, then a walk, then we just ended up talking for like three hours. Time '},{p:'flew',k:'time flies'},{t:' 😮‍💨'}], time:'22:14'},
+      {who:'B', text:[{t:'Oh that\'s the BEST sign 😭❤️ what\'s he like?'}], time:'22:15'},
+      {who:'A', text:[{t:'He\'s just really... '},{p:'easy to be around',k:'easy to be around'},{t:'. Like no pressure, no awkwardness at all 🥹'}], time:'22:16'},
+      {who:'B', text:[{t:'Mia. That\'s huge 🫶 are you going to '},{p:'play it cool',k:'play it cool'},{t:' or are you going full heart-eyes?'}], time:'22:18'},
+      {who:'A', text:[{t:'Trying to play it cool but I think I\'m '},{p:'catching feelings',k:'catch feelings'},{t:' a bit 🫣🫣'}], time:'22:19'},
+      {who:'B', text:[{t:'That\'s so cute 😭💕 just '},{p:'go with it',k:'go with it'},{t:', you don\'t have to have it all figured out'}], time:'22:21'},
+      {who:'A', text:[{t:'I know. I just don\'t want to '},{p:'get ahead of myself',k:'get ahead of yourself'},{t:' 😅'}], time:'22:22'},
+      {who:'B', text:[{t:'Stop overthinking and enjoy it!! You deserve this 💕💕'}], time:'22:23'}
+    ],
+    vocab: {
+      'hit it off': {def:'to immediately like someone and get on well with them from the first meeting', ex:'We hit it off straight away. By the end of the night it felt like we\'d known each other for years.'},
+      'time flies': {def:'time passes much faster than expected, usually when you are enjoying yourself', ex:'I can\'t believe it\'s midnight. Time just flies when you\'re having fun.'},
+      'easy to be around': {def:'describes someone who is relaxed and comfortable to spend time with, with no pressure or drama', ex:'She\'s just so easy to be around. There\'s never any awkwardness.'},
+      'play it cool': {def:'to pretend to be less interested or excited than you really are', ex:'I like him but I\'m trying to play it cool and not text too much.'},
+      'catch feelings': {def:'informal. To start developing romantic feelings for someone, often unexpectedly', ex:'I wasn\'t planning to get attached but I think I\'m catching feelings.'},
+      'go with it': {def:'to accept a situation and allow it to develop naturally without overthinking or resisting', ex:'"Should I ask her out?" "Just go with it, see what happens."'},
+      'get ahead of yourself': {def:'to think or plan too far forward before the situation has developed enough', ex:'We\'ve had two dates. Don\'t get ahead of yourself.'},
+      'overthink': {def:'to think about something too much, especially in a way that creates unnecessary worry', ex:'Stop overthinking it. Just send the message.'},
+      'full heart-eyes': {def:'informal. Completely infatuated, as in the heart-eyes emoji. Very keen on someone.', ex:'"She saw him and went full heart-eyes." Usually used with irony or affection.'},
+      'you deserve this': {def:'a phrase of encouragement. Means: this good thing is happening to you and you have earned it.', ex:'"I got the promotion." "You deserve it, honestly."'}
+    }
+  },
+  {
+    id: 11,
+    title: 'Calling in sick',
+    level: 'b2', levelLabel: 'B2',
+    desc: 'Jamie is not going in today. The colleague who covers for them is not thrilled.',
+    tags: ['Work', 'Guilt'],
+    nameA: 'Jamie', nameB: 'Sam', avatarColor: '#C05621',
+    status: 'last seen today at 08:05',
+    ticks: 'grey',
+    messages: [
+      {who:'A', text:[{t:'Sam... I\'m not going to make it in today 😬😬'}], time:'07:48'},
+      {who:'B', text:[{t:'Seriously? We\'ve got the 10am with the client 😐😐'}], time:'07:51'},
+      {who:'A', text:[{t:'I know, I\'m really sorry. I\'ve been '},{p:'up all night',k:'up all night'},{t:' with a stomach thing. I genuinely can\'t 🤢'}], time:'07:52'},
+      {who:'B', text:[{t:'Ok. I mean... '},{p:'it is what it is',k:'it is what it is'},{t:'. I\'ll cover the call 🙄'}], time:'07:54'},
+      {who:'A', text:[{t:'You\'re a '},{p:'star',k:'star'},{t:' 🙏🙏 I\'ll send you my notes right now'}], time:'07:55'},
+      {who:'B', text:[{t:'Yeah, please do. And the brief — I haven\'t had a chance to '},{p:'look over',k:'look over'},{t:' it properly'}], time:'07:56'},
+      {who:'A', text:[{t:'Sending now. The main thing is to just '},{p:'manage their expectations',k:'manage expectations'},{t:' on the timeline'}], time:'07:58'},
+      {who:'B', text:[{t:'Ok, got it. You owe me by the way 😑'}], time:'08:00'},
+      {who:'A', text:[{t:'I know I know 😩 I\'ll '},{p:'make it up to you',k:'make it up to someone'},{t:', I swear. Lunch on me when I\'m back'}], time:'08:01'},
+      {who:'B', text:[{t:'Deal. Now go back to bed and stop '},{p:'guilt-tripping yourself',k:'guilt-trip'},{t:', it\'s fine 😂'}], time:'08:03'},
+      {who:'A', text:[{t:'Haha thank you. Honestly you\'re the best. Sorry again 🙏🙏'}], time:'08:04'},
+      {who:'B', text:[{t:'Yeah yeah. Feel better 🙄💙'}], time:'08:05'}
+    ],
+    vocab: {
+      'up all night': {def:'to have not slept, spending the whole night awake', ex:'I was up all night finishing the report.'},
+      'it is what it is': {def:'used to accept a situation you cannot change, even if it is frustrating', ex:'"We missed the deadline." "Well, it is what it is. Let\'s focus on next steps."'},
+      'star': {def:'informal British term of appreciation. Calling someone a star means they have done something kind or helpful.', ex:'"I covered your shift." "You\'re an absolute star, thank you."'},
+      'look over': {def:'to read or check something, usually quickly', ex:'Can you look over my draft before I send it?'},
+      'manage expectations': {def:'to be clear about what is and is not possible so people are not disappointed', ex:'We need to manage their expectations about the delivery date.'},
+      'make it up to someone': {def:'to do something kind or generous to compensate for a mistake', ex:'"I missed your birthday." "I\'ll make it up to you, I promise."'},
+      'guilt-trip': {def:'to make someone feel guilty, or to feel guilty yourself. Can be used as a verb or noun.', ex:'Stop guilt-tripping yourself, you were actually ill.'},
+      'in': {def:'at work, in the office. "Not going in" means not going to work.', ex:'"Is she in today?" "No, she called in sick."'},
+      'cover': {def:'to take responsibility for someone else\'s work or duties when they are absent', ex:'Can you cover for me on Tuesday? I have a hospital appointment.'},
+      'brief': {def:'a document or summary that sets out the background and objectives of a project or meeting', ex:'Have you had a chance to read the brief for tomorrow\'s pitch?'}
+    }
+  },
+  {
+    id: 12,
+    title: 'Moving out',
+    level: 'b2', levelLabel: 'B2',
+    desc: 'One flatmate is leaving at the end of the month. It\'s bittersweet.',
+    tags: ['Home', 'Emotions'],
+    nameA: 'Chloe', nameB: 'Dan', avatarColor: '#744210',
+    status: 'online',
+    ticks: 'blue',
+    messages: [
+      {who:'B', text:[{t:'So... You\'re really going 😕'}], time:'20:02'},
+      {who:'A', text:[{t:'I really am 😢😢 end of the month. I can\'t believe it'}], time:'20:04'},
+      {who:'B', text:[{t:'This place is going to be so weird without you. I\'m going to '},{p:'miss you like mad',k:'miss someone like mad'},{t:' 😭'}], time:'20:05'},
+      {who:'A', text:[{t:'Stop it, you\'ll make me cry 😭😭 I\'m going to miss you too. So much.'}], time:'20:06'},
+      {who:'B', text:[{t:'I mean it\'s not like you\'re moving to another country... But still 😔'}], time:'20:08'},
+      {who:'A', text:[{t:'I know, but it\'s the end of an '},{p:'era',k:'end of an era'},{t:' isn\'t it. Three years we\'ve lived here 🥹'}], time:'20:09'},
+      {who:'B', text:[{t:'Three years, two flooded kitchens and one very regrettable '},{p:'all-nighter',k:'all-nighter'},{t:' 😂😂'}], time:'20:11'},
+      {who:'A', text:[{t:'Haha don\'t remind me 😂 honestly though, living here has been some of the '},{p:'best times',k:'best times'},{t:' 🥹❤️'}], time:'20:13'},
+      {who:'B', text:[{t:'100%. '},{p:'memories',k:'memories'},{t:' for life, honestly. The new people won\'t know what they\'ve got 🙄'}], time:'20:15'},
+      {who:'A', text:[{t:'Ok but we\'re not doing the whole "goodbye forever" thing. We\'re going to actually see each other, yes?'}], time:'20:16'},
+      {who:'B', text:[{t:'Obviously 🙄💙 I\'m '},{p:'holding you to that',k:'hold someone to something'},{t:''}], time:'20:17'},
+      {who:'A', text:[{t:'Deal. Ok I need to go pack and not cry 😅😭'}], time:'20:18'}
+    ],
+    vocab: {
+      'miss someone like mad': {def:'to miss someone very much. "Like mad" intensifies the verb informally.', ex:'I missed her like mad when she moved to Barcelona.'},
+      'end of an era': {def:'the end of a significant and memorable period of time', ex:'Leaving university felt like the end of an era.'},
+      'all-nighter': {def:'a night spent without sleep, usually studying, working, or partying', ex:'We pulled an all-nighter before the deadline and somehow finished it.'},
+      'best times': {def:'used to describe a period remembered fondly as exceptionally happy or fun', ex:'"Those summers were the best times." Usually followed by a smile or a sigh.'},
+      'memories': {def:'used here as a standalone exclamation. Means: this is something worth remembering fondly.', ex:'The way she laughed... memories.'},
+      'hold someone to something': {def:'to make sure someone keeps a promise they made', ex:'"I\'ll come and visit." "I\'m holding you to that."'},
+      'bittersweet': {def:'describes something that is happy and sad at the same time', ex:'Graduating was a bittersweet moment, exciting but also the end of something special.'},
+      'regrettable': {def:'something you wish had not happened, usually because of the consequences', ex:'That was a regrettable decision in hindsight.'},
+      'go pack': {def:'"go" before a verb suggests the speaker is moving to do something. Casual and informal.', ex:'"I need to go shower." / "I\'m going to go sleep."'},
+      'new people': {def:'informal way of referring to whoever will replace you or take over your place', ex:'"The new people move in Friday." Said with mild curiosity or mild sadness.'}
+    }
+  },
+  {
+    id: 13,
+    title: 'The difficult family chat',
+    level: 'c1', levelLabel: 'C1',
+    desc: 'Something happened at a family event. Two siblings try to make sense of it.',
+    tags: ['Family', 'Tension'],
+    nameA: 'Sofia', nameB: 'Luca', avatarColor: '#2D3748',
+    status: 'online',
+    ticks: 'blue',
+    messages: [
+      {who:'A', text:[{t:'I\'ve been thinking about what happened at Mum\'s birthday 😔'}], time:'21:15'},
+      {who:'B', text:[{t:'Yeah. It was a lot. I didn\'t know how to '},{p:'handle it',k:'handle something'},{t:' in the moment'}], time:'21:17'},
+      {who:'A', text:[{t:'I just think Dad really '},{p:'crossed a line',k:'cross a line'},{t:' this time. That wasn\'t ok.'}], time:'21:18'},
+      {who:'B', text:[{t:'I know. But also... You know what he\'s like. '},{p:'pick your battles',k:'pick your battles'},{t:' and all that'}], time:'21:20'},
+      {who:'A', text:[{t:'I hate that phrase honestly. At some point we have to '},{p:'address it',k:'address something'},{t:' or nothing ever changes'}], time:'21:22'},
+      {who:'B', text:[{t:'I agree. I just think the timing has to be right. He was '},{p:'on the defensive',k:'on the defensive'},{t:' all evening'}], time:'21:24'},
+      {who:'A', text:[{t:'He\'s always on the defensive. That\'s the problem. He can\'t '},{p:'take criticism',k:'take criticism'},{t:' without making it about him'}], time:'21:26'},
+      {who:'B', text:[{t:'Yeah... Look, I\'m not '},{p:'defending him',k:'defend someone'},{t:'. What he said to Mum was out of order. I just think we need a plan'}], time:'21:28'},
+      {who:'A', text:[{t:'Ok fair. '},{p:'what would you suggest',k:'suggest'},{t:'?'}], time:'21:29'},
+      {who:'B', text:[{t:'Talk to him. Calmly. Not when things are already '},{p:'charged',k:'charged'},{t:'. Maybe next week?'}], time:'21:31'},
+      {who:'A', text:[{t:'Ok. Yes. I don\'t love it but you\'re probably right. '},{p:'united front',k:'united front'},{t:' though. I don\'t want to do it alone.'}], time:'21:33'},
+      {who:'B', text:[{t:'Agreed. Together 🤝'}], time:'21:34'}
+    ],
+    vocab: {
+      'handle something': {def:'to deal with a situation, often a difficult or emotional one', ex:'I didn\'t know how to handle the conversation without it turning into an argument.'},
+      'cross a line': {def:'to do or say something that goes beyond what is acceptable', ex:'Criticising her in front of everyone crossed a line.'},
+      'pick your battles': {def:'to choose which disagreements are worth having and let smaller ones go', ex:'You can\'t argue about everything. You have to pick your battles.'},
+      'address something': {def:'to deal with or speak directly about a problem or issue', ex:'We need to address this before it becomes a bigger issue.'},
+      'on the defensive': {def:'in a state of reacting to criticism or perceived attack, rather than engaging openly', ex:'As soon as I mentioned it, he was immediately on the defensive.'},
+      'take criticism': {def:'to be able to hear and accept negative feedback without becoming defensive or upset', ex:'A good leader needs to be able to take criticism.'},
+      'defend someone': {def:'to support or argue in favour of someone who is being criticised', ex:'I\'m not defending what he did. I\'m just explaining the context.'},
+      'suggest': {def:'to put forward an idea or proposal for others to consider', ex:'"What would you suggest?" is a careful way of asking for advice without sounding demanding.'},
+      'charged': {def:'describes a situation or atmosphere that is emotionally tense and likely to escalate', ex:'The atmosphere in the room was already charged before anyone said a word.'},
+      'united front': {def:'when two or more people present a consistent and agreed position together, especially in a conflict', ex:'Whatever we disagree on privately, we need to show a united front.'}
+    }
+  },
+  {
+    id: 14,
+    title: 'Burnout',
+    level: 'c1', levelLabel: 'C1',
+    desc: 'Priya notices her colleague Jake is not ok. The conversation that follows is careful and real.',
+    tags: ['Work', 'Wellbeing'],
+    nameA: 'Jake', nameB: 'Priya', avatarColor: '#2176FF',
+    status: 'last seen today at 18:43',
+    ticks: 'grey',
+    messages: [
+      {who:'B', text:[{t:'Jake, can I ask you something and you don\'t have to answer if you don\'t want to?'}], time:'18:20'},
+      {who:'A', text:[{t:'...sure 😐'}], time:'18:22'},
+      {who:'B', text:[{t:'You\'ve just seemed really '},{p:'run down',k:'run down'},{t:' lately. Like not yourself. Is everything ok?'}], time:'18:23'},
+      {who:'A', text:[{t:'I\'m fine. Just tired.'}], time:'18:25'},
+      {who:'B', text:[{t:'Jake.'}], time:'18:26'},
+      {who:'A', text:[{t:'...ok. Not really, no. I think I\'m '},{p:'burning out',k:'burn out'},{t:'. I haven\'t said that out loud before'}], time:'18:28'},
+      {who:'B', text:[{t:'Thank you for saying it. That takes guts. How long has it been building?'}], time:'18:29'},
+      {who:'A', text:[{t:'Months probably. I keep thinking I\'ll '},{p:'push through',k:'push through'},{t:' but it\'s not getting better'}], time:'18:31'},
+      {who:'B', text:[{t:'Pushing through only works up to a point. At some point your body just says no. Have you spoken to anyone?'}], time:'18:33'},
+      {who:'A', text:[{t:'Not really. I don\'t want to seem like I can\'t '},{p:'handle the pressure',k:'handle the pressure'},{t:''}], time:'18:35'},
+      {who:'B', text:[{t:'That\'s such a common thing to think and it\'s just... Not how it works. Asking for help is not '},{p:'a sign of weakness',k:'a sign of weakness'},{t:''}], time:'18:37'},
+      {who:'A', text:[{t:'I know that rationally. Just hard to '},{p:'internalise',k:'internalise'},{t:' it'}], time:'18:39'},
+      {who:'B', text:[{t:'Ok. No pressure. But I think you should talk to someone — not me, a professional. And in the meantime, '},{p:'lean on',k:'lean on someone'},{t:' me if you need to. Seriously.'}], time:'18:41'},
+      {who:'A', text:[{t:'Yeah. Ok. Thank you Priya. I mean it.'}], time:'18:43'}
+    ],
+    vocab: {
+      'run down': {def:'exhausted and in poor health, especially from sustained stress or overwork', ex:'She\'s been looking really run down lately. I think she\'s doing too much.'},
+      'burn out': {def:'to become completely exhausted, physically and mentally, usually from prolonged stress or overwork', ex:'He burned out after two years in the role and had to take a leave of absence.'},
+      'push through': {def:'to continue despite difficulty, fatigue, or obstacles', ex:'I know you\'re tired but we need to push through the last section.'},
+      'handle the pressure': {def:'to cope with stress and demands without being overwhelmed', ex:'The role comes with a lot of responsibility. Can you handle the pressure?'},
+      'a sign of weakness': {def:'something perceived as showing vulnerability or inadequacy. Often used to challenge this assumption.', ex:'Asking for help is not a sign of weakness. It\'s a sign of self-awareness.'},
+      'internalise': {def:'to fully absorb and believe something so that it shapes your thinking or behaviour', ex:'She knows it intellectually but hasn\'t yet internalised it emotionally.'},
+      'lean on someone': {def:'to rely on someone for emotional support during a difficult time', ex:'That\'s what friends are for. Lean on me if you need to.'},
+      'takes guts': {def:'requires courage or bravery. "Guts" informally means courage.', ex:'Admitting you\'re struggling takes real guts.'},
+      'not yourself': {def:'behaving differently from your usual self, often due to stress, illness, or unhappiness', ex:'You\'ve not been yourself this week. Is something going on?'},
+      'rationally': {def:'based on reason and logic rather than emotion', ex:'I know rationally that it\'s not my fault, but I still feel guilty.'}
+    }
+  },
+  {
+    id: 15,
+    title: 'Asking for a favour',
+    level: 'c1', levelLabel: 'C1',
+    desc: 'Sal needs Mira to cover the Thursday briefing. The ask requires careful navigation.',
+    tags: ['Work', 'Hedging'],
+    nameA: 'Sal', nameB: 'Mira', avatarColor: '#0E7D6A',
+    status: 'online',
+    ticks: 'blue',
+    messages: [
+      {who:'A', text:[{t:'Hey, slightly awkward ask incoming 😬'}], time:'09:17'},
+      {who:'B', text:[{t:'Go on then 😂'}], time:'09:18'},
+      {who:'A', text:[{t:'So you know the Thursday briefing with the ops team... Any chance you could '},{p:'step in',k:'step in'},{t:' for me?'}], time:'09:19'},
+      {who:'B', text:[{t:'I mean... I\'m pretty '},{p:'tied up',k:'tied up'},{t:' Thursday morning. What\'s the situation?'}], time:'09:21'},
+      {who:'A', text:[{t:'My sister\'s wedding anniversary thing came up and I didn\'t want to '},{p:'let the team down',k:'let someone down'},{t:'. No pressure at all if you can\'t'}], time:'09:23'},
+      {who:'B', text:[{t:'No I get it. Look, I could probably '},{p:'shuffle things around',k:'shuffle things around'},{t:'. What\'s involved exactly?'}], time:'09:25'},
+      {who:'A', text:[{t:'It\'s about forty minutes, pretty '},{p:'straightforward',k:'straightforward'},{t:'. I\'ll send you everything you need. Honestly you\'d be doing me a massive favour'}], time:'09:27'},
+      {who:'B', text:[{t:'Ok, yeah. I\'ll do it. But you owe me 😂'}], time:'09:29'},
+      {who:'A', text:[{t:'You are an absolute '},{p:'lifesaver',k:'lifesaver'},{t:'. Genuinely. I\'ll prep everything by tomorrow'}], time:'09:30'},
+      {who:'B', text:[{t:'Make sure the brief is actually clear this time though, last one was a bit '},{p:'all over the place',k:'all over the place'},{t:''}], time:'09:32'},
+      {who:'A', text:[{t:'Haha fair point 😅 crystal clear. Promise.'}], time:'09:33'},
+      {who:'B', text:[{t:'Great. '},{p:'I\'ll hold you to that',k:'hold someone to something'},{t:' 😂'}], time:'09:34'}
+    ],
+    vocab: {
+      'step in': {def:'to take on a role or responsibility, usually to help out when someone else cannot', ex:'She stepped in at the last minute when the speaker cancelled.'},
+      'tied up': {def:'busy and unavailable, usually with existing commitments', ex:'"Can you talk?" "Not right now, I\'m a bit tied up."'},
+      'let someone down': {def:'to disappoint someone by failing to do what they were counting on you for', ex:'I hate letting the team down but I have a family commitment.'},
+      'shuffle things around': {def:'to rearrange plans or schedule to make something work', ex:'Let me shuffle things around and I can probably fit it in Thursday.'},
+      'straightforward': {def:'simple, clear, and without complications', ex:'It\'s a fairly straightforward task. Shouldn\'t take more than an hour.'},
+      'lifesaver': {def:'someone who helps you out of a difficult or stressful situation', ex:'You covered for me at the last minute. You\'re a total lifesaver.'},
+      'all over the place': {def:'disorganised, unclear, or lacking structure. Describes something messy or inconsistent.', ex:'The presentation was all over the place. No clear argument.'},
+      'hold someone to something': {def:'to make sure someone keeps a commitment they made', ex:'"I\'ll have it ready by Friday." "I\'m holding you to that."'},
+      'incoming': {def:'about to arrive or happen. Used informally to signal that something is coming.', ex:'"Awkward question incoming." / "Bad news incoming, brace yourself."'},
+      'crystal clear': {def:'completely clear and easy to understand, with no ambiguity', ex:'I want the brief to be crystal clear so there\'s no confusion on the day.'}
+    }
+  },
+  {
+    id: 16,
+    title: 'The non-apology apology',
+    level: 'c1', levelLabel: 'C1',
+    desc: 'Something was said at dinner. An apology follows. Sort of.',
+    tags: ['Relationships', 'Tension'],
+    nameA: 'You', nameB: 'Chris', avatarColor: '#E53E3E',
+    status: '',
+    ticks: 'none',
+    messages: [
+      {who:'B', text:[{t:'Hey. I\'ve been thinking about what I said last night'}], time:'11:30'},
+      {who:'A', text:[{t:'Ok'}], time:'11:35'},
+      {who:'B', text:[{t:'I think maybe it came out wrong. I didn\'t mean it the way it sounded.'}], time:'11:36'},
+      {who:'A', text:[{t:'How did you mean it then?'}], time:'11:42'},
+      {who:'B', text:[{t:'I just... I was '},{p:'in a mood',k:'in a mood'},{t:' and I said something stupid. I\'m sorry if it upset you'}], time:'11:44'},
+      {who:'A', text:[{t:'The "sorry if" thing is a bit of a '},{p:'non-apology',k:'non-apology'},{t:' to be honest'}], time:'11:46'},
+      {who:'B', text:[{t:'You\'re right. Ok. I\'m sorry. No "if". It was '},{p:'out of order',k:'out of order'},{t:' and I shouldn\'t have said it'}], time:'11:48'},
+      {who:'A', text:[{t:'Thank you. That\'s all I needed.'}], time:'11:52'},
+      {who:'B', text:[{t:'I know I can be '},{p:'sharp',k:'sharp'},{t:' sometimes when I\'m stressed. It\'s not an excuse, just... Context'}], time:'11:54'},
+      {who:'A', text:[{t:'I know. And I know it\'s been a hard week for you. I\'m not trying to '},{p:'hold it against you',k:'hold something against someone'},{t:''}], time:'11:56'},
+      {who:'B', text:[{t:'I appreciate that. '},{p:'for what it\'s worth',k:'for what it\'s worth'},{t:', you handled it better than I would have'}], time:'11:58'},
+      {who:'A', text:[{t:'Let\'s just '},{p:'move on',k:'move on'},{t:'. Dinner again this week?'}], time:'12:00'},
+      {who:'B', text:[{t:'Yes please. Thursday? I\'m buying 🙂'}], time:'12:01'}
+    ],
+    vocab: {
+      'in a mood': {def:'feeling irritable, withdrawn, or emotionally difficult without necessarily explaining why', ex:'"Why is he being so short with everyone?" "He\'s just in a mood."'},
+      'non-apology': {def:'an apology that does not fully take responsibility, often using "if" or blaming the other person\'s reaction', ex:'"Sorry if you were offended" is a classic non-apology.'},
+      'out of order': {def:'unacceptable, inappropriate, or beyond the limits of decent behaviour', ex:'That comment was completely out of order. He should apologise.'},
+      'sharp': {def:'describes someone who is cutting or hurtful with words, often unintentionally', ex:'She can be a bit sharp when she\'s under pressure. She doesn\'t always realise.'},
+      'hold something against someone': {def:'to continue to resent someone for something they did in the past', ex:'I\'m not going to hold one bad evening against you.'},
+      'for what it\'s worth': {def:'used to offer an opinion or observation while acknowledging it may not change much', ex:'"For what it\'s worth, I think you handled that really well."'},
+      'move on': {def:'to stop dwelling on something and continue forward', ex:'We\'ve talked it through. Let\'s move on and not let it ruin things.'},
+      'come out wrong': {def:'when what you say does not express what you intended and sounds worse than you meant', ex:'"That came out wrong, I didn\'t mean it like that."'},
+      'context': {def:'background information that helps explain a situation or behaviour', ex:'"He was rude to the waiter." "I know, but the context matters, he\'d had terrible news."'},
+      'I appreciate that': {def:'a formal or careful way of saying "thank you" or "that means something to me"', ex:'"I appreciate that you listened." More considered than a simple thanks.'}
+    }
+  },
+  {
+    id: 17,
+    title: 'Ghosted',
+    level: 'c1', levelLabel: 'C1',
+    desc: 'Three weeks of silence. Jas tells her friend what happened and tries to make sense of it.',
+    tags: ['Dating', 'Advice'],
+    nameA: 'Jas', nameB: 'Nadia', avatarColor: '#B7791F',
+    status: 'last seen today at 20:15',
+    ticks: 'grey',
+    messages: [
+      {who:'A', text:[{t:'Ok so I have an update on the Ben situation'}], time:'20:00'},
+      {who:'B', text:[{t:'Oh god. Good or bad'}], time:'20:01'},
+      {who:'A', text:[{t:'Just... Weird. So he texted after three weeks of nothing. "hey stranger"'}], time:'20:02'},
+      {who:'B', text:[{t:'"hey stranger"?????? After three weeks of being '},{p:'ghosted',k:'ghost'},{t:'?? Absolutely not'}], time:'20:03'},
+      {who:'A', text:[{t:'I know. I didn\'t respond for like two days just to... I don\'t know, '},{p:'not seem desperate',k:'seem desperate'},{t:''}], time:'20:04'},
+      {who:'B', text:[{t:'Good. What did you say when you did?'}], time:'20:05'},
+      {who:'A', text:[{t:'I kept it short. Just "hi, yeah been a while." Trying to play it '},{p:'close to my chest',k:'play it close to your chest'},{t:''}], time:'20:06'},
+      {who:'B', text:[{t:'Smart. What did he say?'}], time:'20:07'},
+      {who:'A', text:[{t:'Something about being busy and apologised. But like... A '},{p:'cop-out',k:'cop-out'},{t:' apology. No real explanation'}], time:'20:08'},
+      {who:'B', text:[{t:'Classic. So what are you thinking? Because I don\'t want you to '},{p:'let him back in',k:'let someone back in'},{t:' just like that'}], time:'20:10'},
+      {who:'A', text:[{t:'Honestly part of me wants to, which I know is '},{p:'ridiculous',k:'ridiculous'},{t:''}], time:'20:11'},
+      {who:'B', text:[{t:'It\'s not ridiculous, it\'s human. But someone who goes silent for three weeks without a word isn\'t '},{p:'worth your energy',k:'worth your energy'},{t:''}], time:'20:13'},
+      {who:'A', text:[{t:'You\'re right. I just wish I didn\'t still '},{p:'care',k:'care'},{t:''}], time:'20:14'},
+      {who:'B', text:[{t:'That\'s the worst bit isn\'t it 😔 but you will stop. Give it time.'}], time:'20:15'}
+    ],
+    vocab: {
+      'ghost': {def:'to suddenly stop all contact with someone without explanation, especially in a dating context', ex:'They had five great dates and then he just ghosted. No message, nothing.'},
+      'seem desperate': {def:'to appear too eager or needy, which is considered unattractive in dating contexts', ex:'I waited a day to reply so I didn\'t seem desperate.'},
+      'play it close to your chest': {def:'to keep your feelings, plans, or thoughts private and not reveal them', ex:'She played it close to her chest and didn\'t let on how much she liked him.'},
+      'cop-out': {def:'an easy way of avoiding responsibility or giving a proper explanation. Often describes a weak excuse.', ex:'That apology was a total cop-out. He didn\'t even explain himself.'},
+      'let someone back in': {def:'to allow someone who hurt you to return to a place of trust or closeness', ex:'After everything he did, she let him back in. I hope she doesn\'t regret it.'},
+      'ridiculous': {def:'used informally to describe feelings or behaviour you know are illogical or hard to justify', ex:'"I still miss him." "That\'s not ridiculous. It takes time."'},
+      'worth your energy': {def:'deserving of your time, attention, and emotional investment', ex:'He\'s not worth your energy. Move on.'},
+      'care': {def:'to have feelings for someone. "I wish I didn\'t still care" expresses the pain of unwanted attachment.', ex:'"Do you still care about him?" "Unfortunately, yes."'},
+      'give it time': {def:'to allow time to pass so that feelings ease or a situation improves naturally', ex:'It hurts now but give it time. You\'ll feel differently.'},
+      'let on': {def:'to reveal or show what you are thinking or feeling, often used in the negative', ex:'She didn\'t let on how upset she was. She just smiled and left.'}
+    }
+  },
+  {
+    id: 18,
+    title: 'Long-distance check-in',
+    level: 'c1', levelLabel: 'C1',
+    desc: 'Theo moved to Amsterdam six months ago. His friend back home checks in.',
+    tags: ['Relationships', 'Expat'],
+    nameA: 'Theo', nameB: 'Will', avatarColor: '#553C9A',
+    status: 'online',
+    ticks: 'blue',
+    messages: [
+      {who:'B', text:[{t:'Theo!! How\'s Amsterdam? Feel like I haven\'t spoken to you properly in ages'}], time:'19:04'},
+      {who:'A', text:[{t:'Will! I know, life has been a bit full-on. Amsterdam is good though — starting to feel more '},{p:'settled',k:'settled'},{t:''}], time:'19:07'},
+      {who:'B', text:[{t:'That\'s great. Are you starting to '},{p:'find your feet',k:'find your feet'},{t:'?'}], time:'19:09'},
+      {who:'A', text:[{t:'Yeah, slowly. It was '},{p:'overwhelming',k:'overwhelming'},{t:' at first honestly. The language, the cycling, the very direct people 😂'}], time:'19:11'},
+      {who:'B', text:[{t:'Haha the Dutch directness is something else. Do you miss home?'}], time:'19:13'},
+      {who:'A', text:[{t:'Yeah, not in a sad way exactly — more like a low-level '},{p:'homesickness',k:'homesickness'},{t:'. I miss the pub and proper curry 😂'}], time:'19:15'},
+      {who:'B', text:[{t:'We\'ll sort that when you\'re back. When are you next visiting?'}], time:'19:16'},
+      {who:'A', text:[{t:'Probably Christmas. Can\'t believe it\'s been six months. Time '},{p:'flies',k:'time flies'},{t:' when you\'re terrified 😂'}], time:'19:18'},
+      {who:'B', text:[{t:'Haha that\'s a great quote. Are you making friends or is it still '},{p:'early days',k:'early days'},{t:'?'}], time:'19:20'},
+      {who:'A', text:[{t:'Early days, but there are some people at work I\'ve '},{p:'clicked with',k:'click with someone'},{t:'. That\'s helped a lot'}], time:'19:22'},
+      {who:'B', text:[{t:'That\'s everything honestly. Once you have your people it\'s different'}], time:'19:24'},
+      {who:'A', text:[{t:'Exactly. Still miss you lot though. This does not replace the pub 😂'}], time:'19:25'},
+      {who:'B', text:[{t:'Nothing replaces the pub. Christmas then. I\'m '},{p:'counting the days',k:'count the days'},{t:' 🍻'}], time:'19:26'}
+    ],
+    vocab: {
+      'settled': {def:'feeling comfortable and at home in a new place or situation after an initial period of adjustment', ex:'It took about three months before I really felt settled in the new city.'},
+      'find your feet': {def:'to gradually become more confident and comfortable in a new situation', ex:'It takes time to find your feet when you move abroad.'},
+      'overwhelming': {def:'so intense or difficult that it is hard to cope with or process', ex:'The first week was overwhelming. Too much new information all at once.'},
+      'homesickness': {def:'a feeling of longing for home, family, or familiar things when you are away', ex:'The homesickness was worst in the evenings when I had nothing to distract me.'},
+      'time flies': {def:'time passes much faster than expected', ex:'I can\'t believe it\'s been a year already. Time really flies.'},
+      'early days': {def:'used to say that a situation is still new and it is too soon to draw conclusions or expect results', ex:'"Are you happy there?" "It\'s early days but it\'s looking good."'},
+      'click with someone': {def:'to immediately get on well with someone and feel a natural connection', ex:'I clicked with her straight away. We just had the same sense of humour.'},
+      'full-on': {def:'intense, busy, or demanding. Used to describe a period of time or a situation.', ex:'This week has been absolutely full-on. I\'ve barely had time to breathe.'},
+      'low-level': {def:'mild and persistent rather than intense or acute. Often describes feelings or problems that are present but not overwhelming.', ex:'There\'s a low-level anxiety about the whole thing that I can\'t quite shake.'},
+      'count the days': {def:'to eagerly anticipate a future event and be very aware of how long until it arrives', ex:'Only two weeks until the holiday. I\'m counting the days.'}
+    }
+  },
+  {
+    id: 19,
+    title: 'Career crossroads',
+    level: 'c1', levelLabel: 'C1',
+    desc: 'Nora has been offered a new job. She\'s not sure what to do. Her friend helps her think it through.',
+    tags: ['Work', 'Decisions'],
+    nameA: 'Nora', nameB: 'Felix', avatarColor: '#285E61',
+    status: 'online',
+    ticks: 'blue',
+    messages: [
+      {who:'A', text:[{t:'Felix. I have a situation and I need a '},{p:'sounding board',k:'sounding board'},{t:''}], time:'20:30'},
+      {who:'B', text:[{t:'Always. What\'s going on?'}], time:'20:31'},
+      {who:'A', text:[{t:'I\'ve been offered a job. Really good one. But it means leaving where I am now and I\'m... '},{p:'torn',k:'torn'},{t:''}], time:'20:32'},
+      {who:'B', text:[{t:'Ok, interesting. What\'s pulling you back from just saying yes?'}], time:'20:34'},
+      {who:'A', text:[{t:'Partly the team. I love the people I work with. And partly just... '},{p:'the devil you know',k:'the devil you know'},{t:'. It feels safe where I am'}], time:'20:35'},
+      {who:'B', text:[{t:'But "safe" isn\'t the same as "happy" is it. Are you actually happy where you are?'}], time:'20:37'},
+      {who:'A', text:[{t:'Honestly? Not really. I think I\'ve '},{p:'outgrown it',k:'outgrow something'},{t:' a bit. Just hard to admit.'}], time:'20:39'},
+      {who:'B', text:[{t:'Right. So the question isn\'t really new job or not — it\'s whether you\'re ready to '},{p:'step outside your comfort zone',k:'step outside your comfort zone'},{t:''}], time:'20:41'},
+      {who:'A', text:[{t:'Yeah. And the answer is probably yes but it\'s '},{p:'terrifying',k:'terrifying'},{t:''}], time:'20:42'},
+      {who:'B', text:[{t:'Of course it is. But you know that feeling where something is scary AND exciting at the same time?'}], time:'20:44'},
+      {who:'A', text:[{t:'Yes. That\'s exactly what this is'}], time:'20:45'},
+      {who:'B', text:[{t:'That\'s usually the thing you should do. The comfortable option '},{p:'rarely',k:'rarely'},{t:' leads anywhere new'}], time:'20:46'},
+      {who:'A', text:[{t:'You\'re right. Ok. I think I\'m going to say yes. I just needed to '},{p:'say it out loud',k:'say something out loud'},{t:' to someone'}], time:'20:48'},
+      {who:'B', text:[{t:'Go for it. And when it\'s great you can thank me 😂'}], time:'20:49'}
+    ],
+    vocab: {
+      'sounding board': {def:'a person you use to test out ideas or talk through decisions, not necessarily for advice but to help you think', ex:'"I don\'t need you to decide for me, I just need a sounding board."'},
+      'torn': {def:'unable to decide between two options because both have appeal or value', ex:'I\'m torn between staying and taking the risk. I genuinely don\'t know what to do.'},
+      'the devil you know': {def:'short for "better the devil you know than the devil you don\'t". Means: a familiar situation is preferable to an unknown one, even if imperfect.', ex:'"Why stay in a job you\'re bored in?" "The devil you know, I suppose."'},
+      'outgrow something': {def:'to reach a point where something no longer fits your level, needs, or ambitions', ex:'She\'d outgrown the role. There was nothing left for her to learn there.'},
+      'step outside your comfort zone': {def:'to do something that challenges you beyond what feels familiar or safe', ex:'Real growth only happens when you step outside your comfort zone.'},
+      'terrifying': {def:'very frightening. Used informally for anything that causes anxiety or uncertainty, not just literal danger.', ex:'"It\'s a big move." "Yeah, terrifying, but probably the right call."'},
+      'rarely': {def:'almost never. Used here for emphasis to reinforce that the "safe" choice seldom leads to growth.', ex:'Playing it safe rarely gets you where you actually want to be.'},
+      'say something out loud': {def:'to verbalise a thought or feeling, which often makes it more real or clearer', ex:'I\'d been thinking about quitting for months but I hadn\'t said it out loud until then.'},
+      'go for it': {def:'an enthusiastic encouragement to do something bold or take a risk', ex:'"Should I apply?" "Go for it. You\'ve got nothing to lose."'},
+      'pull someone back': {def:'to make someone hesitant or reluctant to commit to a decision', ex:'"What\'s pulling you back?" is asking what is causing hesitation.'}
+    }
+  },
+  {
+    id: 20,
+    title: 'Mam checking in',
+    level: 'b2', levelLabel: 'B2',
+    desc: 'John\'s mam sends a voice note... and then fifteen texts.',
+    tags: ['Family', 'Informal'],
+    nameA: 'John', nameB: 'Mam', avatarColor: '#E53E3E',
+    status: 'online',
+    ticks: 'blue',
+    messages: [
+      {who:'B', text:[{t:'John are you eating properly'}], time:'11:02'},
+      {who:'A', text:[{t:'Yes Mam 😂'}], time:'11:14'},
+      {who:'B', text:[{t:'I sent you a voice note did you listen to it'}], time:'11:15'},
+      {who:'A', text:[{t:'Not yet, I\'ll listen later'}], time:'11:15'},
+      {who:'B', text:[{t:'Well I just want to say I saw your one on Instagram and you looked very pale'}], time:'11:16'},
+      {who:'B', text:[{t:'Are you getting enough sleep'}], time:'11:16'},
+      {who:'A', text:[{t:'Mam I\'m grand 😂 stop worrying'}], time:'11:18'},
+      {who:'B', text:[{t:'I\'m your mother I\'m allowed to worry. Your cousin Niamh is coming home for Easter will you be here'}], time:'11:19'},
+      {who:'A', text:[{t:'Yeah I should be. Why?'}], time:'11:20'},
+      {who:'B', text:[{t:'Good. I\'m doing a big dinner. '},{'p':'Don\'t say anything to your father',k:'don\'t say anything'},{t:' yet I haven\'t told him how many people are coming 😂'}], time:'11:21'},
+      {who:'A', text:[{t:'How many people ARE coming?? 😂'}], time:'11:22'},
+      {who:'B', text:[{t:'Only about twenty. '},{p:'It\'ll be grand',k:'it\'ll be grand'},{t:''}], time:'11:23'},
+      {who:'A', text:[{t:'Jesus Mam 😂😂 Ok. I\'ll be there. Listen that voice note though'}], time:'11:24'},
+      {who:'B', text:[{t:'Oh don\'t worry about that I was just rambling. Love you son 💙'}], time:'11:25'},
+      {who:'A', text:[{t:'Love you too Mam ❤️'}], time:'11:25'}
+    ],
+    vocab: {
+      'don\'t say anything': {def:'keep this secret for now. A very common informal instruction.', ex:'"Don\'t say anything to your dad — it\'s a surprise."'},
+      'it\'ll be grand': {def:'Irish English — it will be fine, don\'t worry about it. Used to dismiss concerns cheerfully.', ex:'"Are you sure there\'s enough food?" "Ah it\'ll be grand."'},
+      'grand': {def:'Irish English for fine, good, or OK. Not particularly impressive — just perfectly acceptable.', ex:'"How are you?" "Ah, grand thanks."'},
+      'rambling': {def:'talking or writing at length without a clear point, often going off topic', ex:'Sorry, I\'m rambling — what was I saying?'},
+      'checking in': {def:'making contact to see how someone is, without a specific reason', ex:'Just checking in — haven\'t heard from you in a while.'}
+    }
+  },
+  {
+    id: 21,
+    title: 'Dad and the technology',
+    level: 'b2', levelLabel: 'B2',
+    desc: 'John\'s dad needs help with his phone. Again.',
+    tags: ['Family', 'Humour'],
+    nameA: 'John', nameB: 'Dad', avatarColor: '#2D3748',
+    status: 'last seen today at 16:02',
+    ticks: 'grey',
+    messages: [
+      {who:'B', text:[{t:'John how do I make the writing bigger on this yoke'}], time:'15:44'},
+      {who:'A', text:[{t:'What yoke Dad, the phone?'}], time:'15:51'},
+      {who:'B', text:[{t:'Yes the phone the writing is very small I can hardly see it'}], time:'15:52'},
+      {who:'A', text:[{t:'Go to Settings, then Accessibility, then Display and Text Size'}], time:'15:53'},
+      {who:'B', text:[{t:'Where\'s settings'}], time:'15:54'},
+      {who:'A', text:[{t:'The little gear icon 😂'}], time:'15:54'},
+      {who:'B', text:[{t:'I don\'t see any gear'}], time:'15:55'},
+      {who:'A', text:[{t:'Ok swipe down from the top right of the screen'}], time:'15:56'},
+      {who:'B', text:[{t:'Nothing happened'}], time:'15:57'},
+      {who:'A', text:[{t:'Which phone do you have?'}], time:'15:58'},
+      {who:'B', text:[{t:'I don\'t know. A black one'}], time:'15:58'},
+      {who:'A', text:[{t:'😂😂😂 Dad. Ok. Can you just '},{p:'hand it to Mam',k:'hand something to someone'},{t:' and I\'ll talk her through it'}], time:'15:59'},
+      {who:'B', text:[{t:'She\'s at the shops'}], time:'16:00'},
+      {who:'A', text:[{t:'Right. When she gets back will you ask her. I\'ll ring at the weekend and '},{p:'sort it out',k:'sort it out'},{t:' properly'}], time:'16:01'},
+      {who:'B', text:[{t:'Grand so. How\'s yourself anyway'}], time:'16:02'}
+    ],
+    vocab: {
+      'yoke': {def:'Irish English — a thing, an object, a device. Used when you can\'t remember or don\'t know the name of something.', ex:'"What do you call that yoke you use to open tins?"'},
+      'grand so': {def:'Irish English — OK then, alright, that\'s fine. Used to close a conversation or accept a plan.', ex:'"I\'ll call you tomorrow." "Grand so."'},
+      'hand something to someone': {def:'to physically give something to someone', ex:'Can you hand me that pen?'},
+      'sort it out': {def:'to fix or resolve a problem', ex:'Leave it with me — I\'ll sort it out.'},
+      'how\'s yourself': {def:'Irish English — how are you? A standard greeting, often used after other business is done.', ex:'"Right, that\'s sorted. How\'s yourself anyway?"'}
+    }
+  },
+  {
+    id: 22,
+    title: 'Uncle Kev\'s conspiracy',
+    level: 'b2', levelLabel: 'B2',
+    desc: 'Uncle Kev has seen something on Facebook. John tries to manage the situation.',
+    tags: ['Family', 'Humour'],
+    nameA: 'John', nameB: 'Uncle Kev', avatarColor: '#744210',
+    status: 'online',
+    ticks: 'blue',
+    messages: [
+      {who:'B', text:[{t:'John did you see what they\'re doing now'}], time:'21:03'},
+      {who:'A', text:[{t:'What\'s this now Kev 😂'}], time:'21:06'},
+      {who:'B', text:[{t:'The 5G. They\'re putting it in the water as well now. I saw it on a video'}], time:'21:07'},
+      {who:'A', text:[{t:'Kev. That\'s not a thing 😂'}], time:'21:08'},
+      {who:'B', text:[{t:'How do you know. Were you there'}], time:'21:09'},
+      {who:'A', text:[{t:'I wasn\'t there but neither was the fella who made the video 😂'}], time:'21:10'},
+      {who:'B', text:[{t:'He\'s a doctor'}], time:'21:11'},
+      {who:'A', text:[{t:'Did it say that on the video or did someone in the comments say it'}], time:'21:12'},
+      {who:'B', text:[{t:'...the comments'}], time:'21:14'},
+      {who:'A', text:[{t:'Kev 😂😂 Don\'t '},{p:'be taken in',k:'be taken in'},{t:' by this stuff. Anyone can put anything on Facebook'}], time:'21:15'},
+      {who:'B', text:[{t:'Well they wouldn\'t be allowed post it if it wasn\'t true'}], time:'21:16'},
+      {who:'A', text:[{t:'I promise you they would 😂 Have you talked to Mam lately by the way? She\'s doing a big Easter dinner'}], time:'21:17'},
+      {who:'B', text:[{t:'Twenty people? She told me. '},{p:'God love her',k:'God love her'},{t:''}], time:'21:18'},
+      {who:'A', text:[{t:'😂😂 exactly. Look '},{p:'leave it',k:'leave it'},{t:' with the 5G and come to the dinner'}], time:'21:19'},
+      {who:'B', text:[{t:'I\'ll be there. I\'ll bring cans 🍺'}], time:'21:20'}
+    ],
+    vocab: {
+      'be taken in': {def:'to be deceived or fooled by something that isn\'t true', ex:'Don\'t be taken in by that email — it\'s a scam.'},
+      'God love her': {def:'Irish English — an expression of affectionate sympathy. Means: she\'s a sweet person, bless her.', ex:'"She knitted jumpers for the whole family." "Ah God love her."'},
+      'leave it': {def:'stop pursuing that topic or argument. Used to move on from something unproductive.', ex:'"Leave it, will you? We\'re going in circles."'},
+      'cans': {def:'Irish/British informal — cans of beer', ex:'"Will I bring anything?" "Bring a few cans."'},
+      'fella': {def:'Irish/British informal word for a man or a guy', ex:'Some fella on YouTube was saying the same thing.'}
+    }
+  },
+  {
+    id: 23,
+    title: 'Marco in Milan',
+    level: 'c1', levelLabel: 'C1',
+    desc: 'John\'s Italian friend Marco messages about a visit.',
+    tags: ['Social', 'Relationships'],
+    nameA: 'John', nameB: 'Marco', avatarColor: '#C05621',
+    status: 'online',
+    ticks: 'blue',
+    messages: [
+      {who:'B', text:[{t:'John!! I\'m coming to London in March, you still living there?'}], time:'18:22'},
+      {who:'A', text:[{t:'Marco! Yes still here — when exactly?'}], time:'18:35'},
+      {who:'B', text:[{t:'The 14th to the 18th. Work thing but I have the evenings free'}], time:'18:36'},
+      {who:'A', text:[{t:'Perfect. You have to come for dinner at least one of those nights'}], time:'18:37'},
+      {who:'B', text:[{t:'Of course! I\'ll bring something from here. What do you need, wine? Pasta?'}], time:'18:38'},
+      {who:'A', text:[{t:'Both 😂 Honestly though don\'t '},{p:'go to any trouble',k:'go to any trouble'},{t:''}], time:'18:39'},
+      {who:'B', text:[{t:'Please, it\'s no trouble. My mother would be offended if I arrived empty-handed 😂'}], time:'18:40'},
+      {who:'A', text:[{t:'Ha — fair enough. How is she?'}], time:'18:41'},
+      {who:'B', text:[{t:'Good, good. She asks about you actually. She still talks about that time you tried to make risotto at ours 😂'}], time:'18:42'},
+      {who:'A', text:[{t:'Oh god. We don\'t need to '},{p:'bring that up',k:'bring something up'},{t:' 😂'}], time:'18:44'},
+      {who:'B', text:[{t:'She says it was "very enthusiastic" 😂'}], time:'18:45'},
+      {who:'A', text:[{t:'That\'s a very generous way to put it. Right — the 15th, dinner at mine. '},{p:'Put it in the diary',k:'put something in the diary'},{t:''}], time:'18:46'},
+      {who:'B', text:[{t:'Done. I\'m already looking forward to it 🍷'}], time:'18:47'},
+      {who:'A', text:[{t:'Me too. It\'s been too long 🙂'}], time:'18:48'}
+    ],
+    vocab: {
+      'go to any trouble': {def:'to make a special effort for someone, often used in the negative to tell someone not to fuss', ex:'"Don\'t go to any trouble — whatever you have is fine."'},
+      'bring something up': {def:'to mention or introduce a topic in conversation', ex:'I didn\'t want to bring up the argument in front of everyone.'},
+      'put something in the diary': {def:'to schedule something officially so you don\'t forget it', ex:'"Can we meet next Thursday?" "Yes, let me put it in the diary."'},
+      'empty-handed': {def:'arriving without a gift or contribution when one might be expected', ex:'You can\'t go to someone\'s house for dinner empty-handed.'},
+      'it\'s been too long': {def:'a warm expression meaning too much time has passed since we last saw each other', ex:'"It\'s so good to see you." "It\'s been too long!"'}
+    }
+  },
+  {
+    id: 24,
+    title: 'Sofía from Madrid',
+    level: 'c1', levelLabel: 'C1',
+    desc: 'John\'s Spanish friend Sofía messages about something that happened at work.',
+    tags: ['Social', 'Gossip'],
+    nameA: 'John', nameB: 'Sofía', avatarColor: '#9B72CF',
+    status: 'online',
+    ticks: 'blue',
+    messages: [
+      {who:'B', text:[{t:'John I need to tell you something but you have to promise not to repeat it'}], time:'20:11'},
+      {who:'A', text:[{t:'Oh this sounds good. Go on 👀'}], time:'20:14'},
+      {who:'B', text:[{t:'So you know Isabel from my team?'}], time:'20:14'},
+      {who:'A', text:[{t:'The one who always sends the reply-all emails?'}], time:'20:15'},
+      {who:'B', text:[{t:'YES her. Ok so apparently she\'s been going '},{p:'behind the manager\'s back',k:'go behind someone\'s back'},{t:' about the project for months'}], time:'20:16'},
+      {who:'A', text:[{t:'What?? How?'}], time:'20:17'},
+      {who:'B', text:[{t:'She\'s been sending reports directly to the director without telling anyone. My colleague found out by accident'}], time:'20:18'},
+      {who:'A', text:[{t:'Ok that\'s actually quite '},{p:'bold',k:'bold'},{t:'. Stupid, but bold 😂'}], time:'20:19'},
+      {who:'B', text:[{t:'The manager is '},{p:'fuming',k:'fuming'},{t:'. I could hear the conversation through the wall this afternoon'}], time:'20:20'},
+      {who:'A', text:[{t:'Oh no 😂 Was it bad?'}], time:'20:21'},
+      {who:'B', text:[{t:'Let\'s just say Isabel went very quiet after. She\'s been '},{p:'keeping a low profile',k:'keep a low profile'},{t:' all week'}], time:'20:22'},
+      {who:'A', text:[{t:'I\'d do the same 😂 What happens now?'}], time:'20:23'},
+      {who:'B', text:[{t:'No idea. But I\'m watching this like a TV show honestly 🍿'}], time:'20:24'},
+      {who:'A', text:[{t:'Keep me posted. This is the most exciting thing to happen this week 😂'}], time:'20:25'}
+    ],
+    vocab: {
+      'go behind someone\'s back': {def:'to do something secretly that affects someone without their knowledge or permission', ex:'She went behind his back and applied for the same role.'},
+      'bold': {def:'brave or daring, sometimes recklessly so. Often used with irony.', ex:'"He asked for a 30% raise in his first week." "Bold move."'},
+      'fuming': {def:'extremely angry', ex:'She was absolutely fuming when she found out.'},
+      'keep a low profile': {def:'to avoid drawing attention to yourself, especially after making a mistake or causing trouble', ex:'After the incident he kept a very low profile for a few weeks.'},
+      'keep me posted': {def:'to continue sending updates as a situation develops', ex:'"I\'ll let you know what they decide." "Please — keep me posted."'}
+    }
+  },
+  {
+    id: 25,
+    title: 'Olena before class',
+    level: 'b2', levelLabel: 'B2',
+    desc: 'John\'s Ukrainian student Olena messages on the weekend about the upcoming lesson.',
+    tags: ['Work', 'Informal'],
+    nameA: 'John', nameB: 'Olena', avatarColor: '#2176FF',
+    status: 'online',
+    ticks: 'blue',
+    messages: [
+      {who:'B', text:[{t:'Hello John! Sorry to message on weekend 😊'}], time:'10:32'},
+      {who:'A', text:[{t:'Not at all Olena — what\'s up?'}], time:'10:44'},
+      {who:'B', text:[{t:'I wanted to ask — next Thursday lesson, is it still online or in person?'}], time:'10:45'},
+      {who:'A', text:[{t:'Still online — same link as always 👍'}], time:'10:46'},
+      {who:'B', text:[{t:'Perfect, thank you. Also I have a question about the homework'}], time:'10:47'},
+      {who:'A', text:[{t:'Of course, go ahead'}], time:'10:48'},
+      {who:'B', text:[{t:'For the phrasal verbs — do we need to use them in our own sentences or just explain the meaning?'}], time:'10:49'},
+      {who:'A', text:[{t:'Both! Write the meaning in your own words and then one example sentence for each. Don\'t '},{p:'overthink it',k:'overthink'},{t:' — just natural examples from your own life'}], time:'10:50'},
+      {who:'B', text:[{t:'Ok that makes sense. One more thing — the idiom "bite the bullet". I '},{p:'couldn\'t get my head around',k:'get your head around something'},{t:' it at first but I think I understand now'}], time:'10:52'},
+      {who:'A', text:[{t:'What do you think it means?'}], time:'10:53'},
+      {who:'B', text:[{t:'To do something difficult or unpleasant that you have been avoiding?'}], time:'10:54'},
+      {who:'A', text:[{t:'Exactly right 🎯 Great work. See you Thursday!'}], time:'10:55'},
+      {who:'B', text:[{t:'Thank you John 😊 See you Thursday!'}], time:'10:55'}
+    ],
+    vocab: {
+      'overthink': {def:'to think about something too much, creating unnecessary worry or complication', ex:'Stop overthinking it — just write whatever comes naturally.'},
+      'get your head around something': {def:'to fully understand something that is initially confusing or complex', ex:'I couldn\'t get my head around the grammar at first but it makes sense now.'},
+      'not at all': {def:'a polite way of saying "don\'t worry about it" — dismisses an apology or thanks graciously', ex:'"Sorry for bothering you." "Not at all — happy to help."'},
+      'go ahead': {def:'proceed, or feel free to ask or do something', ex:'"Can I ask you something?" "Of course, go ahead."'},
+      'makes sense': {def:'is logical, clear, or understandable', ex:'"So we just submit it by Friday?" "Exactly — does that make sense?"'}
+    }
+  },
+  {
+    id: 26,
+    title: 'Camille in Paris',
+    level: 'c1', levelLabel: 'C1',
+    desc: 'John\'s French friend Camille follows up on a voice note John sent.',
+    tags: ['Social', 'Relationships'],
+    nameA: 'John', nameB: 'Camille', avatarColor: '#E53E3E',
+    status: 'last seen today at 23:41',
+    ticks: 'grey',
+    messages: [
+      {who:'B', text:[{t:'Ok so I listened to your voice note from last week and I have so many thoughts 😂'}], time:'22:58'},
+      {who:'A', text:[{t:'Ha — which part?'}], time:'23:04'},
+      {who:'B', text:[{t:'The part about your friend and the job situation. You were very diplomatic but I could tell you were '},{p:'holding back',k:'hold back'},{t:''}], time:'23:05'},
+      {who:'A', text:[{t:'Was I that obvious? 😂'}], time:'23:06'},
+      {who:'B', text:[{t:'A little bit. What do you actually think?'}], time:'23:07'},
+      {who:'A', text:[{t:'Honestly? I think he made a mistake but '},{p:'it\'s not my place',k:'it\'s not my place'},{t:' to say so'}], time:'23:08'},
+      {who:'B', text:[{t:'That\'s very... English of you 😂'}], time:'23:09'},
+      {who:'A', text:[{t:'I\'m Irish but yes, fair point 😂'}], time:'23:10'},
+      {who:'B', text:[{t:'In France we would just tell him'}], time:'23:11'},
+      {who:'A', text:[{t:'And that\'s why I love the French 😂 Maybe you\'re right. I just don\'t want to '},{p:'stick my nose in',k:'stick your nose in'},{t:''}], time:'23:12'},
+      {who:'B', text:[{t:'Sometimes sticking your nose in is the kind thing to do, no?'}], time:'23:13'},
+      {who:'A', text:[{t:'...yeah. You might have a point actually'}], time:'23:15'},
+      {who:'B', text:[{t:'Good. Tell him. Then tell me what he says 😂'}], time:'23:16'},
+      {who:'A', text:[{t:'Always the researcher 😂 I\'ll think about it. Night Camille'}], time:'23:17'},
+      {who:'B', text:[{t:'Bonne nuit John 😘'}], time:'23:18'}
+    ],
+    vocab: {
+      'hold back': {def:'to restrain yourself from saying or doing something fully', ex:'I could tell she was holding back — there was clearly more she wanted to say.'},
+      'it\'s not my place': {def:'it\'s not my role or right to intervene or comment on something', ex:'"Why didn\'t you say anything?" "It wasn\'t really my place."'},
+      'stick your nose in': {def:'to get involved in someone else\'s business without being asked', ex:'I didn\'t want to stick my nose in but I was genuinely worried about him.'},
+      'diplomatic': {def:'careful about what you say to avoid offending people or creating conflict', ex:'That was a very diplomatic answer — you didn\'t actually commit to anything.'},
+      'fair point': {def:'an acknowledgement that what someone has said is valid or correct', ex:'"You could have just called instead." "Fair point."'}
+    }
+  },
+  {
+    id: 27,
+    title: 'The family group chat',
+    level: 'b2', levelLabel: 'B2',
+    desc: 'The O\'Brien family WhatsApp group. Easter planning goes sideways.',
+    tags: ['Family', 'Humour'],
+    nameA: 'John', nameB: 'Family 🏠', avatarColor: '#0E7D6A',
+    status: 'online',
+    ticks: 'blue',
+    messages: [
+      {who:'B', text:[{t:'Mam: Right everyone. Easter Sunday dinner here. 1pm. Be here. ✅'}], time:'09:11'},
+      {who:'B', text:[{t:'Dad: Grand'}], time:'09:14'},
+      {who:'B', text:[{t:'Uncle Kev: I\'ll bring the cans 🍺'}], time:'09:15'},
+      {who:'B', text:[{t:'Niamh: Can I bring Paul?'}], time:'09:17'},
+      {who:'B', text:[{t:'Mam: Of course love, '},{p:'the more the merrier',k:'the more the merrier'},{t:' 😊'}], time:'09:18'},
+      {who:'A', text:[{t:'I\'ll be there 👍 What do you want me to bring?'}], time:'09:22'},
+      {who:'B', text:[{t:'Mam: '},{p:'Just yourself',k:'just yourself'},{t:', love'}], time:'09:23'},
+      {who:'B', text:[{t:'Uncle Kev: Bring beer John'}], time:'09:23'},
+      {who:'A', text:[{t:'😂 I\'ll bring dessert Mam'}], time:'09:24'},
+      {who:'B', text:[{t:'Dad: What time is the match on?'}], time:'09:31'},
+      {who:'B', text:[{t:'Mam: There will be NO match on Sunday Declan I mean it 😤'}], time:'09:32'},
+      {who:'B', text:[{t:'Uncle Kev: 😂😂😂'}], time:'09:32'},
+      {who:'A', text:[{t:'😂😂 Dad '},{p:'you should know better',k:'should know better'},{t:' by now'}], time:'09:34'},
+      {who:'B', text:[{t:'Dad: '},{p:'I\'m just asking a question',k:'I\'m just asking a question'},{t:' 🙃'}], time:'09:35'},
+      {who:'B', text:[{t:'Mam: Easter Sunday is about FAMILY. See everyone at 1. '},{p:'That\'s final',k:'that\'s final'},{t:' 🐣'}], time:'09:36'}
+    ],
+    vocab: {
+      'the more the merrier': {def:'the more people who join, the better — a welcoming expression', ex:'"Is it ok if I bring a friend?" "Of course! The more the merrier."'},
+      'just yourself': {def:'Irish/British way of saying your presence is enough — no need to bring anything', ex:'"What should I bring?" "Ah, just yourself."'},
+      'should know better': {def:'to be experienced enough to know something is a bad idea', ex:'"He wore that to a job interview?" "He should know better."'},
+      'I\'m just asking a question': {def:'used defensively to protest innocence after a question has caused a reaction', ex:'"I\'m just asking a question!" — classic move when someone reacts badly.'},
+      'that\'s final': {def:'the decision has been made and will not be changed', ex:'"We\'re leaving at 8 and that\'s final."'}
+    }
+  },
+  {
+    id: 28,
+    title: 'Dmytro before class',
+    level: 'b2', levelLabel: 'B2',
+    desc: 'John\'s Ukrainian student Dmytro needs to reschedule an hour before the lesson.',
+    tags: ['Work', 'Informal'],
+    nameA: 'John', nameB: 'Dmytro', avatarColor: '#553C9A',
+    status: 'last seen today at 17:18',
+    ticks: 'grey',
+    messages: [
+      {who:'B', text:[{t:'Hi John, sorry — can we move today\'s lesson? Something came up at work'}], time:'17:01'},
+      {who:'A', text:[{t:'Of course — no problem at all. When works for you?'}], time:'17:08'},
+      {who:'B', text:[{t:'Maybe tomorrow evening? Around 7?'}], time:'17:09'},
+      {who:'A', text:[{t:'Tomorrow at 7 works perfectly. I\'ll send a new link'}], time:'17:10'},
+      {who:'B', text:[{t:'Thank you so much. I feel bad about the short notice'}], time:'17:11'},
+      {who:'A', text:[{t:'Honestly don\'t worry about it — '},{p:'these things happen',k:'these things happen'},{t:' 👍'}], time:'17:12'},
+      {who:'B', text:[{t:'You\'re very understanding. Can I ask — for tomorrow, should we continue with conditionals or start something new?'}], time:'17:13'},
+      {who:'A', text:[{t:'Let\'s '},{p:'pick up where we left off',k:'pick up where you left off'},{t:' with conditionals. We were just getting to the interesting part'}], time:'17:14'},
+      {who:'B', text:[{t:'The mixed conditionals? Those are... difficult 😅'}], time:'17:15'},
+      {who:'A', text:[{t:'They are! But you\'re '},{p:'nearly there',k:'nearly there'},{t:'. Don\'t write yourself off — your instinct is actually quite good'}], time:'17:16'},
+      {who:'B', text:[{t:'That\'s encouraging, thank you. Ok see you tomorrow at 7!'}], time:'17:17'},
+      {who:'A', text:[{t:'See you then. And Dmytro — don\'t stress about today 🙂'}], time:'17:18'}
+    ],
+    vocab: {
+      'these things happen': {def:'a reassuring phrase accepting that unexpected events are a normal part of life', ex:'"I\'m so sorry I\'m late." "Don\'t worry — these things happen."'},
+      'pick up where you left off': {def:'to continue from the point where you stopped, without starting again', ex:'We ran out of time, so next week we\'ll pick up where we left off.'},
+      'nearly there': {def:'very close to achieving or completing something', ex:'You\'re nearly there — just a couple more things to polish.'},
+      'short notice': {def:'very little time between telling someone something and it happening', ex:'Sorry for the short notice — can you make it Tuesday?'},
+      'write yourself off': {def:'to dismiss yourself as incapable or unlikely to succeed', ex:'Don\'t write yourself off — you\'re better than you think.'}
+    }
+  },
+  {
+    id: 29,
+    title: 'Antoine in Lyon',
+    level: 'c1', levelLabel: 'C1',
+    desc: 'John checks in on his French friend Antoine, who\'s been quiet lately.',
+    tags: ['Relationships', 'Empathy'],
+    nameA: 'John', nameB: 'Antoine', avatarColor: '#B7791F',
+    status: 'last seen yesterday at 22:18',
+    ticks: 'grey',
+    messages: [
+      {who:'A', text:[{t:'Hey Antoine — haven\'t heard from you in a while. Everything ok?'}], time:'20:04'},
+      {who:'B', text:[{t:'Hey. Sorry. It\'s been a strange few weeks if I\'m honest'}], time:'21:44'},
+      {who:'A', text:[{t:'No need to apologise. Do you want to talk about it?'}], time:'21:46'},
+      {who:'B', text:[{t:'I don\'t know. It\'s Léa. We\'ve decided to '},{p:'take a break',k:'take a break'},{t:''}], time:'21:47'},
+      {who:'A', text:[{t:'Oh Antoine. I\'m sorry. How are you feeling?'}], time:'21:48'},
+      {who:'B', text:[{t:'Honestly? A bit relieved, which makes me feel guilty. Is that strange?'}], time:'21:49'},
+      {who:'A', text:[{t:'No — not at all. Sometimes that\'s the most honest feeling there is'}], time:'21:50'},
+      {who:'B', text:[{t:'I think we\'ve been '},{p:'going through the motions',k:'go through the motions'},{t:' for a while. We both knew it'}], time:'21:51'},
+      {who:'A', text:[{t:'That\'s hard to admit. But it takes courage to be honest about it'}], time:'21:52'},
+      {who:'B', text:[{t:'I suppose. I just keep '},{p:'second-guessing myself',k:'second-guess yourself'},{t:''}], time:'21:53'},
+      {who:'A', text:[{t:'That\'s completely normal. Give it time. And lean on your friends — that\'s what we\'re here for'}], time:'21:54'},
+      {who:'B', text:[{t:'Merci John. Really. You always know what to say'}], time:'21:56'},
+      {who:'A', text:[{t:'I really don\'t 😂 But I\'m here. Whenever you need it.'}], time:'21:57'},
+      {who:'B', text:[{t:'🙏'}], time:'21:58'}
+    ],
+    vocab: {
+      'take a break': {def:'to pause a romantic relationship without necessarily ending it', ex:'"Are you still together?" "We\'re taking a break — I\'m not sure what comes next."'},
+      'go through the motions': {def:'to do something without real feeling or commitment, just out of habit', ex:'By the end they were just going through the motions — neither of them was really present.'},
+      'second-guess yourself': {def:'to doubt decisions you\'ve already made, wondering if you chose correctly', ex:'I keep second-guessing myself — what if I made the wrong call?'},
+      'give it time': {def:'allow time to pass so that feelings or situations improve naturally', ex:'It hurts now, but give it time — it does get easier.'},
+      'take courage': {def:'to require bravery or emotional strength', ex:'Admitting you were wrong takes real courage.'}
+    }
+  }
+];
+
+var currentId = 0;
+var activeKey = null;
+var activeFilter = 'all';
+
+var TOPICS = ['all','Work','Social','Home','Relationships','Dating','Family'];
+
+function buildFilterChips() {
+  var row = document.getElementById('filterRow');
+  var html = '';
+  TOPICS.forEach(function(t) {
+    var label = t === 'all' ? 'All' : t;
+    html += '<button class="filter-chip'+(t===activeFilter?' active':'')+'" onclick="setFilter(\''+t+'\')">'+label+'</button>';
+  });
+  row.innerHTML = html;
+}
+
+function setFilter(topic) {
+  activeFilter = topic;
+  buildFilterChips();
+  buildScenarioList();
+}
+
+function buildScenarioList() {
+  var packs = {'B2':[],'C1':[]};
+  SCENARIOS.forEach(function(sc){
+    // Filter by topic tag
+    if (activeFilter !== 'all') {
+      var match = sc.tags.some(function(t){ return t === activeFilter; });
+      if (!match) return;
+    }
+    packs[sc.level==='b2'?'B2':'C1'].push(sc);
+  });
+  var html = '';
+  ['B2','C1'].forEach(function(key) {
+    if (!packs[key].length) return;
+    html += '<div class="pack-header">' + key + '</div>';
+    packs[key].forEach(function(sc) {
+      html += '<div class="scenario-card" onclick="loadScenario('+sc.id+')" id="sc-card-'+sc.id+'">';
+      html += '<div class="sc-title">'+sc.title+'</div>';
+      html += '<div class="sc-desc">'+sc.desc+'</div>';
+      html += '</div>';
+    });
+  });
+  if (!html) html = '<div style="padding:.8rem 1rem;font-size:.84rem;color:var(--muted)">No scenarios in this topic.</div>';
+  document.getElementById('scenarioList').innerHTML = html;
+  // Re-mark active card if still visible
+  var activeCard = document.getElementById('sc-card-'+currentId);
+  if (activeCard) activeCard.classList.add('active');
+}
+
+function buildPhraseDropdown(vocab, sc) {
+  var body = document.getElementById('phraseBody');
+  var count = document.getElementById('phraseCount');
+  var keys = Object.keys(vocab);
+  count.textContent = keys.length;
+  if (!keys.length) { body.innerHTML = ''; return; }
+  var html = '';
+  keys.forEach(function(k) {
+    html += '<div class="pi-item" onclick="showDefinition(\''+escAttr(k)+'\',SCENARIOS.find(function(s){return s.id==='+sc.id+'}).vocab[\''+escAttr(k)+'\'])">';
+    html += '<div class="pi-phrase">'+escHtml(k)+'</div>';
+    html += '<div class="pi-def">'+escHtml(vocab[k].def.split('.')[0])+'</div>';
+    html += '</div>';
+  });
+  body.innerHTML = html;
+  // close dropdown on scenario switch
+  body.classList.remove('open');
+  document.getElementById('phraseChevron').classList.remove('open');
+}
+
+function togglePhraseDropdown() {
+  var body = document.getElementById('phraseBody');
+  var chevron = document.getElementById('phraseChevron');
+  var open = body.classList.toggle('open');
+  chevron.classList.toggle('open', open);
+}
+
+function buildMessage(msg, isMe, senderName, vocab, showSender, isGrouped, tickColor) {
+  var row = document.createElement('div');
+  row.className = 'msg-row ' + (isMe ? 'me' : 'them') + (isGrouped ? ' grouped' : '');
+
+  tickColor = tickColor || 'blue';
+  var ticksHtml = (isMe && tickColor !== 'none')
+    ? '<span class="bticks '+tickColor+'"><svg viewBox="0 0 24 10"><polyline points="1 5 5 9 13 1"/><polyline points="9 5 13 9 21 1"/></svg></span>'
+    : '';
+
+  var content = '';
+  msg.text.forEach(function(part) {
+    if (part.p !== undefined && part.k && vocab[part.k]) {
+      content += '<span class="hl" data-key="'+escAttr(part.k)+'">'+escHtml(part.p)+'</span>';
+    } else if (part.t) {
+      content += escHtml(part.t);
+    }
+  });
+
+  // Tail — only on last bubble of a group (not grouped-top)
+  // Tail: right edge is perfectly straight (butts against bubble wall), outer edge curves away
+  var tailThem = isGrouped ? '' : '<svg width="10" height="20" viewBox="0 0 10 20" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;align-self:flex-end;display:block;margin-right:-2px;z-index:1;position:relative"><path d="M10 0 L10 20 L0 20 Q2 16 3 12 Q6 6 10 0 Z" fill="#fff"/></svg>';
+  var tailMe   = isGrouped ? '' : '<svg width="10" height="20" viewBox="0 0 10 20" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;align-self:flex-end;display:block;margin-left:-2px;z-index:1;position:relative"><path d="M0 0 L0 20 L10 20 Q8 16 7 12 Q4 6 0 0 Z" fill="#DCF8C6"/></svg>';
+
+  var senderHtml = (showSender && !isMe) ? '<div class="sender-label">'+senderName+'</div>' : '';
+
+  // Bubble class — grouped-top removes the tail corner
+  var bubbleClass = 'bubble ' + (isMe ? 'me' : 'them') + (isGrouped ? ' grouped-top' : '');
+
+  // Footer placed AFTER content so it floats to bottom-right
+  var footer = '<span class="bubble-time"><span class="btime">'+msg.time+'</span>'+ticksHtml+'</span>';
+
+  row.innerHTML = '<div class="bubble-wrap">'
+    + senderHtml
+    + '<div style="display:flex;align-items:flex-end;gap:0;overflow:visible">'
+    + (isMe ? '' : tailThem)
+    + '<div class="'+bubbleClass+'">'+content+' '+footer+'</div>'
+    + (isMe ? tailMe : '')
+    + '</div>'
+    + '</div>';
+  return row;
+}
+
+function loadScenario(id) {
+  currentId = id;
+  var sc = SCENARIOS.find(function(s){ return s.id===id; });
+  if (!sc) return;
+  document.querySelectorAll('.scenario-card').forEach(function(c){
+    c.classList.toggle('active', c.id==='sc-card-'+id);
+  });
+  document.getElementById('wa-name').textContent = sc.nameB;
+  document.getElementById('wa-avatar').textContent = sc.nameB.charAt(0).toUpperCase();
+  document.getElementById('wa-avatar').style.background = sc.avatarColor;
+  document.getElementById('wa-status').textContent = sc.status || 'online';
+  var cw = document.getElementById('chatWindow');
+  cw.innerHTML = '';
+  var chip = document.createElement('div');
+  chip.className = 'date-chip';
+  chip.textContent = 'Today';
+  cw.appendChild(chip);
+  sc.messages.forEach(function(msg, i) {
+    var isMe = msg.who === 'A';
+    var senderName = msg.who === 'A' ? sc.nameA : sc.nameB;
+    var prev = sc.messages[i - 1];
+    var next = sc.messages[i + 1];
+    var showSender = !isMe && (!prev || prev.who !== msg.who);
+    var isGrouped = next && next.who === msg.who;
+    cw.appendChild(buildMessage(msg, isMe, senderName, sc.vocab, showSender, isGrouped, sc.ticks || 'blue'));
+  });
+  cw.querySelectorAll('.hl').forEach(function(el) {
+    el.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var key = el.getAttribute('data-key');
+      if (activeKey === key) { hideDefinition(); return; }
+      if (sc.vocab[key]) showDefinition(key, sc.vocab[key]);
+    });
+  });
+  hideDefinition();
+  buildPhraseDropdown(sc.vocab, sc);
+  var ps = document.getElementById('phoneScroll');
+  ps.scrollTop = 0;
+  setTimeout(updateThumb, 50);
+}
+
+function showDefinition(phrase, entry) {
+  activeKey = phrase;
+  document.getElementById('def-phrase').textContent = phrase;
+  document.getElementById('def-body').textContent = entry.def;
+  var exEl = document.getElementById('def-ex');
+  exEl.textContent = entry.ex ? entry.ex : '';
+  exEl.style.display = entry.ex ? 'block' : 'none';
+  var panel = document.getElementById('defPanel');
+  // Position fixed relative to def-col
+  var col = document.querySelector('.def-col');
+  if (col) {
+    var rect = col.getBoundingClientRect();
+    panel.style.left = rect.left + 'px';
+    panel.style.width = rect.width + 'px';
+  }
+  panel.classList.add('show');
+}
+
+function hideDefinition() {
+  activeKey = null;
+  document.getElementById('defPanel').classList.remove('show');
+}
+
+document.addEventListener('click', function(e) {
+  if (!e.target.classList.contains('hl') && !e.target.closest('#defPanel')) hideDefinition();
+});
+
+function updateThumb() {
+  var ps = document.getElementById('phoneScroll');
+  var thumb = document.getElementById('scrollThumb');
+  var rail = document.getElementById('scrollRail');
+  if (!ps||!thumb||!rail) return;
+  var railH = rail.offsetHeight;
+  var scrollH = ps.scrollHeight;
+  var clientH = ps.clientHeight;
+  if (scrollH <= clientH) { thumb.style.height='0'; return; }
+  var thumbH = Math.max(36, (clientH/scrollH)*railH);
+  var maxTop = railH - thumbH;
+  var ratio = ps.scrollTop / (scrollH - clientH);
+  thumb.style.height = thumbH+'px';
+  thumb.style.top = (ratio*maxTop)+'px';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  var ps = document.getElementById('phoneScroll');
+  if (ps) ps.addEventListener('scroll', updateThumb);
+  var thumb = document.getElementById('scrollThumb');
+  var dragging = false, startY = 0, startTop = 0;
+  if (thumb) {
+    thumb.addEventListener('mousedown', function(e) {
+      dragging = true; startY = e.clientY;
+      startTop = document.getElementById('phoneScroll').scrollTop;
+      e.preventDefault();
+    });
+  }
+  document.addEventListener('mousemove', function(e) {
+    if (!dragging) return;
+    var ps2 = document.getElementById('phoneScroll');
+    var rail = document.getElementById('scrollRail');
+    var thumb2 = document.getElementById('scrollThumb');
+    var railH = rail.offsetHeight;
+    var thumbH = parseFloat(thumb2.style.height)||36;
+    var maxTop = railH - thumbH;
+    var dy = e.clientY - startY;
+    var scrollRange = ps2.scrollHeight - ps2.clientHeight;
+    ps2.scrollTop = startTop + (dy/maxTop)*scrollRange;
+  });
+  document.addEventListener('mouseup', function(){ dragging=false; });
+  window.addEventListener('resize', function() {
+    var panel = document.getElementById('defPanel');
+    if (panel.classList.contains('show')) {
+      var col = document.querySelector('.def-col');
+      if (col) {
+        var rect = col.getBoundingClientRect();
+        panel.style.left = rect.left + 'px';
+        panel.style.width = rect.width + 'px';
+      }
+    }
+  });
+  // Click on rail to jump
+  var rail = document.getElementById('scrollRail');
+  if (rail) {
+    rail.addEventListener('click', function(e) {
+      if (e.target === rail) {
+        var ps2 = document.getElementById('phoneScroll');
+        var railRect = rail.getBoundingClientRect();
+        var ratio = (e.clientY - railRect.top) / railRect.height;
+        ps2.scrollTop = ratio * (ps2.scrollHeight - ps2.clientHeight);
+      }
+    });
+  }
+});
+
+function escHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escAttr(s){ return s.replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+buildFilterChips();
+buildScenarioList();
+loadScenario(0);
+
+function exportPng() {
+  var btn = document.getElementById('exportPngBtn');
+  btn.textContent = 'Generating...';
+  btn.disabled = true;
+
+  // Temporarily expand phone screen to show full chat
+  var scroll = document.getElementById('phoneScroll');
+  var inner = document.querySelector('.phone-inner');
+  var origHeight = inner.style.height;
+  var origOverflow = scroll.style.overflow;
+  var fullH = scroll.scrollHeight + 54 + 56 + 30; // statusbar + header + homebar
+  inner.style.height = fullH + 'px';
+  scroll.style.overflow = 'visible';
+  scroll.style.height = 'auto';
+  scroll.style.maxHeight = 'none';
+
+  // Load html2canvas on demand
+  if (typeof html2canvas === 'undefined') {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+    s.onload = function(){ doCapture(); };
+    document.head.appendChild(s);
+  } else {
+    doCapture();
+  }
+
+  function doCapture() {
+    var frame = document.querySelector('.phone-frame');
+    html2canvas(frame, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: null,
+      logging: false
+    }).then(function(canvas) {
+      // Restore
+      inner.style.height = origHeight;
+      scroll.style.overflow = origOverflow;
+      scroll.style.height = '';
+      scroll.style.maxHeight = '';
+
+      var link = document.createElement('a');
+      var sc = SCENARIOS.find(function(s){ return s.id === currentId; });
+      link.download = (sc ? sc.title.toLowerCase().replace(/\s+/g,'-') : 'chat') + '.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+
+      btn.innerHTML = '<svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Save as PNG';
+      btn.disabled = false;
+    }).catch(function() {
+      inner.style.height = origHeight;
+      scroll.style.overflow = origOverflow;
+      scroll.style.height = '';
+      btn.textContent = 'Save as PNG';
+      btn.disabled = false;
+    });
+  }
+}
+</script>
+</body>
+</html>
