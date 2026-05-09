@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A2 Grammar — JohnPlusEnglish</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --sky:#2176FF;--sea:#1DD3B0;--coral:#FF6B6B;--sun:#FFB347;--lav:#9B72CF;
+  --cream:#F7F6F3;--ink:#2D3047;--ink2:#4A4E6B;--ink3:#8B8FA8;
+  --a1:#FF9100;--a1bg:#FFF3E0;--a1dark:#B36400;
+  --radius:14px;--radius-sm:8px;
+  --card-shadow:0 1px 3px rgba(45,48,71,.07),0 4px 16px rgba(45,48,71,.05);
+}
+body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;font-size:15px}
+.topnav{display:flex;align-items:center;justify-content:space-between;padding:13px 32px;background:#fff;border-bottom:1px solid #E8E6E0;position:sticky;top:0;z-index:200;}
+.logo{font-weight:900;font-size:17px;letter-spacing:-0.02em}
+.logo span{color:var(--sky)}
+.nav-back{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--ink3);cursor:pointer;padding:6px 12px;border-radius:20px;border:1px solid #E8E6E0;background:transparent;transition:all .15s;font-family:'Outfit',sans-serif;}
+.nav-back:hover{background:var(--cream);color:var(--ink)}
+.nav-breadcrumb{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink3)}
+.nav-breadcrumb span{color:var(--sky);font-weight:600}
+.nav-breadcrumb .sep{opacity:.4;color:var(--ink3)}
+.layout{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 53px)}
+.sidebar{background:#fff;border-right:1px solid #E8E6E0;position:sticky;top:53px;height:calc(100vh - 53px);overflow-y:auto;display:flex;flex-direction:column;}
+.sidebar-head{padding:20px 20px 14px;border-bottom:1px solid #F0EEE8;}
+.level-pill{display:inline-flex;align-items:center;gap:5px;background:var(--a1bg);color:var(--a1);font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:4px 10px;border-radius:20px;margin-bottom:10px;}
+.sidebar-head h2{font-size:16px;font-weight:700;letter-spacing:-.02em;color:var(--ink)}
+.sidebar-head p{font-size:12px;color:var(--ink3);margin-top:3px;line-height:1.45}
+.topic-nav{padding:8px 0;flex:1}
+.topic-link{display:flex;align-items:center;gap:10px;padding:10px 20px;cursor:pointer;transition:background .12s;border:none;background:transparent;width:100%;text-align:left;font-family:'Outfit',sans-serif;}
+.topic-link:hover{background:#F7F6F3}
+.topic-link.active{background:var(--a1bg)}
+.topic-link.done .tl-check{background:var(--sea);border-color:var(--sea);color:#fff}
+.tl-num{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink3);width:16px;flex-shrink:0}
+.tl-check{width:18px;height:18px;border-radius:50%;border:1.5px solid #D4D2CA;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;color:var(--sea);transition:all .2s;}
+.topic-link.active .tl-check{border-color:var(--a1)}
+.tl-name{font-size:13px;color:var(--ink2);font-weight:400;line-height:1.3}
+.topic-link.active .tl-name{color:var(--a1);font-weight:600}
+.topic-link.done .tl-name{color:var(--ink3)}
+.sidebar-foot{padding:14px 20px;border-top:1px solid #F0EEE8;display:flex;align-items:center;justify-content:space-between;}
+.prog-bar{flex:1;height:4px;background:#E8E6E0;border-radius:2px;margin-right:10px;overflow:hidden}
+.prog-fill{height:100%;background:var(--sea);border-radius:2px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.prog-text{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--ink3);white-space:nowrap}
+.main{padding:0;overflow:hidden}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.lesson-hero{padding:36px 40px 28px;border-bottom:1px solid #E8E6E0;background:linear-gradient(135deg,#fff 0%,#F2F7FF 100%);}
+.lesson-meta{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.tag{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 10px;border-radius:20px}
+.tag-a1{background:var(--a1bg);color:var(--a1)}
+.lesson-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink3)}
+.lesson-hero h1{font-size:32px;font-weight:900;letter-spacing:-.03em;color:var(--ink);line-height:1.1;margin-bottom:8px}
+.lesson-hero p{font-size:15px;color:var(--ink2);line-height:1.6;max-width:580px}
+.lesson-toolbar{display:flex;align-items:center;gap:8px;margin-top:20px;}
+.btn{font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;padding:8px 18px;border-radius:20px;border:none;cursor:pointer;transition:all .15s}
+.btn-primary{background:var(--sky);color:#fff}
+.btn-primary:hover{background:#1a6ae8;transform:translateY(-1px)}
+.btn-ghost{background:#fff;color:var(--ink2);border:1px solid #E0DED8}
+.btn-ghost:hover{background:var(--cream)}
+.btn-done{background:var(--sea);color:#fff}
+.btn-done:hover{background:#17b89e;transform:translateY(-1px)}
+.lesson-body{padding:32px 40px;display:flex;flex-direction:column;gap:8px}
+.section-label{display:flex;align-items:center;gap:10px;margin-bottom:0;margin-top:8px;padding:9px 14px;background:var(--ink);border-radius:6px;cursor:pointer;user-select:none;transition:background .15s;}
+.section-label:hover{background:#2D3047}
+.btn-toggle-all{font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;color:var(--ink3);background:transparent;border:1px solid #D8D6D0;border-radius:20px;padding:5px 14px;cursor:pointer;transition:all .15s;}
+.btn-toggle-all:hover{background:var(--cream);color:var(--ink);border-color:#B0AEA6;}
+.section-label-chevron{margin-left:auto;display:flex;align-items:center;color:rgba(255,255,255,.5);transition:transform .2s;}
+.section-label.collapsed .section-label-chevron{transform:rotate(-90deg)}
+.section-body{overflow:hidden;transition:max-height .25s ease,opacity .2s ease,margin-top .2s ease;max-height:2000px;opacity:1;margin-top:14px;}
+.section-body.collapsed{max-height:0;opacity:0;margin-top:0;}
+.section-label-icon{display:flex;align-items:center;color:#fff;flex-shrink:0}
+.section-label h2{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#fff}
+.explain-card{background:#fff;border-radius:var(--radius);border:1px solid #E8E6E0;padding:26px 28px;box-shadow:var(--card-shadow);}
+.explain-lead{font-size:16px;font-weight:600;color:var(--ink);line-height:1.55;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid #F0EEE8;}
+.explain-lead em{font-style:normal;color:var(--sky);font-weight:700}
+.explain-body{font-size:14px;color:var(--ink2);line-height:1.8}
+.explain-body p{margin-bottom:14px}
+.explain-body p:last-child{margin-bottom:0}
+.explain-body strong{color:var(--ink)}
+.explain-body .rule{display:flex;gap:14px;align-items:flex-start;background:var(--cream);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:10px;}
+.explain-body .rule:last-child{margin-bottom:0}
+.explain-body .rule-num{flex-shrink:0;width:10px;height:10px;border-radius:50%;background:var(--a1);margin-top:6px;}
+.explain-body .rule-num.n{width:22px;height:22px;border-radius:50%;font-size:11px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;margin-top:1px;}
+.explain-body .rule-text{font-size:14px;color:var(--ink2);line-height:1.7}
+.explain-body .rule-text strong{color:var(--ink)}
+.explain-body .rule-text em{font-style:italic;color:var(--ink)}
+.explain-body .note{background:var(--a1bg);border-left:3px solid var(--a1);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:10px 14px;margin-top:12px;font-size:13px;color:var(--ink2);line-height:1.6}
+.explain-body .note strong{color:var(--ink)}
+.form-table{width:100%;border-collapse:collapse;font-size:14px}
+.form-table th{background:#EEF2FF;color:var(--ink);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.06em;padding:10px 14px;text-align:left;}
+.form-table th:first-child{border-radius:8px 0 0 0}
+.form-table th:last-child{border-radius:0 8px 0 0}
+.form-table td{padding:11px 14px;border-bottom:1px solid #F0EEE8;color:var(--ink2);font-size:14px}
+.form-table tr:last-child td{border-bottom:none}
+.form-table tr:nth-child(even) td{background:#FAFAF8}
+.form-table .subject{font-weight:700;color:var(--ink)}
+.form-table .form{color:var(--ink2)}
+.form-table .neg{color:var(--ink2)}
+.form-table .example{color:var(--ink2);font-style:italic}
+.form-table .example{color:var(--ink2);font-style:italic}
+.examples-grid{display:grid;gap:10px}
+.example-item{background:#fff;border-radius:var(--radius-sm);border:1px solid #E8E6E0;padding:14px 16px;display:flex;align-items:flex-start;gap:12px;}
+.ex-marker{width:22px;height:22px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-top:1px;}
+.ex-marker.pos{background:#E8F8F5;color:var(--sea)}
+.ex-marker.neg{background:#FFF0F0;color:var(--coral)}
+.ex-marker.q{background:var(--a1bg);color:var(--sky)}
+.ex-eng{font-size:14px;font-weight:600;color:var(--ink)}
+.ex-note{font-size:12px;color:var(--ink3);margin-top:2px}
+.error-card{background:#fff;border-radius:var(--radius);padding:20px 22px;border:1px solid #E0DED8;}
+.error-card h3{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--ink3);margin-bottom:14px}
+.error-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px}
+.error-bad,.error-good{border-radius:var(--radius-sm);padding:11px 14px}
+.error-bad{background:#FFF5F5;border:1px solid #FCDADA}
+.error-good{background:#F0FBF8;border:1px solid #C0EDE4}
+.error-label{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px;display:flex;align-items:center;gap:5px}
+.error-bad .error-label{color:var(--coral)}
+.error-good .error-label{color:#0F7A6A}
+.error-text{font-size:14px;color:var(--ink);font-weight:500;font-style:italic}
+.error-bad .error-text{color:#B84040}
+.error-good .error-text{color:#0F5A4A}
+.error-reason{font-size:13px;color:var(--ink3);margin-top:10px;margin-bottom:4px;grid-column:1/-1;padding:0 2px}
+.exercise-card{background:#fff;border-radius:var(--radius);border:1px solid #E8E6E0;overflow:hidden;box-shadow:var(--card-shadow);}
+.ex-card-header{padding:16px 20px;border-bottom:1px solid #F0EEE8;display:flex;align-items:center;justify-content:space-between;}
+.ex-card-title{font-size:14px;font-weight:700;color:var(--ink)}
+.ex-card-sub{font-size:12px;color:var(--ink3);margin-top:2px}
+.ex-type-badge{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 10px;border-radius:20px;background:#F0F0F0;color:var(--ink3)}
+.ex-card-body{padding:20px}
+.gap-sentence{font-size:15px;color:var(--ink);line-height:2.4;margin-bottom:4px;display:flex;align-items:baseline;flex-wrap:wrap;gap:4px;}
+.gap-sentence:last-child{margin-bottom:0}
+.gap-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink3);margin-right:4px}
+.gap-input{display:inline-block;border:none;border-bottom:2px dashed #BBAEF0;background:transparent;font-family:'Outfit',sans-serif;font-weight:600;font-size:15px;color:var(--ink);outline:none;padding:2px 6px;transition:all .15s;text-align:center;vertical-align:baseline;}
+.gap-input:focus{border-bottom-color:var(--sky);background:rgba(33,118,255,.05);}
+.gap-input.correct{color:#3FB87A;border-bottom-color:var(--sea);border-bottom-style:solid;background:rgba(29,211,176,.08);}
+.gap-input.wrong{color:var(--coral);border-bottom-color:var(--coral);border-bottom-style:solid;background:rgba(239,35,60,.06);}
+.gap-wrap{display:inline-flex;flex-direction:column;align-items:center;gap:0;vertical-align:baseline}
+.gap-reveal{font-size:11px;color:var(--sea);font-weight:600;font-family:'JetBrains Mono',monospace;height:14px;opacity:0;transition:opacity .2s}
+.gap-reveal.show{opacity:1}
+.mc-question{margin-bottom:20px}
+.mc-question:last-child{margin-bottom:0}
+.mc-text{font-size:14px;color:var(--ink);margin-bottom:10px;font-weight:500}
+.mc-options{display:flex;flex-wrap:wrap;gap:8px}
+.mc-opt{font-family:'Outfit',sans-serif;font-size:13px;padding:7px 16px;border-radius:20px;border:1.5px solid #E0DED8;background:#fff;cursor:pointer;transition:all .15s;color:var(--ink2);}
+.mc-opt:hover{border-color:var(--sky);color:var(--sky);background:var(--a1bg)}
+.mc-opt.correct-ans{border-color:var(--sea);background:#E8F8F5;color:#0F7A6A;font-weight:600}
+.mc-opt.wrong-ans{border-color:var(--coral);background:#FFF0F0;color:#B84040}
+.mc-feedback{font-size:12px;margin-top:8px;padding:8px 12px;border-radius:6px;display:none}
+.mc-feedback.show{display:block}
+.mc-feedback.ok{background:#E8F8F5;color:#0F7A6A}
+.mc-feedback.bad{background:#FFF0F0;color:#B84040}
+.ec-item{margin-bottom:16px}
+.ec-item:last-child{margin-bottom:0}
+.ec-sentence{font-size:14px;background:#FFF8F0;border:1px solid #FFD8B0;border-radius:var(--radius-sm);padding:11px 14px;color:var(--ink);font-weight:500;margin-bottom:8px;}
+.ec-input-row{display:flex;gap:8px;align-items:center}
+.ec-input{flex:1;border:1.5px solid #E0DED8;border-radius:var(--radius-sm);padding:9px 13px;font-family:'Outfit',sans-serif;font-size:14px;color:var(--ink);outline:none;transition:border-color .15s;background:#fff;}
+.ec-input:focus{border-color:var(--sky)}
+.ec-input.correct{border-color:var(--sea);background:#F0FBF8}
+.ec-input.wrong{border-color:var(--coral);background:#FFF5F5}
+.check-row{display:flex;gap:8px;margin-top:16px}
+.btn-check{background:var(--sky);color:#fff;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;padding:9px 20px;border-radius:20px;border:none;cursor:pointer;transition:all .15s}
+.btn-check:hover{background:#1a6ae8}
+.btn-reset{background:var(--cream);color:var(--ink3);font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;padding:9px 16px;border-radius:20px;border:1px solid #E0DED8;cursor:pointer;transition:all .15s}
+.btn-reset:hover{background:#EDEBE5;color:var(--ink)}
+.score-badge{display:none;align-items:center;gap:6px;font-size:13px;font-weight:700;padding:6px 14px;border-radius:20px;margin-top:12px;}
+.score-badge.show{display:inline-flex}
+.score-badge.full{background:#E8F8F5;color:#0F7A6A}
+.score-badge.partial{background:#FFF8E8;color:#8B6000}
+.score-badge.low{background:#FFF0F0;color:#B84040}
+.lesson-footer{padding:24px 40px;border-top:1px solid #E8E6E0;display:flex;align-items:center;justify-content:space-between;background:#fff;}
+.footer-hint{font-size:12px;color:var(--ink3)}
+.footer-nav{display:flex;gap:8px}
+.real-use{background:linear-gradient(135deg,var(--a1bg) 0%,#F8F0FF 100%);border-radius:var(--radius);border:1px solid #C8DEFF;padding:20px 24px;}
+.real-use h3{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--sky);margin-bottom:12px}
+.real-use ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.real-use li{font-size:13px;color:var(--ink2);line-height:1.6;padding-left:20px;position:relative;}
+.real-use li::before{content:'→';position:absolute;left:0;color:var(--sky);font-weight:700}
+
+/* ── JOHN\'S TIP ── */
+.johns-tip{
+  background:#FFFBF0;border:1.5px solid #FFD97A;border-radius:var(--radius);
+  padding:18px 20px;display:flex;gap:14px;align-items:flex-start;
+}
+.tip-avatar{
+  width:36px;height:36px;border-radius:50%;background:var(--sky);color:#fff;
+  font-size:14px;font-weight:900;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;letter-spacing:-.02em;
+}
+.tip-body{}
+.tip-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#B8860B;margin-bottom:5px}
+.tip-text{font-size:13px;color:#5A4500;line-height:1.65}
+.tip-text strong{color:#3A2D00;font-weight:700}
+
+@media(max-width:768px){
+  .layout{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .lesson-hero{padding:24px 20px 20px}
+  .lesson-body{padding:24px 20px}
+  .lesson-footer{padding:16px 20px}
+  .error-row{grid-template-columns:1fr}
+}
+
+/* ── SENTENCE BUILDER ── */
+.sb-bank{display:flex;flex-wrap:wrap;gap:8px;min-height:44px;padding:12px;background:var(--cream);border-radius:var(--radius-sm);border:1px solid #E0DED8;margin-bottom:12px;}
+.sb-word{font-family:'Outfit',sans-serif;font-size:14px;font-weight:500;padding:6px 14px;background:#fff;border:1.5px solid #E0DED8;border-radius:20px;cursor:pointer;transition:all .15s;color:var(--ink2);user-select:none;}
+.sb-word:hover{border-color:var(--sky);color:var(--sky)}
+.sb-word.used{opacity:.3;pointer-events:none;}
+.sb-slot{display:flex;flex-wrap:wrap;gap:8px;min-height:48px;padding:10px 12px;border:2px dashed #C8DEFF;border-radius:var(--radius-sm);background:#FAFCFF;margin-bottom:12px;align-items:center;}
+.sb-placed{font-family:'Outfit',sans-serif;font-size:14px;font-weight:500;padding:6px 14px;background:var(--a1bg);border:1.5px solid var(--sky);border-radius:20px;cursor:pointer;color:var(--sky);user-select:none;transition:all .15s;}
+.sb-placed:hover{background:#FFE8E8;border-color:var(--coral);color:var(--coral)}
+.sb-sentence{margin-bottom:20px}
+.sb-sentence:last-child{margin-bottom:0}
+.sb-sentence-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink3);margin-bottom:6px}
+.sb-context{font-size:13px;color:var(--ink3);margin-bottom:8px;font-style:italic}
+.sb-result{font-size:12px;margin-top:6px;padding:6px 12px;border-radius:6px;display:none}
+.sb-result.show{display:block}
+.sb-result.ok{background:#E8F8F5;color:#0F7A6A}
+.sb-result.bad{background:#FFF0F0;color:#B84040}
+
+/* ── MATCHING ── */
+.match-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.match-col-head{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink3);margin-bottom:8px;}
+.match-item{font-size:13px;padding:10px 14px;border-radius:var(--radius-sm);border:1.5px solid #E0DED8;cursor:pointer;transition:all .15s;background:#fff;color:var(--ink2);font-family:'Outfit',sans-serif;text-align:left;width:100%;margin-bottom:6px;display:block;}
+.match-item:last-child{margin-bottom:0}
+.match-item:hover{border-color:var(--sky);color:var(--sky)}
+.match-item.selected{border-color:var(--sky);background:var(--a1bg);color:var(--sky);font-weight:600}
+.match-item.matched{border-color:var(--sea);background:#E8F8F5;color:#0F7A6A;font-weight:600;pointer-events:none;cursor:default;}
+.match-item.wrong-flash{border-color:var(--coral)!important;background:#FFF0F0!important;color:var(--coral)!important}
+.match-pairs{margin-top:12px;}
+.match-pair-line{font-size:12px;display:flex;gap:6px;align-items:center;padding:5px 0;border-bottom:1px solid #F0EEE8;color:var(--ink3);}
+.match-pair-line:last-child{border-bottom:none}
+
+/* ── TRANSFORMATION ── */
+.transform-item{margin-bottom:16px;background:#fff;border-radius:var(--radius-sm);border:1px solid #E8E6E0;padding:14px 16px;}
+.transform-item:last-child{margin-bottom:0}
+.transform-original{font-size:14px;color:var(--ink);font-weight:500;margin-bottom:8px;line-height:1.5}
+.transform-keyword{display:inline-block;background:var(--sky);color:#fff;font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;margin:0 2px;}
+.transform-input{width:100%;border:1.5px solid #E0DED8;border-radius:var(--radius-sm);padding:9px 13px;font-family:'Outfit',sans-serif;font-size:14px;color:var(--ink);outline:none;transition:border-color .15s;background:#fff;}
+.transform-input:focus{border-color:var(--sky)}
+.transform-input.correct{border-color:var(--sea);background:#F0FBF8}
+.transform-input.wrong{border-color:var(--coral);background:#FFF5F5}
+.transform-reveal{font-size:11px;color:var(--sea);font-weight:600;font-family:'JetBrains Mono',monospace;margin-top:5px;opacity:0;transition:opacity .2s;min-height:16px}
+.transform-reveal.show{opacity:1}
+
+/* ── CATEGORISATION ── */
+.cat-bank{display:flex;flex-wrap:wrap;gap:8px;padding:12px;background:var(--cream);border-radius:var(--radius-sm);border:1px solid #E0DED8;margin-bottom:14px;min-height:48px;}
+.cat-word{font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;padding:6px 14px;background:#fff;border:1.5px solid #E0DED8;border-radius:20px;cursor:pointer;transition:all .15s;color:var(--ink2);user-select:none;}
+.cat-word:hover{border-color:var(--sky);color:var(--sky)}
+.cat-word.placed{opacity:.3;pointer-events:none;}
+.cat-columns{display:grid;gap:10px;margin-bottom:12px;}
+.cat-col{border-radius:var(--radius-sm);border:2px dashed #D0CEC8;padding:10px 12px;min-height:80px;transition:border-color .2s;}
+.cat-col-head{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #E0DED8;}
+.cat-placed{font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;padding:4px 11px;border-radius:20px;border:1.5px solid #E0DED8;background:#fff;cursor:pointer;user-select:none;transition:all .15s;display:inline-block;margin:3px;}
+.cat-placed:hover{opacity:.65}
+.cat-col.checked-correct .cat-col-head{color:#0F7A6A}
+.cat-col.checked-correct{border-color:var(--sea);border-style:solid;}
+.cat-col.checked-wrong{border-color:var(--coral);border-style:solid;}
+
+/* ── CONVERSATION FILL ── */
+.convo-wrap{background:#fff;border-radius:var(--radius-sm);border:1px solid #E8E6E0;overflow:hidden;margin-bottom:12px;}
+.convo-line{display:flex;align-items:flex-start;gap:10px;padding:11px 16px;border-bottom:1px solid #F5F3EF;}
+.convo-line:last-child{border-bottom:none}
+.convo-speaker{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;width:28px;flex-shrink:0;padding-top:3px;}
+.convo-speaker.a{color:var(--sky)}
+.convo-speaker.b{color:var(--lav)}
+.convo-text{font-size:14px;color:var(--ink);line-height:1.7;flex:1}
+.convo-input{border:none;border-bottom:2px dashed #BBAEF0;background:transparent;font-family:'Outfit',sans-serif;font-weight:600;font-size:14px;color:var(--ink);outline:none;padding:2px 6px;transition:all .15s;text-align:center;vertical-align:baseline;}
+.convo-input:focus{border-bottom-color:var(--sky);background:rgba(33,118,255,.05);}
+.convo-input.correct{color:#3FB87A;border-bottom-color:var(--sea);border-bottom-style:solid;background:rgba(29,211,176,.08);}
+.convo-input.wrong{color:var(--coral);border-bottom-color:var(--coral);border-bottom-style:solid;background:rgba(239,35,60,.06);}
+.convo-gwrap{display:inline-flex;flex-direction:column;align-items:center;gap:0;vertical-align:middle}
+.convo-reveal{font-size:11px;color:var(--sea);font-weight:600;font-family:'JetBrains Mono',monospace;height:14px;opacity:0;transition:opacity .2s}
+.convo-reveal.show{opacity:1}
+
+/* ── TRUE / FALSE / NOT GIVEN ── */
+.tf-item{margin-bottom:10px;background:#fff;border-radius:var(--radius-sm);border:1px solid #E8E6E0;padding:14px 16px;}
+.tf-item:last-child{margin-bottom:0}
+.tf-context{font-size:12px;color:var(--ink3);margin-bottom:6px;font-style:italic;line-height:1.5}
+.tf-statement{font-size:14px;color:var(--ink);font-weight:500;margin-bottom:10px;line-height:1.5}
+.tf-options{display:flex;gap:8px;flex-wrap:wrap;}
+.tf-btn{font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;padding:6px 16px;border-radius:20px;border:1.5px solid #E0DED8;background:#fff;cursor:pointer;transition:all .15s;color:var(--ink2);}
+.tf-btn:hover{border-color:var(--sky);background:var(--a1bg);color:var(--sky)}
+.tf-btn.correct-ans{border-color:var(--sea);background:#E8F8F5;color:#0F7A6A}
+.tf-btn.wrong-ans{border-color:var(--coral);background:#FFF0F0;color:#B84040}
+.tf-feedback{font-size:12px;margin-top:8px;padding:6px 10px;border-radius:6px;display:none}
+.tf-feedback.show{display:block}
+.tf-feedback.ok{background:#E8F8F5;color:#0F7A6A}
+.tf-feedback.bad{background:#FFF0F0;color:#B84040}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="logo">John<span>+</span>English</div>
+  <div class="nav-breadcrumb">
+    <span>Grammar</span><span class="sep">›</span>
+    <span>A2 — Elementary</span><span class="sep">›</span>
+    <span id="breadcrumb-topic">Verb to be</span>
+  </div>
+  <button class="nav-back" onclick="history.back()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Back to Grammar</button>
+</nav>
+
+<div class="layout">
+<aside class="sidebar">
+  <div class="sidebar-head">
+    <div class="level-pill"><svg width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg> A2 · Elementary</div>
+    <h2>Building blocks</h2>
+    <p>15 topics. Expand your grammar and start expressing more complex ideas.</p>
+  </div>
+  <nav class="topic-nav" id="topic-nav"></nav>
+  <div class="sidebar-foot">
+    <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+    <div class="prog-text" id="prog-text">0/15</div>
+  </div>
+</aside>
+<main class="main" id="main"></main>
+</div>
+
+<script>
+// ── HELPER ──
+const tip = (t) => `<div class="johns-tip"><div class="tip-avatar">J</div><div class="tip-body"><div class="tip-label">John's tip</div><div class="tip-text">${t}</div></div></div>`;
+
+// ── LESSON DATA ──
+const lessons = [
+{id:"pastsimple",title:"Past simple",subtitle:"I worked, she went, did you see?",intro:"The most important past tense. Regular verbs are easy \u2014 the irregulars need learning.",desc:"The past simple is used for completed actions in the past. Regular verbs add -ed. Irregular verbs change completely \u2014 there is no shortcut except learning them.",tip:"The most common mistake: <strong>\"Did she went?\"</strong> Wrong. With <em>did</em>, the main verb must be the base form: <strong>\"Did she go?\"</strong> Once you use <em>did</em>, it carries the past \u2014 the main verb goes back to base form.",explanation:"<p>The past simple describes <strong>completed actions in the past</strong> \u2014 things that started and finished at a specific time.</p>\n<div class=\"rule\"><div class=\"rule-num\"></div><div class=\"rule-text\"><strong>Regular verbs</strong> \u2014 add <em>-ed</em>: work \u2192 worked, play \u2192 played, arrive \u2192 arrived. Spelling: stop \u2192 stop<strong>p</strong>ed (short vowel + consonant = double it), study \u2192 stud<strong>ied</strong> (consonant + y \u2192 ied).</div></div>\n<div class=\"rule\"><div class=\"rule-num\"></div><div class=\"rule-text\"><strong>Irregular verbs</strong> \u2014 change completely: go \u2192 went, see \u2192 saw, have \u2192 had, come \u2192 came, buy \u2192 bought. No rule \u2014 must be memorised. The most common verbs in English are irregular, so you will encounter them constantly.</div></div>\n<div class=\"rule\"><div class=\"rule-num\"></div><div class=\"rule-text\"><strong>Questions and negatives</strong> use <em>did/didn't</em> + the base form. Once <em>did</em> is in the sentence, the main verb returns to its dictionary form \u2014 no past tense ending.</div></div>\n<div class=\"note\"><strong>The most important rule:</strong> did/didn't + BASE form \u2014 never past tense.<br>\n<em>\"Did she go?\"</em> \u2713 &nbsp; <em>\"Did she went?\"</em> \u2717<br>\n<em>\"I didn't eat.\"</em> \u2713 &nbsp; <em>\"I didn't ate.\"</em> \u2717<br>\n<strong>Time words that signal past simple:</strong> yesterday, last week, in 2019, two days ago, when I was a child \u2014 whenever you name a specific finished time, use past simple, not present perfect.</div>",table:{headers:["","Positive","Negative","Question"],rows:[["Regular verb","I worked / She played","I didn't work / She didn't play","Did you work? / Did she play?"],["Irregular verb","I went / He saw / She had","I didn't go / He didn't see","Did she go? / Did he see?"],["Short answer","\u2014","No, I didn't.","Yes, I did."],["Key rule","verb changes form","didn't + BASE form (not past)","Did + subject + BASE form"],["Time words","yesterday, last week, in 2019, two days ago","\u2014","\u2014"]]},examples:[{type:"pos",eng:"I visited Rome last summer.",note:"Regular verb: visit + ed."},{type:"pos",eng:"She went to the gym yesterday.",note:"Irregular verb: go \u2192 went."},{type:"neg",eng:"They didn't watch the match.",note:"Negative: didn't + base form."},{type:"neg",eng:"He didn't know the answer.",note:"Irregular know \u2014 but base form after didn't."},{type:"q",eng:"Did you enjoy the film?",note:"Did + subject + base form."},{type:"q",eng:"Where did she go last night?",note:"Wh- question: question word + did + subject + base form."}],errors:[{bad:"Did she went to the party?",good:"Did she go to the party?",reason:"After did/didn't, use the base form \u2014 never past tense."},{bad:"I didn't went home.",good:"I didn't go home.",reason:"Same rule \u2014 didn't + base form."},{bad:"She goed to school.",good:"She went to school.",reason:"Go is irregular \u2014 past simple is went, not goed."},{bad:"Yesterday I have seen him.",good:"Yesterday I saw him.",reason:"Yesterday signals a completed past action \u2014 use past simple, not present perfect."}],realUse:["\"I went to...\", \"She said...\", \"We had...\" \u2014 the three most common irregular past forms.","\"Did you know that...?\" \u2014 common way to start an interesting fact.","\"It happened so fast.\" \u2014 describing a sudden past event.","\"I had no idea.\" \u2014 fixed expression using past simple of have."],exercises:[{type:"gap",title:"Regular past simple",sub:"Fill each gap with the past simple form of the verb in brackets.",items:[{answer:"visited",before:"We ",after:" Paris last year. (visit)"},{answer:"finished",before:"She ",after:" work at six. (finish)"},{answer:"studied",before:"He ",after:" English at university. (study)"},{answer:"arrived",before:"They ",after:" late to the meeting. (arrive)"},{answer:"stopped",before:"The bus ",after:" suddenly. (stop)"},{answer:"played",before:"I ",after:" tennis every Saturday as a child. (play)"},{answer:"watched",before:"We ",after:" a great film last night. (watch)"},{answer:"decided",before:"She ",after:" to change jobs. (decide)"}]},{type:"gap",title:"Irregular past simple",sub:"Fill each gap with the correct irregular past form.",items:[{answer:"went",before:"I ",after:" to the gym this morning. (go)"},{answer:"saw",before:"We ",after:" a great film last night. (see)"},{answer:"had",before:"She ",after:" a wonderful time. (have)"},{answer:"came",before:"He ",after:" home very late. (come)"},{answer:"knew",before:"I ",after:" the answer immediately. (know)"},{answer:"took",before:"It ",after:" three hours to get there. (take)"},{answer:"told",before:"She ",after:" me the truth. (tell)"},{answer:"made",before:"He ",after:" a big mistake. (make)"}]},{type:"gap",title:"Negatives and questions",sub:"Fill each gap with the correct negative or question form.",items:[{answer:"didn't go",before:"I ",after:" to the party. (not go)"},{answer:"didn't like",before:"She ",after:" the food. (not like)"},{answer:"Did",before:"",after:" you see the match? (question)"},{answer:"did",before:"Where ",after:" you go last weekend?"},{answer:"didn't know",before:"They ",after:" about the problem. (not know)"},{answer:"Did",before:"",after:" she call you? (question)"}]},{type:"match",title:"Match verb to past form",sub:"Match each verb to its irregular past simple form.",leftHead:"Base form",rightHead:"Past simple",pairs:[{left:"go",right:"went"},{left:"see",right:"saw"},{left:"come",right:"came"},{left:"buy",right:"bought"},{left:"think",right:"thought"},{left:"speak",right:"spoke"},{left:"write",right:"wrote"},{left:"find",right:"found"}]},{type:"ec",title:"Error correction",sub:"One error per sentence.",items:[{wrong:"Did she went to the party?",correct:"Did she go to the party?",hint:"Did + base form."},{wrong:"I didn't went home.",correct:"I didn't go home.",hint:"Didn't + base form."},{wrong:"She goed to school by bus.",correct:"She went to school by bus.",hint:"Go is irregular \u2014 went."},{wrong:"Yesterday I have seen him.",correct:"Yesterday I saw him.",hint:"Yesterday = completed past \u2014 past simple."},{wrong:"We didn't ate anything.",correct:"We didn't eat anything.",hint:"Didn't + base form."},{wrong:"Did they enjoyed the concert?",correct:"Did they enjoy the concert?",hint:"Did + base form."}]}]},
+
+{id:"pastcontinuous",title:"Past continuous",subtitle:"I was working, they were sleeping",intro:"What was already in progress when something else happened.",desc:"The past continuous describes an action that was in progress at a specific moment in the past, or an ongoing background action that was interrupted.",tip:"The most common use at A2 is the <strong>interrupted action</strong> pattern: <em>\"I was cooking when the phone rang.\"</em> The continuous gives the background \u2014 the simple gives the interruption. The two tenses work as a pair.",explanation:"<p>The past continuous describes an action that was <strong>already in progress</strong> at a specific past moment \u2014 not when it started or finished, but what was happening in the middle.</p>\n<p>Formed with <strong>was/were + verb-ing</strong>. Same spelling rules as present continuous: drop -e (come \u2192 coming), double the consonant on short vowel words (run \u2192 running, sit \u2192 sitting).</p>\n<div class=\"rule\"><div class=\"rule-num n\">1</div><div class=\"rule-text\"><strong>Interrupted action pattern</strong> \u2014 the most important use at A2. A longer background action (past continuous) is interrupted by a shorter sudden event (past simple). <em>\"I was cooking when the phone rang.\"</em> Cooking was already happening \u2014 the phone rang and cut across it.</div></div>\n<div class=\"rule\"><div class=\"rule-num n\">2</div><div class=\"rule-text\"><strong>Two simultaneous actions</strong> \u2014 both continuous, joined with <em>while</em>. <em>\"While I was cooking, she was setting the table.\"</em></div></div>\n<div class=\"rule\"><div class=\"rule-num n\">3</div><div class=\"rule-text\"><strong>Background scene-setting</strong> \u2014 describing what was happening at a moment in a story. <em>\"It was raining. The streets were empty. A man was walking towards the station.\"</em></div></div>\n<div class=\"note\"><strong>While vs when:</strong> <em>While</em> typically introduces the continuous (background) action. <em>When</em> typically introduces the interruption (past simple). You can swap the clause order without changing the meaning: <em>\"When the phone rang, I was cooking.\"</em> \u2014 same as above.</div>",table:{headers:["","I / He / She / It","You / We / They"],rows:[["Positive","was + verb-ing (was working)","were + verb-ing (were working)"],["Negative","wasn't + verb-ing (wasn't listening)","weren't + verb-ing (weren't waiting)"],["Question","Was she + verb-ing? (Was she cooking?)","Were they + verb-ing? (Were they waiting?)"],["Short answer","Yes, she was. / No, she wasn't.","Yes, they were. / No, they weren't."],["Interrupted action","I was reading (background)","...when he called. (interruption \u2014 past simple)"],["Two simultaneous","While I was cooking...","...she was setting the table."]]},examples:[{type:"pos",eng:"I was sleeping at midnight.",note:"In progress at a specific past time."},{type:"pos",eng:"She was studying when I called.",note:"Background action interrupted by a past simple."},{type:"pos",eng:"They were having dinner at 8pm.",note:"What was happening at a specific moment."},{type:"neg",eng:"He wasn't listening to the teacher.",note:"Wasn't = was not."},{type:"q",eng:"What were you doing when it happened?",note:"Question asking for background context."},{type:"q",eng:"Was she working late last night?",note:"Yes/No question."}],errors:[{bad:"I was cook when you called.",good:"I was cooking when you called.",reason:"Past continuous needs the -ing form of the verb."},{bad:"She were sleeping.",good:"She was sleeping.",reason:"She/he/it \u2192 was. Were is for you/we/they."},{bad:"While I walked, it started to rain.",good:"While I was walking, it started to rain.",reason:"The ongoing background action needs the continuous."},{bad:"I was working yesterday.",good:"I worked yesterday.",reason:"A general past statement about yesterday uses simple, not continuous."}],realUse:["\"What were you doing at 10pm?\" \u2014 police procedural question.","\"I was just thinking about you!\" \u2014 coincidence with continuous.","\"While I was living in London...\" \u2014 past continuous for extended background.","\"It was raining when I left.\" \u2014 setting the scene."],exercises:[{type:"gap",title:"Past continuous \u2014 positive",sub:"Fill each gap with the past continuous form.",items:[{answer:"was sleeping",before:"She ",after:" when the alarm went off. (sleep)"},{answer:"were watching",before:"They ",after:" TV all evening. (watch)"},{answer:"was raining",before:"It ",after:" when we arrived. (rain)"},{answer:"were having",before:"We ",after:" dinner at eight. (have)"},{answer:"was working",before:"He ",after:" late again. (work)"},{answer:"were waiting",before:"The students ",after:" outside the classroom. (wait)"}]},{type:"gap",title:"Past simple vs past continuous",sub:"Fill each gap \u2014 decide whether to use past simple or past continuous.",items:[{answer:"was cooking",before:"I ",after:" when the fire alarm rang. (cook)"},{answer:"rang",before:"I was cooking when the fire alarm ",after:". (ring)"},{answer:"were playing",before:"The children ",after:" in the garden when it started to rain. (play)"},{answer:"started",before:"The children were playing when it ",after:" to rain. (start)"},{answer:"was driving",before:"She ",after:" when she heard the news. (drive)"},{answer:"heard",before:"She was driving when she ",after:" the news. (hear)"}]},{type:"mc",title:"Which tense?",sub:"Choose the correct form.",items:[{q:"I _____ a shower when you called.",opts:["had","was having","have","were having"],answer:"was having",explanation:"Background action in progress when interrupted \u2014 past continuous."},{q:"While she _____, the power went off.",opts:["worked","was working","is working","works"],answer:"was working",explanation:"While + ongoing background action \u2014 past continuous."},{q:"What _____ at 9pm last night?",opts:["did you do","were you doing","you were doing","you did"],answer:"were you doing",explanation:"Asking what was in progress at a specific time \u2014 past continuous question."},{q:"He _____ the door and _____ in.",opts:["opened / walked","was opening / was walking","opened / was walking","was opening / walked"],answer:"opened / walked",explanation:"Two completed sequential actions \u2014 both past simple."}]},{type:"builder",title:"Sentence builder",sub:"Put the words in the correct order.",items:[{words:["I","was","reading","when","you","called"],answer:"I was reading when you called",context:"Background + interruption."},{words:["were","they","sleeping","at","midnight","?"],answer:"were they sleeping at midnight ?",context:"Question about a specific time."},{words:["she","wasn't","listening","to","the","teacher"],answer:"she wasn't listening to the teacher",context:"Negative past continuous."},{words:["while","I","was","cooking","he","arrived"],answer:"while I was cooking he arrived",context:"Two overlapping past events."},{words:["what","were","you","doing","when","it","happened","?"],answer:"what were you doing when it happened ?",context:"Wh- question with past continuous."}]},{type:"ec",title:"Error correction",sub:"One error per sentence.",items:[{wrong:"I was cook dinner when he arrived.",correct:"I was cooking dinner when he arrived.",hint:"Was + -ing form."},{wrong:"She were working late.",correct:"She was working late.",hint:"She \u2014 was, not were."},{wrong:"While I walked, my phone rang.",correct:"While I was walking, my phone rang.",hint:"Background action \u2014 past continuous."},{wrong:"They was watching TV all evening.",correct:"They were watching TV all evening.",hint:"They \u2014 were, not was."},{wrong:"I was working yesterday all day.",correct:"I worked all day yesterday.",hint:"General statement about the whole day \u2014 past simple."}]}]},
+
+{id:"presentperfect",title:"Present perfect",subtitle:"I have been, she has seen",intro:"A bridge between past and present. The past with a connection to now.",desc:"The present perfect is often the trickiest tense for A2 learners because it does not exist in many languages. The key is that the action has a connection to the present.",tip:"The classic mistake is using the present perfect with a specific past time: <strong>\"I have seen him yesterday.\"</strong> Wrong. If you can say <em>when</em> it happened, use past simple. Present perfect = past action, no specific time, relevant now.",explanation:"<p>The present perfect connects a past action to <strong>right now</strong>. The action happened in the past, but it still matters \u2014 because of its result, its relevance, or because the time is still open. Formed with <strong>have/has + past participle</strong>.</p>\n<div class=\"note\"><strong>The golden rule:</strong> If you mention a specific finished time (yesterday, in 2019, last week, an hour ago) \u2192 use <strong>past simple</strong>. No specific time, or time still ongoing \u2192 use <strong>present perfect</strong>. These two never mix: <em>I have seen him yesterday</em> is always wrong.</div>\n<p style=\"margin-top:14px\"><strong>For vs since</strong> \u2014 both used with present perfect for ongoing situations:</p>\n<div class=\"rule\"><div class=\"rule-num\"></div><div class=\"rule-text\"><strong>for</strong> + a duration of time: <em>for two years, for a long time, for ages</em>. Ask yourself: \"How long?\" \u2192 for.</div></div>\n<div class=\"rule\"><div class=\"rule-num\"></div><div class=\"rule-text\"><strong>since</strong> + a starting point: <em>since 2018, since last Tuesday, since I was a child</em>. Ask yourself: \"Since when?\" \u2192 since.</div></div>",table:{headers:["Use","Key word(s)","Example","Important note"],rows:[["Life experience \u2014 any time up to now","ever (questions) / never (negatives)","Have you ever been to Japan? / I've never tried it.","No specific time mentioned"],["Very recent action","just","She's just arrived. / He's just called.","Just goes between have and participle"],["Action not yet done, but expected","yet","I haven't finished yet. / Have you eaten yet?","Yet goes at the end"],["Action done sooner than expected","already","I've already seen that film.","Already goes between have and participle"],["Unfinished time \u2014 duration","for + length of time","I've lived here for three years.","Still living here now"],["Unfinished time \u2014 starting point","since + point in time","I've worked here since 2020.","Still working here now"],["NOT for finished past times","past simple instead","I saw him yesterday. \u2713   I've seen him yesterday. \u2717","Yesterday/last week/ago \u2192 past simple"]]},examples:[{type:"pos",eng:"I've been to Spain three times.",note:"Life experience \u2014 no specific time mentioned."},{type:"pos",eng:"She's just arrived.",note:"Very recent action \u2014 just + present perfect."},{type:"pos",eng:"Have you ever tried sushi?",note:"Ever in questions about life experience."},{type:"neg",eng:"I haven't finished yet.",note:"Yet in negatives \u2014 action expected but not done."},{type:"q",eng:"Have you done your homework?",note:"Asking if an action is complete or not."},{type:"q",eng:"How long have you lived here?",note:"For / since \u2014 unfinished time period."}],errors:[{bad:"I have seen him yesterday.",good:"I saw him yesterday.",reason:"Yesterday is a specific past time \u2014 use past simple."},{bad:"Did you ever been to Paris?",good:"Have you ever been to Paris?",reason:"Ever with life experience \u2014 present perfect, not past simple."},{bad:"She has gone there an hour ago.",good:"She went there an hour ago.",reason:"Specific time (an hour ago) \u2014 past simple."},{bad:"I live here since 2019.",good:"I have lived here since 2019.",reason:"Since + unfinished time period \u2014 present perfect."}],realUse:["\"I've never done that.\" \u2014 life experience with never.","\"Have you heard the news?\" \u2014 present perfect for very recent events.","\"I've already eaten.\" / \"I haven't eaten yet.\" \u2014 already/yet contrast.","\"She's been working here for ten years.\" \u2014 ongoing duration."],exercises:[{type:"gap",title:"Present perfect \u2014 positive",sub:"Fill each gap with the present perfect form.",items:[{answer:"have been",before:"I ",after:" to Japan twice. (be)"},{answer:"has just arrived",before:"She ",after:". (just arrive)"},{answer:"have never tried",before:"I ",after:" sushi. (never try)"},{answer:"has won",before:"Our team ",after:" three trophies this year. (win)"},{answer:"have lived",before:"They ",after:" here since 2018. (live)"},{answer:"has already finished",before:"He ",after:" the report. (already finish)"},{answer:"have visited",before:"We ",after:" fifteen countries. (visit)"},{answer:"has changed",before:"Everything ",after:" so much. (change)"}]},{type:"gap",title:"Present perfect or past simple?",sub:"Fill each gap \u2014 choose the correct tense.",items:[{answer:"Have you ever been",before:"",after:" to Paris? (ever be \u2014 present perfect question)"},{answer:"went",before:"I ",after:" to Paris in 2019. (go \u2014 past simple)"},{answer:"saw",before:"I ",after:" that film last week. (see \u2014 past simple)"},{answer:"haven't seen",before:"I ",after:" that film yet. (not see \u2014 present perfect)"},{answer:"has just called",before:"She ",after:". (just call \u2014 present perfect)"},{answer:"called",before:"She ",after:" an hour ago. (call \u2014 past simple)"}]},{type:"mc",title:"Ever, never, already, yet, just",sub:"Choose the correct time word.",items:[{q:"Have you _____ been to Australia?",opts:["already","yet","ever","just"],answer:"ever",explanation:"Ever = at any time in your life. Used in questions about life experience."},{q:"I've _____ finished \u2014 I started five minutes ago!",opts:["yet","just","ever","never"],answer:"just",explanation:"Just = very recently, moments ago."},{q:"Have you called her _____?",opts:["ever","just","never","yet"],answer:"yet",explanation:"Yet = by now. Used in questions and negatives."},{q:"I've _____ eaten sushi \u2014 I hate fish.",opts:["just","yet","ever","never"],answer:"never",explanation:"Never = at no time in your life."}]},{type:"transform",title:"Sentence transformation",sub:"Rewrite using the keyword given.",items:[{original:"She arrived an hour ago.",keyword:"just",answer:"She has just arrived."},{original:"Did you ever try Thai food?",keyword:"Have",answer:"Have you ever tried Thai food?"},{original:"I started working here in 2020 and still work here.",keyword:"since",answer:"I have worked here since 2020."},{original:"He finished the report. (already)",keyword:"already",answer:"He has already finished the report."},{original:"I didn't finish yet.",keyword:"haven't",answer:"I haven't finished yet."}]},{type:"ec",title:"Error correction",sub:"One error per sentence.",items:[{wrong:"I have seen him yesterday.",correct:"I saw him yesterday.",hint:"Specific past time \u2014 past simple."},{wrong:"Did you ever been to Rome?",correct:"Have you ever been to Rome?",hint:"Life experience \u2014 present perfect."},{wrong:"She has gone there last year.",correct:"She went there last year.",hint:"Last year = specific time \u2014 past simple."},{wrong:"I live here since 2019.",correct:"I have lived here since 2019.",hint:"Since + unfinished period \u2014 present perfect."},{wrong:"Have you finished yet? Yes, I finished.",correct:"Yes, I have.",hint:"Short answer for present perfect \u2014 Yes, I have."}]}]},
+
+{id:"goingto",title:"Future: going to",subtitle:"I'm going to study, she's going to leave",intro:"Plans and predictions based on what you can already see.",desc:"Going to is used for intentions and plans you have already decided on, and for predictions based on present evidence.",tip:"Students often confuse <em>going to</em> and <em>will</em>. Simple rule: if you have <strong>already decided</strong> or you can <strong>see the evidence</strong> right now, use <em>going to</em>. If it is a spontaneous decision or general prediction, use <em>will</em>.",explanation:"<p><strong>Going to</strong> is formed with <strong>am/is/are + going to + base verb</strong>. It is used when there is already <em>evidence</em> for the future \u2014 either a prior decision, or something you can see.</p>\n<div class=\"rule\"><div class=\"rule-num n\">1</div><div class=\"rule-text\"><strong>Pre-decided plans and intentions.</strong> The decision was made before this conversation \u2014 you are not deciding now, you are reporting a decision already made. <em>\"I'm going to study medicine.\"</em> (decided before we spoke).</div></div>\n<div class=\"rule\"><div class=\"rule-num n\">2</div><div class=\"rule-text\"><strong>Predictions based on present evidence.</strong> You can see or sense something right now that tells you what is about to happen. <em>\"Look at those clouds \u2014 it's going to rain!\"</em> (the evidence is visible).</div></div>\n<div class=\"note\"><strong>Going to vs will:</strong><br>\nEvidence behind the prediction or decision? \u2192 <strong>going to</strong><br>\nDeciding something right now, in this moment? \u2192 <strong>will</strong><br>\nGeneral prediction based on opinion, no specific evidence? \u2192 <strong>will</strong></div>",table:{headers:["Form","Structure","Example"],rows:[["Positive","am/is/are + going to + base verb","I'm going to study. / She's going to leave. / They're going to win."],["Negative","am/is/are + not + going to + base verb","I'm not going to go. / He isn't going to call. / We aren't going to stay."],["Question","Am/Is/Are + subject + going to + base verb?","Are you going to come? / Is she going to stay?"],["Short answer","Yes/No + subject + am/is/are (not)","Yes, I am. / No, she isn't. / Yes, they are."],["Use 1: pre-decided plan","decision was made before speaking","I'm going to quit. (decided earlier)"],["Use 2: evidence prediction","something visible signals the outcome","Look \u2014 it's going to rain! (I can see the clouds)"],["vs will \u2014 spontaneous decision","deciding right now, no prior plan","'The phone's ringing.' 'I'll get it.'"]]},examples:[{type:"pos",eng:"I'm going to study medicine.",note:"Decided plan \u2014 already know what you want to do."},{type:"pos",eng:"Look at those clouds! It's going to rain.",note:"Prediction from present evidence \u2014 you can see the clouds."},{type:"pos",eng:"She's going to have a baby.",note:"Planned / inevitable future event."},{type:"neg",eng:"I'm not going to eat meat anymore.",note:"Decided intention."},{type:"q",eng:"Are you going to come to the party?",note:"Asking about someone's plans."},{type:"q",eng:"What are you going to do after university?",note:"Asking about future intentions."}],errors:[{bad:"I going to study tonight.",good:"I'm going to study tonight.",reason:"Going to needs the verb to be: am/is/are going to."},{bad:"She is go to leave.",good:"She is going to leave.",reason:"Full form: is going to + base verb."},{bad:"Look \u2014 he going to fall!",good:"Look \u2014 he's going to fall!",reason:"Present evidence prediction still needs is/are."},{bad:"Are you going to went?",good:"Are you going to go?",reason:"Going to is always followed by the base form."}],realUse:["\"I'm going to quit.\" \u2014 announcing a big decision.","\"It's going to be a long day.\" \u2014 prediction at the start of a difficult day.","\"What are you going to do?\" \u2014 common conversational question.","\"This is going to hurt.\" \u2014 prediction based on what you can see coming."],exercises:[{type:"gap",title:"Going to \u2014 positive",sub:"Fill each gap with the going to form of the verb in brackets.",items:[{answer:"'m going to study",before:"I ",after:" medicine. (study)"},{answer:"is going to rain",before:"Look at those clouds \u2014 it ",after:". (rain)"},{answer:"are going to miss",before:"If we don't hurry, we ",after:" the train. (miss)"},{answer:"'s going to be",before:"This ",after:" a great party! (be)"},{answer:"are going to buy",before:"They ",after:" a new house next year. (buy)"},{answer:"is going to leave",before:"She ",after:" the company at the end of the month. (leave)"},{answer:"'m going to cook",before:"I ",after:" dinner tonight. (cook)"},{answer:"are going to win",before:"Look at the score \u2014 they ",after:". (win)"}]},{type:"gap",title:"Negatives and questions",sub:"Fill each gap \u2014 negative or question form.",items:[{answer:"aren't going to come",before:"They ",after:" to the party. (not come)"},{answer:"isn't going to be",before:"It ",after:" easy. (not be)"},{answer:"Are you going to",before:"",after:" apply for the job?"},{answer:"Is she going to",before:"",after:" stay for dinner?"},{answer:"aren't going to finish",before:"We ",after:" in time. (not finish)"}]},{type:"mc",title:"Will or going to?",sub:"Choose the most natural option.",items:[{q:"Look out! You _____ drop that!",opts:["will drop","are going to drop","drop","are dropping"],answer:"are going to drop",explanation:"You can see it about to happen \u2014 present evidence \u2014 going to."},{q:"The phone is ringing. OK, I _____ get it.",opts:["am going to get","get","will get","am getting"],answer:"will get",explanation:"Spontaneous decision made at the moment of speaking \u2014 will."},{q:"She _____ study in Paris next year. She applied last month.",opts:["will study","is going to study","studies","studied"],answer:"is going to study",explanation:"Already decided and planned \u2014 going to."},{q:"I think it _____ be cold tomorrow.",opts:["is going to","goes to","will","is"],answer:"will",explanation:"General prediction without specific present evidence \u2014 will."}]},{type:"builder",title:"Sentence builder",sub:"Put the words in the correct order.",items:[{words:["she","is","going","to","leave","the","company"],answer:"she is going to leave the company",context:"An announced plan."},{words:["are","you","going","to","come","tonight","?"],answer:"are you going to come tonight ?",context:"Asking about plans."},{words:["he","isn't","going","to","pass","the","exam"],answer:"he isn't going to pass the exam",context:"Negative prediction from evidence."},{words:["we","are","going","to","buy","a","new","car"],answer:"we are going to buy a new car",context:"A decided intention."},{words:["look","it","is","going","to","rain","!"],answer:"look it is going to rain !",context:"Immediate prediction from evidence."}]},{type:"ec",title:"Error correction",sub:"One error per sentence.",items:[{wrong:"I going to study tonight.",correct:"I'm going to study tonight.",hint:"Need am/is/are before going to."},{wrong:"She is go to leave next week.",correct:"She is going to leave next week.",hint:"Is going to \u2014 not is go to."},{wrong:"Are you going to went to the party?",correct:"Are you going to go to the party?",hint:"Going to + base form."},{wrong:"Look \u2014 he going to fall!",correct:"Look \u2014 he's going to fall!",hint:"Still needs is/are in the structure."},{wrong:"We not going to be late.",correct:"We aren't going to be late.",hint:"Negative needs aren't/isn't/am not."}]}]},
+
+{id:"will",title:"Future: will",subtitle:"I will call, she won't come",intro:"Spontaneous decisions, promises, offers, and predictions.",desc:"Will is one of those modal verbs students pick up quickly but then overuse. The key is knowing when going to is more natural.",tip:"Will is for <strong>spontaneous decisions</strong> made at the moment of speaking. If you thought about it before \u2014 use <em>going to</em>. \"I'll have the pasta\" (deciding right now). \"I'm going to make pasta tonight\" (decided this morning).",explanation:"<p><strong>Will</strong> is a modal verb + base form \u2014 no <em>to</em>, no <em>-ing</em>, no <em>-s</em> for third person. Contraction: <em>'ll</em>. Negative: <em>won't</em>.</p>\n<div class=\"rule\"><div class=\"rule-num\"></div><div class=\"rule-text\"><strong>Spontaneous decisions</strong> \u2014 you decide at the exact moment of speaking, no prior plan. <em>\"The milk is finished.\" \"I'll buy some.\"</em></div></div>\n<div class=\"rule\"><div class=\"rule-num\"></div><div class=\"rule-text\"><strong>Promises and offers</strong> \u2014 <em>\"I'll be there, I promise.\"</em> &nbsp;/&nbsp; <em>\"I'll carry that for you.\"</em></div></div>\n<div class=\"rule\"><div class=\"rule-num\"></div><div class=\"rule-text\"><strong>Suggestions</strong> \u2014 <em>Shall I...?</em> (offering to do something) &nbsp;/&nbsp; <em>Shall we...?</em> (suggesting a joint action). More British, slightly more formal.</div></div>\n<div class=\"rule\"><div class=\"rule-num\"></div><div class=\"rule-text\"><strong>General predictions</strong> \u2014 based on opinion, not visible evidence. <em>\"I think things will get better.\"</em></div></div>\n<div class=\"note\"><strong>Will vs going to for predictions:</strong> Can you point to evidence right now? \u2192 <strong>going to</strong>. &nbsp;General belief or opinion? \u2192 <strong>will</strong>.</div>",table:{headers:["Use","Structure","Example"],rows:[["Spontaneous decision (now)","will + base verb","'The phone's ringing.' 'I'll get it.'"],["Promise","will / won't + base verb","I'll be there. / I won't tell anyone."],["Offer","I'll + base verb  OR  Shall I + base verb?","I'll carry that. / Shall I open the window?"],["Joint suggestion","Shall we + base verb?","Shall we get a coffee?"],["General prediction","I think/probably + will","I think it will rain later. / It'll probably be fine."],["vs going to","visible evidence now \u2192 going to","Look \u2014 it's going to rain! (I can see the clouds)"],["Contraction forms","'ll = will  /  won't = will not","I'll call. / She won't come. / They'll be late."]]},examples:[{type:"pos",eng:"I'll call you later.",note:"Spontaneous decision or promise."},{type:"pos",eng:"It will be cold in December.",note:"General prediction \u2014 no specific evidence."},{type:"pos",eng:"Don't worry \u2014 I'll help you.",note:"Offer made in the moment."},{type:"neg",eng:"She won't be there, I'm sure.",note:"Won't = will not."},{type:"q",eng:"Will you marry me?",note:"Famous will question \u2014 a request/proposal."},{type:"q",eng:"Will it rain tomorrow?",note:"Asking for a prediction."}],errors:[{bad:"I will to call you.",good:"I'll call you.",reason:"Will is a modal verb \u2014 no to after it."},{bad:"She won't to come.",good:"She won't come.",reason:"Won't + base form, no to."},{bad:"Will she comes?",good:"Will she come?",reason:"Will + base form \u2014 never adds -s."},{bad:"I will to help you.",good:"I'll help you.",reason:"No to after will."}],realUse:["\"I'll get it!\" \u2014 answering the door or phone spontaneously.","\"I won't tell anyone, I promise.\" \u2014 a strong promise.","\"Will you be quiet, please?\" \u2014 polite but firm request.","\"Things will get better.\" \u2014 reassurance about the future."],exercises:[{type:"gap",title:"Will \u2014 positive, negative, questions",sub:"Fill each gap with will, won't, or the contracted form.",items:[{answer:"I'll",before:"",after:" call you later."},{answer:"won't",before:"She ",after:" be at the party \u2014 she's busy."},{answer:"Will",before:"",after:" you help me with this?"},{answer:"'ll",before:"Don't worry \u2014 it ",after:" be fine."},{answer:"won't",before:"I ",after:" tell anyone, I promise."},{answer:"Will",before:"",after:" they be late?"},{answer:"'ll",before:"I ",after:" have the pasta, please."},{answer:"won't",before:"He ",after:" change his mind \u2014 he never does."}]},{type:"mc",title:"Will or going to?",sub:"Choose the most natural option for each context.",items:[{q:"There's no milk. OK, I _____ buy some. (spontaneous decision)",opts:["'m going to buy","'ll buy","bought","buy"],answer:"'ll buy",explanation:"Spontaneous decision made at that moment \u2014 will."},{q:"What are your plans for summer? I _____ travel around Spain. (already planned)",opts:["will travel","'ll travel","'m going to travel","travelled"],answer:"'m going to travel",explanation:"Already planned before the conversation \u2014 going to."},{q:"I think robots _____ do most jobs in the future. (general prediction)",opts:["are going to do","go to do","will do","are doing"],answer:"will do",explanation:"General prediction without current evidence \u2014 will."},{q:"Look! She _____ fall! (prediction from current evidence)",opts:["will fall","is going to fall","falls","fell"],answer:"is going to fall",explanation:"You can see it happening right now \u2014 going to."}]},{type:"transform",title:"Sentence transformation",sub:"Rewrite using the keyword given.",items:[{original:"I promise I won't be late.",keyword:"will",answer:"I will not be late, I promise."},{original:"She is not going to come.",keyword:"won't",answer:"She won't come."},{original:"Do you want to eat out tonight?",keyword:"Shall",answer:"Shall we eat out tonight?"},{original:"I think the weather will be good.",keyword:"will",answer:"The weather will be good, I think."},{original:"Would you like me to help?",keyword:"Shall",answer:"Shall I help?"}]},{type:"convo",title:"Fill the conversation",sub:"Complete the dialogue with will, won't, or shall.",lines:[{speaker:"A",text:"I can't carry all these bags."},{speaker:"B",text:"Don't worry \u2014 I [will] help you."},{speaker:"A",text:"Thank you. [Shall] we take a taxi?"},{speaker:"B",text:"Good idea. I [won't] be able to walk far with my ankle."},{speaker:"A",text:"[Will] it take long to get there?"},{speaker:"B",text:"No, it [won't] \u2014 maybe ten minutes."}]},{type:"ec",title:"Error correction",sub:"One error per sentence.",items:[{wrong:"I will to call you tomorrow.",correct:"I will call you tomorrow.",hint:"No to after will."},{wrong:"She won't to come.",correct:"She won't come.",hint:"Won't + base form, no to."},{wrong:"Will she comes to the party?",correct:"Will she come to the party?",hint:"Will + base form \u2014 no -s."},{wrong:"I'll to have the chicken, please.",correct:"I'll have the chicken, please.",hint:"No to after will/I'll."},{wrong:"They will be arrive at six.",correct:"They will arrive at six.",hint:"Will + base form directly."}]}]},
+
+{id:"comparatives",title:"Comparative adjectives",subtitle:"bigger, more interesting, better",intro:"Comparing two things. Short adjectives add -er, long ones use more.",desc:"Comparatives are used to compare two things. The structure is simple but the rules for forming them trip students up \u2014 especially the irregular forms.",tip:"The word <strong>than</strong> is key \u2014 and it is often missed. <strong>\"Madrid is bigger than Valencia.\"</strong> Not \"Madrid is bigger Valencia.\" Also watch out for double comparatives: never \"more bigger\" \u2014 it is one or the other.",explanation:"<p>Comparatives compare <strong>two things</strong>. Structure: <strong>subject + verb + comparative + than + second thing</strong>. The word <em>than</em> is essential \u2014 never leave it out.</p>\n<div class=\"rule\"><div class=\"rule-num n\">1</div><div class=\"rule-text\"><strong>Short adjectives (1 syllable)</strong> \u2014 add <em>-er</em>: tall \u2192 taller, fast \u2192 faster. Ends in <em>-e</em>? Just add <em>-r</em>: nice \u2192 nicer. Ends in single vowel + consonant (big, hot, thin)? <strong>Double the final consonant</strong>: big \u2192 bigger, hot \u2192 hotter. The doubling protects the short vowel \u2014 without it, <em>biger</em> would sound different.</div></div>\n<div class=\"rule\"><div class=\"rule-num n\">2</div><div class=\"rule-text\"><strong>Adjectives ending in -y</strong> \u2014 change -y to -ier: happy \u2192 happier, easy \u2192 easier, busy \u2192 busier.</div></div>\n<div class=\"rule\"><div class=\"rule-num n\">3</div><div class=\"rule-text\"><strong>Long adjectives (2+ syllables)</strong> \u2014 put <em>more</em> in front. Never add -er to a long adjective. more interesting, more comfortable, more expensive. <em>Interestinger</em> is not a word.</div></div>\n<div class=\"note\"><strong>Irregular forms \u2014 must be memorised:</strong> good \u2192 better &nbsp;\u00b7&nbsp; bad \u2192 worse &nbsp;\u00b7&nbsp; far \u2192 further</div>",table:{headers:["Rule","Adjective type","How to form","Examples"],rows:[["Rule 1a","1 syllable (most)","add -er","tall \u2192 taller,  fast \u2192 faster,  cheap \u2192 cheaper"],["Rule 1b","1 syllable ending in -e","add -r only","nice \u2192 nicer,  large \u2192 larger,  safe \u2192 safer"],["Rule 1c","1 syllable: single vowel + consonant","double consonant + -er","big \u2192 bigger,  hot \u2192 hotter,  thin \u2192 thinner,  sad \u2192 sadder"],["Rule 2","2 syllables ending in -y","change y \u2192 ier","happy \u2192 happier,  easy \u2192 easier,  busy \u2192 busier"],["Rule 3","2 or more syllables (not -y)","more + adjective","more interesting,  more expensive,  more comfortable"],["Irregular","\u2014","must be memorised","good \u2192 better,  bad \u2192 worse,  far \u2192 further"],["Structure","\u2014","comparative + than + second thing","Madrid is bigger than Valencia."]]},examples:[{type:"pos",eng:"This city is bigger than my hometown.",note:"Short adjective: big \u2192 bigger."},{type:"pos",eng:"Spanish is more difficult than English for me.",note:"Long adjective: more + adjective."},{type:"pos",eng:"She speaks English better than her brother.",note:"Irregular: good \u2192 better."},{type:"neg",eng:"The new phone isn't cheaper than the old one.",note:"Negative comparison."},{type:"q",eng:"Is the north route faster?",note:"Asking for a comparison."},{type:"q",eng:"Which is more comfortable \u2014 the train or the bus?",note:"Choosing between two options."}],errors:[{bad:"She is more tall than her sister.",good:"She is taller than her sister.",reason:"One-syllable adjectives use -er, not more."},{bad:"This is the more good option.",good:"This is the better option.",reason:"Good \u2192 better. Irregular comparative."},{bad:"Madrid is bigger Valencia.",good:"Madrid is bigger than Valencia.",reason:"Comparatives must be followed by than."},{bad:"He is more fast than me.",good:"He is faster than me.",reason:"Fast is one syllable \u2014 use -er."}],realUse:["\"It's easier said than done.\" \u2014 fixed expression with comparative.","\"The older I get, the wiser I become.\" \u2014 double comparative structure.","\"Better late than never.\" \u2014 common proverb.","\"She's getting better and better.\" \u2014 repeated comparative for gradual change."],exercises:[{type:"gap",title:"Form the comparative",sub:"Fill each gap with the correct comparative form of the adjective in brackets.",items:[{answer:"taller",before:"He is ",after:" than his father. (tall)"},{answer:"more interesting",before:"This book is ",after:" than the last one. (interesting)"},{answer:"better",before:"Her English is ",after:" than mine. (good)"},{answer:"hotter",before:"July is ",after:" than June here. (hot)"},{answer:"more expensive",before:"The restaurant is ",after:" than I expected. (expensive)"},{answer:"worse",before:"The traffic is ",after:" today than yesterday. (bad)"},{answer:"happier",before:"She looks ",after:" than she did before. (happy)"},{answer:"further",before:"The station is ",after:" than I thought. (far)"}]},{type:"categorise",title:"How do you form the comparative?",sub:"Click an adjective, then click the correct column.",categories:[{name:"add -er",items:["tall","fast","cheap","warm","young"]},{name:"more + adjective",items:["interesting","comfortable","expensive","popular","difficult"]},{name:"irregular",items:["good","bad","far","little","much"]}]},{type:"mc",title:"Multiple choice",sub:"Choose the correct comparative form.",items:[{q:"My bag is _____ than yours.",opts:["more heavy","heavier","heavyer","more heavier"],answer:"heavier",explanation:"Heavy \u2192 change y to i + er: heavier."},{q:"She is _____ than her sister.",opts:["more tall","taller","more taller","tallier"],answer:"taller",explanation:"Tall is one syllable \u2192 taller."},{q:"This job is _____ than my last one.",opts:["satisfying more","more satisfying","satisfyinger","more satisfyinger"],answer:"more satisfying",explanation:"Satisfying has 4 syllables \u2192 more + adjective."},{q:"He drives _____ than me.",opts:["more good","gooder","better","more better"],answer:"better",explanation:"Good \u2192 better. Always irregular."}]},{type:"builder",title:"Sentence builder",sub:"Put the words in the correct order to make a comparison.",items:[{words:["Spanish","is","more","difficult","than","English"],answer:"Spanish is more difficult than English",context:"Comparing difficulty."},{words:["she","is","taller","than","her","brother"],answer:"she is taller than her brother",context:"Comparing height."},{words:["which","city","is","bigger","Madrid","or","Barcelona","?"],answer:"which city is bigger Madrid or Barcelona ?",context:"Asking for a comparison."},{words:["the","new","model","is","more","expensive","than","the","old","one"],answer:"the new model is more expensive than the old one",context:"Comparing prices."},{words:["my","English","is","getting","better","and","better"],answer:"my English is getting better and better",context:"Gradual improvement."}]},{type:"ec",title:"Error correction",sub:"One error per sentence.",items:[{wrong:"She is more tall than her sister.",correct:"She is taller than her sister.",hint:"One syllable \u2014 -er."},{wrong:"This is the more good option.",correct:"This is the better option.",hint:"Good \u2192 better (irregular)."},{wrong:"Madrid is bigger Valencia.",correct:"Madrid is bigger than Valencia.",hint:"Need than after comparative."},{wrong:"He is more fast than me.",correct:"He is faster than me.",hint:"Fast is one syllable \u2014 faster."},{wrong:"The weather is more bad than yesterday.",correct:"The weather is worse than yesterday.",hint:"Bad \u2192 worse (irregular)."}]}]},
+
+{id:"superlatives",title:"Superlative adjectives",subtitle:"the biggest, the most beautiful",intro:"The extreme end. The best, the worst, the most interesting in a group.",desc:"Superlatives describe the extreme quality of something within a group. They always use the.",tip:"Always use <strong>the</strong> before a superlative \u2014 students often leave it out. <strong>\"She is the best student in the class.\"</strong> Not \"She is best student.\" The is mandatory because a superlative singles out one unique thing.",explanation:"<p>Superlatives describe the <strong>extreme end of a scale</strong> within a group. They always use <strong>the</strong> \u2014 because they point to something unique.</p>\n<p>The formation rules are the same as comparatives \u2014 just replace <em>-er</em> with <em>-est</em> and <em>more</em> with <em>the most</em>. If you know the comparative, you know the superlative.</p>\n<div class=\"rule\"><div class=\"rule-num n\">1</div><div class=\"rule-text\"><strong>Short adjectives:</strong> the + -est &nbsp;\u2192&nbsp; tall \u2192 the tallest, fast \u2192 the fastest, big \u2192 the biggest.</div></div>\n<div class=\"rule\"><div class=\"rule-num n\">2</div><div class=\"rule-text\"><strong>Ending in -y:</strong> the + -iest &nbsp;\u2192&nbsp; happy \u2192 the happiest, easy \u2192 the easiest.</div></div>\n<div class=\"rule\"><div class=\"rule-num n\">3</div><div class=\"rule-text\"><strong>Long adjectives:</strong> the most + adjective &nbsp;\u2192&nbsp; the most interesting, the most expensive.</div></div>\n<div class=\"note\"><strong>Irregular:</strong> good \u2192 the best &nbsp;\u00b7&nbsp; bad \u2192 the worst &nbsp;\u00b7&nbsp; far \u2192 the furthest<br><strong>In vs of:</strong> use <em>in</em> for places/groups (the best player <em>in</em> the team) \u2014 use <em>of</em> for sets/time (the best film <em>of</em> the year).</div>",table:{headers:["Rule","Adjective type","Comparative","Superlative"],rows:[["Rule 1a","1 syllable (most)","taller","the tallest"],["Rule 1c","1 syllable: vowel + consonant","hotter","the hottest"],["Rule 2","ending in -y","happier","the happiest"],["Rule 3","2+ syllables","more interesting","the most interesting"],["Irregular","good","better","the best"],["Irregular","bad","worse","the worst"],["Irregular","far","further","the furthest"],["Structure","\u2014","comparative + than","the + superlative + in/of"]]},examples:[{type:"pos",eng:"It's the tallest building in the city.",note:"Short adjective \u2192 the + -est."},{type:"pos",eng:"That was the most interesting lecture I've attended.",note:"Long adjective \u2192 the most + adjective."},{type:"pos",eng:"She's the best player on the team.",note:"Irregular: good \u2192 the best."},{type:"pos",eng:"It's the hottest day of the year.",note:"Short CVC adjective \u2192 double consonant + -est."},{type:"q",eng:"What's the most popular sport in Spain?",note:"Most popular \u2014 long adjective superlative."},{type:"q",eng:"Who is the fastest runner in the group?",note:"Short adjective superlative in a question."}],errors:[{bad:"She is best student in the class.",good:"She is the best student in the class.",reason:"Superlatives always need the."},{bad:"It's the most tall building.",good:"It's the tallest building.",reason:"Tall is one syllable \u2192 the tallest."},{bad:"That was the baddest film.",good:"That was the worst film.",reason:"Bad \u2192 the worst. Always irregular."},{bad:"He's the most good player.",good:"He's the best player.",reason:"Good \u2192 the best. Always irregular."}],realUse:["\"The best of both worlds.\" \u2014 fixed expression.","\"At the latest, at the earliest.\" \u2014 superlatives in time expressions.","\"She did her best.\" \u2014 best as a pronoun.","\"It's the least I could do.\" \u2014 least = opposite of most."],exercises:[{type:"gap",title:"Form the superlative",sub:"Fill each gap with the correct superlative form.",items:[{answer:"the tallest",before:"He is ",after:" person in the family. (tall)"},{answer:"the most interesting",before:"That was ",after:" film I've seen. (interesting)"},{answer:"the best",before:"She is ",after:" player on the team. (good)"},{answer:"the hottest",before:"July is ",after:" month of the year here. (hot)"},{answer:"the worst",before:"That was ",after:" meal I've ever had. (bad)"},{answer:"the most expensive",before:"This is ",after:" restaurant in the city. (expensive)"},{answer:"the happiest",before:"It was ",after:" day of my life. (happy)"},{answer:"the furthest",before:"That is ",after:" I've ever run. (far)"}]},{type:"mc",title:"Comparative or superlative?",sub:"Choose the correct form.",items:[{q:"She is _____ student in the class.",opts:["the best","better","the better","best"],answer:"the best",explanation:"Comparing to all students \u2014 superlative with the."},{q:"London is _____ than Madrid.",opts:["the biggest","bigger","the bigger","most big"],answer:"bigger",explanation:"Comparing two cities \u2014 comparative (no the)."},{q:"This is _____ film I've ever seen!",opts:["the most boring","more boring","the more boring","most boring"],answer:"the most boring",explanation:"Superlative of life experience \u2014 the most boring."},{q:"She speaks _____ than her brother.",opts:["the most fluently","more fluent","more fluently","the fluenter"],answer:"more fluently",explanation:"Comparing two people \u2014 comparative adverb."}]},{type:"transform",title:"Sentence transformation",sub:"Rewrite using a superlative.",items:[{original:"No other building in the city is as tall as this one.",keyword:"the tallest",answer:"This is the tallest building in the city."},{original:"No other student works as hard as Maria.",keyword:"the hardest",answer:"Maria works the hardest in the class."},{original:"I have never eaten a better meal.",keyword:"the best",answer:"It's the best meal I've ever eaten."},{original:"Nothing is worse than cold coffee.",keyword:"the worst",answer:"Cold coffee is the worst."}]},{type:"ec",title:"Error correction",sub:"One error per sentence.",items:[{wrong:"She is best student in the class.",correct:"She is the best student in the class.",hint:"Superlatives need the."},{wrong:"It's the most tall building in the city.",correct:"It's the tallest building in the city.",hint:"Tall is one syllable \u2014 the tallest."},{wrong:"That was the baddest film ever.",correct:"That was the worst film ever.",hint:"Bad \u2192 the worst (irregular)."},{wrong:"He is the most good cook I know.",correct:"He is the best cook I know.",hint:"Good \u2192 the best (irregular)."},{wrong:"This is the expensivest restaurant here.",correct:"This is the most expensive restaurant here.",hint:"Expensive has 3 syllables \u2014 the most expensive."}]}]},
+
+{id:"should",title:"Modal: should / shouldn't",subtitle:"You should rest, she shouldn't worry",intro:"Advice, recommendations, and mild obligation.",desc:"Should is the go-to verb for giving advice in English. It is softer than must and more polite than need to \u2014 which makes it the most socially versatile modal at A2.",tip:"Students often want to say <strong>\"You should to rest.\"</strong> No \u2014 like all modal verbs, should is followed directly by the base form: <strong>\"You should rest.\"</strong> No to, no -ing, no -s for third person.",explanation:"<p><strong>Should</strong> is a modal verb \u2014 base form only, no <em>to</em>, no <em>-ing</em>, no <em>-s</em> for third person. <em>She should</em> \u2014 never <em>she shoulds</em>. <em>You should rest</em> \u2014 never <em>you should to rest</em>.</p>\n<p>Should expresses that something is a <strong>good idea</strong> \u2014 the speaker's advice or recommendation. Think of it as meaning <em>\"in my opinion, it would be a good idea to...\"</em></p>\n<div class=\"rule\"><div class=\"rule-num\"></div><div class=\"rule-text\"><strong>Advice and recommendations</strong> \u2014 <em>\"You should see a doctor.\"</em> / <em>\"We should book early.\"</em> The speaker believes it is the right thing to do.</div></div>\n<div class=\"rule\"><div class=\"rule-num\"></div><div class=\"rule-text\"><strong>Asking for advice</strong> \u2014 <em>\"What should I do?\"</em> / <em>\"Should I tell her?\"</em> These invite a recommendation. Answer with <em>should</em> or <em>shouldn't</em>.</div></div>\n<div class=\"rule\"><div class=\"rule-num\"></div><div class=\"rule-text\"><strong>Shouldn't</strong> = bad idea, advise against it. Not the same as forbidden. <em>\"You shouldn't eat so much sugar\"</em> = bad idea, but no rule stops you.</div></div>\n<div class=\"note\"><strong>Should vs must vs mustn't:</strong><br>\n<em>\"You should exercise more.\"</em> \u2014 advice, good idea.<br>\n<em>\"You must wear a seatbelt.\"</em> \u2014 obligation, it is the law.<br>\n<em>\"You mustn't smoke here.\"</em> \u2014 prohibition, it is not allowed.<br>\n<em>\"You shouldn't smoke so much.\"</em> \u2014 advice against it, but not forbidden.</div>",table:{headers:["Form","Example","What it means"],rows:[["should + base verb","You should see a doctor.","I recommend it \u2014 it's a good idea"],["shouldn't + base verb","You shouldn't drive if you're tired.","I advise against it \u2014 bad idea, not forbidden"],["Should + subject + base verb?","Should I apologise? / What should I wear?","Asking for advice or a recommendation"],["Short answers","Yes, you should. / No, you shouldn't.","Never: Yes, you should to."],["should vs must","You should exercise more. (advice)","You must wear a seatbelt. (law/rule)"],["shouldn't vs mustn't","You shouldn't eat so much. (bad idea)","You mustn't smoke here. (prohibited, forbidden)"]]},examples:[{type:"pos",eng:"You should see a doctor.",note:"Giving advice."},{type:"pos",eng:"We should book early \u2014 it gets busy.",note:"Recommendation."},{type:"pos",eng:"Children should eat more vegetables.",note:"General recommendation."},{type:"neg",eng:"You shouldn't stay up so late.",note:"Advising against something."},{type:"q",eng:"Should I apologise?",note:"Asking for advice."},{type:"q",eng:"What should I wear?",note:"Asking for a recommendation."}],errors:[{bad:"You should to rest.",good:"You should rest.",reason:"No to after modal verbs."},{bad:"She shoulds call him.",good:"She should call him.",reason:"Should never adds -s for third person."},{bad:"You shouldn't to worry.",good:"You shouldn't worry.",reason:"Shouldn't + base form, no to."},{bad:"Should I to bring anything?",good:"Should I bring anything?",reason:"No to after should in questions."}],realUse:["\"You should try it \u2014 it's amazing.\" \u2014 enthusiastic recommendation.","\"I really think you should talk to her.\" \u2014 strong but tactful advice.","\"You should have called.\" \u2014 past advice (should have + past participle).","\"Shouldn't you be at work?\" \u2014 questioning someone's actions."],exercises:[{type:"gap",title:"Should or shouldn't?",sub:"Fill each gap with should or shouldn't.",items:[{answer:"should",before:"You ",after:" see a doctor about that cough."},{answer:"shouldn't",before:"You ",after:" eat so much junk food."},{answer:"should",before:"We ",after:" book the tickets in advance."},{answer:"shouldn't",before:"Children ",after:" spend too much time on screens."},{answer:"should",before:"I think you ",after:" apologise."},{answer:"shouldn't",before:"You ",after:" drive if you're tired."},{answer:"should",before:"She ",after:" call her parents more often."},{answer:"shouldn't",before:"He ",after:" work so hard \u2014 it's not healthy."}]},{type:"mc",title:"Giving advice",sub:"Choose the best option.",items:[{q:"I have a headache. What _____ I do?",opts:["should","shall","must","am"],answer:"should",explanation:"Asking for advice \u2014 should."},{q:"You look exhausted. You _____ take a break.",opts:["should to","should","shouldn't to","shoulds"],answer:"should",explanation:"Should + base form."},{q:"It's very hot. You _____ drink more water.",opts:["should","shouldn't","mustn't","should to"],answer:"should",explanation:"Recommendation \u2014 should."},{q:"He _____ stay up late \u2014 he has an exam tomorrow.",opts:["shouldn't","should","must","should to"],answer:"shouldn't",explanation:"Advising against \u2014 shouldn't."}]},{type:"convo",title:"Fill the conversation",sub:"Complete the dialogue with should or shouldn't.",lines:[{speaker:"A",text:"I've got a really bad cold. What [should] I do?"},{speaker:"B",text:"You [should] rest and drink lots of fluids."},{speaker:"A",text:"[Should] I go to work tomorrow?"},{speaker:"B",text:"No, you [shouldn't]. You [should] stay at home."},{speaker:"A",text:"And [should] I take any medicine?"},{speaker:"B",text:"You [should] take something for the fever, but you [shouldn't] take too many pills."}]},{type:"transform",title:"Sentence transformation",sub:"Rewrite using should or shouldn't.",items:[{original:"My advice is: see a doctor.",keyword:"should",answer:"You should see a doctor."},{original:"It's not a good idea to eat before swimming.",keyword:"shouldn't",answer:"You shouldn't eat before swimming."},{original:"What's the best thing to do?",keyword:"should",answer:"What should I do?"},{original:"Taking a jacket is a good idea.",keyword:"should",answer:"You should take a jacket."}]},{type:"ec",title:"Error correction",sub:"One error per sentence.",items:[{wrong:"You should to rest.",correct:"You should rest.",hint:"No to after modal verbs."},{wrong:"She shoulds call him.",correct:"She should call him.",hint:"Should never adds -s."},{wrong:"You shouldn't to worry.",correct:"You shouldn't worry.",hint:"Shouldn't + base form, no to."},{wrong:"Should I to bring anything?",correct:"Should I bring anything?",hint:"No to in questions either."},{wrong:"He should resting more.",correct:"He should rest more.",hint:"Should + base form, not -ing."}]}]},
+
+{id:"musthaveto",title:"Modal: must / have to",subtitle:"You must stop, I have to work",intro:"Obligation and necessity \u2014 and the important difference between them.",desc:"Both express obligation, but they come from different sources. Must is internal \u2014 the speaker imposes it. Have to is external \u2014 rules, laws, or circumstances impose it.",tip:"The key distinction: <strong>must</strong> = I am telling you (my authority), <strong>have to</strong> = the rules/situation require it. For day-to-day necessity in speech, <em>have to</em> is more common than <em>must</em>.",explanation:"<p>Both express <strong>obligation</strong> \u2014 something that is necessary. The key question is: <em>who is imposing it?</em></p>\n<div class=\"rule\"><div class=\"rule-num\"></div><div class=\"rule-text\"><strong>Must</strong> \u2014 the obligation comes from <em>the speaker</em>. Your own strong feeling, or you imposing the rule. <em>\"You must try this cake!\"</em> (my insistence). <em>\"I must call her.\"</em> (my strong feeling).</div></div>\n<div class=\"rule\"><div class=\"rule-num\"></div><div class=\"rule-text\"><strong>Have to</strong> \u2014 the obligation comes from <em>outside</em>: rules, laws, other people, schedules. <em>\"I have to be at work by 9.\"</em> (the company's rule). <em>\"She has to take medication.\"</em> (doctor's orders).</div></div>\n<div class=\"note\"><strong>The negatives mean completely different things:</strong><br>\n<strong>Mustn't</strong> = PROHIBITED \u2014 it is not allowed. <em>\"You mustn't park here.\"</em><br>\n<strong>Don't have to</strong> = NOT NECESSARY \u2014 optional, your choice. <em>\"You don't have to wear a tie.\"</em><br>\nConfusing these two is one of the most common grammar mistakes at A2.</div>\n<p style=\"margin-top:14px\">Have to conjugates normally: <em>I/you/we/they have to</em>, <em>he/she/it has to</em>. Past: <strong>had to</strong> (must has no past form).</p>",table:{headers:["Form","Example","What it means / source of obligation"],rows:[["must + base verb","You must try this! / I must call her.","Obligation from the speaker or strong personal feeling"],["have to / has to + base verb","I have to work Saturdays. / She has to take medicine.","Obligation from external rules, laws, or circumstances"],["mustn't + base verb","You mustn't park here.","PROHIBITED \u2014 it is not allowed at all"],["don't / doesn't have to + base verb","You don't have to wear a tie.","NOT NECESSARY \u2014 optional, your choice, no obligation"],["had to + base verb (past)","I had to wait two hours. / She had to cancel.","Past obligation (must has no past form)"],["Key question","\u2014","Who is imposing it?  Me \u2192 must.  Rules/situation \u2192 have to."]]},examples:[{type:"pos",eng:"You must try this \u2014 it's incredible.",note:"Personal strong recommendation."},{type:"pos",eng:"I have to be at work by 8.",note:"External obligation \u2014 work schedule."},{type:"pos",eng:"She has to take medicine three times a day.",note:"Has to for he/she/it."},{type:"neg",eng:"You mustn't smoke in here.",note:"Prohibition \u2014 it is forbidden."},{type:"neg",eng:"You don't have to wear a tie.",note:"Not necessary \u2014 but you can if you want."},{type:"q",eng:"Do you have to work on Saturdays?",note:"Question about external obligation."}],errors:[{bad:"I must to go now.",good:"I have to go now.",reason:"Must + base form \u2014 no to. For external necessity, have to is more natural."},{bad:"She have to work on Sundays.",good:"She has to work on Sundays.",reason:"He/she/it \u2192 has to."},{bad:"I had must leave early.",good:"I had to leave early.",reason:"Past of must \u2192 had to."},{bad:"You don't must park here.",good:"You mustn't park here.",reason:"Negative of must \u2192 mustn't."}],realUse:["\"You must come to dinner sometime.\" \u2014 strong social invitation.","\"I really have to go \u2014 my train leaves in ten minutes.\" \u2014 external pressure.","\"You don't have to do this.\" \u2014 reassurance that something is optional.","\"She had to cancel everything.\" \u2014 past obligation with had to."],exercises:[{type:"gap",title:"Must or have to?",sub:"Fill each gap with the correct form of must or have to.",items:[{answer:"must",before:"You ",after:" try this cake \u2014 it's amazing!"},{answer:"have to",before:"I ",after:" be at the airport by six. (external rule)"},{answer:"has to",before:"She ",after:" take this medication every day."},{answer:"must",before:"You ",after:" see this film \u2014 it's incredible."},{answer:"had to",before:"We ",after:" wait two hours for the bus yesterday."},{answer:"have to",before:"Do you ",after:" work on weekends?"},{answer:"has to",before:"He ",after:" wear a uniform at work."},{answer:"must",before:"I ",after:" remember to call my mother."}]},{type:"gap",title:"Mustn't or don't have to?",sub:"Fill each gap \u2014 prohibition (mustn't) or not necessary (don't/doesn't have to)?",items:[{answer:"mustn't",before:"You ",after:" smoke in this building. (prohibited)"},{answer:"don't have to",before:"You ",after:" wear a tie \u2014 it's casual. (not necessary)"},{answer:"mustn't",before:"Students ",after:" use phones during the exam. (prohibited)"},{answer:"doesn't have to",before:"She ",after:" cook tonight \u2014 we're going out. (not necessary)"},{answer:"mustn't",before:"You ",after:" tell anyone \u2014 it's a secret. (prohibited)"},{answer:"don't have to",before:"You ",after:" pay now \u2014 you can pay later. (not necessary)"}]},{type:"mc",title:"Choose the correct form",sub:"Choose must, mustn't, have to, or don't have to.",items:[{q:"The sign says: No entry. You _____ go in there.",opts:["don't have to","must","mustn't","have to"],answer:"mustn't",explanation:"Mustn't = it is prohibited."},{q:"It's Sunday \u2014 I _____ get up early.",opts:["mustn't","must","don't have to","had to"],answer:"don't have to",explanation:"Don't have to = not necessary."},{q:"I _____ renew my passport before the trip. It expires next month.",opts:["must","mustn't","don't have to","should to"],answer:"must",explanation:"Personal strong necessity \u2014 must."},{q:"She _____ be at the office at 9 \u2014 it's company policy.",opts:["must","has to","mustn't","should"],answer:"has to",explanation:"External rule/policy \u2014 has to."}]},{type:"tf",title:"True, False, or Not given",sub:"Read the sentence. Is the statement true, false, or not given?",items:[{context:"You don't have to come.",statement:"Coming is forbidden.",answer:"False",explanation:"Don't have to means it is not necessary \u2014 not that it is forbidden."},{context:"She must call him.",statement:"The obligation comes from the speaker or a strong personal feeling.",answer:"True",explanation:"Must expresses the speaker's authority or strong feeling."},{context:"I had to work late.",statement:"This happened in the past.",answer:"True",explanation:"Had to is the past form of have to."},{context:"You mustn't park here.",statement:"Parking here is permitted if you pay.",answer:"False",explanation:"Mustn't means it is prohibited \u2014 full stop."}]},{type:"ec",title:"Error correction",sub:"One error per sentence.",items:[{wrong:"I must to go now.",correct:"I must go now.",hint:"Must + base form, no to."},{wrong:"She have to work on Sundays.",correct:"She has to work on Sundays.",hint:"He/she/it \u2192 has to."},{wrong:"I had must leave early.",correct:"I had to leave early.",hint:"Past of must \u2192 had to."},{wrong:"You don't must park here.",correct:"You mustn't park here.",hint:"Negative of must \u2192 mustn't."},{wrong:"He must to wear a uniform.",correct:"He has to wear a uniform.",hint:"External rule \u2192 have to. And no to after must."}]}]},
+
+{id:"adverbsfreq",title:"Adverbs of frequency",subtitle:"always, usually, often, sometimes, never",intro:"How often? Adverbs that describe the frequency of an action.",desc:"Adverbs of frequency are easy to understand but students often put them in the wrong position in the sentence.",tip:"Position is the key thing: adverbs of frequency go <strong>before the main verb</strong> but <strong>after the verb to be</strong>. <em>\"I always eat breakfast.\"</em> But: <em>\"I am always tired on Mondays.\"</em>",explanation:"<p>Adverbs of frequency say <strong>how often</strong> something happens. The meaning is easy \u2014 the difficulty is <strong>position</strong>.</p>\n<div class=\"rule\"><div class=\"rule-num n\">1</div><div class=\"rule-text\"><strong>Before the main verb:</strong> I <em>always</em> have breakfast. &nbsp;She <em>never</em> eats meat. &nbsp;We <em>often</em> go out.</div></div>\n<div class=\"rule\"><div class=\"rule-num n\">2</div><div class=\"rule-text\"><strong>After the verb to be (am/is/are/was/were):</strong> She <em>is always</em> late. &nbsp;He <em>was never</em> happy. \u2014 The opposite of rule 1, and where most mistakes happen.</div></div>\n<div class=\"rule\"><div class=\"rule-num n\">3</div><div class=\"rule-text\"><strong>In negatives \u2014 between auxiliary and main verb:</strong> I <em>don't usually</em> drink coffee. \u2014 NOT <em>I usually don't drink coffee.</em></div></div>\n<div class=\"note\"><em>Sometimes, usually</em> and <em>often</em> can also go at the start of a sentence for emphasis: <em>\"Sometimes I regret it.\"</em> But mid-sentence is always safe for all adverbs.</div>",table:{headers:["Adverb","Rough frequency","Example sentence"],rows:[["always","100% \u2014 every time","I always have coffee in the morning."],["usually / normally","~80% \u2014 most of the time","She usually walks to work."],["often / frequently","~60% \u2014 more often than not","We often eat out at the weekend."],["sometimes","~40% \u2014 roughly half the time","I sometimes work late."],["occasionally","~20\u201330%","He occasionally misses class."],["rarely / seldom","~10%","She rarely complains."],["hardly ever","~5% \u2014 close to never","I hardly ever watch TV."],["never","0% \u2014 not once","I never eat fast food."],["Rule: with to be","AFTER am/is/are/was/were","She is always tired. / He was never happy."],["Rule: with other verbs","BEFORE the main verb","I always check my email. / She never eats meat."],["Rule: in negatives","between auxiliary and verb","I don't usually drink coffee late."]]},examples:[{type:"pos",eng:"I always check my email first thing.",note:"Before the main verb (check)."},{type:"pos",eng:"She is usually tired on Mondays.",note:"After to be (is)."},{type:"pos",eng:"We often eat out at the weekend.",note:"Before the main verb (eat)."},{type:"neg",eng:"I don't usually drink coffee in the evening.",note:"Between don't and the main verb."},{type:"q",eng:"Do you often cook at home?",note:"Often goes after the subject in questions."},{type:"q",eng:"How often do you go to the gym?",note:"How often = asking about frequency."}],errors:[{bad:"I go always to the gym on Mondays.",good:"I always go to the gym on Mondays.",reason:"Adverbs of frequency go before the main verb, not after it."},{bad:"He never is happy.",good:"He is never happy.",reason:"After to be \u2014 never comes after is/am/are/was/were."},{bad:"She is often arriving late.",good:"She often arrives late.",reason:"Adverbs of frequency go with the simple form, not continuous."},{bad:"Do you go often to the cinema?",good:"Do you often go to the cinema?",reason:"Often goes before the main verb in questions."}],realUse:["\"I hardly ever...\" = almost never \u2014 very natural in British English.","\"How often do you...?\" \u2014 the question form for frequency.","\"Once/twice/three times a week\" \u2014 specific frequency expressions.","\"Every day / every week\" \u2014 can replace or complement adverbs."],exercises:[{type:"gap",title:"Position of adverbs of frequency",sub:"Add the adverb in brackets in the correct position.",items:[{answer:"I always have coffee in the morning.",before:"always: I ",after:" have coffee in the morning."},{answer:"She is usually late.",before:"usually: She ",after:" is late."},{answer:"We often go out at the weekend.",before:"often: We ",after:" go out at the weekend."},{answer:"He is never happy.",before:"never: He ",after:" is happy."},{answer:"They sometimes eat out.",before:"sometimes: They ",after:" eat out."},{answer:"She rarely complains.",before:"rarely: She ",after:" complains."}]},{type:"mc",title:"Choose the correct position",sub:"Where does the adverb go?",items:[{q:"I ___ eat breakfast before 7am. (always)",opts:["always eat","eat always","am always eating","always am eating"],answer:"always eat",explanation:"Before the main verb (eat)."},{q:"She ___ late for meetings. (is / never)",opts:["never is","is never","is always","never are"],answer:"is never",explanation:"After the verb to be: is never."},{q:"They ___ to the cinema. (go / sometimes)",opts:["sometimes go","go sometimes","sometimes goes","goes sometimes"],answer:"sometimes go",explanation:"Before the main verb (go)."},{q:"Do you ___ exercise? (often)",opts:["often","often do","do often","does often"],answer:"often",explanation:"In questions, the adverb comes after the subject."}]},{type:"categorise",title:"How frequent?",sub:"Click an adverb, then click the correct column.",categories:[{name:"High frequency (60\u2013100%)",items:["always","usually","normally","often","frequently"]},{name:"Medium frequency (~40%)",items:["sometimes","occasionally"]},{name:"Low frequency (0\u201320%)",items:["rarely","seldom","hardly ever","never"]}]},{type:"convo",title:"Fill the conversation",sub:"Complete the dialogue with an adverb of frequency.",lines:[{speaker:"A",text:"How often do you cook at home?"},{speaker:"B",text:"I [usually] cook during the week, but at weekends I [sometimes] go out."},{speaker:"A",text:"Do you [always] eat breakfast?"},{speaker:"B",text:"Yes, I [always] have something \u2014 even just a coffee."},{speaker:"A",text:"And do you eat fast food?"},{speaker:"B",text:"I [rarely] eat it \u2014 maybe once a month. I [never] eat it before an exam!"}]},{type:"ec",title:"Error correction",sub:"One error per sentence.",items:[{wrong:"I go always to the gym on Mondays.",correct:"I always go to the gym on Mondays.",hint:"Adverbs of frequency go before the main verb."},{wrong:"She never is late.",correct:"She is never late.",hint:"After to be \u2014 never comes after is/am/are."},{wrong:"He is often arriving late.",correct:"He often arrives late.",hint:"Use simple form, not continuous."},{wrong:"Do you go often to the cinema?",correct:"Do you often go to the cinema?",hint:"Often goes before the main verb."},{wrong:"I usually don't like it.",correct:"I don't usually like it.",hint:"Between auxiliary and main verb in negatives."}]}]},
+
+{id:"relativeclauses",title:"Relative clauses",subtitle:"who, which, that",intro:"Adding information about a noun using who, which, and that.",desc:"Relative clauses allow you to add information about a person or thing without starting a new sentence. They make speech and writing much more fluent.",tip:"The key decision is <strong>who vs which</strong>: <em>who</em> for people, <em>which</em> for things. <em>That</em> can replace either. At A2, focus on defining clauses where the information is essential to identify which person or thing you mean.",explanation:"<p>A relative clause adds information about a noun \u2014 attached directly, without starting a new sentence. It makes sentences flow naturally instead of sounding choppy.</p>\n<p><strong>Choosing the right pronoun:</strong></p>\n<div class=\"rule\"><div class=\"rule-num\"></div><div class=\"rule-text\"><strong>who</strong> \u2014 for people. <em>\"The teacher who helped me.\"</em></div></div>\n<div class=\"rule\"><div class=\"rule-num\"></div><div class=\"rule-text\"><strong>which</strong> \u2014 for things and animals. <em>\"The book which I recommended.\"</em></div></div>\n<div class=\"rule\"><div class=\"rule-num\"></div><div class=\"rule-text\"><strong>that</strong> \u2014 for both people and things (in defining clauses). <em>\"The man that I met.\"</em> &nbsp;/&nbsp; <em>\"The film that won.\"</em></div></div>\n<div class=\"rule\"><div class=\"rule-num\"></div><div class=\"rule-text\"><strong>where</strong> \u2014 for places. <em>\"The city where I grew up.\"</em></div></div>\n<div class=\"rule\"><div class=\"rule-num\"></div><div class=\"rule-text\"><strong>whose</strong> \u2014 for possession. <em>\"The student whose essay won\"</em> = the student's essay won.</div></div>\n<div class=\"note\"><strong>Critical rule:</strong> Do not repeat the subject pronoun inside the clause.<br><em>\"The house where I grew up <u>it</u> is old.\"</em> \u2014 remove the <em>it</em>. The relative pronoun has already replaced it.</div>",table:{headers:["Pronoun","Used for","Example","Can use 'that' instead?"],rows:[["who","people","the teacher who helped me","yes \u2014 'the teacher that helped me'"],["which","things / animals","the book which I lent you","yes \u2014 'the book that I lent you'"],["that","people or things (defining)","the man that I met / the film that won","\u2014"],["where","places","the caf\u00e9 where we met","no"],["whose","possession \u2014 who something belongs to","the student whose essay won","no"],["when","points in time","the day when I arrived","sometimes"],["Rule: no repeated subject","\u2014","The house where I grew up is old. \u2713","NOT: The house where I grew up it is old. \u2717"]]},examples:[{type:"pos",eng:"She's the teacher who changed my life.",note:"Who for a person."},{type:"pos",eng:"That's the film which won the Oscar.",note:"Which for a thing."},{type:"pos",eng:"This is the caf\u00e9 where we first met.",note:"Where for a place."},{type:"pos",eng:"I have a friend whose father is a doctor.",note:"Whose = possession."},{type:"q",eng:"What's the name of the man who called?",note:"Relative clause in a question."},{type:"q",eng:"Is this the book that you recommended?",note:"That can replace which."}],errors:[{bad:"She's the woman which called.",good:"She's the woman who called.",reason:"Who for people, which for things."},{bad:"That's the film who won the award.",good:"That's the film which won the award.",reason:"Which for things, who for people."},{bad:"The house where I grew up it is in the north.",good:"The house where I grew up is in the north.",reason:"Don't repeat the subject \u2014 the relative clause replaces it."},{bad:"He's a friend which I trust completely.",good:"He's a friend who I trust completely.",reason:"Who or that for people."}],realUse:["\"The reason why I came here.\" \u2014 why as relative pronoun for reasons.","\"The day when I met her.\" \u2014 when as relative pronoun for time.","\"Everything that glitters is not gold.\" \u2014 proverb with that.","\"That's what I mean.\" \u2014 what as relative pronoun."],exercises:[{type:"gap",title:"Who, which, where, or whose?",sub:"Fill each gap with who, which, where, or whose.",items:[{answer:"who",before:"She's the teacher ",after:" helped me most."},{answer:"which",before:"That's the film ",after:" won the Oscar."},{answer:"where",before:"This is the caf\u00e9 ",after:" we first met."},{answer:"whose",before:"He's the student ",after:" work was the best."},{answer:"who",before:"Do you know the man ",after:" called this morning?"},{answer:"which",before:"I've lost the keys ",after:" you gave me."},{answer:"where",before:"That's the hotel ",after:" we stayed last year."},{answer:"who",before:"The woman ",after:" lives next door is a doctor."}]},{type:"builder",title:"Sentence builder",sub:"Combine the two sentences using a relative clause.",items:[{words:["the","man","who","called","is","my","brother"],answer:"the man who called is my brother",context:"A man called. He is my brother."},{words:["that's","the","book","which","I","recommended"],answer:"that's the book which I recommended",context:"That's a book. I recommended it."},{words:["she","works","in","a","hospital","which","is","very","famous"],answer:"she works in a hospital which is very famous",context:"She works in a hospital. The hospital is very famous."},{words:["he's","a","teacher","whose","classes","I","love"],answer:"he's a teacher whose classes I love",context:"He's a teacher. I love his classes."},{words:["that's","the","city","where","I","was","born"],answer:"that's the city where I was born",context:"That's a city. I was born there."}]},{type:"mc",title:"Who, which, that, or where?",sub:"Choose the correct relative pronoun.",items:[{q:"The man _____ I spoke to was very helpful.",opts:["which","whose","who","where"],answer:"who",explanation:"The man is a person \u2014 who or that."},{q:"The hotel _____ we stayed was beautiful.",opts:["which","who","that","where"],answer:"where",explanation:"A place \u2014 where."},{q:"I bought a book _____ explains everything clearly.",opts:["who","whose","which","where"],answer:"which",explanation:"A book is a thing \u2014 which or that."},{q:"She's the student _____ got the highest mark.",opts:["which","whose","where","who"],answer:"who",explanation:"A student is a person \u2014 who or that."}]},{type:"tf",title:"True, False, or Not given",sub:"Is the statement true, false, or not given?",items:[{context:"She's the teacher who changed my life.",statement:"The relative clause tells us which teacher is meant.",answer:"True",explanation:"This is a defining relative clause \u2014 it identifies which specific teacher."},{context:"That's the film which won the Oscar.",statement:"We could replace 'which' with 'who' here.",answer:"False",explanation:"Film is a thing \u2014 we must use which or that, not who."},{context:"The house where I grew up is in the north.",statement:"The speaker grew up in the north.",answer:"True",explanation:"The house where they grew up is in the north."},{context:"I have a friend whose father is a doctor.",statement:"The speaker's father is a doctor.",answer:"False",explanation:"Whose refers to the friend's father, not the speaker's."}]},{type:"ec",title:"Error correction",sub:"One error per sentence.",items:[{wrong:"She's the woman which called.",correct:"She's the woman who called.",hint:"Who for people."},{wrong:"That's the film who won the award.",correct:"That's the film which won the award.",hint:"Which for things."},{wrong:"The house where I grew up it is old.",correct:"The house where I grew up is old.",hint:"Don't repeat the subject."},{wrong:"He's a friend which I trust.",correct:"He's a friend who I trust.",hint:"Who or that for people."},{wrong:"The city who I was born in is Madrid.",correct:"The city where I was born is Madrid.",hint:"Where for places."}]}]},
+
+{id:"conjunctions",title:"Conjunctions",subtitle:"because, so, but, although, when, if",intro:"Joining ideas together to make complex, natural sentences.",desc:"Conjunctions are what make sentences flow. Without them, every idea lives in isolation. With them, you can express cause, contrast, result, condition and more.",tip:"The most common confusion is between <strong>because</strong> and <strong>so</strong>. They are opposites in structure: <em>because</em> introduces the reason, <em>so</em> introduces the result. Same meaning, opposite order.",explanation:"<p>Conjunctions join two clauses into one sentence. The conjunction signals the <strong>logical relationship</strong> between the ideas.</p>\n<div class=\"rule\"><div class=\"rule-num\"></div><div class=\"rule-text\"><strong>Because vs so</strong> \u2014 both express cause and effect, from opposite directions. <em>Because</em> = the reason. <em>So</em> = the result. <em>\"I stayed home because I was ill.\"</em> &nbsp;/&nbsp; <em>\"I was ill, so I stayed home.\"</em> Same situation, opposite structure. Comma before <em>so</em>.</div></div>\n<div class=\"rule\"><div class=\"rule-num\"></div><div class=\"rule-text\"><strong>But vs although</strong> \u2014 both express contrast. <em>But</em> joins two equal ideas. <em>Although/even though</em> introduces the surprising part. <strong>Never use both together</strong> \u2014 <em>\"Although it was cold, but I went out\"</em> is wrong. One conjunction is enough.</div></div>\n<div class=\"rule\"><div class=\"rule-num\"></div><div class=\"rule-text\"><strong>Unless</strong> = if not. <em>\"I won't go unless you come\"</em> = <em>\"I won't go if you don't come.\"</em></div></div>\n<div class=\"note\"><strong>After time conjunctions (when, before, after, until, as soon as)</strong> \u2014 use <strong>present simple</strong> for future meaning, never will.<br><em>\"I'll call you when I arrive.\"</em> &nbsp;NOT&nbsp; <em>\"when I will arrive.\"</em></div>",table:{headers:["Conjunction","Logical relationship","Example","Key note"],rows:[["because","introduces the reason/cause","I left because I was tired.","Answers 'why?' \u2014 no comma needed before because"],["so","introduces the result/effect","I was tired, so I left.","Comma before so"],["but","simple contrast \u2014 unexpected idea","I like him, but he's annoying.","Comma before but"],["although / even though","strong contrast \u2014 surprising fact","Although it was cold, we went out.","Never use with but in same clause"],["if","condition \u2014 one thing depends on another","I'll come if I finish early.","Present simple after if for future"],["unless","negative condition (= if not)","I won't go unless you come.","= I won't go if you don't come"],["when","time \u2014 future event will happen","Call me when you arrive.","Present simple NOT will \u2014 never 'when I will arrive'"],["while","two actions at the same time","She reads while she eats.","Often used with continuous tense"],["before / after","sequence of events","Wash your hands before you eat.","Present simple for future after these too"]]},examples:[{type:"pos",eng:"I couldn't sleep because it was too hot.",note:"Because introduces the reason."},{type:"pos",eng:"It was too hot, so I couldn't sleep.",note:"So introduces the result."},{type:"pos",eng:"I like him, but he can be very annoying.",note:"But introduces a contrast."},{type:"pos",eng:"Although it was expensive, I bought it.",note:"Although at the start of a sentence."},{type:"q",eng:"Why did you leave? \u2014 Because I was tired.",note:"Because answers a why question."},{type:"q",eng:"Will you come if I invite you?",note:"If introduces a condition."}],errors:[{bad:"I was tired. Because I worked all day.",good:"I was tired because I worked all day.",reason:"Because cannot start a standalone sentence \u2014 it must join two clauses."},{bad:"Although it was cold, but I went out.",good:"Although it was cold, I went out.",reason:"Don't use although and but together \u2014 one is enough."},{bad:"I'll call you if I'll arrive.",good:"I'll call you when I arrive.",reason:"After time conjunctions (when, before, after), use present simple \u2014 not will."},{bad:"I like coffee. So I drink it every day.",good:"I like coffee, so I drink it every day.",reason:"So should join the clauses with a comma, not a full stop."}],realUse:["\"Because of\" + noun vs \"because\" + clause \u2014 both correct, different structure.","\"Even though\" is stronger than \"although\" \u2014 both correct at A2.","\"Unless = if not\": \"I won't go unless you come\" = \"I won't go if you don't come.\"","\"However\" = but, used at the start of a new sentence with a comma."],exercises:[{type:"gap",title:"Choose the conjunction",sub:"Fill each gap with because, so, but, although, if, or when.",items:[{answer:"because",before:"I stayed home ",after:" I was ill."},{answer:"so",before:"I was ill, ",after:" I stayed home."},{answer:"but",before:"I like him, ",after:" he can be very annoying."},{answer:"Although",before:"",after:" it was cold, we went for a walk."},{answer:"if",before:"I'll come ",after:" I finish early."},{answer:"when",before:"Call me ",after:" you arrive."},{answer:"because",before:"She was happy ",after:" she got the job."},{answer:"so",before:"It was raining, ",after:" we took a taxi."}]},{type:"mc",title:"Because, so, but, or although?",sub:"Choose the most natural conjunction.",items:[{q:"I was exhausted, _____ I went to bed early.",opts:["because","although","so","but"],answer:"so",explanation:"Result clause \u2014 so."},{q:"I went to bed early _____ I was exhausted.",opts:["so","although","but","because"],answer:"because",explanation:"Reason clause \u2014 because."},{q:"She studied hard, _____ she failed the exam.",opts:["so","because","but","although"],answer:"but",explanation:"Unexpected contrast \u2014 but."},{q:"_____ she studied hard, she failed the exam.",opts:["Because","So","But","Although"],answer:"Although",explanation:"Contrast at the start of a sentence \u2014 although."}]},{type:"transform",title:"Sentence transformation",sub:"Rewrite using the conjunction given.",items:[{original:"I was tired. I worked all day.",keyword:"because",answer:"I was tired because I worked all day."},{original:"It was expensive. I bought it.",keyword:"although",answer:"Although it was expensive, I bought it."},{original:"She was tired. She went to bed early.",keyword:"so",answer:"She was tired, so she went to bed early."},{original:"I won't go if you don't come.",keyword:"unless",answer:"I won't go unless you come."},{original:"He arrived. I called him.",keyword:"when",answer:"I called him when he arrived."}]},{type:"ec",title:"Error correction",sub:"One error per sentence.",items:[{wrong:"I was tired. Because I worked all day.",correct:"I was tired because I worked all day.",hint:"Because can't start a standalone sentence."},{wrong:"Although it was cold, but I went out.",correct:"Although it was cold, I went out.",hint:"Don't use although and but together."},{wrong:"I'll call you when I'll arrive.",correct:"I'll call you when I arrive.",hint:"After when/if/before/after, use present simple."},{wrong:"I like coffee. So I drink it every day.",correct:"I like coffee, so I drink it every day.",hint:"So joins clauses \u2014 use a comma."},{wrong:"She went out although the rain.",correct:"She went out although it was raining.",hint:"Although introduces a clause, not a noun."}]}]},
+
+{id:"preposmovement",title:"Prepositions of movement",subtitle:"into, out of, along, past, through",intro:"Where are you going? Prepositions that describe movement through space.",desc:"Prepositions of place say where something is. Prepositions of movement say where something is going. They often pair with verbs like go, walk, run, drive, come.",tip:"The most common confusion is <strong>in vs into</strong> and <strong>on vs onto</strong>. <em>In/on</em> = static position. <em>Into/onto</em> = movement in that direction. \"The cat is in the box.\" (position) vs \"The cat jumped into the box.\" (movement).",explanation:"<p>Prepositions of movement describe <strong>direction and path</strong> \u2014 where something is going, not where it is. They pair with movement verbs: walk, run, drive, jump, get, go, come, fly, swim, climb.</p>\n<div class=\"note\"><strong>Position vs movement \u2014 the most important distinction:</strong><br>\n<em>In / on / at</em> = where something <em>is</em> (static). &nbsp;<em>\"The cat is in the box.\"</em><br>\n<em>Into / onto</em> = movement <em>towards</em> that position. &nbsp;<em>\"The cat jumped into the box.\"</em><br>\nThis is the most common error \u2014 using <em>in</em> when you mean <em>into</em>.</div>\n<div class=\"rule\"><div class=\"rule-num\"></div><div class=\"rule-text\"><strong>Through vs across</strong> \u2014 both mean from one side to the other. <em>Through</em> = enclosed space (a tunnel, a forest, a crowd). <em>Across</em> = open flat surface (a lake, a road, a field).</div></div>\n<div class=\"rule\"><div class=\"rule-num\"></div><div class=\"rule-text\"><strong>Transport fixed expressions:</strong> <em>get on / get off</em> = public transport (bus, train, plane, bike). <em>Get into / get out of</em> = private vehicles (car, taxi). These are fixed \u2014 <em>get in the bus</em> sounds wrong.</div></div>\n<div class=\"rule\"><div class=\"rule-num\"></div><div class=\"rule-text\"><strong>Along</strong> = following the length of something: a road, a river, a corridor, a beach. <em>\"We walked along the river.\"</em></div></div>\n<div class=\"rule\"><div class=\"rule-num\"></div><div class=\"rule-text\"><strong>Past</strong> = movement beyond a point without stopping. Common in directions: <em>\"Go past the church and turn left.\"</em> \u2014 turn left / right, no preposition needed with <em>turn</em>.</div></div>",table:{headers:["Preposition","Direction / path","Example","Contrast / note"],rows:[["into","towards the inside of something","She walked into the room.","vs in = static: she is in the room"],["out of","from inside to outside","He came out of the building.","opposite of into"],["onto","towards a surface","The cat jumped onto the table.","vs on = static: the cat is on the table"],["off","away from a surface or vehicle","She got off the bus.","get off = public transport"],["through","inside an enclosed space, one side to the other","They drove through the tunnel.","enclosed / surrounded"],["across","one side to the other over an open surface","She swam across the lake.","flat, open surface"],["along","following the length of something","We walked along the river.","a path, road, corridor, beach"],["past","beyond a fixed point without stopping","Go past the school and turn left.","directions"],["up / down","towards a higher or lower point","He ran up the stairs.","vertical movement"],["around","in a circuit or loop","They walked around the lake.","circular path"]]},examples:[{type:"pos",eng:"She walked into the caf\u00e9.",note:"Movement to the inside of somewhere."},{type:"pos",eng:"He got off the train at Madrid.",note:"Movement away from public transport."},{type:"pos",eng:"We drove through the mountains.",note:"Movement passing through a space."},{type:"pos",eng:"Go along this road and turn right.",note:"Following a path."},{type:"q",eng:"How do I get to the station?",note:"Asking for directions \u2014 uses movement prepositions in the answer."},{type:"q",eng:"Did you walk through the park?",note:"Through for movement that enters and exits."}],errors:[{bad:"She went in the shop.",good:"She went into the shop.",reason:"Movement towards the inside \u2014 into (not in)."},{bad:"He jumped on the bus.",good:"He got on the bus.",reason:"For public transport: get on/off."},{bad:"Go past the traffic lights and turn on the left.",good:"Go past the traffic lights and turn left.",reason:"Turn left/right \u2014 no on."},{bad:"They walked trough the park.",good:"They walked through the park.",reason:"Spelling: through."}],realUse:["\"Get on/off\" \u2014 bus, train, plane, bike. \"Get in/out of\" \u2014 car, taxi.","\"Walk past\" = pass by without stopping. \"Go through\" = enter and exit.","\"Up and down the street.\" \u2014 common phrase for describing movement.","\"Turn left/right\" \u2014 no preposition needed with turn."],exercises:[{type:"gap",title:"Prepositions of movement",sub:"Fill each gap with the correct preposition of movement.",items:[{answer:"into",before:"She walked ",after:" the room."},{answer:"out of",before:"He came ",after:" the building."},{answer:"along",before:"We cycled ",after:" the river path."},{answer:"past",before:"Go ",after:" the church and turn right."},{answer:"through",before:"They drove ",after:" the tunnel."},{answer:"up",before:"She ran ",after:" the stairs."},{answer:"across",before:"We walked ",after:" the bridge."},{answer:"around",before:"They walked ",after:" the old city."}]},{type:"mc",title:"In or into? On or onto?",sub:"Choose the correct preposition.",items:[{q:"She walked _____ the room without knocking.",opts:["in","into","to","at"],answer:"into",explanation:"Movement towards the inside \u2014 into."},{q:"The cat jumped _____ the sofa.",opts:["on","onto","into","over"],answer:"onto",explanation:"Movement towards a surface \u2014 onto."},{q:"He got _____ the bus at the last stop.",opts:["in","into","on","onto"],answer:"on",explanation:"Get on the bus \u2014 standard expression for public transport."},{q:"She got _____ the taxi outside the hotel.",opts:["on","onto","in","into"],answer:"into",explanation:"Get into a car/taxi \u2014 enclosed private vehicle."}]},{type:"builder",title:"Sentence builder",sub:"Put the words in the correct order to describe movement.",items:[{words:["she","walked","into","the","caf\u00e9"],answer:"she walked into the caf\u00e9",context:"Describing entry into a place."},{words:["go","past","the","school","and","turn","left"],answer:"go past the school and turn left",context:"Giving directions."},{words:["we","drove","through","the","mountains"],answer:"we drove through the mountains",context:"Describing a route."},{words:["he","ran","out","of","the","building"],answer:"he ran out of the building",context:"Describing exit from a place."},{words:["they","walked","along","the","beach"],answer:"they walked along the beach",context:"Describing movement following a path."}]},{type:"categorise",title:"Position or movement?",sub:"Click a phrase, then click the correct column.",categories:[{name:"Position (static)",items:["in the room","on the table","at the station","under the bridge","next to the door"]},{name:"Movement (direction)",items:["into the room","onto the table","past the station","through the tunnel","along the river"]}]},{type:"ec",title:"Error correction",sub:"One error per sentence.",items:[{wrong:"She went in the shop.",correct:"She went into the shop.",hint:"Movement towards inside \u2014 into."},{wrong:"He got in the bus.",correct:"He got on the bus.",hint:"Public transport: get on/off."},{wrong:"They walked trough the park.",correct:"They walked through the park.",hint:"Spelling: through."},{wrong:"Go past the lights and turn on the left.",correct:"Go past the lights and turn left.",hint:"Turn left \u2014 no on."},{wrong:"She jumped on the pool.",correct:"She jumped into the pool.",hint:"Movement towards inside of water \u2014 into."}]}]},
+
+{id:"questiontags",title:"Question tags",subtitle:"isn't it?, don't you?, can't she?",intro:"Short questions added to the end of a statement to check or confirm.",desc:"Question tags are very common in spoken British English. They are used to check information, invite agreement, or keep conversation flowing.",tip:"The rule has two parts: <strong>positive statement \u2192 negative tag</strong>. <strong>Negative statement \u2192 positive tag</strong>. And the tag always uses the same auxiliary as the main sentence. <em>\"She can swim, can't she?\"</em> Not \"doesn't she\".",explanation:"<p>A question tag is a short question added to a statement to <strong>check information or invite agreement</strong>. Very common in spoken British English.</p>\n<p><strong>Two steps to build any question tag:</strong></p>\n<div class=\"rule\"><div class=\"rule-num n\">1</div><div class=\"rule-text\"><strong>Find the auxiliary verb</strong> in the main clause (be, have, do/does/did, can, will, etc.). If there is no auxiliary, use <em>do/does</em> (present) or <em>did</em> (past).</div></div>\n<div class=\"rule\"><div class=\"rule-num n\">2</div><div class=\"rule-text\"><strong>Reverse the polarity.</strong> Positive main clause \u2192 negative tag. Negative main clause \u2192 positive tag. Always use a pronoun, never a noun.</div></div>\n<p style=\"margin-top:14px\"><strong>Worked examples:</strong> <em>\"She can swim, ___?\"</em> \u2192 auxiliary: <em>can</em> \u2192 positive \u2192 tag: <em>can't she?</em> &nbsp;|&nbsp; <em>\"They don't know, ___?\"</em> \u2192 auxiliary: <em>don't</em> \u2192 negative \u2192 tag: <em>do they?</em></p>\n<div class=\"note\"><strong>Two special cases to memorise:</strong><br>\n<em>I am right,</em> \u2192 <strong>aren't I?</strong> (not <em>amn't I</em> \u2014 this form does not exist)<br>\n<em>Let's go,</em> \u2192 <strong>shall we?</strong> (fixed expression)</div>",table:{headers:["Main clause","Step 1: auxiliary","Step 2: polarity","Full question tag"],rows:[["She is French,","is","positive \u2192 negative","isn't she?"],["They aren't ready,","aren't","negative \u2192 positive","are they?"],["You can drive,","can","positive \u2192 negative","can't you?"],["It will be fine,","will","positive \u2192 negative","won't it?"],["He likes football, (no auxiliary)","add does","positive \u2192 negative doesn't","doesn't he?"],["She doesn't know, (no auxiliary)","add does","negative \u2192 positive does","does she?"],["They went home, (past simple)","add did","positive \u2192 negative didn't","didn't they?"],["I'm right, (special case)","am","positive \u2192 aren't (irregular)","aren't I?"],["Let's go, (special case)","\u2014","fixed form","shall we?"]]},examples:[{type:"pos",eng:"It's a beautiful day, isn't it?",note:"Positive statement \u2192 negative tag."},{type:"pos",eng:"You haven't seen this, have you?",note:"Negative statement \u2192 positive tag."},{type:"pos",eng:"She can drive, can't she?",note:"Modal verb can \u2192 can't in tag."},{type:"neg",eng:"They didn't come, did they?",note:"Past simple negative \u2192 positive did."},{type:"q",eng:"You're coming to the party, aren't you?",note:"Checking/confirming a plan."},{type:"q",eng:"It doesn't matter, does it?",note:"Seeking agreement."}],errors:[{bad:"She is French, isn't she not?",good:"She is French, isn't she?",reason:"The tag already contains the negative \u2014 don't add not again."},{bad:"He likes football, isn't he?",good:"He likes football, doesn't he?",reason:"No auxiliary in the main clause \u2192 use do/does/did."},{bad:"You can swim, can you?",good:"You can swim, can't you?",reason:"Positive statement \u2192 negative tag."},{bad:"They went home, didn't they not?",good:"They went home, didn't they?",reason:"Didn't already contains the negative."}],realUse:["\"Nice weather, isn't it?\" \u2014 classic British conversation opener.","\"You're not serious, are you?\" \u2014 expressing disbelief.","\"Let's take a break, shall we?\" \u2014 fixed tag for let's.","\"I'm right, aren't I?\" \u2014 the irregular I am tag."],exercises:[{type:"gap",title:"Complete the question tag",sub:"Fill each gap with the correct question tag.",items:[{answer:"isn't it",before:"It's cold today, ",after:"?"},{answer:"aren't they",before:"They're coming tonight, ",after:"?"},{answer:"doesn't she",before:"She speaks French, ",after:"?"},{answer:"can't you",before:"You can drive, ",after:"?"},{answer:"didn't he",before:"He called yesterday, ",after:"?"},{answer:"have they",before:"They haven't arrived yet, ",after:"?"},{answer:"is it",before:"It isn't ready, ",after:"?"},{answer:"shall we",before:"Let's take a break, ",after:"?"}]},{type:"mc",title:"Choose the correct tag",sub:"Choose the correct question tag.",items:[{q:"She is Spanish, _____?",opts:["is she","isn't she","doesn't she","wasn't she"],answer:"isn't she",explanation:"Positive is \u2192 negative isn't."},{q:"They don't like it, _____?",opts:["do they","don't they","are they","did they"],answer:"do they",explanation:"Negative don't \u2192 positive do."},{q:"You can speak French, _____?",opts:["can you","don't you","can't you","aren't you"],answer:"can't you",explanation:"Positive can \u2192 negative can't."},{q:"He went home early, _____?",opts:["isn't he","does he","didn't he","wasn't he"],answer:"didn't he",explanation:"Past simple \u2192 didn't in tag."}]},{type:"builder",title:"Build the tag question",sub:"Put the words in the correct order.",items:[{words:["it's","cold","today",",","isn't","it","?"],answer:"it's cold today , isn't it ?",context:"Positive statement \u2192 negative tag."},{words:["she","doesn't","like","coffee",",","does","she","?"],answer:"she doesn't like coffee , does she ?",context:"Negative statement \u2192 positive tag."},{words:["they","went","home",",","didn't","they","?"],answer:"they went home , didn't they ?",context:"Past simple \u2192 didn't tag."},{words:["you","can","help","me",",","can't","you","?"],answer:"you can help me , can't you ?",context:"Modal verb \u2192 negative modal tag."},{words:["let's","go",",","shall","we","?"],answer:"let's go , shall we ?",context:"Fixed tag for let's."}]},{type:"tf",title:"True, False, or Not given",sub:"Is the statement true, false, or not given?",items:[{context:"You haven't called her, have you?",statement:"The tag is grammatically correct.",answer:"True",explanation:"Negative statement \u2192 positive tag. Correct."},{context:"He likes football, isn't he?",statement:"This sentence contains a grammar error.",answer:"True",explanation:"No auxiliary in the main clause \u2192 should be doesn't he, not isn't he."},{context:"Let's go, shall we?",statement:"This is the standard tag for let's.",answer:"True",explanation:"Let's \u2192 shall we? is a fixed form."},{context:"She is French, isn't she?",statement:"The speaker is certain she is French.",answer:"Not given",explanation:"Tags can express either certainty seeking confirmation or genuine uncertainty \u2014 we cannot tell."}]},{type:"ec",title:"Error correction",sub:"One error per sentence.",items:[{wrong:"She is French, isn't she not?",correct:"She is French, isn't she?",hint:"Isn't already contains the negative."},{wrong:"He likes football, isn't he?",correct:"He likes football, doesn't he?",hint:"No auxiliary \u2014 use does/doesn't."},{wrong:"You can swim, can you?",correct:"You can swim, can't you?",hint:"Positive statement \u2192 negative tag."},{wrong:"They went, didn't they not?",correct:"They went, didn't they?",hint:"Didn't already contains the negative."},{wrong:"It's nice, doesn't it?",correct:"It's nice, isn't it?",hint:"The tag must match the auxiliary in the main clause (is)."}]}]},
+
+{id:"countableuncountable",title:"Countable & uncountable nouns",subtitle:"a bottle of water, a piece of advice",intro:"Extend your knowledge of countable and uncountable nouns \u2014 and how to quantify them.",desc:"You saw the basics at A1. At A2 we add the partitive structures that let you talk about quantities of uncountable nouns: a piece of, a bottle of, a cup of, and more.",tip:"The most common error is applying a/an to uncountable nouns: <strong>\"an information\"</strong>, <strong>\"an advice\"</strong>, <strong>\"a furniture\"</strong>. None of these work. For uncountable nouns you need either no article (general), some/any, or a partitive expression: <em>a piece of advice</em>.",explanation:"<p>At A1 you learnt the basics: uncountable nouns cannot use <em>a/an</em> and have no plural. At A2 we focus on how to <strong>talk about quantities</strong> of uncountable nouns using partitive expressions.</p>\n<div class=\"rule\"><div class=\"rule-num\"></div><div class=\"rule-text\"><strong>Partitive expressions</strong> give uncountable nouns a countable unit: container/measure word + <em>of</em> + uncountable noun. <em>\"A glass of water.\"</em> / <em>\"A piece of advice.\"</em> / <em>\"A bit of luck.\"</em> The container takes the plural \u2014 the uncountable noun stays the same.</div></div>\n<div class=\"rule\"><div class=\"rule-num\"></div><div class=\"rule-text\"><strong>Common uncountable nouns students try to count:</strong> advice, information, news, furniture, luggage, equipment, knowledge, research, traffic, progress, weather, homework, money. None can take <em>a/an</em> or -s. <em>\"An advice\"</em>, <em>\"two furnitures\"</em>, <em>\"a homework\"</em> \u2014 all wrong.</div></div>\n<div class=\"rule\"><div class=\"rule-num\"></div><div class=\"rule-text\"><strong>How much vs how many:</strong> <em>how much</em> + uncountable noun. <em>how many</em> + countable noun. <em>\"How much luggage?\"</em> / <em>\"How many bags?\"</em> / <em>\"How many pieces of luggage?\"</em></div></div>\n<div class=\"note\"><strong>Partitive plurals:</strong> the container word takes the plural, not the uncountable noun. <em>\"Two glasses of water\"</em> \u2713 &nbsp; <em>\"Two glass of waters\"</em> \u2717 &nbsp; <em>\"Two waters\"</em> \u2717</div>",table:{headers:["Partitive expression","Used with which uncountable nouns?","Example"],rows:[["a piece of","advice, information, news, paper, music, bread, cake, furniture, pizza","a piece of advice / a piece of cake"],["a glass of","water, juice, wine, milk","a glass of water / two glasses of juice"],["a cup of","tea, coffee","a cup of coffee / three cups of tea"],["a bottle of","water, wine, beer, juice, oil","a bottle of water / two bottles of wine"],["a bit of / a little","luck, help, news, fun, advice, trouble","a bit of luck / a little help"],["a loaf of","bread","a loaf of bread / two loaves of bread"],["a slice of","bread, pizza, cake, ham","a slice of pizza / two slices of cake"],["a bag of","rice, flour, sugar, crisps","a bag of rice / two bags of flour"],["How much + uncountable","\u2014","How much advice did she give you?"],["How many + countable / partitive","\u2014","How many pieces of advice? / How many bags?"]]},examples:[{type:"pos",eng:"Can I have a piece of cake?",note:"Piece of for a portion of an uncountable food."},{type:"pos",eng:"She gave me some good advice.",note:"Some + uncountable, or a piece of advice."},{type:"pos",eng:"I need a bit of help.",note:"A bit of + uncountable."},{type:"neg",eng:"I don't have any information about that.",note:"Any + uncountable in negatives."},{type:"q",eng:"How much time do we have?",note:"How much + uncountable."},{type:"q",eng:"Could I have a glass of water, please?",note:"Partitive in a polite request."}],errors:[{bad:"Can you give me an advice?",good:"Can you give me some advice?",reason:"Advice is uncountable \u2014 no a/an. Use some or a piece of advice."},{bad:"I need an information.",good:"I need some information.",reason:"Information is uncountable \u2014 no a/an."},{bad:"She has a lot of furnitures.",good:"She has a lot of furniture.",reason:"Furniture is uncountable \u2014 no plural."},{bad:"How many homeworks do we have?",good:"How much homework do we have?",reason:"Homework is uncountable \u2014 how much, not how many."}],realUse:["\"A word of warning / advice / thanks.\" \u2014 formal partitive expressions.","\"A stroke of luck / genius.\" \u2014 fixed expressions.","\"Two rounds of drinks.\" \u2014 pub/bar expression.","\"Could I get a round of applause?\" \u2014 performance expression."],exercises:[{type:"gap",title:"Partitive expressions",sub:"Fill each gap with the correct partitive expression.",items:[{answer:"a piece of",before:"Can I have ",after:" cake?"},{answer:"a cup of",before:"Would you like ",after:" coffee?"},{answer:"a glass of",before:"Can I have ",after:" water, please?"},{answer:"a bit of",before:"I need ",after:" help with this."},{answer:"a loaf of",before:"Can you buy ",after:" bread?"},{answer:"a slice of",before:"She only had ",after:" pizza."},{answer:"a bottle of",before:"We need ",after:" water for the trip."},{answer:"a piece of",before:"Let me give you ",after:" advice."}]},{type:"categorise",title:"Countable or uncountable?",sub:"Click a word, then click the correct column.",categories:[{name:"Countable (can use a/an, has plural)",items:["book","chair","idea","problem","friend","suggestion"]},{name:"Uncountable (no a/an, no plural)",items:["furniture","advice","information","luggage","money","knowledge"]}]},{type:"mc",title:"A/an, some, or a piece of?",sub:"Choose the correct option.",items:[{q:"She gave me _____ advice.",opts:["an","a","some","a piece"],answer:"some",explanation:"Advice is uncountable \u2014 use some or a piece of advice."},{q:"I need _____ piece of information.",opts:["a","an","some","any"],answer:"a",explanation:"A piece of information \u2014 the partitive piece is countable."},{q:"Could I have _____ glass of water?",opts:["some","any","a","an"],answer:"a",explanation:"A glass of water \u2014 a + partitive noun."},{q:"How _____ luggage do you have?",opts:["many","much","a lot","few"],answer:"much",explanation:"Luggage is uncountable \u2014 how much."}]},{type:"transform",title:"Sentence transformation",sub:"Rewrite using a partitive expression.",items:[{original:"Can you give me some advice?",keyword:"piece",answer:"Can you give me a piece of advice?"},{original:"I'd like some water.",keyword:"glass",answer:"I'd like a glass of water."},{original:"She gave me some very useful information.",keyword:"piece",answer:"She gave me a very useful piece of information."},{original:"We need some bread.",keyword:"loaf",answer:"We need a loaf of bread."},{original:"Can I have some coffee?",keyword:"cup",answer:"Can I have a cup of coffee?"}]},{type:"ec",title:"Error correction",sub:"One error per sentence.",items:[{wrong:"Can you give me an advice?",correct:"Can you give me some advice?",hint:"Advice is uncountable \u2014 no a/an."},{wrong:"I need an information.",correct:"I need some information.",hint:"Information is uncountable."},{wrong:"She has a lot of furnitures.",correct:"She has a lot of furniture.",hint:"Furniture is uncountable \u2014 no plural."},{wrong:"How many homeworks do we have?",correct:"How much homework do we have?",hint:"Homework is uncountable \u2014 how much."},{wrong:"We bought two luggages.",correct:"We bought two pieces of luggage.",hint:"Luggage is uncountable \u2014 use pieces of luggage."}]}]}
+
+]; // end lessons array
+// ── PRINT ──
+function printLesson(){
+  const labels = document.querySelectorAll('.section-label');
+  const wasCollapsed = [];
+  labels.forEach((label,i)=>{
+    const body = label.nextElementSibling;
+    wasCollapsed[i] = label.classList.contains('collapsed');
+    if(wasCollapsed[i]){
+      label.classList.remove('collapsed');
+      if(body) body.classList.remove('collapsed');
+    }
+  });
+  setTimeout(()=>{
+    window.print();
+    setTimeout(()=>{
+      labels.forEach((label,i)=>{
+        if(wasCollapsed[i]){
+          label.classList.add('collapsed');
+          const body = label.nextElementSibling;
+          if(body) body.classList.add('collapsed');
+        }
+      });
+    }, 500);
+  }, 150);
+}
+
+// ── COLLAPSIBLE SECTIONS ──
+function toggleAllSections(btn){
+  const isOpen = btn.textContent === 'Open all';
+  document.querySelectorAll('.section-label').forEach(label=>{
+    const body = label.nextElementSibling;
+    if(body && body.classList.contains('section-body')){
+      if(isOpen){ label.classList.remove('collapsed'); body.classList.remove('collapsed'); }
+      else { label.classList.add('collapsed'); body.classList.add('collapsed'); }
+    }
+  });
+  btn.textContent = isOpen ? 'Close all' : 'Open all';
+}
+
+function toggleSection(label){
+  label.classList.toggle('collapsed');
+  const body = label.nextElementSibling;
+  if(body && body.classList.contains('section-body')){
+    body.classList.toggle('collapsed');
+  }
+}
+
+// ── DONE STATE ──
+const done = JSON.parse(localStorage.getItem('jpe-a1-done')||'[]');
+let current = 0;
+
+// ── SIDEBAR ──
+function buildSidebar(){
+  const nav = document.getElementById('topic-nav');
+  nav.innerHTML = lessons.map((l,i)=>`
+    <button class="topic-link${i===current?' active':''}${done.includes(l.id)?' done':''}" onclick="goto(${i})">
+      <span class="tl-num">${String(i+1).padStart(2,'0')}</span>
+      <span class="tl-check">${done.includes(l.id)?'✓':''}</span>
+      <span class="tl-name">${l.title}<br><small style="font-size:11px;opacity:.6">${l.subtitle}</small></span>
+    </button>`).join('');
+  const pct = (done.length/lessons.length)*100;
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('prog-text').textContent=`${done.length}/${lessons.length}`;
+}
+
+// ── BUILD LESSON ──
+function buildLesson(l, idx){
+  const isLast = idx===lessons.length-1;
+  const isDone = done.includes(l.id);
+
+  const tableHTML = `<table class="form-table">
+    <thead><tr>${l.table.headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+    <tbody>${l.table.rows.map(r=>`<tr>${r.map((c,ci)=>`<td class="${ci===0?'subject':ci===1?'form':ci===2?'neg':'example'}">${c}</td>`).join('')}</tr>`).join('')}</tbody>
+  </table>`;
+
+  const exHTML = l.examples.map(e=>`
+    <div class="example-item">
+      <div class="ex-marker ${e.type}">${e.type==='pos'?'+':e.type==='neg'?'−':'?'}</div>
+      <div><div class="ex-eng">${e.eng}</div><div class="ex-note">${e.note}</div></div>
+    </div>`).join('');
+
+  const errHTML = l.errors.map(e=>`
+    <div class="error-row">
+      <div class="error-bad"><div class="error-label"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Wrong</div><div class="error-text">${e.bad}</div></div>
+      <div class="error-good"><div class="error-label"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Correct</div><div class="error-text">${e.good}</div></div>
+    </div>
+    `).join('');
+
+  const realHTML = l.realUse.map(r=>`<li>${r}</li>`).join('');
+
+  const exerciseHTML = l.exercises.map((ex,ei)=>{
+
+    // ── GAP FILL ──
+    if(ex.type==='gap'){
+      const items = ex.items.map((it,ii)=>`
+        <div class="gap-sentence">
+          <span class="gap-num">${ii+1}.</span>
+          <span>${(it.before||'').replace(/_+\s*$/,'').trimEnd()}</span>
+          <span class="gap-wrap">
+            <input class="gap-input" id="gap-${l.id}-${ei}-${ii}" data-answer="${it.answer}" placeholder="" autocomplete="off" style="width:${Math.max(4,it.answer.length+1)}ch">
+            <span class="gap-reveal" id="gap-rev-${l.id}-${ei}-${ii}"></span>
+          </span>
+          <span>${(it.after||'').replace(/^\s*_+/,'').trimStart()}</span>
+        </div>`).join('');
+      return `<div class="exercise-card">
+        <div class="ex-card-header">
+          <div><div class="ex-card-title">${ex.title}</div><div class="ex-card-sub">${ex.sub}</div></div>
+          <span class="ex-type-badge">Gap fill</span>
+        </div>
+        <div class="ex-card-body">${items}
+          <div class="check-row">
+            <button class="btn-check" onclick="checkGap('${l.id}',${ei},${ex.items.length})">Check answers</button>
+            <button class="btn-reset" onclick="resetGap('${l.id}',${ei},${ex.items.length})">Reset</button>
+          </div>
+          <div class="score-badge" id="score-gap-${l.id}-${ei}"></div>
+        </div></div>`;
+    }
+
+    // ── MULTIPLE CHOICE ──
+    if(ex.type==='mc'){
+      const items = ex.items.map((it,ii)=>`
+        <div class="mc-question" id="mc-${l.id}-${ei}-${ii}">
+          <div class="mc-text">${ii+1}. ${it.q}</div>
+          <div class="mc-options">${it.opts.map(o=>`<button class="mc-opt" onclick="pickMC('${l.id}',${ei},${ii},'${o.replace(/'/g,"'")}','${it.answer.replace(/'/g,"'")}','${it.explanation.replace(/'/g,"'")}')" data-opt="${o}">${o}</button>`).join('')}</div>
+          <div class="mc-feedback" id="mcfb-${l.id}-${ei}-${ii}"></div>
+        </div>`).join('');
+      return `<div class="exercise-card">
+        <div class="ex-card-header">
+          <div><div class="ex-card-title">${ex.title}</div><div class="ex-card-sub">${ex.sub}</div></div>
+          <span class="ex-type-badge">Multiple choice</span>
+        </div>
+        <div class="ex-card-body">${items}</div></div>`;
+    }
+
+    // ── ERROR CORRECTION ──
+    if(ex.type==='ec'){
+      const items = ex.items.map((it,ii)=>`
+        <div class="ec-item">
+          <div class="ec-sentence">✗ ${it.wrong}</div>
+          <div class="ec-input-row">
+            <input class="ec-input" id="ec-${l.id}-${ei}-${ii}" data-answer="${it.correct}" placeholder="Write the correct sentence…">
+          </div>
+          <div style="font-size:11px;color:var(--ink3);margin-top:4px">Hint: ${it.hint}</div>
+        </div>`).join('');
+      return `<div class="exercise-card">
+        <div class="ex-card-header">
+          <div><div class="ex-card-title">${ex.title}</div><div class="ex-card-sub">${ex.sub}</div></div>
+          <span class="ex-type-badge">Error correction</span>
+        </div>
+        <div class="ex-card-body">${items}
+          <div class="check-row">
+            <button class="btn-check" onclick="checkEC('${l.id}',${ei},${ex.items.length})">Check answers</button>
+            <button class="btn-reset" onclick="resetEC('${l.id}',${ei},${ex.items.length})">Reset</button>
+          </div>
+          <div class="score-badge" id="score-ec-${l.id}-${ei}"></div>
+        </div></div>`;
+    }
+
+    // ── SENTENCE BUILDER ──
+    if(ex.type==='builder'){
+      const sid = `${l.id}-${ei}`;
+      const items = ex.items.map((it,ii)=>{
+        const shuffled = [...it.words].sort(()=>Math.random()-.5);
+        const wordBtns = shuffled.map((w,wi)=>`<button class="sb-word" id="sbw-${sid}-${ii}-${wi}" data-word="${w}" onclick="sbClick('${sid}',${ii},${wi})">${w}</button>`).join('');
+        return `<div class="sb-sentence" id="sb-sent-${sid}-${ii}">
+          <div class="sb-sentence-num">${ii+1}.</div>
+          ${it.context?`<div class="sb-context">${it.context}</div>`:''}
+          <div class="sb-slot" id="sb-slot-${sid}-${ii}"></div>
+          <div class="sb-bank" id="sb-bank-${sid}-${ii}">${wordBtns}</div>
+          <div class="sb-result" id="sb-res-${sid}-${ii}"></div>
+        </div>`;
+      }).join('');
+      return `<div class="exercise-card">
+        <div class="ex-card-header">
+          <div><div class="ex-card-title">${ex.title}</div><div class="ex-card-sub">${ex.sub}</div></div>
+          <span class="ex-type-badge">Sentence builder</span>
+        </div>
+        <div class="ex-card-body">${items}
+          <div class="check-row">
+            <button class="btn-check" onclick="checkBuilder('${sid}',${ex.items.length},${JSON.stringify(ex.items.map(i=>i.answer)).replace(/"/g,'&quot;')})">Check answers</button>
+            <button class="btn-reset" onclick="resetBuilder('${sid}',${ex.items.length},${JSON.stringify(ex.items.map(i=>i.words)).replace(/"/g,'&quot;')})">Reset</button>
+          </div>
+          <div class="score-badge" id="score-sb-${sid}"></div>
+        </div></div>`;
+    }
+
+    // ── MATCHING ──
+    if(ex.type==='match'){
+      const mid = `${l.id}-${ei}`;
+      const leftBtns = ex.pairs.map((p,pi)=>`<button class="match-item" id="ml-${mid}-${pi}" data-idx="${pi}" data-side="left" onclick="matchClick('${mid}',${pi},'left')">${p.left}</button>`).join('');
+      const rightShuffled = ex.pairs.map((p,pi)=>({text:p.right,idx:pi})).sort(()=>Math.random()-.5);
+      const rightBtns = rightShuffled.map((p,ri)=>`<button class="match-item" id="mr-${mid}-${ri}" data-idx="${p.idx}" data-side="right" onclick="matchClick('${mid}',${ri},'right')">${p.text}</button>`).join('');
+      return `<div class="exercise-card">
+        <div class="ex-card-header">
+          <div><div class="ex-card-title">${ex.title}</div><div class="ex-card-sub">${ex.sub}</div></div>
+          <span class="ex-type-badge">Matching</span>
+        </div>
+        <div class="ex-card-body">
+          <div class="match-cols">
+            <div><div class="match-col-head">${ex.leftHead||'A'}</div>${leftBtns}</div>
+            <div><div class="match-col-head">${ex.rightHead||'B'}</div>${rightBtns}</div>
+          </div>
+          <div class="score-badge" id="score-match-${mid}"></div>
+        </div></div>`;
+    }
+
+    // ── TRANSFORMATION ──
+    if(ex.type==='transform'){
+      const tid = `${l.id}-${ei}`;
+      const items = ex.items.map((it,ii)=>`
+        <div class="transform-item">
+          <div class="transform-original">${ii+1}. ${it.original}<br><span style="font-size:12px;color:var(--ink3)">Use: <span class="transform-keyword">${it.keyword}</span></span></div>
+          <input class="transform-input" id="tr-${tid}-${ii}" data-answer="${it.answer}" placeholder="Rewrite the sentence…">
+          <div class="transform-reveal" id="tr-rev-${tid}-${ii}"></div>
+        </div>`).join('');
+      return `<div class="exercise-card">
+        <div class="ex-card-header">
+          <div><div class="ex-card-title">${ex.title}</div><div class="ex-card-sub">${ex.sub}</div></div>
+          <span class="ex-type-badge">Transformation</span>
+        </div>
+        <div class="ex-card-body">${items}
+          <div class="check-row">
+            <button class="btn-check" onclick="checkTransform('${tid}',${ex.items.length})">Check answers</button>
+            <button class="btn-reset" onclick="resetTransform('${tid}',${ex.items.length})">Reset</button>
+          </div>
+          <div class="score-badge" id="score-tr-${tid}"></div>
+        </div></div>`;
+    }
+
+    // ── CATEGORISATION ──
+    if(ex.type==='categorise'){
+      const cid = `${l.id}-${ei}`;
+      const allWords = ex.categories.flatMap((c,ci)=>c.items.map(w=>({w,ci}))).sort(()=>Math.random()-.5);
+      const wordBtns = allWords.map((item,wi)=>`<button class="cat-word" id="cw-${cid}-${wi}" data-cat="${item.ci}" onclick="catClick('${cid}',${wi})">${item.w}</button>`).join('');
+      const cols = ex.categories.map((c,ci)=>`
+        <div class="cat-col" id="cc-${cid}-${ci}" onclick="catColClick('${cid}',${ci})" style="cursor:pointer">
+          <div class="cat-col-head" style="color:${['var(--sky)','var(--sea)','var(--sun)','var(--lav)'][ci]||'var(--ink3)'}">${c.name}</div>
+          <div class="cat-col-items" id="cc-items-${cid}-${ci}"></div>
+        </div>`).join('');
+      const colStyle = `grid-template-columns:repeat(${ex.categories.length},1fr)`;
+      return `<div class="exercise-card">
+        <div class="ex-card-header">
+          <div><div class="ex-card-title">${ex.title}</div><div class="ex-card-sub">${ex.sub}</div></div>
+          <span class="ex-type-badge">Categorise</span>
+        </div>
+        <div class="ex-card-body">
+          <div class="cat-bank" id="cb-${cid}">${wordBtns}</div>
+          <div class="cat-columns" style="${colStyle}">${cols}</div>
+          <div class="check-row">
+            <button class="btn-check" onclick="checkCat('${cid}',${ex.categories.length})">Check answers</button>
+            <button class="btn-reset" onclick="resetCat('${cid}',${ex.categories.length})">Reset</button>
+          </div>
+          <div class="score-badge" id="score-cat-${cid}"></div>
+        </div></div>`;
+    }
+
+    // ── CONVERSATION FILL ──
+    if(ex.type==='convo'){
+      const cvid = `${l.id}-${ei}`;
+      let gapCount = 0;
+      const lines = ex.lines.map((line,li)=>{
+        const spk = line.speaker==='A'?'a':'b';
+        const text = line.text.replace(/\[([^\]]+)\]/g,(match,ans)=>{
+          const gi = gapCount++;
+          return `<span class="convo-gwrap"><input class="convo-input" id="cv-${cvid}-${gi}" data-answer="${ans}" autocomplete="off" style="width:${Math.max(4,ans.replace(/\//g,'').split('/')[0].length+1)}ch"><span class="convo-reveal" id="cv-rev-${cvid}-${gi}"></span></span>`;
+        });
+        return `<div class="convo-line"><span class="convo-speaker ${spk}">${line.speaker}</span><span class="convo-text">${text}</span></div>`;
+      }).join('');
+      const total = gapCount;
+      return `<div class="exercise-card">
+        <div class="ex-card-header">
+          <div><div class="ex-card-title">${ex.title}</div><div class="ex-card-sub">${ex.sub}</div></div>
+          <span class="ex-type-badge">Conversation</span>
+        </div>
+        <div class="ex-card-body">
+          <div class="convo-wrap">${lines}</div>
+          <div class="check-row">
+            <button class="btn-check" onclick="checkConvo('${cvid}',${total})">Check answers</button>
+            <button class="btn-reset" onclick="resetConvo('${cvid}',${total})">Reset</button>
+          </div>
+          <div class="score-badge" id="score-cv-${cvid}"></div>
+        </div></div>`;
+    }
+
+    // ── TRUE / FALSE / NOT GIVEN ──
+    if(ex.type==='tf'){
+      const tfid = `${l.id}-${ei}`;
+      const items = ex.items.map((it,ii)=>`
+        <div class="tf-item">
+          ${it.context?`<div class="tf-context">"${it.context}"</div>`:''}
+          <div class="tf-statement">${ii+1}. ${it.statement}</div>
+          <div class="tf-options">
+            ${['True','False','Not given'].map(opt=>`<button class="tf-btn" onclick="pickTF('${tfid}',${ii},'${opt}','${it.answer}','${it.explanation.replace(/'/g,"'")}') ">${opt}</button>`).join('')}
+          </div>
+          <div class="tf-feedback" id="tf-fb-${tfid}-${ii}"></div>
+        </div>`).join('');
+      return `<div class="exercise-card">
+        <div class="ex-card-header">
+          <div><div class="ex-card-title">${ex.title}</div><div class="ex-card-sub">${ex.sub}</div></div>
+          <span class="ex-type-badge">True / False</span>
+        </div>
+        <div class="ex-card-body">${items}</div></div>`;
+    }
+
+  }).join('');
+
+  return `
+  <div class="lesson-hero">
+    <div class="lesson-meta">
+      <span class="tag tag-a1">A1</span>
+      <span class="lesson-num">Topic ${idx+1} of ${lessons.length}</span>
+    </div>
+    <h1>${l.title} <span style="color:var(--ink3);font-weight:400;font-size:22px">— ${l.subtitle}</span></h1>
+    <p>${l.desc}</p>
+    <div class="lesson-toolbar">
+      <button class="btn ${isDone?'btn-done':'btn-primary'}" onclick="markDone('${l.id}',${idx})" id="done-btn-${l.id}">
+        ${isDone?'✓ Completed':'Mark as complete'}
+      </button>
+      <button class="btn btn-ghost" onclick="printLesson()">Print lesson</button>
+    </div>
+  </div>
+  <div class="lesson-body">
+    <div>
+      <div class="section-label collapsed" onclick="toggleSection(this)"><span class="section-label-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span><h2>Explanation</h2><span class="section-label-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span></div>
+      <div class="section-body collapsed">
+        <div class="explain-card">
+          <div class="explain-lead">${l.intro}</div>
+          <div class="explain-body">${l.explanation}</div>
+        </div>
+        ${tip(l.tip)}
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label collapsed" onclick="toggleSection(this)"><span class="section-label-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span><h2>Form & structure</h2><span class="section-label-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span></div>
+      <div class="section-body collapsed">
+        <div class="explain-card" style="padding:0;overflow:hidden">${tableHTML}</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label collapsed" onclick="toggleSection(this)"><span class="section-label-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><h2>Examples</h2><span class="section-label-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span></div>
+      <div class="section-body collapsed">
+        <div class="examples-grid">${exHTML}</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label collapsed" onclick="toggleSection(this)"><span class="section-label-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span><h2>Common errors</h2><span class="section-label-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span></div>
+      <div class="section-body collapsed">
+        <div class="error-card"><h3>What learners get wrong — and why</h3>${errHTML}</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label collapsed" onclick="toggleSection(this)"><span class="section-label-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"/></svg></span><h2>In real use</h2><span class="section-label-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span></div>
+      <div class="section-body collapsed">
+        <div class="real-use"><h3>Native speaker patterns</h3><ul>${realHTML}</ul></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label collapsed" onclick="toggleSection(this)"><span class="section-label-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="14 2 18 6 7 17 3 17 3 13 14 2"/><line x1="3" y1="22" x2="21" y2="22"/></svg></span><h2>Practice</h2><span class="section-label-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span></div>
+      <div class="section-body collapsed">
+        <div style="display:flex;flex-direction:column;gap:16px">${exerciseHTML}</div>
+      </div>
+    </div>
+
+  </div>
+  <div class="lesson-footer">
+    <div class="footer-hint">${isDone?"✓ You've completed this topic.":"Complete the exercises above, then mark this topic as done."}</div>
+    <div class="footer-nav">
+      ${idx>0?`<button class="btn btn-ghost" onclick="goto(${idx-1})">← Previous</button>`:''}
+      ${!isLast?`<button class="btn btn-primary" onclick="goto(${idx+1})">Next topic →</button>`:`<button class="btn btn-done" onclick="alert('You\'ve completed the full A1 course! 🎉')">Finish A1 🎉</button>`}
+    </div>
+  </div>`;
+}
+
+// ── NAVIGATION ──
+function goto(i){
+  current=i;
+  const main=document.getElementById('main');
+  main.innerHTML=buildLesson(lessons[i],i);
+  main.style.animation='none';
+  main.offsetHeight;
+  main.style.animation='fadeUp .25s ease forwards';
+  document.getElementById('breadcrumb-topic').textContent=lessons[i].title;
+  buildSidebar();
+  window.scrollTo(0,0);
+}
+
+// ── MARK DONE ──
+function markDone(id,idx){
+  if(!done.includes(id)){done.push(id);localStorage.setItem('jpe-a1-done',JSON.stringify(done));}
+  goto(idx);
+}
+
+// ── GAP FILL ──
+function checkGap(lid,ei,count){
+  let correct=0;
+  for(let i=0;i<count;i++){
+    const inp=document.getElementById(`gap-${lid}-${ei}-${i}`);
+    const rev=document.getElementById(`gap-rev-${lid}-${ei}-${i}`);
+    const accepted=inp.dataset.answer.toLowerCase().split('/').map(a=>a.trim());
+    const val=inp.value.toLowerCase().trim();
+    const ok=accepted.includes(val)||(val===''&&accepted.includes('—'));
+    if(ok){inp.className='gap-input correct';rev.className='gap-reveal';correct++;}
+    else{inp.className='gap-input wrong';rev.textContent='→ '+inp.dataset.answer;rev.className='gap-reveal show';}
+  }
+  const badge=document.getElementById(`score-gap-${lid}-${ei}`);
+  const pct=Math.round((correct/count)*100);
+  badge.textContent=`${correct}/${count} correct (${pct}%)`;
+  badge.className=`score-badge show ${pct===100?'full':pct>=50?'partial':'low'}`;
+}
+function resetGap(lid,ei,count){
+  for(let i=0;i<count;i++){
+    const inp=document.getElementById(`gap-${lid}-${ei}-${i}`);
+    const rev=document.getElementById(`gap-rev-${lid}-${ei}-${i}`);
+    inp.value='';inp.className='gap-input';rev.textContent='';rev.className='gap-reveal';
+  }
+  document.getElementById(`score-gap-${lid}-${ei}`).className='score-badge';
+}
+
+// ── MULTIPLE CHOICE ──
+function pickMC(lid,ei,qi,choice,answer,explanation){
+  const container=document.getElementById(`mc-${lid}-${ei}-${qi}`);
+  container.querySelectorAll('.mc-opt').forEach(o=>{
+    o.classList.remove('correct-ans','wrong-ans');
+    if(o.dataset.opt===answer) o.classList.add('correct-ans');
+    if(o.dataset.opt===choice&&choice!==answer) o.classList.add('wrong-ans');
+  });
+  const fb=document.getElementById(`mcfb-${lid}-${ei}-${qi}`);
+  fb.textContent=explanation;
+  fb.className=`mc-feedback show ${choice===answer?'ok':'bad'}`;
+}
+
+// ── ERROR CORRECTION ──
+function checkEC(lid,ei,count){
+  let correct=0;
+  for(let i=0;i<count;i++){
+    const inp=document.getElementById(`ec-${lid}-${ei}-${i}`);
+    const ans=inp.dataset.answer.toLowerCase().replace(/[.!?,]/g,'').trim();
+    const val=inp.value.toLowerCase().replace(/[.!?,]/g,'').trim();
+    if(val===ans){inp.className='ec-input correct';correct++;}
+    else inp.className='ec-input wrong';
+  }
+  const badge=document.getElementById(`score-ec-${lid}-${ei}`);
+  const pct=Math.round((correct/count)*100);
+  badge.textContent=`${correct}/${count} correct (${pct}%)`;
+  badge.className=`score-badge show ${pct===100?'full':pct>=50?'partial':'low'}`;
+}
+function resetEC(lid,ei,count){
+  for(let i=0;i<count;i++){const inp=document.getElementById(`ec-${lid}-${ei}-${i}`);inp.value='';inp.className='ec-input';}
+  document.getElementById(`score-ec-${lid}-${ei}`).className='score-badge';
+}
+
+// ── SENTENCE BUILDER ──
+const sbState={};
+function sbClick(sid,si,wi){
+  if(!sbState[sid]) sbState[sid]={};
+  if(!sbState[sid][si]) sbState[sid][si]=[];
+  const wordEl=document.getElementById(`sbw-${sid}-${si}-${wi}`);
+  const word=wordEl.dataset.word;
+  sbState[sid][si].push({word,wi});
+  wordEl.classList.add('used');
+  const slot=document.getElementById(`sb-slot-${sid}-${si}`);
+  const placed=document.createElement('button');
+  placed.className='sb-placed';
+  placed.textContent=word;
+  placed.onclick=()=>sbRemove(sid,si,wi,placed);
+  slot.appendChild(placed);
+}
+function sbRemove(sid,si,wi,el){
+  const wordEl=document.getElementById(`sbw-${sid}-${si}-${wi}`);
+  wordEl.classList.remove('used');
+  sbState[sid][si]=sbState[sid][si].filter(x=>x.wi!==wi);
+  el.remove();
+}
+function checkBuilder(sid,count,answersJson){
+  const answers=JSON.parse(answersJson.replace(/&quot;/g,'"'));
+  let correct=0;
+  for(let i=0;i<count;i++){
+    const placed=(sbState[sid]&&sbState[sid][i])||[];
+    const built=placed.map(x=>x.word).join(' ').toLowerCase().trim();
+    const ans=answers[i].toLowerCase().trim();
+    const res=document.getElementById(`sb-res-${sid}-${i}`);
+    if(built===ans){res.textContent='✓ Correct!';res.className='sb-result show ok';correct++;}
+    else{res.textContent=`✗ Answer: ${answers[i]}`;res.className='sb-result show bad';}
+  }
+  const badge=document.getElementById(`score-sb-${sid}`);
+  const pct=Math.round((correct/count)*100);
+  badge.textContent=`${correct}/${count} correct (${pct}%)`;
+  badge.className=`score-badge show ${pct===100?'full':pct>=50?'partial':'low'}`;
+}
+function resetBuilder(sid,count,wordsJson){
+  const words=JSON.parse(wordsJson.replace(/&quot;/g,'"'));
+  sbState[sid]={};
+  for(let i=0;i<count;i++){
+    document.getElementById(`sb-slot-${sid}-${i}`).innerHTML='';
+    document.getElementById(`sb-res-${sid}-${i}`).className='sb-result';
+    const bank=document.getElementById(`sb-bank-${sid}-${i}`);
+    const shuffled=[...words[i]].sort(()=>Math.random()-.5);
+    bank.innerHTML=shuffled.map((w,wi)=>`<button class="sb-word" id="sbw-${sid}-${i}-${wi}" data-word="${w}" onclick="sbClick('${sid}',${i},${wi})">${w}</button>`).join('');
+  }
+  document.getElementById(`score-sb-${sid}`).className='score-badge';
+}
+
+// ── MATCHING ──
+const matchState={};
+function matchClick(mid,idx,side){
+  if(!matchState[mid]) matchState[mid]={left:null,right:null};
+  const elId=side==='left'?`ml-${mid}-${idx}`:`mr-${mid}-${idx}`;
+  const el=document.getElementById(elId);
+  if(el.classList.contains('matched')) return;
+  // deselect same side
+  document.querySelectorAll(`[id^="m${side==='left'?'l':'r'}-${mid}-"]`).forEach(e=>{if(!e.classList.contains('matched'))e.classList.remove('selected')});
+  el.classList.add('selected');
+  matchState[mid][side]={idx,elId};
+  const ms=matchState[mid];
+  if(ms.left&&ms.right){
+    const leftEl=document.getElementById(ms.left.elId);
+    const rightEl=document.getElementById(ms.right.elId);
+    const leftDataIdx=leftEl.dataset.idx;
+    const rightDataIdx=rightEl.dataset.idx;
+    if(leftDataIdx===rightDataIdx){
+      leftEl.classList.remove('selected');rightEl.classList.remove('selected');
+      leftEl.classList.add('matched');rightEl.classList.add('matched');
+      // check if all matched
+      const total=document.querySelectorAll(`[id^="ml-${mid}-"]`).length;
+      const matched=document.querySelectorAll(`[id^="ml-${mid}-"].matched`).length;
+      const badge=document.getElementById(`score-match-${mid}`);
+      if(matched===total){badge.textContent=`${total}/${total} — all matched! 🎉`;badge.className='score-badge show full';}
+    } else {
+      leftEl.classList.add('wrong-flash');rightEl.classList.add('wrong-flash');
+      setTimeout(()=>{leftEl.classList.remove('wrong-flash','selected');rightEl.classList.remove('wrong-flash','selected');},600);
+    }
+    matchState[mid]={left:null,right:null};
+  }
+}
+
+// ── TRANSFORMATION ──
+function checkTransform(tid,count){
+  let correct=0;
+  for(let i=0;i<count;i++){
+    const inp=document.getElementById(`tr-${tid}-${i}`);
+    const rev=document.getElementById(`tr-rev-${tid}-${i}`);
+    const ans=inp.dataset.answer.toLowerCase().replace(/[.!?,]/g,'').trim();
+    const val=inp.value.toLowerCase().replace(/[.!?,]/g,'').trim();
+    if(val===ans){inp.className='transform-input correct';rev.className='transform-reveal';correct++;}
+    else{inp.className='transform-input wrong';rev.textContent='→ '+inp.dataset.answer;rev.className='transform-reveal show';}
+  }
+  const badge=document.getElementById(`score-tr-${tid}`);
+  const pct=Math.round((correct/count)*100);
+  badge.textContent=`${correct}/${count} correct (${pct}%)`;
+  badge.className=`score-badge show ${pct===100?'full':pct>=50?'partial':'low'}`;
+}
+function resetTransform(tid,count){
+  for(let i=0;i<count;i++){
+    const inp=document.getElementById(`tr-${tid}-${i}`);
+    const rev=document.getElementById(`tr-rev-${tid}-${i}`);
+    inp.value='';inp.className='transform-input';rev.textContent='';rev.className='transform-reveal';
+  }
+  document.getElementById(`score-tr-${tid}`).className='score-badge';
+}
+
+// ── CATEGORISATION ──
+const catState={};
+function catClick(cid,wi){
+  if(!catState[cid]) catState[cid]={selected:null,placed:{}};
+  const cs=catState[cid];
+  const wordEl=document.getElementById(`cw-${cid}-${wi}`);
+  if(wordEl.classList.contains('placed')) return;
+  // find which column was most recently clicked (use a pending col)
+  if(cs.pendingCol===undefined||cs.pendingCol===null){
+    // first select the word
+    document.querySelectorAll(`[id^="cw-${cid}-"]`).forEach(e=>e.style.outline='');
+    wordEl.style.outline='2px solid var(--sky)';
+    cs.selectedWord={wi,word:wordEl.textContent,cat:parseInt(wordEl.dataset.cat)};
+  }
+}
+function catColClick(cid,ci){
+  if(!catState[cid]) catState[cid]={selectedWord:null,placed:{}};
+  const cs=catState[cid];
+  if(!cs.selectedWord) return;
+  const {wi,word}=cs.selectedWord;
+  const wordEl=document.getElementById(`cw-${cid}-${wi}`);
+  wordEl.classList.add('placed');
+  wordEl.style.outline='';
+  const colItems=document.getElementById(`cc-items-${cid}-${ci}`);
+  const placed=document.createElement('button');
+  placed.className='cat-placed';
+  placed.textContent=word;
+  placed.dataset.wi=wi;
+  placed.dataset.ci=String(ci);
+  placed.dataset.correctCat=String(cs.selectedWord.cat);
+  placed.style.background='var(--a1bg)';placed.style.borderColor='var(--sky)';placed.style.color='var(--sky)';
+  placed.onclick=()=>{
+    wordEl.classList.remove('placed');wordEl.style.outline='';
+    placed.remove();
+    if(catState[cid].placed[wi]) delete catState[cid].placed[wi];
+  };
+  colItems.appendChild(placed);
+  cs.placed[wi]={ci,correctCat:cs.selectedWord.cat};
+  cs.selectedWord=null;
+  document.querySelectorAll(`[id^="cw-${cid}-"]`).forEach(e=>e.style.outline='');
+}
+function checkCat(cid,numCols){
+  const cs=catState[cid]||{placed:{}};
+  let correct=0,total=0;
+  // check each placed item
+  for(const wi in cs.placed){
+    const {ci,correctCat}=cs.placed[wi];
+    const wordEl=document.getElementById(`cw-${cid}-${wi}`);
+    total++;
+    if(ci===correctCat) correct++;
+  }
+  // also count unplaced items (wrong — left in bank)
+  document.querySelectorAll(`[id^="cw-${cid}-"]:not(.placed)`).forEach(()=>total++);
+  // colour the columns
+  for(let ci=0;ci<numCols;ci++){
+    const col=document.getElementById(`cc-${cid}-${ci}`);
+    const items=document.getElementById(`cc-items-${cid}-${ci}`);
+    let colCorrect=true;
+    items.querySelectorAll('.cat-placed').forEach(p=>{
+      const correctCat=parseInt(p.dataset.correctCat);
+      const placedIn=parseInt(p.dataset.ci);
+      if(correctCat!==placedIn){colCorrect=false;p.style.background='#FFF0F0';p.style.borderColor='var(--coral)';p.style.color='var(--coral)';}
+      else{p.style.background='#E8F8F5';p.style.borderColor='var(--sea)';p.style.color='#0F7A6A';}
+    });
+  }
+  const badge=document.getElementById(`score-cat-${cid}`);
+  const pct=total>0?Math.round((correct/total)*100):0;
+  badge.textContent=`${correct}/${total} correct (${pct}%)`;
+  badge.className=`score-badge show ${pct===100?'full':pct>=50?'partial':'low'}`;
+}
+function resetCat(cid,numCols){
+  catState[cid]={selectedWord:null,placed:{}};
+  document.querySelectorAll(`[id^="cw-${cid}-"]`).forEach(e=>{e.classList.remove('placed');e.style.outline='';});
+  for(let ci=0;ci<numCols;ci++) document.getElementById(`cc-items-${cid}-${ci}`).innerHTML='';
+  document.getElementById(`score-cat-${cid}`).className='score-badge';
+}
+
+// ── CONVERSATION FILL ──
+function checkConvo(cvid,count){
+  let correct=0;
+  for(let i=0;i<count;i++){
+    const inp=document.getElementById(`cv-${cvid}-${i}`);
+    const rev=document.getElementById(`cv-rev-${cvid}-${i}`);
+    const accepted=inp.dataset.answer.toLowerCase().split('/').map(a=>a.trim());
+    const val=inp.value.toLowerCase().trim();
+    if(accepted.includes(val)){inp.className='convo-input correct';rev.className='convo-reveal';correct++;}
+    else{inp.className='convo-input wrong';rev.textContent='→ '+inp.dataset.answer;rev.className='convo-reveal show';}
+  }
+  const badge=document.getElementById(`score-cv-${cvid}`);
+  const pct=Math.round((correct/count)*100);
+  badge.textContent=`${correct}/${count} correct (${pct}%)`;
+  badge.className=`score-badge show ${pct===100?'full':pct>=50?'partial':'low'}`;
+}
+function resetConvo(cvid,count){
+  for(let i=0;i<count;i++){
+    const inp=document.getElementById(`cv-${cvid}-${i}`);
+    const rev=document.getElementById(`cv-rev-${cvid}-${i}`);
+    inp.value='';inp.className='convo-input';rev.textContent='';rev.className='convo-reveal';
+  }
+  document.getElementById(`score-cv-${cvid}`).className='score-badge';
+}
+
+// ── TRUE / FALSE / NOT GIVEN ──
+function pickTF(tfid,qi,choice,answer,explanation){
+  const item=document.getElementById(`tf-fb-${tfid}-${qi}`).parentElement;
+  item.querySelectorAll('.tf-btn').forEach(b=>{
+    b.classList.remove('correct-ans','wrong-ans');
+    if(b.textContent===answer) b.classList.add('correct-ans');
+    if(b.textContent===choice&&choice!==answer) b.classList.add('wrong-ans');
+  });
+  const fb=document.getElementById(`tf-fb-${tfid}-${qi}`);
+  fb.textContent=explanation;
+  fb.className=`tf-feedback show ${choice===answer?'ok':'bad'}`;
+}
+
+// ── INIT ──
+buildSidebar();
+goto(0);
+
+</script>
+</body>
+</html>
