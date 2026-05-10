@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Odd One Out · John+English</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sun:#FFB347;--sky:#2176FF;--sky-light:#E8EEFF;
+  --sea:#1DD3B0;--sea-light:#E4FBF7;
+  --coral:#FF6B6B;--coral-light:#FFE8E8;
+  --lavender:#9B72CF;--lavender-light:#F0E8FA;
+  --mint:#5DDEA0;--sand:#FFF5E6;
+  --cream:#F7F6F3;--ink:#2D3047;--muted:#7A7D8E;
+  --border:#E8E5DF;--card:#fff;--radius:14px;
+  --shadow-sm:0 1px 3px rgba(45,48,71,.06);
+  --shadow-md:0 4px 12px rgba(45,48,71,.08);
+  --shadow-lg:0 8px 32px rgba(45,48,71,.12);
+  --b2:#2EC4B6;--b2-light:#2EC4B626;
+  --c1:#2176FF;--c1-light:#E8F2FD
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,var(--border) 1px,transparent 1px);background-size:28px 28px;opacity:.4;pointer-events:none;z-index:0}
+
+/* NAV */
+.topnav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(247,246,243,.88);backdrop-filter:blur(16px);border-bottom:1.5px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-size:1.3rem;font-weight:800;letter-spacing:-.02em;color:var(--ink);text-decoration:none}
+.nav-logo span{color:var(--sky)}
+.topnav-links{display:flex;gap:1.2rem}
+.topnav-links a{font-size:.8rem;font-weight:600;color:var(--muted);text-decoration:none;transition:color .2s}
+.topnav-links a:hover{color:var(--sky)}
+
+/* BACK + HERO */
+.back-link-wrap{max-width:860px;margin:0 auto;padding:4.2rem 2rem 0;position:relative;z-index:1}
+.wf-back-link{display:inline-flex;align-items:center;gap:.35rem;font-size:.82rem;font-weight:600;color:var(--muted);text-decoration:none;transition:color .15s}
+.wf-back-link:hover{color:var(--ink)}
+.hero{padding:1.4rem 2rem 1.2rem;max-width:860px;margin:0 auto;text-align:center;position:relative;z-index:1}
+.hero-badge{display:inline-flex;align-items:center;gap:.4rem;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.3rem .9rem;border-radius:20px;margin-bottom:.7rem;color:var(--sun);background:var(--sand);border:1px solid rgba(255,179,71,.25)}
+.hero h1{font-size:clamp(1.8rem,3.6vw,2.6rem);line-height:1.1;letter-spacing:-.02em;margin-bottom:.6rem;font-weight:900}
+.hero-sub{font-size:.95rem;color:var(--muted);max-width:480px;margin:0 auto;line-height:1.6}
+
+/* CONTROLS */
+.controls-bar{position:sticky;top:52px;z-index:100;background:rgba(247,246,243,.95);backdrop-filter:blur(12px);padding:.8rem 2rem;border-bottom:1px solid var(--border);margin-bottom:2rem}
+.controls-inner{max-width:860px;margin:0 auto;display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;row-gap:.5rem}
+.filter-group{display:flex;align-items:center;gap:.4rem;flex-wrap:nowrap}
+.filter-divider{width:1px;height:20px;background:var(--border);margin:0 .3rem;flex-shrink:0}
+.filter-label{font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-right:.2rem}
+.filter-pill{font-family:'Outfit',sans-serif;font-size:.8rem;font-weight:600;padding:.35rem .8rem;border-radius:100px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap}
+.filter-pill:hover{border-color:var(--ink);color:var(--ink)}
+.filter-pill.active.level-b2{background:var(--b2);color:#fff;border-color:var(--b2)}
+.filter-pill.active.level-c1{background:var(--c1);color:#fff;border-color:var(--c1)}
+.filter-pill.active.topic{background:var(--ink);color:#fff;border-color:var(--ink)}
+.card-count{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--muted);font-weight:500}
+
+/* MAIN */
+.main{max-width:860px;margin:0 auto;padding:0 2rem 4rem;position:relative;z-index:1}
+
+/* TIMER */
+.timer-wrap{display:flex;justify-content:center;margin-bottom:1.4rem}
+.timer-ring{position:relative;width:110px;height:110px;cursor:pointer}
+.timer-ring svg{transform:rotate(-90deg)}
+.timer-ring circle{fill:none;stroke-width:6}
+.timer-bg{stroke:var(--border)}
+.timer-progress{stroke:var(--ink);stroke-linecap:round;transition:stroke-dashoffset .1s linear;stroke-dasharray:308;stroke-dashoffset:0}
+.timer-ring.warning .timer-progress{stroke:var(--sun)}
+.timer-ring.danger .timer-progress{stroke:var(--coral)}
+.timer-display{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.timer-secs{font-family:'JetBrains Mono',monospace;font-size:1.9rem;font-weight:700;color:var(--ink);line-height:1}
+.timer-hint{font-size:.63rem;color:var(--muted);margin-top:.15rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+
+.timer-presets{display:flex;justify-content:center;gap:.4rem;margin-bottom:1.8rem;flex-wrap:wrap;align-items:center}
+.preset-btn{font-family:'JetBrains Mono',monospace;font-size:.65rem;font-weight:700;padding:.28rem .7rem;border-radius:6px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s}
+.preset-btn:hover{border-color:var(--ink);color:var(--ink)}
+.preset-btn.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+/* QUESTION CARD */
+.q-card{background:var(--card);border-radius:20px;border:2px solid var(--border);box-shadow:var(--shadow-lg);overflow:hidden;max-width:580px;margin:0 auto 1.6rem}
+.q-header{padding:.7rem 1.2rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1.5px solid var(--border)}
+.q-level{font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:.2rem .5rem;border-radius:5px}
+.q-level.b2{background:var(--b2-light);color:var(--b2)}
+.q-level.c1{background:var(--c1-light);color:var(--c1)}
+.q-topic{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.q-num{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--muted)}
+.q-prompt{padding:1.4rem 1.6rem .6rem;text-align:center;font-size:.8rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-family:'JetBrains Mono',monospace}
+
+/* WORD BUTTONS */
+.words-grid{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;padding:.8rem 1.4rem 1.4rem}
+.word-btn{font-family:'Outfit',sans-serif;font-size:1.25rem;font-weight:700;padding:.9rem 1rem;border-radius:12px;border:2px solid var(--border);background:var(--cream);color:var(--ink);cursor:pointer;transition:all .18s;text-align:center;letter-spacing:-.01em}
+.word-btn:hover:not(:disabled){border-color:var(--ink);background:var(--card);transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.word-btn:disabled{cursor:default;transform:none}
+.word-btn.correct{background:#22c55e;border-color:#22c55e;color:#fff;box-shadow:0 4px 16px rgba(34,197,94,.35)}
+.word-btn.wrong{background:var(--coral);border-color:var(--coral);color:#fff}
+.word-btn.neutral{opacity:.45}
+
+/* FEEDBACK PANEL */
+.feedback{display:none;padding:1.2rem 1.6rem 1.4rem;border-top:1.5px solid var(--border);background:var(--cream)}
+.feedback.show{display:block}
+.fb-result{display:flex;align-items:center;gap:.6rem;margin-bottom:.7rem}
+.fb-badge{font-family:'JetBrains Mono',monospace;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:.25rem .65rem;border-radius:6px}
+.fb-badge.got-it{background:#dcfce7;color:#16a34a}
+.fb-badge.valid{background:#fef9c3;color:#a16207}
+.fb-badge.not-quite{background:var(--coral-light);color:var(--coral)}
+.fb-title{font-size:1rem;font-weight:700;color:var(--ink)}
+.fb-answer{font-size:.9rem;color:var(--ink);line-height:1.6;margin-bottom:.6rem}
+.fb-answer strong{color:var(--ink);font-weight:700}
+.fb-alt{font-size:.85rem;color:var(--muted);line-height:1.6;padding:.65rem .8rem;background:var(--card);border-radius:8px;border-left:3px solid var(--border);margin-top:.4rem}
+.fb-alt strong{color:var(--muted);font-weight:700}
+
+/* NEXT BUTTON */
+.next-wrap{display:flex;justify-content:center;margin-bottom:1rem}
+.btn-next{font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;padding:.7rem 2rem;border-radius:12px;border:none;background:var(--ink);color:#fff;cursor:pointer;transition:all .18s;display:none;align-items:center;gap:.45rem}
+.btn-next:hover{background:#1a1d2e;transform:translateY(-1px)}
+.btn-next svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+
+.bottom-row{display:flex;justify-content:center;gap:.6rem;flex-wrap:wrap}
+.btn-secondary{font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:600;padding:.45rem 1rem;border-radius:10px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:.4rem}
+.btn-secondary:hover{border-color:var(--ink);color:var(--ink)}
+.btn-secondary svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* EMPTY / END */
+.empty-state,.end-card{text-align:center;padding:4rem 2rem;background:var(--card);border-radius:20px;border:2px solid var(--border);box-shadow:var(--shadow-md);max-width:580px;margin:0 auto}
+.empty-state h3,.end-card h2{font-size:1.2rem;font-weight:800;color:var(--ink);margin-bottom:.5rem}
+.empty-state p,.end-card p{font-size:.9rem;color:var(--muted);margin-bottom:1.5rem}
+.btn-primary{font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;padding:.7rem 1.8rem;border-radius:12px;border:none;background:var(--ink);color:#fff;cursor:pointer;transition:all .18s}
+.btn-primary:hover{background:#1a1d2e}
+
+@media(max-width:600px){
+  .topnav{padding:0 1.2rem}
+  .back-link-wrap,.hero,.main{padding-left:1.2rem;padding-right:1.2rem}
+  .controls-bar{padding:.8rem 1.2rem}
+  .word-btn{font-size:1.05rem;padding:.75rem .8rem}
+  .words-grid{gap:.5rem;padding:.7rem 1rem 1rem}
+}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="index.html" class="nav-logo">john<span>+</span>english</a>
+  <div class="topnav-links">
+    <a href="index.html">Home</a>
+    <a href="index.html#group-fun">Fun Tools</a>
+  </div>
+</nav>
+
+<div class="back-link-wrap">
+  <a href="index.html" class="wf-back-link">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    Back to Home
+  </a>
+</div>
+
+<section class="hero">
+  <span class="hero-badge">Fun Tools</span>
+  <h1>Odd One Out</h1>
+  <p class="hero-sub">Which word doesn't belong? There's often more than one answer — the discussion is the point.</p>
+</section>
+
+<div class="controls-bar">
+  <div class="controls-inner">
+    <div class="filter-group">
+      <span class="filter-label">Level</span>
+      <button class="filter-pill level-b2 active" onclick="toggleLevel('b2',this)">B2</button>
+      <button class="filter-pill level-c1 active" onclick="toggleLevel('c1',this)">C1</button>
+    </div>
+    <div class="filter-divider"></div>
+    <div style="display:flex;align-items:flex-start;gap:.4rem">
+      <span class="filter-label" style="margin-top:.45rem;flex-shrink:0">Topic</span>
+      <div id="topicFilters" style="display:flex;flex-wrap:wrap;gap:.4rem"></div>
+    </div>
+    <span class="card-count" id="cardCount" style="margin-left:auto"></span>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="timer-wrap">
+    <div class="timer-ring" id="timerRing" onclick="toggleTimer()">
+      <svg width="110" height="110" viewBox="0 0 110 110">
+        <circle class="timer-bg" cx="55" cy="55" r="49"/>
+        <circle class="timer-progress" id="timerArc" cx="55" cy="55" r="49"/>
+      </svg>
+      <div class="timer-display">
+        <div class="timer-secs" id="timerDisplay">30</div>
+        <div class="timer-hint" id="timerHint">tap to start</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="timer-presets">
+    <span class="filter-label">Timer</span>
+    <button class="preset-btn active" onclick="setDuration(30,this)">30s</button>
+    <button class="preset-btn" onclick="setDuration(60,this)">60s</button>
+    <button class="preset-btn" onclick="setDuration(90,this)">90s</button>
+    <button class="preset-btn" onclick="setDuration(0,this)">No timer</button>
+  </div>
+
+  <div id="qCardWrap"></div>
+
+  <div class="next-wrap">
+    <button class="btn-next" id="btnNext" onclick="nextQuestion()">
+      Next question
+      <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </button>
+  </div>
+
+  <div class="bottom-row">
+    <button class="btn-secondary" onclick="skipQuestion()">
+      <svg viewBox="0 0 24 24"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>
+      Skip
+    </button>
+    <button class="btn-secondary" onclick="rebuildDeck()">
+      <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.03"/></svg>
+      Shuffle &amp; restart
+    </button>
+  </div>
+
+</div>
+
+<script>
+// Each set:
+// w: [word0, word1, word2, word3]
+// ans: index of intended odd one out
+// why: explanation of intended answer
+// alts: array of {idx, reason} — valid alternative answers with explanation
+// l: level, topic: topic
+
+var SETS = [
+  // ── B2 ──────────────────────────────────────────────────────────────
+
+  // Feelings
+  {w:['anxious','nervous','calm','worried'],ans:2,l:'b2',topic:'Feelings',
+   why:'<strong>Calm</strong> is the odd one out — it\'s the only positive emotion. The other three all describe a state of unease or stress.',
+   alts:[{idx:0,reason:'You could argue <strong>anxious</strong> — it\'s the only clinical/psychological term. Nervous, worried, and calm are all very common everyday words.'}]},
+
+  {w:['furious','annoyed','irritated','upset'],ans:0,l:'b2',topic:'Feelings',
+   why:'<strong>Furious</strong> is the odd one out — it\'s the most extreme. Annoyed, irritated and upset are relatively mild; furious is at the top of the anger scale.',
+   alts:[{idx:3,reason:'You could argue <strong>upset</strong> — it\'s the only word that doesn\'t specifically describe anger. Upset can mean sad, hurt or distressed.'}]},
+
+  {w:['delighted','pleased','thrilled','content'],ans:3,l:'b2',topic:'Feelings',
+   why:'<strong>Content</strong> is the odd one out — it describes quiet, settled satisfaction rather than active happiness. Delighted, pleased and thrilled all suggest a positive reaction to something.',
+   alts:[]},
+
+  {w:['terrified','scared','frightened','startled'],ans:3,l:'b2',topic:'Feelings',
+   why:'<strong>Startled</strong> is the odd one out — it describes a sudden shock reaction, not sustained fear. The other three all describe ongoing fear.',
+   alts:[]},
+
+  {w:['exhausted','tired','drained','sleepy'],ans:3,l:'b2',topic:'Feelings',
+   why:'<strong>Sleepy</strong> is the odd one out — it specifically means wanting to sleep. Exhausted, tired and drained all describe a lack of energy that doesn\'t necessarily mean you want sleep.',
+   alts:[{idx:0,reason:'You could argue <strong>exhausted</strong> — it\'s the only one that implies total physical or mental depletion. The others are milder.'}]},
+
+  // Work
+  {w:['salary','bonus','wage','pension'],ans:3,l:'b2',topic:'Work',
+   why:'<strong>Pension</strong> is the odd one out — it\'s money paid after you stop working. Salary, bonus and wage are all payments received while employed.',
+   alts:[{idx:1,reason:'You could argue <strong>bonus</strong> — it\'s the only payment that is variable and performance-related. The others are regular, predictable payments.'}]},
+
+  {w:['resign','retire','quit','leave'],ans:1,l:'b2',topic:'Work',
+   why:'<strong>Retire</strong> is the odd one out — it means leaving work permanently due to age, not as a career decision. Resign, quit and leave all mean choosing to stop working somewhere at any age.',
+   alts:[]},
+
+  {w:['boss','manager','colleague','supervisor'],ans:2,l:'b2',topic:'Work',
+   why:'<strong>Colleague</strong> is the odd one out — it refers to someone at the same level as you. Boss, manager and supervisor all describe someone with authority over others.',
+   alts:[]},
+
+  {w:['deadline','target','goal','objective'],ans:0,l:'b2',topic:'Work',
+   why:'<strong>Deadline</strong> is the odd one out — it refers specifically to time, not achievement. Targets, goals and objectives all describe what you want to accomplish.',
+   alts:[]},
+
+  {w:['interview','appraisal','meeting','presentation'],ans:0,l:'b2',topic:'Work',
+   why:'<strong>Interview</strong> is the odd one out — it\'s the only one that typically happens before you get a job. Appraisal, meeting and presentation all happen during employment.',
+   alts:[{idx:1,reason:'You could argue <strong>appraisal</strong> — it\'s the only formal evaluation of an employee\'s performance. The others don\'t carry that specific meaning.'}]},
+
+  // Social
+  {w:['cancel','postpone','reschedule','delay'],ans:0,l:'b2',topic:'Social',
+   why:'<strong>Cancel</strong> is the odd one out — it means something won\'t happen at all. Postpone, reschedule and delay all mean it will still happen, just later.',
+   alts:[]},
+
+  {w:['acquaintance','friend','colleague','stranger'],ans:3,l:'b2',topic:'Social',
+   why:'<strong>Stranger</strong> is the odd one out — it\'s the only person you have had no previous contact with. Acquaintance, friend and colleague all describe someone you know to some degree.',
+   alts:[{idx:0,reason:'You could argue <strong>acquaintance</strong> — it\'s the only word that implies a weak social connection rather than a real relationship.'}]},
+
+  {w:['gossip','rumour','secret','fact'],ans:3,l:'b2',topic:'Social',
+   why:'<strong>Fact</strong> is the odd one out — it\'s true and verifiable. Gossip, rumours and secrets are all pieces of information that may be unreliable, private or unverified.',
+   alts:[]},
+
+  {w:['shy','reserved','introverted','antisocial'],ans:3,l:'b2',topic:'Social',
+   why:'<strong>Antisocial</strong> is the odd one out — it has a negative connotation suggesting hostility or disregard for others. Shy, reserved and introverted simply describe someone who is quiet or prefers less social interaction.',
+   alts:[]},
+
+  // Home
+  {w:['tidy','clean','spotless','cluttered'],ans:3,l:'b2',topic:'Home',
+   why:'<strong>Cluttered</strong> is the odd one out — it\'s negative, describing a messy space. Tidy, clean and spotless are all positive descriptions of an ordered, dirt-free place.',
+   alts:[]},
+
+  {w:['landlord','tenant','flatmate','lodger'],ans:0,l:'b2',topic:'Home',
+   why:'<strong>Landlord</strong> is the odd one out — it\'s the owner. Tenant, flatmate and lodger are all people who live in a property they don\'t own.',
+   alts:[{idx:2,reason:'You could argue <strong>flatmate</strong> — it\'s the only word that doesn\'t imply a formal rental arrangement. You can have a flatmate who is a friend, not a paying tenant.'}]},
+
+  {w:['cosy','cramped','compact','tiny'],ans:0,l:'b2',topic:'Home',
+   why:'<strong>Cosy</strong> is the odd one out — it has a warm, positive meaning. Cramped, compact and tiny all describe small size, often with a neutral or negative implication.',
+   alts:[]},
+
+  // Travel
+  {w:['delay','cancellation','diversion','departure'],ans:3,l:'b2',topic:'Travel',
+   why:'<strong>Departure</strong> is the odd one out — it\'s a normal, expected event. Delay, cancellation and diversion are all disruptions or problems.',
+   alts:[]},
+
+  {w:['hostel','hotel','B&B','resort'],ans:0,l:'b2',topic:'Travel',
+   why:'<strong>Hostel</strong> is the odd one out — it typically involves shared dormitories and is aimed at budget travellers. Hotel, B&B and resort all provide private rooms.',
+   alts:[{idx:3,reason:'You could argue <strong>resort</strong> — it\'s the only one that refers to a whole complex with entertainment, pools and facilities, not just accommodation.'}]},
+
+  {w:['visa','passport','boarding pass','suitcase'],ans:3,l:'b2',topic:'Travel',
+   why:'<strong>Suitcase</strong> is the odd one out — it\'s a physical object for carrying things. Visa, passport and boarding pass are all documents required for travel.',
+   alts:[]},
+
+  // Food & Drink
+  {w:['boil','fry','steam','chop'],ans:3,l:'b2',topic:'Food',
+   why:'<strong>Chop</strong> is the odd one out — it\'s a preparation method, not a cooking method. Boil, fry and steam all involve applying heat to cook food.',
+   alts:[]},
+
+  {w:['stale','rotten','expired','fresh'],ans:3,l:'b2',topic:'Food',
+   why:'<strong>Fresh</strong> is the odd one out — it\'s the only positive quality. Stale, rotten and expired all describe food that is no longer good to eat.',
+   alts:[]},
+
+  {w:['sour','bitter','sharp','sweet'],ans:3,l:'b2',topic:'Food',
+   why:'<strong>Sweet</strong> is the odd one out — it\'s a distinct, pleasant taste. Sour, bitter and sharp can all describe a similar acidic or harsh quality.',
+   alts:[]},
+
+  // Health
+  {w:['symptom','diagnosis','treatment','cure'],ans:0,l:'b2',topic:'Health',
+   why:'<strong>Symptom</strong> is the odd one out — it describes what you experience, not what a doctor or medicine does. Diagnosis, treatment and cure are all things in the medical process of dealing with an illness.',
+   alts:[]},
+
+  {w:['doctor','nurse','surgeon','patient'],ans:3,l:'b2',topic:'Health',
+   why:'<strong>Patient</strong> is the odd one out — they receive care rather than provide it. Doctor, nurse and surgeon are all healthcare professionals.',
+   alts:[]},
+
+  {w:['exhausted','ill','unwell','sick'],ans:0,l:'b2',topic:'Health',
+   why:'<strong>Exhausted</strong> is the odd one out — it describes extreme tiredness, not illness. Ill, unwell and sick all suggest the body is fighting disease or infection.',
+   alts:[]},
+
+  // Technology
+  {w:['upload','download','stream','delete'],ans:3,l:'b2',topic:'Technology',
+   why:'<strong>Delete</strong> is the odd one out — it removes data. Upload, download and stream all involve transferring or accessing data across a network.',
+   alts:[]},
+
+  {w:['app','website','software','keyboard'],ans:3,l:'b2',topic:'Technology',
+   why:'<strong>Keyboard</strong> is the odd one out — it\'s physical hardware. App, website and software are all digital, intangible things.',
+   alts:[]},
+
+  {w:['virus','malware','bug','update'],ans:3,l:'b2',topic:'Technology',
+   why:'<strong>Update</strong> is the odd one out — it\'s a positive improvement to software. Virus, malware and bug are all problems or threats.',
+   alts:[{idx:2,reason:'You could argue <strong>bug</strong> — it\'s the only unintentional error. Virus and malware are deliberately created by people with harmful intent.'}]},
+
+  // Money
+  {w:['save','invest','lend','spend'],ans:2,l:'b2',topic:'Money',
+   why:'<strong>Lend</strong> is the odd one out — it involves giving money to someone else temporarily. Save, invest and spend are all things you do with your own money.',
+   alts:[{idx:1,reason:'You could argue <strong>invest</strong> — it\'s the only one where the aim is to make your money grow, not just hold it or use it.'}]},
+
+  {w:['cheap','affordable','reasonable','free'],ans:3,l:'b2',topic:'Money',
+   why:'<strong>Free</strong> is the odd one out — it means no cost at all. Cheap, affordable and reasonable all suggest a low but real price.',
+   alts:[]},
+
+  {w:['receipt','invoice','bill','refund'],ans:3,l:'b2',topic:'Money',
+   why:'<strong>Refund</strong> is the odd one out — it\'s money going back to the customer. Receipt, invoice and bill are all documents related to payment.',
+   alts:[]},
+
+  // Education
+  {w:['essay','dissertation','thesis','lecture'],ans:3,l:'b2',topic:'Education',
+   why:'<strong>Lecture</strong> is the odd one out — it\'s a spoken presentation. Essay, dissertation and thesis are all written academic works.',
+   alts:[]},
+
+  {w:['fail','pass','scrape through','ace'],ans:0,l:'b2',topic:'Education',
+   why:'<strong>Fail</strong> is the odd one out — it\'s the only one where you don\'t achieve the required standard. Pass, scrape through and ace all mean succeeding to varying degrees.',
+   alts:[{idx:3,reason:'You could argue <strong>ace</strong> — it\'s the only one that means exceptional performance, not just passing. The others describe degrees of barely succeeding.'}]},
+
+  // ── C1 ──────────────────────────────────────────────────────────────
+
+  // Feelings
+  {w:['apprehensive','anxious','eager','nervous'],ans:2,l:'c1',topic:'Feelings',
+   why:'<strong>Eager</strong> is the odd one out — it\'s positive, describing enthusiastic anticipation. Apprehensive, anxious and nervous all describe negative anticipation or worry.',
+   alts:[]},
+
+  {w:['melancholy','despondent','pensive','grief-stricken'],ans:2,l:'c1',topic:'Feelings',
+   why:'<strong>Pensive</strong> is the odd one out — it simply means thoughtful or reflective, not necessarily sad. Melancholy, despondent and grief-stricken all describe genuine sadness or distress.',
+   alts:[]},
+
+  {w:['indignant','furious','outraged','irritated'],ans:3,l:'c1',topic:'Feelings',
+   why:'<strong>Irritated</strong> is the odd one out — it\'s mild. Indignant, furious and outraged all describe intense anger, often provoked by injustice or wrongdoing.',
+   alts:[]},
+
+  {w:['ambivalent','indifferent','conflicted','uncertain'],ans:1,l:'c1',topic:'Feelings',
+   why:'<strong>Indifferent</strong> is the odd one out — it means you simply don\'t care. Ambivalent, conflicted and uncertain all suggest having some emotional or intellectual stake but being pulled in two directions.',
+   alts:[]},
+
+  {w:['elated','euphoric','content','ecstatic'],ans:2,l:'c1',topic:'Feelings',
+   why:'<strong>Content</strong> is the odd one out — it describes quiet, settled satisfaction. Elated, euphoric and ecstatic all describe extreme, intense happiness.',
+   alts:[]},
+
+  // Language & Communication
+  {w:['imply','suggest','insinuate','state'],ans:3,l:'c1',topic:'Language',
+   why:'<strong>State</strong> is the odd one out — it means saying something directly and explicitly. Imply, suggest and insinuate all involve communicating something indirectly or without saying it outright.',
+   alts:[{idx:2,reason:'You could argue <strong>insinuate</strong> — it has a negative connotation, suggesting something unflattering or accusatory. Imply and suggest are neutral.'}]},
+
+  {w:['eloquent','articulate','verbose','fluent'],ans:2,l:'c1',topic:'Language',
+   why:'<strong>Verbose</strong> is the odd one out — it means using too many words, which is a criticism. Eloquent, articulate and fluent are all positive descriptions of someone who communicates well.',
+   alts:[]},
+
+  {w:['sarcasm','irony','hyperbole','sincerity'],ans:3,l:'c1',topic:'Language',
+   why:'<strong>Sincerity</strong> is the odd one out — it means saying exactly what you mean. Sarcasm, irony and hyperbole are all rhetorical techniques that say something other than the literal truth.',
+   alts:[]},
+
+  {w:['condescending','patronising','dismissive','encouraging'],ans:3,l:'c1',topic:'Language',
+   why:'<strong>Encouraging</strong> is the odd one out — it\'s positive and supportive. Condescending, patronising and dismissive all describe negative ways of treating or speaking to someone.',
+   alts:[]},
+
+  {w:['concise','succinct','brief','vague'],ans:3,l:'c1',topic:'Language',
+   why:'<strong>Vague</strong> is the odd one out — it has a negative meaning, suggesting a lack of clarity. Concise, succinct and brief are all positive qualities meaning clear and to the point.',
+   alts:[]},
+
+  // Society & Politics
+  {w:['inequality','disparity','discrimination','diversity'],ans:3,l:'c1',topic:'Society',
+   why:'<strong>Diversity</strong> is the odd one out — it\'s a positive term describing variety and inclusion. Inequality, disparity and discrimination all describe social problems or unfair treatment.',
+   alts:[]},
+
+  {w:['prejudice','bias','stereotype','awareness'],ans:3,l:'c1',topic:'Society',
+   why:'<strong>Awareness</strong> is the odd one out — it\'s the positive counterpart. Prejudice, bias and stereotype all describe flawed or unfair ways of thinking about groups of people.',
+   alts:[]},
+
+  {w:['transparent','accountable','corrupt','ethical'],ans:2,l:'c1',topic:'Society',
+   why:'<strong>Corrupt</strong> is the odd one out — it\'s negative, describing dishonesty or abuse of power. Transparent, accountable and ethical are all positive qualities expected of institutions or leaders.',
+   alts:[]},
+
+  {w:['reform','overhaul','abolish','maintain'],ans:3,l:'c1',topic:'Society',
+   why:'<strong>Maintain</strong> is the odd one out — it means keeping something as it is. Reform, overhaul and abolish all describe varying degrees of changing or ending something.',
+   alts:[{idx:2,reason:'You could argue <strong>abolish</strong> — it\'s the only one that means complete elimination rather than modification or improvement.'}]},
+
+  {w:['lobby','campaign','advocate','comply'],ans:3,l:'c1',topic:'Society',
+   why:'<strong>Comply</strong> is the odd one out — it means following rules or instructions. Lobby, campaign and advocate all describe actively pushing for change.',
+   alts:[]},
+
+  // Relationships
+  {w:['platonic','romantic','intimate','passionate'],ans:0,l:'c1',topic:'Relationships',
+   why:'<strong>Platonic</strong> is the odd one out — it describes a non-romantic relationship. Romantic, intimate and passionate all carry connotations of love or physical attraction.',
+   alts:[]},
+
+  {w:['manipulate','coerce','persuade','control'],ans:2,l:'c1',topic:'Relationships',
+   why:'<strong>Persuade</strong> is the odd one out — it can be done ethically, using reason and honest argument. Manipulate, coerce and control all suggest forcing or deceiving someone against their will.',
+   alts:[]},
+
+  {w:['reconcile','forgive','resent','move on'],ans:2,l:'c1',topic:'Relationships',
+   why:'<strong>Resent</strong> is the odd one out — it means holding onto negative feelings. Reconcile, forgive and move on are all about resolving conflict and leaving it behind.',
+   alts:[]},
+
+  {w:['loyal','devoted','dependent','committed'],ans:2,l:'c1',topic:'Relationships',
+   why:'<strong>Dependent</strong> is the odd one out — it can carry a negative connotation of unhealthy reliance. Loyal, devoted and committed are all positive descriptions of dedication to a relationship.',
+   alts:[]},
+
+  // Work & Economy
+  {w:['redundancy','dismissal','resignation','retirement'],ans:2,l:'c1',topic:'Work',
+   why:'<strong>Resignation</strong> is the odd one out — it\'s the employee\'s own decision to leave. Redundancy, dismissal and retirement are all situations where employment ends due to circumstances beyond the employee\'s immediate choice.',
+   alts:[{idx:3,reason:'You could argue <strong>retirement</strong> — it\'s the only positive ending to employment, chosen freely when financially and personally ready.'}]},
+
+  {w:['incentive','deterrent','reward','bonus'],ans:1,l:'c1',topic:'Work',
+   why:'<strong>Deterrent</strong> is the odd one out — it discourages behaviour. Incentive, reward and bonus all encourage or positively reinforce behaviour.',
+   alts:[]},
+
+  {w:['mediator','arbitrator','negotiator','defendant'],ans:3,l:'c1',topic:'Work',
+   why:'<strong>Defendant</strong> is the odd one out — it\'s a legal term for someone being accused. Mediator, arbitrator and negotiator are all roles involved in resolving disputes between parties.',
+   alts:[]},
+
+  {w:['austerity','deficit','recession','surplus'],ans:3,l:'c1',topic:'Work',
+   why:'<strong>Surplus</strong> is the odd one out — it means having more than needed, which is positive. Austerity, deficit and recession are all associated with economic hardship or shortfall.',
+   alts:[]},
+
+  // Health & Psychology
+  {w:['resilience','perseverance','determination','impulsiveness'],ans:3,l:'c1',topic:'Health',
+   why:'<strong>Impulsiveness</strong> is the odd one out — it\'s often seen as a weakness or risk. Resilience, perseverance and determination are all positive qualities related to sustained effort and mental strength.',
+   alts:[]},
+
+  {w:['chronic','persistent','recurring','acute'],ans:3,l:'c1',topic:'Health',
+   why:'<strong>Acute</strong> is the odd one out — it describes something sudden and severe but short-lived. Chronic, persistent and recurring all describe conditions that last over a long period.',
+   alts:[]},
+
+  {w:['therapy','counselling','medication','diagnosis'],ans:3,l:'c1',topic:'Health',
+   why:'<strong>Diagnosis</strong> is the odd one out — it\'s the identification of a problem, not a solution to it. Therapy, counselling and medication are all forms of treatment.',
+   alts:[]},
+
+  {w:['compulsion','obsession','habit','addiction'],ans:2,l:'c1',topic:'Health',
+   why:'<strong>Habit</strong> is the odd one out — it can be positive or neutral and is within conscious control. Compulsion, obsession and addiction all suggest an unhealthy, hard-to-control pattern of behaviour.',
+   alts:[]},
+
+  // Environment & Technology
+  {w:['sustainable','renewable','eco-friendly','disposable'],ans:3,l:'c1',topic:'Society',
+   why:'<strong>Disposable</strong> is the odd one out — it implies something designed to be thrown away. Sustainable, renewable and eco-friendly all describe approaches that are good for the environment.',
+   alts:[]},
+
+  {w:['algorithm','data','software','keyboard'],ans:3,l:'c1',topic:'Technology',
+   why:'<strong>Keyboard</strong> is the odd one out — it\'s physical hardware. Algorithm, data and software are all intangible, digital concepts.',
+   alts:[]},
+
+  {w:['transparent','anonymous','encrypted','private'],ans:0,l:'c1',topic:'Technology',
+   why:'<strong>Transparent</strong> is the odd one out — it means open and visible to all. Anonymous, encrypted and private all describe ways of hiding or protecting information.',
+   alts:[]},
+
+  // Vocabulary & Register
+  {w:['purchase','buy','acquire','obtain'],ans:1,l:'c1',topic:'Language',
+   why:'<strong>Buy</strong> is the odd one out — it\'s informal and everyday. Purchase, acquire and obtain are all more formal synonyms, typically used in written or professional contexts.',
+   alts:[]},
+
+  {w:['substantial','considerable','significant','tiny'],ans:3,l:'c1',topic:'Language',
+   why:'<strong>Tiny</strong> is the odd one out — it means very small. Substantial, considerable and significant all describe something large, important or noteworthy.',
+   alts:[]},
+
+  {w:['allegedly','supposedly','apparently','definitely'],ans:3,l:'c1',topic:'Language',
+   why:'<strong>Definitely</strong> is the odd one out — it expresses certainty. Allegedly, supposedly and apparently all hedge a statement, suggesting the speaker is not certain or is reporting what others say.',
+   alts:[]}
+];
+
+var TOPICS = ['All'];
+SETS.forEach(function(s){ if (TOPICS.indexOf(s.topic) === -1) TOPICS.push(s.topic); });
+TOPICS.sort(function(a,b){ return a==='All'?-1:b==='All'?1:a.localeCompare(b); });
+
+var activeLevels = {b2:true, c1:true};
+var activeTopic = 'All';
+var deck = [];
+var currentIdx = 0;
+var answered = false;
+var timerDuration = 30;
+var timerRemaining = 30;
+var timerInterval = null;
+var timerRunning = false;
+
+function buildTopicFilters() {
+  var el = document.getElementById('topicFilters');
+  var html = '';
+  TOPICS.forEach(function(t) {
+    html += '<button class="filter-pill topic'+(t===activeTopic?' active':'')+'" onclick="setTopic(\''+t+'\',this)">'+t+'</button>';
+  });
+  el.innerHTML = html;
+}
+
+function toggleLevel(lv, btn) {
+  var would = !activeLevels[lv];
+  if (!would && !activeLevels[lv === 'b2' ? 'c1' : 'b2']) return;
+  activeLevels[lv] = would;
+  btn.classList.toggle('active', activeLevels[lv]);
+  rebuildDeck();
+}
+
+function setTopic(t, btn) {
+  activeTopic = t;
+  document.querySelectorAll('.filter-pill.topic').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  rebuildDeck();
+}
+
+function getFiltered() {
+  return SETS.filter(function(s) {
+    return activeLevels[s.l] && (activeTopic === 'All' || s.topic === activeTopic);
+  });
+}
+
+function shuffle(arr) {
+  for (var i = arr.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+  }
+  return arr;
+}
+
+function rebuildDeck() {
+  stopTimer();
+  timerRemaining = timerDuration;
+  updateTimerDisplay();
+  deck = shuffle(getFiltered().slice());
+  currentIdx = 0;
+  answered = false;
+  document.getElementById('btnNext').style.display = 'none';
+  renderQuestion();
+  document.getElementById('cardCount').textContent = deck.length + ' questions';
+}
+
+function renderQuestion() {
+  var wrap = document.getElementById('qCardWrap');
+  answered = false;
+  document.getElementById('btnNext').style.display = 'none';
+
+  if (!deck.length) {
+    wrap.innerHTML = '<div class="empty-state"><h3>No questions match that filter</h3><p>Try selecting a different level or topic.</p></div>';
+    return;
+  }
+  if (currentIdx >= deck.length) {
+    wrap.innerHTML = '<div class="end-card"><h2>All done! 🎉</h2><p>You\'ve been through all '+deck.length+' questions in this set.</p><button class="btn-primary" onclick="rebuildDeck()">Play again</button></div>';
+    stopTimer();
+    return;
+  }
+
+  var q = deck[currentIdx];
+  // Shuffle word display order but track original indices
+  var indices = [0,1,2,3];
+  shuffle(indices);
+
+  var wordsHtml = indices.map(function(origIdx) {
+    return '<button class="word-btn" data-idx="'+origIdx+'" onclick="choose(this,'+origIdx+')">' + q.w[origIdx] + '</button>';
+  }).join('');
+
+  wrap.innerHTML = '<div class="q-card" id="activeCard">'
+    + '<div class="q-header">'
+    + '<span class="q-level '+q.l+'">'+(q.l==='b2'?'B2':'C1')+'</span>'
+    + '<span class="q-topic">'+q.topic+'</span>'
+    + '<span class="q-num">'+(currentIdx+1)+' / '+deck.length+'</span>'
+    + '</div>'
+    + '<div class="q-prompt">Which is the odd one out?</div>'
+    + '<div class="words-grid">'+wordsHtml+'</div>'
+    + '<div class="feedback" id="feedback"></div>'
+    + '</div>';
+}
+
+function choose(btn, chosenIdx) {
+  if (answered) return;
+  answered = true;
+  stopTimer();
+
+  var q = deck[currentIdx];
+  var correct = chosenIdx === q.ans;
+
+  // Style all buttons
+  document.querySelectorAll('.word-btn').forEach(function(b) {
+    var idx = parseInt(b.getAttribute('data-idx'));
+    b.disabled = true;
+    if (idx === q.ans) {
+      b.classList.add('correct');
+    } else if (idx === chosenIdx && !correct) {
+      b.classList.add('wrong');
+    } else {
+      b.classList.add('neutral');
+    }
+  });
+
+  // Build feedback
+  var fb = document.getElementById('feedback');
+  var badgeClass, badgeText, intro;
+
+  if (correct) {
+    badgeClass = 'got-it'; badgeText = 'Correct!';
+    intro = '';
+  } else {
+    // Check if chosen answer has a valid alternative reason
+    var altMatch = q.alts && q.alts.find(function(a){ return a.idx === chosenIdx; });
+    if (altMatch) {
+      badgeClass = 'valid'; badgeText = 'Valid argument!';
+      intro = altMatch.reason + '<br><br>';
+    } else {
+      badgeClass = 'not-quite'; badgeText = 'Not quite';
+      intro = '';
+    }
+  }
+
+  var altNote = '';
+  if (correct && q.alts && q.alts.length) {
+    altNote = '<div class="fb-alt"><strong>Worth discussing:</strong> '+q.alts[0].reason+'</div>';
+  } else if (!correct) {
+    // Show correct answer explanation always
+  }
+
+  fb.innerHTML = '<div class="fb-result">'
+    + '<span class="fb-badge '+badgeClass+'">'+badgeText+'</span>'
+    + '<span class="fb-title">The odd one out is <em>'+q.w[q.ans]+'</em></span>'
+    + '</div>'
+    + '<div class="fb-answer">'+intro+q.why+'</div>'
+    + altNote;
+
+  fb.classList.add('show');
+
+  var btnNext = document.getElementById('btnNext');
+  btnNext.style.display = 'inline-flex';
+
+  // Reset timer for next question
+  timerRemaining = timerDuration;
+  updateTimerDisplay();
+  var ring = document.getElementById('timerRing');
+  ring.classList.remove('warning','danger');
+}
+
+function nextQuestion() {
+  currentIdx++;
+  answered = false;
+  renderQuestion();
+  if (timerDuration > 0 && currentIdx < deck.length) {
+    startTimer();
+  }
+}
+
+function skipQuestion() {
+  if (answered) { nextQuestion(); return; }
+  var q = deck.splice(currentIdx, 1)[0];
+  var insertAt = Math.min(currentIdx + 3, deck.length);
+  deck.splice(insertAt, 0, q);
+  renderQuestion();
+}
+
+// Timer
+function setDuration(secs, btn) {
+  timerDuration = secs;
+  timerRemaining = secs || 0;
+  document.querySelectorAll('.preset-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  stopTimer();
+  var ring = document.getElementById('timerRing');
+  ring.classList.remove('warning','danger');
+  if (secs === 0) {
+    document.getElementById('timerDisplay').textContent = '--';
+    document.getElementById('timerHint').textContent = 'no timer';
+  } else {
+    updateTimerDisplay();
+    document.getElementById('timerHint').textContent = 'tap to start';
+  }
+}
+
+function toggleTimer() {
+  if (timerDuration === 0 || answered) return;
+  timerRunning ? stopTimer() : startTimer();
+}
+
+function startTimer() {
+  if (timerDuration === 0) return;
+  if (timerRemaining <= 0) timerRemaining = timerDuration;
+  timerRunning = true;
+  document.getElementById('timerHint').textContent = 'tap to pause';
+  timerInterval = setInterval(function() {
+    timerRemaining--;
+    updateTimerDisplay();
+    if (timerRemaining <= 0) { stopTimer(); timerExpired(); }
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  if (timerDuration > 0 && timerRemaining > 0)
+    document.getElementById('timerHint').textContent = 'tap to start';
+}
+
+function timerExpired() {
+  document.getElementById('timerHint').textContent = 'time\'s up!';
+  var ring = document.getElementById('timerRing');
+  ring.classList.add('danger');
+  var flashes = 0;
+  var iv = setInterval(function(){
+    ring.style.opacity = ring.style.opacity==='0.4'?'1':'0.4';
+    if(++flashes>5){clearInterval(iv);ring.style.opacity='1';}
+  },200);
+}
+
+function updateTimerDisplay() {
+  if (timerDuration === 0) return;
+  document.getElementById('timerDisplay').textContent = timerRemaining;
+  var ratio = timerDuration > 0 ? timerRemaining / timerDuration : 1;
+  var circumference = 308;
+  document.getElementById('timerArc').style.strokeDashoffset = circumference * (1 - ratio);
+  var ring = document.getElementById('timerRing');
+  ring.classList.remove('warning','danger');
+  if (ratio <= 0.25) ring.classList.add('danger');
+  else if (ratio <= 0.5) ring.classList.add('warning');
+}
+
+buildTopicFilters();
+rebuildDeck();
+</script>
+</body>
+</html>
