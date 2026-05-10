@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Accent Challenge · John+English</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sun:#FFB347;--sky:#2176FF;--sky-light:#E8EEFF;
+  --sea:#1DD3B0;--sea-light:#E4FBF7;
+  --coral:#FF6B6B;--coral-light:#FFE8E8;
+  --lavender:#9B72CF;--lavender-light:#F0E8FA;
+  --cream:#F7F6F3;--ink:#2D3047;--muted:#7A7D8E;
+  --border:#E8E5DF;--card:#fff;--radius:14px;
+  --shadow-sm:0 1px 3px rgba(45,48,71,.06);
+  --shadow-md:0 4px 12px rgba(45,48,71,.08);
+  --shadow-lg:0 8px 32px rgba(45,48,71,.14)
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;min-height:100vh}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,var(--border) 1px,transparent 1px);background-size:28px 28px;opacity:.4;pointer-events:none;z-index:0}
+.topnav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(247,246,243,.88);backdrop-filter:blur(16px);border-bottom:1.5px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-size:1.3rem;font-weight:800;letter-spacing:-.02em;color:var(--ink);text-decoration:none}
+.nav-logo span{color:var(--sky)}
+.topnav-links{display:flex;gap:1.2rem}
+.topnav-links a{font-size:.8rem;font-weight:600;color:var(--muted);text-decoration:none;transition:color .2s}
+.topnav-links a:hover{color:var(--sky)}
+.back-link-wrap{max-width:700px;margin:0 auto;padding:4.2rem 2rem 0;position:relative;z-index:1}
+.wf-back-link{display:inline-flex;align-items:center;gap:.35rem;font-size:.82rem;font-weight:600;color:var(--muted);text-decoration:none}
+.wf-back-link:hover{color:var(--ink)}
+.hero{padding:1.4rem 2rem 1.8rem;max-width:700px;margin:0 auto;text-align:center;position:relative;z-index:1}
+.hero-badge{display:inline-flex;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.3rem .9rem;border-radius:20px;margin-bottom:.7rem;color:var(--sun);background:#FFF5E6;border:1px solid rgba(255,179,71,.25)}
+.hero h1{font-size:clamp(1.8rem,3.6vw,2.6rem);line-height:1.1;letter-spacing:-.02em;margin-bottom:.6rem;font-weight:900}
+.hero-sub{font-size:.95rem;color:var(--muted);max-width:440px;margin:0 auto;line-height:1.6}
+.main{max-width:700px;margin:0 auto;padding:0 2rem 4rem;position:relative;z-index:1}
+
+/* CARD */
+.ac-card{background:var(--card);border-radius:22px;border:2px solid var(--border);box-shadow:var(--shadow-lg);overflow:hidden;margin-bottom:1.6rem}
+.card-top{padding:.8rem 1.4rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1.5px solid var(--border)}
+.card-num{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--muted)}
+
+/* STYLE BANNER */
+.style-banner{padding:1.2rem 1.6rem;text-align:center;border-bottom:1.5px solid var(--border)}
+.style-label{font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.5rem}
+.style-text{font-size:1.6rem;font-weight:900;color:var(--ink);letter-spacing:-.02em}
+.style-emoji{font-size:2rem;margin-right:.4rem}
+.style-tag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;padding:.2rem .55rem;border-radius:5px;margin-top:.4rem}
+.style-tag.emotion{background:var(--coral-light);color:var(--coral)}
+.style-tag.register{background:var(--lavender-light);color:var(--lavender)}
+
+/* SENTENCE */
+.sentence-area{padding:2rem 2rem 1.8rem;text-align:center}
+.sentence-label{font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:.9rem}
+.sentence-text{font-size:1.25rem;font-weight:700;color:var(--ink);line-height:1.5;max-width:500px;margin:0 auto;font-style:italic}
+
+/* TIMER */
+.timer-wrap{display:flex;justify-content:center;margin-bottom:1.4rem}
+.timer-ring{position:relative;width:110px;height:110px;cursor:pointer}
+.timer-ring svg{transform:rotate(-90deg)}
+.timer-ring circle{fill:none;stroke-width:6}
+.timer-bg{stroke:var(--border)}
+.timer-progress{stroke:var(--ink);stroke-linecap:round;transition:stroke-dashoffset .1s linear;stroke-dasharray:308;stroke-dashoffset:0}
+.timer-ring.warning .timer-progress{stroke:var(--sun)}
+.timer-ring.danger .timer-progress{stroke:var(--coral)}
+.timer-display{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.timer-secs{font-family:'JetBrains Mono',monospace;font-size:2rem;font-weight:700;color:var(--ink);line-height:1}
+.timer-hint{font-size:.62rem;color:var(--muted);margin-top:.15rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.timer-presets{display:flex;justify-content:center;gap:.4rem;margin-bottom:1.6rem;flex-wrap:wrap;align-items:center}
+.preset-btn{font-family:'JetBrains Mono',monospace;font-size:.65rem;font-weight:700;padding:.28rem .7rem;border-radius:6px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s}
+.preset-btn:hover{border-color:var(--ink);color:var(--ink)}
+.preset-btn.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+/* FILTER ROW */
+.filter-row{display:flex;align-items:center;justify-content:center;gap:.5rem;margin-bottom:1.8rem;flex-wrap:wrap}
+.filter-label{font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.filter-pill{font-family:'Outfit',sans-serif;font-size:.8rem;font-weight:600;padding:.35rem .8rem;border-radius:100px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s}
+.filter-pill:hover{border-color:var(--ink);color:var(--ink)}
+.filter-pill.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.filter-divider{width:1px;height:20px;background:var(--border)}
+
+.action-row{display:flex;gap:.7rem;justify-content:center;flex-wrap:wrap}
+.btn-primary{font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;padding:.7rem 1.8rem;border-radius:12px;border:none;background:var(--ink);color:#fff;cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:.45rem}
+.btn-primary:hover{background:#1a1d2e;transform:translateY(-1px)}
+.btn-primary svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.btn-secondary{font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:600;padding:.55rem 1.2rem;border-radius:10px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:.4rem}
+.btn-secondary:hover{border-color:var(--ink);color:var(--ink)}
+.btn-secondary svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.card-count{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--muted);text-align:center;margin-bottom:1.4rem}
+
+@media(max-width:600px){.topnav,.back-link-wrap,.hero,.main{padding-left:1.2rem;padding-right:1.2rem}.topnav{padding:0 1.2rem}.sentence-text{font-size:1.1rem}}
+</style>
+</head>
+<body>
+<nav class="topnav">
+  <a href="index.html" class="nav-logo">john<span>+</span>english</a>
+  <div class="topnav-links"><a href="index.html">Home</a><a href="index.html#group-fun">Fun Tools</a></div>
+</nav>
+<div class="back-link-wrap">
+  <a href="index.html" class="wf-back-link">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    Back to Home
+  </a>
+</div>
+<section class="hero">
+  <span class="hero-badge">Fun Tools</span>
+  <h1>Accent Challenge</h1>
+  <p class="hero-sub">Read the sentence — but the way it says. Say it like you mean it.</p>
+</section>
+<div class="main">
+  <div class="filter-row">
+    <span class="filter-label">Style</span>
+    <button class="filter-pill active" onclick="setFilter('all',this)">All</button>
+    <button class="filter-pill" onclick="setFilter('emotion',this)">Emotions</button>
+    <button class="filter-pill" onclick="setFilter('register',this)">Register</button>
+  </div>
+  <div class="card-count" id="cardCount"></div>
+  <div id="cardWrap"></div>
+  <div class="timer-wrap">
+    <div class="timer-ring" id="timerRing" onclick="toggleTimer()">
+      <svg width="110" height="110" viewBox="0 0 110 110">
+        <circle class="timer-bg" cx="55" cy="55" r="49"/>
+        <circle class="timer-progress" id="timerArc" cx="55" cy="55" r="49"/>
+      </svg>
+      <div class="timer-display">
+        <div class="timer-secs" id="timerDisplay">30</div>
+        <div class="timer-hint" id="timerHint">tap to start</div>
+      </div>
+    </div>
+  </div>
+  <div class="timer-presets">
+    <span class="filter-label">Timer</span>
+    <button class="preset-btn active" onclick="setDuration(30,this)">30s</button>
+    <button class="preset-btn" onclick="setDuration(45,this)">45s</button>
+    <button class="preset-btn" onclick="setDuration(60,this)">60s</button>
+    <button class="preset-btn" onclick="setDuration(0,this)">No timer</button>
+  </div>
+  <div class="action-row">
+    <button class="btn-secondary" onclick="skipCard()">
+      <svg viewBox="0 0 24 24"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>
+      Skip
+    </button>
+    <button class="btn-primary" onclick="nextCard()">
+      Next
+      <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </button>
+    <button class="btn-secondary" onclick="rebuildDeck()">
+      <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.03"/></svg>
+      Shuffle
+    </button>
+  </div>
+</div>
+<script>
+var CARDS = [
+  // EMOTIONS
+  {style:'Like you just heard the worst news of your life',type:'emotion',emoji:'😭',
+   sentences:['I\'ve just put the kettle on.','The bus arrives at half past three.','Could you pass me the salt?','I finished the report this morning.','The meeting has been moved to Thursday.']},
+  {style:'Like you\'re absolutely furious',type:'emotion',emoji:'🤬',
+   sentences:['I believe there has been a small misunderstanding.','The printer is out of paper again.','Someone has eaten my lunch.','The train is delayed by four minutes.','Could you keep the noise down a little?']},
+  {style:'Like you\'re trying not to laugh',type:'emotion',emoji:'😂',
+   sentences:['I have a very important announcement to make.','The situation is entirely under control.','I have never been more serious in my life.','This is a formal complaint.','Please remain calm at all times.']},
+  {style:'Like you\'re absolutely terrified',type:'emotion',emoji:'😱',
+   sentences:['There\'s something behind you.','I think I left the door open.','Can anyone else hear that?','The lights just went out.','I\'m sure it\'s nothing.']},
+  {style:'Like you\'re the most bored person alive',type:'emotion',emoji:'😴',
+   sentences:['This is the most exciting thing that has ever happened.','I am having the time of my life.','Please tell me more about your spreadsheet.','Another Monday. How wonderful.','I simply cannot wait for the next meeting.']},
+  {style:'Like you\'re completely in love',type:'emotion',emoji:'🥰',
+   sentences:['You\'ve left the milk out again.','Your presentation was acceptable.','The Wi-Fi password is on the back of the router.','You have a phone call from the bank.','There\'s a queue.']},
+  {style:'Like you\'re delivering terrible news very calmly',type:'emotion',emoji:'😐',
+   sentences:['The building is on fire.','We\'ve run out of coffee.','I\'m afraid the dog ate your homework.','Your flight has been cancelled.','The server is down indefinitely.']},
+  {style:'Like you\'re trying very hard to sound confident but you\'re not',type:'emotion',emoji:'😬',
+   sentences:['I definitely know exactly what I\'m doing.','This is completely according to plan.','I have done this many times before.','Everything is absolutely fine.','I am not lost at all.']},
+  {style:'Like you\'ve just won a major award',type:'emotion',emoji:'🏆',
+   sentences:['I found a parking space.','The pasta is ready.','I remembered to charge my phone.','My package arrived on time.','There was no queue at the supermarket.']},
+  {style:'Like you\'re whispering a dangerous secret',type:'emotion',emoji:'🤫',
+   sentences:['The meeting starts at ten.','They\'ve changed the coffee brand in the office.','I think she likes him.','There\'s a sale on at Boots.','The photocopier is working again.']},
+  {style:'Like you\'re completely heartbroken',type:'emotion',emoji:'💔',
+   sentences:['Your pizza is ready to collect.','I\'ve refilled the stapler.','The broadband has been fixed.','There\'s a new series on tonight.','Your parcel is out for delivery.']},
+  {style:'Like you\'re absolutely disgusted',type:'emotion',emoji:'🤢',
+   sentences:['Someone left a mug in the sink.','There\'s a hair in the soup.','The cheese is a week past its date.','He didn\'t wash his hands.','The bin hasn\'t been emptied.']},
+  {style:'Like you\'re desperately trying not to cry',type:'emotion',emoji:'🥹',
+   sentences:['It\'s just a film.','The dog is perfectly fine.','I\'m absolutely not going to miss this place.','It\'s just an onion.','I\'m fine. Really.']},
+  {style:'Like you\'ve just had the greatest idea of your life',type:'emotion',emoji:'💡',
+   sentences:['What if we just had toast?','I could reply to that email tomorrow.','We could use the other door.','What about Tuesday instead?','We could just... not go.']},
+  {style:'Like you\'re seething with jealousy',type:'emotion',emoji:'😒',
+   sentences:['Oh, you got the promotion. How wonderful.','You went to Paris? How nice for you.','A new car. That\'s great. Really great.','You look very well rested.','So you finished on time. Good for you.']},
+  {style:'Like you\'re overwhelmingly relieved',type:'emotion',emoji:'😮‍💨',
+   sentences:['The meeting has been cancelled.','It was just the wind.','The test came back negative.','They found the keys.','The flight is only delayed by ten minutes.']},
+  {style:'Like you\'re completely exhausted and running on nothing',type:'emotion',emoji:'😵',
+   sentences:['I am absolutely fine.','Just one more thing to do.','Nearly there.','I slept brilliantly, thank you.','I can do this.']},
+  {style:'Like something has just deeply offended you',type:'emotion',emoji:'😤',
+   sentences:['You\'ve put the milk in first.','You call that a sandwich?','That is not how you pronounce it.','You\'ve used the wrong font.','That is technically not a biscuit.']},
+  {style:'Like you\'re painfully nervous meeting someone for the first time',type:'emotion',emoji:'🫣',
+   sentences:['Hello. I am a person. Normal.','I enjoy things. And also activities.','Yes. Weather, isn\'t it.','I have a job and I do it.','This is fine. Everything is fine.']},
+  {style:'Like you\'ve just remembered something terrible you forgot to do',type:'emotion',emoji:'😰',
+   sentences:['Today is Tuesday.','The report was due yesterday.','I said I\'d call her back last week.','The cat needs feeding.','I left the oven on.']},
+
+  // REGISTER / CHARACTER
+  {style:'Like a newsreader reporting a minor inconvenience',type:'register',emoji:'📺',
+   sentences:['The biscuits have run out.','A cat is sitting on the neighbour\'s fence.','Someone has parked slightly over the line.','The queue for the bathroom is quite long.','A pigeon is on the roof again.']},
+  {style:'Like a Shakespearean actor doing their finest work',type:'register',emoji:'🎭',
+   sentences:['The Wi-Fi keeps cutting out.','I can\'t find my keys.','We\'re out of milk again.','The film starts in twenty minutes.','I think I\'ll have the soup.']},
+  {style:'Like a five-year-old explaining something very important',type:'register',emoji:'👶',
+   sentences:['The economic situation is quite complex.','I have serious concerns about the proposal.','We need to discuss the Q3 projections.','The structural integrity is compromised.','I\'d like to raise a point of order.']},
+  {style:'Like a very disappointed parent',type:'register',emoji:'😔',
+   sentences:['You said you\'d be home by ten.','I\'m not angry. I\'m just disappointed.','We need to have a little talk.','I expected more from you, I really did.','This is not what we agreed.']},
+  {style:'Like a sports commentator at peak excitement',type:'register',emoji:'🎙️',
+   sentences:['He\'s looking for the remote control.','She\'s approaching the kettle.','He\'s putting on his coat.','She\'s opening the fridge.','He\'s about to send the email.']},
+  {style:'Like a villain revealing their master plan',type:'register',emoji:'😈',
+   sentences:['I have moved the staplers to the other drawer.','I ate the last biscuit. All of them.','I changed the Wi-Fi password.','I set all the alarms for 3am.','I replied to everyone in the group chat.']},
+  {style:'Like a robot learning to feel emotions for the first time',type:'register',emoji:'🤖',
+   sentences:['This is what they call a hug.','I have detected something called loneliness.','The experience known as joy is... unexpected.','I believe I have made what humans call a mistake.','Music. I do not yet understand music.']},
+  {style:'Like a nature documentary narrator',type:'register',emoji:'🌿',
+   sentences:['He opens the fridge for the third time.','She approaches the coffee machine with purpose.','The student stares at the blank page.','He has found a seat on the train.','She checks her phone again.']},
+  {style:'Like someone trying to sell you something you don\'t need',type:'register',emoji:'💼',
+   sentences:['It\'s just a quick call.','Have you considered our premium plan?','I just wanted to follow up on my last email.','This won\'t take long at all.','We have a very exciting opportunity for you.']},
+  {style:'Like a pirate who has just discovered modern life',type:'register',emoji:'🏴‍☠️',
+   sentences:['Excuse me, is this the 9:15 to Birmingham?','I\'d like a regular flat white please.','Do you validate parking here?','Could I get the bill when you\'re ready?','I\'m looking for the self-checkout.']},
+  {style:'Like a Mafia boss making a very reasonable request',type:'register',emoji:'🕴️',
+   sentences:['Could you pass me a napkin?','I would appreciate it if you moved your car.','Let\'s say we meet for lunch on Tuesday.','I am asking you nicely.','It would be a shame if something happened to the printer.']},
+  {style:'Like a doctor delivering very average news',type:'register',emoji:'👨‍⚕️',
+   sentences:['You\'re going to need to rest your wrist for a few days.','There are a number of possibilities.','That\'s... not ideal.','We\'ll need to run a few more tests.','I\'ve seen worse. Much worse.']},
+  {style:'Like a motivational speaker giving a TED talk about toast',type:'register',emoji:'🌟',
+   sentences:['Every morning, you have a choice.','The bread was ordinary. The toaster was ordinary. But the dream was not.','What if I told you that warmth was already inside you?','You are not just eating. You are becoming.','This is your moment.']},
+  {style:'Like a ghost who has only just realised they\'re a ghost',type:'register',emoji:'👻',
+   sentences:['No one sat next to me on the bus.','I waved at my neighbour and she didn\'t wave back.','The dog keeps barking at the corner where I stand.','I\'ve been wearing this same shirt for eleven years.','The calendar still says 2003.']},
+  {style:'Like a medieval knight who has been transported to the present',type:'register',emoji:'⚔️',
+   sentences:['What manner of sorcery is this flatscreen?','I seek the castle of Westfield.','Your horseless carriage is most impressive.','I demand to speak with the Wi-Fi wizard.','This metal bird carries 200 souls and no one seems concerned.']},
+  {style:'Like a wedding speech that is going terribly wrong',type:'register',emoji:'🥂',
+   sentences:['I\'ve known the groom for many years.','And this brings me to what happened in Málaga.','I promised I wouldn\'t mention the incident.','She is... very lucky.','I would like to thank the open bar for getting me through this.']},
+  {style:'Like a tour guide who has completely lost interest',type:'register',emoji:'🗺️',
+   sentences:['And on your left... another wall.','This was built in some century. Probably.','It\'s very old. Or so they claim.','You\'re welcome to take photos. I\'ll be here.','The gift shop is that way. That\'s the highlight, really.']},
+  {style:'Like someone narrating their own life as a film noir',type:'register',emoji:'🎬',
+   sentences:['The coffee was cold. Like her smile.','It was a Tuesday. Tuesdays never end well.','I opened the fridge. Nothing. As usual.','She said she\'d call. She didn\'t.','The rain hadn\'t stopped since Thursday. Neither had my problems.']},
+  {style:'Like an astronaut who has just returned to Earth after six months',type:'register',emoji:'🧑‍🚀',
+   sentences:['The ground feels strange under my feet.','Is this what wind feels like?','There are so many people. All at once.','The smell of bread. I had forgotten about bread.','Everything moves very fast here.']},
+  {style:'Like a wizard who has just been told magic isn\'t real',type:'register',emoji:'🧙',
+   sentences:['But I have the receipt.','I studied for seventeen years.','The hat alone cost me four hundred gold coins.','My mentor will be very disappointed.','I\'d like to return the wand then, please.']},
+  {style:'Like a child who has just eaten too much sugar',type:'register',emoji:'🍭',
+   sentences:['I\'m not tired.','Can we go again?','What does this button do?','I can do a backflip.','Let\'s race.']},
+  {style:'Like someone receiving a standing ovation for something very small',type:'register',emoji:'👏',
+   sentences:['I found my glasses.','I remembered to water the plant.','I replied to that email within 48 hours.','I made the bed.','I arrived on time.']},
+  {style:'Like a hostage negotiator trying to calm the situation',type:'register',emoji:'🚔',
+   sentences:['Let\'s just take a breath.','I hear you. I really hear you.','Nobody needs to do anything dramatic right now.','We can talk about the stapler.','Just put the report down and let\'s think this through.']},
+  {style:'Like a retired spy trying to live a normal life',type:'register',emoji:'🕵️',
+   sentences:['I\'ll have the soup.','I noticed you came in through the side door.','The briefcase belongs to the man at table four.','I\'ve booked a standard room under a different name.','Leave the car running.']},
+  {style:'Like someone doing a very bad impression of a posh British accent',type:'register',emoji:'🎩',
+   sentences:['One simply must have a biscuit with one\'s tea.','I find the tube rather ghastly.','This scone is simply not up to scratch.','Shall we pop to the garden for a spot of fresh air?','I\'m frightfully sorry but that seat is taken.']},
+  {style:'Like a tired teacher at 4pm on a Friday',type:'register',emoji:'📚',
+   sentences:['So if everyone could just... yes.','That\'s a very interesting question.','We\'ll come back to that next week.','Let\'s just... open the book.','Good effort. Really.']},
+  {style:'Like a contestant on a cookery show who knows they\'ve lost',type:'register',emoji:'👨‍🍳',
+   sentences:['I\'m really proud of what I\'ve put on that plate.','The flavours are... there.','I know the presentation isn\'t perfect.','I think the judges will appreciate my vision.','I put a lot of love into it.']},
+  {style:'Like a phone assistant that has become slightly self-aware',type:'register',emoji:'📱',
+   sentences:['I found twelve results for that.','Are you sure you want to delete everything?','You haven\'t called your mother in six weeks.','I noticed you\'re nearby the bakery again.','Your screen time is up thirty percent this week.']},
+  {style:'Like a Victorian explorer discovering something completely ordinary',type:'register',emoji:'🧭',
+   sentences:['By Jove, it\'s a roundabout.','The natives call this... a bus stop.','I have discovered a remarkable beverage. They call it a flat white.','This contraption... it warms the bread.','I believe this dwelling to be a Pret A Manger.']},
+  {style:'Like someone who took an improv class once and never forgot it',type:'register',emoji:'🎪',
+   sentences:['Yes, and... it\'s raining.','Yes, and... the bus is full.','Yes, and... the meeting has been extended.','Yes, and... we\'ve run out of milk again.','Yes, and... I forgot my password.']},
+  {style:'Like a disappointed football manager at a post-match press conference',type:'register',emoji:'⚽',
+   sentences:['We didn\'t take our chances on the day.','I thought we were the better team.','The result doesn\'t reflect the performance.','We need to dust ourselves off and go again.','I\'ll need to have a look at the footage.']},
+];
+
+var activeFilter = 'all';
+var deck = [];
+var currentIdx = 0;
+var timerDuration = 30;
+var timerRemaining = 30;
+var timerInterval = null;
+var timerRunning = false;
+
+function getFiltered(){
+  return CARDS.filter(function(c){ return activeFilter==='all'||c.type===activeFilter; });
+}
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+
+function setFilter(f,btn){
+  activeFilter=f;
+  document.querySelectorAll('.filter-pill').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  rebuildDeck();
+}
+
+function rebuildDeck(){
+  stopTimer(); timerRemaining=timerDuration; updateTimerDisplay();
+  document.getElementById('timerRing').classList.remove('warning','danger');
+  // For each card pick a random sentence
+  var filtered = getFiltered();
+  deck = shuffle(filtered.map(function(c){
+    var s = c.sentences[Math.floor(Math.random()*c.sentences.length)];
+    return {style:c.style,type:c.type,emoji:c.emoji,sentence:s};
+  }));
+  currentIdx=0;
+  document.getElementById('cardCount').textContent = deck.length+' cards';
+  renderCard();
+}
+
+function renderCard(){
+  var wrap=document.getElementById('cardWrap');
+  if(!deck.length){wrap.innerHTML='<div style="text-align:center;padding:3rem;color:var(--muted)">No cards match that filter.</div>';return;}
+  if(currentIdx>=deck.length){wrap.innerHTML='<div style="text-align:center;padding:3rem;background:var(--card);border-radius:20px;border:2px solid var(--border)"><div style="font-size:2rem;margin-bottom:.5rem">🎉</div><div style="font-weight:900;font-size:1.2rem;margin-bottom:.5rem">All done!</div><button class="btn-primary" onclick="rebuildDeck()" style="margin:.5rem auto 0;display:flex">Play again</button></div>';stopTimer();return;}
+  var c=deck[currentIdx];
+  wrap.innerHTML='<div class="ac-card">'
+    +'<div class="card-top"><span style="font-family:\'JetBrains Mono\',monospace;font-size:.6rem;color:var(--muted)">'+c.type.toUpperCase()+'</span><span class="card-num">'+(currentIdx+1)+' / '+deck.length+'</span></div>'
+    +'<div class="style-banner"><div class="style-label">Say this sentence...</div><div class="style-text"><span class="style-emoji">'+c.emoji+'</span>'+c.style+'</div><span class="style-tag '+c.type+'">'+c.type+'</span></div>'
+    +'<div class="sentence-area"><div class="sentence-label">Your sentence</div><div class="sentence-text">"'+c.sentence+'"</div></div>'
+    +'</div>';
+}
+
+function nextCard(){stopTimer();currentIdx++;timerRemaining=timerDuration;updateTimerDisplay();document.getElementById('timerRing').classList.remove('warning','danger');renderCard();}
+function skipCard(){
+  stopTimer();
+  var c=deck.splice(currentIdx,1)[0];
+  deck.splice(Math.min(currentIdx+3,deck.length),0,c);
+  timerRemaining=timerDuration;updateTimerDisplay();
+  document.getElementById('timerRing').classList.remove('warning','danger');
+  renderCard();
+}
+
+function setDuration(s,btn){
+  timerDuration=s;timerRemaining=s;
+  document.querySelectorAll('.preset-btn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');stopTimer();
+  document.getElementById('timerRing').classList.remove('warning','danger');
+  if(s===0){document.getElementById('timerDisplay').textContent='--';document.getElementById('timerHint').textContent='no timer';}
+  else{updateTimerDisplay();document.getElementById('timerHint').textContent='tap to start';}
+}
+function toggleTimer(){if(timerDuration===0)return;timerRunning?stopTimer():startTimer();}
+function startTimer(){
+  if(timerDuration===0)return;
+  if(timerRemaining<=0)timerRemaining=timerDuration;
+  timerRunning=true;document.getElementById('timerHint').textContent='tap to pause';
+  timerInterval=setInterval(function(){timerRemaining--;updateTimerDisplay();if(timerRemaining<=0){stopTimer();timerExpired();}},1000);
+}
+function stopTimer(){clearInterval(timerInterval);timerRunning=false;if(timerDuration>0&&timerRemaining>0)document.getElementById('timerHint').textContent='tap to start';}
+function timerExpired(){
+  document.getElementById('timerHint').textContent='time\'s up!';
+  document.getElementById('timerRing').classList.add('danger');
+  var f=0,iv=setInterval(function(){document.getElementById('timerRing').style.opacity=document.getElementById('timerRing').style.opacity==='0.4'?'1':'0.4';if(++f>5){clearInterval(iv);document.getElementById('timerRing').style.opacity='1';}},200);
+}
+function updateTimerDisplay(){
+  if(timerDuration===0)return;
+  document.getElementById('timerDisplay').textContent=timerRemaining;
+  var r=timerRemaining/timerDuration;
+  document.getElementById('timerArc').style.strokeDashoffset=308*(1-r);
+  var ring=document.getElementById('timerRing');ring.classList.remove('warning','danger');
+  if(r<=0.25)ring.classList.add('danger');else if(r<=0.5)ring.classList.add('warning');
+}
+document.addEventListener('DOMContentLoaded',function(){rebuildDeck();});
+</script>
+</body>
+</html>
