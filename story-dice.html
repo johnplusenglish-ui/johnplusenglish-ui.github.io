@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Story Dice · John+English</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sun:#FFB347;--sky:#2176FF;--sky-light:#E8EEFF;
+  --sea:#1DD3B0;--sea-light:#E4FBF7;
+  --coral:#FF6B6B;--coral-light:#FFE8E8;
+  --lavender:#9B72CF;--lavender-light:#F0E8FA;
+  --cream:#F7F6F3;--ink:#2D3047;--muted:#7A7D8E;
+  --border:#E8E5DF;--card:#fff;--radius:14px;
+  --shadow-sm:0 1px 3px rgba(45,48,71,.06);
+  --shadow-md:0 4px 12px rgba(45,48,71,.08);
+  --shadow-lg:0 8px 32px rgba(45,48,71,.14)
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,var(--border) 1px,transparent 1px);background-size:28px 28px;opacity:.4;pointer-events:none;z-index:0}
+
+/* NAV */
+.topnav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(247,246,243,.88);backdrop-filter:blur(16px);border-bottom:1.5px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-size:1.3rem;font-weight:800;letter-spacing:-.02em;color:var(--ink);text-decoration:none}
+.nav-logo span{color:var(--sky)}
+.topnav-links{display:flex;gap:1.2rem}
+.topnav-links a{font-size:.8rem;font-weight:600;color:var(--muted);text-decoration:none;transition:color .2s}
+.topnav-links a:hover{color:var(--sky)}
+
+/* BACK + HERO */
+.back-link-wrap{max-width:860px;margin:0 auto;padding:4.2rem 2rem 0;position:relative;z-index:1}
+.wf-back-link{display:inline-flex;align-items:center;gap:.35rem;font-size:.82rem;font-weight:600;color:var(--muted);text-decoration:none;transition:color .15s}
+.wf-back-link:hover{color:var(--ink)}
+.hero{padding:1.4rem 2rem 1.4rem;max-width:860px;margin:0 auto;text-align:center;position:relative;z-index:1}
+.hero-badge{display:inline-flex;align-items:center;gap:.4rem;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.3rem .9rem;border-radius:20px;margin-bottom:.7rem;color:var(--sun);background:#FFF5E6;border:1px solid rgba(255,179,71,.25)}
+.hero h1{font-size:clamp(1.8rem,3.6vw,2.6rem);line-height:1.1;letter-spacing:-.02em;margin-bottom:.6rem;font-weight:900}
+.hero-sub{font-size:.95rem;color:var(--muted);max-width:480px;margin:0 auto;line-height:1.6}
+
+/* MAIN */
+.main{max-width:860px;margin:0 auto;padding:0 2rem 4rem;position:relative;z-index:1}
+
+/* CONTROLS ROW */
+.controls-row{display:flex;align-items:center;justify-content:center;gap:.8rem;margin-bottom:2.4rem;flex-wrap:wrap}
+.filter-label{font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.filter-pill{font-family:'Outfit',sans-serif;font-size:.8rem;font-weight:600;padding:.35rem .85rem;border-radius:100px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap}
+.filter-pill:hover{border-color:var(--ink);color:var(--ink)}
+.filter-pill.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.filter-divider{width:1px;height:20px;background:var(--border)}
+
+/* DICE AREA */
+.dice-area{display:flex;justify-content:center;gap:1.4rem;margin-bottom:2rem;flex-wrap:wrap}
+
+.die-wrap{display:flex;flex-direction:column;align-items:center;gap:.7rem}
+.die-label{font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+
+/* THE DIE */
+.die{width:160px;height:160px;border-radius:28px;background:var(--card);border:2px solid var(--border);box-shadow:var(--shadow-lg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;padding:1rem;cursor:pointer;transition:transform .15s,box-shadow .15s;position:relative;overflow:hidden;user-select:none}
+.die:hover{transform:translateY(-3px);box-shadow:0 12px 36px rgba(45,48,71,.16)}
+.die:active{transform:scale(.97)}
+.die.rolling{animation:diceRoll .5s cubic-bezier(.36,.07,.19,.97)}
+@keyframes diceRoll{
+  0%{transform:rotate(0) scale(1)}
+  20%{transform:rotate(-8deg) scale(.95)}
+  40%{transform:rotate(6deg) scale(1.04)}
+  60%{transform:rotate(-4deg) scale(.98)}
+  80%{transform:rotate(2deg) scale(1.01)}
+  100%{transform:rotate(0) scale(1)}
+}
+.die-icon{font-size:2.8rem;line-height:1;transition:opacity .15s}
+.die-word{font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;color:var(--ink);text-align:center;line-height:1.3;transition:opacity .15s}
+.die.rolling .die-icon,.die.rolling .die-word{opacity:.3}
+
+/* Die colour accents */
+.die-char{border-top:4px solid var(--sky)}
+.die-char .die-word{color:var(--sky)}
+.die-set{border-top:4px solid #2EC4B6}
+.die-set .die-word{color:#2EC4B6}
+.die-twist{border-top:4px solid var(--coral)}
+.die-twist .die-word{color:var(--coral)}
+
+/* Re-roll button on die */
+.reroll-btn{position:absolute;bottom:.5rem;right:.55rem;font-family:'JetBrains Mono',monospace;font-size:.55rem;font-weight:700;color:var(--muted);background:var(--cream);border:1px solid var(--border);border-radius:5px;padding:.15rem .4rem;cursor:pointer;transition:all .15s;text-transform:uppercase;letter-spacing:.05em}
+.reroll-btn:hover{border-color:var(--ink);color:var(--ink)}
+
+/* ROLL ALL BUTTON */
+.roll-wrap{display:flex;justify-content:center;margin-bottom:1.8rem}
+.btn-roll{font-family:'Outfit',sans-serif;font-size:1.05rem;font-weight:800;padding:.85rem 2.6rem;border-radius:14px;border:none;background:var(--ink);color:#fff;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:.55rem;letter-spacing:-.01em;box-shadow:0 4px 18px rgba(45,48,71,.22)}
+.btn-roll:hover{background:#1a1d2e;transform:translateY(-2px);box-shadow:0 8px 28px rgba(45,48,71,.28)}
+.btn-roll:active{transform:scale(.97)}
+.btn-roll svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+
+/* TIMER */
+.timer-section{display:flex;flex-direction:column;align-items:center;gap:.8rem;margin-bottom:1.8rem}
+.timer-ring{position:relative;width:110px;height:110px;cursor:pointer}
+.timer-ring svg{transform:rotate(-90deg)}
+.timer-ring circle{fill:none;stroke-width:6}
+.timer-bg{stroke:var(--border)}
+.timer-progress{stroke:var(--ink);stroke-linecap:round;transition:stroke-dashoffset .1s linear;stroke-dasharray:308;stroke-dashoffset:0}
+.timer-ring.warning .timer-progress{stroke:var(--sun)}
+.timer-ring.danger .timer-progress{stroke:var(--coral)}
+.timer-display{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.timer-secs{font-family:'JetBrains Mono',monospace;font-size:1.9rem;font-weight:700;color:var(--ink);line-height:1}
+.timer-hint{font-size:.62rem;color:var(--muted);margin-top:.15rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.timer-presets{display:flex;gap:.4rem;flex-wrap:wrap;justify-content:center;align-items:center}
+.preset-btn{font-family:'JetBrains Mono',monospace;font-size:.65rem;font-weight:700;padding:.28rem .7rem;border-radius:6px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s}
+.preset-btn:hover{border-color:var(--ink);color:var(--ink)}
+.preset-btn.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+/* STORY STARTER */
+.starter-wrap{max-width:580px;margin:0 auto 1.8rem}
+.btn-starter{width:100%;font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;padding:.65rem 1.4rem;border-radius:12px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:.45rem}
+.btn-starter:hover{border-color:var(--lavender);color:var(--lavender)}
+.btn-starter svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.starter-card{margin-top:.7rem;background:var(--lavender-light);border:1.5px solid var(--lavender);border-radius:12px;padding:1rem 1.2rem;display:none}
+.starter-card.show{display:block}
+.starter-label{font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lavender);margin-bottom:.4rem}
+.starter-text{font-size:1rem;font-weight:600;color:var(--ink);line-height:1.5;font-style:italic}
+
+/* THEME BADGE ROW */
+.theme-row{display:flex;justify-content:center;align-items:center;gap:.4rem;margin-bottom:2rem;flex-wrap:wrap}
+.theme-badge{font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:700;padding:.22rem .6rem;border-radius:5px;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;transition:all .15s;border:1.5px solid var(--border);background:var(--card);color:var(--muted)}
+.theme-badge:hover{border-color:var(--ink);color:var(--ink)}
+.theme-badge.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+@media(max-width:640px){
+  .topnav{padding:0 1.2rem}
+  .back-link-wrap,.hero,.main{padding-left:1.2rem;padding-right:1.2rem}
+  .die{width:130px;height:130px;border-radius:22px}
+  .die-icon{font-size:2.2rem}
+  .die-word{font-size:.85rem}
+  .dice-area{gap:1rem}
+}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="index.html" class="nav-logo">john<span>+</span>english</a>
+  <div class="topnav-links">
+    <a href="index.html">Home</a>
+    <a href="index.html#group-fun">Fun Tools</a>
+  </div>
+</nav>
+
+<div class="back-link-wrap">
+  <a href="index.html" class="wf-back-link">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    Back to Home
+  </a>
+</div>
+
+<section class="hero">
+  <span class="hero-badge">Fun Tools</span>
+  <h1>Story Dice</h1>
+  <p class="hero-sub">Roll the dice. Get a character, a setting and a twist. Tell your story in 90 seconds.</p>
+</section>
+
+<div class="main">
+
+  <!-- Theme filter -->
+  <div class="theme-row" id="themeRow"></div>
+
+  <!-- Dice -->
+  <div class="dice-area">
+    <div class="die-wrap">
+      <div class="die-label">Character</div>
+      <div class="die die-char" id="die0" onclick="rollOne(0)">
+        <div class="die-icon" id="icon0">🧑</div>
+        <div class="die-word" id="word0">Roll to start</div>
+        <button class="reroll-btn" onclick="event.stopPropagation();rollOne(0)">re-roll</button>
+      </div>
+    </div>
+    <div class="die-wrap">
+      <div class="die-label">Setting</div>
+      <div class="die die-set" id="die1" onclick="rollOne(1)">
+        <div class="die-icon" id="icon1">🌍</div>
+        <div class="die-word" id="word1">Roll to start</div>
+        <button class="reroll-btn" onclick="event.stopPropagation();rollOne(1)">re-roll</button>
+      </div>
+    </div>
+    <div class="die-wrap">
+      <div class="die-label">Twist</div>
+      <div class="die die-twist" id="die2" onclick="rollOne(2)">
+        <div class="die-icon" id="icon2">⚡</div>
+        <div class="die-word" id="word2">Roll to start</div>
+        <button class="reroll-btn" onclick="event.stopPropagation();rollOne(2)">re-roll</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Roll button -->
+  <div class="roll-wrap">
+    <button class="btn-roll" id="btnRoll" onclick="rollAll()">
+      <svg viewBox="0 0 24 24"><path d="M21.5 2h-7a1 1 0 0 0-.7.3l-11.5 11.5a2 2 0 0 0 0 2.8l5.1 5.1a2 2 0 0 0 2.8 0L21.7 10.2a1 1 0 0 0 .3-.7v-7a.5.5 0 0 0-.5-.5z"/><circle cx="16.5" cy="7.5" r="1.5" fill="currentColor" stroke="none"/></svg>
+      Roll the dice
+    </button>
+  </div>
+
+  <!-- Timer -->
+  <div class="timer-section">
+    <div class="timer-ring" id="timerRing" onclick="toggleTimer()">
+      <svg width="110" height="110" viewBox="0 0 110 110">
+        <circle class="timer-bg" cx="55" cy="55" r="49"/>
+        <circle class="timer-progress" id="timerArc" cx="55" cy="55" r="49"/>
+      </svg>
+      <div class="timer-display">
+        <div class="timer-secs" id="timerDisplay">90</div>
+        <div class="timer-hint" id="timerHint">tap to start</div>
+      </div>
+    </div>
+    <div class="timer-presets">
+      <span class="filter-label">Timer</span>
+      <button class="preset-btn" onclick="setDuration(60,this)">60s</button>
+      <button class="preset-btn active" onclick="setDuration(90,this)">90s</button>
+      <button class="preset-btn" onclick="setDuration(120,this)">2 min</button>
+      <button class="preset-btn" onclick="setDuration(180,this)">3 min</button>
+      <button class="preset-btn" onclick="setDuration(0,this)">No timer</button>
+    </div>
+  </div>
+
+  <!-- Story starter -->
+  <div class="starter-wrap">
+    <button class="btn-starter" id="btnStarter" onclick="toggleStarter()">
+      <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      Show me a story starter
+    </button>
+    <div class="starter-card" id="starterCard">
+      <div class="starter-label">Story starter</div>
+      <div class="starter-text" id="starterText"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────
+
+var DICE = {
+  character: {
+    everyday: [
+      {icon:'👩‍💼', word:'a nervous accountant'},
+      {icon:'👨‍🍳', word:'an overconfident chef'},
+      {icon:'🧑‍🏫', word:'a fed-up teacher'},
+      {icon:'👴', word:'a stubborn grandfather'},
+      {icon:'👩‍⚕️', word:'an exhausted doctor'},
+      {icon:'🕵️', word:'a retired detective'},
+      {icon:'👨‍💻', word:'a paranoid programmer'},
+      {icon:'🧑‍🎤', word:'a struggling musician'},
+      {icon:'👩‍🔬', word:'an absent-minded scientist'},
+      {icon:'🏃', word:'a compulsive runner'},
+      {icon:'👨‍🍼', word:'a first-time parent'},
+      {icon:'👩‍🎨', word:'a broke artist'},
+      {icon:'🧑‍⚕️', word:'a student nurse'},
+      {icon:'👮', word:'an off-duty police officer'},
+      {icon:'🧑‍🌾', word:'a city person trying to farm'},
+      {icon:'👩‍💻', word:'a social media influencer'},
+      {icon:'🧑‍🔧', word:'a plumber who hates water'},
+      {icon:'👨‍🎓', word:'a PhD student in a panic'},
+    ],
+    dramatic: [
+      {icon:'🕵️', word:'a spy with amnesia'},
+      {icon:'👑', word:'a disgraced royal'},
+      {icon:'🧙', word:'a wizard who lost their powers'},
+      {icon:'🦸', word:'a superhero with a secret'},
+      {icon:'🥷', word:'an assassin having second thoughts'},
+      {icon:'🧑‍✈️', word:'a pilot afraid of flying'},
+      {icon:'👩‍⚖️', word:'a judge with something to hide'},
+      {icon:'🎭', word:'an actor who forgets the script'},
+      {icon:'🧑‍🚀', word:'an astronaut stranded on Earth'},
+      {icon:'🤴', word:'a prince pretending to be normal'},
+    ],
+    absurd: [
+      {icon:'🐧', word:'a penguin with big ambitions'},
+      {icon:'🤖', word:'a robot trying to fall in love'},
+      {icon:'🧟', word:'a zombie who wants to be polite'},
+      {icon:'🧛', word:'a vampire who hates the dark'},
+      {icon:'👻', word:'a ghost no one can hear'},
+      {icon:'🦄', word:'a unicorn working in an office'},
+      {icon:'🐉', word:'a dragon who is scared of fire'},
+      {icon:'🧜', word:'a mermaid afraid of water'},
+    ],
+    professional: [
+      {icon:'👩‍💼', word:'a manager nobody respects'},
+      {icon:'🤝', word:'a salesperson who can\'t lie'},
+      {icon:'📊', word:'an analyst who hates numbers'},
+      {icon:'📣', word:'a PR person in a crisis'},
+      {icon:'🧑‍⚖️', word:'a lawyer who always tells the truth'},
+      {icon:'🏦', word:'a banker who gives money away'},
+      {icon:'📰', word:'a journalist with the wrong story'},
+      {icon:'🎙️', word:'a politician with no opinions'},
+    ]
+  },
+  setting: {
+    everyday: [
+      {icon:'🚂', word:'a delayed train'},
+      {icon:'🏥', word:'a hospital waiting room'},
+      {icon:'✈️', word:'a cancelled flight'},
+      {icon:'🛒', word:'a supermarket at midnight'},
+      {icon:'🏋️', word:'an empty gym'},
+      {icon:'☕', word:'a coffee shop before it opens'},
+      {icon:'🏨', word:'a hotel with no staff'},
+      {icon:'📚', word:'a library during a storm'},
+      {icon:'🚗', word:'a broken-down car on a motorway'},
+      {icon:'🎂', word:'a birthday party nobody came to'},
+      {icon:'💒', word:'a wedding nobody wanted'},
+      {icon:'🏢', word:'an office after everyone leaves'},
+      {icon:'🎓', word:'a graduation where it goes wrong'},
+      {icon:'🏠', word:'a house that isn\'t theirs'},
+      {icon:'🚌', word:'the last bus of the night'},
+      {icon:'🌧️', word:'a park in the pouring rain'},
+      {icon:'🏖️', word:'a beach in winter'},
+      {icon:'🎪', word:'a fairground that\'s closing down'},
+    ],
+    dramatic: [
+      {icon:'🏚️', word:'an abandoned building'},
+      {icon:'⛵', word:'a boat in the middle of the ocean'},
+      {icon:'🏔️', word:'the top of a mountain'},
+      {icon:'🗝️', word:'a room with a locked door'},
+      {icon:'🌃', word:'a city at 3am'},
+      {icon:'🏝️', word:'an island with no way off'},
+      {icon:'🌋', word:'the edge of a volcano'},
+      {icon:'🕍', word:'an ancient building with a secret'},
+      {icon:'🚇', word:'a subway tunnel with no lights'},
+      {icon:'🛸', word:'a spaceship heading the wrong way'},
+    ],
+    absurd: [
+      {icon:'🌈', word:'inside a rainbow'},
+      {icon:'🍄', word:'a world where everything is tiny'},
+      {icon:'🪞', word:'a mirror that shows the future'},
+      {icon:'🎠', word:'a roundabout that never stops'},
+      {icon:'🌊', word:'an underwater shopping centre'},
+      {icon:'🍦', word:'a town made entirely of food'},
+      {icon:'🌙', word:'the surface of the moon'},
+      {icon:'📦', word:'inside a very large box'},
+    ],
+    professional: [
+      {icon:'📋', word:'a board meeting going badly'},
+      {icon:'🎤', word:'a conference with no speakers'},
+      {icon:'🏛️', word:'a government building at night'},
+      {icon:'⚖️', word:'a courtroom with a surprise'},
+      {icon:'📡', word:'a TV studio going live'},
+      {icon:'🏗️', word:'a building site with a problem'},
+      {icon:'🔬', word:'a lab with a missing sample'},
+      {icon:'🖥️', word:'a server room in a crisis'},
+    ]
+  },
+  twist: {
+    everyday: [
+      {icon:'📵', word:'nobody has a phone'},
+      {icon:'⏰', word:'they have exactly ten minutes'},
+      {icon:'🤫', word:'nobody believes them'},
+      {icon:'🔑', word:'they\'ve lost the key'},
+      {icon:'💸', word:'the money has disappeared'},
+      {icon:'🤥', word:'someone is lying'},
+      {icon:'🧳', word:'the wrong bag'},
+      {icon:'📝', word:'a letter arrives too late'},
+      {icon:'🔄', word:'everything is backwards'},
+      {icon:'🤐', word:'they can\'t tell anyone'},
+      {icon:'👁️', word:'someone has been watching'},
+      {icon:'🪪', word:'the wrong identity'},
+      {icon:'📦', word:'the package contains a surprise'},
+      {icon:'🔇', word:'nobody can hear them'},
+      {icon:'💡', word:'there\'s only one solution'},
+      {icon:'🚪', word:'every door is locked'},
+      {icon:'🎭', word:'nothing is what it seems'},
+      {icon:'🔁', word:'it keeps happening again'},
+    ],
+    dramatic: [
+      {icon:'💣', word:'they have 24 hours'},
+      {icon:'🎯', word:'only one person can help'},
+      {icon:'🩸', word:'there\'s no turning back'},
+      {icon:'📜', word:'a secret has been kept for years'},
+      {icon:'⚠️', word:'the stakes couldn\'t be higher'},
+      {icon:'🧩', word:'a piece of the puzzle is missing'},
+      {icon:'🌀', word:'time is running out'},
+      {icon:'🔮', word:'they knew this would happen'},
+      {icon:'🪤', word:'it was a trap'},
+      {icon:'👥', word:'there\'s a second person involved'},
+    ],
+    absurd: [
+      {icon:'🐟', word:'a fish keeps following them'},
+      {icon:'🎵', word:'everything happens in musical form'},
+      {icon:'🌡️', word:'the temperature keeps rising'},
+      {icon:'🍌', word:'someone keeps slipping'},
+      {icon:'🤧', word:'they can\'t stop sneezing'},
+      {icon:'🦆', word:'a duck is the only witness'},
+      {icon:'🎲', word:'everything is decided by chance'},
+      {icon:'🪄', word:'one wish goes horribly wrong'},
+    ],
+    professional: [
+      {icon:'📊', word:'the numbers don\'t add up'},
+      {icon:'📰', word:'it\'s all over the news'},
+      {icon:'🔏', word:'the files are classified'},
+      {icon:'📧', word:'the email went to the wrong person'},
+      {icon:'📱', word:'a screenshot has leaked'},
+      {icon:'🤝', word:'the deal falls apart'},
+      {icon:'🗳️', word:'the vote is tied'},
+      {icon:'🏆', word:'someone else takes the credit'},
+    ]
+  }
+};
+
+var THEMES = ['All','Everyday','Dramatic','Absurd','Professional'];
+var activeTheme = 'All';
+var currentFaces = [null, null, null];
+var starterVisible = false;
+
+// Story starters — generated dynamically based on current faces
+var STARTERS_TEMPLATES = [
+  function(c,s,t){ return 'It started like any other day for '+c+', until they arrived at '+s+' and realised that '+t+'.'; },
+  function(c,s,t){ return 'Nobody at '+s+' had ever seen anything quite like it. '+cap(c)+' had not planned for any of this, especially not the fact that '+t+'.'; },
+  function(c,s,t){ return 'If you had told '+c+' that morning what was about to happen at '+s+', they would never have believed you — particularly the part about '+t+'.'; },
+  function(c,s,t){ return cap(c)+' had been to '+s+' a hundred times. But this time was different. Because this time, '+t+'.'; },
+  function(c,s,t){ return 'The thing about '+c+' is that they were used to problems. But standing there at '+s+', facing the fact that '+t+', even they had to admit this was something else.'; },
+  function(c,s,t){ return 'Later, when people asked '+c+' to explain what happened at '+s+', they always started with the same sentence: "You have to understand that '+t+'."'; },
+];
+
+function cap(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
+
+function getPool(dieKey) {
+  var d = DICE[dieKey];
+  if (activeTheme === 'All') {
+    return [].concat(d.everyday, d.dramatic, d.absurd, d.professional);
+  }
+  var key = activeTheme.toLowerCase();
+  return d[key] || d.everyday;
+}
+
+function rollOne(idx) {
+  var dieEl = document.getElementById('die'+idx);
+  dieEl.classList.add('rolling');
+  var keys = ['character','setting','twist'];
+  var pool = getPool(keys[idx]);
+
+  // Shuffle through quickly then land
+  var ticks = 0;
+  var iv = setInterval(function() {
+    var item = pool[Math.floor(Math.random()*pool.length)];
+    document.getElementById('icon'+idx).textContent = item.icon;
+    document.getElementById('word'+idx).textContent = item.word;
+    ticks++;
+    if (ticks >= 8) {
+      clearInterval(iv);
+      var final = pool[Math.floor(Math.random()*pool.length)];
+      document.getElementById('icon'+idx).textContent = final.icon;
+      document.getElementById('word'+idx).textContent = final.word;
+      currentFaces[idx] = final.word;
+      dieEl.classList.remove('rolling');
+      hideStarter();
+    }
+  }, 60);
+}
+
+function rollAll() {
+  var btn = document.getElementById('btnRoll');
+  btn.disabled = true;
+  setTimeout(function(){ btn.disabled = false; }, 600);
+
+  rollOne(0);
+  setTimeout(function(){ rollOne(1); }, 80);
+  setTimeout(function(){ rollOne(2); }, 160);
+
+  // Reset timer
+  stopTimer();
+  timerRemaining = timerDuration;
+  updateTimerDisplay();
+  document.getElementById('timerRing').classList.remove('warning','danger');
+  document.getElementById('timerHint').textContent = timerDuration > 0 ? 'tap to start' : 'no timer';
+}
+
+// Theme
+function buildThemeRow() {
+  var el = document.getElementById('themeRow');
+  el.innerHTML = '<span class="filter-label">Theme</span>'
+    + THEMES.map(function(t){
+        return '<button class="theme-badge'+(t===activeTheme?' active':'')+'" onclick="setTheme(\''+t+'\',this)">'+t+'</button>';
+      }).join('');
+}
+
+function setTheme(t, btn) {
+  activeTheme = t;
+  document.querySelectorAll('.theme-badge').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  hideStarter();
+}
+
+// Starter
+function toggleStarter() {
+  var card = document.getElementById('starterCard');
+  var btn = document.getElementById('btnStarter');
+  if (!currentFaces[0] || !currentFaces[1] || !currentFaces[2]) {
+    // Roll first if no faces
+    rollAll();
+    setTimeout(function(){ generateStarter(); }, 700);
+    return;
+  }
+  if (card.classList.contains('show')) {
+    hideStarter();
+  } else {
+    generateStarter();
+  }
+}
+
+function generateStarter() {
+  var c = currentFaces[0] || 'a stranger';
+  var s = currentFaces[1] || 'an unfamiliar place';
+  var t = currentFaces[2] || 'something unexpected happened';
+  var template = STARTERS_TEMPLATES[Math.floor(Math.random()*STARTERS_TEMPLATES.length)];
+  document.getElementById('starterText').textContent = template(c, s, t);
+  document.getElementById('starterCard').classList.add('show');
+  document.getElementById('btnStarter').innerHTML = '<svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> New starter';
+}
+
+function hideStarter() {
+  document.getElementById('starterCard').classList.remove('show');
+  document.getElementById('btnStarter').innerHTML = '<svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> Show me a story starter';
+}
+
+// Timer
+var timerDuration = 90;
+var timerRemaining = 90;
+var timerInterval = null;
+var timerRunning = false;
+
+function setDuration(secs, btn) {
+  timerDuration = secs;
+  timerRemaining = secs;
+  document.querySelectorAll('.preset-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  stopTimer();
+  var ring = document.getElementById('timerRing');
+  ring.classList.remove('warning','danger');
+  if (secs === 0) {
+    document.getElementById('timerDisplay').textContent = '--';
+    document.getElementById('timerHint').textContent = 'no timer';
+  } else {
+    updateTimerDisplay();
+    document.getElementById('timerHint').textContent = 'tap to start';
+  }
+}
+
+function toggleTimer() {
+  if (timerDuration === 0) return;
+  timerRunning ? stopTimer() : startTimer();
+}
+
+function startTimer() {
+  if (timerDuration === 0) return;
+  if (timerRemaining <= 0) timerRemaining = timerDuration;
+  timerRunning = true;
+  document.getElementById('timerHint').textContent = 'tap to pause';
+  timerInterval = setInterval(function(){
+    timerRemaining--;
+    updateTimerDisplay();
+    if (timerRemaining <= 0){ stopTimer(); timerExpired(); }
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  if (timerDuration > 0 && timerRemaining > 0)
+    document.getElementById('timerHint').textContent = 'tap to start';
+}
+
+function timerExpired() {
+  document.getElementById('timerHint').textContent = 'time\'s up!';
+  var ring = document.getElementById('timerRing');
+  ring.classList.add('danger');
+  var flashes = 0;
+  var iv = setInterval(function(){
+    ring.style.opacity = ring.style.opacity==='0.4'?'1':'0.4';
+    if(++flashes>5){ clearInterval(iv); ring.style.opacity='1'; }
+  }, 200);
+}
+
+function updateTimerDisplay() {
+  if (timerDuration === 0) return;
+  document.getElementById('timerDisplay').textContent = timerRemaining;
+  var ratio = timerRemaining / timerDuration;
+  document.getElementById('timerArc').style.strokeDashoffset = 308 * (1 - ratio);
+  var ring = document.getElementById('timerRing');
+  ring.classList.remove('warning','danger');
+  if (ratio <= 0.25) ring.classList.add('danger');
+  else if (ratio <= 0.5) ring.classList.add('warning');
+}
+
+buildThemeRow();
+updateTimerDisplay();
+</script>
+</body>
+</html>
