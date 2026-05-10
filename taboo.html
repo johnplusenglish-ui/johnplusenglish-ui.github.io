@@ -41,9 +41,10 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .hero-sub{font-size:.95rem;color:var(--muted);max-width:480px;margin:0 auto;line-height:1.6}
 
 /* CONTROLS BAR */
-.controls-bar{position:sticky;top:52px;z-index:100;background:var(--cream);padding:1rem 2rem .8rem;border-bottom:1px solid var(--border);margin-bottom:2rem}
-.controls-inner{max-width:860px;margin:0 auto;display:flex;flex-wrap:wrap;gap:.8rem;align-items:center;justify-content:space-between}
-.filter-group{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}
+.controls-bar{position:sticky;top:52px;z-index:100;background:rgba(247,246,243,.95);backdrop-filter:blur(12px);padding:.8rem 2rem;border-bottom:1px solid var(--border);margin-bottom:2rem}
+.controls-inner{max-width:860px;margin:0 auto;display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;row-gap:.5rem}
+.filter-group{display:flex;align-items:center;gap:.4rem;flex-wrap:nowrap}
+.filter-divider{width:1px;height:20px;background:var(--border);margin:0 .3rem;flex-shrink:0}
 .filter-label{font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-right:.2rem}
 .filter-pill{font-family:'Outfit',sans-serif;font-size:.8rem;font-weight:600;padding:.35rem .8rem;border-radius:100px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap}
 .filter-pill:hover{border-color:var(--ink);color:var(--ink)}
@@ -159,15 +160,17 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 
 <div class="controls-bar">
   <div class="controls-inner">
-    <div style="display:flex;gap:1.2rem;flex-wrap:wrap;align-items:center">
-      <div class="filter-group">
-        <span class="filter-label">Level</span>
-        <button class="filter-pill level-b2 active" onclick="toggleLevel('b2',this)">B2</button>
-        <button class="filter-pill level-c1 active" onclick="toggleLevel('c1',this)">C1</button>
-      </div>
-      <div class="filter-group" id="topicFilters"></div>
+    <div class="filter-group">
+      <span class="filter-label">Level</span>
+      <button class="filter-pill level-b2 active" onclick="toggleLevel('b2',this)">B2</button>
+      <button class="filter-pill level-c1 active" onclick="toggleLevel('c1',this)">C1</button>
     </div>
-    <span class="card-count" id="cardCount"></span>
+    <div class="filter-divider"></div>
+    <div style="display:flex;align-items:flex-start;gap:.4rem">
+      <span class="filter-label" style="margin-top:.45rem;flex-shrink:0">Topic</span>
+      <div id="topicFilters" style="display:flex;flex-wrap:wrap;gap:.4rem"></div>
+    </div>
+    <span class="card-count" id="cardCount" style="margin-left:auto"></span>
   </div>
 </div>
 
@@ -465,7 +468,7 @@ var timerRunning = false;
 
 function buildTopicFilters() {
   var el = document.getElementById('topicFilters');
-  var html = '<span class="filter-label">Topic</span>';
+  var html = '';
   TOPICS.forEach(function(t) {
     html += '<button class="filter-pill topic'+(t===activeTopic?' active':'')+'" onclick="setTopic(\''+t+'\',this)">'+t+'</button>';
   });
