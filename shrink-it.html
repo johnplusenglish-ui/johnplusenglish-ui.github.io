@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shrink It · John+English</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sun:#FFB347;--sky:#2176FF;--sky-light:#E8EEFF;
+  --sea:#1DD3B0;--sea-light:#E4FBF7;
+  --coral:#FF6B6B;--coral-light:#FFE8E8;
+  --lavender:#9B72CF;--lavender-light:#F0E8FA;
+  --cream:#F7F6F3;--ink:#2D3047;--muted:#7A7D8E;
+  --border:#E8E5DF;--card:#fff;--radius:14px;
+  --b2:#2EC4B6;--b2-light:#2EC4B626;
+  --c1:#2176FF;--c1-light:#E8F2FD;
+  --shadow-lg:0 8px 32px rgba(45,48,71,.14);
+  --shadow-md:0 4px 12px rgba(45,48,71,.08)
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;min-height:100vh}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,var(--border) 1px,transparent 1px);background-size:28px 28px;opacity:.4;pointer-events:none;z-index:0}
+.topnav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(247,246,243,.88);backdrop-filter:blur(16px);border-bottom:1.5px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-size:1.3rem;font-weight:800;letter-spacing:-.02em;color:var(--ink);text-decoration:none}
+.nav-logo span{color:var(--sky)}
+.topnav-links{display:flex;gap:1.2rem}
+.topnav-links a{font-size:.8rem;font-weight:600;color:var(--muted);text-decoration:none}
+.topnav-links a:hover{color:var(--sky)}
+.back-link-wrap{max-width:760px;margin:0 auto;padding:4.2rem 2rem 0;position:relative;z-index:1}
+.wf-back-link{display:inline-flex;align-items:center;gap:.35rem;font-size:.82rem;font-weight:600;color:var(--muted);text-decoration:none}
+.wf-back-link:hover{color:var(--ink)}
+.hero{padding:1.4rem 2rem 1.8rem;max-width:760px;margin:0 auto;text-align:center;position:relative;z-index:1}
+.hero-badge{display:inline-flex;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.3rem .9rem;border-radius:20px;margin-bottom:.7rem;color:var(--sun);background:#FFF5E6;border:1px solid rgba(255,179,71,.25)}
+.hero h1{font-size:clamp(1.8rem,3.6vw,2.6rem);line-height:1.1;letter-spacing:-.02em;margin-bottom:.6rem;font-weight:900}
+.hero-sub{font-size:.95rem;color:var(--muted);max-width:460px;margin:0 auto;line-height:1.6}
+.main{max-width:760px;margin:0 auto;padding:0 2rem 4rem;position:relative;z-index:1}
+
+/* CONTROLS */
+.controls-bar{position:sticky;top:52px;z-index:100;background:rgba(247,246,243,.95);backdrop-filter:blur(12px);padding:.8rem 2rem;border-bottom:1px solid var(--border);margin-bottom:2rem}
+.controls-inner{max-width:760px;margin:0 auto;display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}
+.filter-label{font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);flex-shrink:0}
+.filter-pill{font-family:'Outfit',sans-serif;font-size:.8rem;font-weight:600;padding:.35rem .8rem;border-radius:100px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap}
+.filter-pill:hover{border-color:var(--ink);color:var(--ink)}
+.filter-pill.active.level-b2{background:var(--b2);color:#fff;border-color:var(--b2)}
+.filter-pill.active.level-c1{background:var(--c1);color:#fff;border-color:var(--c1)}
+.filter-pill.active.topic{background:var(--ink);color:#fff;border-color:var(--ink)}
+.filter-divider{width:1px;height:20px;background:var(--border);flex-shrink:0}
+.card-count{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--muted);margin-left:auto}
+
+/* CARD */
+.shrink-card{background:var(--card);border-radius:22px;border:2px solid var(--border);box-shadow:var(--shadow-lg);overflow:hidden;margin-bottom:1.6rem}
+.card-top{padding:.8rem 1.4rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1.5px solid var(--border)}
+.card-meta{display:flex;gap:.6rem;align-items:center}
+.level-badge{font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:700;padding:.2rem .5rem;border-radius:5px}
+.level-badge.b2{background:var(--b2-light);color:var(--b2)}
+.level-badge.c1{background:var(--c1-light);color:var(--c1)}
+.topic-badge{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+.card-num{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--muted)}
+
+/* ORIGINAL TEXT */
+.original-area{padding:1.6rem 1.8rem}
+.area-label{font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:.8rem;display:flex;align-items:center;gap:.5rem}
+.word-count{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--muted);background:var(--cream);padding:.15rem .45rem;border-radius:4px;border:1px solid var(--border)}
+.original-text{font-size:1rem;color:var(--ink);line-height:1.75}
+
+/* MODEL ANSWER */
+.model-area{padding:1.4rem 1.8rem;background:var(--sea-light);border-top:1.5px solid var(--sea);display:none}
+.model-area.show{display:block}
+.model-label{font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--sea);margin-bottom:.7rem;display:flex;align-items:center;gap:.5rem}
+.model-text{font-size:.97rem;color:var(--ink);line-height:1.65;font-weight:600}
+.model-note{font-size:.82rem;color:var(--muted);margin-top:.6rem;font-style:italic;line-height:1.5}
+
+/* TIMER */
+.timer-section{display:flex;flex-direction:column;align-items:center;gap:.9rem;margin-bottom:1.6rem}
+.timer-ring{position:relative;width:120px;height:120px;cursor:pointer}
+.timer-ring svg{transform:rotate(-90deg)}
+.timer-ring circle{fill:none;stroke-width:6}
+.timer-bg{stroke:var(--border)}
+.timer-progress{stroke:var(--ink);stroke-linecap:round;transition:stroke-dashoffset .1s linear;stroke-dasharray:339;stroke-dashoffset:0}
+.timer-ring.warning .timer-progress{stroke:var(--sun)}
+.timer-ring.danger .timer-progress{stroke:var(--coral)}
+.timer-display{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.timer-secs{font-family:'JetBrains Mono',monospace;font-size:2rem;font-weight:700;color:var(--ink);line-height:1}
+.timer-hint{font-size:.62rem;color:var(--muted);margin-top:.15rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.timer-presets{display:flex;gap:.4rem;flex-wrap:wrap;justify-content:center;align-items:center}
+.preset-btn{font-family:'JetBrains Mono',monospace;font-size:.65rem;font-weight:700;padding:.28rem .7rem;border-radius:6px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s}
+.preset-btn:hover{border-color:var(--ink);color:var(--ink)}
+.preset-btn.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+.action-row{display:flex;gap:.7rem;justify-content:center;flex-wrap:wrap}
+.btn-primary{font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;padding:.7rem 1.8rem;border-radius:12px;border:none;background:var(--ink);color:#fff;cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:.45rem}
+.btn-primary:hover{background:#1a1d2e;transform:translateY(-1px)}
+.btn-primary svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.btn-secondary{font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:600;padding:.55rem 1.2rem;border-radius:10px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:.4rem}
+.btn-secondary:hover{border-color:var(--ink);color:var(--ink)}
+.btn-secondary svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.btn-reveal{font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;padding:.55rem 1.4rem;border-radius:10px;border:1.5px solid var(--sea);background:var(--card);color:var(--sea);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:.4rem}
+.btn-reveal:hover{background:var(--sea);color:#fff}
+.btn-reveal svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+@media(max-width:600px){.topnav{padding:0 1.2rem}.back-link-wrap,.hero,.main{padding-left:1.2rem;padding-right:1.2rem}.controls-bar{padding:.8rem 1.2rem}}
+</style>
+</head>
+<body>
+<nav class="topnav">
+  <a href="index.html" class="nav-logo">john<span>+</span>english</a>
+  <div class="topnav-links"><a href="index.html">Home</a><a href="index.html#group-fun">Fun Tools</a></div>
+</nav>
+<div class="back-link-wrap">
+  <a href="index.html" class="wf-back-link">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    Back to Home
+  </a>
+</div>
+<section class="hero">
+  <span class="hero-badge">Fun Tools</span>
+  <h1>Shrink It</h1>
+  <p class="hero-sub">Read the paragraph. Reduce it to one sentence without losing the meaning. You have 90 seconds.</p>
+</section>
+<div class="controls-bar">
+  <div class="controls-inner">
+    <div style="display:flex;align-items:center;gap:.4rem;flex-shrink:0">
+      <span class="filter-label">Level</span>
+      <button class="filter-pill level-b2 active" onclick="toggleLevel('b2',this)">B2</button>
+      <button class="filter-pill level-c1 active" onclick="toggleLevel('c1',this)">C1</button>
+    </div>
+    <div class="filter-divider"></div>
+    <div style="display:flex;align-items:flex-start;gap:.4rem">
+      <span class="filter-label" style="margin-top:.45rem;flex-shrink:0">Topic</span>
+      <div id="topicFilters" style="display:flex;flex-wrap:wrap;gap:.4rem"></div>
+    </div>
+    <span class="card-count" id="cardCount"></span>
+  </div>
+</div>
+<div class="main">
+  <div id="cardWrap"></div>
+  <div class="timer-section">
+    <div class="timer-ring" id="timerRing" onclick="toggleTimer()">
+      <svg width="120" height="120" viewBox="0 0 120 120">
+        <circle class="timer-bg" cx="60" cy="60" r="54"/>
+        <circle class="timer-progress" id="timerArc" cx="60" cy="60" r="54"/>
+      </svg>
+      <div class="timer-display">
+        <div class="timer-secs" id="timerDisplay">90</div>
+        <div class="timer-hint" id="timerHint">tap to start</div>
+      </div>
+    </div>
+    <div class="timer-presets">
+      <span class="filter-label">Timer</span>
+      <button class="preset-btn" onclick="setDuration(60,this)">60s</button>
+      <button class="preset-btn active" onclick="setDuration(90,this)">90s</button>
+      <button class="preset-btn" onclick="setDuration(120,this)">2 min</button>
+      <button class="preset-btn" onclick="setDuration(0,this)">No timer</button>
+    </div>
+  </div>
+  <div class="action-row">
+    <button class="btn-secondary" onclick="skipCard()">
+      <svg viewBox="0 0 24 24"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>
+      Skip
+    </button>
+    <button class="btn-reveal" onclick="revealModel()">
+      <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      Show model
+    </button>
+    <button class="btn-primary" onclick="nextCard()">
+      Next
+      <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </button>
+    <button class="btn-secondary" onclick="rebuildDeck()">
+      <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.03"/></svg>
+      Shuffle
+    </button>
+  </div>
+</div>
+<script>
+var TEXTS = [
+  // B2
+  {l:'b2',topic:'Work',
+   text:'Many people who work in offices spend a large part of their day in meetings. These meetings often last for a long time, involve a lot of people, and frequently end without any clear decisions being made. As a result, employees often feel that the time they spend in meetings could have been used more productively doing their actual work.',
+   words:65,
+   model:'Office workers spend too much time in unproductive meetings that rarely lead to clear outcomes.',
+   note:'Key ideas to keep: meetings, time wasted, no clear decisions. Everything else can go.'},
+
+  {l:'b2',topic:'Technology',
+   text:'Smartphones have changed the way we communicate with each other. Instead of calling or meeting in person, many people now prefer to send short text messages or use social media apps to stay in touch. Some people believe this has made communication easier and more convenient, while others argue that it has made our relationships less meaningful and more superficial.',
+   words:60,
+   model:'Smartphones have made communication easier but may have made our relationships less meaningful.',
+   note:'The "some say / others say" structure can be collapsed into one balanced sentence.'},
+
+  {l:'b2',topic:'Education',
+   text:'Learning a foreign language takes a long time and requires a great deal of effort. Students need to practise regularly, build up their vocabulary, and develop an understanding of grammar rules. Despite all this work, many people who study a foreign language never reach a level where they feel truly comfortable using it in real conversations.',
+   words:52,
+   model:'Despite requiring significant time and effort, most foreign language learners never reach genuine conversational fluency.',
+   note:'The three requirements (practice, vocabulary, grammar) are details — the key point is effort vs result.'},
+
+  {l:'b2',topic:'Society',
+   text:'Cities around the world are growing rapidly as more and more people move from rural areas to urban centres in search of work and better living conditions. This growth puts enormous pressure on housing, transport, and public services. While cities offer more opportunities, they can also be expensive, overcrowded, and stressful places to live.',
+   words:55,
+   model:'Rapid urban growth creates both opportunities and serious pressures on infrastructure and quality of life.',
+   note:'The cause (rural-urban migration) can be condensed. The tension between opportunity and problems is the core.'},
+
+  {l:'b2',topic:'Food & Lifestyle',
+   text:'In recent years, there has been a significant increase in the number of people choosing not to eat meat. Some do this for environmental reasons, as the production of meat uses large amounts of water and land and contributes significantly to greenhouse gas emissions. Others choose a vegetarian or vegan diet for health reasons, or because they are concerned about the welfare of animals.',
+   words:63,
+   model:'More people are avoiding meat for environmental, health, and ethical reasons.',
+   note:'Three reasons: environment, health, animal welfare. Everything else is supporting detail.'},
+
+  {l:'b2',topic:'Work',
+   text:'Working from home became much more common during the pandemic, and many employees discovered that they were just as productive — or even more productive — at home as they were in the office. As a result, many companies have continued to offer flexible or remote working arrangements. However, some employers and employees have found that working from home makes it harder to collaborate, maintain company culture, and separate work from personal life.',
+   words:72,
+   model:'Remote working has proved productive for many but raises concerns about collaboration, culture, and work-life boundaries.',
+   note:'Keep the tension: productivity benefits vs social/cultural costs.'},
+
+  {l:'b2',topic:'Society',
+   text:'Social media platforms allow people to share their opinions and experiences with a large audience very easily. This can be positive, as it gives ordinary people a voice and allows important stories to be shared widely. However, it also means that false information can spread very quickly, and that people can face harassment or abuse from strangers without any consequences.',
+   words:59,
+   model:'Social media empowers ordinary voices but also enables misinformation and online abuse to spread rapidly.',
+   note:'The for/against structure compresses neatly into one balanced sentence.'},
+
+  {l:'b2',topic:'Technology',
+   text:'Many children and teenagers spend several hours every day looking at screens — watching videos, playing games, or scrolling through social media. Parents and doctors have raised concerns about the effects this has on young people\'s sleep, concentration, and mental health. At the same time, digital skills are increasingly important in modern life, and spending time online is not always harmful.',
+   words:60,
+   model:'Excessive screen time raises health concerns for young people, though digital literacy is also increasingly essential.',
+   note:'Don\'t list all the harms individually. Keep the tension between concern and necessity.'},
+
+  {l:'b2',topic:'Food & Lifestyle',
+   text:'Travelling is something that many people dream about and save up for. It can be a wonderful way to experience different cultures, try new foods, and gain a new perspective on the world. However, it is also expensive, exhausting, and can have a negative environmental impact, particularly when it involves long-haul flights. For some people, the reality of travelling does not match the expectations.',
+   words:65,
+   model:'Travel broadens your perspective and experience, but comes with significant financial, physical, and environmental costs.',
+   note:'The "reality vs expectation" point is too specific for a one-sentence summary. Stay with the core tension.'},
+
+  {l:'b2',topic:'Education',
+   text:'Many schools still use traditional methods of teaching, where the teacher stands at the front of the classroom and delivers information to students who sit quietly and take notes. Some educators argue that this approach is outdated and that students learn better through more active, collaborative, and creative methods. Others, however, believe that direct instruction from an experienced teacher remains one of the most effective ways to learn.',
+   words:70,
+   model:'Traditional teacher-led instruction is increasingly challenged by active learning approaches, though both have proven value.',
+   note:'Compress the two sides without listing the methods in detail.'},
+
+  // C1
+  {l:'c1',topic:'Society',
+   text:'The concept of meritocracy — the idea that people succeed based on their talent, effort, and ability rather than their background or connections — is widely celebrated in Western societies as a fair and just way of organising the world. However, critics argue that genuine meritocracy is largely a myth. They point out that factors such as socioeconomic background, access to quality education, and social networks play a far more significant role in determining a person\'s success than innate ability or hard work alone. In this view, the belief in meritocracy may actually cause harm by encouraging people to attribute failure to personal inadequacy rather than systemic inequality.',
+   words:112,
+   model:'Meritocracy is celebrated as fair, but critics argue it obscures how background and privilege largely determine success, causing people to blame themselves for structural failures.',
+   note:'Three things to keep: the claim of fairness, the counterargument, and the consequence. "Innate ability" and "hard work" are examples — don\'t need both.'},
+
+  {l:'c1',topic:'Technology',
+   text:'The widespread adoption of artificial intelligence in the workplace has the potential to transform entire industries. Proponents argue that AI will take over repetitive, low-skill tasks and free workers to focus on more creative, strategic, and interpersonal work. Sceptics, however, point out that many of the jobs most vulnerable to automation are held by people who lack the education or resources to retrain for the kind of roles that AI is unlikely to replace. The result, they warn, could be significant structural unemployment concentrated among already disadvantaged groups.',
+   words:90,
+   model:'AI may liberate skilled workers from repetitive tasks, but risks concentrating unemployment among those least able to adapt.',
+   note:'The core tension: liberation for some, displacement for others. Don\'t list the job types in detail.'},
+
+  {l:'c1',topic:'Psychology',
+   text:'Resilience — the capacity to recover from adversity — is frequently cited as one of the most important qualities a person can develop. Self-help literature, corporate training programmes, and educational curricula increasingly emphasise the importance of building resilience in individuals. However, some psychologists and social critics have begun to challenge this framing. They argue that an excessive focus on individual resilience places the burden of dealing with difficult circumstances on the individual, when the real problem may be the circumstances themselves. In their view, encouraging resilience can sometimes function as a way of normalising conditions that should instead be challenged and changed.',
+   words:100,
+   model:'While resilience is widely valued, over-emphasising it as an individual quality can obscure the need to address the systemic conditions that create adversity in the first place.',
+   note:'The key shift: from individual virtue to systemic critique. That tension is the whole point.'},
+
+  {l:'c1',topic:'Society',
+   text:'Privacy, once considered a fundamental right in democratic societies, is under increasing pressure from multiple directions. Governments justify mass surveillance in the name of national security; corporations collect and monetise vast quantities of personal data in exchange for free services; and individuals voluntarily share intimate details of their lives on social media platforms. The cumulative effect of these developments is that genuine privacy has become increasingly difficult to maintain — and yet public resistance to this erosion remains, for the most part, remarkably limited.',
+   words:85,
+   model:'Privacy is being eroded simultaneously by state surveillance, corporate data collection, and individuals\' own behaviour, yet public resistance to this loss remains surprisingly weak.',
+   note:'Three sources of erosion + the paradox of weak resistance = the whole paragraph in one sentence.'},
+
+  {l:'c1',topic:'Work',
+   text:'The concept of work-life balance has become central to contemporary discussions about wellbeing and workplace culture. Yet critics have pointed out that the very notion of "balance" implies an equivalence between the two sides — as though work and life are separate, equally weighted domains that need to be managed in proportion. In practice, for many workers — particularly those in low-paid or insecure employment — work does not sit alongside life in any balanced way. It dominates it. In this sense, the language of work-life balance may be more relevant to a specific class of professional, salaried worker than it is to the workforce as a whole.',
+   words:104,
+   model:'The concept of work-life balance, while appealing, assumes a kind of separation and equality between work and personal life that is only realistic for relatively privileged workers.',
+   note:'The critique of the concept itself is the main point. Don\'t get lost in the examples.'},
+
+  {l:'c1',topic:'Society',
+   text:'Nostalgia is a powerful emotional force that shapes how individuals and societies understand the past. It tends to idealise what has been lost — focusing on the positive elements of earlier times while ignoring the difficulties, injustices, and limitations that also characterised them. Politicians have long understood the power of nostalgic sentiment, using appeals to a golden past as a way of generating support and creating a sense of shared identity. The danger of this is that nostalgic political movements can lead people to pursue a return to conditions that either never existed as remembered or that benefited only some at the expense of others.',
+   words:99,
+   model:'Nostalgia selectively idealises the past, and when exploited politically it can drive movements that pursue a vision of history that was never fully real or was only ever beneficial to some.',
+   note:'Nostalgia + its selective nature + political exploitation + the danger = four ideas that compress into one sentence.'},
+
+  {l:'c1',topic:'Language',
+   text:'The question of whether language shapes thought, or whether thought shapes language, has occupied linguists and philosophers for centuries. The Sapir-Whorf hypothesis, in its strong form, proposed that the language a person speaks determines the way they think and perceive reality. This extreme version has largely been discredited, but a weaker version — that language influences certain aspects of cognition without fully determining it — continues to attract empirical support. Studies have shown, for example, that speakers of languages with different colour terminology perceive and remember colours differently, suggesting that language does at least partially shape perception.',
+   words:95,
+   model:'While the strong claim that language determines thought has been largely rejected, evidence supports a weaker version: that language influences how we perceive and remember certain aspects of reality.',
+   note:'The key move from strong to weak form of the hypothesis is the whole argument. Keep that and the supporting evidence briefly.'},
+
+  {l:'c1',topic:'Psychology',
+   text:'Confirmation bias — the tendency to seek out and favour information that confirms what we already believe, while discounting or ignoring evidence that contradicts our existing views — is one of the most well-documented and pervasive cognitive biases. It affects not just ordinary members of the public but scientists, doctors, judges, and other professionals who are trained to think rationally and objectively. The digital media environment has arguably made confirmation bias more damaging, as algorithms increasingly serve people content that aligns with their existing preferences, creating echo chambers that reinforce rather than challenge pre-existing beliefs.',
+   words:96,
+   model:'Confirmation bias — our tendency to favour information that confirms existing beliefs — affects everyone, and is amplified by digital algorithms that entrench rather than challenge our views.',
+   note:'Define it, note it\'s universal, note the digital aggravation. Everything else is elaboration.'},
+];
+
+var TOPICS=['All'];
+TEXTS.forEach(function(t){if(TOPICS.indexOf(t.topic)===-1)TOPICS.push(t.topic);});
+TOPICS.sort(function(a,b){return a==='All'?-1:b==='All'?1:a.localeCompare(b);});
+
+var activeLevels={b2:true,c1:true};
+var activeTopic='All';
+var deck=[];
+var currentIdx=0;
+var timerDuration=90;
+var timerRemaining=90;
+var timerInterval=null;
+var timerRunning=false;
+
+function buildTopicFilters(){
+  var el=document.getElementById('topicFilters');
+  el.innerHTML=TOPICS.map(function(t){
+    return '<button class="filter-pill topic'+(t===activeTopic?' active':'')+'" onclick="setTopic(\''+t+'\',this)">'+t+'</button>';
+  }).join('');
+}
+function toggleLevel(lv,btn){
+  var other=lv==='b2'?'c1':'b2';
+  if(activeLevels[lv]&&!activeLevels[other])return;
+  activeLevels[lv]=!activeLevels[lv];
+  btn.classList.toggle('active',activeLevels[lv]);
+  rebuildDeck();
+}
+function setTopic(t,btn){
+  activeTopic=t;
+  document.querySelectorAll('.filter-pill.topic').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  rebuildDeck();
+}
+function getFiltered(){return TEXTS.filter(function(t){return activeLevels[t.l]&&(activeTopic==='All'||t.topic===activeTopic);});}
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+
+function rebuildDeck(){
+  stopTimer();timerRemaining=timerDuration;updateTimerDisplay();
+  document.getElementById('timerRing').classList.remove('warning','danger');
+  deck=shuffle(getFiltered().slice());
+  currentIdx=0;
+  document.getElementById('cardCount').textContent=deck.length+' passages';
+  renderCard();
+}
+
+function renderCard(){
+  var wrap=document.getElementById('cardWrap');
+  if(!deck.length){wrap.innerHTML='<div style="text-align:center;padding:3rem;color:var(--muted)">No passages match that filter.</div>';return;}
+  if(currentIdx>=deck.length){
+    wrap.innerHTML='<div style="text-align:center;padding:3rem;background:var(--card);border-radius:20px;border:2px solid var(--border);box-shadow:var(--shadow-md)"><div style="font-size:2rem;margin-bottom:.5rem">✂️</div><div style="font-weight:900;font-size:1.2rem;margin-bottom:.5rem">All done!</div><button class="btn-primary" onclick="rebuildDeck()" style="margin:.5rem auto 0;display:flex">Play again</button></div>';
+    stopTimer();return;
+  }
+  var t=deck[currentIdx];
+  wrap.innerHTML='<div class="shrink-card">'
+    +'<div class="card-top"><div class="card-meta"><span class="level-badge '+t.l+'">'+(t.l==='b2'?'B2':'C1')+'</span><span class="topic-badge">'+t.topic+'</span></div><span class="card-num">'+(currentIdx+1)+' / '+deck.length+'</span></div>'
+    +'<div class="original-area"><div class="area-label">Original text <span class="word-count">'+t.words+' words</span></div><div class="original-text">'+t.text+'</div></div>'
+    +'<div class="model-area" id="modelArea"><div class="model-label">Model answer</div><div class="model-text">'+t.model+'</div><div class="model-note">💡 '+t.note+'</div></div>'
+    +'</div>';
+}
+
+function revealModel(){
+  var el=document.getElementById('modelArea');
+  if(el)el.classList.add('show');
+  stopTimer();
+}
+
+function nextCard(){
+  stopTimer();currentIdx++;
+  timerRemaining=timerDuration;updateTimerDisplay();
+  document.getElementById('timerRing').classList.remove('warning','danger');
+  renderCard();
+}
+function skipCard(){
+  stopTimer();
+  var t=deck.splice(currentIdx,1)[0];
+  deck.splice(Math.min(currentIdx+3,deck.length),0,t);
+  timerRemaining=timerDuration;updateTimerDisplay();
+  document.getElementById('timerRing').classList.remove('warning','danger');
+  renderCard();
+}
+
+function setDuration(s,btn){
+  timerDuration=s;timerRemaining=s;
+  document.querySelectorAll('.preset-btn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');stopTimer();
+  document.getElementById('timerRing').classList.remove('warning','danger');
+  if(s===0){document.getElementById('timerDisplay').textContent='--';document.getElementById('timerHint').textContent='no timer';}
+  else{updateTimerDisplay();document.getElementById('timerHint').textContent='tap to start';}
+}
+function toggleTimer(){if(timerDuration===0)return;timerRunning?stopTimer():startTimer();}
+function startTimer(){
+  if(timerDuration===0)return;
+  if(timerRemaining<=0)timerRemaining=timerDuration;
+  timerRunning=true;document.getElementById('timerHint').textContent='tap to pause';
+  timerInterval=setInterval(function(){timerRemaining--;updateTimerDisplay();if(timerRemaining<=0){stopTimer();timerExpired();}},1000);
+}
+function stopTimer(){clearInterval(timerInterval);timerRunning=false;if(timerDuration>0&&timerRemaining>0)document.getElementById('timerHint').textContent='tap to start';}
+function timerExpired(){
+  document.getElementById('timerHint').textContent='time\'s up!';
+  document.getElementById('timerRing').classList.add('danger');
+  revealModel();
+  var f=0,iv=setInterval(function(){document.getElementById('timerRing').style.opacity=document.getElementById('timerRing').style.opacity==='0.4'?'1':'0.4';if(++f>5){clearInterval(iv);document.getElementById('timerRing').style.opacity='1';}},200);
+}
+function updateTimerDisplay(){
+  if(timerDuration===0)return;
+  document.getElementById('timerDisplay').textContent=timerRemaining;
+  var r=timerRemaining/timerDuration;
+  document.getElementById('timerArc').style.strokeDashoffset=339*(1-r);
+  var ring=document.getElementById('timerRing');ring.classList.remove('warning','danger');
+  if(r<=0.25)ring.classList.add('danger');else if(r<=0.5)ring.classList.add('warning');
+}
+document.addEventListener('DOMContentLoaded',function(){buildTopicFilters();rebuildDeck();});
+</script>
+</body>
+</html>
