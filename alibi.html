@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alibi · John+English</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sun:#FFB347;--sky:#2176FF;--sky-light:#E8EEFF;
+  --sea:#1DD3B0;--sea-light:#E4FBF7;
+  --coral:#FF6B6B;--coral-light:#FFE8E8;
+  --lavender:#9B72CF;--lavender-light:#F0E8FA;
+  --cream:#F7F6F3;--ink:#2D3047;--muted:#7A7D8E;
+  --border:#E8E5DF;--card:#fff;--radius:14px;
+  --shadow-sm:0 1px 3px rgba(45,48,71,.06);
+  --shadow-md:0 4px 12px rgba(45,48,71,.08);
+  --shadow-lg:0 8px 32px rgba(45,48,71,.14)
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,var(--border) 1px,transparent 1px);background-size:28px 28px;opacity:.4;pointer-events:none;z-index:0}
+
+/* NAV */
+.topnav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(247,246,243,.88);backdrop-filter:blur(16px);border-bottom:1.5px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-size:1.3rem;font-weight:800;letter-spacing:-.02em;color:var(--ink);text-decoration:none}
+.nav-logo span{color:var(--sky)}
+.topnav-links{display:flex;gap:1.2rem}
+.topnav-links a{font-size:.8rem;font-weight:600;color:var(--muted);text-decoration:none;transition:color .2s}
+.topnav-links a:hover{color:var(--sky)}
+
+/* BACK + HERO */
+.back-link-wrap{max-width:960px;margin:0 auto;padding:4.2rem 2rem 0;position:relative;z-index:1}
+.wf-back-link{display:inline-flex;align-items:center;gap:.35rem;font-size:.82rem;font-weight:600;color:var(--muted);text-decoration:none;transition:color .15s}
+.wf-back-link:hover{color:var(--ink)}
+.hero{padding:1.4rem 2rem 1.6rem;max-width:960px;margin:0 auto;text-align:center;position:relative;z-index:1}
+.hero-badge{display:inline-flex;align-items:center;gap:.4rem;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.3rem .9rem;border-radius:20px;margin-bottom:.7rem;color:var(--sun);background:#FFF5E6;border:1px solid rgba(255,179,71,.25)}
+.hero h1{font-size:clamp(1.8rem,3.6vw,2.6rem);line-height:1.1;letter-spacing:-.02em;margin-bottom:.6rem;font-weight:900}
+.hero-sub{font-size:.95rem;color:var(--muted);max-width:540px;margin:0 auto;line-height:1.6}
+
+/* MAIN */
+.main{max-width:960px;margin:0 auto;padding:0 2rem 4rem;position:relative;z-index:1}
+
+/* PHASE INDICATOR */
+.phase-bar{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:2.4rem;background:var(--card);border:1.5px solid var(--border);border-radius:100px;padding:.3rem;max-width:600px;margin-left:auto;margin-right:auto;margin-bottom:2.4rem}
+.phase-step{flex:1;text-align:center;font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:.4rem .6rem;border-radius:100px;color:var(--muted);transition:all .2s;cursor:pointer;white-space:nowrap}
+.phase-step.active{background:var(--ink);color:#fff}
+.phase-step.done{color:var(--ink)}
+
+/* SCENARIO PICKER */
+.scenario-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem;margin-bottom:1.5rem}
+.scenario-card{background:var(--card);border:2px solid var(--border);border-radius:16px;padding:1.2rem 1.3rem;cursor:pointer;transition:all .18s;position:relative;overflow:hidden}
+.scenario-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px}
+.scenario-card.realistic::before{background:var(--sky)}
+.scenario-card.absurd::before{background:var(--coral)}
+.scenario-card:hover{border-color:var(--ink);transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.scenario-card.selected{border-color:var(--ink);box-shadow:var(--shadow-md)}
+.sc-badge{font-family:'JetBrains Mono',monospace;font-size:.57rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;padding:.18rem .5rem;border-radius:5px;margin-bottom:.5rem;display:inline-block}
+.sc-badge.realistic{background:var(--sky-light);color:var(--sky)}
+.sc-badge.absurd{background:var(--coral-light);color:var(--coral)}
+.sc-title{font-size:1rem;font-weight:800;color:var(--ink);margin-bottom:.3rem;line-height:1.3}
+.sc-desc{font-size:.82rem;color:var(--muted);line-height:1.5}
+.sc-meta{display:flex;gap:.8rem;margin-top:.6rem}
+.sc-meta span{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--muted);display:flex;align-items:center;gap:.3rem}
+
+/* MAIN CONTENT CARD */
+.content-card{background:var(--card);border:2px solid var(--border);border-radius:20px;box-shadow:var(--shadow-lg);overflow:hidden;margin-bottom:1.2rem}
+.content-header{padding:.9rem 1.4rem;border-bottom:1.5px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.content-label{font-family:'JetBrains Mono',monospace;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.content-badge{font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:700;padding:.2rem .55rem;border-radius:5px}
+.badge-crime{background:#FEE2E2;color:#dc2626}
+.badge-suspects{background:var(--lavender-light);color:var(--lavender)}
+.badge-questions{background:var(--sky-light);color:var(--sky)}
+.badge-verdict{background:#dcfce7;color:#16a34a}
+
+/* CRIME SCENE */
+.crime-body{padding:2rem 2rem 1.6rem}
+.crime-emoji{font-size:3.5rem;margin-bottom:.8rem;display:block;text-align:center}
+.crime-title{font-size:1.5rem;font-weight:900;color:var(--ink);text-align:center;margin-bottom:.4rem;letter-spacing:-.02em}
+.crime-time{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--muted);text-align:center;margin-bottom:1.2rem;text-transform:uppercase;letter-spacing:.08em}
+.crime-desc{font-size:1rem;color:var(--ink);line-height:1.7;max-width:540px;margin:0 auto 1.4rem;text-align:center}
+.crime-detail-row{display:flex;gap:.8rem;flex-wrap:wrap;justify-content:center}
+.crime-detail{background:var(--cream);border:1.5px solid var(--border);border-radius:10px;padding:.5rem .9rem;font-size:.82rem;color:var(--ink);display:flex;align-items:center;gap:.4rem}
+.crime-detail-icon{font-size:1rem}
+
+/* SUSPECTS PANEL */
+.suspects-body{padding:1.4rem 1.6rem}
+.suspects-intro{font-size:.88rem;color:var(--muted);line-height:1.6;margin-bottom:1.2rem;padding:.8rem 1rem;background:var(--lavender-light);border-radius:10px;border-left:3px solid var(--lavender)}
+.suspects-intro strong{color:var(--lavender)}
+.alibi-fact-grid{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-bottom:1rem}
+.alibi-fact{background:var(--cream);border:1.5px solid var(--border);border-radius:10px;padding:.7rem .9rem}
+.alibi-fact-label{font-family:'JetBrains Mono',monospace;font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.25rem}
+.alibi-fact-value{font-size:.9rem;font-weight:700;color:var(--ink);line-height:1.4}
+.alibi-note{font-size:.83rem;color:var(--muted);line-height:1.6;margin-top:.8rem;font-style:italic}
+
+/* QUESTION CARDS */
+.q-deck-area{padding:1.4rem 1.6rem}
+.q-intro{font-size:.87rem;color:var(--muted);margin-bottom:1.2rem;line-height:1.6}
+.q-card-display{position:relative;margin-bottom:1.2rem}
+.q-card{background:var(--card);border:2px solid var(--sky);border-radius:16px;padding:2rem 1.8rem;text-align:center;min-height:130px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;box-shadow:0 4px 20px rgba(33,118,255,.12)}
+.q-category{font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--sky)}
+.q-text{font-size:1.25rem;font-weight:800;color:var(--ink);line-height:1.3;letter-spacing:-.01em}
+.q-tip{font-size:.78rem;color:var(--muted);font-style:italic}
+.q-nav{display:flex;align-items:center;justify-content:center;gap:1rem}
+.q-nav-btn{font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:700;padding:.5rem 1.2rem;border-radius:10px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:.4rem}
+.q-nav-btn:hover{border-color:var(--ink);color:var(--ink)}
+.q-nav-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.q-counter{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--muted);min-width:60px;text-align:center}
+
+/* CAUGHT OUT COUNTER */
+.caught-row{display:flex;align-items:center;justify-content:center;gap:1.2rem;padding:1rem 1.6rem;border-top:1.5px solid var(--border)}
+.caught-label{font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.caught-count{font-family:'JetBrains Mono',monospace;font-size:1.4rem;font-weight:700;color:var(--coral);min-width:2rem;text-align:center}
+.caught-btn{font-family:'Outfit',sans-serif;font-size:.8rem;font-weight:700;padding:.35rem .8rem;border-radius:8px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s}
+.caught-btn:hover{border-color:var(--coral);color:var(--coral)}
+.caught-btn.minus:hover{border-color:var(--muted)}
+
+/* TIMER */
+.timer-row{display:flex;align-items:center;justify-content:center;gap:1.4rem;padding:.8rem 1.6rem;border-top:1.5px solid var(--border);flex-wrap:wrap}
+.timer-ring{position:relative;width:80px;height:80px;cursor:pointer;flex-shrink:0}
+.timer-ring svg{transform:rotate(-90deg)}
+.timer-ring circle{fill:none;stroke-width:5}
+.timer-bg{stroke:var(--border)}
+.timer-progress{stroke:var(--ink);stroke-linecap:round;transition:stroke-dashoffset .1s linear;stroke-dasharray:226;stroke-dashoffset:0}
+.timer-ring.warning .timer-progress{stroke:var(--sun)}
+.timer-ring.danger .timer-progress{stroke:var(--coral)}
+.timer-display{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.timer-secs{font-family:'JetBrains Mono',monospace;font-size:1.4rem;font-weight:700;color:var(--ink);line-height:1}
+.timer-hint{font-size:.55rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.timer-presets{display:flex;gap:.35rem;flex-wrap:wrap;align-items:center}
+.preset-btn{font-family:'JetBrains Mono',monospace;font-size:.63rem;font-weight:700;padding:.25rem .65rem;border-radius:6px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s}
+.preset-btn:hover{border-color:var(--ink);color:var(--ink)}
+.preset-btn.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+/* VERDICT */
+.verdict-body{padding:1.6rem}
+.verdict-intro{font-size:.9rem;color:var(--muted);margin-bottom:1.4rem;text-align:center}
+.verdict-btns{display:flex;gap:1rem;justify-content:center;margin-bottom:1.4rem;flex-wrap:wrap}
+.verdict-btn{font-family:'Outfit',sans-serif;font-size:1rem;font-weight:800;padding:.8rem 2rem;border-radius:14px;border:2px solid var(--border);background:var(--card);cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:.5rem;letter-spacing:-.01em}
+.verdict-btn.guilty:hover{background:#fee2e2;border-color:#dc2626;color:#dc2626}
+.verdict-btn.innocent:hover{background:#dcfce7;border-color:#16a34a;color:#16a34a}
+.verdict-btn.selected-guilty{background:#dc2626;border-color:#dc2626;color:#fff}
+.verdict-btn.selected-innocent{background:#16a34a;border-color:#16a34a;color:#fff}
+.verdict-result{text-align:center;padding:1.4rem;border-radius:14px;border:2px solid var(--border);display:none}
+.verdict-result.show{display:block}
+.verdict-result.guilty-result{background:#fee2e2;border-color:#dc2626}
+.verdict-result.innocent-result{background:#dcfce7;border-color:#16a34a}
+.verdict-emoji{font-size:3rem;margin-bottom:.5rem}
+.verdict-headline{font-size:1.3rem;font-weight:900;margin-bottom:.4rem;letter-spacing:-.02em}
+.verdict-sub{font-size:.88rem;color:var(--muted);line-height:1.6}
+
+/* ACTION BUTTONS */
+.btn-primary{font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;padding:.7rem 1.8rem;border-radius:12px;border:none;background:var(--ink);color:#fff;cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:.45rem}
+.btn-primary:hover{background:#1a1d2e;transform:translateY(-1px)}
+.btn-primary svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.btn-secondary{font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:600;padding:.55rem 1.2rem;border-radius:10px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s}
+.btn-secondary:hover{border-color:var(--ink);color:var(--ink)}
+.action-row{display:flex;gap:.7rem;justify-content:center;flex-wrap:wrap;margin-top:1.4rem}
+
+/* PHASE PANELS */
+.phase-panel{display:none;min-height:400px}
+.phase-panel.active{display:block}
+
+@media(max-width:640px){
+  .topnav{padding:0 1.2rem}
+  .back-link-wrap,.hero,.main{padding-left:1.2rem;padding-right:1.2rem}
+  .scenario-grid{grid-template-columns:1fr}
+  .alibi-fact-grid{grid-template-columns:1fr}
+  .verdict-btns{flex-direction:column;align-items:stretch}
+  .verdict-btn{justify-content:center}
+  .phase-step{font-size:.52rem;padding:.35rem .4rem}
+}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="index.html" class="nav-logo">john<span>+</span>english</a>
+  <div class="topnav-links">
+    <a href="index.html">Home</a>
+    <a href="index.html#group-fun">Fun Tools</a>
+  </div>
+</nav>
+
+<div class="back-link-wrap">
+  <a href="index.html" class="wf-back-link">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    Back to Home
+  </a>
+</div>
+
+<section class="hero">
+  <span class="hero-badge">Fun Tools</span>
+  <h1>Alibi</h1>
+  <p class="hero-sub">Two suspects. One crime. They invent their alibi independently — then the class interrogates them to find inconsistencies.</p>
+</section>
+
+<div class="main">
+
+  <!-- Phase bar -->
+  <div class="phase-bar">
+    <div class="phase-step active" id="step0" onclick="safeGoToPhase(0)">1. Crime</div>
+    <div class="phase-step" id="step1" onclick="safeGoToPhase(1)">2. Suspects</div>
+    <div class="phase-step" id="step2" onclick="safeGoToPhase(2)">3. Interrogate</div>
+    <div class="phase-step" id="step3" onclick="safeGoToPhase(3)">4. Verdict</div>
+  </div>
+
+  <!-- PHASE 0: Pick scenario -->
+  <div class="phase-panel active" id="phase0">
+    <div class="scenario-grid" id="scenarioGrid"></div>
+    <div class="action-row">
+      <button class="btn-primary" onclick="confirmScenario()">
+        Use this scenario
+        <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- PHASE 1: Crime + Suspects briefing -->
+  <div class="phase-panel" id="phase1">
+    <!-- Crime card -->
+    <div class="content-card" id="crimeCard">
+      <div class="content-header">
+        <span class="content-label">The Crime</span>
+        <span class="content-badge badge-crime">Show to the whole class</span>
+      </div>
+      <div class="crime-body" id="crimeBody"></div>
+    </div>
+    <!-- Suspects card -->
+    <div class="content-card" id="suspectsCard">
+      <div class="content-header">
+        <span class="content-label">Suspects' Briefing</span>
+        <span class="content-badge badge-suspects">Show only to the two suspects</span>
+      </div>
+      <div class="suspects-body" id="suspectsBody"></div>
+    </div>
+    <div class="action-row">
+      <button class="btn-secondary" onclick="goToPhase(0)">Change scenario</button>
+      <button class="btn-primary" onclick="goToPhase(2)">
+        Start interrogation
+        <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- PHASE 2: Interrogation -->
+  <div class="phase-panel" id="phase2">
+    <div class="content-card">
+      <div class="content-header">
+        <span class="content-label">Question Cards</span>
+        <span class="content-badge badge-questions">For the class to use</span>
+      </div>
+      <div class="q-deck-area">
+        <p class="q-intro">Flip through the questions below. Ask them to <strong>Suspect A first</strong>, note their answers, then ask the same questions to <strong>Suspect B</strong>. Look for inconsistencies.</p>
+        <div class="q-card-display">
+          <div class="q-card">
+            <div class="q-category" id="qCategory"></div>
+            <div class="q-text" id="qText"></div>
+            <div class="q-tip" id="qTip"></div>
+          </div>
+        </div>
+        <div class="q-nav">
+          <button class="q-nav-btn" onclick="prevQ()">
+            <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            Prev
+          </button>
+          <span class="q-counter" id="qCounter"></span>
+          <button class="q-nav-btn" onclick="nextQ()">
+            Next
+            <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="caught-row">
+        <span class="caught-label">Caught out</span>
+        <button class="caught-btn minus" onclick="changeCaught(-1)">−</button>
+        <span class="caught-count" id="caughtCount">0</span>
+        <button class="caught-btn" onclick="changeCaught(1)">+</button>
+        <span class="caught-label">inconsistencies</span>
+      </div>
+      <div class="timer-row">
+        <div class="timer-ring" id="timerRing" onclick="toggleTimer()">
+          <svg width="80" height="80" viewBox="0 0 80 80">
+            <circle class="timer-bg" cx="40" cy="40" r="36"/>
+            <circle class="timer-progress" id="timerArc" cx="40" cy="40" r="36"/>
+          </svg>
+          <div class="timer-display">
+            <div class="timer-secs" id="timerDisplay">3:00</div>
+            <div class="timer-hint" id="timerHint">start</div>
+          </div>
+        </div>
+        <div class="timer-presets">
+          <button class="preset-btn" onclick="setDuration(120,this)">2 min</button>
+          <button class="preset-btn active" onclick="setDuration(180,this)">3 min</button>
+          <button class="preset-btn" onclick="setDuration(300,this)">5 min</button>
+          <button class="preset-btn" onclick="setDuration(0,this)">No timer</button>
+        </div>
+      </div>
+    </div>
+    <div class="action-row">
+      <button class="btn-secondary" onclick="goToPhase(1)">Back to briefing</button>
+      <button class="btn-primary" onclick="goToPhase(3)">
+        Go to verdict
+        <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- PHASE 3: Verdict -->
+  <div class="phase-panel" id="phase3">
+    <div class="content-card">
+      <div class="content-header">
+        <span class="content-label">The Verdict</span>
+        <span class="content-badge badge-verdict">Class decision</span>
+      </div>
+      <div class="verdict-body">
+        <p class="verdict-intro" id="verdictIntro"></p>
+        <div class="verdict-btns">
+          <button class="verdict-btn guilty" onclick="setVerdict('guilty')">🔒 Stories didn't match</button>
+          <button class="verdict-btn innocent" onclick="setVerdict('innocent')">✅ Stories held up</button>
+        </div>
+        <div class="verdict-result" id="verdictResult">
+          <div class="verdict-emoji" id="verdictEmoji"></div>
+          <div class="verdict-headline" id="verdictHeadline"></div>
+          <div class="verdict-sub" id="verdictSub"></div>
+        </div>
+      </div>
+    </div>
+    <div class="action-row">
+      <button class="btn-secondary" onclick="resetAll()">Play again with new scenario</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+var SCENARIOS = [
+  // ── REALISTIC ─────────────────────────────────────────────────────
+  {
+    tone: 'realistic',
+    emoji: '💍',
+    title: 'The Missing Ring',
+    time: 'Saturday, 14 March · between 2pm and 4pm',
+    desc: 'A valuable engagement ring has disappeared from Apartment 4B. The owner returned home to find it gone from the bedside table. Two guests had access to the flat during that time.',
+    details: [
+      {icon:'📍', label:'Location', value:'Apartment 4B, Elm Street'},
+      {icon:'🕐', label:'Time of incident', value:'Between 2:00pm and 4:00pm'},
+      {icon:'💰', label:'Value', value:'Approximately £3,500'},
+      {icon:'🚪', label:'Access', value:'Front door key was left under the mat'}
+    ],
+    alibi: {
+      agreed: [
+        {label:'Where you were', value:'Together at a coffee shop, then a walk in the park'},
+        {label:'Time period', value:'From around 1:45pm until roughly 4:30pm'},
+        {label:'General area', value:'Westside, about 15 minutes from Elm Street'},
+        {label:'Contact with others', value:'You bumped into someone you both know vaguely'}
+      ],
+      note: 'Everything else — what you ordered, what you talked about, what you were wearing, the exact route you walked — you must invent independently. Your stories must match.'
+    },
+    questions: [
+      {cat:'Location', q:'What café did you go to?', tip:'Ask for the name, the street, what floor, how they got there.'},
+      {cat:'Time', q:'What time exactly did you arrive at the café?', tip:'Follow up: how do you know what time it was?'},
+      {cat:'Food & drink', q:'What did you order?', tip:'Ask about both suspects separately. Did they share anything?'},
+      {cat:'Appearance', q:'What were you wearing?', tip:'Coats, shoes, bags — details are where stories fall apart.'},
+      {cat:'Other people', q:'Who did you see that you know?', tip:'How do they know them? Where exactly did they see them?'},
+      {cat:'The walk', q:'Which route did you take through the park?', tip:'Did they enter from the north or south? Which paths?'},
+      {cat:'Weather', q:'What was the weather like?', tip:'Was it sunny? Did they need an umbrella?'},
+      {cat:'Phone', q:'Did you take any photos or make any calls?', tip:'Ask if they can show you — if they can\'t, why not?'},
+      {cat:'Payment', q:'Who paid at the café?', tip:'Cash or card? Did they keep the receipt?'},
+      {cat:'Leaving', q:'What time did you leave the park?', tip:'How did they get home? Did they go together?'},
+      {cat:'Mood', q:'How was the mood between you that afternoon?', tip:'Were you happy? Did you argue about anything?'},
+      {cat:'Evidence', q:'Is there anyone who can confirm you were there?', tip:'A server, a friend, someone on the street?'}
+    ]
+  },
+  {
+    tone: 'realistic',
+    emoji: '💻',
+    title: 'The Deleted Files',
+    time: 'Monday, 9 June · between 6pm and 8pm',
+    desc: 'Critical project files have been permanently deleted from the company server. The IT department has traced the deletion to an employee login that was accessed after office hours. Two employees were the last to leave the building.',
+    details: [
+      {icon:'📍', label:'Location', value:'Greenfield & Partners, 3rd floor'},
+      {icon:'🕐', label:'Time of incident', value:'Between 6:00pm and 8:00pm'},
+      {icon:'💾', label:'Files deleted', value:'18 months of client data'},
+      {icon:'🔐', label:'Access', value:'Required an employee swipe card and login'}
+    ],
+    alibi: {
+      agreed: [
+        {label:'Where you were', value:'Left the office together and went to a nearby pub'},
+        {label:'Time period', value:'Left around 6:15pm, stayed until roughly 8:30pm'},
+        {label:'General area', value:'The Anchor pub, two streets from the office'},
+        {label:'Contact with others', value:'Spoke briefly to the barman'}
+      ],
+      note: 'Everything else — what you drank, where you sat, what you talked about, who else was in the pub — you must invent independently. Your stories must match.'
+    },
+    questions: [
+      {cat:'Location', q:'What pub did you go to and where is it exactly?', tip:'Ask for the street name and what it looks like inside.'},
+      {cat:'Time', q:'What time did you actually leave the office?', tip:'Did they sign out? Take the lift or the stairs?'},
+      {cat:'Drinks', q:'What did you drink, and how many rounds?', tip:'Who went to the bar? Did they use card or cash?'},
+      {cat:'Seating', q:'Where did you sit in the pub?', tip:'Table or bar? Near a window? Upstairs or downstairs?'},
+      {cat:'Other people', q:'Who else was in the pub that you noticed?', tip:'Was it busy? Was a sport on the TV?'},
+      {cat:'Conversation', q:'What did you talk about?', tip:'Did they discuss work? Personal topics? Current events?'},
+      {cat:'Phone', q:'Did either of you use your phone during the evening?', tip:'Did they check emails? Take calls? Post anything?'},
+      {cat:'The barman', q:'What did the barman look like?', tip:'Young or old? What accent? Did he know you?'},
+      {cat:'Leaving', q:'What time did you leave the pub?', tip:'Did they leave together? How did they get home?'},
+      {cat:'Before the pub', q:'Did you go anywhere between the office and the pub?', tip:'A shop? Cash machine? Did you split up at any point?'},
+      {cat:'Evidence', q:'Do you have a receipt, bank transaction or message to prove where you were?', tip:'Check if both stories about payment match.'},
+      {cat:'Feeling', q:'How are you feeling about this investigation?', tip:'Watch their body language — are they nervous or calm?'}
+    ]
+  },
+  {
+    tone: 'realistic',
+    emoji: '🎨',
+    title: 'The Stolen Painting',
+    time: 'Friday, 22 November · between 7pm and 10pm',
+    desc: 'A small but valuable oil painting has vanished from the Caldwell Gallery during the evening opening event. The painting was confirmed present at 7pm and missing by 10pm. Two attendees were seen near the back room.',
+    details: [
+      {icon:'📍', label:'Location', value:'Caldwell Gallery, High Street'},
+      {icon:'🕐', label:'Time of incident', value:'Between 7:00pm and 10:00pm'},
+      {icon:'🖼️', label:'Item', value:'Oil painting, 40cm x 30cm, value unknown'},
+      {icon:'👥', label:'Witnesses', value:'At least three people saw you near the back room'}
+    ],
+    alibi: {
+      agreed: [
+        {label:'Where you were', value:'At the gallery event, then left early together'},
+        {label:'Time period', value:'Arrived around 7:15pm, left before 9pm'},
+        {label:'Why you left early', value:'One of you wasn\'t feeling well'},
+        {label:'After leaving', value:'Went to a nearby restaurant for a light meal'}
+      ],
+      note: 'Everything else — which part of the gallery you were in, who you spoke to, what you ate, what the restaurant was called — you must invent independently. Your stories must match.'
+    },
+    questions: [
+      {cat:'Arrival', q:'What time did you arrive and how did you get there?', tip:'Taxi, walk, public transport? Were you on time?'},
+      {cat:'The event', q:'What was the exhibition about?', tip:'Did they look at specific paintings? What did they like?'},
+      {cat:'The back room', q:'Did you go near the back room at any point?', tip:'Why? What was back there? How long were you there?'},
+      {cat:'People', q:'Who did you speak to at the event?', tip:'Names, descriptions — anyone who could confirm they were there?'},
+      {cat:'Feeling unwell', q:'What were the symptoms? When did they start?', tip:'Was it sudden? Had they eaten something earlier?'},
+      {cat:'Leaving', q:'What time did you leave and which exit did you use?', tip:'Did anyone see them leave? Coat check?'},
+      {cat:'The restaurant', q:'What restaurant did you go to?', tip:'Name, location, what they ordered, how long they stayed.'},
+      {cat:'Payment', q:'Who paid for the meal?', tip:'Cash or card? Do they have a receipt?'},
+      {cat:'The painting', q:'Did you notice the painting that went missing?', tip:'Had they seen it before? Did they find it interesting?'},
+      {cat:'After dinner', q:'What did you do after the restaurant?', tip:'Went home separately or together? How?'},
+      {cat:'Phone', q:'Did you photograph anything at the gallery?', tip:'Can they show the photos — what time were they taken?'},
+      {cat:'General', q:'Is there anything you think we should know?', tip:'Open question — see what they volunteer.'}
+    ]
+  },
+
+  // ── ABSURD ────────────────────────────────────────────────────────
+  {
+    tone: 'absurd',
+    emoji: '🍩',
+    title: 'The Great Doughnut Heist',
+    time: 'Wednesday, 5 February · between 10am and 11am',
+    desc: 'All 48 doughnuts have vanished from the staff kitchen at Pemberton & Co. They were there at 10am for the monthly team meeting and completely gone by 11am. Sugar residue was found on the stairs. Two employees were seen near the kitchen.',
+    details: [
+      {icon:'📍', label:'Location', value:'Staff kitchen, 2nd floor, Pemberton & Co'},
+      {icon:'🕐', label:'Time of incident', value:'Between 10:00am and 11:00am'},
+      {icon:'🍩', label:'Items missing', value:'48 assorted doughnuts (value: approximately £36)'},
+      {icon:'🔍', label:'Evidence', value:'Trail of icing sugar leading to the fire exit'}
+    ],
+    alibi: {
+      agreed: [
+        {label:'Where you were', value:'Together in the 3rd floor meeting room for a "personal project" meeting'},
+        {label:'Time period', value:'From 9:50am until approximately 11:15am'},
+        {label:'Purpose', value:'Working on a presentation for next week'},
+        {label:'Witnessed by', value:'You passed someone in the corridor on the way up'}
+      ],
+      note: 'Everything else — what the presentation was about, what you were eating or drinking, what you were wearing, who exactly you passed in the corridor — you must invent independently. Your stories must match.'
+    },
+    questions: [
+      {cat:'Location', q:'Which meeting room exactly were you in?', tip:'Room number? Which floor? Near the window or the wall?'},
+      {cat:'The project', q:'What was the presentation about?', tip:'Which client? Which product? How far did they get?'},
+      {cat:'Food and drink', q:'Did you have anything to eat or drink during the meeting?', tip:'Did either of them happen to have a doughnut? Where did they get it?'},
+      {cat:'The corridor', q:'Who did you pass on the way to the 3rd floor?', tip:'Name? Department? What were they wearing?'},
+      {cat:'Lift or stairs', q:'Did you take the lift or the stairs?', tip:'If stairs, did they notice anything on the stairwell?'},
+      {cat:'Timing', q:'How do you know what time you arrived and left?', tip:'Did they check their phone? A clock on the wall?'},
+      {cat:'Smell', q:'Did you notice any unusual smells during your meeting?', tip:'Like... fried dough, perhaps?'},
+      {cat:'Equipment', q:'What did you use in the meeting room?', tip:'Laptop, whiteboard, projector? Whose laptop?'},
+      {cat:'The doughnuts', q:'Did you know about the doughnuts for the meeting?', tip:'Had you been looking forward to them? Were you disappointed to miss them?'},
+      {cat:'Sugar', q:'Do you have any sugar or icing on your clothing or hands?', tip:'Ask them to show their hands and check their jacket.'},
+      {cat:'Witnesses', q:'Did anyone come into the meeting room while you were there?', tip:'A knock at the door? An interruption?'},
+      {cat:'Motive', q:'How do you feel about doughnuts generally?', tip:'Purely investigative.'}
+    ]
+  },
+  {
+    tone: 'absurd',
+    emoji: '🦜',
+    title: 'The Parrot Disappearance',
+    time: 'Sunday, 14 April · between 3pm and 5pm',
+    desc: 'Rodrigo, a prize-winning African Grey parrot belonging to local eccentric Countess Von Fleck, has vanished from his cage in the conservatory. Rodrigo speaks seven languages and is valued at £12,000. Two visitors were alone with him for over an hour.',
+    details: [
+      {icon:'📍', label:'Location', value:'Von Fleck Manor, conservatory'},
+      {icon:'🕐', label:'Time of incident', value:'Between 3:00pm and 5:00pm'},
+      {icon:'🦜', label:'Victim', value:'Rodrigo, 14-year-old African Grey parrot'},
+      {icon:'🗣️', label:'Special note', value:'Rodrigo can repeat conversations he has heard'}
+    ],
+    alibi: {
+      agreed: [
+        {label:'Where you were', value:'Together at the garden centre on the edge of town'},
+        {label:'Time period', value:'From about 2:45pm until around 5:15pm'},
+        {label:'Purpose', value:'Buying plants for a friend\'s birthday'},
+        {label:'Witnessed by', value:'You spoke to a member of staff at the till'}
+      ],
+      note: 'Everything else — what plants you bought, what the garden centre looked like, what you were wearing, what you talked about on the way — you must invent independently. Your stories must match.'
+    },
+    questions: [
+      {cat:'Location', q:'Which garden centre did you go to?', tip:'Name? Where is it? How did you get there?'},
+      {cat:'The plants', q:'What plants did you buy?', tip:'Specific names, sizes, colours — what were they for?'},
+      {cat:'The friend', q:'Whose birthday was it and how well do you know them?', tip:'Did they discuss the friend at all?'},
+      {cat:'The staff member', q:'Describe the person who served you at the till.', tip:'Approximate age, hair, uniform — did they say anything memorable?'},
+      {cat:'Time', q:'How long did you spend inside the garden centre?', tip:'Did they browse or go straight to what they needed?'},
+      {cat:'Payment', q:'How did you pay and how much did you spend?', tip:'Cash or card? Do they have a receipt or bank notification?'},
+      {cat:'Transport', q:'How did you get there and back?', tip:'Car, bus, taxi? Who drove? Parking?'},
+      {cat:'Rodrigo', q:'Have you ever met Rodrigo the parrot?', tip:'Do they like parrots? Have they visited the Manor before?'},
+      {cat:'The conservatory', q:'Did you visit the conservatory during your time at the Manor?', tip:'Why would they have been there if not?'},
+      {cat:'Languages', q:'Do either of you speak any languages other than English?', tip:'Rodrigo\'s special ability makes this relevant.'},
+      {cat:'Motive', q:'What would you even do with a parrot worth £12,000?', tip:'A reasonable question.'},
+      {cat:'On the way home', q:'Did you go anywhere else after the garden centre?', tip:'A petrol station, a friend\'s house, anywhere with a large carry bag?'}
+    ]
+  },
+  {
+    tone: 'absurd',
+    emoji: '🏆',
+    title: 'The Trophy Incident',
+    time: 'Thursday, 3 October · between 8pm and 10pm',
+    desc: 'The annual Regional Cheese-Rolling Championship trophy has been removed from its display case in the lobby of Chedford Leisure Centre. The trophy, a 47-year-old solid silver wheel of cheese, is irreplaceable. CCTV shows two figures near the display case.',
+    details: [
+      {icon:'📍', label:'Location', value:'Chedford Leisure Centre, main lobby'},
+      {icon:'🕐', label:'Time of incident', value:'Between 8:00pm and 10:00pm'},
+      {icon:'🏆', label:'Item', value:'Silver Cheese-Rolling Trophy (47 years old)'},
+      {icon:'📹', label:'Evidence', value:'CCTV shows two figures but faces unclear'}
+    ],
+    alibi: {
+      agreed: [
+        {label:'Where you were', value:'Together at the bowling alley on Marsh Road'},
+        {label:'Time period', value:'From 8:00pm until approximately 10:30pm'},
+        {label:'Activity', value:'Two games of bowling, then drinks at the bar'},
+        {label:'Witnessed by', value:'The person at the shoe hire desk'}
+      ],
+      note: 'Everything else — your scores, what shoes you hired, what you drank, who else was there, what music was playing — you must invent independently. Your stories must match.'
+    },
+    questions: [
+      {cat:'Bowling', q:'What were your scores in each game?', tip:'Who won? By how much? Was either of them particularly good or bad?'},
+      {cat:'Shoes', q:'What size shoes did you hire?', tip:'Describe the person at the shoe desk — what did they look like?'},
+      {cat:'Timing', q:'What time did you arrive and how did you book the lane?', tip:'In advance or just walked in? Was it busy?'},
+      {cat:'The bar', q:'What did you drink after bowling?', tip:'Who went to the bar? How long did they stay?'},
+      {cat:'Other people', q:'Did you speak to anyone else there?', tip:'Friends? Strangers? Anyone who would remember them?'},
+      {cat:'Music', q:'What music was playing in the bowling alley?', tip:'A specific song, an era, a genre — even approximate.'},
+      {cat:'The trophy', q:'Do you know what the Regional Cheese-Rolling Championship is?', tip:'Have you ever attended? Did you know there was a trophy?'},
+      {cat:'Cheese-rolling', q:'What do you know about cheese-rolling as a sport?', tip:'It\'s a niche question but shows whether they\'ve done research.'},
+      {cat:'CCTV', q:'The CCTV shows two people near the trophy case. Could that have been you?', tip:'Have they ever been to Chedford Leisure Centre before?'},
+      {cat:'Transport', q:'How did you get to and from the bowling alley?', tip:'Car, taxi, bus? Who drove? Did they go home together?'},
+      {cat:'Motive', q:'What would someone want with a solid silver cheese trophy?', tip:'Rhetorical — but watch their reaction.'},
+      {cat:'General', q:'Is there anything that can prove beyond doubt you were at the bowling alley?', tip:'App, receipt, photo, score sheet?'}
+    ]
+  },
+  {
+    tone: 'absurd',
+    emoji: '🌱',
+    title: 'The Prize Marrow Mystery',
+    time: 'Saturday, 6 September · between 9am and 12pm',
+    desc: 'Harold Perkins\' prize-winning marrow — 43kg and widely expected to win first place at the Dunston Village Show — has vanished overnight from his allotment. Two allotment neighbours were on site during the morning.',
+    details: [
+      {icon:'📍', label:'Location', value:'Dunston Community Allotments, Plot 7'},
+      {icon:'🕐', label:'Time of incident', value:'Between 9:00am and 12:00pm'},
+      {icon:'🌱', label:'Item', value:'One marrow, 43kg, grown over 18 months'},
+      {icon:'🔍', label:'Evidence', value:'Tyre tracks and a small piece of rope near the plot'}
+    ],
+    alibi: {
+      agreed: [
+        {label:'Where you were', value:'Together at the Dunston Farmers\' Market'},
+        {label:'Time period', value:'From around 9:30am until after midday'},
+        {label:'What you were doing', value:'Shopping for vegetables and local produce'},
+        {label:'Witnessed by', value:'You bought something from at least one stall'}
+      ],
+      note: 'Everything else — what you bought, which stalls you visited, who you spoke to, what you were wearing — you must invent independently. Your stories must match.'
+    },
+    questions: [
+      {cat:'The market', q:'Where exactly is the farmers\' market held?', tip:'Which field or car park? How far from the allotments?'},
+      {cat:'Stalls', q:'Which stalls did you visit?', tip:'What were they selling? Did they buy from the same stalls?'},
+      {cat:'Purchases', q:'What did you buy and how much did you spend?', tip:'Do they have a bag with them? Receipts? Can they show the produce?'},
+      {cat:'Time', q:'What time did you arrive at the market?', tip:'How did they get there? How long did they stay?'},
+      {cat:'Appearance', q:'What were you wearing?', tip:'Practical market clothes? Coats? Boots or shoes?'},
+      {cat:'The marrow', q:'Do you know Harold Perkins?', tip:'How long have they known him? Have they seen the marrow?'},
+      {cat:'The allotment', q:'When did you last visit your own allotment?', tip:'Yesterday? This morning? Before or after the market?'},
+      {cat:'The rope', q:'Do you own or use rope on your allotment?', tip:'What for? What kind?'},
+      {cat:'Transport', q:'How did you get to the market?', tip:'Car? Could a 43kg marrow fit in it?'},
+      {cat:'Motive', q:'What would you even do with a 43kg marrow?', tip:'A reasonable and important question.'},
+      {cat:'Weather', q:'What was the weather like that morning?', tip:'Cold? Sunny? Did they need an umbrella?'},
+      {cat:'Witnesses', q:'Is there anyone at the market who would definitely remember seeing you there?', tip:'A regular stallholder? A friend?'}
+    ]
+  },
+  {
+    tone: 'realistic',
+    emoji: '📱',
+    title: 'The Leaked Message',
+    time: 'Tuesday, 18 February · between 12pm and 2pm',
+    desc: 'A private WhatsApp message from a company group chat has appeared on a competitor\'s website. The message contained sensitive pricing information. Only two junior employees had access to the group and were both in the building during the lunch period.',
+    details: [
+      {icon:'📍', label:'Location', value:'Hartley Solutions Ltd, open plan office'},
+      {icon:'🕐', label:'Time of incident', value:'Between 12:00pm and 2:00pm'},
+      {icon:'📊', label:'Leaked content', value:'Pricing strategy for Q3'},
+      {icon:'📱', label:'Method', value:'Screenshot shared via personal device'}
+    ],
+    alibi: {
+      agreed: [
+        {label:'Where you were', value:'Went for lunch together at a place nearby'},
+        {label:'Time period', value:'Left the office at 12:15pm, back by 1:45pm'},
+        {label:'General location', value:'Somewhere on or near the high street'},
+        {label:'Contact with others', value:'Served by someone at the restaurant or café'}
+      ],
+      note: 'Everything else — where exactly you went, what you ordered, what you discussed, whether you used your phones — you must invent independently. Your stories must match.'
+    },
+    questions: [
+      {cat:'Location', q:'Where exactly did you go for lunch?', tip:'Name of the place, what kind of food, which street.'},
+      {cat:'Order', q:'What did you eat and drink?', tip:'Did they order the same thing? Did they share anything?'},
+      {cat:'Payment', q:'How did you pay?', tip:'Separately or together? Card or cash? Receipt?'},
+      {cat:'Phones', q:'Did you use your phones during lunch?', tip:'Did they scroll social media, send messages, take photos?'},
+      {cat:'The server', q:'Describe the person who served you.', tip:'Appearance, approximate age, any memorable interaction?'},
+      {cat:'Conversation', q:'What did you talk about at lunch?', tip:'Work? Personal? Any specific topics they can name?'},
+      {cat:'Timing', q:'How do you know when you left and returned?', tip:'A clock, a phone notification, a colleague comment?'},
+      {cat:'The message', q:'Did you know about the pricing strategy that was leaked?', tip:'Of course they have access — but did they understand its value?'},
+      {cat:'The competitor', q:'Do either of you have any contact with people at the competitor company?', tip:'Former colleagues, friends, LinkedIn connections?'},
+      {cat:'Phones again', q:'Were your phones on you at all times during lunch?', tip:'Did you put them on the table? In a bag? Leave them unattended?'},
+      {cat:'After lunch', q:'Did you come straight back to the office?', tip:'Any detours? A shop, a cash machine, a brief call?'},
+      {cat:'General', q:'How do you feel about working at Hartley Solutions?', tip:'Are you happy there? Any grievances?'}
+    ]
+  }
+];
+
+var UNIVERSAL_QUESTIONS = [
+  {cat:'General', q:'Are you nervous?', tip:'Watch the reaction — genuine or performed?'},
+  {cat:'General', q:'What do you think happened?', tip:'Their theory might reveal knowledge they shouldn\'t have.'},
+  {cat:'General', q:'Have you ever been in trouble before?', tip:'A direct question they have to answer.'},
+  {cat:'Emotions', q:'How are you feeling right now?', tip:'Anxious, calm, confused, defensive?'},
+  {cat:'Relationship', q:'How well do you two know each other?', tip:'Do their descriptions of the relationship match?'}
+];
+
+var currentScenario = 0;
+var currentPhase = 0;
+var maxPhase = 0;
+var currentQ = 0;
+var caughtCount = 0;
+var timerDuration = 180;
+var timerRemaining = 180;
+var timerInterval = null;
+var timerRunning = false;
+var verdictChosen = null;
+var allQuestions = [];
+
+// Build scenario grid
+function buildScenarioGrid() {
+  var html = '';
+  SCENARIOS.forEach(function(sc, i) {
+    html += '<div class="scenario-card '+sc.tone+(i===currentScenario?' selected':'')
+      +'" onclick="selectScenario('+i+')" id="sc-'+i+'">'
+      +'<span class="sc-badge '+sc.tone+'">'+(sc.tone==='realistic'?'Realistic':'Absurd')+'</span>'
+      +'<div class="sc-title">'+sc.emoji+' '+sc.title+'</div>'
+      +'<div class="sc-desc">'+sc.desc.slice(0,100)+'...</div>'
+      +'<div class="sc-meta">'
+      +'<span>🕐 '+sc.time.split('·')[1].trim()+'</span>'
+      +'<span>❓ '+sc.questions.length+' questions</span>'
+      +'</div>'
+      +'</div>';
+  });
+  document.getElementById('scenarioGrid').innerHTML = html;
+}
+
+function selectScenario(i) {
+  currentScenario = i;
+  document.querySelectorAll('.scenario-card').forEach(function(c,j){
+    c.classList.toggle('selected', j===i);
+  });
+}
+
+function confirmScenario() {
+  buildCrimeCard();
+  buildSuspectsCard();
+  buildQuestions();
+  goToPhase(1);
+}
+
+function buildCrimeCard() {
+  var sc = SCENARIOS[currentScenario];
+  var detailsHtml = sc.details.map(function(d){
+    return '<div class="crime-detail"><span class="crime-detail-icon">'+d.icon+'</span><strong>'+d.label+':</strong> '+d.value+'</div>';
+  }).join('');
+  document.getElementById('crimeBody').innerHTML =
+    '<div class="crime-emoji">'+sc.emoji+'</div>'
+    +'<div class="crime-title">'+sc.title+'</div>'
+    +'<div class="crime-time">'+sc.time+'</div>'
+    +'<div class="crime-desc">'+sc.desc+'</div>'
+    +'<div class="crime-detail-row">'+detailsHtml+'</div>';
+}
+
+function buildSuspectsCard() {
+  var sc = SCENARIOS[currentScenario];
+  var factsHtml = sc.alibi.agreed.map(function(f){
+    return '<div class="alibi-fact"><div class="alibi-fact-label">'+f.label+'</div><div class="alibi-fact-value">'+f.value+'</div></div>';
+  }).join('');
+  document.getElementById('suspectsBody').innerHTML =
+    '<p class="suspects-intro">Show this screen to the two suspects only. They have <strong>3 minutes</strong> to agree on the facts below — <strong>nothing else</strong>. They then separate. Everything not listed here must be invented independently. The class will question them one at a time and look for inconsistencies.</p>'
+    +'<div class="alibi-fact-grid">'+factsHtml+'</div>'
+    +'<p class="alibi-note">⚠️ '+sc.alibi.note+'</p>';
+}
+
+function buildQuestions() {
+  var sc = SCENARIOS[currentScenario];
+  allQuestions = sc.questions.concat(UNIVERSAL_QUESTIONS);
+  currentQ = 0;
+  caughtCount = 0;
+  document.getElementById('caughtCount').textContent = '0';
+  renderQuestion();
+  document.getElementById('verdictIntro').textContent =
+    'The class has questioned both suspects about '+sc.title.toLowerCase()+'. You tracked '+caughtCount+' inconsistencies. Time to decide.';
+}
+
+function renderQuestion() {
+  var q = allQuestions[currentQ];
+  document.getElementById('qCategory').textContent = q.cat;
+  document.getElementById('qText').textContent = q.q;
+  document.getElementById('qTip').textContent = q.tip;
+  document.getElementById('qCounter').textContent = (currentQ+1)+' / '+allQuestions.length;
+}
+
+function nextQ() {
+  if (currentQ < allQuestions.length - 1) { currentQ++; renderQuestion(); }
+}
+
+function prevQ() {
+  if (currentQ > 0) { currentQ--; renderQuestion(); }
+}
+
+function changeCaught(delta) {
+  caughtCount = Math.max(0, caughtCount + delta);
+  document.getElementById('caughtCount').textContent = caughtCount;
+  // Update verdict intro
+  var sc = SCENARIOS[currentScenario];
+  document.getElementById('verdictIntro').textContent =
+    'The class questioned both suspects and found '+caughtCount+' inconsistenc'+(caughtCount===1?'y':'ies')+'. Time to deliver the verdict.';
+}
+
+function setVerdict(v) {
+  verdictChosen = v;
+  document.querySelectorAll('.verdict-btn').forEach(function(b){ b.classList.remove('selected-guilty','selected-innocent'); });
+  document.querySelector('.verdict-btn.'+v).classList.add('selected-'+v);
+  var result = document.getElementById('verdictResult');
+  result.className = 'verdict-result show '+v+'-result';
+  var sc = SCENARIOS[currentScenario];
+  if (v === 'guilty') {
+    document.getElementById('verdictEmoji').textContent = '🔒';
+    document.getElementById('verdictHeadline').textContent = 'The stories didn\'t match.';
+    document.getElementById('verdictSub').textContent =
+      'The class found '+caughtCount+' inconsistenc'+(caughtCount===1?'y':'ies')+'. Their accounts of '+sc.title.toLowerCase()+' could not be reconciled.';
+  } else {
+    document.getElementById('verdictEmoji').textContent = '✅';
+    document.getElementById('verdictHeadline').textContent = 'The stories held up.';
+    document.getElementById('verdictSub').textContent =
+      'The class found only '+caughtCount+' inconsistenc'+(caughtCount===1?'y':'ies')+' across '+allQuestions.length+' questions. The accounts were consistent.';
+  }
+}
+
+// Phase navigation
+function safeGoToPhase(n) {
+  if (n > maxPhase) return; // can't skip ahead
+  goToPhase(n);
+}
+
+function goToPhase(n) {
+  currentPhase = n;
+  if (n > maxPhase) maxPhase = n;
+  document.querySelectorAll('.phase-panel').forEach(function(p,i){ p.classList.toggle('active', i===n); });
+  document.querySelectorAll('.phase-step').forEach(function(s,i){
+    s.classList.toggle('active', i===n);
+    s.classList.toggle('done', i<n && i<=maxPhase);
+    s.style.opacity = (i <= maxPhase) ? '1' : '.4';
+    s.style.cursor = (i <= maxPhase) ? 'pointer' : 'default';
+  });
+  if (n === 2) {
+    stopTimer();
+    timerRemaining = timerDuration;
+    updateTimerDisplay();
+    document.getElementById('timerRing').classList.remove('warning','danger');
+    document.getElementById('timerHint').textContent = timerDuration > 0 ? 'start' : 'off';
+  }
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function resetAll() {
+  currentScenario = 0;
+  currentPhase = 0;
+  maxPhase = 0;
+  caughtCount = 0;
+  verdictChosen = null;
+  document.querySelectorAll('.verdict-btn').forEach(function(b){ b.classList.remove('selected-guilty','selected-innocent'); });
+  document.getElementById('verdictResult').classList.remove('show');
+  document.querySelectorAll('.phase-step').forEach(function(s,i){
+    s.style.opacity = i === 0 ? '1' : '.4';
+    s.style.cursor = i === 0 ? 'pointer' : 'default';
+    s.classList.remove('done');
+  });
+  stopTimer();
+  buildScenarioGrid();
+  goToPhase(0);
+}
+
+// Timer
+function setDuration(secs, btn) {
+  timerDuration = secs;
+  timerRemaining = secs;
+  document.querySelectorAll('.preset-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  stopTimer();
+  var ring = document.getElementById('timerRing');
+  ring.classList.remove('warning','danger');
+  if (secs === 0) {
+    document.getElementById('timerDisplay').textContent = '--';
+    document.getElementById('timerHint').textContent = 'off';
+  } else {
+    updateTimerDisplay();
+    document.getElementById('timerHint').textContent = 'start';
+  }
+}
+
+function toggleTimer() {
+  if (timerDuration === 0) return;
+  timerRunning ? stopTimer() : startTimer();
+}
+
+function startTimer() {
+  if (timerDuration === 0) return;
+  if (timerRemaining <= 0) timerRemaining = timerDuration;
+  timerRunning = true;
+  document.getElementById('timerHint').textContent = 'pause';
+  timerInterval = setInterval(function(){
+    timerRemaining--;
+    updateTimerDisplay();
+    if (timerRemaining <= 0){ stopTimer(); timerExpired(); }
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  if (timerDuration > 0 && timerRemaining > 0)
+    document.getElementById('timerHint').textContent = 'start';
+}
+
+function timerExpired() {
+  document.getElementById('timerHint').textContent = 'done!';
+  var ring = document.getElementById('timerRing');
+  ring.classList.add('danger');
+  var flashes = 0;
+  var iv = setInterval(function(){
+    ring.style.opacity = ring.style.opacity==='0.4'?'1':'0.4';
+    if(++flashes>5){ clearInterval(iv); ring.style.opacity='1'; }
+  }, 200);
+}
+
+function updateTimerDisplay() {
+  if (timerDuration === 0) return;
+  var mins = Math.floor(timerRemaining / 60);
+  var secs = timerRemaining % 60;
+  document.getElementById('timerDisplay').textContent = mins + ':' + (secs < 10 ? '0' : '') + secs;
+  var ratio = timerDuration > 0 ? timerRemaining / timerDuration : 1;
+  document.getElementById('timerArc').style.strokeDashoffset = 226 * (1 - ratio);
+  var ring = document.getElementById('timerRing');
+  ring.classList.remove('warning','danger');
+  if (ratio <= 0.25) ring.classList.add('danger');
+  else if (ratio <= 0.5) ring.classList.add('warning');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  buildScenarioGrid();
+  document.querySelectorAll('.phase-step').forEach(function(s,i){
+    if (i > 0) { s.style.opacity = '.4'; s.style.cursor = 'default'; }
+  });
+});
+</script>
+</body>
+</html>
