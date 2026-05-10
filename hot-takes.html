@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hot Takes · John+English</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sun:#FFB347;--sky:#2176FF;--sky-light:#E8EEFF;
+  --sea:#1DD3B0;--sea-light:#E4FBF7;
+  --coral:#FF6B6B;--coral-light:#FFE8E8;
+  --lavender:#9B72CF;--lavender-light:#F0E8FA;
+  --cream:#F7F6F3;--ink:#2D3047;--muted:#7A7D8E;
+  --border:#E8E5DF;--card:#fff;--radius:14px;
+  --b2:#2EC4B6;--b2-light:#2EC4B626;
+  --c1:#2176FF;--c1-light:#E8F2FD;
+  --for:#22c55e;--for-light:#dcfce7;
+  --against:#FF6B6B;--against-light:#FFE8E8;
+  --shadow-sm:0 1px 3px rgba(45,48,71,.06);
+  --shadow-md:0 4px 12px rgba(45,48,71,.08);
+  --shadow-lg:0 8px 32px rgba(45,48,71,.14)
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,var(--border) 1px,transparent 1px);background-size:28px 28px;opacity:.4;pointer-events:none;z-index:0}
+
+/* NAV */
+.topnav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(247,246,243,.88);backdrop-filter:blur(16px);border-bottom:1.5px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-size:1.3rem;font-weight:800;letter-spacing:-.02em;color:var(--ink);text-decoration:none}
+.nav-logo span{color:var(--sky)}
+.topnav-links{display:flex;gap:1.2rem}
+.topnav-links a{font-size:.8rem;font-weight:600;color:var(--muted);text-decoration:none;transition:color .2s}
+.topnav-links a:hover{color:var(--sky)}
+
+/* BACK + HERO */
+.back-link-wrap{max-width:760px;margin:0 auto;padding:4.2rem 2rem 0;position:relative;z-index:1}
+.wf-back-link{display:inline-flex;align-items:center;gap:.35rem;font-size:.82rem;font-weight:600;color:var(--muted);text-decoration:none;transition:color .15s}
+.wf-back-link:hover{color:var(--ink)}
+.hero{padding:1.4rem 2rem 1.8rem;max-width:760px;margin:0 auto;text-align:center;position:relative;z-index:1}
+.hero-badge{display:inline-flex;align-items:center;gap:.4rem;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.3rem .9rem;border-radius:20px;margin-bottom:.7rem;color:var(--sun);background:#FFF5E6;border:1px solid rgba(255,179,71,.25)}
+.hero h1{font-size:clamp(1.8rem,3.6vw,2.6rem);line-height:1.1;letter-spacing:-.02em;margin-bottom:.6rem;font-weight:900}
+.hero-sub{font-size:.95rem;color:var(--muted);max-width:460px;margin:0 auto;line-height:1.6}
+
+/* CONTROLS */
+.controls-bar{position:sticky;top:52px;z-index:100;background:rgba(247,246,243,.95);backdrop-filter:blur(12px);padding:.8rem 2rem;border-bottom:1px solid var(--border);margin-bottom:2rem}
+.controls-inner{max-width:760px;margin:0 auto;display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}
+.filter-label{font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);flex-shrink:0}
+.filter-pill{font-family:'Outfit',sans-serif;font-size:.8rem;font-weight:600;padding:.35rem .8rem;border-radius:100px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap}
+.filter-pill:hover{border-color:var(--ink);color:var(--ink)}
+.filter-pill.active.level-b2{background:var(--b2);color:#fff;border-color:var(--b2)}
+.filter-pill.active.level-c1{background:var(--c1);color:#fff;border-color:var(--c1)}
+.filter-pill.active.topic{background:var(--ink);color:#fff;border-color:var(--ink)}
+.filter-divider{width:1px;height:20px;background:var(--border);flex-shrink:0}
+.card-count{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--muted);margin-left:auto}
+
+/* MAIN */
+.main{max-width:760px;margin:0 auto;padding:0 2rem 4rem;position:relative;z-index:1}
+
+/* HOT TAKE CARD */
+.card-wrap{margin-bottom:1.6rem}
+.hot-card{background:var(--card);border-radius:22px;border:2px solid var(--border);box-shadow:var(--shadow-lg);overflow:hidden}
+.card-top{padding:.85rem 1.4rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1.5px solid var(--border)}
+.card-meta{display:flex;align-items:center;gap:.6rem}
+.level-badge{font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:700;padding:.2rem .5rem;border-radius:5px}
+.level-badge.b2{background:var(--b2-light);color:var(--b2)}
+.level-badge.c1{background:var(--c1-light);color:var(--c1)}
+.topic-badge{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+.card-num{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--muted)}
+
+/* Position banner */
+.position-banner{padding:.9rem 1.4rem;text-align:center;font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;display:none}
+.position-banner.show{display:block}
+.position-banner.for{background:var(--for-light);color:var(--for)}
+.position-banner.against{background:var(--against-light);color:var(--against)}
+
+/* Statement */
+.statement-area{padding:2.4rem 2rem 2rem;text-align:center}
+.statement-label{font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:1rem}
+.statement-text{font-size:1.6rem;font-weight:900;color:var(--ink);line-height:1.25;letter-spacing:-.02em;max-width:540px;margin:0 auto}
+
+/* Discussion prompt */
+.discuss-area{padding:1rem 2rem 1.4rem;border-top:1.5px solid var(--border);display:none}
+.discuss-area.show{display:block}
+.discuss-label{font-family:'JetBrains Mono',monospace;font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lavender);margin-bottom:.5rem}
+.discuss-text{font-size:.92rem;color:var(--muted);line-height:1.6;font-style:italic}
+
+/* POSITION REVEAL */
+.position-reveal{display:none;padding:1.6rem 2rem;text-align:center;border-top:1.5px solid var(--border)}
+.position-reveal.show{display:block}
+.pos-label{font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.7rem}
+.pos-buttons{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+.pos-btn{font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:800;padding:.8rem 2.2rem;border-radius:14px;border:2px solid var(--border);background:var(--card);cursor:pointer;transition:all .18s;letter-spacing:-.01em}
+.pos-btn.for-btn:hover,.pos-btn.for-btn.chosen{background:var(--for);border-color:var(--for);color:#fff;box-shadow:0 4px 18px rgba(34,197,94,.3)}
+.pos-btn.against-btn:hover,.pos-btn.against-btn.chosen{background:var(--against);border-color:var(--against);color:#fff;box-shadow:0 4px 18px rgba(255,107,107,.3)}
+
+/* TIMER */
+.timer-section{display:flex;flex-direction:column;align-items:center;gap:.9rem;margin-bottom:1.6rem}
+.timer-ring{position:relative;width:120px;height:120px;cursor:pointer}
+.timer-ring svg{transform:rotate(-90deg)}
+.timer-ring circle{fill:none;stroke-width:6}
+.timer-bg{stroke:var(--border)}
+.timer-progress{stroke:var(--ink);stroke-linecap:round;transition:stroke-dashoffset .1s linear;stroke-dasharray:339;stroke-dashoffset:0}
+.timer-ring.warning .timer-progress{stroke:var(--sun)}
+.timer-ring.danger .timer-progress{stroke:var(--coral)}
+.timer-display{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.timer-secs{font-family:'JetBrains Mono',monospace;font-size:2.1rem;font-weight:700;color:var(--ink);line-height:1}
+.timer-hint{font-size:.62rem;color:var(--muted);margin-top:.15rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.timer-presets{display:flex;gap:.4rem;flex-wrap:wrap;justify-content:center;align-items:center}
+.preset-btn{font-family:'JetBrains Mono',monospace;font-size:.65rem;font-weight:700;padding:.28rem .7rem;border-radius:6px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s}
+.preset-btn:hover{border-color:var(--ink);color:var(--ink)}
+.preset-btn.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+/* ACTION BUTTONS */
+.action-row{display:flex;gap:.7rem;justify-content:center;flex-wrap:wrap;margin-bottom:1.4rem}
+.btn-primary{font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;padding:.7rem 1.8rem;border-radius:12px;border:none;background:var(--ink);color:#fff;cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:.45rem}
+.btn-primary:hover{background:#1a1d2e;transform:translateY(-1px)}
+.btn-primary svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.btn-secondary{font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:600;padding:.55rem 1.2rem;border-radius:10px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:.4rem}
+.btn-secondary:hover{border-color:var(--ink);color:var(--ink)}
+.btn-secondary svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ASSIGN MODE TOGGLE */
+.assign-row{display:flex;align-items:center;justify-content:center;gap:.8rem;margin-bottom:1.6rem;font-size:.85rem;color:var(--muted)}
+.toggle-wrap{display:flex;align-items:center;gap:.5rem}
+.toggle{position:relative;width:40px;height:22px;cursor:pointer}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:var(--border);border-radius:22px;transition:.2s}
+.toggle-slider::before{content:'';position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s}
+.toggle input:checked + .toggle-slider{background:var(--ink)}
+.toggle input:checked + .toggle-slider::before{transform:translateX(18px)}
+.toggle-label{font-size:.83rem;font-weight:600;color:var(--ink)}
+
+/* END CARD */
+.end-card{background:var(--card);border-radius:20px;border:2px solid var(--border);padding:3rem 2rem;text-align:center;box-shadow:var(--shadow-md)}
+.end-card h2{font-size:1.6rem;font-weight:900;margin-bottom:.5rem}
+.end-card p{color:var(--muted);margin-bottom:1.5rem;font-size:.95rem}
+
+@media(max-width:600px){
+  .topnav{padding:0 1.2rem}
+  .back-link-wrap,.hero,.main{padding-left:1.2rem;padding-right:1.2rem}
+  .controls-bar{padding:.8rem 1.2rem}
+  .statement-text{font-size:1.25rem}
+  .pos-btn{font-size:.95rem;padding:.7rem 1.4rem}
+}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="index.html" class="nav-logo">john<span>+</span>english</a>
+  <div class="topnav-links">
+    <a href="index.html">Home</a>
+    <a href="index.html#group-fun">Fun Tools</a>
+  </div>
+</nav>
+
+<div class="back-link-wrap">
+  <a href="index.html" class="wf-back-link">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    Back to Home
+  </a>
+</div>
+
+<section class="hero">
+  <span class="hero-badge">Fun Tools</span>
+  <h1>Hot Takes</h1>
+  <p class="hero-sub">A statement appears. You have 60 seconds to argue for or against it. Then the floor opens.</p>
+</section>
+
+<div class="controls-bar">
+  <div class="controls-inner">
+    <div style="display:flex;align-items:center;gap:.4rem;flex-shrink:0">
+      <span class="filter-label">Level</span>
+      <button class="filter-pill level-b2 active" onclick="toggleLevel('b2',this)">B2</button>
+      <button class="filter-pill level-c1 active" onclick="toggleLevel('c1',this)">C1</button>
+    </div>
+    <div class="filter-divider"></div>
+    <div style="display:flex;align-items:flex-start;gap:.4rem">
+      <span class="filter-label" style="margin-top:.45rem;flex-shrink:0">Topic</span>
+      <div id="topicFilters" style="display:flex;flex-wrap:wrap;gap:.4rem"></div>
+    </div>
+    <span class="card-count" id="cardCount"></span>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- Assign position toggle -->
+  <div class="assign-row">
+    <span>Free choice</span>
+    <label class="toggle">
+      <input type="checkbox" id="assignToggle" onchange="toggleAssign()">
+      <span class="toggle-slider"></span>
+    </label>
+    <span class="toggle-label">Assign position (for/against)</span>
+  </div>
+
+  <!-- Hot take card -->
+  <div class="card-wrap" id="cardWrap"></div>
+
+  <!-- Timer -->
+  <div class="timer-section">
+    <div class="timer-ring" id="timerRing" onclick="toggleTimer()">
+      <svg width="120" height="120" viewBox="0 0 120 120">
+        <circle class="timer-bg" cx="60" cy="60" r="54"/>
+        <circle class="timer-progress" id="timerArc" cx="60" cy="60" r="54"/>
+      </svg>
+      <div class="timer-display">
+        <div class="timer-secs" id="timerDisplay">60</div>
+        <div class="timer-hint" id="timerHint">tap to start</div>
+      </div>
+    </div>
+    <div class="timer-presets">
+      <span class="filter-label">Timer</span>
+      <button class="preset-btn" onclick="setDuration(30,this)">30s</button>
+      <button class="preset-btn active" onclick="setDuration(60,this)">60s</button>
+      <button class="preset-btn" onclick="setDuration(90,this)">90s</button>
+      <button class="preset-btn" onclick="setDuration(0,this)">No timer</button>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="action-row">
+    <button class="btn-secondary" onclick="skipCard()">
+      <svg viewBox="0 0 24 24"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>
+      Skip
+    </button>
+    <button class="btn-primary" onclick="nextCard()">
+      Next statement
+      <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </button>
+    <button class="btn-secondary" onclick="rebuildDeck()">
+      <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.03"/></svg>
+      Shuffle
+    </button>
+  </div>
+
+</div>
+
+<script>
+var TAKES = [
+  // ── B2 ──────────────────────────────────────────────────────────
+  // Language Learning
+  {s:'Grammar is overrated.', l:'b2', topic:'Language', discuss:'When does grammar actually matter? Can you think of situations where mistakes cause real problems?'},
+  {s:'You can\'t truly understand a culture without speaking its language.', l:'b2', topic:'Language', discuss:'What about people who travel, live abroad, or integrate without speaking the local language fluently?'},
+  {s:'Children learn languages better than adults.', l:'b2', topic:'Language', discuss:'Is this always true? What advantages do adults have that children don\'t?'},
+  {s:'Accents don\'t matter — only being understood matters.', l:'b2', topic:'Language', discuss:'Are there situations where an accent changes how people are treated or perceived?'},
+  {s:'Everyone in the world should learn one common language.', l:'b2', topic:'Language', discuss:'What would be lost if languages disappeared? What would be gained?'},
+  {s:'Watching TV in English is better than studying grammar.', l:'b2', topic:'Language', discuss:'What can TV teach you that a textbook can\'t? What can\'t it teach you?'},
+  {s:'It\'s impossible to be truly fluent in more than two languages.', l:'b2', topic:'Language', discuss:'What does "fluent" actually mean? Does it depend on the person or the language?'},
+
+  // Education
+  {s:'University is a waste of money for most people.', l:'b2', topic:'Education', discuss:'What do you actually get from university that you couldn\'t get another way?'},
+  {s:'School teaches you almost nothing useful for real life.', l:'b2', topic:'Education', discuss:'What did you learn at school that you actually use? What do you wish you\'d been taught?'},
+  {s:'Homework should be banned.', l:'b2', topic:'Education', discuss:'What is homework actually for? Does it help all students equally?'},
+  {s:'Exams are the worst way to measure intelligence.', l:'b2', topic:'Education', discuss:'What would a better system look like? Who would it benefit?'},
+  {s:'Teachers are the most important people in society.', l:'b2', topic:'Education', discuss:'More important than doctors? Politicians? Parents?'},
+  {s:'Gap years are just an excuse to avoid real life.', l:'b2', topic:'Education', discuss:'What do people actually get out of a gap year? Is it available to everyone?'},
+
+  // Technology
+  {s:'Social media does more harm than good.', l:'b2', topic:'Technology', discuss:'Who does it harm most? Who benefits most? Is it the same platforms for both?'},
+  {s:'Smartphones have made us less intelligent.', l:'b2', topic:'Technology', discuss:'What do we remember that we used to look up? What do we now think about instead?'},
+  {s:'Working from home is better than working in an office.', l:'b2', topic:'Technology', discuss:'For whom? Does it depend on your job, your home, your personality?'},
+  {s:'People under 16 should not be allowed on social media.', l:'b2', topic:'Technology', discuss:'How would you enforce this? What would teenagers miss out on — and gain?'},
+  {s:'Online friendships are just as real as offline ones.', l:'b2', topic:'Technology', discuss:'What can an online friendship not give you that a face-to-face one can?'},
+  {s:'Technology is making us lonely.', l:'b2', topic:'Technology', discuss:'Is technology causing loneliness or just exposing it? Can the same technology also connect people?'},
+
+  // Relationships & Society
+  {s:'It is impossible to be truly honest with people you love.', l:'b2', topic:'Relationships', discuss:'Are there situations where lying to someone is the kinder thing to do?'},
+  {s:'Long-distance relationships never really work.', l:'b2', topic:'Relationships', discuss:'What makes them fail? What would need to be true for one to succeed?'},
+  {s:'People who stay in jobs they hate have only themselves to blame.', l:'b2', topic:'Work', discuss:'What stops people from leaving? Is it always a choice?'},
+  {s:'Money can buy happiness.', l:'b2', topic:'Society', discuss:'Up to what point? What does money provide that makes people happier?'},
+  {s:'City life is better than country life.', l:'b2', topic:'Society', discuss:'Better for whom? At what stage of life?'},
+  {s:'Celebrities should not talk about politics.', l:'b2', topic:'Society', discuss:'Why do people listen to celebrities? Is their influence dangerous or useful?'},
+  {s:'Pets are more important to some people than other humans.', l:'b2', topic:'Society', discuss:'Is this a problem? What does it say about modern society?'},
+
+  // Work
+  {s:'A four-day working week should be standard everywhere.', l:'b2', topic:'Work', discuss:'Would it work for all jobs? Who would benefit most and who might lose out?'},
+  {s:'You should never mix work and friendship.', l:'b2', topic:'Work', discuss:'Is it possible to keep them completely separate? What are the risks of each approach?'},
+  {s:'Your job should not define who you are.', l:'b2', topic:'Work', discuss:'Is it realistic to separate identity from work? Do most people actually manage it?'},
+  {s:'It\'s acceptable to lie on your CV.', l:'b2', topic:'Work', discuss:'Where is the line between exaggerating and lying? What are the real risks?'},
+  {s:'The customer is always right.', l:'b2', topic:'Work', discuss:'When is the customer clearly wrong? What happens when staff have to follow this rule anyway?'},
+
+  // Food & Lifestyle
+  {s:'Everyone should eat less meat.', l:'b2', topic:'Food & Lifestyle', discuss:'Is this a personal choice or a social responsibility? What makes it difficult?'},
+  {s:'Fast food is unfairly blamed for society\'s health problems.', l:'b2', topic:'Food & Lifestyle', discuss:'Who is responsible for what people eat — individuals, companies, or governments?'},
+  {s:'People who don\'t exercise have no excuse.', l:'b2', topic:'Food & Lifestyle', discuss:'What barriers to exercise exist that are not immediately obvious?'},
+  {s:'Travelling makes you a better person.', l:'b2', topic:'Food & Lifestyle', discuss:'Is it the travel itself, or what you do while travelling? Can travel also reinforce bad attitudes?'},
+  {s:'People take too many photos and don\'t enjoy the moment.', l:'b2', topic:'Food & Lifestyle', discuss:'What is a photo actually for? Does taking one affect your memory of an experience?'},
+
+  // ── C1 ──────────────────────────────────────────────────────────
+  // Language & Communication
+  {s:'Political correctness has gone too far.', l:'c1', topic:'Language', discuss:'What is political correctness actually trying to achieve? Where does it help and where does it restrict?'},
+  {s:'The language you speak shapes the way you think.', l:'c1', topic:'Language', discuss:'Can you think of concepts that exist in one language but not another? What does that mean?'},
+  {s:'Silence is the most powerful form of communication.', l:'c1', topic:'Language', discuss:'When is saying nothing more powerful than speaking? When is it cowardly?'},
+  {s:'Persuasion is just manipulation with better PR.', l:'c1', topic:'Language', discuss:'What is the difference between persuading someone ethically and manipulating them?'},
+
+  // Society & Ethics
+  {s:'Privacy is a luxury, not a right.', l:'c1', topic:'Society', discuss:'Who has the most privacy? Who has the least? Is that a coincidence?'},
+  {s:'Democracy is overrated.', l:'c1', topic:'Society', discuss:'What does democracy do badly? What would a better system look like — and is it realistic?'},
+  {s:'Patriotism is just tribalism with better branding.', l:'c1', topic:'Society', discuss:'Is there a version of national pride that is harmless or even positive?'},
+  {s:'We are morally responsible for the actions of our government.', l:'c1', topic:'Society', discuss:'What are citizens actually able to do? Does inaction make you responsible?'},
+  {s:'Equality of opportunity is a myth.', l:'c1', topic:'Society', discuss:'What would genuine equality of opportunity require? Is it achievable?'},
+  {s:'Cancel culture does more harm than good.', l:'c1', topic:'Society', discuss:'Is public accountability the same as cancellation? Who gets cancelled and who doesn\'t?'},
+  {s:'Charity is a way of avoiding systemic change.', l:'c1', topic:'Society', discuss:'Is giving to charity instead of demanding structural reform a political act?'},
+  {s:'Free speech should have no limits.', l:'c1', topic:'Society', discuss:'Where do most societies draw the line? Who decides what causes harm?'},
+
+  // Psychology & Human Nature
+  {s:'Ambition is overrated.', l:'c1', topic:'Psychology', discuss:'What does ambition cost the person who has it? What does society gain and lose from highly ambitious people?'},
+  {s:'Failure is more valuable than success.', l:'c1', topic:'Psychology', discuss:'Is this always true? For whom is failure genuinely educational and for whom is it just destructive?'},
+  {s:'People don\'t really change.', l:'c1', topic:'Psychology', discuss:'What kind of change is possible? Is fundamental personality change different from behavioural change?'},
+  {s:'Happiness is a choice.', l:'c1', topic:'Psychology', discuss:'Does this account for mental illness, poverty, or circumstance? Is it empowering or dismissive?'},
+  {s:'We are all, to some extent, products of our upbringing.', l:'c1', topic:'Psychology', discuss:'Does this reduce personal responsibility? At what point does the influence of childhood stop?'},
+  {s:'Regret is a waste of time.', l:'c1', topic:'Psychology', discuss:'What function does regret actually serve? Can it be useful?'},
+  {s:'Most people are fundamentally selfish.', l:'c1', topic:'Psychology', discuss:'Is altruism real, or is there always a self-interested motive behind it?'},
+
+  // Work & Economics
+  {s:'Meritocracy is a convenient fiction.', l:'c1', topic:'Work', discuss:'What factors determine success that have nothing to do with merit? Does the myth of meritocracy cause harm?'},
+  {s:'Entrepreneurship is glorified gambling.', l:'c1', topic:'Work', discuss:'What does society gain from entrepreneurship? Who takes the real risks?'},
+  {s:'Work-life balance is a middle-class concept.', l:'c1', topic:'Work', discuss:'Who actually has the luxury of balance? What does the concept ignore about economic reality?'},
+  {s:'The gig economy is modern exploitation dressed up as freedom.', l:'c1', topic:'Work', discuss:'Who benefits from gig work genuinely? Who is harmed by it?'},
+  {s:'We should all be paid the same wage.', l:'c1', topic:'Work', discuss:'What would equal pay change about how people work, what they study, and what jobs exist?'},
+
+  // Technology & Future
+  {s:'Artificial intelligence will ultimately destroy more jobs than it creates.', l:'c1', topic:'Technology', discuss:'Which jobs are most vulnerable? Which might be protected — or even created?'},
+  {s:'Social media algorithms are the most powerful political force in the world.', l:'c1', topic:'Technology', discuss:'More powerful than governments? Than media? What evidence would support or challenge this?'},
+  {s:'We have a moral obligation to future generations that we are currently failing.', l:'c1', topic:'Technology', discuss:'What specifically are we failing to do? Who is "we" in this sentence?'},
+  {s:'Privacy is already dead — we just haven\'t accepted it yet.', l:'c1', topic:'Technology', discuss:'What would it actually mean to protect your privacy in 2025? Is it even possible?'},
+
+  // Relationships & Ethics
+  {s:'Unconditional love is unhealthy.', l:'c1', topic:'Relationships', discuss:'Is there always a condition beneath "unconditional" love? What happens when there are no boundaries?'},
+  {s:'It is impossible to be truly objective about anything.', l:'c1', topic:'Relationships', discuss:'Does acknowledging bias help? Or does it just make us feel better about being biased?'},
+  {s:'Forgiveness benefits the person who forgives more than the person forgiven.', l:'c1', topic:'Relationships', discuss:'What does forgiveness actually require? Can you forgive without the other person apologising?'},
+  {s:'Loyalty is the most overrated virtue.', l:'c1', topic:'Relationships', discuss:'When does loyalty become complicity? Is there a point at which it stops being a virtue?'},
+
+  // Food, Culture & Lifestyle
+  {s:'Cultural appropriation is impossible to define and therefore useless as a concept.', l:'c1', topic:'Food & Lifestyle', discuss:'Can you draw a clear line between appreciation and appropriation? Who gets to draw it?'},
+  {s:'The obsession with wellness is a symptom of a sick society.', l:'c1', topic:'Food & Lifestyle', discuss:'What is the wellness industry selling? Who does it help and who does it exploit?'},
+  {s:'Tourism destroys the places it claims to celebrate.', l:'c1', topic:'Food & Lifestyle', discuss:'Is sustainable tourism real or a marketing concept? What would it actually require?'}
+];
+
+var TOPICS = ['All'];
+TAKES.forEach(function(t){ if (TOPICS.indexOf(t.topic) === -1) TOPICS.push(t.topic); });
+TOPICS.sort(function(a,b){ return a==='All'?-1:b==='All'?1:a.localeCompare(b); });
+
+var activeLevels = {b2:true, c1:true};
+var activeTopic = 'All';
+var assignPosition = false;
+var deck = [];
+var currentIdx = 0;
+var currentPosition = null;
+var discussVisible = false;
+
+// Timer
+var timerDuration = 60;
+var timerRemaining = 60;
+var timerInterval = null;
+var timerRunning = false;
+
+function buildTopicFilters() {
+  var el = document.getElementById('topicFilters');
+  el.innerHTML = TOPICS.map(function(t){
+    return '<button class="filter-pill topic'+(t===activeTopic?' active':'')+'" onclick="setTopic(\''+t+'\',this)">'+t+'</button>';
+  }).join('');
+}
+
+function toggleLevel(lv, btn) {
+  var other = lv==='b2'?'c1':'b2';
+  if (activeLevels[lv] && !activeLevels[other]) return;
+  activeLevels[lv] = !activeLevels[lv];
+  btn.classList.toggle('active', activeLevels[lv]);
+  rebuildDeck();
+}
+
+function setTopic(t, btn) {
+  activeTopic = t;
+  document.querySelectorAll('.filter-pill.topic').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  rebuildDeck();
+}
+
+function toggleAssign() {
+  assignPosition = document.getElementById('assignToggle').checked;
+  renderCard();
+}
+
+function getFiltered() {
+  return TAKES.filter(function(t){
+    return activeLevels[t.l] && (activeTopic==='All' || t.topic===activeTopic);
+  });
+}
+
+function shuffle(arr) {
+  for (var i=arr.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=arr[i];arr[i]=arr[j];arr[j]=tmp;}
+  return arr;
+}
+
+function rebuildDeck() {
+  stopTimer();
+  timerRemaining = timerDuration;
+  updateTimerDisplay();
+  document.getElementById('timerRing').classList.remove('warning','danger');
+  deck = shuffle(getFiltered().slice());
+  currentIdx = 0;
+  document.getElementById('cardCount').textContent = deck.length + ' statements';
+  renderCard();
+}
+
+function renderCard() {
+  var wrap = document.getElementById('cardWrap');
+  if (!deck.length) {
+    wrap.innerHTML = '<div class="end-card"><h2>No statements match</h2><p>Try adjusting the level or topic filter.</p></div>';
+    return;
+  }
+  if (currentIdx >= deck.length) {
+    wrap.innerHTML = '<div class="end-card"><h2>All done! 🎉</h2><p>You\'ve been through all '+deck.length+' statements in this set.</p><button class="btn-primary" onclick="rebuildDeck()" style="margin:0 auto;display:flex">Go again</button></div>';
+    stopTimer();
+    return;
+  }
+
+  var take = deck[currentIdx];
+  var pos = null;
+  var posBannerHtml = '';
+  if (assignPosition) {
+    pos = Math.random() < 0.5 ? 'for' : 'against';
+    currentPosition = pos;
+    var posLabel = pos === 'for' ? '👍 Argue FOR this statement' : '👎 Argue AGAINST this statement';
+    posBannerHtml = '<div class="position-banner show '+pos+'">'+posLabel+'</div>';
+  } else {
+    currentPosition = null;
+  }
+
+  wrap.innerHTML = '<div class="hot-card">'
+    + '<div class="card-top">'
+    + '<div class="card-meta">'
+    + '<span class="level-badge '+take.l+'">'+(take.l==='b2'?'B2':'C1')+'</span>'
+    + '<span class="topic-badge">'+take.topic+'</span>'
+    + '</div>'
+    + '<span class="card-num">'+(currentIdx+1)+' / '+deck.length+'</span>'
+    + '</div>'
+    + posBannerHtml
+    + '<div class="statement-area">'
+    + '<div class="statement-label">Hot take</div>'
+    + '<div class="statement-text">'+take.s+'</div>'
+    + '</div>'
+    + (!assignPosition ? '<div class="position-reveal show" id="posReveal">'
+      + '<div class="pos-label">Choose your position</div>'
+      + '<div class="pos-buttons">'
+      + '<button class="pos-btn for-btn" onclick="choosePos(\'for\',this)">👍 For</button>'
+      + '<button class="pos-btn against-btn" onclick="choosePos(\'against\',this)">👎 Against</button>'
+      + '</div></div>' : '')
+    + '<div class="discuss-area" id="discussArea">'
+    + '<div class="discuss-label">Discussion prompt</div>'
+    + '<div class="discuss-text">'+take.discuss+'</div>'
+    + '</div>'
+    + '</div>';
+}
+
+function choosePos(pos, btn) {
+  currentPosition = pos;
+  document.querySelectorAll('.pos-btn').forEach(function(b){ b.classList.remove('chosen'); });
+  btn.classList.add('chosen');
+  if (!timerRunning && timerDuration > 0) startTimer();
+}
+
+function showDiscuss() {
+  var el = document.getElementById('discussArea');
+  if (el) el.classList.add('show');
+}
+
+function nextCard() {
+  stopTimer();
+  currentIdx++;
+  timerRemaining = timerDuration;
+  updateTimerDisplay();
+  document.getElementById('timerRing').classList.remove('warning','danger');
+  renderCard();
+  if (timerDuration > 0 && assignPosition) startTimer();
+}
+
+function skipCard() {
+  stopTimer();
+  var take = deck.splice(currentIdx, 1)[0];
+  deck.splice(Math.min(currentIdx+3, deck.length), 0, take);
+  timerRemaining = timerDuration;
+  updateTimerDisplay();
+  document.getElementById('timerRing').classList.remove('warning','danger');
+  renderCard();
+}
+
+// Timer
+function setDuration(secs, btn) {
+  timerDuration = secs;
+  timerRemaining = secs;
+  document.querySelectorAll('.preset-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  stopTimer();
+  var ring = document.getElementById('timerRing');
+  ring.classList.remove('warning','danger');
+  if (secs===0){
+    document.getElementById('timerDisplay').textContent='--';
+    document.getElementById('timerHint').textContent='no timer';
+  } else {
+    updateTimerDisplay();
+    document.getElementById('timerHint').textContent='tap to start';
+  }
+}
+
+function toggleTimer() {
+  if (timerDuration===0) return;
+  timerRunning ? stopTimer() : startTimer();
+}
+
+function startTimer() {
+  if (timerDuration===0) return;
+  if (timerRemaining<=0) timerRemaining=timerDuration;
+  timerRunning=true;
+  document.getElementById('timerHint').textContent='tap to pause';
+  timerInterval=setInterval(function(){
+    timerRemaining--;
+    updateTimerDisplay();
+    if (timerRemaining<=0){ stopTimer(); timerExpired(); }
+  },1000);
+}
+
+function stopTimer() {
+  clearInterval(timerInterval);
+  timerRunning=false;
+  if (timerDuration>0 && timerRemaining>0)
+    document.getElementById('timerHint').textContent='tap to start';
+}
+
+function timerExpired() {
+  document.getElementById('timerHint').textContent='time\'s up!';
+  var ring=document.getElementById('timerRing');
+  ring.classList.add('danger');
+  // Show discussion prompt automatically when time's up
+  showDiscuss();
+  var flashes=0;
+  var iv=setInterval(function(){
+    ring.style.opacity=ring.style.opacity==='0.4'?'1':'0.4';
+    if(++flashes>5){clearInterval(iv);ring.style.opacity='1';}
+  },200);
+}
+
+function updateTimerDisplay() {
+  if (timerDuration===0) return;
+  document.getElementById('timerDisplay').textContent=timerRemaining;
+  var ratio=timerRemaining/timerDuration;
+  document.getElementById('timerArc').style.strokeDashoffset=339*(1-ratio);
+  var ring=document.getElementById('timerRing');
+  ring.classList.remove('warning','danger');
+  if (ratio<=0.25) ring.classList.add('danger');
+  else if (ratio<=0.5) ring.classList.add('warning');
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  buildTopicFilters();
+  rebuildDeck();
+});
+</script>
+</body>
+</html>
