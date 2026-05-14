@@ -568,9 +568,6 @@ td.is-editing .cell-edit-wrap{display:flex;}
             <button class="gen-btn" onclick="generatePrompt('vocab')">
               <span>📄</span> Vocab PDF
             </button>
-            <button class="gen-btn" onclick="generatePrompt('instagram')">
-              <span>📸</span> Instagram Post
-            </button>
             <button class="gen-btn" onclick="generatePrompt('whatsapp')">
               <span>💬</span> WhatsApp Chat
             </button>
@@ -837,7 +834,8 @@ function loadFromLocal(){
   lessons=JSON.parse(localStorage.getItem('jpe_l3')||'[]');
   groups=JSON.parse(localStorage.getItem('jpe_g1')||'[]');
   logs=JSON.parse(localStorage.getItem('jpe_logs')||'{}');
-  if(!students.length)loadSeedData();
+  // Only load seed data if truly nothing exists anywhere
+  if(!students.length&&!lessons.length&&!Object.keys(logs).length) loadSeedData();
 }
 function loadSeedData(){
   students=[
@@ -895,9 +893,15 @@ function loadSeedData(){
     {id:3,name:'Ukrainian Thu Morning — Thu 09:30',level:'B2',slot:'Thu 09:30',start:'2025-09-11',end:'2026-06-25',members:['Vika','Kate','Maria','Julia'],notes:'B2 conversation.',payments:[]},
     {id:4,name:'Sunday C2 — Sun 10:00',level:'C2',slot:'Sun 10:00',start:'2025-09-14',end:'2026-06-28',members:['Oksana','Tatiana','Olesya','Daria'],notes:'C2 conversation.',payments:[]},
   ];
-  logs={};
+  // Never reset logs — preserve any existing lesson log data
+  if(!Object.keys(logs).length) logs={};
 }
 function saveAll(){
+  // Safety guard — never save if data looks empty (protects against bad state wiping GitHub)
+  if(!students.length&&!lessons.length&&!Object.keys(logs).length){
+    console.warn('saveAll blocked — data appears empty, skipping GitHub push');
+    return;
+  }
   localStorage.setItem('jpe_s3',JSON.stringify(students));
   localStorage.setItem('jpe_l3',JSON.stringify(lessons));
   localStorage.setItem('jpe_g1',JSON.stringify(groups));
@@ -1446,22 +1450,6 @@ ${homework?`\nHomework set: ${homework}`:''}
 
 Follow the skill exactly. Ask me for the class date if needed, then produce both the A4 Laptop Notes PDF and the Mobile Notes PDF.`;
     confirmText='Vocab PDF prompt copied!';
-  }
-
-  else if(type==='instagram'){
-    prompt=`Use the /ig-post-template skill to create an Instagram vocabulary post for JohnPlusEnglish.
-
-Lesson context:
-- Class: ${currentLogLesson.name} — ${lessonLevel}
-- Date: ${dateStr} (Class #${classNum})
-- Topic: ${topic}
-- Level: ${lessonLevel}
-
-Vocabulary to feature:
-${vocabList}
-
-Use the correct colour scheme for the content type based on the vocab (idioms, phrasal verbs, vocabulary, etc.). Follow the skill exactly for the 1080×1440px format. Ask me if you need to clarify the post type.`;
-    confirmText='Instagram prompt copied!';
   }
 
   else if(type==='whatsapp'){
