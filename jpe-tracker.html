@@ -161,7 +161,7 @@ td.is-editing .cell-edit-wrap{display:flex;}
 .lb{position:absolute;left:3px;right:3px;border-radius:8px;padding:5px 8px;cursor:grab;overflow:hidden;z-index:2;box-shadow:0 2px 8px rgba(0,0,0,.14);transition:transform .15s,box-shadow .15s;}
 .lb:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.2);z-index:10;}
 .lb.dragging{opacity:.35;cursor:grabbing;transform:scale(.97);}
-.lb-title{font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.25;}
+.lb-title{font-size:11px;font-weight:700;line-height:1.4;word-break:break-word;white-space:normal;overflow:hidden;}
 .lb-meta{font-size:9px;font-weight:500;opacity:.8;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .lb-level{position:absolute;top:3px;right:5px;font-size:8px;font-weight:800;opacity:.85;}
 .lb-has-log{position:absolute;bottom:4px;right:5px;width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.7);}
@@ -263,6 +263,21 @@ td.is-editing .cell-edit-wrap{display:flex;}
 .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--cobalt);box-shadow:0 0 0 3px rgba(33,118,255,.1);}
 .form-textarea{resize:vertical;min-height:70px;}
 
+/* EXPORT MODAL */
+.export-section{margin-bottom:20px;}
+.export-section:last-child{margin-bottom:0;}
+.export-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--grey);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.export-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 14px;background:var(--off-white);border-radius:10px;border:1px solid var(--border);margin-bottom:8px;}
+.export-row:last-child{margin-bottom:0;}
+.export-desc{flex:1;}
+.export-name{font-size:13px;font-weight:700;color:var(--dark);margin-bottom:2px;}
+.export-sub{font-size:11px;color:var(--grey);line-height:1.5;}
+.export-btns{display:flex;gap:6px;flex-shrink:0;}
+.export-btn{padding:6px 14px;border-radius:7px;border:1.5px solid var(--border);background:#fff;color:var(--dark);font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.export-btn:hover{background:var(--dark);color:#fff;border-color:var(--dark);}
+.export-btn-primary{background:var(--cobalt);color:#fff;border-color:var(--cobalt);}
+.export-btn-primary:hover{background:#1860d4;border-color:#1860d4;}
+
 /* TOAST */
 .toast{position:fixed;bottom:28px;right:28px;background:var(--dark);color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.2);transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);z-index:9999;display:flex;align-items:center;gap:8px;}
 .toast.show{transform:translateY(0);opacity:1;}
@@ -324,6 +339,7 @@ td.is-editing .cell-edit-wrap{display:flex;}
   </nav>
   <div class="header-actions">
     <button class="sync-btn" onclick="syncNow()">☁ <span id="sync-label">Saved</span></button>
+    <button class="sync-btn" onclick="openExport()">↓ Export</button>
     <button class="btn btn-primary" id="header-add-btn" onclick="openAddStudent()">+ Add Student</button>
     <button class="settings-btn" onclick="openSettings()">⚙</button>
   </div>
@@ -526,6 +542,88 @@ td.is-editing .cell-edit-wrap{display:flex;}
       <button class="btn btn-neutral" onclick="closeModal('log-modal')">Cancel</button>
       <button class="btn btn-primary" onclick="saveLog()">Save Log</button>
     </div>
+  </div>
+</div>
+
+<!-- Export Modal -->
+<div class="modal-overlay" id="export-modal">
+  <div class="modal" style="width:520px">
+    <div class="modal-header"><div class="modal-title">↓ Export Data</div><button class="modal-close" onclick="closeModal('export-modal')">×</button></div>
+    <div class="modal-body">
+
+      <div class="export-section">
+        <div class="export-section-title">📋 Students</div>
+        <div class="export-row">
+          <div class="export-desc">
+            <div class="export-name">Student List — CSV</div>
+            <div class="export-sub">Name, nationality, level, objective, availability, email, telegram, notes. One row per student.</div>
+          </div>
+          <div class="export-btns">
+            <button class="export-btn" onclick="exportStudentsCSV('current')">Current</button>
+            <button class="export-btn" onclick="exportStudentsCSV('all')">All</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="export-section">
+        <div class="export-section-title">👥 Groups &amp; Payments</div>
+        <div class="export-row">
+          <div class="export-desc">
+            <div class="export-name">Groups Summary — CSV</div>
+            <div class="export-sub">Group name, level, slot, course dates, member count, total paid per group.</div>
+          </div>
+          <div class="export-btns">
+            <button class="export-btn" onclick="exportGroupsCSV()">Export</button>
+          </div>
+        </div>
+        <div class="export-row">
+          <div class="export-desc">
+            <div class="export-name">Payment Log — CSV</div>
+            <div class="export-sub">Every payment entry: group, student, date, amount, notes. Useful for accounting.</div>
+          </div>
+          <div class="export-btns">
+            <button class="export-btn" onclick="exportPaymentsCSV()">Export</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="export-section">
+        <div class="export-section-title">📅 Schedule &amp; Lesson Logs</div>
+        <div class="export-row">
+          <div class="export-desc">
+            <div class="export-name">Weekly Schedule — CSV</div>
+            <div class="export-sub">All recurring lessons: day, start time, duration, level, group name.</div>
+          </div>
+          <div class="export-btns">
+            <button class="export-btn" onclick="exportScheduleCSV()">Export</button>
+          </div>
+        </div>
+        <div class="export-row">
+          <div class="export-desc">
+            <div class="export-name">Lesson Logs — CSV</div>
+            <div class="export-sub">Every saved lesson log: date, group, topic, attendance, vocab, homework, notes.</div>
+          </div>
+          <div class="export-btns">
+            <button class="export-btn" onclick="exportLogsCSV()">Export</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="export-section">
+        <div class="export-section-title">💾 Full Backup</div>
+        <div class="export-row">
+          <div class="export-desc">
+            <div class="export-name">Complete Data — JSON</div>
+            <div class="export-sub">Everything: students, lessons, groups, payments, and all lesson logs. Use to restore or migrate.</div>
+          </div>
+          <div class="export-btns">
+            <button class="export-btn export-btn-primary" onclick="exportFullJSON()">Export</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-footer"><button class="btn btn-neutral" onclick="closeModal('export-modal')">Close</button></div>
   </div>
 </div>
 
@@ -943,7 +1041,7 @@ function renderCalendar(){
           ondragend="lbDragEnd(event)"
           onclick="event.stopPropagation();openLogModal(${lesson.id},'${dateIso}')"
           title="${lesson.name} — ${ts} — ${lesson.duration}min${hasLog?' (log saved)':' (no log yet)'}">
-          <div class="lb-title">${lesson.name}</div>
+          <div class="lb-title">${lesson.name.split(',').map(n=>n.trim()).join('<br>')}</div>
           <div class="lb-meta" style="color:${c.text}">${ts} · ${lesson.duration}min</div>
           <div class="lb-level" style="color:${c.text}">${lesson.level}</div>
           ${hasLog?`<div class="lb-has-log"></div>`:''}
@@ -1180,6 +1278,115 @@ function clearAllData(){if(!confirm('Delete ALL data?'))return;if(!confirm('Real
 function openModal(id){document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.modal-overlay').forEach(o=>{o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');});});
+
+// ═══════════════════════════════════════════════════════
+// EXPORT
+// ═══════════════════════════════════════════════════════
+function openExport(){openModal('export-modal');}
+
+function dlCSV(filename,rows){
+  const csv=rows.map(r=>r.map(cell=>{
+    const s=String(cell??'').replace(/"/g,'""');
+    return /[,"\n\r]/.test(s)?`"${s}"`:s;
+  }).join(',')).join('\r\n');
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast(`Exported ${filename} ✓`);
+}
+
+function dlJSON(filename,data){
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast(`Exported ${filename} ✓`);
+}
+
+function exportStudentsCSV(filter='all'){
+  const list=filter==='current'
+    ?students.filter(s=>s.status!=='prospective')
+    :students;
+  const rows=[
+    ['Name','Nationality','Level','Status','Objective','Availability','Email','Telegram','Notes'],
+    ...list.map(s=>[s.name,s.nat,s.level,s.status,s.obj,s.avail,s.email,s.tg,s.notes])
+  ];
+  dlCSV(`jpe-students-${filter}-${isoDate(new Date())}.csv`,rows);
+}
+
+function exportGroupsCSV(){
+  const rows=[
+    ['Group Name','Level','Day & Time','Course Start','Course End','Members','Total Paid (€)']
+  ];
+  groups.forEach(g=>{
+    const totalPaid=(g.payments||[]).reduce((sum,p)=>sum+Number(p.amount||0),0);
+    rows.push([
+      g.name, g.level, g.slot, g.start, g.end,
+      (g.members||[]).join('; '),
+      totalPaid.toFixed(2)
+    ]);
+  });
+  dlCSV(`jpe-groups-${isoDate(new Date())}.csv`,rows);
+}
+
+function exportPaymentsCSV(){
+  const rows=[['Group','Student','Date','Amount (€)','Notes']];
+  groups.forEach(g=>{
+    (g.payments||[]).forEach(p=>{
+      rows.push([g.name, p.member, p.date, p.amount, p.notes||'']);
+    });
+  });
+  if(rows.length===1){toast('No payment records to export','info');return;}
+  dlCSV(`jpe-payments-${isoDate(new Date())}.csv`,rows);
+}
+
+function exportScheduleCSV(){
+  const rows=[['Day','Start Time','Duration (min)','Level','Group / Students','Linked Group','Notes']];
+  const dayOrder={Monday:0,Tuesday:1,Wednesday:2,Thursday:3,Friday:4,Saturday:5,Sunday:6};
+  [...lessons].sort((a,b)=>(dayOrder[a.day]??9)-(dayOrder[b.day]??9)||a.start.localeCompare(b.start))
+    .forEach(l=>{
+      const linkedName=l.groupLink?groups.find(g=>g.id===l.groupLink)?.name||'':'';
+      rows.push([l.day,l.start,l.duration,l.level,l.name,linkedName,l.notes||'']);
+    });
+  dlCSV(`jpe-schedule-${isoDate(new Date())}.csv`,rows);
+}
+
+function exportLogsCSV(){
+  const rows=[['Date','Day','Lesson','Level','Topic','Attendance — Present','Attendance — Absent','Key Vocab','Pronunciation','Homework','Notes']];
+  const entries=Object.entries(logs).sort((a,b)=>a[0].localeCompare(b[0]));
+  if(!entries.length){toast('No lesson logs to export','info');return;}
+  entries.forEach(([key,log])=>{
+    const [lessonIdStr,date]=key.split('_');
+    const lesson=lessons.find(l=>l.id===parseInt(lessonIdStr));
+    const lessonName=lesson?lesson.name:'Unknown';
+    const level=lesson?lesson.level:'';
+    const present=Object.entries(log.attendance||{}).filter(([,v])=>v===true).map(([n])=>n).join('; ');
+    const absent=Object.entries(log.attendance||{}).filter(([,v])=>v===false).map(([n])=>n).join('; ');
+    const d=new Date(date+'T12:00:00');
+    const dayName=d.toLocaleDateString('en-GB',{weekday:'long'});
+    rows.push([
+      date, dayName, lessonName, level,
+      log.topic||'', present, absent,
+      (log.vocab||[]).join('; '),
+      log.pronunciation||'',
+      log.homework||'',
+      log.notes||''
+    ]);
+  });
+  dlCSV(`jpe-lesson-logs-${isoDate(new Date())}.csv`,rows);
+}
+
+function exportFullJSON(){
+  dlJSON(`jpe-full-backup-${isoDate(new Date())}.json`,{
+    exportedAt:new Date().toISOString(),
+    students, lessons, groups, logs
+  });
+}
 
 // ═══════════════════════════════════════════════════════
 // BOOT
