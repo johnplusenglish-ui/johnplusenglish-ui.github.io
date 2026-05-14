@@ -562,8 +562,16 @@ const ALL_TIMES=[];
 for(let h=9;h<21;h++){ALL_TIMES.push(`${String(h).padStart(2,'0')}:00`);ALL_TIMES.push(`${String(h).padStart(2,'0')}:30`);}
 
 const NAT_FLAGS={'Spanish':'🇪🇸','Ukrainian':'🇺🇦','Russian':'🇷🇺','Italian':'🇮🇹','Irish':'🇮🇪','British':'🇬🇧','French':'🇫🇷','German':'🇩🇪','Brazilian':'🇧🇷','Mexican':'🇲🇽','Argentinian':'🇦🇷','Polish':'🇵🇱','Chinese':'🇨🇳','Japanese':'🇯🇵','Iranian':'🇮🇷','Turkish':'🇹🇷','Hungarian':'🇭🇺','Swedish':'🇸🇪','Dutch':'🇳🇱','Portuguese':'🇵🇹','Romanian':'🇷🇴','Greek':'🇬🇷','Czech':'🇨🇿','Croatian':'🇭🇷','Slovak':'🇸🇰'};
-const AC=['#2176FF','#EF233C','#FF9100','#1DD3B0','#8E24AA','#E64A19','#43A047','#0277BD'];
-function getAC(n){let s=0;for(let c of n)s+=c.charCodeAt(0);return AC[s%AC.length];}
+// Avatar colour by level — matches level badge palette
+const LEVEL_AVATAR={
+  A1:{bg:'#F4A259',text:'#fff'},
+  A2:{bg:'#5C9BD6',text:'#fff'},
+  B1:{bg:'#FF6B6B',text:'#fff'},
+  B2:{bg:'#2EC4B6',text:'#fff'},
+  C1:{bg:'#2176FF',text:'#fff'},
+  C2:{bg:'#9B72CF',text:'#fff'},
+};
+function getAvatar(level){return LEVEL_AVATAR[level]||{bg:'#8892A4',text:'#fff'};}
 function getInits(n){return n.trim().split(/\s+/).map(w=>w[0]).join('').substring(0,2).toUpperCase();}
 
 const COLOURS=[
@@ -639,7 +647,13 @@ async function loadFromGitHub(){
     setSyncBar('syncing');
     const r=await fetch(ghApiUrl(),{headers:{Authorization:`token ${cfg.ghToken}`,Accept:'application/vnd.github.v3+json'}});
     if(r.status===404){loadSeedData();await pushToGitHub('Initial data');setSyncStatus('ok','Ready');}
-    else if(r.ok){const j=await r.json();ghSha=j.sha;const data=JSON.parse(atob(j.content.replace(/\n/g,'')));students=data.students||[];lessons=data.lessons||[];groups=data.groups||[];logs=data.logs||{};setSyncStatus('ok',`Loaded · ${new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}`);setCfg({...cfg,lastSync:new Date().toISOString()});}
+    else if(r.ok){const j=await r.json();ghSha=j.sha;
+      // Proper UTF-8 decode from base64
+      const raw=j.content.replace(/\n/g,'');
+      const bytes=Uint8Array.from(atob(raw),c=>c.charCodeAt(0));
+      const decoded=new TextDecoder().decode(bytes);
+      const data=JSON.parse(decoded);
+      students=data.students||[];lessons=data.lessons||[];groups=data.groups||[];logs=data.logs||{};setSyncStatus('ok',`Loaded · ${new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}`);setCfg({...cfg,lastSync:new Date().toISOString()});}
     else throw new Error(`HTTP ${r.status}`);
   }catch(e){console.error(e);setSyncStatus('err','GitHub error — using local cache');loadFromLocal();}
   setSyncBar('');
@@ -648,7 +662,11 @@ async function pushToGitHub(msg='Update'){
   const cfg=getCfg();if(!cfg.ghToken){setSyncStatus('err','No token');return false;}
   try{
     setSyncBar('syncing');setSyncStatus('busy','Saving…');
-    const content=btoa(unescape(encodeURIComponent(JSON.stringify({students,lessons,groups,logs},null,2))));
+    // Proper UTF-8 encode to base64
+    const jsonStr=JSON.stringify({students,lessons,groups,logs},null,2);
+    const bytes=new TextEncoder().encode(jsonStr);
+    const binary=Array.from(bytes).map(b=>String.fromCharCode(b)).join('');
+    const content=btoa(binary);
     const body={message:msg,content};if(ghSha)body.sha=ghSha;
     const r=await fetch(ghApiUrl(),{method:'PUT',headers:{Authorization:`token ${cfg.ghToken}`,Accept:'application/vnd.github.v3+json','Content-Type':'application/json'},body:JSON.stringify(body)});
     if(r.ok){const j=await r.json();ghSha=j.content.sha;setSyncStatus('ok',`Saved · ${new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}`);setCfg({...getCfg(),lastSync:new Date().toISOString()});setSyncBar('');return true;}
@@ -802,7 +820,7 @@ function renderStudents(){
     const tg=s.tg?`<a class="tg-link" href="${s.tg.startsWith('http')?s.tg:'https://t.me/'+s.tg.replace('@','')}" target="_blank" onclick="event.stopPropagation()"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248l-2.04 9.613c-.154.69-.555.858-1.124.534l-3.1-2.285-1.495 1.438c-.165.165-.305.305-.627.305l.224-3.165 5.77-5.21c.25-.223-.055-.348-.39-.125l-7.131 4.49-3.07-.957c-.667-.21-.68-.667.14-.987l11.99-4.622c.556-.2 1.042.136.853.971z"/></svg>${s.tg.includes('/')?'Telegram':s.tg}</a>`:`<span style="color:#ddd;font-size:11px">—</span>`;
     const em=s.email?`<a href="mailto:${s.email}" style="color:var(--ws-sky);font-size:12px;font-weight:600;text-decoration:none" onclick="event.stopPropagation()">${s.email}</a>`:`<span style="color:#ddd;font-size:11px">—</span>`;
     return `<tr data-sid="${s.id}">
-      <td><div class="cell-view" onclick="startCE(this.parentNode,'name',${s.id})"><div class="s-name-wrap"><div class="avatar" style="background:${getAC(s.name)}">${getInits(s.name)}</div>${s.name}</div></div><div class="cell-edit-wrap"></div></td>
+      <td><div class="cell-view" onclick="startCE(this.parentNode,'name',${s.id})"><div class="s-name-wrap"><div class="avatar" style="background:${getAvatar(s.level).bg};color:${getAvatar(s.level).text}">${getInits(s.name)}</div>${s.name}</div></div><div class="cell-edit-wrap"></div></td>
       <td><div class="cell-view" onclick="startCE(this.parentNode,'nat',${s.id})"><span style="font-size:17px">${flag}</span>&nbsp;<span style="font-size:12px;color:var(--grey)">${s.nat||'—'}</span></div><div class="cell-edit-wrap"></div></td>
       <td><div class="cell-view" onclick="startCE(this.parentNode,'level',${s.id})"><span class="level-badge level-${s.level||''}">${s.level||'—'}</span></div><div class="cell-edit-wrap"></div></td>
       <td style="max-width:170px"><div class="cell-view" style="font-size:12px;color:var(--grey);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" onclick="startCE(this.parentNode,'obj',${s.id})">${s.obj||'—'}</div><div class="cell-edit-wrap"></div></td>
