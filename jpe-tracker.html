@@ -161,13 +161,15 @@ td.is-editing .cell-edit-wrap{display:flex;}
 .wg-slot.out-of-term{background:repeating-linear-gradient(45deg,transparent,transparent 4px,rgba(0,0,0,.025) 4px,rgba(0,0,0,.025) 8px);}
 
 /* Lesson blocks in calendar */
-.lb{position:absolute;left:3px;right:3px;border-radius:8px;padding:5px 8px;cursor:pointer;overflow:hidden;z-index:2;box-shadow:0 2px 8px rgba(0,0,0,.14);transition:transform .15s,box-shadow .15s;}
+.lb{position:absolute;left:3px;right:3px;border-radius:8px;padding:5px 8px;cursor:grab;overflow:hidden;z-index:2;box-shadow:0 2px 8px rgba(0,0,0,.14);transition:transform .15s,box-shadow .15s;}
 .lb:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.2);z-index:10;}
+.lb.dragging{opacity:.35;cursor:grabbing;transform:scale(.97);}
 .lb-title{font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.25;}
 .lb-meta{font-size:9px;font-weight:500;opacity:.8;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .lb-level{position:absolute;top:3px;right:5px;font-size:8px;font-weight:800;opacity:.85;}
 .lb-has-log{position:absolute;bottom:4px;right:5px;width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.7);}
 .lb-no-log{opacity:.7;}
+.wg-slot.drag-over{background:#dbeaff!important;outline:2px dashed var(--cobalt);outline-offset:-2px;z-index:1;}
 
 /* Legend */
 .sched-legend{display:flex;gap:10px;flex-wrap:wrap;}
@@ -896,7 +898,12 @@ function renderCalendar(){
       // Check if date is in-term for any lesson that starts here
       let slotClass='wg-slot'+(sl%2===1?' half':'')+(isPast?' past':'');
 
-      html+=`<div class="${slotClass}" onclick="handleCalSlotClick('${dayName}','${ts}','${dateIso}')">`;
+      html+=`<div class="${slotClass}" 
+        data-day="${dayName}" data-time="${ts}"
+        ondragover="slotDragOver(event)"
+        ondragleave="slotDragLeave(event)"
+        ondrop="slotDrop(event,'${dayName}','${ts}')"
+        onclick="handleCalSlotClick('${dayName}','${ts}','${dateIso}')">`;
       starting.forEach(lesson=>{
         const c=clr(lesson);
         const hp=(lesson.duration/30)*SLOT_H-6;
@@ -906,7 +913,11 @@ function renderCalendar(){
         const linkedGroup=lesson.groupLink?groups.find(g=>g.id===lesson.groupLink):null;
         const inTerm=linkedGroup?(dateIso>=linkedGroup.start&&dateIso<=linkedGroup.end):true;
         html+=`<div class="lb${hasLog?'':' lb-no-log'}" 
+          draggable="true"
+          data-lesson-id="${lesson.id}"
           style="top:3px;height:${hp}px;background:${c.bg};color:${c.text};${!inTerm?'opacity:0.45':''}"
+          ondragstart="lbDragStart(event,${lesson.id})"
+          ondragend="lbDragEnd(event)"
           onclick="event.stopPropagation();openLogModal(${lesson.id},'${dateIso}')"
           title="${lesson.name} — ${ts} — ${lesson.duration}min${hasLog?' (log saved)':' (no log yet)'}">
           <div class="lb-title">${lesson.name}</div>
@@ -920,6 +931,53 @@ function renderCalendar(){
   }
 
   document.getElementById('week-grid-wrap').innerHTML=`<div class="week-grid">${html}</div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// DRAG & DROP — reschedule lessons
+// ═══════════════════════════════════════════════════════
+let dragLessonId=null;
+
+function lbDragStart(e,lessonId){
+  dragLessonId=lessonId;
+  e.dataTransfer.effectAllowed='move';
+  e.dataTransfer.setData('text/plain',String(lessonId));
+  // Slight delay so the block shows dimmed while dragging
+  setTimeout(()=>{
+    const el=document.querySelector(`.lb[data-lesson-id="${lessonId}"]`);
+    if(el)el.classList.add('dragging');
+  },0);
+}
+
+function lbDragEnd(e){
+  dragLessonId=null;
+  document.querySelectorAll('.lb.dragging').forEach(el=>el.classList.remove('dragging'));
+  document.querySelectorAll('.wg-slot.drag-over').forEach(el=>el.classList.remove('drag-over'));
+}
+
+function slotDragOver(e){
+  e.preventDefault();
+  e.dataTransfer.dropEffect='move';
+  e.currentTarget.classList.add('drag-over');
+}
+
+function slotDragLeave(e){
+  e.currentTarget.classList.remove('drag-over');
+}
+
+function slotDrop(e,newDay,newTime){
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  const id=parseInt(e.dataTransfer.getData('text/plain'));
+  if(!id)return;
+  const idx=lessons.findIndex(l=>l.id===id);
+  if(idx===-1)return;
+  const old=lessons[idx];
+  if(old.day===newDay&&old.start===newTime)return; // no change
+  lessons[idx]={...old,day:newDay,start:newTime};
+  saveAll();
+  renderCalendar();
+  toast(`Moved to ${newDay} ${newTime} ✓`);
 }
 
 function handleCalSlotClick(day,time,dateIso){openAddLesson(day,time);}
