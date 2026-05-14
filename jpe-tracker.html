@@ -268,6 +268,11 @@ td.is-editing .cell-edit-wrap{display:flex;}
 .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--cobalt);box-shadow:0 0 0 3px rgba(33,118,255,.1);}
 .form-textarea{resize:vertical;min-height:70px;}
 
+/* GENERATE BUTTONS */
+.gen-btn{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:9px;border:1.5px solid rgba(255,255,255,.15);background:rgba(255,255,255,.07);color:#fff;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .18s;}
+.gen-btn:hover{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.3);transform:translateY(-1px);}
+.gen-btn span{font-size:16px;}
+
 /* EXPORT MODAL */
 .export-section{margin-bottom:20px;}
 .export-section:last-child{margin-bottom:0;}
@@ -550,6 +555,30 @@ td.is-editing .cell-edit-wrap{display:flex;}
       <div class="log-section" id="log-history-section" style="display:none">
         <button class="log-prev-btn" onclick="toggleLogHistory()">▸ <span id="log-history-toggle-label">Show previous logs for this group</span></button>
         <div class="log-history-list" id="log-history-list" style="display:none"></div>
+      </div>
+
+      <!-- GENERATE WITH CLAUDE -->
+      <div class="log-section">
+        <div class="log-section-title"><span>✨</span> Generate with Claude</div>
+        <div style="background:linear-gradient(135deg,#1A1A2E 0%,#16213E 100%);border-radius:12px;padding:16px 18px;">
+          <div style="font-size:12px;color:rgba(255,255,255,.5);margin-bottom:12px;line-height:1.5">
+            Copies a ready-made prompt to your clipboard using this lesson's vocab, students &amp; topic — then opens Claude. Just paste and send.
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;">
+            <button class="gen-btn" onclick="generatePrompt('vocab')">
+              <span>📄</span> Vocab PDF
+            </button>
+            <button class="gen-btn" onclick="generatePrompt('instagram')">
+              <span>📸</span> Instagram Post
+            </button>
+            <button class="gen-btn" onclick="generatePrompt('whatsapp')">
+              <span>💬</span> WhatsApp Chat
+            </button>
+          </div>
+          <div id="gen-confirm" style="display:none;margin-top:10px;font-size:12px;color:var(--ws-sea);font-weight:600;display:none;align-items:center;gap:6px">
+            <span>✓</span> <span id="gen-confirm-text">Prompt copied!</span> <a href="https://claude.ai" target="_blank" style="color:var(--sky);font-weight:700;text-decoration:none;margin-left:4px">Open Claude →</a>
+          </div>
+        </div>
       </div>
 
     </div>
@@ -1369,6 +1398,109 @@ function clearAllData(){if(!confirm('Delete ALL data?'))return;if(!confirm('Real
 function openModal(id){document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.modal-overlay').forEach(o=>{o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');});});
+
+// ═══════════════════════════════════════════════════════
+// GENERATE WITH CLAUDE
+// ═══════════════════════════════════════════════════════
+function generatePrompt(type){
+  // Gather current log state (unsaved fields are fine — we read live from DOM)
+  const classNum=document.getElementById('log-classnum').value||'?';
+  const topic=document.getElementById('log-topic').value.trim()||'(no topic set)';
+  const pronunciation=document.getElementById('log-pronunciation').value.trim();
+  const homework=document.getElementById('log-homework').value.trim();
+  const vocab=[...currentLogVocab]; // from the live vocab array
+
+  // Student names — present ones from attendance chips
+  const presentStudents=[];
+  document.querySelectorAll('#log-attendance .att-chip').forEach(chip=>{
+    if(chip.classList.contains('present')||(!chip.classList.contains('absent')&&!chip.classList.contains('present'))){
+      const name=chip.textContent.trim().replace(/^[✓✗○]\s*/,'');
+      if(name) presentStudents.push(name);
+    }
+  });
+  // Fall back to lesson name parsing if no attendance chips
+  const studentList=presentStudents.length
+    ? presentStudents.join(', ')
+    : currentLogLesson.name;
+
+  const lessonLevel=currentLogLesson.level;
+  const d=new Date(currentLogDate+'T12:00:00');
+  const dateStr=d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const vocabList=vocab.length ? vocab.map(v=>`- ${v}`).join('\n') : '(no vocab added yet)';
+
+  let prompt='';
+  let confirmText='';
+
+  if(type==='vocab'){
+    prompt=`Use the /lesson-vocab-template skill to generate vocabulary PDFs for this lesson.
+
+Class: ${currentLogLesson.name} — ${lessonLevel}
+Students: ${studentList}
+Date: ${dateStr} (Class #${classNum})
+Topic: ${topic}
+
+Key Vocabulary:
+${vocabList}
+${pronunciation?`\nPronunciation focus: ${pronunciation}`:''}
+${homework?`\nHomework set: ${homework}`:''}
+
+Follow the skill exactly. Ask me for the class date if needed, then produce both the A4 Laptop Notes PDF and the Mobile Notes PDF.`;
+    confirmText='Vocab PDF prompt copied!';
+  }
+
+  else if(type==='instagram'){
+    prompt=`Use the /ig-post-template skill to create an Instagram vocabulary post for JohnPlusEnglish.
+
+Lesson context:
+- Class: ${currentLogLesson.name} — ${lessonLevel}
+- Date: ${dateStr} (Class #${classNum})
+- Topic: ${topic}
+- Level: ${lessonLevel}
+
+Vocabulary to feature:
+${vocabList}
+
+Use the correct colour scheme for the content type based on the vocab (idioms, phrasal verbs, vocabulary, etc.). Follow the skill exactly for the 1080×1440px format. Ask me if you need to clarify the post type.`;
+    confirmText='Instagram prompt copied!';
+  }
+
+  else if(type==='whatsapp'){
+    prompt=`Use the /whatsapp-vocab-chat skill to create a WhatsApp-style group chat for this lesson's vocabulary.
+
+Class details:
+- Students: ${studentList}
+- Level: ${lessonLevel}
+- Date: ${dateStr} (Class #${classNum})
+- Topic: ${topic}
+
+Vocabulary to embed naturally in the chat:
+${vocabList}
+
+Follow the skill exactly — create a realistic WhatsApp phone frame conversation between the students that uses all the vocabulary naturally in context. Use each student's real name and give them a consistent voice.`;
+    confirmText='WhatsApp chat prompt copied!';
+  }
+
+  // Copy to clipboard and show confirmation
+  navigator.clipboard.writeText(prompt).then(()=>{
+    const conf=document.getElementById('gen-confirm');
+    document.getElementById('gen-confirm-text').textContent=confirmText;
+    conf.style.display='flex';
+    // Open Claude in new tab
+    window.open('https://claude.ai/new','_blank');
+    setTimeout(()=>conf.style.display='none',8000);
+  }).catch(()=>{
+    // Fallback — show in a textarea the user can manually copy
+    const ta=document.createElement('textarea');
+    ta.value=prompt;
+    ta.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:80vw;height:60vh;z-index:9999;font-size:12px;padding:12px;border-radius:8px;border:2px solid var(--cobalt)';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    toast('Prompt copied — paste into Claude ✓');
+    setTimeout(()=>ta.remove(),3000);
+    window.open('https://claude.ai/new','_blank');
+  });
+}
 
 // ═══════════════════════════════════════════════════════
 // EXPORT
