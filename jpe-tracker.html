@@ -122,17 +122,14 @@ td.is-editing .cell-edit-wrap{display:flex;}
 .avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;color:#fff;flex-shrink:0;}
 .s-name-wrap{display:flex;align-items:center;gap:9px;font-weight:700;font-size:13px;}
 
-/* LEVEL BADGES */
-.level-badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;}
-.level-A1{background:#FFE8E8;color:#c94040;}
-.level-A2{background:#FFE8E8;color:#c94040;border:1.5px solid #FF6B6B;}
-.level-B1{background:#E2FAF1;color:#1a9068;}
-.level-B2{background:#E8F2FD;color:#2a6db5;}
-.level-C1{background:#F0EAF9;color:#6b4fa0;}
-.level-C2{background:#FFF3E0;color:#b87200;border:1.5px solid #FFB347;}
-.level-FCE{background:#E2F7F6;color:#1a8a80;}
-.level-CAE{background:#CCF0EE;color:#177a72;border:1.5px solid #2EC4B6;}
-.level-CPE{background:var(--dark);color:#FFB347;}
+/* LEVEL BADGES — matched exactly to grammar pages + C2 purple per John */
+.level-badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.3px;}
+.level-A1{background:#FEF3E8;color:#F4A259;border:1.5px solid #F4A259;}
+.level-A2{background:#EBF3FB;color:#5C9BD6;border:1.5px solid #5C9BD6;}
+.level-B1{background:#FFEEEE;color:#C0001A;border:1.5px solid #FF6B6B;}
+.level-B2{background:#E6F9F7;color:#1A8A80;border:1.5px solid #2EC4B6;}
+.level-C1{background:#EEF4FF;color:#0C44A0;border:1.5px solid #2176FF;}
+.level-C2{background:#F0EAF9;color:#6b4fa0;border:1.5px solid #9B72CF;}
 .tg-link{display:inline-flex;align-items:center;gap:5px;color:#0088cc;text-decoration:none;font-weight:600;font-size:12px;padding:3px 8px;border-radius:6px;background:#E8F4FD;}
 
 /* ═══════════════════════════════════════
@@ -169,6 +166,9 @@ td.is-editing .cell-edit-wrap{display:flex;}
 .lb-level{position:absolute;top:3px;right:5px;font-size:8px;font-weight:800;opacity:.85;}
 .lb-has-log{position:absolute;bottom:4px;right:5px;width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.7);}
 .lb-no-log{opacity:.7;}
+/* Edit button — shown on hover */
+.lb-edit-btn{position:absolute;bottom:5px;left:6px;background:rgba(0,0,0,.25);border:none;border-radius:4px;color:#fff;font-size:9px;font-weight:700;padding:2px 6px;cursor:pointer;opacity:0;transition:opacity .15s;font-family:'Outfit',sans-serif;line-height:1.4;}
+.lb:hover .lb-edit-btn{opacity:1;}
 .wg-slot.drag-over{background:#dbeaff!important;outline:2px dashed var(--cobalt);outline-offset:-2px;z-index:1;}
 
 /* Legend */
@@ -338,7 +338,7 @@ td.is-editing .cell-edit-wrap{display:flex;}
     <div class="stat-card"><div class="stat-label">Current Students</div><div class="stat-value blue" id="stat-total">0</div></div>
     <div class="stat-card"><div class="stat-label">C1 / C2</div><div class="stat-value mint" id="stat-advanced">0</div></div>
     <div class="stat-card"><div class="stat-label">B1 / B2</div><div class="stat-value" id="stat-intermediate">0</div></div>
-    <div class="stat-card"><div class="stat-label">Exam Prep</div><div class="stat-value orange" id="stat-exam">0</div></div>
+    <div class="stat-card"><div class="stat-label">Advanced (C1/C2)</div><div class="stat-value orange" id="stat-exam">0</div></div>
     <div class="stat-card"><div class="stat-label">Prospective</div><div class="stat-value red" id="stat-prospect">0</div></div>
   </div>
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
@@ -350,7 +350,7 @@ td.is-editing .cell-edit-wrap{display:flex;}
   </div>
   <div class="toolbar">
     <div class="search-wrap"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input class="search-input" id="student-search" placeholder="Search students…" oninput="renderStudents()"></div>
-    <select class="filter-select" id="filter-level" onchange="renderStudents()"><option value="">All Levels</option><option>A1</option><option>A2</option><option>B1</option><option>B2</option><option>C1</option><option>C2</option><option>FCE</option><option>CAE</option><option>CPE</option></select>
+    <select class="filter-select" id="filter-level" onchange="renderStudents()"><option value="">All Levels</option><option>A1</option><option>A2</option><option>B1</option><option>B2</option><option>C1</option><option>C2</option></select>
     <select class="filter-select" id="filter-nat" onchange="renderStudents()"><option value="">All Nationalities</option></select>
   </div>
   <div class="table-wrap"><table>
@@ -399,9 +399,9 @@ td.is-editing .cell-edit-wrap{display:flex;}
     <div class="modal-body"><div class="form-grid">
       <div class="form-group"><label class="form-label">Full Name *</label><input class="form-input" id="s-name" placeholder="e.g. María García"></div>
       <div class="form-group"><label class="form-label">Nationality</label><input class="form-input" id="s-nat" placeholder="e.g. Spanish"></div>
-      <div class="form-group"><label class="form-label">Level</label><select class="form-select" id="s-level"><option value="">Select…</option><option>A1</option><option>A2</option><option>B1</option><option>B2</option><option>C1</option><option>C2</option><option>FCE</option><option>CAE</option><option>CPE</option></select></div>
+      <div class="form-group"><label class="form-label">Level</label><select class="form-select" id="s-level"><option value="">Select…</option><option>A1</option><option>A2</option><option>B1</option><option>B2</option><option>C1</option><option>C2</option></select></div>
       <div class="form-group"><label class="form-label">Status</label><select class="form-select" id="s-status"><option value="current">Current Student</option><option value="prospective">Prospective</option></select></div>
-      <div class="form-group full"><label class="form-label">Objective</label><input class="form-input" id="s-obj" placeholder="e.g. Business English, CPE Exam"></div>
+      <div class="form-group full"><label class="form-label">Objective</label><input class="form-input" id="s-obj" placeholder="e.g. Business English, C2 Advanced"></div>
       <div class="form-group full"><label class="form-label">Availability</label><input class="form-input" id="s-avail" placeholder="e.g. Mon 09:00, Wed 18:30"></div>
       <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="s-email" type="email" placeholder="maria@email.com"></div>
       <div class="form-group"><label class="form-label">Telegram</label><input class="form-input" id="s-tg" placeholder="@username or t.me/link"></div>
@@ -416,8 +416,8 @@ td.is-editing .cell-edit-wrap{display:flex;}
   <div class="modal" style="width:560px">
     <div class="modal-header"><div class="modal-title" id="group-modal-title">Add Group</div><button class="modal-close" onclick="closeModal('group-modal')">×</button></div>
     <div class="modal-body"><div class="form-grid">
-      <div class="form-group full"><label class="form-label">Group Name *</label><input class="form-input" id="g-name" placeholder="e.g. CPE Group — Wed 16:00"></div>
-      <div class="form-group"><label class="form-label">Level</label><select class="form-select" id="g-level"><option value="">Select…</option><option>A1</option><option>A2</option><option>B1</option><option>B2</option><option>C1</option><option>C2</option><option>FCE</option><option>CAE</option><option>CPE</option></select></div>
+      <div class="form-group full"><label class="form-label">Group Name *</label><input class="form-input" id="g-name" placeholder="e.g. C2 Group — Wed 16:00"></div>
+      <div class="form-group"><label class="form-label">Level</label><select class="form-select" id="g-level"><option value="">Select…</option><option>A1</option><option>A2</option><option>B1</option><option>B2</option><option>C1</option><option>C2</option></select></div>
       <div class="form-group"><label class="form-label">Day &amp; Time</label><input class="form-input" id="g-slot" placeholder="e.g. Wed 16:00"></div>
       <div class="form-group"><label class="form-label">Course Start</label><input class="form-input" type="date" id="g-start"></div>
       <div class="form-group"><label class="form-label">Course End</label><input class="form-input" type="date" id="g-end"></div>
@@ -449,9 +449,9 @@ td.is-editing .cell-edit-wrap{display:flex;}
     <div class="modal-body"><div class="form-grid">
       <div class="form-group"><label class="form-label">Day *</label><select class="form-select" id="l-day"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option></select></div>
       <div class="form-group"><label class="form-label">Start Time *</label><select class="form-select" id="l-start"></select></div>
-      <div class="form-group"><label class="form-label">Duration</label><select class="form-select" id="l-duration"><option value="60">60 min</option><option value="90" selected>90 min</option><option value="120">120 min (2 hr)</option></select></div>
-      <div class="form-group"><label class="form-label">Level Tag *</label><select class="form-select" id="l-level" onchange="syncColour()"><option value="">Select…</option><option>A1</option><option>A2</option><option>B1</option><option>B2</option><option>C1</option><option>C2</option><option>FCE</option><option>CAE</option><option>CPE</option></select></div>
-      <div class="form-group full"><label class="form-label">Group / Student Name *</label><input class="form-input" id="l-name" placeholder="e.g. Tania, Cristina, Raquel — CPE Group"></div>
+      <div class="form-group"><label class="form-label">Duration</label><select class="form-select" id="l-duration"><option value="30">30 min</option><option value="60">60 min</option><option value="90" selected>90 min</option><option value="120">120 min (2 hr)</option><option value="150">150 min (2.5 hr)</option></select></div>
+      <div class="form-group"><label class="form-label">Level Tag *</label><select class="form-select" id="l-level" onchange="syncColour()"><option value="">Select…</option><option>A1</option><option>A2</option><option>B1</option><option>B2</option><option>C1</option><option>C2</option></select></div>
+      <div class="form-group full"><label class="form-label">Group / Student Name *</label><input class="form-input" id="l-name" placeholder="e.g. Tania, Cristina, Raquel — C2 Group"></div>
       <div class="form-group full"><label class="form-label">Linked Group (for attendance)</label><select class="form-select" id="l-group-link"><option value="">None</option></select></div>
       <div class="form-group full"><label class="form-label">Block Colour</label><div class="colour-picker-wrap" id="colour-picker"></div></div>
       <div class="form-group full"><label class="form-label">Notes</label><input class="form-input" id="l-notes" placeholder="Zoom link, topic, materials…"></div>
@@ -483,7 +483,7 @@ td.is-editing .cell-edit-wrap{display:flex;}
       <!-- TOPIC -->
       <div class="log-section">
         <div class="log-section-title"><span>📌</span> Topic / Theme</div>
-        <input class="form-input" id="log-topic" placeholder="e.g. Describing change, CPE Part 2 open cloze…">
+        <input class="form-input" id="log-topic" placeholder="e.g. Describing change, Use of English open cloze…">
       </div>
 
       <!-- KEY VOCAB -->
@@ -505,7 +505,7 @@ td.is-editing .cell-edit-wrap{display:flex;}
       <!-- HOMEWORK -->
       <div class="log-section">
         <div class="log-section-title"><span>📝</span> Homework Set</div>
-        <textarea class="log-textarea" id="log-homework" placeholder="e.g. CPE Part 4 KWT practice — 10 sentences. Due next week."></textarea>
+        <textarea class="log-textarea" id="log-homework" placeholder="e.g. Use of English KWT practice — 10 sentences. Due next week."></textarea>
       </div>
 
       <!-- NOTES -->
@@ -567,24 +567,29 @@ function getAC(n){let s=0;for(let c of n)s+=c.charCodeAt(0);return AC[s%AC.lengt
 function getInits(n){return n.trim().split(/\s+/).map(w=>w[0]).join('').substring(0,2).toUpperCase();}
 
 const COLOURS=[
-  {id:'sky',bg:'#4A90D9',text:'#fff',label:'Sky (B2)'},
-  {id:'cobalt',bg:'#2176FF',text:'#fff',label:'Cobalt'},
-  {id:'teal',bg:'#2EC4B6',text:'#fff',label:'Sea/Teal (FCE/CAE)'},
-  {id:'mint',bg:'#5DDEA0',text:'#1A1A2E',label:'Mint'},
-  {id:'violet',bg:'#9B72CF',text:'#fff',label:'Lavender (C1)'},
-  {id:'purple',bg:'#6A1B9A',text:'#fff',label:'Purple'},
-  {id:'coral',bg:'#FF6B6B',text:'#fff',label:'Coral (A)'},
-  {id:'red',bg:'#EF233C',text:'#fff',label:'Red'},
-  {id:'sun',bg:'#FFB347',text:'#1A1A2E',label:'Sun (C2)'},
-  {id:'orange',bg:'#FF9100',text:'#fff',label:'Orange'},
-  {id:'lime',bg:'#7CB342',text:'#fff',label:'Lime (B1)'},
-  {id:'green',bg:'#43A047',text:'#fff',label:'Green'},
-  {id:'navy',bg:'#0F3460',text:'#49B6FF',label:'Navy'},
-  {id:'dark',bg:'#1A1A2E',text:'#FFB347',label:'Dark (CPE)'},
-  {id:'slate',bg:'#5A6472',text:'#fff',label:'Slate'},
-  {id:'rose',bg:'#D81B60',text:'#fff',label:'Rose'},
+  {id:'c1blue',  bg:'#2176FF',text:'#fff',   label:'C1 Blue'},
+  {id:'c2purple',bg:'#9B72CF',text:'#fff',   label:'C2 Purple'},
+  {id:'b2teal',  bg:'#2EC4B6',text:'#fff',   label:'B2 Teal'},
+  {id:'b1coral', bg:'#FF6B6B',text:'#fff',   label:'B1 Coral'},
+  {id:'a2steel', bg:'#5C9BD6',text:'#fff',   label:'A2 Steel Blue'},
+  {id:'a1amber', bg:'#F4A259',text:'#fff',   label:'A1 Amber'},
+  {id:'dark',    bg:'#1A1A2E',text:'#FFB347',label:'Dark'},
+  {id:'deepteal',bg:'#1A8A80',text:'#fff',   label:'Deep Teal'},
+  {id:'cobalt',  bg:'#2176FF',text:'#fff',   label:'Cobalt'},
+  {id:'navy',    bg:'#0F3460',text:'#49B6FF',label:'Navy'},
+  {id:'lavender',bg:'#9B72CF',text:'#fff',   label:'Lavender'},
+  {id:'mint',    bg:'#1DD3B0',text:'#1A1A2E',label:'Mint'},
+  {id:'sun',     bg:'#FFB347',text:'#1A1A2E',label:'Sun'},
+  {id:'orange',  bg:'#FF9100',text:'#fff',   label:'Orange'},
+  {id:'red',     bg:'#EF233C',text:'#fff',   label:'Red'},
+  {id:'slate',   bg:'#5A6472',text:'#fff',   label:'Slate'},
 ];
-const LEVEL_CLR={A1:'coral',A2:'coral',B1:'lime',B2:'sky',C1:'violet',C2:'sun',FCE:'teal',CAE:'teal',CPE:'dark'};
+const LEVEL_CLR={
+  A1:'a1amber', A2:'a2steel',
+  B1:'b1coral', B2:'b2teal',
+  C1:'c1blue',  C2:'c2purple',
+  
+};
 
 // ═══════════════════════════════════════════════════════
 // DATE HELPERS
@@ -681,9 +686,9 @@ function loadSeedData(){
     {id:4,name:'Nieves',nat:'Spanish',level:'C1',status:'current',obj:'Conversation',avail:'Wed 09:30',email:'',tg:'',notes:'Wednesday morning group'},
     {id:5,name:'Nataly',nat:'Ukrainian',level:'C1',status:'current',obj:'Conversation',avail:'Wed 09:30',email:'',tg:'',notes:'Wednesday morning group'},
     {id:6,name:'Julia (Wed)',nat:'Ukrainian',level:'C1',status:'current',obj:'Conversation',avail:'Wed 09:30',email:'',tg:'',notes:'Wednesday morning group'},
-    {id:7,name:'Tania',nat:'Spanish',level:'C2',status:'current',obj:'CPE Exam Prep',avail:'Wed 16:00',email:'',tg:'',notes:'CPE group'},
-    {id:8,name:'Cristina',nat:'Spanish',level:'C2',status:'current',obj:'CPE Exam Prep',avail:'Wed 16:00',email:'',tg:'',notes:'CPE group'},
-    {id:9,name:'Raquel (CPE)',nat:'Spanish',level:'CPE',status:'current',obj:'CPE Exam',avail:'Wed 16:00',email:'',tg:'',notes:'CPE group'},
+    {id:7,name:'Tania',nat:'Spanish',level:'C2',status:'current',obj:'Advanced conversation',avail:'Wed 16:00',email:'',tg:'',notes:'C2 group'},
+    {id:8,name:'Cristina',nat:'Spanish',level:'C2',status:'current',obj:'Advanced conversation',avail:'Wed 16:00',email:'',tg:'',notes:'C2 group'},
+    {id:9,name:'Raquel',nat:'Spanish',level:'C2',status:'current',obj:'Advanced conversation',avail:'Wed 16:00',email:'',tg:'',notes:'C2 group'},
     {id:10,name:'Mireia',nat:'Spanish',level:'C1',status:'current',obj:'Conversation',avail:'Wed 18:30',email:'',tg:'',notes:'Wed evening group'},
     {id:11,name:'Patri',nat:'Spanish',level:'C1',status:'current',obj:'Conversation',avail:'Wed 18:30',email:'',tg:'',notes:'Wed evening group'},
     {id:12,name:'Vika',nat:'Ukrainian',level:'B2',status:'current',obj:'Conversation',avail:'Thu 09:30',email:'',tg:'',notes:'Thu morning Ukrainian group'},
@@ -699,32 +704,32 @@ function loadSeedData(){
     {id:22,name:'Mahta',nat:'Iranian',level:'C2',status:'current',obj:'Monday Madness',avail:'Mon 19:00',email:'',tg:'',notes:'Monday Madness C2 group'},
     {id:23,name:'Marta',nat:'Spanish',level:'C2',status:'current',obj:'Monday Madness',avail:'Mon 19:00',email:'',tg:'',notes:'Monday Madness C2 group'},
     {id:24,name:'Alessandra',nat:'Italian',level:'C2',status:'current',obj:'Monday Madness',avail:'Mon 19:00',email:'',tg:'',notes:'Monday Madness C2 group'},
-    {id:25,name:'Oksana',nat:'Ukrainian',level:'C2',status:'current',obj:'CPE / advanced conversation',avail:'Sun 10:00',email:'',tg:'',notes:'Sunday C2 group'},
+    {id:25,name:'Oksana',nat:'Ukrainian',level:'C2',status:'current',obj:'Advanced conversation',avail:'Sun 10:00',email:'',tg:'',notes:'Sunday C2 group'},
     {id:26,name:'Tatiana',nat:'Ukrainian',level:'C2',status:'current',obj:'Advanced conversation',avail:'Sun 10:00',email:'',tg:'',notes:'Sunday C2 group'},
     {id:27,name:'Manuel',nat:'Spanish',level:'B2',status:'current',obj:'Business English / Pitching',avail:'Tue private',email:'',tg:'',notes:'Marketing — Ratio startup — 1:1'},
     {id:28,name:'Federica',nat:'Italian',level:'B2',status:'current',obj:'Business / HR English',avail:'TBC',email:'',tg:'',notes:'Italian HR professional — 1:1'},
-    {id:29,name:'Francesca',nat:'Italian',level:'C1',status:'current',obj:'CAE Exam Prep',avail:'TBC',email:'',tg:'',notes:'Italian C1 — CAE prep'},
+    {id:29,name:'Francesca',nat:'Italian',level:'C1',status:'current',obj:'C1 exam prep',avail:'TBC',email:'',tg:'',notes:'Italian C1 individual'},
     {id:30,name:'Arturo',nat:'Italian',level:'C1',status:'current',obj:'Speaking & Grammar',avail:'TBC',email:'',tg:'',notes:'Italian C1 individual'},
     {id:31,name:'Candidate A',nat:'Spanish',level:'B1',status:'prospective',obj:'General English',avail:'Evenings',email:'',tg:'',notes:'Enquired via website'},
     {id:32,name:'Candidate B',nat:'Ukrainian',level:'B2',status:'prospective',obj:'Exam prep interest',avail:'TBC',email:'',tg:'',notes:'Referred by Galya'},
   ];
   lessons=[
-    {id:1,day:'Monday',start:'09:00',duration:90,level:'C1',colour:'violet',name:'Raquel, Cayetana, Ana, Pino',groupLink:null,notes:''},
-    {id:2,day:'Monday',start:'17:30',duration:90,level:'B1',colour:'lime',name:'Galya, Svitlana, Liudmyla',groupLink:null,notes:''},
-    {id:3,day:'Monday',start:'19:00',duration:90,level:'C2',colour:'sun',name:'Monday Madness',groupLink:null,notes:''},
-    {id:4,day:'Tuesday',start:'09:00',duration:60,level:'C2',colour:'sun',name:'Maura, Maria, Eva',groupLink:null,notes:''},
-    {id:5,day:'Tuesday',start:'11:00',duration:60,level:'B2',colour:'sky',name:'Manuel',groupLink:null,notes:'1:1'},
-    {id:6,day:'Wednesday',start:'09:30',duration:90,level:'C1',colour:'violet',name:'Nieves, Nataly, Julia, Natalia',groupLink:null,notes:''},
-    {id:7,day:'Wednesday',start:'16:00',duration:90,level:'CPE',colour:'dark',name:'CPE Group',groupLink:null,notes:''},
-    {id:8,day:'Wednesday',start:'18:30',duration:90,level:'C1',colour:'violet',name:'Mireia, Patri, Sonsoles, La Patri',groupLink:null,notes:''},
-    {id:9,day:'Thursday',start:'09:30',duration:90,level:'B2',colour:'sky',name:'Vika, Kate, Maria, Julia',groupLink:null,notes:''},
-    {id:10,day:'Thursday',start:'17:00',duration:90,level:'C1',colour:'teal',name:'Marina, Katherine, Masha, Evgenia',groupLink:null,notes:''},
-    {id:11,day:'Thursday',start:'19:00',duration:90,level:'B2',colour:'cobalt',name:'Ivanna, Veronika, Julia, Anhelina',groupLink:null,notes:''},
-    {id:12,day:'Friday',start:'09:00',duration:60,level:'B2',colour:'sky',name:'Irene, Elisabet',groupLink:null,notes:''},
-    {id:13,day:'Sunday',start:'10:00',duration:90,level:'C2',colour:'sun',name:'Oksana, Tatiana, Olesya, Daria',groupLink:null,notes:''},
+    {id:1,day:'Monday',start:'09:00',duration:90,level:'C1',colour:'c2purple',name:'Raquel, Cayetana, Ana, Pino',groupLink:null,notes:''},
+    {id:2,day:'Monday',start:'17:30',duration:90,level:'B1',colour:'b1coral',name:'Galya, Svitlana, Liudmyla',groupLink:null,notes:''},
+    {id:3,day:'Monday',start:'19:00',duration:90,level:'C2',colour:'c2purple',name:'Monday Madness',groupLink:null,notes:''},
+    {id:4,day:'Tuesday',start:'09:00',duration:60,level:'C2',colour:'c2purple',name:'Maura, Maria, Eva',groupLink:null,notes:''},
+    {id:5,day:'Tuesday',start:'11:00',duration:60,level:'B2',colour:'b2teal',name:'Manuel',groupLink:null,notes:'1:1'},
+    {id:6,day:'Wednesday',start:'09:30',duration:90,level:'C1',colour:'c2purple',name:'Nieves, Nataly, Julia, Natalia',groupLink:null,notes:''},
+    {id:7,day:'Wednesday',start:'16:00',duration:90,level:'C2',colour:'c2purple',name:'C2 Group',groupLink:null,notes:''},
+    {id:8,day:'Wednesday',start:'18:30',duration:90,level:'C1',colour:'c2purple',name:'Mireia, Patri, Sonsoles, La Patri',groupLink:null,notes:''},
+    {id:9,day:'Thursday',start:'09:30',duration:90,level:'B2',colour:'b2teal',name:'Vika, Kate, Maria, Julia',groupLink:null,notes:''},
+    {id:10,day:'Thursday',start:'17:00',duration:90,level:'C1',colour:'b2teal',name:'Marina, Katherine, Masha, Evgenia',groupLink:null,notes:''},
+    {id:11,day:'Thursday',start:'19:00',duration:90,level:'B2',colour:'b2teal',name:'Ivanna, Veronika, Julia, Anhelina',groupLink:null,notes:''},
+    {id:12,day:'Friday',start:'09:00',duration:60,level:'B2',colour:'b2teal',name:'Irene, Elisabet',groupLink:null,notes:''},
+    {id:13,day:'Sunday',start:'10:00',duration:90,level:'C2',colour:'c2purple',name:'Oksana, Tatiana, Olesya, Daria',groupLink:null,notes:''},
   ];
   groups=[
-    {id:1,name:'CPE Group — Wed 16:00',level:'CPE',slot:'Wed 16:00',start:'2025-09-15',end:'2026-06-30',members:['Tania','Cristina','Raquel (CPE)'],notes:'CPE exam prep.',payments:[]},
+    {id:1,name:'C2 Group — Wed 16:00',level:'C2',slot:'Wed 16:00',start:'2025-09-15',end:'2026-06-30',members:['Tania','Cristina','Raquel'],notes:'C2 advanced conversation.',payments:[]},
     {id:2,name:'Monday Madness — Mon 19:00',level:'C2',slot:'Mon 19:00',start:'2025-09-08',end:'2026-06-23',members:['Mahta','Marta','Su','Alessandra'],notes:'Advanced C2 conversation.',payments:[]},
     {id:3,name:'Ukrainian Thu Morning — Thu 09:30',level:'B2',slot:'Thu 09:30',start:'2025-09-11',end:'2026-06-25',members:['Vika','Kate','Maria','Julia'],notes:'B2 conversation.',payments:[]},
     {id:4,name:'Sunday C2 — Sun 10:00',level:'C2',slot:'Sun 10:00',start:'2025-09-14',end:'2026-06-28',members:['Oksana','Tatiana','Olesya','Daria'],notes:'C2 conversation.',payments:[]},
@@ -782,9 +787,9 @@ function renderStudents(){
   document.getElementById('cnt-prospective').textContent=students.filter(s=>s.status==='prospective').length;
   let list=students.filter(s=>{const sm=curTab==='prospective'?s.status==='prospective':s.status!=='prospective';return sm&&(!q||[s.name,s.nat,s.obj].some(x=>(x||'').toLowerCase().includes(q)))&&(!fL||s.level===fL)&&(!fN||s.nat===fN);});
   document.getElementById('stat-total').textContent=students.filter(s=>s.status!=='prospective').length;
-  document.getElementById('stat-advanced').textContent=students.filter(s=>s.status!=='prospective'&&['C1','C2','CPE'].includes(s.level)).length;
-  document.getElementById('stat-intermediate').textContent=students.filter(s=>s.status!=='prospective'&&['B1','B2','FCE','CAE'].includes(s.level)).length;
-  document.getElementById('stat-exam').textContent=students.filter(s=>['CPE','CAE','FCE'].includes(s.level)).length;
+  document.getElementById('stat-advanced').textContent=students.filter(s=>s.status!=='prospective'&&['C1','C2'].includes(s.level)).length;
+  document.getElementById('stat-intermediate').textContent=students.filter(s=>s.status!=='prospective'&&['B1','B2'].includes(s.level)).length;
+  document.getElementById('stat-exam').textContent=students.filter(s=>s.status==='prospective').length;
   document.getElementById('stat-prospect').textContent=students.filter(s=>s.status==='prospective').length;
   document.getElementById('student-count-label').textContent=`Showing ${list.length} ${curTab} student${list.length!==1?'s':''}`;
   const nats=[...new Set(students.map(s=>s.nat).filter(Boolean))].sort();
@@ -810,7 +815,7 @@ function renderStudents(){
   }).join('');
 }
 let activeCell=null;
-function startCE(td,field,id){if(td.classList.contains('is-editing'))return;if(activeCell)cancelCE(activeCell);const s=students.find(x=>x.id===id);if(!s)return;activeCell=td;td.classList.add('is-editing');const wrap=td.querySelector('.cell-edit-wrap');const v=(s[field]||'').replace(/"/g,'&quot;');let inp='';if(field==='level'){inp=`<select onkeydown="ek(event,this,'${field}',${id})"><option value="">—</option>${['A1','A2','B1','B2','C1','C2','FCE','CAE','CPE'].map(l=>`<option${s.level===l?' selected':''}>${l}</option>`).join('')}</select>`;}else if(field==='notes'){inp=`<textarea rows="2" onkeydown="ek(event,this,'${field}',${id})">${s[field]||''}</textarea>`;}else{inp=`<input type="text" value="${v}" onkeydown="ek(event,this,'${field}',${id})">`;}wrap.innerHTML=inp+`<button class="ce-save" onclick="commitCE('${field}',${id})">✓</button><button class="ce-cancel" onclick="cancelCEById(${id})">✕</button>`;const el=wrap.querySelector('input,select,textarea');el.focus();if(el.tagName==='INPUT')el.select();}
+function startCE(td,field,id){if(td.classList.contains('is-editing'))return;if(activeCell)cancelCE(activeCell);const s=students.find(x=>x.id===id);if(!s)return;activeCell=td;td.classList.add('is-editing');const wrap=td.querySelector('.cell-edit-wrap');const v=(s[field]||'').replace(/"/g,'&quot;');let inp='';if(field==='level'){inp=`<select onkeydown="ek(event,this,'${field}',${id})"><option value="">—</option>${['A1','A2','B1','B2','C1','C2'].map(l=>`<option${s.level===l?' selected':''}>${l}</option>`).join('')}</select>`;}else if(field==='notes'){inp=`<textarea rows="2" onkeydown="ek(event,this,'${field}',${id})">${s[field]||''}</textarea>`;}else{inp=`<input type="text" value="${v}" onkeydown="ek(event,this,'${field}',${id})">`;}wrap.innerHTML=inp+`<button class="ce-save" onclick="commitCE('${field}',${id})">✓</button><button class="ce-cancel" onclick="cancelCEById(${id})">✕</button>`;const el=wrap.querySelector('input,select,textarea');el.focus();if(el.tagName==='INPUT')el.select();}
 function ek(e,el,field,id){if(e.key==='Enter'&&el.tagName!=='TEXTAREA')commitCE(field,id);if(e.key==='Escape')cancelCEById(id);}
 function commitCE(field,id){const td=document.querySelector(`tr[data-sid='${id}'] td.is-editing`);if(!td)return;const el=td.querySelector('input,select,textarea');if(!el)return;const idx=students.findIndex(s=>s.id===id);if(idx===-1)return;students[idx][field]=el.value.trim();saveAll();activeCell=null;renderStudents();toast('Saved ✓');}
 function cancelCEById(id){const td=document.querySelector(`tr[data-sid='${id}'] td.is-editing`);if(td)cancelCE(td);}
@@ -924,6 +929,7 @@ function renderCalendar(){
           <div class="lb-meta" style="color:${c.text}">${ts} · ${lesson.duration}min</div>
           <div class="lb-level" style="color:${c.text}">${lesson.level}</div>
           ${hasLog?`<div class="lb-has-log"></div>`:''}
+          <button class="lb-edit-btn" onclick="event.stopPropagation();openEditLesson(${lesson.id})" title="Edit lesson">✏ Edit</button>
         </div>`;
       });
       html+=`</div>`;
@@ -1138,7 +1144,7 @@ function pickClr(id){selClr=id;document.querySelectorAll('.c-swatch').forEach(sw
 function syncColour(){const lv=document.getElementById('l-level').value;if(lv&&LEVEL_CLR[lv])buildPicker(LEVEL_CLR[lv]);}
 function populateGroupLink(){const sel=document.getElementById('l-group-link');sel.innerHTML='<option value="">None</option>'+groups.map(g=>`<option value="${g.id}">${g.name}</option>`).join('');}
 function populateTimes(){document.getElementById('l-start').innerHTML=ALL_TIMES.map(t=>`<option>${t}</option>`).join('');}
-function openAddLesson(day='',time=''){editLId=null;document.getElementById('lesson-modal-title').textContent='Add Lesson';document.getElementById('lesson-delete-btn').style.display='none';populateTimes();populateGroupLink();if(day)document.getElementById('l-day').value=day;if(time)document.getElementById('l-start').value=time;document.getElementById('l-duration').value='90';document.getElementById('l-level').value='';document.getElementById('l-name').value='';document.getElementById('l-group-link').value='';document.getElementById('l-notes').value='';buildPicker('cobalt');openModal('lesson-modal');}
+function openAddLesson(day='',time=''){editLId=null;document.getElementById('lesson-modal-title').textContent='Add Lesson';document.getElementById('lesson-delete-btn').style.display='none';populateTimes();populateGroupLink();if(day)document.getElementById('l-day').value=day;if(time)document.getElementById('l-start').value=time;document.getElementById('l-duration').value='90';document.getElementById('l-level').value='';document.getElementById('l-name').value='';document.getElementById('l-group-link').value='';document.getElementById('l-notes').value='';buildPicker('c1blue');openModal('lesson-modal');}
 function openEditLesson(id){const l=lessons.find(x=>x.id===id);if(!l)return;editLId=id;document.getElementById('lesson-modal-title').textContent='Edit Lesson';document.getElementById('lesson-delete-btn').style.display='inline-flex';populateTimes();populateGroupLink();document.getElementById('l-day').value=l.day;document.getElementById('l-start').value=l.start;document.getElementById('l-duration').value=l.duration;document.getElementById('l-level').value=l.level;document.getElementById('l-name').value=l.name;document.getElementById('l-group-link').value=l.groupLink||'';document.getElementById('l-notes').value=l.notes||'';buildPicker(l.colour||LEVEL_CLR[l.level]||'cobalt');openModal('lesson-modal');}
 function saveLesson(){const name=document.getElementById('l-name').value.trim(),level=document.getElementById('l-level').value;if(!name){toast('Name required','error');return;}if(!level){toast('Level required','error');return;}const glRaw=document.getElementById('l-group-link').value;const l={id:editLId||Date.now(),day:document.getElementById('l-day').value,start:document.getElementById('l-start').value,duration:parseInt(document.getElementById('l-duration').value),level,colour:selClr,name,groupLink:glRaw?parseInt(glRaw):null,notes:document.getElementById('l-notes').value.trim()};if(editLId){lessons[lessons.findIndex(x=>x.id===editLId)]=l;toast('Lesson updated ✓');}else{lessons.push(l);toast('Lesson added ✓');}saveAll();renderCalendar();closeModal('lesson-modal');}
 function deleteLesson(){if(!editLId)return;if(!confirm('Delete lesson?'))return;lessons=lessons.filter(l=>l.id!==editLId);saveAll();renderCalendar();closeModal('lesson-modal');toast('Lesson deleted');}
