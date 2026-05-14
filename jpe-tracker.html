@@ -469,10 +469,9 @@ td.is-editing .cell-edit-wrap{display:flex;}
       <div class="form-group"><label class="form-label">Day *</label><select class="form-select" id="l-day"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option></select></div>
       <div class="form-group"><label class="form-label">Start Time *</label><select class="form-select" id="l-start"></select></div>
       <div class="form-group"><label class="form-label">Duration</label><select class="form-select" id="l-duration"><option value="30">30 min</option><option value="60">60 min</option><option value="90" selected>90 min</option><option value="120">120 min (2 hr)</option><option value="150">150 min (2.5 hr)</option></select></div>
-      <div class="form-group"><label class="form-label">Level Tag *</label><select class="form-select" id="l-level" onchange="syncColour()"><option value="">Select…</option><option>A1</option><option>A2</option><option>B1</option><option>B2</option><option>C1</option><option>C2</option></select></div>
+      <div class="form-group"><label class="form-label">Level Tag *</label><select class="form-select" id="l-level"><option value="">Select…</option><option>A1</option><option>A2</option><option>B1</option><option>B2</option><option>C1</option><option>C2</option></select></div>
       <div class="form-group full"><label class="form-label">Group / Student Name *</label><input class="form-input" id="l-name" placeholder="e.g. Tania, Cristina, Raquel — C2 Group"></div>
       <div class="form-group full"><label class="form-label">Linked Group (for attendance)</label><select class="form-select" id="l-group-link"><option value="">None</option></select></div>
-      <div class="form-group full"><label class="form-label">Block Colour</label><div class="colour-picker-wrap" id="colour-picker"></div></div>
       <div class="form-group full"><label class="form-label">Notes</label><input class="form-input" id="l-notes" placeholder="Zoom link, topic, materials…"></div>
     </div></div>
     <div class="modal-footer"><button class="btn btn-danger btn-sm" id="lesson-delete-btn" onclick="deleteLesson()" style="display:none;margin-right:auto">Delete Lesson</button><button class="btn btn-neutral" onclick="closeModal('lesson-modal')">Cancel</button><button class="btn btn-primary" onclick="saveLesson()">Save Lesson</button></div>
@@ -1138,7 +1137,8 @@ function slotDrop(e,newDay,newTime){
 }
 
 function handleCalSlotClick(day,time,dateIso){openAddLesson(day,time);}
-function clr(l){const cid=LEVEL_CLR[l.level]||l.colour||'cobalt';return COLOURS.find(c=>c.id===cid)||COLOURS[0];}
+// Block colour is ALWAYS determined by level — stored colour field is irrelevant for rendering
+function clr(l){const cid=LEVEL_CLR[l.level]||'cobalt';return COLOURS.find(c=>c.id===cid)||COLOURS[0];}
 
 // ═══════════════════════════════════════════════════════
 // LESSON LOG
@@ -1289,15 +1289,15 @@ function deleteLog(){
 // ═══════════════════════════════════════════════════════
 // LESSON TEMPLATE MODAL
 // ═══════════════════════════════════════════════════════
-let editLId=null,selClr='cobalt';
-function buildPicker(sel){selClr=sel||'cobalt';document.getElementById('colour-picker').innerHTML=COLOURS.map(c=>`<div class="c-swatch${c.id===selClr?' sel':''}" style="background:${c.bg}" title="${c.label}" onclick="pickClr('${c.id}')">✓</div>`).join('');}
-function pickClr(id){selClr=id;document.querySelectorAll('.c-swatch').forEach(sw=>sw.classList.toggle('sel',sw.title===COLOURS.find(c=>c.id===id)?.label));}
-function syncColour(){const lv=document.getElementById('l-level').value;if(lv&&LEVEL_CLR[lv])buildPicker(LEVEL_CLR[lv]);}
+let editLId=null;
+function buildPicker(){}
+function pickClr(){}
+function syncColour(){}
 function populateGroupLink(){const sel=document.getElementById('l-group-link');sel.innerHTML='<option value="">None</option>'+groups.map(g=>`<option value="${g.id}">${g.name}</option>`).join('');}
 function populateTimes(){document.getElementById('l-start').innerHTML=ALL_TIMES.map(t=>`<option>${t}</option>`).join('');}
-function openAddLesson(day='',time=''){editLId=null;document.getElementById('lesson-modal-title').textContent='Add Lesson';document.getElementById('lesson-delete-btn').style.display='none';populateTimes();populateGroupLink();if(day)document.getElementById('l-day').value=day;if(time)document.getElementById('l-start').value=time;document.getElementById('l-duration').value='90';document.getElementById('l-level').value='';document.getElementById('l-name').value='';document.getElementById('l-group-link').value='';document.getElementById('l-notes').value='';buildPicker('c1blue');openModal('lesson-modal');}
-function openEditLesson(id){const l=lessons.find(x=>x.id===id);if(!l)return;editLId=id;document.getElementById('lesson-modal-title').textContent='Edit Lesson';document.getElementById('lesson-delete-btn').style.display='inline-flex';populateTimes();populateGroupLink();document.getElementById('l-day').value=l.day;document.getElementById('l-start').value=l.start;document.getElementById('l-duration').value=l.duration;document.getElementById('l-level').value=l.level;document.getElementById('l-name').value=l.name;document.getElementById('l-group-link').value=l.groupLink||'';document.getElementById('l-notes').value=l.notes||'';buildPicker(l.colour||LEVEL_CLR[l.level]||'cobalt');openModal('lesson-modal');}
-function saveLesson(){const name=document.getElementById('l-name').value.trim(),level=document.getElementById('l-level').value;if(!name){toast('Name required','error');return;}if(!level){toast('Level required','error');return;}const glRaw=document.getElementById('l-group-link').value;const l={id:editLId||Date.now(),day:document.getElementById('l-day').value,start:document.getElementById('l-start').value,duration:parseInt(document.getElementById('l-duration').value),level,colour:selClr,name,groupLink:glRaw?parseInt(glRaw):null,notes:document.getElementById('l-notes').value.trim()};if(editLId){lessons[lessons.findIndex(x=>x.id===editLId)]=l;toast('Lesson updated ✓');}else{lessons.push(l);toast('Lesson added ✓');}saveAll();renderCalendar();closeModal('lesson-modal');}
+function openAddLesson(day='',time=''){editLId=null;document.getElementById('lesson-modal-title').textContent='Add Lesson';document.getElementById('lesson-delete-btn').style.display='none';populateTimes();populateGroupLink();if(day)document.getElementById('l-day').value=day;if(time)document.getElementById('l-start').value=time;document.getElementById('l-duration').value='90';document.getElementById('l-level').value='';document.getElementById('l-name').value='';document.getElementById('l-group-link').value='';document.getElementById('l-notes').value='';openModal('lesson-modal');}
+function openEditLesson(id){const l=lessons.find(x=>x.id===id);if(!l)return;editLId=id;document.getElementById('lesson-modal-title').textContent='Edit Lesson';document.getElementById('lesson-delete-btn').style.display='inline-flex';populateTimes();populateGroupLink();document.getElementById('l-day').value=l.day;document.getElementById('l-start').value=l.start;document.getElementById('l-duration').value=l.duration;document.getElementById('l-level').value=l.level;document.getElementById('l-name').value=l.name;document.getElementById('l-group-link').value=l.groupLink||'';document.getElementById('l-notes').value=l.notes||'';openModal('lesson-modal');}
+function saveLesson(){const name=document.getElementById('l-name').value.trim(),level=document.getElementById('l-level').value;if(!name){toast('Name required','error');return;}if(!level){toast('Level required','error');return;}const glRaw=document.getElementById('l-group-link').value;const l={id:editLId||Date.now(),day:document.getElementById('l-day').value,start:document.getElementById('l-start').value,duration:parseInt(document.getElementById('l-duration').value),level,name,groupLink:glRaw?parseInt(glRaw):null,notes:document.getElementById('l-notes').value.trim()};if(editLId){lessons[lessons.findIndex(x=>x.id===editLId)]=l;toast('Lesson updated ✓');}else{lessons.push(l);toast('Lesson added ✓');}saveAll();renderCalendar();closeModal('lesson-modal');}
 function deleteLesson(){if(!editLId)return;if(!confirm('Delete lesson?'))return;lessons=lessons.filter(l=>l.id!==editLId);saveAll();renderCalendar();closeModal('lesson-modal');toast('Lesson deleted');}
 
 // ═══════════════════════════════════════════════════════
