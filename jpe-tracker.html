@@ -1407,33 +1407,26 @@ document.querySelectorAll('.modal-overlay').forEach(o=>{o.addEventListener('clic
 // GENERATE WITH CLAUDE
 // ═══════════════════════════════════════════════════════
 function generatePrompt(type){
-  // Gather current log state (unsaved fields are fine — we read live from DOM)
   const classNum=document.getElementById('log-classnum').value||'?';
   const topic=document.getElementById('log-topic').value.trim()||'(no topic set)';
   const pronunciation=document.getElementById('log-pronunciation').value.trim();
   const homework=document.getElementById('log-homework').value.trim();
-  const vocab=[...currentLogVocab]; // from the live vocab array
+  const vocab=[...currentLogVocab];
 
-  // Student names — present ones from attendance chips
   const presentStudents=[];
   document.querySelectorAll('#log-attendance .att-chip').forEach(chip=>{
-    if(chip.classList.contains('present')||(!chip.classList.contains('absent')&&!chip.classList.contains('present'))){
+    if(chip.classList.contains('present')){
       const name=chip.textContent.trim().replace(/^[✓✗○]\s*/,'');
       if(name) presentStudents.push(name);
     }
   });
-  // Fall back to lesson name parsing if no attendance chips
-  const studentList=presentStudents.length
-    ? presentStudents.join(', ')
-    : currentLogLesson.name;
-
+  const studentList=presentStudents.length ? presentStudents.join(', ') : currentLogLesson.name;
   const lessonLevel=currentLogLesson.level;
   const d=new Date(currentLogDate+'T12:00:00');
   const dateStr=d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   const vocabList=vocab.length ? vocab.map(v=>`- ${v}`).join('\n') : '(no vocab added yet)';
 
   let prompt='';
-  let confirmText='';
 
   if(type==='vocab'){
     prompt=`Use the /lesson-vocab-template skill to generate vocabulary PDFs for this lesson.
@@ -1441,52 +1434,83 @@ function generatePrompt(type){
 Class: ${currentLogLesson.name} — ${lessonLevel}
 Students: ${studentList}
 Date: ${dateStr} (Class #${classNum})
-Topic: ${topic}
+Topic: ${topic}${pronunciation?`\nPronunciation focus: ${pronunciation}`:''}${homework?`\nHomework set: ${homework}`:''}
 
 Key Vocabulary:
 ${vocabList}
-${pronunciation?`\nPronunciation focus: ${pronunciation}`:''}
-${homework?`\nHomework set: ${homework}`:''}
 
 Follow the skill exactly. Ask me for the class date if needed, then produce both the A4 Laptop Notes PDF and the Mobile Notes PDF.`;
-    confirmText='Vocab PDF prompt copied!';
   }
-
   else if(type==='whatsapp'){
     prompt=`Use the /whatsapp-vocab-chat skill to create a WhatsApp-style group chat for this lesson's vocabulary.
 
-Class details:
-- Students: ${studentList}
-- Level: ${lessonLevel}
-- Date: ${dateStr} (Class #${classNum})
-- Topic: ${topic}
+Students: ${studentList}
+Level: ${lessonLevel}
+Date: ${dateStr} (Class #${classNum})
+Topic: ${topic}
 
 Vocabulary to embed naturally in the chat:
 ${vocabList}
 
 Follow the skill exactly — create a realistic WhatsApp phone frame conversation between the students that uses all the vocabulary naturally in context. Use each student's real name and give them a consistent voice.`;
-    confirmText='WhatsApp chat prompt copied!';
   }
 
-  // Copy to clipboard and show confirmation
-  navigator.clipboard.writeText(prompt).then(()=>{
-    const conf=document.getElementById('gen-confirm');
-    document.getElementById('gen-confirm-text').textContent=confirmText;
-    conf.style.display='flex';
-    // Open Claude in new tab
-    window.open('https://claude.ai/new','_blank');
-    setTimeout(()=>conf.style.display='none',8000);
-  }).catch(()=>{
-    // Fallback — show in a textarea the user can manually copy
-    const ta=document.createElement('textarea');
-    ta.value=prompt;
-    ta.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:80vw;height:60vh;z-index:9999;font-size:12px;padding:12px;border-radius:8px;border:2px solid var(--cobalt)';
-    document.body.appendChild(ta);
+  // Always show the overlay with the prompt — most reliable cross-browser approach
+  showPromptOverlay(prompt, type);
+}
+
+function showPromptOverlay(text, type){
+  document.getElementById('prompt-overlay')?.remove();
+  const label=type==='vocab'?'Vocab PDF':'WhatsApp Chat';
+
+  const overlay=document.createElement('div');
+  overlay.id='prompt-overlay';
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(26,26,46,.88);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+
+  // Try clipboard on creation
+  let clipStatus='';
+  navigator.clipboard.writeText(text)
+    .then(()=>{ clipStatus='copied'; updateClipLabel(); })
+    .catch(()=>{ clipStatus='failed'; updateClipLabel(); });
+
+  overlay.innerHTML=`
+    <div style="background:#fff;border-radius:18px;padding:28px;max-width:620px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,.4);font-family:'Outfit',sans-serif">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <div style="font-size:17px;font-weight:800;color:#1A1A2E">✨ ${label} Prompt</div>
+        <button onclick="document.getElementById('prompt-overlay').remove()" style="width:30px;height:30px;border-radius:8px;border:none;background:#E8ECF4;cursor:pointer;font-size:16px;color:#8892A4;display:flex;align-items:center;justify-content:center">×</button>
+      </div>
+      <div id="clip-label" style="font-size:12px;color:#8892A4;margin-bottom:14px">Trying to copy to clipboard…</div>
+      <textarea id="prompt-ta" style="width:100%;height:200px;font-family:monospace;font-size:11px;padding:12px;border:1.5px solid #E0E6F0;border-radius:10px;resize:vertical;outline:none;color:#1A1A2E;line-height:1.6;background:#F4F6FB" readonly>${text}</textarea>
+      <div style="display:flex;gap:10px;margin-top:16px;justify-content:space-between;align-items:center;flex-wrap:wrap">
+        <button onclick="copyPromptText()" style="padding:8px 18px;border-radius:8px;border:1.5px solid #E0E6F0;background:#fff;font-family:'Outfit',sans-serif;font-weight:700;font-size:13px;cursor:pointer;color:#1A1A2E;display:flex;align-items:center;gap:6px">📋 Copy prompt</button>
+        <a href="https://claude.ai/new" target="_blank" onclick="copyPromptText()" style="padding:9px 22px;border-radius:8px;background:#2176FF;color:#fff;font-family:'Outfit',sans-serif;font-weight:700;font-size:13px;text-decoration:none;display:inline-flex;align-items:center;gap:6px">Open Claude &amp; paste →</a>
+      </div>
+      <div style="font-size:11px;color:#8892A4;margin-top:10px">Tip: the "Open Claude" button copies the prompt automatically, then opens Claude in a new tab. Just paste with Cmd+V or Ctrl+V.</div>
+    </div>`;
+
+  document.body.appendChild(overlay);
+
+  function updateClipLabel(){
+    const el=document.getElementById('clip-label');
+    if(!el) return;
+    if(clipStatus==='copied') el.innerHTML='<span style="color:#1a8a80;font-weight:600">✓ Copied to clipboard</span> — open Claude and paste (Cmd+V / Ctrl+V)';
+    else el.textContent='Select all text below, copy it, then paste into Claude';
+  }
+
+  // Auto-select textarea for easy manual copy
+  setTimeout(()=>{
+    const ta=document.getElementById('prompt-ta');
+    if(ta){ta.focus();ta.select();}
+    updateClipLabel();
+  },100);
+}
+
+function copyPromptText(){
+  const ta=document.getElementById('prompt-ta');
+  if(!ta) return;
+  navigator.clipboard.writeText(ta.value).catch(()=>{
     ta.select();
     document.execCommand('copy');
-    toast('Prompt copied — paste into Claude ✓');
-    setTimeout(()=>ta.remove(),3000);
-    window.open('https://claude.ai/new','_blank');
   });
 }
 
