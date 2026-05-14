@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JohnPlusEnglish — Student Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cobalt:#2176FF;--red:#EF233C;--sun:#FFDD4A;--orange:#FF9100;
+    --sky:#49B6FF;--mint:#1DD3B0;--dark:#1A1A2E;--dark2:#16213E;--dark3:#0F3460;
+    --ws-sun:#FFB347;--ws-sky:#4A90D9;--ws-sea:#2EC4B6;
+    --ws-coral:#FF6B6B;--ws-lavender:#9B72CF;--ws-mint:#5DDEA0;
+    --white:#fff;--off-white:#F4F6FB;--grey:#8892A4;--light-grey:#E8ECF4;
+    --border:#E0E6F0;--shadow:0 2px 12px rgba(26,26,46,.08);
+    --radius:14px;--radius-sm:8px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Outfit',sans-serif;background:var(--off-white);color:var(--dark);min-height:100vh;font-size:14px;}
+
+  /* ── SETUP SCREEN ── */
+  #setup-screen{position:fixed;inset:0;background:var(--dark);z-index:9999;display:flex;align-items:center;justify-content:center;}
+  .setup-box{background:#fff;border-radius:20px;padding:40px;width:480px;max-width:95vw;box-shadow:0 32px 80px rgba(0,0,0,.4);}
+  .setup-logo{font-weight:800;font-size:22px;letter-spacing:-.5px;margin-bottom:6px;}
+  .setup-logo span{color:var(--cobalt);}.setup-logo em{color:var(--ws-sun);font-style:normal;}
+  .setup-sub{font-size:13px;color:var(--grey);margin-bottom:28px;line-height:1.5;}
+  .setup-section{margin-bottom:20px;}
+  .setup-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--dark);margin-bottom:6px;display:block;}
+  .setup-hint{font-size:11px;color:var(--grey);margin-top:4px;line-height:1.5;}
+  .setup-input{width:100%;padding:10px 13px;border-radius:var(--radius-sm);border:1.5px solid var(--border);font-family:'Outfit',sans-serif;font-size:13px;color:var(--dark);outline:none;transition:border-color .2s;}
+  .setup-input:focus{border-color:var(--cobalt);box-shadow:0 0 0 3px rgba(33,118,255,.1);}
+  .setup-divider{border:none;border-top:1px solid var(--border);margin:22px 0;}
+  .setup-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:24px;}
+  .setup-step{display:none;}.setup-step.active{display:block;}
+  .step-indicator{display:flex;gap:6px;margin-bottom:24px;}
+  .step-dot{width:8px;height:8px;border-radius:50%;background:var(--light-grey);}
+  .step-dot.done{background:var(--ws-sea);}
+  .step-dot.active{background:var(--cobalt);}
+  .token-help{background:#F0F6FF;border-radius:10px;padding:14px;font-size:12px;color:#2a6db5;line-height:1.7;margin-top:8px;}
+  .token-help code{background:#D6E8FF;padding:1px 5px;border-radius:4px;font-family:monospace;font-size:11px;}
+
+  /* ── SYNC STATUS BAR ── */
+  #sync-bar{height:3px;background:transparent;position:fixed;top:60px;left:0;right:0;z-index:99;transition:background .3s;}
+  #sync-bar.syncing{background:linear-gradient(90deg,var(--cobalt),var(--ws-sea),var(--cobalt));background-size:200%;animation:syncAnim 1.2s linear infinite;}
+  #sync-bar.error{background:var(--ws-coral);}
+  @keyframes syncAnim{0%{background-position:0%}100%{background-position:200%}}
+  .sync-status{position:fixed;bottom:28px;left:28px;font-size:12px;font-weight:600;color:var(--grey);display:flex;align-items:center;gap:6px;opacity:0;transition:opacity .3s;}
+  .sync-status.show{opacity:1;}
+  .sync-dot{width:7px;height:7px;border-radius:50%;background:var(--grey);}
+  .sync-dot.ok{background:var(--ws-sea);}
+  .sync-dot.err{background:var(--ws-coral);}
+  .sync-dot.busy{background:var(--cobalt);animation:pulse .8s infinite;}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+  /* ── HEADER ── */
+  header{background:var(--dark);color:#fff;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,.25);}
+  .logo{font-weight:800;font-size:18px;letter-spacing:-.5px;}
+  .logo span{color:var(--cobalt);}.logo em{color:var(--sun);font-style:normal;}
+  .nav-tabs{display:flex;gap:4px;}
+  .nav-tab{padding:7px 20px;border-radius:8px;font-family:'Outfit',sans-serif;font-weight:600;font-size:13px;cursor:pointer;border:none;background:transparent;color:var(--grey);transition:all .2s;}
+  .nav-tab:hover{color:#fff;background:rgba(255,255,255,.08);}
+  .nav-tab.active{background:var(--cobalt);color:#fff;}
+  .header-actions{display:flex;align-items:center;gap:8px;}
+  .sync-btn{padding:6px 14px;border-radius:7px;font-family:'Outfit',sans-serif;font-weight:600;font-size:12px;cursor:pointer;border:1px solid rgba(255,255,255,.15);background:transparent;color:rgba(255,255,255,.6);transition:all .18s;display:flex;align-items:center;gap:5px;}
+  .sync-btn:hover{background:rgba(255,255,255,.08);color:#fff;}
+  .settings-btn{width:32px;height:32px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:transparent;color:rgba(255,255,255,.5);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .15s;}
+  .settings-btn:hover{background:rgba(255,255,255,.1);color:#fff;}
+
+  /* ── BUTTONS ── */
+  .btn{padding:8px 18px;border-radius:var(--radius-sm);font-family:'Outfit',sans-serif;font-weight:600;font-size:13px;cursor:pointer;border:none;transition:all .18s;display:inline-flex;align-items:center;gap:6px;}
+  .btn-primary{background:var(--cobalt);color:#fff;}
+  .btn-primary:hover{background:#1860d4;transform:translateY(-1px);box-shadow:0 4px 12px rgba(33,118,255,.35);}
+  .btn-danger{background:var(--red);color:#fff;}.btn-danger:hover{background:#c71d30;}
+  .btn-neutral{background:var(--light-grey);color:var(--dark);}.btn-neutral:hover{background:var(--border);}
+  .btn-sm{padding:5px 12px;font-size:12px;}
+  .btn-icon{padding:6px 8px;border-radius:7px;background:transparent;color:var(--grey);border:1px solid var(--border);cursor:pointer;font-size:13px;transition:all .15s;line-height:1;}
+  .btn-icon:hover{background:var(--light-grey);color:var(--dark);}
+
+  /* ── VIEWS ── */
+  .view{display:none;padding:28px 32px;}.view.active{display:block;}
+  .page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+  .page-title{font-size:22px;font-weight:800;letter-spacing:-.5px;}
+  .page-subtitle{font-size:13px;color:var(--grey);margin-top:2px;font-weight:400;}
+
+  /* ── STATS ── */
+  .stats-bar{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:20px;}
+  .stat-card{background:#fff;border-radius:var(--radius);padding:16px 20px;box-shadow:var(--shadow);border:1px solid var(--border);}
+  .stat-label{font-size:11px;font-weight:600;color:var(--grey);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;}
+  .stat-value{font-size:26px;font-weight:800;line-height:1;}
+  .stat-value.blue{color:var(--cobalt);}.stat-value.mint{color:var(--mint);}.stat-value.orange{color:var(--orange);}.stat-value.red{color:var(--red);}
+
+  /* ── STUDENT TABS ── */
+  .student-tabs{display:flex;background:#fff;border:1px solid var(--border);border-radius:10px;padding:4px;width:fit-content;box-shadow:var(--shadow);}
+  .student-tab{padding:7px 22px;border-radius:7px;font-family:'Outfit',sans-serif;font-weight:600;font-size:13px;cursor:pointer;border:none;background:transparent;color:var(--grey);transition:all .18s;display:flex;align-items:center;gap:6px;}
+  .student-tab.active{background:var(--dark);color:#fff;}
+  .tab-count{background:var(--light-grey);color:var(--grey);border-radius:10px;padding:1px 7px;font-size:11px;}
+  .student-tab.active .tab-count{background:rgba(255,255,255,.2);color:#fff;}
+
+  /* ── TOOLBAR ── */
+  .toolbar{display:flex;gap:10px;margin-bottom:16px;align-items:center;flex-wrap:wrap;}
+  .search-wrap{position:relative;flex:1;min-width:200px;}
+  .search-wrap svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--grey);}
+  .search-input{width:100%;padding:9px 12px 9px 36px;border-radius:var(--radius-sm);border:1.5px solid var(--border);font-family:'Outfit',sans-serif;font-size:13px;background:#fff;color:var(--dark);outline:none;transition:border-color .2s;}
+  .search-input:focus{border-color:var(--cobalt);}
+  .filter-select{padding:9px 14px;border-radius:var(--radius-sm);border:1.5px solid var(--border);font-family:'Outfit',sans-serif;font-size:13px;background:#fff;color:var(--dark);outline:none;cursor:pointer;}
+
+  /* ── TABLE ── */
+  .table-wrap{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border);overflow:hidden;}
+  table{width:100%;border-collapse:collapse;}
+  thead th{background:var(--dark);color:rgba(255,255,255,.65);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:12px 14px;text-align:left;white-space:nowrap;}
+  tbody tr{border-bottom:1px solid var(--light-grey);transition:background .15s;}
+  tbody tr:last-child{border-bottom:none;}
+  tbody tr:hover{background:#F8FAFF;}
+  td{padding:0;vertical-align:middle;}
+
+  /* ── INLINE EDIT ── */
+  .cell-view{padding:10px 14px;min-height:42px;display:flex;align-items:center;cursor:pointer;}
+  .cell-view:hover{background:rgba(33,118,255,.04);}
+  .cell-edit-wrap{display:none;padding:5px 10px;align-items:center;gap:5px;}
+  td.is-editing .cell-view{display:none;}
+  td.is-editing .cell-edit-wrap{display:flex;}
+  .cell-edit-wrap input,.cell-edit-wrap select,.cell-edit-wrap textarea{font-family:'Outfit',sans-serif;font-size:13px;color:var(--dark);padding:5px 9px;border:1.5px solid var(--cobalt);border-radius:6px;background:#fff;outline:none;box-shadow:0 0 0 3px rgba(33,118,255,.1);min-width:90px;width:100%;}
+  .cell-edit-wrap textarea{resize:vertical;min-height:52px;}
+  .ce-save{padding:4px 9px;border:none;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;background:var(--cobalt);color:#fff;white-space:nowrap;}
+  .ce-cancel{padding:4px 9px;border:none;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;background:var(--light-grey);color:var(--dark);white-space:nowrap;}
+
+  .avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;color:#fff;flex-shrink:0;}
+  .s-name-wrap{display:flex;align-items:center;gap:9px;font-weight:700;font-size:13px;}
+
+  /* ── LEVEL BADGES ── */
+  .level-badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;}
+  .level-A1{background:#FFE8E8;color:#c94040;}
+  .level-A2{background:#FFE8E8;color:#c94040;border:1.5px solid #FF6B6B;}
+  .level-B1{background:#E2FAF1;color:#1a9068;}
+  .level-B2{background:#E8F2FD;color:#2a6db5;}
+  .level-C1{background:#F0EAF9;color:#6b4fa0;}
+  .level-C2{background:#FFF3E0;color:#b87200;border:1.5px solid #FFB347;}
+  .level-FCE{background:#E2F7F6;color:#1a8a80;}
+  .level-CAE{background:#CCF0EE;color:#177a72;border:1.5px solid #2EC4B6;}
+  .level-CPE{background:var(--dark);color:#FFB347;}
+
+  .tg-link{display:inline-flex;align-items:center;gap:5px;color:#0088cc;text-decoration:none;font-weight:600;font-size:12px;padding:3px 8px;border-radius:6px;background:#E8F4FD;}
+  .tg-link:hover{background:#d0e9f8;}
+
+  /* ── SCHEDULE ── */
+  .schedule-controls{display:flex;align-items:center;gap:14px;margin-bottom:18px;flex-wrap:wrap;}
+  .schedule-legend{display:flex;gap:10px;flex-wrap:wrap;margin-left:auto;}
+  .legend-item{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--grey);}
+  .legend-dot{width:10px;height:10px;border-radius:3px;}
+  .schedule-grid{display:grid;grid-template-columns:60px repeat(7,1fr);background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border);overflow:hidden;}
+  .sched-header{background:var(--dark);color:#fff;padding:12px 8px;text-align:center;font-size:12px;font-weight:700;border-right:1px solid rgba(255,255,255,.07);}
+  .sched-header.time-col{color:var(--grey);font-size:10px;}
+  .sched-day-name{font-size:13px;font-weight:800;}
+  .sched-day-sub{font-size:10px;color:rgba(255,255,255,.45);margin-top:1px;}
+  .sched-time-cell{background:var(--off-white);border-right:1px solid var(--border);border-bottom:1px solid var(--light-grey);padding:0 8px;display:flex;align-items:flex-start;justify-content:flex-end;padding-top:5px;font-size:10px;font-weight:700;color:var(--grey);min-height:44px;}
+  .sched-slot{border-right:1px solid var(--light-grey);border-bottom:1px solid var(--light-grey);position:relative;min-height:44px;cursor:pointer;transition:background .12s;}
+  .sched-slot:hover{background:#f0f4ff;}
+  .sched-slot.half{border-bottom:1px dashed #edf0f8;}
+  .lesson-block{position:absolute;left:3px;right:3px;border-radius:8px;padding:5px 8px;cursor:pointer;overflow:hidden;z-index:2;box-shadow:0 2px 8px rgba(0,0,0,.14);transition:transform .15s,box-shadow .15s;}
+  .lesson-block:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.2);z-index:10;}
+  .lb-title{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.25;}
+  .lb-meta{font-size:10px;font-weight:500;opacity:.8;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .lb-level{position:absolute;top:4px;right:6px;font-size:9px;font-weight:800;opacity:.85;}
+
+  /* ── COLOUR PICKER ── */
+  .colour-picker-wrap{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px;}
+  .c-swatch{width:30px;height:30px;border-radius:7px;cursor:pointer;border:3px solid transparent;transition:all .15s;display:flex;align-items:center;justify-content:center;font-size:13px;color:transparent;}
+  .c-swatch:hover{transform:scale(1.12);}
+  .c-swatch.sel{border-color:var(--dark);box-shadow:0 0 0 2px #fff,0 0 0 4px var(--dark);color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.5);}
+
+  /* ── GROUP CARDS ── */
+  .groups-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(460px,1fr));gap:20px;}
+  .group-card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border);overflow:hidden;}
+  .group-card-header{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+  .group-card-title{font-size:15px;font-weight:800;}
+  .group-card-meta{font-size:12px;color:var(--grey);margin-top:2px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
+  .group-meta-pill{background:var(--off-white);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:600;color:var(--grey);border:1px solid var(--border);}
+  .group-dates-bar{padding:10px 20px;background:var(--off-white);border-bottom:1px solid var(--border);display:flex;gap:20px;align-items:center;flex-wrap:wrap;}
+  .gd-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--grey);}
+  .gd-label{font-weight:700;text-transform:uppercase;letter-spacing:.5px;font-size:10px;}
+  .gd-val{font-weight:600;color:var(--dark);}
+  .progress-bar-wrap{flex:1;min-width:120px;}
+  .progress-bar-track{height:6px;background:var(--light-grey);border-radius:3px;overflow:hidden;}
+  .progress-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#2EC4B6,#4A90D9);transition:width .4s;}
+  .pay-table{width:100%;border-collapse:collapse;}
+  .pay-table th{background:var(--dark);color:rgba(255,255,255,.6);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;padding:9px 16px;text-align:left;}
+  .pay-table td{padding:9px 16px;font-size:13px;border-bottom:1px solid var(--light-grey);vertical-align:middle;}
+  .pay-table tr:last-child td{border-bottom:none;}
+  .pay-table tr:hover td{background:#F8FAFF;}
+  .pay-status{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+  .pay-paid{background:#E2F7F6;color:#1a8a80;}
+  .pay-unpaid{background:#FFF3E0;color:#b87200;}
+  .pay-history-row{background:var(--off-white)!important;}
+  .pay-history-row td{padding:5px 16px 5px 32px;font-size:11px;color:var(--grey);border-bottom:1px dashed var(--light-grey);}
+  .add-pay-btn{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;border:1.5px dashed var(--border);background:transparent;color:var(--grey);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;font-family:'Outfit',sans-serif;}
+  .add-pay-btn:hover{border-color:var(--ws-sea);color:var(--ws-sea);background:#E2F7F6;}
+  .group-notes-row{padding:12px 20px;font-size:12px;color:var(--grey);border-top:1px solid var(--light-grey);font-style:italic;}
+  .empty-groups{text-align:center;padding:60px 20px;color:var(--grey);}
+
+  /* ── MODAL ── */
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(26,26,46,.6);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+  .modal-overlay.open{display:flex;}
+  .modal{background:#fff;border-radius:18px;box-shadow:0 24px 64px rgba(0,0,0,.28);width:560px;max-width:95vw;max-height:90vh;overflow-y:auto;animation:mIn .22s ease;}
+  @keyframes mIn{from{opacity:0;transform:scale(.95) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+  .modal-header{padding:22px 28px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+  .modal-title{font-size:18px;font-weight:800;}
+  .modal-close{width:30px;height:30px;border-radius:7px;border:none;background:var(--light-grey);cursor:pointer;font-size:17px;color:var(--grey);transition:all .15s;}
+  .modal-close:hover{background:var(--border);color:var(--dark);}
+  .modal-body{padding:20px 28px;}
+  .modal-footer{padding:14px 28px 22px;display:flex;gap:10px;justify-content:flex-end;border-top:1px solid var(--border);}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .form-grid .full{grid-column:1/-1;}
+  .form-group{display:flex;flex-direction:column;gap:5px;}
+  .form-label{font-size:11px;font-weight:700;color:var(--dark);text-transform:uppercase;letter-spacing:.6px;}
+  .form-input,.form-select,.form-textarea{padding:9px 12px;border-radius:var(--radius-sm);border:1.5px solid var(--border);font-family:'Outfit',sans-serif;font-size:13px;color:var(--dark);outline:none;transition:border-color .2s;background:#fff;}
+  .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--cobalt);box-shadow:0 0 0 3px rgba(33,118,255,.1);}
+  .form-textarea{resize:vertical;min-height:70px;}
+
+  /* ── TOAST ── */
+  .toast{position:fixed;bottom:28px;right:28px;background:var(--dark);color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.2);transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);z-index:9999;display:flex;align-items:center;gap:8px;}
+  .toast.show{transform:translateY(0);opacity:1;}
+  .toast.success{border-left:4px solid var(--ws-sea);}
+  .toast.error{border-left:4px solid var(--ws-coral);}
+  .toast.info{border-left:4px solid var(--cobalt);}
+
+  ::-webkit-scrollbar{width:6px;height:6px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+</style>
+</head>
+<body>
+
+<!-- ════════════ SETUP SCREEN ════════════ -->
+<div id="setup-screen" style="display:none">
+  <div class="setup-box">
+    <div class="setup-logo">John<span>+</span><em>English</em></div>
+    <div class="setup-sub">Student Tracker — first time setup.<br>This takes about 2 minutes and only happens once.</div>
+    <div class="step-indicator">
+      <div class="step-dot active" id="dot-1"></div>
+      <div class="step-dot" id="dot-2"></div>
+      <div class="step-dot" id="dot-3"></div>
+    </div>
+
+    <!-- Step 1: Password -->
+    <div class="setup-step active" id="step-1">
+      <div class="setup-section">
+        <label class="setup-label">Choose a password for this tracker</label>
+        <input class="setup-input" type="password" id="setup-pass" placeholder="e.g. jpe2025admin" autocomplete="new-password">
+        <input class="setup-input" type="password" id="setup-pass2" placeholder="Confirm password" autocomplete="new-password" style="margin-top:8px">
+        <div class="setup-hint">You'll type this once per browser session. Keep it simple — it just stops students stumbling on it if they find the URL.</div>
+      </div>
+      <div class="setup-footer">
+        <button class="btn btn-primary" onclick="setupStep1()">Next →</button>
+      </div>
+    </div>
+
+    <!-- Step 2: GitHub repo -->
+    <div class="setup-step" id="step-2">
+      <div class="setup-section">
+        <label class="setup-label">Your GitHub username</label>
+        <input class="setup-input" id="setup-user" placeholder="e.g. johnteacher" autocomplete="off">
+      </div>
+      <div class="setup-section">
+        <label class="setup-label">Repository name</label>
+        <input class="setup-input" id="setup-repo" placeholder="e.g. johnplusenglish" autocomplete="off">
+        <div class="setup-hint">This is the repo where your site lives — the one connected to GitHub Pages.</div>
+      </div>
+      <div class="setup-section">
+        <label class="setup-label">Path for data file (optional)</label>
+        <input class="setup-input" id="setup-path" placeholder="admin/tracker-data.json" autocomplete="off">
+        <div class="setup-hint">Leave as default unless you have a reason to change it. The file will be created automatically.</div>
+      </div>
+      <div class="setup-footer">
+        <button class="btn btn-neutral" onclick="gotoStep(1)">← Back</button>
+        <button class="btn btn-primary" onclick="setupStep2()">Next →</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Token -->
+    <div class="setup-step" id="step-3">
+      <div class="setup-section">
+        <label class="setup-label">GitHub Personal Access Token</label>
+        <input class="setup-input" id="setup-token" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
+        <div class="token-help">
+          <strong>To create a token:</strong><br>
+          1. Go to <strong>github.com → Settings → Developer settings → Personal access tokens → Tokens (classic)</strong><br>
+          2. Click <strong>Generate new token (classic)</strong><br>
+          3. Give it a name like <code>jpe-tracker</code><br>
+          4. Tick the <strong>repo</strong> checkbox (full repo access)<br>
+          5. Click <strong>Generate token</strong>, copy it, paste it here<br><br>
+          <strong>It's stored only in your browser's localStorage — never sent anywhere except GitHub's own API.</strong>
+        </div>
+      </div>
+      <div class="setup-footer">
+        <button class="btn btn-neutral" onclick="gotoStep(2)">← Back</button>
+        <button class="btn btn-primary" onclick="setupStep3()">✓ Save &amp; Start</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ LOGIN SCREEN ════════════ -->
+<div id="login-screen" style="display:none;position:fixed;inset:0;background:var(--dark);z-index:9998;align-items:center;justify-content:center;">
+  <div class="setup-box" style="width:360px;text-align:center">
+    <div class="setup-logo" style="margin-bottom:4px">John<span>+</span><em>English</em></div>
+    <div style="font-size:13px;color:var(--grey);margin-bottom:24px">Student Tracker</div>
+    <div style="font-size:36px;margin-bottom:20px">🔒</div>
+    <input class="setup-input" type="password" id="login-pass" placeholder="Password" style="text-align:center;margin-bottom:12px" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="doLogin()">Unlock</button>
+    <div id="login-error" style="color:var(--ws-coral);font-size:12px;margin-top:10px;display:none">Incorrect password</div>
+  </div>
+</div>
+
+<!-- ════════════ SYNC BAR ════════════ -->
+<div id="sync-bar"></div>
+
+<!-- ════════════ HEADER ════════════ -->
+<header id="main-header" style="display:none">
+  <div class="logo">John<span>+</span><em>English</em><span style="color:rgba(255,255,255,.25);margin:0 8px;font-weight:300">|</span><span style="color:rgba(255,255,255,.45);font-size:14px;font-weight:400">Student Tracker</span></div>
+  <nav class="nav-tabs">
+    <button class="nav-tab active" onclick="switchView('students')">Students</button>
+    <button class="nav-tab" onclick="switchView('groups')">Groups</button>
+    <button class="nav-tab" onclick="switchView('schedule')">Schedule</button>
+  </nav>
+  <div class="header-actions">
+    <button class="sync-btn" onclick="syncNow()" title="Sync to GitHub">
+      <span id="sync-icon">☁</span> <span id="sync-label">Saved</span>
+    </button>
+    <button class="btn btn-primary" id="header-add-btn" onclick="openAddStudent()">+ Add Student</button>
+    <button class="settings-btn" onclick="openSettings()" title="Settings">⚙</button>
+  </div>
+</header>
+
+<!-- ════════════ MAIN CONTENT ════════════ -->
+<div id="main-content" style="display:none">
+
+<!-- STUDENTS -->
+<div class="view active" id="view-students">
+  <div class="page-header">
+    <div><div class="page-title">Student Database</div><div class="page-subtitle" id="student-count-label">—</div></div>
+  </div>
+  <div class="stats-bar">
+    <div class="stat-card"><div class="stat-label">Current Students</div><div class="stat-value blue" id="stat-total">0</div></div>
+    <div class="stat-card"><div class="stat-label">C1 / C2</div><div class="stat-value mint" id="stat-advanced">0</div></div>
+    <div class="stat-card"><div class="stat-label">B1 / B2</div><div class="stat-value" id="stat-intermediate">0</div></div>
+    <div class="stat-card"><div class="stat-label">Exam Prep</div><div class="stat-value orange" id="stat-exam">0</div></div>
+    <div class="stat-card"><div class="stat-label">Prospective</div><div class="stat-value red" id="stat-prospect">0</div></div>
+  </div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+    <div class="student-tabs">
+      <button class="student-tab active" id="tab-current" onclick="setStudentTab('current')">Current <span class="tab-count" id="cnt-current">0</span></button>
+      <button class="student-tab" id="tab-prospective" onclick="setStudentTab('prospective')">Prospective <span class="tab-count" id="cnt-prospective">0</span></button>
+    </div>
+    <span style="font-size:12px;color:var(--grey)">✏️ Click any cell to edit inline · Enter to save · Esc to cancel</span>
+  </div>
+  <div class="toolbar">
+    <div class="search-wrap">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input class="search-input" id="student-search" placeholder="Search students…" oninput="renderStudents()">
+    </div>
+    <select class="filter-select" id="filter-level" onchange="renderStudents()">
+      <option value="">All Levels</option>
+      <option>A1</option><option>A2</option><option>B1</option><option>B2</option>
+      <option>C1</option><option>C2</option><option>FCE</option><option>CAE</option><option>CPE</option>
+    </select>
+    <select class="filter-select" id="filter-nat" onchange="renderStudents()"><option value="">All Nationalities</option></select>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Student</th><th>Nationality</th><th>Level</th><th>Objective</th><th>Availability</th><th>Notes</th><th>Email</th><th>Telegram</th><th style="width:70px"></th></tr></thead>
+      <tbody id="students-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- GROUPS -->
+<div class="view" id="view-groups">
+  <div class="page-header">
+    <div><div class="page-title">Group Tracker</div><div class="page-subtitle">Payment status, course dates &amp; student records per group</div></div>
+    <button class="btn btn-primary" onclick="openAddGroup()">+ Add Group</button>
+  </div>
+  <div id="groups-container"></div>
+</div>
+
+<!-- SCHEDULE -->
+<div class="view" id="view-schedule">
+  <div class="page-header">
+    <div><div class="page-title">Weekly Schedule</div><div class="page-subtitle">09:00 – 21:00 CET · Click an empty slot to add · Click a lesson to edit</div></div>
+  </div>
+  <div class="schedule-controls">
+    <div class="schedule-legend" id="sched-legend"></div>
+    <button class="btn btn-primary btn-sm" onclick="openAddLesson()">+ Add Lesson</button>
+  </div>
+  <div class="schedule-grid" id="schedule-grid"></div>
+</div>
+
+</div><!-- end main-content -->
+
+<!-- ════════════ MODALS ════════════ -->
+
+<!-- Student Modal -->
+<div class="modal-overlay" id="student-modal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title" id="student-modal-title">Add Student</div><button class="modal-close" onclick="closeModal('student-modal')">×</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">Full Name *</label><input class="form-input" id="s-name" placeholder="e.g. María García"></div>
+        <div class="form-group"><label class="form-label">Nationality</label><input class="form-input" id="s-nat" placeholder="e.g. Spanish"></div>
+        <div class="form-group"><label class="form-label">Level</label>
+          <select class="form-select" id="s-level"><option value="">Select…</option><option>A1</option><option>A2</option><option>B1</option><option>B2</option><option>C1</option><option>C2</option><option>FCE</option><option>CAE</option><option>CPE</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">Status</label>
+          <select class="form-select" id="s-status"><option value="current">Current Student</option><option value="prospective">Prospective</option></select>
+        </div>
+        <div class="form-group full"><label class="form-label">Objective</label><input class="form-input" id="s-obj" placeholder="e.g. Business English, CPE Exam"></div>
+        <div class="form-group full"><label class="form-label">Availability</label><input class="form-input" id="s-avail" placeholder="e.g. Mon 09:00, Wed 18:30"></div>
+        <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="s-email" type="email" placeholder="maria@email.com"></div>
+        <div class="form-group"><label class="form-label">Telegram</label><input class="form-input" id="s-tg" placeholder="@username or t.me/link"></div>
+        <div class="form-group full"><label class="form-label">Notes</label><textarea class="form-textarea" id="s-notes" placeholder="Background, progress, preferences…"></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-neutral" onclick="closeModal('student-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveStudent()">Save Student</button>
+    </div>
+  </div>
+</div>
+
+<!-- Group Modal -->
+<div class="modal-overlay" id="group-modal">
+  <div class="modal" style="width:560px">
+    <div class="modal-header"><div class="modal-title" id="group-modal-title">Add Group</div><button class="modal-close" onclick="closeModal('group-modal')">×</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group full"><label class="form-label">Group Name *</label><input class="form-input" id="g-name" placeholder="e.g. CPE Group — Wed 16:00"></div>
+        <div class="form-group"><label class="form-label">Level</label>
+          <select class="form-select" id="g-level"><option value="">Select…</option><option>A1</option><option>A2</option><option>B1</option><option>B2</option><option>C1</option><option>C2</option><option>FCE</option><option>CAE</option><option>CPE</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">Day &amp; Time</label><input class="form-input" id="g-slot" placeholder="e.g. Wed 16:00"></div>
+        <div class="form-group"><label class="form-label">Course Start</label><input class="form-input" type="date" id="g-start"></div>
+        <div class="form-group"><label class="form-label">Course End</label><input class="form-input" type="date" id="g-end"></div>
+        <div class="form-group full"><label class="form-label">Students (comma-separated)</label><input class="form-input" id="g-members" placeholder="e.g. Tania, Cristina, Raquel"></div>
+        <div class="form-group full"><label class="form-label">Notes</label><textarea class="form-textarea" id="g-notes" placeholder="Topics, materials, goals…"></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-danger btn-sm" id="group-delete-btn" onclick="deleteGroup()" style="display:none;margin-right:auto">Delete Group</button>
+      <button class="btn btn-neutral" onclick="closeModal('group-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveGroup()">Save Group</button>
+    </div>
+  </div>
+</div>
+
+<!-- Payment Modal -->
+<div class="modal-overlay" id="payment-modal">
+  <div class="modal" style="width:420px">
+    <div class="modal-header"><div class="modal-title" id="pay-modal-title">Log Payment</div><button class="modal-close" onclick="closeModal('payment-modal')">×</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group full"><label class="form-label">Student</label><input class="form-input" id="pay-student" readonly style="background:var(--off-white);color:var(--grey)"></div>
+        <div class="form-group"><label class="form-label">Amount (€)</label><input class="form-input" type="number" id="pay-amount" placeholder="80" min="0"></div>
+        <div class="form-group"><label class="form-label">Date Paid</label><input class="form-input" type="date" id="pay-date"></div>
+        <div class="form-group full"><label class="form-label">Notes</label><input class="form-input" id="pay-notes" placeholder="e.g. April block, Bizum, cash…"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-neutral" onclick="closeModal('payment-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="savePayment()">Save Payment</button>
+    </div>
+  </div>
+</div>
+
+<!-- Lesson Modal -->
+<div class="modal-overlay" id="lesson-modal">
+  <div class="modal" style="width:500px">
+    <div class="modal-header"><div class="modal-title" id="lesson-modal-title">Add Lesson</div><button class="modal-close" onclick="closeModal('lesson-modal')">×</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">Day *</label>
+          <select class="form-select" id="l-day"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">Start Time *</label><select class="form-select" id="l-start"></select></div>
+        <div class="form-group"><label class="form-label">Duration</label>
+          <select class="form-select" id="l-duration"><option value="60">60 min</option><option value="90" selected>90 min</option><option value="120">120 min (2 hr)</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">Level Tag *</label>
+          <select class="form-select" id="l-level" onchange="syncColour()"><option value="">Select…</option><option>A1</option><option>A2</option><option>B1</option><option>B2</option><option>C1</option><option>C2</option><option>FCE</option><option>CAE</option><option>CPE</option></select>
+        </div>
+        <div class="form-group full"><label class="form-label">Group / Student Name *</label><input class="form-input" id="l-name" placeholder="e.g. Tania, Cristina, Raquel — CPE Group"></div>
+        <div class="form-group full"><label class="form-label">Block Colour</label><div class="colour-picker-wrap" id="colour-picker"></div></div>
+        <div class="form-group full"><label class="form-label">Notes</label><input class="form-input" id="l-notes" placeholder="Zoom link, topic, materials…"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-danger btn-sm" id="lesson-delete-btn" onclick="deleteLesson()" style="display:none;margin-right:auto">Delete Lesson</button>
+      <button class="btn btn-neutral" onclick="closeModal('lesson-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveLesson()">Save Lesson</button>
+    </div>
+  </div>
+</div>
+
+<!-- Settings Modal -->
+<div class="modal-overlay" id="settings-modal">
+  <div class="modal" style="width:460px">
+    <div class="modal-header"><div class="modal-title">⚙ Settings</div><button class="modal-close" onclick="closeModal('settings-modal')">×</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group full"><label class="form-label">GitHub Username</label><input class="form-input" id="cfg-user"></div>
+        <div class="form-group full"><label class="form-label">Repository Name</label><input class="form-input" id="cfg-repo"></div>
+        <div class="form-group full"><label class="form-label">Data File Path</label><input class="form-input" id="cfg-path"></div>
+        <div class="form-group full"><label class="form-label">GitHub Token</label><input class="form-input" type="password" id="cfg-token" placeholder="ghp_…"></div>
+        <div class="form-group full"><label class="form-label">Change Password</label><input class="form-input" type="password" id="cfg-pass" placeholder="Leave blank to keep current password"></div>
+      </div>
+      <div style="margin-top:16px;padding:14px;background:var(--off-white);border-radius:10px;font-size:12px;color:var(--grey);line-height:1.7">
+        <strong style="color:var(--dark)">Data file location:</strong> <span id="cfg-file-url">—</span><br>
+        <strong style="color:var(--dark)">Last synced:</strong> <span id="cfg-last-sync">Never</span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-danger btn-sm" style="margin-right:auto" onclick="clearAllData()">Reset all data</button>
+      <button class="btn btn-neutral" onclick="closeModal('settings-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="sync-status" id="sync-status"><div class="sync-dot" id="sync-dot"></div><span id="sync-text">—</span></div>
+
+<script>
+// ════════════════════════════════════════
+// CONSTANTS
+// ════════════════════════════════════════
+const DAYS=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const SLOT_H=44;
+const ALL_TIMES=[];
+for(let h=9;h<21;h++){ALL_TIMES.push(`${String(h).padStart(2,'0')}:00`);ALL_TIMES.push(`${String(h).padStart(2,'0')}:30`);}
+
+const NAT_FLAGS={'Spanish':'🇪🇸','Ukrainian':'🇺🇦','Russian':'🇷🇺','Italian':'🇮🇹','Irish':'🇮🇪','British':'🇬🇧','French':'🇫🇷','German':'🇩🇪','Brazilian':'🇧🇷','Mexican':'🇲🇽','Argentinian':'🇦🇷','Polish':'🇵🇱','Chinese':'🇨🇳','Japanese':'🇯🇵','Iranian':'🇮🇷','Turkish':'🇹🇷','Hungarian':'🇭🇺','Swedish':'🇸🇪','Dutch':'🇳🇱','Portuguese':'🇵🇹','Romanian':'🇷🇴','Greek':'🇬🇷','Czech':'🇨🇿','Croatian':'🇭🇷','Slovak':'🇸🇰'};
+const AC=['#2176FF','#EF233C','#FF9100','#1DD3B0','#8E24AA','#E64A19','#43A047','#0277BD'];
+function getAC(n){let s=0;for(let c of n)s+=c.charCodeAt(0);return AC[s%AC.length];}
+function getInits(n){return n.trim().split(/\s+/).map(w=>w[0]).join('').substring(0,2).toUpperCase();}
+
+const COLOURS=[
+  {id:'sky',bg:'#4A90D9',text:'#fff',label:'Sky (B2)'},
+  {id:'cobalt',bg:'#2176FF',text:'#fff',label:'Cobalt'},
+  {id:'teal',bg:'#2EC4B6',text:'#fff',label:'Sea/Teal (FCE/CAE)'},
+  {id:'mint',bg:'#5DDEA0',text:'#1A1A2E',label:'Mint'},
+  {id:'violet',bg:'#9B72CF',text:'#fff',label:'Lavender (C1)'},
+  {id:'purple',bg:'#6A1B9A',text:'#fff',label:'Purple'},
+  {id:'coral',bg:'#FF6B6B',text:'#fff',label:'Coral (A)'},
+  {id:'red',bg:'#EF233C',text:'#fff',label:'Red'},
+  {id:'sun',bg:'#FFB347',text:'#1A1A2E',label:'Sun (C2)'},
+  {id:'orange',bg:'#FF9100',text:'#fff',label:'Orange'},
+  {id:'lime',bg:'#7CB342',text:'#fff',label:'Lime (B1)'},
+  {id:'green',bg:'#43A047',text:'#fff',label:'Green'},
+  {id:'navy',bg:'#0F3460',text:'#49B6FF',label:'Navy'},
+  {id:'dark',bg:'#1A1A2E',text:'#FFB347',label:'Dark (CPE)'},
+  {id:'slate',bg:'#5A6472',text:'#fff',label:'Slate'},
+  {id:'rose',bg:'#D81B60',text:'#fff',label:'Rose'},
+];
+const LEVEL_CLR={A1:'coral',A2:'coral',B1:'lime',B2:'sky',C1:'violet',C2:'sun',FCE:'teal',CAE:'teal',CPE:'dark'};
+
+// ════════════════════════════════════════
+// CONFIG (stored in localStorage)
+// ════════════════════════════════════════
+function getCfg(){return JSON.parse(localStorage.getItem('jpe_cfg')||'{}');}
+function setCfg(o){localStorage.setItem('jpe_cfg',JSON.stringify(o));}
+
+// ════════════════════════════════════════
+// STARTUP — password gate + setup
+// ════════════════════════════════════════
+function boot(){
+  const cfg=getCfg();
+  if(!cfg.password){
+    // First time — show setup wizard
+    document.getElementById('setup-screen').style.display='flex';
+    return;
+  }
+  // Check session auth
+  if(sessionStorage.getItem('jpe_authed')!==cfg.password){
+    const ls=document.getElementById('login-screen');
+    ls.style.display='flex';
+    setTimeout(()=>document.getElementById('login-pass').focus(),100);
+    return;
+  }
+  launch();
+}
+
+function doLogin(){
+  const cfg=getCfg();
+  const v=document.getElementById('login-pass').value;
+  if(v===cfg.password){
+    sessionStorage.setItem('jpe_authed',v);
+    document.getElementById('login-screen').style.display='none';
+    launch();
+  } else {
+    document.getElementById('login-error').style.display='block';
+    document.getElementById('login-pass').value='';
+    document.getElementById('login-pass').focus();
+  }
+}
+
+// ── SETUP WIZARD ──
+let setupData={};
+function setupStep1(){
+  const p=document.getElementById('setup-pass').value;
+  const p2=document.getElementById('setup-pass2').value;
+  if(!p){toast('Please choose a password','error');return;}
+  if(p!==p2){toast('Passwords do not match','error');return;}
+  setupData.password=p;
+  gotoStep(2);
+}
+function setupStep2(){
+  const user=document.getElementById('setup-user').value.trim();
+  const repo=document.getElementById('setup-repo').value.trim();
+  if(!user||!repo){toast('Username and repo are required','error');return;}
+  setupData.ghUser=user;
+  setupData.ghRepo=repo;
+  setupData.ghPath=document.getElementById('setup-path').value.trim()||'admin/tracker-data.json';
+  gotoStep(3);
+}
+async function setupStep3(){
+  const token=document.getElementById('setup-token').value.trim();
+  if(!token){toast('Token is required','error');return;}
+  setupData.ghToken=token;
+  // Test the token
+  const btn=document.querySelector('#step-3 .btn-primary');
+  btn.textContent='Testing…';btn.disabled=true;
+  const ok=await testGitHub(setupData.ghUser,setupData.ghRepo,setupData.ghToken);
+  btn.textContent='✓ Save & Start';btn.disabled=false;
+  if(!ok){toast('Could not connect to GitHub — check your username, repo, and token','error');return;}
+  setCfg(setupData);
+  sessionStorage.setItem('jpe_authed',setupData.password);
+  document.getElementById('setup-screen').style.display='none';
+  launch();
+}
+function gotoStep(n){
+  document.querySelectorAll('.setup-step').forEach((s,i)=>{
+    s.classList.toggle('active',i===n-1);
+    const dot=document.getElementById(`dot-${i+1}`);
+    if(dot){dot.className='step-dot'+(i<n-1?' done':i===n-1?' active':'');}
+  });
+}
+
+// ════════════════════════════════════════
+// LAUNCH — load data then show UI
+// ════════════════════════════════════════
+async function launch(){
+  document.getElementById('main-header').style.display='flex';
+  document.getElementById('main-content').style.display='block';
+  setSyncStatus('busy','Loading from GitHub…');
+  await loadFromGitHub();
+  renderStudents();
+}
+
+// ════════════════════════════════════════
+// GITHUB SYNC
+// ════════════════════════════════════════
+let ghSha=null; // current SHA of the data file on GitHub
+let syncTimer=null;
+let pendingSync=false;
+
+function ghApiUrl(){
+  const c=getCfg();
+  return `https://api.github.com/repos/${c.ghUser}/${c.ghRepo}/contents/${c.ghPath}`;
+}
+
+async function testGitHub(user,repo,token){
+  try{
+    const r=await fetch(`https://api.github.com/repos/${user}/${repo}`,{
+      headers:{Authorization:`token ${token}`,Accept:'application/vnd.github.v3+json'}
+    });
+    return r.ok;
+  }catch{return false;}
+}
+
+async function loadFromGitHub(){
+  const cfg=getCfg();
+  if(!cfg.ghToken){setSyncStatus('err','No GitHub token');loadFromLocal();return;}
+  try{
+    setSyncBar('syncing');
+    const r=await fetch(ghApiUrl(),{
+      headers:{Authorization:`token ${cfg.ghToken}`,Accept:'application/vnd.github.v3+json'}
+    });
+    if(r.status===404){
+      // File doesn't exist yet — use seed data and create it
+      loadSeedData();
+      await pushToGitHub('Initial data');
+      setSyncStatus('ok','Ready');
+    } else if(r.ok){
+      const json=await r.json();
+      ghSha=json.sha;
+      const data=JSON.parse(atob(json.content.replace(/\n/g,'')));
+      students=data.students||[];
+      lessons=data.lessons||[];
+      groups=data.groups||[];
+      setSyncStatus('ok',`Loaded · ${new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}`);
+      localStorage.setItem('jpe_cfg',JSON.stringify({...cfg,lastSync:new Date().toISOString()}));
+    } else {
+      throw new Error(`HTTP ${r.status}`);
+    }
+  } catch(e){
+    console.error('GitHub load error',e);
+    setSyncStatus('err','GitHub error — using local cache');
+    loadFromLocal();
+  }
+  setSyncBar('');
+}
+
+async function pushToGitHub(msg='Update'){
+  const cfg=getCfg();
+  if(!cfg.ghToken){setSyncStatus('err','No token');return false;}
+  try{
+    setSyncBar('syncing');
+    setSyncStatus('busy','Saving…');
+    const content=btoa(unescape(encodeURIComponent(JSON.stringify({students,lessons,groups},null,2))));
+    const body={message:msg,content};
+    if(ghSha) body.sha=ghSha;
+    const r=await fetch(ghApiUrl(),{
+      method:'PUT',
+      headers:{Authorization:`token ${cfg.ghToken}`,Accept:'application/vnd.github.v3+json','Content-Type':'application/json'},
+      body:JSON.stringify(body)
+    });
+    if(r.ok){
+      const j=await r.json();
+      ghSha=j.content.sha;
+      const t=new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+      setSyncStatus('ok',`Saved · ${t}`);
+      localStorage.setItem('jpe_cfg',JSON.stringify({...cfg,lastSync:new Date().toISOString()}));
+      setSyncBar('');
+      return true;
+    } else {
+      const err=await r.json();
+      throw new Error(err.message||`HTTP ${r.status}`);
+    }
+  } catch(e){
+    console.error('GitHub push error',e);
+    setSyncStatus('err',`Save failed: ${e.message}`);
+    setSyncBar('error');
+    setTimeout(()=>setSyncBar(''),3000);
+    return false;
+  }
+}
+
+// Debounced auto-save — waits 2s after last change before pushing
+function scheduleSave(){
+  pendingSync=true;
+  setSyncStatus('busy','Unsaved changes…');
+  clearTimeout(syncTimer);
+  syncTimer=setTimeout(()=>{pushToGitHub('Auto-save');pendingSync=false;},2000);
+}
+
+function syncNow(){
+  clearTimeout(syncTimer);
+  pushToGitHub('Manual save');
+  pendingSync=false;
+}
+
+function setSyncBar(state){
+  const bar=document.getElementById('sync-bar');
+  bar.className=state?`${state}`:'';
+}
+function setSyncStatus(state,text){
+  const el=document.getElementById('sync-status');
+  const dot=document.getElementById('sync-dot');
+  const txt=document.getElementById('sync-text');
+  const lbl=document.getElementById('sync-label');
+  txt.textContent=text;
+  dot.className='sync-dot '+(state==='ok'?'ok':state==='err'?'err':'busy');
+  if(lbl) lbl.textContent=state==='ok'?'Saved':state==='err'?'Error':'Saving…';
+  el.classList.add('show');
+  if(state==='ok') setTimeout(()=>el.classList.remove('show'),4000);
+}
+
+// ════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════
+let students=[],lessons=[],groups=[];
+
+function loadFromLocal(){
+  students=JSON.parse(localStorage.getItem('jpe_s3')||'null')||[];
+  lessons=JSON.parse(localStorage.getItem('jpe_l3')||'null')||[];
+  groups=JSON.parse(localStorage.getItem('jpe_g1')||'null')||[];
+  if(!students.length) loadSeedData();
+}
+
+function loadSeedData(){
+  students=[
+    {id:1,name:'Maura',nat:'Spanish',level:'C2',status:'current',obj:'Conversation & fluency',avail:'Tue 09:00',email:'',tg:'',notes:'Tuesday morning group'},
+    {id:2,name:'Maria (Tue)',nat:'Spanish',level:'C2',status:'current',obj:'Conversation',avail:'Tue 09:00',email:'',tg:'',notes:'Tuesday morning group'},
+    {id:3,name:'Eva',nat:'Spanish',level:'C2',status:'current',obj:'Conversation',avail:'Tue 09:00',email:'',tg:'',notes:'Tuesday morning group'},
+    {id:4,name:'Nieves',nat:'Spanish',level:'C1',status:'current',obj:'Conversation',avail:'Wed 09:30',email:'',tg:'',notes:'Wednesday morning group'},
+    {id:5,name:'Nataly',nat:'Ukrainian',level:'C1',status:'current',obj:'Conversation',avail:'Wed 09:30',email:'',tg:'',notes:'Wednesday morning group'},
+    {id:6,name:'Julia (Wed)',nat:'Ukrainian',level:'C1',status:'current',obj:'Conversation',avail:'Wed 09:30',email:'',tg:'',notes:'Wednesday morning group'},
+    {id:7,name:'Tania',nat:'Spanish',level:'C2',status:'current',obj:'CPE Exam Prep',avail:'Wed 16:00',email:'',tg:'',notes:'CPE group'},
+    {id:8,name:'Cristina',nat:'Spanish',level:'C2',status:'current',obj:'CPE Exam Prep',avail:'Wed 16:00',email:'',tg:'',notes:'CPE group'},
+    {id:9,name:'Raquel (CPE)',nat:'Spanish',level:'CPE',status:'current',obj:'CPE Exam',avail:'Wed 16:00',email:'',tg:'',notes:'CPE group'},
+    {id:10,name:'Mireia',nat:'Spanish',level:'C1',status:'current',obj:'Conversation',avail:'Wed 18:30',email:'',tg:'',notes:'Wed evening group'},
+    {id:11,name:'Patri',nat:'Spanish',level:'C1',status:'current',obj:'Conversation',avail:'Wed 18:30',email:'',tg:'',notes:'Wed evening group'},
+    {id:12,name:'Vika',nat:'Ukrainian',level:'B2',status:'current',obj:'Conversation',avail:'Thu 09:30',email:'',tg:'',notes:'Thu morning Ukrainian group'},
+    {id:13,name:'Kate',nat:'Ukrainian',level:'B2',status:'current',obj:'Conversation',avail:'Thu 09:30',email:'',tg:'',notes:'Thu morning Ukrainian group'},
+    {id:14,name:'Marina (Thu)',nat:'Russian',level:'C1',status:'current',obj:'Conversation',avail:'Thu 17:00',email:'',tg:'',notes:'Thursday Russian group'},
+    {id:15,name:'Ivanna',nat:'Ukrainian',level:'B2',status:'current',obj:'Conversation',avail:'Thu 19:00',email:'',tg:'',notes:'Thu evening Ukrainian group'},
+    {id:16,name:'Veronika',nat:'Ukrainian',level:'B2',status:'current',obj:'Conversation',avail:'Thu 19:00',email:'',tg:'',notes:'Thu evening Ukrainian group'},
+    {id:17,name:'Irene',nat:'Spanish',level:'B2',status:'current',obj:'B2/C1 conversational English',avail:'Fri 09:00',email:'',tg:'',notes:'Friday morning pair'},
+    {id:18,name:'Elisabet',nat:'Spanish',level:'B2',status:'current',obj:'B2/C1 general English',avail:'Fri 09:00',email:'',tg:'',notes:'Friday morning pair'},
+    {id:19,name:'Galya',nat:'Ukrainian',level:'B1',status:'current',obj:'General English',avail:'Mon 17:30',email:'',tg:'',notes:'Monday afternoon Ukrainian group'},
+    {id:20,name:'Svitlana',nat:'Ukrainian',level:'B1',status:'current',obj:'General English',avail:'Mon 17:30',email:'',tg:'',notes:'Monday afternoon Ukrainian group'},
+    {id:21,name:'Liudmyla',nat:'Ukrainian',level:'B1',status:'current',obj:'General English',avail:'Mon 17:30',email:'',tg:'',notes:'Monday afternoon Ukrainian group'},
+    {id:22,name:'Mahta',nat:'Iranian',level:'C2',status:'current',obj:'Monday Madness',avail:'Mon 19:00',email:'',tg:'',notes:'Monday Madness C2 group'},
+    {id:23,name:'Marta',nat:'Spanish',level:'C2',status:'current',obj:'Monday Madness',avail:'Mon 19:00',email:'',tg:'',notes:'Monday Madness C2 group'},
+    {id:24,name:'Alessandra',nat:'Italian',level:'C2',status:'current',obj:'Monday Madness',avail:'Mon 19:00',email:'',tg:'',notes:'Monday Madness C2 group'},
+    {id:25,name:'Oksana',nat:'Ukrainian',level:'C2',status:'current',obj:'CPE / advanced conversation',avail:'Sun 10:00',email:'',tg:'',notes:'Sunday C2 group'},
+    {id:26,name:'Tatiana',nat:'Ukrainian',level:'C2',status:'current',obj:'Advanced conversation',avail:'Sun 10:00',email:'',tg:'',notes:'Sunday C2 group'},
+    {id:27,name:'Manuel',nat:'Spanish',level:'B2',status:'current',obj:'Business English / Pitching',avail:'Tue private',email:'',tg:'',notes:'Marketing — Ratio startup — 1:1'},
+    {id:28,name:'Federica',nat:'Italian',level:'B2',status:'current',obj:'Business / HR English',avail:'TBC',email:'',tg:'',notes:'Italian HR professional — 1:1'},
+    {id:29,name:'Francesca',nat:'Italian',level:'C1',status:'current',obj:'CAE Exam Prep',avail:'TBC',email:'',tg:'',notes:'Italian C1 — CAE prep'},
+    {id:30,name:'Arturo',nat:'Italian',level:'C1',status:'current',obj:'Speaking & Grammar',avail:'TBC',email:'',tg:'',notes:'Italian C1 individual'},
+    {id:31,name:'Candidate A',nat:'Spanish',level:'B1',status:'prospective',obj:'General English',avail:'Evenings',email:'',tg:'',notes:'Enquired via website'},
+    {id:32,name:'Candidate B',nat:'Ukrainian',level:'B2',status:'prospective',obj:'Exam prep interest',avail:'TBC',email:'',tg:'',notes:'Referred by Galya'},
+  ];
+  lessons=[
+    {id:1,day:'Monday',start:'09:00',duration:90,level:'C1',colour:'purple',name:'Raquel, Cayetana, Ana, Pino',notes:'Mon 09:00 group'},
+    {id:2,day:'Monday',start:'17:30',duration:90,level:'B1',colour:'lime',name:'Galya, Svitlana, Liudmyla',notes:'Ukrainian group'},
+    {id:3,day:'Monday',start:'19:00',duration:90,level:'C2',colour:'sun',name:'Monday Madness — Mahta, Marta, Su, Alessandra',notes:'C2 conversation'},
+    {id:4,day:'Tuesday',start:'09:00',duration:60,level:'C2',colour:'sun',name:'Maura, Maria, Eva',notes:'C2 conversation'},
+    {id:5,day:'Tuesday',start:'11:00',duration:60,level:'B2',colour:'sky',name:'Manuel',notes:'1:1 — Business/Pitching'},
+    {id:6,day:'Wednesday',start:'09:30',duration:90,level:'C1',colour:'violet',name:'Nieves, Nataly, Julia, Natalia',notes:'Wed morning group'},
+    {id:7,day:'Wednesday',start:'16:00',duration:90,level:'CPE',colour:'dark',name:'Tania, Cristina, Raquel',notes:'CPE Exam prep'},
+    {id:8,day:'Wednesday',start:'18:30',duration:90,level:'C1',colour:'violet',name:'Mireia, Patri, Sonsoles, La Patri',notes:'Wed evening group'},
+    {id:9,day:'Thursday',start:'09:30',duration:90,level:'B2',colour:'sky',name:'Vika, Kate, Maria, Julia',notes:'Ukrainian Thu morning'},
+    {id:10,day:'Thursday',start:'17:00',duration:90,level:'C1',colour:'teal',name:'Marina, Katherine, Masha, Evgenia',notes:'Russian Thursday group'},
+    {id:11,day:'Thursday',start:'19:00',duration:90,level:'B2',colour:'cobalt',name:'Ivanna, Veronika, Julia, Anhelina',notes:'Ukrainian Thu evening'},
+    {id:12,day:'Friday',start:'09:00',duration:60,level:'B2',colour:'sky',name:'Irene, Elisabet',notes:'Fri morning pair'},
+    {id:13,day:'Sunday',start:'10:00',duration:90,level:'C2',colour:'sun',name:'Oksana, Tatiana, Olesya, Daria',notes:'Sunday C2 group'},
+  ];
+  groups=[
+    {id:1,name:'CPE Group — Wed 16:00',level:'CPE',slot:'Wed 16:00',start:'2025-09-15',end:'2026-06-30',members:['Tania','Cristina','Raquel (CPE)'],notes:'Cambridge C2 Proficiency exam prep.',payments:[]},
+    {id:2,name:'Monday Madness — Mon 19:00',level:'C2',slot:'Mon 19:00',start:'2025-09-08',end:'2026-06-23',members:['Mahta','Marta','Su','Alessandra'],notes:'Advanced C2 conversation group.',payments:[]},
+    {id:3,name:'Ukrainian Thu Morning — Thu 09:30',level:'B2',slot:'Thu 09:30',start:'2025-09-11',end:'2026-06-25',members:['Vika','Kate','Maria','Julia'],notes:'B2 conversation and grammar.',payments:[]},
+    {id:4,name:'Sunday C2 — Sun 10:00',level:'C2',slot:'Sun 10:00',start:'2025-09-14',end:'2026-06-28',members:['Oksana','Tatiana','Olesya','Daria'],notes:'C2 advanced conversation.',payments:[]},
+  ];
+}
+
+// All saves go through this — writes to GitHub (debounced) + local cache
+function saveAll(){
+  localStorage.setItem('jpe_s3',JSON.stringify(students));
+  localStorage.setItem('jpe_l3',JSON.stringify(lessons));
+  localStorage.setItem('jpe_g1',JSON.stringify(groups));
+  scheduleSave();
+}
+
+// ════════════════════════════════════════
+// TOAST
+// ════════════════════════════════════════
+function toast(msg,type='success'){
+  const t=document.getElementById('toast');
+  t.className=`toast ${type}`;t.innerHTML=(type==='success'?'✓':type==='info'?'ℹ':'✕')+' '+msg;
+  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+// ════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════
+function switchView(v){
+  document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(x=>x.classList.remove('active'));
+  document.getElementById(`view-${v}`).classList.add('active');
+  document.querySelector(`.nav-tab[onclick*="${v}"]`).classList.add('active');
+  const btn=document.getElementById('header-add-btn');
+  if(v==='schedule'){btn.textContent='+ Add Lesson';btn.onclick=()=>openAddLesson();}
+  else if(v==='groups'){btn.textContent='+ Add Group';btn.onclick=()=>openAddGroup();renderGroups();}
+  else{btn.textContent='+ Add Student';btn.onclick=()=>openAddStudent();}
+  if(v==='schedule') renderSchedule();
+}
+
+// ════════════════════════════════════════
+// STUDENTS
+// ════════════════════════════════════════
+let curTab='current';
+function setStudentTab(tab){
+  curTab=tab;
+  document.querySelectorAll('.student-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(`tab-${tab}`).classList.add('active');
+  renderStudents();
+}
+
+function renderStudents(){
+  const q=document.getElementById('student-search').value.toLowerCase();
+  const fL=document.getElementById('filter-level').value;
+  const fN=document.getElementById('filter-nat').value;
+  document.getElementById('cnt-current').textContent=students.filter(s=>s.status!=='prospective').length;
+  document.getElementById('cnt-prospective').textContent=students.filter(s=>s.status==='prospective').length;
+  let list=students.filter(s=>{
+    const sm=curTab==='prospective'?s.status==='prospective':s.status!=='prospective';
+    return sm&&(!q||[s.name,s.nat,s.obj].some(x=>(x||'').toLowerCase().includes(q)))&&(!fL||s.level===fL)&&(!fN||s.nat===fN);
+  });
+  document.getElementById('stat-total').textContent=students.filter(s=>s.status!=='prospective').length;
+  document.getElementById('stat-advanced').textContent=students.filter(s=>s.status!=='prospective'&&['C1','C2','CPE'].includes(s.level)).length;
+  document.getElementById('stat-intermediate').textContent=students.filter(s=>s.status!=='prospective'&&['B1','B2','FCE','CAE'].includes(s.level)).length;
+  document.getElementById('stat-exam').textContent=students.filter(s=>['CPE','CAE','FCE'].includes(s.level)).length;
+  document.getElementById('stat-prospect').textContent=students.filter(s=>s.status==='prospective').length;
+  document.getElementById('student-count-label').textContent=`Showing ${list.length} ${curTab} student${list.length!==1?'s':''}`;
+  const nats=[...new Set(students.map(s=>s.nat).filter(Boolean))].sort();
+  const fns=document.getElementById('filter-nat');const cv=fns.value;
+  fns.innerHTML='<option value="">All Nationalities</option>'+nats.map(n=>`<option${n===cv?' selected':''}>${n}</option>`).join('');
+  const tbody=document.getElementById('students-tbody');
+  if(!list.length){tbody.innerHTML=`<tr><td colspan="9" style="text-align:center;padding:48px;color:var(--grey)">No students found. <button class="btn btn-primary btn-sm" style="margin-left:10px" onclick="openAddStudent()">+ Add</button></td></tr>`;return;}
+  tbody.innerHTML=list.map(s=>{
+    const flag=NAT_FLAGS[s.nat]||'🌍';
+    const tg=s.tg?`<a class="tg-link" href="${s.tg.startsWith('http')?s.tg:'https://t.me/'+s.tg.replace('@','')}" target="_blank" onclick="event.stopPropagation()"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248l-2.04 9.613c-.154.69-.555.858-1.124.534l-3.1-2.285-1.495 1.438c-.165.165-.305.305-.627.305l.224-3.165 5.77-5.21c.25-.223-.055-.348-.39-.125l-7.131 4.49-3.07-.957c-.667-.21-.68-.667.14-.987l11.99-4.622c.556-.2 1.042.136.853.971z"/></svg>${s.tg.includes('/')?'Telegram':s.tg}</a>`:`<span style="color:#ddd;font-size:11px">—</span>`;
+    const em=s.email?`<a href="mailto:${s.email}" style="color:var(--ws-sky);font-size:12px;font-weight:600;text-decoration:none" onclick="event.stopPropagation()">${s.email}</a>`:`<span style="color:#ddd;font-size:11px">—</span>`;
+    return `<tr data-sid="${s.id}">
+      <td><div class="cell-view" onclick="startCE(this.parentNode,'name',${s.id})"><div class="s-name-wrap"><div class="avatar" style="background:${getAC(s.name)}">${getInits(s.name)}</div>${s.name}</div></div><div class="cell-edit-wrap"></div></td>
+      <td><div class="cell-view" onclick="startCE(this.parentNode,'nat',${s.id})"><span style="font-size:17px">${flag}</span>&nbsp;<span style="font-size:12px;color:var(--grey)">${s.nat||'—'}</span></div><div class="cell-edit-wrap"></div></td>
+      <td><div class="cell-view" onclick="startCE(this.parentNode,'level',${s.id})"><span class="level-badge level-${s.level||''}">${s.level||'—'}</span></div><div class="cell-edit-wrap"></div></td>
+      <td style="max-width:170px"><div class="cell-view" style="font-size:12px;color:var(--grey);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" onclick="startCE(this.parentNode,'obj',${s.id})">${s.obj||'—'}</div><div class="cell-edit-wrap"></div></td>
+      <td><div class="cell-view" style="font-size:12px;color:var(--grey)" onclick="startCE(this.parentNode,'avail',${s.id})">${s.avail||'—'}</div><div class="cell-edit-wrap"></div></td>
+      <td style="max-width:180px"><div class="cell-view" style="font-size:12px;color:var(--grey);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" onclick="startCE(this.parentNode,'notes',${s.id})">${s.notes||'—'}</div><div class="cell-edit-wrap"></div></td>
+      <td><div class="cell-view" onclick="startCE(this.parentNode,'email',${s.id})">${em}</div><div class="cell-edit-wrap"></div></td>
+      <td><div class="cell-view" onclick="startCE(this.parentNode,'tg',${s.id})">${tg}</div><div class="cell-edit-wrap"></div></td>
+      <td><div class="cell-view" style="gap:5px;justify-content:center"><button class="btn-icon" onclick="openEditStudent(${s.id})" title="Edit">✏️</button><button class="btn-icon" onclick="delStudent(${s.id})" title="Delete">🗑️</button></div></td>
+    </tr>`;
+  }).join('');
+}
+
+// Inline editing
+let activeCell=null;
+function startCE(td,field,id){
+  if(td.classList.contains('is-editing'))return;
+  if(activeCell)cancelCE(activeCell);
+  const s=students.find(x=>x.id===id);if(!s)return;
+  activeCell=td;td.classList.add('is-editing');
+  const wrap=td.querySelector('.cell-edit-wrap');
+  const v=(s[field]||'').replace(/"/g,'&quot;');
+  let inp='';
+  if(field==='level'){inp=`<select onkeydown="ek(event,this,'${field}',${id})"><option value="">—</option>${['A1','A2','B1','B2','C1','C2','FCE','CAE','CPE'].map(l=>`<option${s.level===l?' selected':''}>${l}</option>`).join('')}</select>`;}
+  else if(field==='notes'){inp=`<textarea rows="2" onkeydown="ek(event,this,'${field}',${id})">${s[field]||''}</textarea>`;}
+  else{inp=`<input type="text" value="${v}" onkeydown="ek(event,this,'${field}',${id})">`;}
+  wrap.innerHTML=inp+`<button class="ce-save" onclick="commitCE('${field}',${id})">✓</button><button class="ce-cancel" onclick="cancelCEById(${id})">✕</button>`;
+  const el=wrap.querySelector('input,select,textarea');el.focus();if(el.tagName==='INPUT')el.select();
+}
+function ek(e,el,field,id){if(e.key==='Enter'&&el.tagName!=='TEXTAREA')commitCE(field,id);if(e.key==='Escape')cancelCEById(id);}
+function commitCE(field,id){
+  const td=document.querySelector(`tr[data-sid='${id}'] td.is-editing`);if(!td)return;
+  const el=td.querySelector('input,select,textarea');if(!el)return;
+  const idx=students.findIndex(s=>s.id===id);if(idx===-1)return;
+  students[idx][field]=el.value.trim();
+  saveAll();activeCell=null;renderStudents();toast('Saved ✓');
+}
+function cancelCEById(id){const td=document.querySelector(`tr[data-sid='${id}'] td.is-editing`);if(td)cancelCE(td);}
+function cancelCE(td){td.classList.remove('is-editing');activeCell=null;renderStudents();}
+document.addEventListener('click',e=>{if(activeCell&&!activeCell.contains(e.target))cancelCE(activeCell);});
+
+// Student modal
+let editSId=null;
+function openAddStudent(){editSId=null;document.getElementById('student-modal-title').textContent='Add Student';['s-name','s-nat','s-obj','s-avail','s-email','s-tg','s-notes'].forEach(i=>document.getElementById(i).value='');document.getElementById('s-level').value='';document.getElementById('s-status').value=curTab==='prospective'?'prospective':'current';openModal('student-modal');}
+function openEditStudent(id){const s=students.find(x=>x.id===id);if(!s)return;editSId=id;document.getElementById('student-modal-title').textContent='Edit Student';document.getElementById('s-name').value=s.name||'';document.getElementById('s-nat').value=s.nat||'';document.getElementById('s-level').value=s.level||'';document.getElementById('s-status').value=s.status||'current';document.getElementById('s-obj').value=s.obj||'';document.getElementById('s-avail').value=s.avail||'';document.getElementById('s-email').value=s.email||'';document.getElementById('s-tg').value=s.tg||'';document.getElementById('s-notes').value=s.notes||'';openModal('student-modal');}
+function saveStudent(){
+  const name=document.getElementById('s-name').value.trim();if(!name){toast('Name required','error');return;}
+  const s={id:editSId||Date.now(),name,nat:document.getElementById('s-nat').value.trim(),level:document.getElementById('s-level').value,status:document.getElementById('s-status').value||'current',obj:document.getElementById('s-obj').value.trim(),avail:document.getElementById('s-avail').value.trim(),email:document.getElementById('s-email').value.trim(),tg:document.getElementById('s-tg').value.trim(),notes:document.getElementById('s-notes').value.trim()};
+  if(editSId){students[students.findIndex(x=>x.id===editSId)]=s;toast('Student updated ✓');}else{students.push(s);toast('Student added ✓');}
+  saveAll();renderStudents();closeModal('student-modal');
+}
+function delStudent(id){if(!confirm('Delete this student?'))return;students=students.filter(s=>s.id!==id);saveAll();renderStudents();toast('Student deleted');}
+
+// ════════════════════════════════════════
+// GROUPS
+// ════════════════════════════════════════
+function renderGroups(){
+  const con=document.getElementById('groups-container');
+  if(!groups.length){con.innerHTML=`<div class="empty-groups"><div style="font-size:48px;margin-bottom:12px">👥</div><div style="font-size:18px;font-weight:700;margin-bottom:6px">No groups yet</div><div style="font-size:13px;margin-bottom:20px;color:var(--grey)">Add a group to track payments and course dates.</div><button class="btn btn-primary" onclick="openAddGroup()">+ Add Group</button></div>`;return;}
+  con.innerHTML=`<div class="groups-grid">${groups.map(g=>groupCardHTML(g)).join('')}</div>`;
+}
+function groupCardHTML(g){
+  const today=new Date();today.setHours(0,0,0,0);
+  const startD=g.start?new Date(g.start):null;const endD=g.end?new Date(g.end):null;
+  let progressHTML='';
+  if(startD&&endD){const total=endD-startD;const elapsed=Math.min(Math.max(today-startD,0),total);const pct=total>0?Math.round((elapsed/total)*100):0;const dl=Math.ceil((endD-today)/(1000*60*60*24));const dls=dl>0?`${dl}d left`:dl===0?'Ends today':'Ended';progressHTML=`<div class="progress-bar-wrap"><div class="progress-bar-track"><div class="progress-bar-fill" style="width:${pct}%"></div></div></div><span style="font-size:11px;font-weight:700;color:${dl<14&&dl>=0?'#c94040':dl<0?'#aaa':'var(--ws-sea)'};white-space:nowrap">${dls}</span>`;}
+  const fd=d=>{if(!d)return'—';return new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});};
+  const payRows=(g.members||[]).map(name=>{
+    const paid=(g.payments||[]).filter(p=>p.member===name).sort((a,b)=>new Date(b.date)-new Date(a.date));
+    const last=paid[0];
+    const hist=paid.map(p=>`<tr class="pay-history-row"><td colspan="2"></td><td>${fd(p.date)}</td><td>€${p.amount}</td><td style="color:var(--grey)">${p.notes||''}</td><td><button class="btn-icon" style="font-size:10px;padding:2px 5px" onclick="delPayment(${g.id},'${name}',${p.id})">✕</button></td></tr>`).join('');
+    return `<tr><td style="font-weight:600">${name}</td><td><span class="pay-status ${last?'pay-paid':'pay-unpaid'}">${last?'Paid':'Unpaid'}</span></td><td style="color:var(--grey);font-size:12px">${last?fd(last.date):'—'}</td><td style="font-weight:600">${last?`€${last.amount}`:'—'}</td><td><button class="add-pay-btn" onclick="openPaymentModal(${g.id},'${name}')">+ Log payment</button></td><td></td></tr>${hist}`;
+  }).join('');
+  return `<div class="group-card"><div class="group-card-header"><div><div class="group-card-title">${g.name}</div><div class="group-card-meta">${g.level?`<span class="level-badge level-${g.level}" style="font-size:10px">${g.level}</span>`:''} ${g.slot?`<span class="group-meta-pill">📅 ${g.slot}</span>`:''}<span class="group-meta-pill">👥 ${(g.members||[]).length} student${(g.members||[]).length!==1?'s':''}</span></div></div><button class="btn-icon" onclick="openEditGroup(${g.id})">✏️</button></div><div class="group-dates-bar"><div class="gd-item"><span class="gd-label">Start</span><span class="gd-val">${fd(g.start)}</span></div><div class="gd-item"><span class="gd-label">End</span><span class="gd-val">${fd(g.end)}</span></div>${progressHTML}</div><table class="pay-table"><thead><tr><th>Student</th><th>Status</th><th>Last Paid</th><th>Amount</th><th>Action</th><th style="width:40px"></th></tr></thead><tbody>${payRows}</tbody></table>${g.notes?`<div class="group-notes-row">📝 ${g.notes}</div>`:''}</div>`;
+}
+let editGId=null;
+function openAddGroup(){editGId=null;document.getElementById('group-modal-title').textContent='Add Group';document.getElementById('group-delete-btn').style.display='none';['g-name','g-slot','g-notes'].forEach(i=>document.getElementById(i).value='');document.getElementById('g-level').value='';document.getElementById('g-start').value='';document.getElementById('g-end').value='';document.getElementById('g-members').value='';openModal('group-modal');}
+function openEditGroup(id){const g=groups.find(x=>x.id===id);if(!g)return;editGId=id;document.getElementById('group-modal-title').textContent='Edit Group';document.getElementById('group-delete-btn').style.display='inline-flex';document.getElementById('g-name').value=g.name||'';document.getElementById('g-level').value=g.level||'';document.getElementById('g-slot').value=g.slot||'';document.getElementById('g-start').value=g.start||'';document.getElementById('g-end').value=g.end||'';document.getElementById('g-members').value=(g.members||[]).join(', ');document.getElementById('g-notes').value=g.notes||'';openModal('group-modal');}
+function saveGroup(){
+  const name=document.getElementById('g-name').value.trim();if(!name){toast('Group name required','error');return;}
+  const g={id:editGId||Date.now(),name,level:document.getElementById('g-level').value,slot:document.getElementById('g-slot').value.trim(),start:document.getElementById('g-start').value,end:document.getElementById('g-end').value,members:document.getElementById('g-members').value.split(',').map(m=>m.trim()).filter(Boolean),notes:document.getElementById('g-notes').value.trim(),payments:editGId?(groups.find(x=>x.id===editGId)?.payments||[]):[]};
+  if(editGId){groups[groups.findIndex(x=>x.id===editGId)]=g;toast('Group updated ✓');}else{groups.push(g);toast('Group added ✓');}
+  saveAll();renderGroups();closeModal('group-modal');
+}
+function deleteGroup(){if(!editGId)return;if(!confirm('Delete this group and all payment records?'))return;groups=groups.filter(g=>g.id!==editGId);saveAll();renderGroups();closeModal('group-modal');toast('Group deleted');}
+
+let payGId=null,payMember=null;
+function openPaymentModal(gId,member){payGId=gId;payMember=member;document.getElementById('pay-modal-title').textContent=`Log Payment — ${member}`;document.getElementById('pay-student').value=member;document.getElementById('pay-amount').value='';document.getElementById('pay-date').value=new Date().toISOString().split('T')[0];document.getElementById('pay-notes').value='';openModal('payment-modal');}
+function savePayment(){
+  const amount=document.getElementById('pay-amount').value;const date=document.getElementById('pay-date').value;
+  if(!amount||!date){toast('Amount and date required','error');return;}
+  const idx=groups.findIndex(g=>g.id===payGId);if(idx===-1)return;
+  if(!groups[idx].payments)groups[idx].payments=[];
+  groups[idx].payments.push({id:Date.now(),member:payMember,amount:parseFloat(amount),date,notes:document.getElementById('pay-notes').value.trim()});
+  saveAll();renderGroups();closeModal('payment-modal');toast(`Payment logged for ${payMember} ✓`);
+}
+function delPayment(gId,member,payId){const idx=groups.findIndex(g=>g.id===gId);if(idx===-1)return;groups[idx].payments=groups[idx].payments.filter(p=>p.id!=payId);saveAll();renderGroups();toast('Payment removed');}
+
+// ════════════════════════════════════════
+// SCHEDULE
+// ════════════════════════════════════════
+function clr(l){return COLOURS.find(c=>c.id===(l.colour||LEVEL_CLR[l.level]||'cobalt'))||COLOURS[0];}
+function renderSchedule(){
+  const grid=document.getElementById('schedule-grid');let html='';
+  html+=`<div class="sched-header time-col"></div>`;
+  DAYS.forEach(d=>{const lc=lessons.filter(l=>l.day===d).length;html+=`<div class="sched-header"><div class="sched-day-name">${d}</div><div class="sched-day-sub">${lc} lesson${lc!==1?'s':''}</div></div>`;});
+  for(let sl=0;sl<24;sl++){
+    const h=9+Math.floor(sl/2),m=sl%2===0?'00':'30';const ts=`${String(h).padStart(2,'0')}:${m}`;const isH=sl%2===0;
+    html+=`<div class="sched-time-cell">${isH?ts:''}</div>`;
+    DAYS.forEach(day=>{
+      const dl=lessons.filter(l=>l.day===day);const starting=dl.filter(l=>l.start===ts);
+      html+=`<div class="sched-slot${isH?'':' half'}" onclick="handleSlotClick('${day}','${ts}')">`;
+      starting.forEach(lesson=>{const c=clr(lesson);const hp=(lesson.duration/30)*SLOT_H-6;html+=`<div class="lesson-block" style="top:3px;height:${hp}px;background:${c.bg};color:${c.text}" onclick="event.stopPropagation();openEditLesson(${lesson.id})" title="${lesson.name} — ${lesson.duration}min — ${lesson.level}"><div class="lb-title">${lesson.name}</div><div class="lb-meta">${lesson.start} · ${lesson.duration}min</div><div class="lb-level">${lesson.level}</div></div>`;});
+      html+=`</div>`;
+    });
+  }
+  grid.innerHTML=html;
+  const used=[...new Set(lessons.map(l=>l.colour||LEVEL_CLR[l.level]||'cobalt'))];
+  document.getElementById('sched-legend').innerHTML=used.map(cid=>{const c=COLOURS.find(x=>x.id===cid)||COLOURS[0];const lvls=[...new Set(lessons.filter(l=>(l.colour||LEVEL_CLR[l.level]||'cobalt')===cid).map(l=>l.level))].join('/');return `<div class="legend-item"><div class="legend-dot" style="background:${c.bg}"></div>${lvls||c.label}</div>`;}).join('');
+}
+
+let editLId=null,selClr='cobalt';
+function buildPicker(sel){selClr=sel||'cobalt';document.getElementById('colour-picker').innerHTML=COLOURS.map(c=>`<div class="c-swatch${c.id===selClr?' sel':''}" style="background:${c.bg}" title="${c.label}" onclick="pickClr('${c.id}')">✓</div>`).join('');}
+function pickClr(id){selClr=id;document.querySelectorAll('.c-swatch').forEach(sw=>sw.classList.toggle('sel',sw.title===COLOURS.find(c=>c.id===id)?.label));}
+function syncColour(){const lv=document.getElementById('l-level').value;if(lv&&LEVEL_CLR[lv])buildPicker(LEVEL_CLR[lv]);}
+function populateTimes(){document.getElementById('l-start').innerHTML=ALL_TIMES.map(t=>`<option>${t}</option>`).join('');}
+function openAddLesson(day='',time=''){editLId=null;document.getElementById('lesson-modal-title').textContent='Add Lesson';document.getElementById('lesson-delete-btn').style.display='none';populateTimes();if(day)document.getElementById('l-day').value=day;if(time)document.getElementById('l-start').value=time;document.getElementById('l-duration').value='90';document.getElementById('l-level').value='';document.getElementById('l-name').value='';document.getElementById('l-notes').value='';buildPicker('cobalt');openModal('lesson-modal');}
+function openEditLesson(id){const l=lessons.find(x=>x.id===id);if(!l)return;editLId=id;document.getElementById('lesson-modal-title').textContent='Edit Lesson';document.getElementById('lesson-delete-btn').style.display='inline-flex';populateTimes();document.getElementById('l-day').value=l.day;document.getElementById('l-start').value=l.start;document.getElementById('l-duration').value=l.duration;document.getElementById('l-level').value=l.level;document.getElementById('l-name').value=l.name;document.getElementById('l-notes').value=l.notes||'';buildPicker(l.colour||LEVEL_CLR[l.level]||'cobalt');openModal('lesson-modal');}
+function handleSlotClick(day,time){openAddLesson(day,time);}
+function saveLesson(){
+  const name=document.getElementById('l-name').value.trim();const level=document.getElementById('l-level').value;
+  if(!name){toast('Group/student name required','error');return;}if(!level){toast('Please select a level','error');return;}
+  const l={id:editLId||Date.now(),day:document.getElementById('l-day').value,start:document.getElementById('l-start').value,duration:parseInt(document.getElementById('l-duration').value),level,colour:selClr,name,notes:document.getElementById('l-notes').value.trim()};
+  if(editLId){lessons[lessons.findIndex(x=>x.id===editLId)]=l;toast('Lesson updated ✓');}else{lessons.push(l);toast('Lesson added ✓');}
+  saveAll();renderSchedule();closeModal('lesson-modal');
+}
+function deleteLesson(){if(!editLId)return;if(!confirm('Delete this lesson?'))return;lessons=lessons.filter(l=>l.id!==editLId);saveAll();renderSchedule();closeModal('lesson-modal');toast('Lesson deleted');}
+
+// ════════════════════════════════════════
+// SETTINGS
+// ════════════════════════════════════════
+function openSettings(){
+  const cfg=getCfg();
+  document.getElementById('cfg-user').value=cfg.ghUser||'';
+  document.getElementById('cfg-repo').value=cfg.ghRepo||'';
+  document.getElementById('cfg-path').value=cfg.ghPath||'admin/tracker-data.json';
+  document.getElementById('cfg-token').value=cfg.ghToken||'';
+  document.getElementById('cfg-pass').value='';
+  document.getElementById('cfg-file-url').textContent=cfg.ghUser&&cfg.ghRepo?`github.com/${cfg.ghUser}/${cfg.ghRepo}/${cfg.ghPath||'admin/tracker-data.json'}`:'—';
+  document.getElementById('cfg-last-sync').textContent=cfg.lastSync?new Date(cfg.lastSync).toLocaleString('en-GB'):'Never';
+  openModal('settings-modal');
+}
+function saveSettings(){
+  const cfg=getCfg();
+  const newCfg={...cfg,ghUser:document.getElementById('cfg-user').value.trim(),ghRepo:document.getElementById('cfg-repo').value.trim(),ghPath:document.getElementById('cfg-path').value.trim()||'admin/tracker-data.json',ghToken:document.getElementById('cfg-token').value.trim()||cfg.ghToken};
+  const newPass=document.getElementById('cfg-pass').value;
+  if(newPass) newCfg.password=newPass;
+  setCfg(newCfg);toast('Settings saved ✓');closeModal('settings-modal');
+}
+function clearAllData(){
+  if(!confirm('This will delete ALL student, lesson and group data permanently. Are you sure?'))return;
+  if(!confirm('Really? This cannot be undone.'))return;
+  students=[];lessons=[];groups=[];ghSha=null;
+  saveAll();renderStudents();renderGroups();renderSchedule();closeModal('settings-modal');toast('All data cleared','info');
+}
+
+// ════════════════════════════════════════
+// MODAL HELPERS
+// ════════════════════════════════════════
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(o=>{o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');});});
+
+// ════════════════════════════════════════
+// BOOT
+// ════════════════════════════════════════
+boot();
+</script>
+</body>
+</html>
