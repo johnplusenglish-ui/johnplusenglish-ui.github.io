@@ -165,6 +165,8 @@ td.is-editing .cell-edit-wrap{display:flex;}
 .lb-meta{font-size:9px;font-weight:500;opacity:.8;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .lb-level{position:absolute;top:3px;right:5px;font-size:8px;font-weight:800;opacity:.85;}
 .lb-has-log{position:absolute;bottom:4px;right:5px;width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.7);}
+.lb-classnum{position:absolute;bottom:4px;left:6px;font-size:9px;font-weight:800;opacity:.85;background:rgba(0,0,0,.18);border-radius:4px;padding:1px 5px;line-height:1.4;}
+.log-classnum-badge{display:inline-block;background:var(--cobalt);color:#fff;font-size:10px;font-weight:800;padding:1px 7px;border-radius:10px;margin-right:4px;}
 .lb-no-log{opacity:.7;}
 /* Edit button — shown on hover */
 .lb-edit-btn{position:absolute;bottom:5px;left:6px;background:rgba(0,0,0,.25);border:none;border-radius:4px;color:#fff;font-size:9px;font-weight:700;padding:2px 6px;cursor:pointer;opacity:0;transition:opacity .15s;font-family:'Outfit',sans-serif;line-height:1.4;}
@@ -498,7 +500,19 @@ td.is-editing .cell-edit-wrap{display:flex;}
         <div style="font-size:11px;color:var(--grey);margin-top:6px">Click a name to toggle present / absent</div>
       </div>
 
-      <!-- TOPIC -->
+      <!-- CLASS NUMBER -->
+      <div class="log-section">
+        <div class="log-section-title"><span>🔢</span> Class Number</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="display:flex;align-items:center;gap:6px">
+            <button onclick="adjustClassNum(-1)" style="width:28px;height:28px;border-radius:6px;border:1.5px solid var(--border);background:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;color:var(--dark)">−</button>
+            <input id="log-classnum" type="number" min="1" value="1" style="width:64px;text-align:center;padding:6px 8px;border-radius:var(--radius-sm);border:1.5px solid var(--border);font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;color:var(--dark);outline:none;" onfocus="this.style.borderColor='var(--cobalt)'" onblur="this.style.borderColor='var(--border)'">
+            <button onclick="adjustClassNum(1)" style="width:28px;height:28px;border-radius:6px;border:1.5px solid var(--border);background:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;color:var(--dark)">+</button>
+          </div>
+          <span style="font-size:12px;color:var(--grey)" id="log-classnum-hint">Auto-calculated — override if needed</span>
+        </div>
+      </div>
+
       <div class="log-section">
         <div class="log-section-title"><span>📌</span> Topic / Theme</div>
         <input class="form-input" id="log-topic" placeholder="e.g. Describing change, Use of English open cloze…">
@@ -1078,7 +1092,7 @@ function renderCalendar(){
           <div class="lb-title">${lesson.name.split(',').map(n=>n.trim()).join('<br>')}</div>
           <div class="lb-meta" style="color:${c.text}">${ts} · ${lesson.duration}min</div>
           <div class="lb-level" style="color:${c.text}">${lesson.level}</div>
-          ${hasLog?`<div class="lb-has-log"></div>`:''}
+          ${hasLog?`<div class="lb-has-log" title="Class ${logs[logKey].classNum||'?'}"></div><div class="lb-classnum">#${logs[logKey].classNum||'?'}</div>`:''}
           <button class="lb-edit-btn" onclick="event.stopPropagation();openEditLesson(${lesson.id})" title="Edit lesson">✏ Edit</button>
         </div>`;
       });
@@ -1193,6 +1207,23 @@ function openLogModal(lessonId,dateIso){
   }).join('');
   document.getElementById('log-attendance').innerHTML=attHTML||`<span style="color:var(--grey);font-size:13px">No students linked — add a Group Link to the lesson to enable attendance tracking.</span>`;
 
+  // Class number — count all logs for this lesson sorted by date, find position of current
+  const allLessonLogs=Object.entries(logs)
+    .filter(([k])=>k.startsWith(`${lessonId}_`))
+    .map(([k])=>k.split('_')[1])
+    .sort();
+  const existingClassNum=existing.classNum;
+  let autoClassNum;
+  if(existingClassNum){
+    autoClassNum=existingClassNum;
+  } else {
+    // Next class number = count of existing logs for this lesson + 1
+    autoClassNum=allLessonLogs.length+1;
+  }
+  document.getElementById('log-classnum').value=autoClassNum;
+  document.getElementById('log-classnum-hint').textContent=
+    existingClassNum?'Saved value — edit if needed':'Auto-calculated — override if needed';
+
   // Fields
   document.getElementById('log-topic').value=existing.topic||'';
   document.getElementById('log-pronunciation').value=existing.pronunciation||'';
@@ -1217,7 +1248,7 @@ function openLogModal(lessonId,dateIso){
       const dt=k.split('_')[1];const dd=new Date(dt+'T12:00:00');
       const attendees=Object.entries(v.attendance||{}).filter(([,p])=>p).map(([n])=>n);
       return `<div class="log-history-item">
-        <div class="log-history-date">${dd.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'})}</div>
+        <div class="log-history-date">${v.classNum?`<span class="log-classnum-badge">#${v.classNum}</span> `:''}${dd.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'})}</div>
         <div class="log-history-topic">${v.topic||'<em style="color:var(--grey)">No topic recorded</em>'}</div>
         <div class="log-history-chips">
           ${attendees.map(n=>`<span class="log-history-chip">✓ ${n}</span>`).join('')}
@@ -1233,6 +1264,12 @@ function openLogModal(lessonId,dateIso){
   document.getElementById('log-history-toggle-label').textContent='Show previous logs for this group';
 
   openModal('log-modal');
+}
+
+function adjustClassNum(delta){
+  const inp=document.getElementById('log-classnum');
+  const val=Math.max(1,(parseInt(inp.value)||1)+delta);
+  inp.value=val;
 }
 
 function updateLogLevel(lessonId){
@@ -1287,6 +1324,7 @@ function saveLog(){
     else if(chip.classList.contains('absent'))att[name]=false;
   });
   logs[currentLogKey]={
+    classNum:parseInt(document.getElementById('log-classnum').value)||1,
     attendance:att,
     topic:document.getElementById('log-topic').value.trim(),
     vocab:currentLogVocab,
