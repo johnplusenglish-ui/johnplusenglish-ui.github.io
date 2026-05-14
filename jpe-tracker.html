@@ -1161,7 +1161,15 @@ function openLogModal(lessonId,dateIso){
   // Banner
   document.getElementById('log-date-banner').innerHTML=`
     <strong>${d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</strong>
-    <span class="log-lesson-badge level-badge level-${lesson.level}" style="font-size:11px">${lesson.level}</span>
+    <select id="log-level-select" onchange="updateLogLevel(${lesson.id})" style="
+      background:transparent;border:1.5px solid rgba(255,255,255,.3);border-radius:20px;
+      color:#fff;font-family:'Outfit',sans-serif;font-weight:700;font-size:12px;
+      padding:3px 10px;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;
+      background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2210%22 height=%226%22 viewBox=%220 0 10 6%22><path d=%22M0 0l5 6 5-6z%22 fill=%22rgba(255,255,255,.6)%22/></svg>');
+      background-repeat:no-repeat;background-position:right 8px center;padding-right:22px;
+    ">
+      ${['A1','A2','B1','B2','C1','C2'].map(lv=>`<option value="${lv}"${lv===lesson.level?' selected':''}>${lv}</option>`).join('')}
+    </select>
     <span style="opacity:.7;font-size:12px">${lesson.start} · ${lesson.duration}min</span>
   `;
 
@@ -1225,6 +1233,16 @@ function openLogModal(lessonId,dateIso){
   document.getElementById('log-history-toggle-label').textContent='Show previous logs for this group';
 
   openModal('log-modal');
+}
+
+function updateLogLevel(lessonId){
+  const newLevel=document.getElementById('log-level-select').value;
+  const idx=lessons.findIndex(l=>l.id===lessonId);
+  if(idx===-1)return;
+  lessons[idx].level=newLevel;
+  saveAll();
+  renderCalendar();
+  toast(`Level updated to ${newLevel} ✓`);
 }
 
 function toggleAtt(chip,name){
