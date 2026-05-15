@@ -173,6 +173,10 @@ td.is-editing .cell-edit-wrap{display:flex;}
 /* Edit button — shown on hover */
 .lb-edit-btn{position:absolute;bottom:5px;left:6px;background:rgba(0,0,0,.25);border:none;border-radius:4px;color:#fff;font-size:9px;font-weight:700;padding:2px 6px;cursor:pointer;opacity:0;transition:opacity .15s;font-family:'Outfit',sans-serif;line-height:1.4;}
 .lb:hover .lb-edit-btn{opacity:1;}
+/* Collapsible gap — hide gap rows by zeroing their height */
+.wg-time.gap-row, .wg-slot.gap-row { min-height:44px; overflow:hidden; }
+.week-grid.gap-collapsed .gap-row { min-height:0 !important; height:0 !important; padding:0 !important; border:none !important; overflow:hidden; }
+
 /* Collapsible gap toggle — inside the grid, spans all 8 columns */
 .cal-gap-toggle{
   grid-column: 1 / -1;
@@ -1319,6 +1323,8 @@ function renderCalendar(){
   const todayIso=isoDate(TODAY);
   const hasLessonInGap=lessons.some(l=>{ const h=parseInt(l.start); return h>=12&&h<15; });
   const shouldCollapse=calGapCollapsed&&!hasLessonInGap;
+  // CSS class added to grid when collapsed — sets gap row heights to 0
+  const gapClass=shouldCollapse?'gap-collapsed':'';
 
   // Single grid — all 24 slots (09:00–20:30)
   let html='';
@@ -1337,10 +1343,8 @@ function renderCalendar(){
     const h=9+Math.floor(sl/2), m=sl%2===0?'00':'30';
     const ts=`${String(h).padStart(2,'0')}:${m}`;
     const inGap=(h>=12&&h<15)||(h===14&&m==='30');
-    const hide=inGap&&shouldCollapse;
-    const rowStyle=hide?'display:none':'';
 
-    html+=`<div class="wg-time" style="${rowStyle}">${sl%2===0?ts:''}</div>`;
+    html+=`<div class="wg-time${inGap?' gap-row':''}">${sl%2===0?ts:''}</div>`;
 
     weekDates.forEach((d,di)=>{
       const dayName=DAYS[di];
@@ -1348,7 +1352,7 @@ function renderCalendar(){
       const isPast=dateIso<todayIso;
       const starting=lessons.filter(l=>l.day===dayName&&l.start===ts);
 
-      html+=`<div class="wg-slot${sl%2===1?' half':''}${isPast?' past':''}" style="${rowStyle}"
+      html+=`<div class="wg-slot${sl%2===1?' half':''}${isPast?' past':''}${inGap?' gap-row':''}"
         ondragover="slotDragOver(event)" ondragleave="slotDragLeave(event)"
         ondrop="slotDrop(event,'${dayName}','${ts}')"
         onclick="handleCalSlotClick('${dayName}','${ts}','${dateIso}')">`;
@@ -1384,7 +1388,7 @@ function renderCalendar(){
     }
   }
 
-  document.getElementById('week-grid-wrap').innerHTML=`<div class="week-grid">${html}</div>`;
+  document.getElementById('week-grid-wrap').innerHTML=`<div class="week-grid ${gapClass}">${html}</div>`;
 }
 
 // ═══════════════════════════════════════════════════════
