@@ -174,7 +174,16 @@ td.is-editing .cell-edit-wrap{display:flex;}
 .lb-edit-btn{position:absolute;bottom:5px;left:6px;background:rgba(0,0,0,.25);border:none;border-radius:4px;color:#fff;font-size:9px;font-weight:700;padding:2px 6px;cursor:pointer;opacity:0;transition:opacity .15s;font-family:'Outfit',sans-serif;line-height:1.4;}
 .lb:hover .lb-edit-btn{opacity:1;}
 /* Collapsible gap row */
-.wg-collapse-toggle{grid-column:1/-1;display:flex;align-items:center;gap:8px;padding:5px 12px;background:var(--light-grey);border-top:1px solid var(--border);border-bottom:1px solid var(--border);cursor:pointer;font-size:11px;font-weight:700;color:var(--grey);letter-spacing:.4px;transition:background .15s;user-select:none;}
+.wg-collapse-toggle{
+  grid-column:1 / span 8;
+  display:flex;align-items:center;gap:8px;
+  padding:5px 14px;
+  background:var(--light-grey);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  cursor:pointer;font-size:11px;font-weight:700;color:var(--grey);
+  letter-spacing:.4px;transition:background .15s;user-select:none;
+}
 .wg-collapse-toggle:hover{background:#dde2ef;color:var(--dark);}
 .wg-slot.drag-over{background:#dbeaff!important;outline:2px dashed var(--cobalt);outline-offset:-2px;z-index:1;}
 
@@ -777,7 +786,7 @@ function setCfg(o){localStorage.setItem('jpe_cfg',JSON.stringify(o));}
 function boot(){
   const cfg=getCfg();
   if(!cfg.password){document.getElementById('setup-screen').style.display='flex';return;}
-  if(sessionStorage.getItem('jpe_authed')!==cfg.password){
+  if(localStorage.getItem('jpe_authed')!==cfg.password){
     const ls=document.getElementById('login-screen');ls.style.display='flex';
     setTimeout(()=>document.getElementById('login-pass').focus(),100);return;
   }
@@ -785,13 +794,13 @@ function boot(){
 }
 function doLogin(){
   const cfg=getCfg();const v=document.getElementById('login-pass').value;
-  if(v===cfg.password){sessionStorage.setItem('jpe_authed',v);document.getElementById('login-screen').style.display='none';launch();}
+  if(v===cfg.password){localStorage.setItem('jpe_authed',v);document.getElementById('login-screen').style.display='none';launch();}
   else{document.getElementById('login-error').style.display='block';document.getElementById('login-pass').value='';document.getElementById('login-pass').focus();}
 }
 let setupData={};
 function setupStep1(){const p=document.getElementById('setup-pass').value;const p2=document.getElementById('setup-pass2').value;if(!p){toast('Choose a password','error');return;}if(p!==p2){toast('Passwords do not match','error');return;}setupData.password=p;gotoStep(2);}
 function setupStep2(){const u=document.getElementById('setup-user').value.trim();const r=document.getElementById('setup-repo').value.trim();if(!u||!r){toast('Username and repo required','error');return;}setupData.ghUser=u;setupData.ghRepo=r;setupData.ghPath=document.getElementById('setup-path').value.trim()||'admin/tracker-data.json';gotoStep(3);}
-async function setupStep3(){const token=document.getElementById('setup-token').value.trim();if(!token){toast('Token required','error');return;}setupData.ghToken=token;const btn=document.querySelector('#step-3 .btn-primary');btn.textContent='Testing…';btn.disabled=true;const ok=await testGitHub(setupData.ghUser,setupData.ghRepo,setupData.ghToken);btn.textContent='✓ Save & Start';btn.disabled=false;if(!ok){toast('Could not connect to GitHub — check username, repo and token','error');return;}setCfg(setupData);sessionStorage.setItem('jpe_authed',setupData.password);document.getElementById('setup-screen').style.display='none';launch();}
+async function setupStep3(){const token=document.getElementById('setup-token').value.trim();if(!token){toast('Token required','error');return;}setupData.ghToken=token;const btn=document.querySelector('#step-3 .btn-primary');btn.textContent='Testing…';btn.disabled=true;const ok=await testGitHub(setupData.ghUser,setupData.ghRepo,setupData.ghToken);btn.textContent='✓ Save & Start';btn.disabled=false;if(!ok){toast('Could not connect to GitHub — check username, repo and token','error');return;}setCfg(setupData);localStorage.setItem('jpe_authed',setupData.password);document.getElementById('setup-screen').style.display='none';launch();}
 function gotoStep(n){document.querySelectorAll('.setup-step').forEach((s,i)=>{s.classList.toggle('active',i===n-1);const dot=document.getElementById(`dot-${i+1}`);if(dot)dot.className='step-dot'+(i<n-1?' done':i===n-1?' active':'');});}
 
 // ═══════════════════════════════════════════════════════
@@ -1320,14 +1329,13 @@ function renderCalendar(){
   const todayIso=isoDate(TODAY);
   // Slots 6–11 = 12:00–14:30 (collapsed by default unless a lesson falls there)
   const COLLAPSE_START=6, COLLAPSE_END=11; // inclusive slot indices
-  // Check if any lesson this week falls in the collapsed range
+  // Check if any lesson actually STARTS in the collapsed range (not just overlaps from before)
   const hasLessonInGap=weekDates.some(d=>{
     const dayName=DAYS[weekDates.indexOf(d)];
     return lessons.some(l=>{
-      if(l.day!==dayName)return false;
+      if(l.day!==dayName) return false;
       const lSlot=(parseInt(l.start.split(':')[0])-9)*2+(l.start.endsWith('30')?1:0);
-      const lEnd=lSlot+(l.duration/30);
-      return lEnd>COLLAPSE_START&&lSlot<=COLLAPSE_END;
+      return lSlot>=COLLAPSE_START && lSlot<=COLLAPSE_END;
     });
   });
 
