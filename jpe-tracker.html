@@ -154,9 +154,6 @@ td.is-editing .cell-edit-wrap{display:flex;}
 .cal-row.cal-half .cal-time,.cal-row.cal-half .cal-cell{border-bottom:1px dashed #edf0f8;}
 .cal-past{background:rgba(0,0,0,.018);}
 
-.cal-toggle-row{cursor:pointer;}
-.cal-toggle-cell{padding:6px 14px;background:var(--light-grey);border-bottom:1px solid var(--border);font-size:11px;font-weight:700;color:var(--grey);letter-spacing:.4px;user-select:none;transition:background .15s;}
-.cal-toggle-cell:hover{background:#dde2ef;color:var(--dark);}
 
 .lb{position:absolute;top:3px;left:3px;right:3px;border-radius:8px;padding:5px 8px;cursor:grab;overflow:hidden;z-index:2;box-shadow:0 2px 8px rgba(0,0,0,.14);transition:transform .15s,box-shadow .15s;}
 .lb:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.2);z-index:10;}
@@ -1274,11 +1271,9 @@ function delPayment(gId,member,payId){const idx=groups.findIndex(g=>g.id===gId);
 // CALENDAR
 // ═══════════════════════════════════════════════════════
 let calWeekStart=getMondayOf(TODAY);
-let calGapOpen=false; // false = collapsed by default
 const YEAR_END=new Date(2026,11,31);
 const YEAR_START=new Date(2026,0,1);
 
-function toggleCalGap(){ calGapOpen=!calGapOpen; renderCalendar(); }
 function shiftWeek(n){ const next=addDays(calWeekStart,n*7); if(next<YEAR_START||next>YEAR_END)return; calWeekStart=next; renderCalendar(); }
 function goToToday(){ calWeekStart=getMondayOf(TODAY); renderCalendar(); }
 
@@ -1301,16 +1296,7 @@ function renderCalendar(){
 
   const todayIso=isoDate(TODAY);
 
-  // Determine if gap has any lessons starting in it
-  const hasLessonInGap=lessons.some(l=>{
-    const hr=parseInt(l.start.split(':')[0],10);
-    return hr>=12 && hr<15;
-  });
-  // If a lesson starts in the gap, always show it
-  const showGap = calGapOpen || hasLessonInGap;
-
-  // ── Build the full table as HTML ──
-  // Using a plain <table> — simple, reliable, no grid quirks.
+  // Build table — all 24 slots, no collapsing
   let t='';
   t+=`<table class="cal-table"><thead><tr><th class="cal-th-time"></th>`;
   weekDates.forEach((d,i)=>{
@@ -1322,22 +1308,10 @@ function renderCalendar(){
   });
   t+=`</tr></thead><tbody>`;
 
-  // 24 half-hour slots: 09:00 to 20:30
   for(let sl=0;sl<24;sl++){
     const hr=9+Math.floor(sl/2);
     const mn=sl%2===0?'00':'30';
     const ts=`${String(hr).padStart(2,'0')}:${mn}`;
-    const isGapSlot = hr>=12 && hr<15;
-    const hideRow = isGapSlot && !showGap;
-
-    // Toggle row before 12:00
-    if(sl===6){
-      const arrow=showGap?'▾':'▸';
-      const label=showGap?'12:00 – 15:00 · click to collapse':'12:00 – 15:00 · click to expand';
-      t+=`<tr class="cal-toggle-row" onclick="toggleCalGap()"><td colspan="8" class="cal-toggle-cell">${arrow} ${label}</td></tr>`;
-    }
-
-    if(hideRow) continue;
 
     t+=`<tr class="cal-row${sl%2===1?' cal-half':''}">`;
     t+=`<td class="cal-time">${sl%2===0?ts:''}</td>`;
