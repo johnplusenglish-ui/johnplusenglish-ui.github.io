@@ -166,6 +166,8 @@ td.is-editing .cell-edit-wrap{display:flex;}
 .lb-level{position:absolute;top:3px;right:5px;font-size:8px;font-weight:800;opacity:.85;}
 .lb-has-log{position:absolute;bottom:4px;right:5px;width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.7);}
 .lb-classnum{position:absolute;bottom:5px;left:6px;right:28px;font-size:9px;font-weight:700;opacity:.9;background:rgba(0,0,0,.22);border-radius:4px;padding:2px 6px;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lb-url-btn{position:absolute;top:4px;left:6px;font-size:11px;text-decoration:none;opacity:.85;line-height:1;transition:opacity .15s;}
+.lb-url-btn:hover{opacity:1;}
 .log-classnum-badge{display:inline-block;background:var(--cobalt);color:#fff;font-size:10px;font-weight:800;padding:1px 7px;border-radius:10px;margin-right:4px;}
 .lb-no-log{opacity:.7;}
 /* Edit button — shown on hover */
@@ -449,6 +451,7 @@ td.is-editing .cell-edit-wrap{display:flex;}
       <div class="form-group"><label class="form-label">Course End</label><input class="form-input" type="date" id="g-end"></div>
       <div class="form-group full"><label class="form-label">Students (comma-separated)</label><input class="form-input" id="g-members" placeholder="e.g. Tania, Cristina, Raquel"></div>
       <div class="form-group full"><label class="form-label">Notes</label><textarea class="form-textarea" id="g-notes"></textarea></div>
+      <input type="hidden" id="g-lesson-link-hidden" value="">
     </div></div>
     <div class="modal-footer"><button class="btn btn-danger btn-sm" id="group-delete-btn" onclick="deleteGroup()" style="display:none;margin-right:auto">Delete Group</button><button class="btn btn-neutral" onclick="closeModal('group-modal')">Cancel</button><button class="btn btn-primary" onclick="saveGroup()">Save Group</button></div>
   </div>
@@ -549,6 +552,16 @@ td.is-editing .cell-edit-wrap{display:flex;}
       <div class="log-section">
         <div class="log-section-title"><span>💬</span> Teacher Notes</div>
         <textarea class="log-textarea" id="log-notes" placeholder="Anything else — energy of class, issues, follow-ups…"></textarea>
+      </div>
+
+      <!-- LESSON FILE LINK -->
+      <div class="log-section">
+        <div class="log-section-title"><span>🔗</span> Lesson File Link</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input class="form-input" id="log-url" placeholder="Paste link to this week's lesson HTML…" style="flex:1" oninput="toggleUrlOpenBtn()">
+          <button id="log-url-open" onclick="openLessonUrl()" style="padding:9px 14px;border-radius:var(--radius-sm);border:1.5px solid var(--cobalt);background:var(--cobalt);font-family:'Outfit',sans-serif;font-weight:600;font-size:13px;cursor:pointer;color:#fff;white-space:nowrap;display:none">Open ↗</button>
+        </div>
+        <div style="font-size:11px;color:var(--grey);margin-top:5px">GitHub Pages, Google Drive, Dropbox — any public URL. Appears as a button on the calendar block.</div>
       </div>
 
       <!-- PREVIOUS LOGS -->
@@ -742,8 +755,14 @@ const LEVEL_CLR={
 // ═══════════════════════════════════════════════════════
 // DATE HELPERS
 // ═══════════════════════════════════════════════════════
-const TODAY = new Date(2026,4,14); // May 14 2026 — update if needed, or use: new Date()
-function isoDate(d){return d.toISOString().split('T')[0];}
+const TODAY = new Date(); // Always use real current date
+function isoDate(d){
+  // Use local date parts to avoid UTC offset shifting the date
+  const y=d.getFullYear();
+  const m=String(d.getMonth()+1).padStart(2,'0');
+  const day=String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
 function getMondayOf(d){const day=d.getDay();const diff=d.getDate()-(day===0?6:day-1);const m=new Date(d);m.setDate(diff);m.setHours(0,0,0,0);return m;}
 function addDays(d,n){const r=new Date(d);r.setDate(r.getDate()+n);return r;}
 function formatDateLong(d){return d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'long',year:'numeric'});}
@@ -824,6 +843,29 @@ function setSyncStatus(state,text){
 }
 
 // ═══════════════════════════════════════════════════════
+// ─── TELEGRAM LINK HELPER ───
+function buildTgLink(raw){
+  const v=raw.trim();
+  let appUrl='',webUrl='',label='';
+  if(v.startsWith('+')||(/^\d{7,}$/.test(v))){
+    const phone=v.replace(/\D/g,'');
+    appUrl=`tg://resolve?phone=${phone}`;
+    webUrl=`https://t.me/+${phone}`;
+    label=v;
+  } else {
+    const username=v.replace(/^https?:\/\/t\.me\//,'').replace(/^t\.me\//,'').replace(/^@/,'');
+    appUrl=`tg://resolve?domain=${username}`;
+    webUrl=`https://t.me/${username}`;
+    label=`@${username}`;
+  }
+  const icon=`<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248l-2.04 9.613c-.154.69-.555.858-1.124.534l-3.1-2.285-1.495 1.438c-.165.165-.305.305-.627.305l.224-3.165 5.77-5.21c.25-.223-.055-.348-.39-.125l-7.131 4.49-3.07-.957c-.667-.21-.68-.667.14-.987l11.99-4.622c.556-.2 1.042.136.853.971z"/></svg>`;
+  return `<a class="tg-link" href="${appUrl}" onclick="event.stopPropagation();tryTgDeepLink(event,'${webUrl}')" title="Open in Telegram · ${label}">${icon} ${label}</a>`;
+}
+function tryTgDeepLink(e,webUrl){
+  // tg:// fires the app if installed; if page stays visible after 800ms, open t.me fallback
+  setTimeout(()=>{if(document.visibilityState!=='hidden')window.open(webUrl,'_blank');},800);
+}
+
 // DATA
 // ═══════════════════════════════════════════════════════
 let students=[],lessons=[],groups=[],logs={};
@@ -964,7 +1006,8 @@ function renderStudents(){
   if(!list.length){tbody.innerHTML=`<tr><td colspan="9" style="text-align:center;padding:48px;color:var(--grey)">No students found. <button class="btn btn-primary btn-sm" style="margin-left:10px" onclick="openAddStudent()">+ Add</button></td></tr>`;return;}
   tbody.innerHTML=list.map(s=>{
     const flag=NAT_FLAGS[s.nat]||'🌍';
-    const tg=s.tg?`<a class="tg-link" href="${s.tg.startsWith('http')?s.tg:'https://t.me/'+s.tg.replace('@','')}" target="_blank" onclick="event.stopPropagation()"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248l-2.04 9.613c-.154.69-.555.858-1.124.534l-3.1-2.285-1.495 1.438c-.165.165-.305.305-.627.305l.224-3.165 5.77-5.21c.25-.223-.055-.348-.39-.125l-7.131 4.49-3.07-.957c-.667-.21-.68-.667.14-.987l11.99-4.622c.556-.2 1.042.136.853.971z"/></svg>${s.tg.includes('/')?'Telegram':s.tg}</a>`:`<span style="color:#ddd;font-size:11px">—</span>`;
+    const tgRaw=s.tg||'';
+    const tg=tgRaw ? buildTgLink(tgRaw) : `<span style="color:#ddd;font-size:11px">—</span>`;
     const em=s.email?`<a href="mailto:${s.email}" style="color:var(--ws-sky);font-size:12px;font-weight:600;text-decoration:none" onclick="event.stopPropagation()">${s.email}</a>`:`<span style="color:#ddd;font-size:11px">—</span>`;
     return `<tr data-sid="${s.id}">
       <td><div class="cell-view" onclick="startCE(this.parentNode,'name',${s.id})"><div class="s-name-wrap"><div class="avatar" style="background:${getAvatar(s.level).bg};color:${getAvatar(s.level).text}">${getInits(s.name)}</div>${s.name}</div></div><div class="cell-edit-wrap"></div></td>
@@ -997,22 +1040,177 @@ function delStudent(id){if(!confirm('Delete this student?'))return;students=stud
 // ═══════════════════════════════════════════════════════
 function renderGroups(){
   const con=document.getElementById('groups-container');
-  if(!groups.length){con.innerHTML=`<div style="text-align:center;padding:60px;color:var(--grey)"><div style="font-size:48px;margin-bottom:12px">👥</div><div style="font-size:18px;font-weight:700;margin-bottom:6px">No groups yet</div><button class="btn btn-primary" onclick="openAddGroup()">+ Add Group</button></div>`;return;}
-  con.innerHTML=`<div class="groups-grid">${groups.map(g=>groupCardHTML(g)).join('')}</div>`;
+
+  // Build a unified list: proper groups + unlinked lessons
+  // For each lesson, check if there's a group linked to it
+  const linkedLessonIds=new Set(groups.map(g=>g.lessonLink).filter(Boolean));
+
+  // Unlinked lessons — appear as "unregistered" group cards prompting linkage
+  const unlinkedLessons=lessons.filter(l=>!linkedLessonIds.has(l.id));
+
+  if(!groups.length&&!unlinkedLessons.length){
+    con.innerHTML=`<div style="text-align:center;padding:60px;color:var(--grey)"><div style="font-size:48px;margin-bottom:12px">👥</div><div style="font-size:18px;font-weight:700;margin-bottom:6px">No groups yet</div><div style="margin-bottom:20px;font-size:13px">Add a group or create lessons in the Schedule — they'll appear here automatically.</div><button class="btn btn-primary" onclick="openAddGroup()">+ Add Group</button></div>`;
+    return;
+  }
+
+  let html='<div class="groups-grid">';
+
+  // Proper groups first
+  groups.forEach(g=>{
+    const linkedLesson=g.lessonLink?lessons.find(l=>l.id===g.lessonLink):null;
+    html+=groupCardHTML(g,linkedLesson);
+  });
+
+  // Unlinked lessons — show as light cards prompting group creation
+  unlinkedLessons.forEach(l=>{
+    const c=clr(l);
+    html+=`<div class="group-card" style="border:2px dashed var(--border);opacity:.8">
+      <div class="group-card-header">
+        <div>
+          <div class="group-card-title" style="display:flex;align-items:center;gap:8px">
+            <div style="width:10px;height:10px;border-radius:50%;background:${c.bg};flex-shrink:0"></div>
+            ${l.name}
+          </div>
+          <div class="group-card-meta">
+            <span class="level-badge level-${l.level}" style="font-size:10px">${l.level}</span>
+            <span class="group-meta-pill">📅 ${l.day} ${l.start}</span>
+            <span class="group-meta-pill">⏱ ${l.duration}min</span>
+            <span style="font-size:11px;color:var(--ws-coral);font-weight:600">⚠ No group linked</span>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="openAddGroupFromLesson(${l.id})">+ Create Group</button>
+      </div>
+      <div style="padding:14px 20px;font-size:12px;color:var(--grey)">
+        This lesson has no group record. Click <strong>+ Create Group</strong> to set up payment tracking, course dates, and student records for it.
+      </div>
+    </div>`;
+  });
+
+  html+='</div>';
+  con.innerHTML=html;
 }
-function groupCardHTML(g){
+
+function groupCardHTML(g, linkedLesson){
   const today=new Date();today.setHours(0,0,0,0);
-  const startD=g.start?new Date(g.start):null,endD=g.end?new Date(g.end):null;
+  const startD=g.start?parseLocalDate(g.start):null,endD=g.end?parseLocalDate(g.end):null;
   let progressHTML='';
-  if(startD&&endD){const total=endD-startD;const elapsed=Math.min(Math.max(today-startD,0),total);const pct=total>0?Math.round((elapsed/total)*100):0;const dl=Math.ceil((endD-today)/(1000*60*60*24));const dls=dl>0?`${dl}d left`:dl===0?'Ends today':'Ended';progressHTML=`<div class="progress-bar-wrap"><div class="progress-bar-track"><div class="progress-bar-fill" style="width:${pct}%"></div></div></div><span style="font-size:11px;font-weight:700;color:${dl<14&&dl>=0?'#c94040':dl<0?'#aaa':'var(--ws-sea)'};white-space:nowrap">${dls}</span>`;}
-  const fd=d=>{if(!d)return'—';return new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});};
-  const payRows=(g.members||[]).map(name=>{const paid=(g.payments||[]).filter(p=>p.member===name).sort((a,b)=>new Date(b.date)-new Date(a.date));const last=paid[0];const hist=paid.map(p=>`<tr class="pay-history-row"><td colspan="2"></td><td>${fd(p.date)}</td><td>€${p.amount}</td><td style="color:var(--grey)">${p.notes||''}</td><td><button class="btn-icon" style="font-size:10px;padding:2px 5px" onclick="delPayment(${g.id},'${name}',${p.id})">✕</button></td></tr>`).join('');return `<tr><td style="font-weight:600">${name}</td><td><span class="pay-status ${last?'pay-paid':'pay-unpaid'}">${last?'Paid':'Unpaid'}</span></td><td style="color:var(--grey);font-size:12px">${last?fd(last.date):'—'}</td><td style="font-weight:600">${last?`€${last.amount}`:'—'}</td><td><button class="add-pay-btn" onclick="openPaymentModal(${g.id},'${name}')">+ Log payment</button></td><td></td></tr>${hist}`;}).join('');
-  return `<div class="group-card"><div class="group-card-header"><div><div class="group-card-title">${g.name}</div><div class="group-card-meta">${g.level?`<span class="level-badge level-${g.level}" style="font-size:10px">${g.level}</span>`:''} ${g.slot?`<span class="group-meta-pill">📅 ${g.slot}</span>`:''}<span class="group-meta-pill">👥 ${(g.members||[]).length} student${(g.members||[]).length!==1?'s':''}</span></div></div><button class="btn-icon" onclick="openEditGroup(${g.id})">✏️</button></div><div class="group-dates-bar"><div style="display:flex;align-items:center;gap:6px"><span class="gd-label">Start</span><span class="gd-val">${fd(g.start)}</span></div><div style="display:flex;align-items:center;gap:6px"><span class="gd-label">End</span><span class="gd-val">${fd(g.end)}</span></div>${progressHTML}</div><table class="pay-table"><thead><tr><th>Student</th><th>Status</th><th>Last Paid</th><th>Amount</th><th>Action</th><th style="width:40px"></th></tr></thead><tbody>${payRows}</tbody></table>${g.notes?`<div class="group-notes-row">📝 ${g.notes}</div>`:''}</div>`;
+  if(startD&&endD){
+    const total=endD-startD;const elapsed=Math.min(Math.max(today-startD,0),total);
+    const pct=total>0?Math.round((elapsed/total)*100):0;
+    const dl=Math.ceil((endD-today)/(1000*60*60*24));
+    const dls=dl>0?`${dl}d left`:dl===0?'Ends today':'Ended';
+    progressHTML=`<div class="progress-bar-wrap"><div class="progress-bar-track"><div class="progress-bar-fill" style="width:${pct}%"></div></div></div><span style="font-size:11px;font-weight:700;color:${dl<14&&dl>=0?'#c94040':dl<0?'#aaa':'var(--ws-sea)'};white-space:nowrap">${dls}</span>`;
+  }
+  const fd=d=>{if(!d)return'—';const dt=typeof d==='string'?parseLocalDate(d):d;return dt.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});};
+
+  // Member rows — try to match each name to a student record
+  const payRows=(g.members||[]).map(name=>{
+    const matchedStudent=students.find(s=>s.name.toLowerCase()===name.toLowerCase()||s.name.toLowerCase().includes(name.toLowerCase()));
+    const paid=(g.payments||[]).filter(p=>p.member===name).sort((a,b)=>new Date(b.date)-new Date(a.date));
+    const last=paid[0];
+    const hist=paid.map(p=>`<tr class="pay-history-row"><td colspan="2"></td><td>${fd(p.date)}</td><td>€${p.amount}</td><td style="color:var(--grey)">${p.notes||''}</td><td><button class="btn-icon" style="font-size:10px;padding:2px 5px" onclick="delPayment(${g.id},'${name}',${p.id})">✕</button></td></tr>`).join('');
+    const nameCell=matchedStudent
+      ?`<span style="display:flex;align-items:center;gap:7px"><div class="avatar" style="width:22px;height:22px;font-size:9px;background:${getAvatar(matchedStudent.level).bg};color:${getAvatar(matchedStudent.level).text};flex-shrink:0">${getInits(matchedStudent.name)}</div><strong>${name}</strong></span>`
+      :`<span style="display:flex;align-items:center;gap:7px"><strong>${name}</strong><button onclick="createStudentFromGroup('${name.replace(/'/g,"\\'")}',${g.id})" style="font-size:10px;color:var(--cobalt);background:var(--off-white);border:1px solid var(--border);border-radius:4px;padding:1px 6px;cursor:pointer;font-family:'Outfit',sans-serif;font-weight:600">+ Add to DB</button></span>`;
+    return `<tr>
+      <td style="font-weight:600">${nameCell}</td>
+      <td><span class="pay-status ${last?'pay-paid':'pay-unpaid'}">${last?'Paid':'Unpaid'}</span></td>
+      <td style="color:var(--grey);font-size:12px">${last?fd(last.date):'—'}</td>
+      <td style="font-weight:600">${last?`€${last.amount}`:'—'}</td>
+      <td><button class="add-pay-btn" onclick="openPaymentModal(${g.id},'${name}')">+ Log payment</button></td>
+      <td></td>
+    </tr>${hist}`;
+  }).join('');
+
+  // Schedule pill
+  const schedPill=linkedLesson
+    ?`<span class="group-meta-pill">📅 ${linkedLesson.day} ${linkedLesson.start} · ${linkedLesson.duration}min</span>`
+    :g.slot?`<span class="group-meta-pill">📅 ${g.slot}</span>`:'';
+
+  return `<div class="group-card">
+    <div class="group-card-header">
+      <div>
+        <div class="group-card-title">${g.name}</div>
+        <div class="group-card-meta">
+          ${g.level?`<span class="level-badge level-${g.level}" style="font-size:10px">${g.level}</span>`:''}
+          ${schedPill}
+          <span class="group-meta-pill">👥 ${(g.members||[]).length} student${(g.members||[]).length!==1?'s':''}</span>
+        </div>
+      </div>
+      <button class="btn-icon" onclick="openEditGroup(${g.id})">✏️</button>
+    </div>
+    <div class="group-dates-bar">
+      <div style="display:flex;align-items:center;gap:6px"><span class="gd-label">Start</span><span class="gd-val">${fd(g.start)}</span></div>
+      <div style="display:flex;align-items:center;gap:6px"><span class="gd-label">End</span><span class="gd-val">${fd(g.end)}</span></div>
+      ${progressHTML}
+    </div>
+    <table class="pay-table">
+      <thead><tr><th>Student</th><th>Status</th><th>Last Paid</th><th>Amount</th><th>Action</th><th style="width:40px"></th></tr></thead>
+      <tbody>${payRows}</tbody>
+    </table>
+    ${g.notes?`<div class="group-notes-row">📝 ${g.notes}</div>`:''}
+  </div>`;
 }
+
+// Create a group pre-filled from a schedule lesson
+function openAddGroupFromLesson(lessonId){
+  const l=lessons.find(x=>x.id===lessonId);if(!l)return;
+  editGId=null;
+  document.getElementById('group-modal-title').textContent='Create Group from Lesson';
+  document.getElementById('group-delete-btn').style.display='none';
+  document.getElementById('g-name').value=l.name;
+  document.getElementById('g-level').value=l.level||'';
+  document.getElementById('g-slot').value=`${l.day} ${l.start}`;
+  document.getElementById('g-start').value='';
+  document.getElementById('g-end').value='';
+  // Pre-fill members from lesson name (comma-split)
+  const parsedNames=l.name.split(',').map(n=>n.trim()).filter(Boolean);
+  document.getElementById('g-members').value=parsedNames.join(', ');
+  document.getElementById('g-notes').value='';
+  // Store the lesson ID to link on save
+  document.getElementById('g-lesson-link-hidden').value=lessonId;
+  openModal('group-modal');
+}
+
+// Create a student record from a group member name
+function createStudentFromGroup(name, groupId){
+  const g=groups.find(x=>x.id===groupId);
+  const level=g?g.level:'';
+  // Open add student modal pre-filled
+  openAddStudent();
+  document.getElementById('s-name').value=name;
+  document.getElementById('s-level').value=level;
+  toast(`Pre-filled student form for ${name}`,'info');
+}
+
 let editGId=null;
-function openAddGroup(){editGId=null;document.getElementById('group-modal-title').textContent='Add Group';document.getElementById('group-delete-btn').style.display='none';['g-name','g-slot','g-notes'].forEach(i=>document.getElementById(i).value='');document.getElementById('g-level').value='';document.getElementById('g-start').value='';document.getElementById('g-end').value='';document.getElementById('g-members').value='';openModal('group-modal');}
-function openEditGroup(id){const g=groups.find(x=>x.id===id);if(!g)return;editGId=id;document.getElementById('group-modal-title').textContent='Edit Group';document.getElementById('group-delete-btn').style.display='inline-flex';document.getElementById('g-name').value=g.name||'';document.getElementById('g-level').value=g.level||'';document.getElementById('g-slot').value=g.slot||'';document.getElementById('g-start').value=g.start||'';document.getElementById('g-end').value=g.end||'';document.getElementById('g-members').value=(g.members||[]).join(', ');document.getElementById('g-notes').value=g.notes||'';openModal('group-modal');}
-function saveGroup(){const name=document.getElementById('g-name').value.trim();if(!name){toast('Group name required','error');return;}const g={id:editGId||Date.now(),name,level:document.getElementById('g-level').value,slot:document.getElementById('g-slot').value.trim(),start:document.getElementById('g-start').value,end:document.getElementById('g-end').value,members:document.getElementById('g-members').value.split(',').map(m=>m.trim()).filter(Boolean),notes:document.getElementById('g-notes').value.trim(),payments:editGId?(groups.find(x=>x.id===editGId)?.payments||[]):[]};if(editGId){groups[groups.findIndex(x=>x.id===editGId)]=g;toast('Group updated ✓');}else{groups.push(g);toast('Group added ✓');}saveAll();renderGroups();closeModal('group-modal');}
+function openAddGroup(){editGId=null;document.getElementById('group-modal-title').textContent='Add Group';document.getElementById('group-delete-btn').style.display='none';['g-name','g-slot','g-notes'].forEach(i=>document.getElementById(i).value='');document.getElementById('g-level').value='';document.getElementById('g-start').value='';document.getElementById('g-end').value='';document.getElementById('g-members').value='';document.getElementById('g-lesson-link-hidden').value='';openModal('group-modal');}
+function openEditGroup(id){const g=groups.find(x=>x.id===id);if(!g)return;editGId=id;document.getElementById('group-modal-title').textContent='Edit Group';document.getElementById('group-delete-btn').style.display='inline-flex';document.getElementById('g-name').value=g.name||'';document.getElementById('g-level').value=g.level||'';document.getElementById('g-slot').value=g.slot||'';document.getElementById('g-start').value=g.start||'';document.getElementById('g-end').value=g.end||'';document.getElementById('g-members').value=(g.members||[]).join(', ');document.getElementById('g-notes').value=g.notes||'';document.getElementById('g-lesson-link-hidden').value=g.lessonLink||'';openModal('group-modal');}
+function saveGroup(){
+  const name=document.getElementById('g-name').value.trim();
+  if(!name){toast('Group name required','error');return;}
+  const lessonLinkRaw=document.getElementById('g-lesson-link-hidden').value;
+  const lessonLink=lessonLinkRaw?parseInt(lessonLinkRaw):null;
+  const g={
+    id:editGId||Date.now(),name,
+    level:document.getElementById('g-level').value,
+    slot:document.getElementById('g-slot').value.trim(),
+    start:document.getElementById('g-start').value,
+    end:document.getElementById('g-end').value,
+    members:document.getElementById('g-members').value.split(',').map(m=>m.trim()).filter(Boolean),
+    notes:document.getElementById('g-notes').value.trim(),
+    lessonLink,
+    payments:editGId?(groups.find(x=>x.id===editGId)?.payments||[]):[]
+  };
+  // If linked to a lesson, update that lesson's groupLink back
+  if(lessonLink){
+    const li=lessons.findIndex(l=>l.id===lessonLink);
+    if(li!==-1) lessons[li].groupLink=g.id;
+  }
+  if(editGId){groups[groups.findIndex(x=>x.id===editGId)]=g;toast('Group updated ✓');}
+  else{groups.push(g);toast('Group added ✓');}
+  saveAll();renderGroups();closeModal('group-modal');
+}
 function deleteGroup(){if(!editGId)return;if(!confirm('Delete group?'))return;groups=groups.filter(g=>g.id!==editGId);saveAll();renderGroups();closeModal('group-modal');toast('Group deleted');}
 let payGId=null,payMember=null;
 function openPaymentModal(gId,member){payGId=gId;payMember=member;document.getElementById('pay-modal-title').textContent=`Log Payment — ${member}`;document.getElementById('pay-student').value=member;document.getElementById('pay-amount').value='';document.getElementById('pay-date').value=new Date().toISOString().split('T')[0];document.getElementById('pay-notes').value='';openModal('payment-modal');}
@@ -1125,7 +1323,7 @@ function renderCalendar(){
           <div class="lb-title">${lesson.name.split(',').map(n=>n.trim()).join('<br>')}</div>
           <div class="lb-meta" style="color:${c.text}">${ts} · ${lesson.duration}min</div>
           <div class="lb-level" style="color:${c.text}">${lesson.level}</div>
-          ${hasLog?`<div class="lb-has-log"></div><div class="lb-classnum">#${logs[logKey].classNum||'?'}${logs[logKey].topic?' · '+logs[logKey].topic:''}</div>`:''}
+          ${hasLog?`<div class="lb-has-log"></div><div class="lb-classnum">#${logs[logKey].classNum||'?'}${logs[logKey].topic?' · '+logs[logKey].topic:''}</div>${logs[logKey].url?`<a href="${logs[logKey].url}" target="_blank" onclick="event.stopPropagation()" class="lb-url-btn" title="Open lesson file">🔗</a>`:''}`:''}
           <button class="lb-edit-btn" onclick="event.stopPropagation();openEditLesson(${lesson.id})" title="Edit lesson">✏ Edit</button>
         </div>`;
       });
@@ -1184,8 +1382,11 @@ function slotDrop(e,newDay,newTime){
 }
 
 function handleCalSlotClick(day,time,dateIso){openAddLesson(day,time);}
-// Block colour is ALWAYS determined by level — stored colour field is irrelevant for rendering
-function clr(l){const cid=LEVEL_CLR[l.level]||'cobalt';return COLOURS.find(c=>c.id===cid)||COLOURS[0];}
+function parseLocalDate(iso){
+  // Parse YYYY-MM-DD as local date (not UTC) to avoid day offset
+  const [y,m,d]=iso.split('-').map(Number);
+  return new Date(y,m-1,d,12,0,0);
+}const cid=LEVEL_CLR[l.level]||'cobalt';return COLOURS.find(c=>c.id===cid)||COLOURS[0];}
 
 // ═══════════════════════════════════════════════════════
 // LESSON LOG
@@ -1198,7 +1399,7 @@ function openLogModal(lessonId,dateIso){
   currentLogLesson=lesson;
   currentLogDate=dateIso;
 
-  const d=new Date(dateIso+'T12:00:00');
+  const d=parseLocalDate(dateIso);
   const c=clr(lesson);
   const existing=logs[currentLogKey]||{};
 
@@ -1263,6 +1464,10 @@ function openLogModal(lessonId,dateIso){
   document.getElementById('log-homework').value=existing.homework||'';
   document.getElementById('log-notes').value=existing.notes||'';
 
+  // URL
+  document.getElementById('log-url').value=existing.url||'';
+  document.getElementById('log-url-open').style.display=existing.url?'block':'none';
+
   // Vocab
   currentLogVocab=[...(existing.vocab||[])];
   renderVocabTags();
@@ -1278,7 +1483,7 @@ function openLogModal(lessonId,dateIso){
   if(groupLogs.length){
     document.getElementById('log-history-section').style.display='block';
     document.getElementById('log-history-list').innerHTML=groupLogs.map(([k,v])=>{
-      const dt=k.split('_')[1];const dd=new Date(dt+'T12:00:00');
+      const dt=k.split('_')[1];const dd=parseLocalDate(dt);
       const attendees=Object.entries(v.attendance||{}).filter(([,p])=>p).map(([n])=>n);
       return `<div class="log-history-item">
         <div class="log-history-date">${v.classNum?`<span class="log-classnum-badge">#${v.classNum}</span> `:''}${dd.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'})}</div>
@@ -1303,6 +1508,15 @@ function adjustClassNum(delta){
   const inp=document.getElementById('log-classnum');
   const val=Math.max(1,(parseInt(inp.value)||1)+delta);
   inp.value=val;
+}
+
+function toggleUrlOpenBtn(){
+  const val=document.getElementById('log-url').value.trim();
+  document.getElementById('log-url-open').style.display=val?'block':'none';
+}
+function openLessonUrl(){
+  const url=document.getElementById('log-url').value.trim();
+  if(url) window.open(url.startsWith('http')?url:'https://'+url,'_blank');
 }
 
 function updateLogLevel(lessonId){
@@ -1364,6 +1578,7 @@ function saveLog(){
     pronunciation:document.getElementById('log-pronunciation').value.trim(),
     homework:document.getElementById('log-homework').value.trim(),
     notes:document.getElementById('log-notes').value.trim(),
+    url:document.getElementById('log-url').value.trim(),
     savedAt:new Date().toISOString()
   };
   saveAll();renderCalendar();toast('Lesson log saved ✓');
@@ -1422,7 +1637,7 @@ function generatePrompt(type){
   });
   const studentList=presentStudents.length ? presentStudents.join(', ') : currentLogLesson.name;
   const lessonLevel=currentLogLesson.level;
-  const d=new Date(currentLogDate+'T12:00:00');
+  const d=parseLocalDate(currentLogDate);
   const dateStr=d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   const vocabList=vocab.length ? vocab.map(v=>`- ${v}`).join('\n') : '(no vocab added yet)';
 
@@ -1591,7 +1806,7 @@ function exportLogsCSV(){
     const level=lesson?lesson.level:'';
     const present=Object.entries(log.attendance||{}).filter(([,v])=>v===true).map(([n])=>n).join('; ');
     const absent=Object.entries(log.attendance||{}).filter(([,v])=>v===false).map(([n])=>n).join('; ');
-    const d=new Date(date+'T12:00:00');
+    const d=parseLocalDate(date);
     const dayName=d.toLocaleDateString('en-GB',{weekday:'long'});
     rows.push([
       date, dayName, lessonName, level,
