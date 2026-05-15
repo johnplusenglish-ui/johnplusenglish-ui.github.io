@@ -800,37 +800,100 @@ function gotoStep(n){document.querySelectorAll('.setup-step').forEach((s,i)=>{s.
 let ghSha=null,syncTimer=null;
 function ghApiUrl(){const c=getCfg();return `https://api.github.com/repos/${c.ghUser}/${c.ghRepo}/contents/${c.ghPath}`;}
 async function testGitHub(u,r,t){try{const res=await fetch(`https://api.github.com/repos/${u}/${r}`,{headers:{Authorization:`token ${t}`,Accept:'application/vnd.github.v3+json'}});return res.ok;}catch{return false;}}
+let dataLoaded=false; // true only after a successful GitHub or local load
+
 async function loadFromGitHub(){
-  const cfg=getCfg();if(!cfg.ghToken){setSyncStatus('err','No token');loadFromLocal();return;}
+  const cfg=getCfg();
+  if(!cfg.ghToken){setSyncStatus('err','No token');loadFromLocal();return;}
   try{
     setSyncBar('syncing');
     const r=await fetch(ghApiUrl(),{headers:{Authorization:`token ${cfg.ghToken}`,Accept:'application/vnd.github.v3+json'}});
-    if(r.status===404){loadSeedData();await pushToGitHub('Initial data');setSyncStatus('ok','Ready');}
-    else if(r.ok){const j=await r.json();ghSha=j.sha;
-      // Proper UTF-8 decode from base64
+    if(r.status===404){
+      // First time — no data file yet. Load seed data and create it.
+      loadSeedData();
+      dataLoaded=true;
+      await pushToGitHub('Initial data');
+      setSyncStatus('ok','Ready');
+    } else if(r.ok){
+      const j=await r.json();
+      ghSha=j.sha;
       const raw=j.content.replace(/\n/g,'');
       const bytes=Uint8Array.from(atob(raw),c=>c.charCodeAt(0));
       const decoded=new TextDecoder().decode(bytes);
       const data=JSON.parse(decoded);
-      students=data.students||[];lessons=data.lessons||[];groups=data.groups||[];logs=data.logs||{};setSyncStatus('ok',`Loaded · ${new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}`);setCfg({...cfg,lastSync:new Date().toISOString()});}
-    else throw new Error(`HTTP ${r.status}`);
-  }catch(e){console.error(e);setSyncStatus('err','GitHub error — using local cache');loadFromLocal();}
+      students=data.students||[];
+      lessons=data.lessons||[];
+      groups=data.groups||[];
+      logs=data.logs||{};
+      // Also cache to localStorage as backup
+      localStorage.setItem('jpe_s3',JSON.stringify(students));
+      localStorage.setItem('jpe_l3',JSON.stringify(lessons));
+      localStorage.setItem('jpe_g1',JSON.stringify(groups));
+      localStorage.setItem('jpe_logs',JSON.stringify(logs));
+      dataLoaded=true;
+      setSyncStatus('ok',`Loaded · ${new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}`);
+      setCfg({...cfg,lastSync:new Date().toISOString()});
+    } else {
+      throw new Error(`HTTP ${r.status}`);
+    }
+  }catch(e){
+    console.error('GitHub load error:',e);
+    setSyncStatus('err','GitHub error — using local cache');
+    loadFromLocal();
+  }
   setSyncBar('');
 }
+
 async function pushToGitHub(msg='Update'){
-  const cfg=getCfg();if(!cfg.ghToken){setSyncStatus('err','No token');return false;}
+  const cfg=getCfg();
+  if(!cfg.ghToken){setSyncStatus('err','No token');return false;}
+  if(!dataLoaded){console.warn('Push blocked — data not loaded yet');return false;}
   try{
     setSyncBar('syncing');setSyncStatus('busy','Saving…');
-    // Proper UTF-8 encode to base64
     const jsonStr=JSON.stringify({students,lessons,groups,logs},null,2);
     const bytes=new TextEncoder().encode(jsonStr);
     const binary=Array.from(bytes).map(b=>String.fromCharCode(b)).join('');
     const content=btoa(binary);
-    const body={message:msg,content};if(ghSha)body.sha=ghSha;
-    const r=await fetch(ghApiUrl(),{method:'PUT',headers:{Authorization:`token ${cfg.ghToken}`,Accept:'application/vnd.github.v3+json','Content-Type':'application/json'},body:JSON.stringify(body)});
-    if(r.ok){const j=await r.json();ghSha=j.content.sha;setSyncStatus('ok',`Saved · ${new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}`);setCfg({...getCfg(),lastSync:new Date().toISOString()});setSyncBar('');return true;}
-    else{const err=await r.json();throw new Error(err.message||`HTTP ${r.status}`);}
-  }catch(e){console.error(e);setSyncStatus('err',`Save failed: ${e.message}`);setSyncBar('error');setTimeout(()=>setSyncBar(''),3000);return false;}
+    const body={message:msg,content};
+    if(ghSha) body.sha=ghSha;
+    const r=await fetch(ghApiUrl(),{
+      method:'PUT',
+      headers:{Authorization:`token ${cfg.ghToken}`,Accept:'application/vnd.github.v3+json','Content-Type':'application/json'},
+      body:JSON.stringify(body)
+    });
+    if(r.ok){
+      const j=await r.json();
+      ghSha=j.content.sha;
+      setSyncStatus('ok',`Saved · ${new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}`);
+      setCfg({...getCfg(),lastSync:new Date().toISOString()});
+      setSyncBar('');
+      return true;
+    } else if(r.status===409){
+      // SHA conflict — re-fetch the latest SHA and retry once
+      console.warn('SHA conflict — re-fetching and retrying…');
+      const latest=await fetch(ghApiUrl(),{headers:{Authorization:`token ${cfg.ghToken}`,Accept:'application/vnd.github.v3+json'}});
+      if(latest.ok){
+        const lj=await latest.json();
+        ghSha=lj.sha;
+        body.sha=ghSha;
+        const r2=await fetch(ghApiUrl(),{method:'PUT',headers:{Authorization:`token ${cfg.ghToken}`,Accept:'application/vnd.github.v3+json','Content-Type':'application/json'},body:JSON.stringify(body)});
+        if(r2.ok){
+          const j2=await r2.json();ghSha=j2.content.sha;
+          setSyncStatus('ok','Saved (retried) ✓');setSyncBar('');return true;
+        }
+      }
+      throw new Error('SHA conflict could not be resolved');
+    } else {
+      const err=await r.json();
+      throw new Error(err.message||`HTTP ${r.status}`);
+    }
+  }catch(e){
+    console.error('Push error:',e);
+    setSyncStatus('err',`Save failed: ${e.message}`);
+    setSyncBar('error');
+    setTimeout(()=>setSyncBar(''),3000);
+    return false;
+  }
 }
 function scheduleSave(){setSyncStatus('busy','Unsaved…');clearTimeout(syncTimer);syncTimer=setTimeout(()=>pushToGitHub('Auto-save'),2000);}
 function syncNow(){clearTimeout(syncTimer);pushToGitHub('Manual save');}
@@ -871,8 +934,8 @@ function loadFromLocal(){
   lessons=JSON.parse(localStorage.getItem('jpe_l3')||'[]');
   groups=JSON.parse(localStorage.getItem('jpe_g1')||'[]');
   logs=JSON.parse(localStorage.getItem('jpe_logs')||'{}');
-  // Only load seed data if truly nothing exists anywhere
   if(!students.length&&!lessons.length&&!Object.keys(logs).length) loadSeedData();
+  dataLoaded=true;
 }
 function loadSeedData(){
   students=[
@@ -934,9 +997,8 @@ function loadSeedData(){
   if(!Object.keys(logs).length) logs={};
 }
 function saveAll(){
-  // Safety guard — never save if data looks empty (protects against bad state wiping GitHub)
-  if(!students.length&&!lessons.length&&!Object.keys(logs).length){
-    console.warn('saveAll blocked — data appears empty, skipping GitHub push');
+  if(!dataLoaded){
+    console.warn('saveAll blocked — data not loaded yet');
     return;
   }
   localStorage.setItem('jpe_s3',JSON.stringify(students));
