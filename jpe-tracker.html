@@ -846,25 +846,20 @@ function setSyncStatus(state,text){
 // ─── TELEGRAM LINK HELPER ───
 function buildTgLink(raw){
   const v=raw.trim();
-  let appUrl='',webUrl='',label='';
+  let href='',label='';
   if(v.startsWith('+')||(/^\d{7,}$/.test(v))){
     const phone=v.replace(/\D/g,'');
-    appUrl=`tg://resolve?phone=${phone}`;
-    webUrl=`https://t.me/+${phone}`;
+    href=`https://t.me/+${phone}`;
     label=v;
   } else {
     const username=v.replace(/^https?:\/\/t\.me\//,'').replace(/^t\.me\//,'').replace(/^@/,'');
-    appUrl=`tg://resolve?domain=${username}`;
-    webUrl=`https://t.me/${username}`;
+    href=`https://t.me/${username}`;
     label=`@${username}`;
   }
   const icon=`<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248l-2.04 9.613c-.154.69-.555.858-1.124.534l-3.1-2.285-1.495 1.438c-.165.165-.305.305-.627.305l.224-3.165 5.77-5.21c.25-.223-.055-.348-.39-.125l-7.131 4.49-3.07-.957c-.667-.21-.68-.667.14-.987l11.99-4.622c.556-.2 1.042.136.853.971z"/></svg>`;
-  return `<a class="tg-link" href="${appUrl}" onclick="event.stopPropagation();tryTgDeepLink(event,'${webUrl}')" title="Open in Telegram · ${label}">${icon} ${label}</a>`;
+  return `<a class="tg-link" href="${href}" target="_blank" onclick="event.stopPropagation()" title="Open in Telegram">${icon} ${label}</a>`;
 }
-function tryTgDeepLink(e,webUrl){
-  // tg:// fires the app if installed; if page stays visible after 800ms, open t.me fallback
-  setTimeout(()=>{if(document.visibilityState!=='hidden')window.open(webUrl,'_blank');},800);
-}
+function tryTgDeepLink(){}
 
 // DATA
 // ═══════════════════════════════════════════════════════
@@ -1386,7 +1381,10 @@ function parseLocalDate(iso){
   // Parse YYYY-MM-DD as local date (not UTC) to avoid day offset
   const [y,m,d]=iso.split('-').map(Number);
   return new Date(y,m-1,d,12,0,0);
-}const cid=LEVEL_CLR[l.level]||'cobalt';return COLOURS.find(c=>c.id===cid)||COLOURS[0];}
+}
+
+// Block colour is ALWAYS determined by level
+function clr(l){const cid=LEVEL_CLR[l.level]||'cobalt';return COLOURS.find(c=>c.id===cid)||COLOURS[0];}
 
 // ═══════════════════════════════════════════════════════
 // LESSON LOG
