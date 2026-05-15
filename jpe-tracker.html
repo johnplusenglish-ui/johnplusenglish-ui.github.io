@@ -1318,83 +1318,77 @@ function renderCalendar(){
     return `<div class="legend-item"><div class="legend-dot" style="background:${c.bg};border-radius:50%"></div>${lv}</div>`;
   }).join('');
 
-  let html='';
-  // Header row
-  html+=`<div class="wg-header time-col"></div>`;
-  weekDates.forEach((d,i)=>{
-    const isToday=isoDate(d)===isoDate(TODAY);
-    html+=`<div class="wg-header${isToday?' is-today':''}"><div class="wg-day-name">${DAY_SHORT[i]}</div><div class="wg-day-date${isToday?' today':''}">${d.getDate()} ${d.toLocaleDateString('en-GB',{month:'short'})}</div></div>`;
-  });
-
   const todayIso=isoDate(TODAY);
-  const COLLAPSE_START=6, COLLAPSE_END=11; // slots 12:00–14:30
 
-  // Only block collapse if a lesson actually starts in the gap
+  // Only prevent collapse if a lesson actually starts between 12:00–14:30
   const hasLessonInGap=lessons.some(l=>{
-    const lSlot=(parseInt(l.start.split(':')[0])-9)*2+(l.start.endsWith('30')?1:0);
-    return lSlot>=COLLAPSE_START && lSlot<=COLLAPSE_END;
+    const h=parseInt(l.start.split(':')[0]);
+    return h>=12&&h<15;
   });
-
   const shouldCollapse=calGapCollapsed&&!hasLessonInGap;
 
-  for(let sl=0;sl<24;sl++){
-    const h=9+Math.floor(sl/2),m=sl%2===0?'00':'30';
-    const ts=`${String(h).padStart(2,'0')}:${m}`;
-    const inGap=sl>=COLLAPSE_START&&sl<=COLLAPSE_END;
-
-    // Skip collapsed gap slots entirely
-    if(inGap&&shouldCollapse) continue;
-
-    html+=`<div class="wg-time">${sl%2===0?ts:''}</div>`;
-    weekDates.forEach((d,di)=>{
-      const dayName=DAYS[di];
-      const dateIso=isoDate(d);
-      const isPast=dateIso<todayIso;
-      const dayLessons=lessons.filter(l=>l.day===dayName);
-      const starting=dayLessons.filter(l=>l.start===ts);
-      let slotClass='wg-slot'+(sl%2===1?' half':'')+(isPast?' past':'');
-
-      html+=`<div class="${slotClass}" 
-        data-day="${dayName}" data-time="${ts}"
-        ondragover="slotDragOver(event)"
-        ondragleave="slotDragLeave(event)"
-        ondrop="slotDrop(event,'${dayName}','${ts}')"
-        onclick="handleCalSlotClick('${dayName}','${ts}','${dateIso}')">`;
-      starting.forEach(lesson=>{
-        const c=clr(lesson);
-        const hp=(lesson.duration/30)*SLOT_H-6;
-        const logKey=`${lesson.id}_${dateIso}`;
-        const hasLog=!!logs[logKey];
-        const linkedGroup=lesson.groupLink?groups.find(g=>g.id===lesson.groupLink):null;
-        const inTerm=linkedGroup?(dateIso>=linkedGroup.start&&dateIso<=linkedGroup.end):true;
-        html+=`<div class="lb${hasLog?'':' lb-no-log'}"
-          draggable="true"
-          data-lesson-id="${lesson.id}"
-          style="top:3px;height:${hp}px;background:${c.bg};color:${c.text};${!inTerm?'opacity:0.45':''}"
-          ondragstart="lbDragStart(event,${lesson.id})"
-          ondragend="lbDragEnd(event)"
-          onclick="event.stopPropagation();openLogModal(${lesson.id},'${dateIso}')"
-          title="${lesson.name} — ${ts} — ${lesson.duration}min${hasLog?' (log saved)':' (no log yet)'}">
-          <div class="lb-title">${lesson.name.split(',').map(n=>n.trim()).join('<br>')}</div>
-          <div class="lb-meta" style="color:${c.text}">${ts} · ${lesson.duration}min</div>
-          <div class="lb-level" style="color:${c.text}">${lesson.level}</div>
-          ${hasLog?`<div class="lb-has-log"></div><div class="lb-classnum">#${logs[logKey].classNum||'?'}${logs[logKey].topic?' · '+logs[logKey].topic:''}</div>${logs[logKey].url?`<a href="${logs[logKey].url}" target="_blank" onclick="event.stopPropagation()" class="lb-url-btn" title="Open lesson file">🔗</a>`:''}`:''}
-          <button class="lb-edit-btn" onclick="event.stopPropagation();openEditLesson(${lesson.id})" title="Edit lesson">✏ Edit</button>
-        </div>`;
+  // Build rows — split into pre-gap, gap, post-gap
+  function buildRows(slotFrom, slotTo){
+    let r='';
+    for(let sl=slotFrom;sl<=slotTo;sl++){
+      const h=9+Math.floor(sl/2),m=sl%2===0?'00':'30';
+      const ts=`${String(h).padStart(2,'0')}:${m}`;
+      r+=`<div class="wg-time">${sl%2===0?ts:''}</div>`;
+      weekDates.forEach((d,di)=>{
+        const dayName=DAYS[di];
+        const dateIso=isoDate(d);
+        const isPast=dateIso<todayIso;
+        const starting=lessons.filter(l=>l.day===dayName&&l.start===ts);
+        r+=`<div class="wg-slot${sl%2===1?' half':''}${isPast?' past':''}"
+          ondragover="slotDragOver(event)" ondragleave="slotDragLeave(event)"
+          ondrop="slotDrop(event,'${dayName}','${ts}')"
+          onclick="handleCalSlotClick('${dayName}','${ts}','${dateIso}')">`;
+        starting.forEach(lesson=>{
+          const c=clr(lesson);
+          const hp=(lesson.duration/30)*SLOT_H-6;
+          const logKey=`${lesson.id}_${dateIso}`;
+          const hasLog=!!logs[logKey];
+          const linkedGroup=lesson.groupLink?groups.find(g=>g.id===lesson.groupLink):null;
+          const inTerm=linkedGroup?(dateIso>=linkedGroup.start&&dateIso<=linkedGroup.end):true;
+          r+=`<div class="lb${hasLog?'':' lb-no-log'}"
+            draggable="true" data-lesson-id="${lesson.id}"
+            style="top:3px;height:${hp}px;background:${c.bg};color:${c.text};${!inTerm?'opacity:0.45':''}"
+            ondragstart="lbDragStart(event,${lesson.id})" ondragend="lbDragEnd(event)"
+            onclick="event.stopPropagation();openLogModal(${lesson.id},'${dateIso}')"
+            title="${lesson.name} — ${ts} — ${lesson.duration}min">
+            <div class="lb-title">${lesson.name.split(',').map(n=>n.trim()).join('<br>')}</div>
+            <div class="lb-meta" style="color:${c.text}">${ts} · ${lesson.duration}min</div>
+            <div class="lb-level" style="color:${c.text}">${lesson.level}</div>
+            ${hasLog?`<div class="lb-has-log"></div><div class="lb-classnum">#${logs[logKey].classNum||'?'}${logs[logKey].topic?' · '+logs[logKey].topic:''}</div>${logs[logKey].url?`<a href="${logs[logKey].url}" target="_blank" onclick="event.stopPropagation()" class="lb-url-btn">🔗</a>`:''}`:''}
+            <button class="lb-edit-btn" onclick="event.stopPropagation();openEditLesson(${lesson.id})">✏ Edit</button>
+          </div>`;
+        });
+        r+=`</div>`;
       });
-      html+=`</div>`;
-    });
-
-    // After rendering slot 5 (11:30), close grid, inject toggle, reopen grid
-    if(sl===COLLAPSE_START-1){
-      const toggleLabel=shouldCollapse?'▸ &nbsp;12:00 – 15:00 — collapsed · click to expand':'▾ &nbsp;12:00 – 15:00 — click to collapse';
-      html+=`</div>
-        <div class="cal-gap-toggle" onclick="toggleCalGap()">${toggleLabel}</div>
-        <div class="week-grid">`;
     }
+    return r;
   }
 
-  document.getElementById('week-grid-wrap').innerHTML=`<div class="week-grid">${html}</div>`;
+  // Header (shared across both grids)
+  const headerRow=`<div class="wg-header time-col"></div>`+weekDates.map((d,i)=>{
+    const isToday=isoDate(d)===isoDate(TODAY);
+    return `<div class="wg-header${isToday?' is-today':''}"><div class="wg-day-name">${DAY_SHORT[i]}</div><div class="wg-day-date${isToday?' today':''}">${d.getDate()} ${d.toLocaleDateString('en-GB',{month:'short'})}</div></div>`;
+  }).join('');
+
+  // Slot 0–5 = 09:00–11:30, slots 6–11 = 12:00–14:30, slots 12–23 = 15:00–20:30
+  const preGap  = buildRows(0, 5);
+  const gapRows = shouldCollapse ? '' : buildRows(6, 11);
+  const postGap = buildRows(12, 23);
+
+  const toggleLabel = shouldCollapse
+    ? '▸ &nbsp;12:00 – 15:00 &nbsp;·&nbsp; click to expand'
+    : '▾ &nbsp;12:00 – 15:00 &nbsp;·&nbsp; click to collapse';
+
+  document.getElementById('week-grid-wrap').innerHTML=`
+    <div class="week-grid">${headerRow}${preGap}</div>
+    <div class="cal-gap-toggle" onclick="toggleCalGap()">${toggleLabel}</div>
+    <div class="week-grid">${gapRows}${postGap}</div>
+  `;
 }
 
 // ═══════════════════════════════════════════════════════
