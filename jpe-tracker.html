@@ -173,9 +173,9 @@ td.is-editing .cell-edit-wrap{display:flex;}
 /* Edit button — shown on hover */
 .lb-edit-btn{position:absolute;bottom:5px;left:6px;background:rgba(0,0,0,.25);border:none;border-radius:4px;color:#fff;font-size:9px;font-weight:700;padding:2px 6px;cursor:pointer;opacity:0;transition:opacity .15s;font-family:'Outfit',sans-serif;line-height:1.4;}
 .lb:hover .lb-edit-btn{opacity:1;}
-/* Collapsible gap — hide gap rows by zeroing their height */
-.wg-time.gap-row, .wg-slot.gap-row { min-height:44px; overflow:hidden; }
-.week-grid.gap-collapsed .gap-row { min-height:0 !important; height:0 !important; padding:0 !important; border:none !important; overflow:hidden; }
+/* Collapsible gap rows */
+.gap-row { overflow:hidden; transition:none; }
+.week-grid.gap-collapsed .gap-row { display:none !important; }
 
 /* Collapsible gap toggle — inside the grid, spans all 8 columns */
 .cal-gap-toggle{
@@ -1321,9 +1321,11 @@ function renderCalendar(){
   }).join('');
 
   const todayIso=isoDate(TODAY);
-  const hasLessonInGap=lessons.some(l=>{ const h=parseInt(l.start); return h>=12&&h<15; });
+  const hasLessonInGap=lessons.some(l=>{
+    const h=parseInt(l.start.split(':')[0],10);
+    return h>=12 && h<15;
+  });
   const shouldCollapse=calGapCollapsed&&!hasLessonInGap;
-  // CSS class added to grid when collapsed — sets gap row heights to 0
   const gapClass=shouldCollapse?'gap-collapsed':'';
 
   // Single grid — all 24 slots (09:00–20:30)
@@ -1343,6 +1345,15 @@ function renderCalendar(){
     const h=9+Math.floor(sl/2), m=sl%2===0?'00':'30';
     const ts=`${String(h).padStart(2,'0')}:${m}`;
     const inGap=(h>=12&&h<15)||(h===14&&m==='30');
+
+    // Skip the entire row (time cell + all day cells) when collapsed
+    if(inGap&&shouldCollapse){
+      // Still insert the toggle after 11:30
+      if(sl===5){
+        html+=`<div class="cal-gap-toggle" onclick="toggleCalGap()">▸ 12:00 – 15:00 · click to expand</div>`;
+      }
+      continue;
+    }
 
     html+=`<div class="wg-time${inGap?' gap-row':''}">${sl%2===0?ts:''}</div>`;
 
@@ -1388,7 +1399,7 @@ function renderCalendar(){
     }
   }
 
-  document.getElementById('week-grid-wrap').innerHTML=`<div class="week-grid ${gapClass}">${html}</div>`;
+  document.getElementById('week-grid-wrap').innerHTML=`<div class="week-grid">${html}</div>`;
 }
 
 // ═══════════════════════════════════════════════════════
