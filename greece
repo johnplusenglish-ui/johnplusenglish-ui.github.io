@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Christine's Guide to Ancient Greece</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --papyrus: #f5e6c8;
+    --papyrus-dark: #e8d5a3;
+    --terracotta: #c0522a;
+    --terracotta-light: #d4724a;
+    --marble: #f0ece4;
+    --marble-dark: #d8d0c0;
+    --gold: #c8920a;
+    --gold-light: #e8b830;
+    --aegean: #1a5c7a;
+    --aegean-light: #2a7a9e;
+    --ink: #2a1f0e;
+    --smoke: #8a7a60;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--papyrus);
+    color: var(--ink);
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 18px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE TEXTURE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.5;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 4rem 2rem;
+    position: relative;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(200,146,10,0.12) 0%, transparent 70%),
+      radial-gradient(ellipse 60% 40% at 20% 100%, rgba(192,82,42,0.1) 0%, transparent 60%),
+      linear-gradient(180deg, #f5e6c8 0%, #ede0c0 100%);
+    overflow: hidden;
+  }
+
+  .hero-columns {
+    position: absolute;
+    bottom: 0;
+    left: 0; right: 0;
+    height: 220px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 0 5vw;
+    pointer-events: none;
+    opacity: 0.12;
+  }
+  .column {
+    width: 28px;
+    background: linear-gradient(180deg, var(--marble-dark) 0%, var(--smoke) 100%);
+    border-radius: 3px 3px 0 0;
+  }
+  .column::before {
+    content: '';
+    display: block;
+    width: 38px;
+    height: 14px;
+    background: var(--smoke);
+    border-radius: 2px;
+    margin-left: -5px;
+    margin-bottom: 2px;
+  }
+  .column::after {
+    content: '';
+    display: block;
+    width: 38px;
+    height: 10px;
+    background: var(--marble-dark);
+    border-radius: 0 0 2px 2px;
+    margin-left: -5px;
+  }
+
+  .hero-eyebrow {
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.35em;
+    color: var(--terracotta);
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.2s forwards;
+  }
+
+  .hero h1 {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(2.8rem, 7vw, 6rem);
+    font-weight: 900;
+    line-height: 1.1;
+    color: var(--ink);
+    margin-bottom: 0.4rem;
+    opacity: 0;
+    animation: fadeUp 0.9s ease 0.4s forwards;
+  }
+
+  .hero h1 span {
+    color: var(--terracotta);
+    display: block;
+  }
+
+  .hero-subtitle {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1rem, 2vw, 1.3rem);
+    color: var(--gold);
+    letter-spacing: 0.12em;
+    margin-bottom: 2rem;
+    opacity: 0;
+    animation: fadeUp 0.9s ease 0.6s forwards;
+  }
+
+  .hero-dedication {
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--smoke);
+    margin-bottom: 3rem;
+    opacity: 0;
+    animation: fadeUp 0.9s ease 0.8s forwards;
+  }
+
+  .hero-dedication strong { color: var(--terracotta); font-style: normal; }
+
+  .scroll-hint {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0;
+    animation: fadeUp 0.9s ease 1.2s forwards;
+  }
+  .scroll-hint span {
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    color: var(--smoke);
+    text-transform: uppercase;
+  }
+  .scroll-arrow {
+    width: 2px;
+    height: 40px;
+    background: linear-gradient(180deg, var(--gold) 0%, transparent 100%);
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(245, 230, 200, 0.92);
+    backdrop-filter: blur(10px);
+    border-bottom: 2px solid var(--papyrus-dark);
+    padding: 0.8rem 2rem;
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem 2rem;
+    flex-wrap: wrap;
+  }
+  nav a {
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--smoke);
+    text-decoration: none;
+    transition: color 0.25s;
+    padding: 0.3rem 0.5rem;
+  }
+  nav a:hover { color: var(--terracotta); }
+
+  /* ── SECTIONS ── */
+  section {
+    padding: 5rem 2rem;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--terracotta);
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--terracotta-light), transparent);
+    max-width: 120px;
+  }
+
+  h2 {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.2;
+    margin-bottom: 2rem;
+  }
+
+  h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--terracotta);
+    margin-bottom: 0.8rem;
+    margin-top: 2rem;
+  }
+
+  p { margin-bottom: 1.2rem; color: #3a2f1e; }
+
+  /* ── TIMELINE ── */
+  .timeline-section {
+    background: linear-gradient(180deg, var(--papyrus) 0%, #ede0c0 50%, var(--papyrus) 100%);
+    padding: 5rem 0;
+  }
+  .timeline-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  .timeline {
+    position: relative;
+    margin-top: 3rem;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0; bottom: 0;
+    width: 2px;
+    background: linear-gradient(180deg, transparent, var(--gold-light), var(--terracotta), var(--gold-light), transparent);
+    transform: translateX(-50%);
+  }
+
+  .timeline-entry {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 3.5rem;
+    position: relative;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .timeline-entry.visible { opacity: 1; transform: translateY(0); }
+
+  .timeline-entry:nth-child(odd) { flex-direction: row-reverse; }
+
+  .timeline-content {
+    width: calc(50% - 40px);
+    background: var(--marble);
+    border: 1px solid var(--marble-dark);
+    border-radius: 4px;
+    padding: 1.5rem;
+    position: relative;
+    box-shadow: 2px 4px 20px rgba(42,31,14,0.07);
+  }
+
+  .timeline-entry:nth-child(odd) .timeline-content { margin-right: 40px; }
+  .timeline-entry:nth-child(even) .timeline-content { margin-left: 40px; }
+
+  .timeline-dot {
+    position: absolute;
+    left: 50%;
+    top: 1.2rem;
+    width: 16px;
+    height: 16px;
+    background: var(--gold);
+    border: 3px solid var(--papyrus);
+    border-radius: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 0 0 2px var(--gold-light);
+    z-index: 1;
+  }
+
+  .timeline-date {
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    color: var(--gold);
+    margin-bottom: 0.4rem;
+  }
+
+  .timeline-content h3 { margin-top: 0; font-size: 1rem; }
+  .timeline-content p { font-size: 0.9rem; margin-bottom: 0; }
+
+  /* ── GODS GRID ── */
+  .gods-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2.5rem;
+  }
+
+  .god-card {
+    background: var(--marble);
+    border: 1px solid var(--marble-dark);
+    border-radius: 6px;
+    padding: 1.8rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: default;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease, box-shadow 0.3s ease;
+  }
+  .god-card.visible { opacity: 1; transform: translateY(0); }
+  .god-card:hover { box-shadow: 0 8px 30px rgba(42,31,14,0.12); transform: translateY(-3px); }
+
+  .god-card::before {
+    content: attr(data-symbol);
+    position: absolute;
+    top: -10px; right: 10px;
+    font-size: 5rem;
+    opacity: 0.07;
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  .god-card .god-name {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--terracotta);
+    margin-bottom: 0.2rem;
+  }
+
+  .god-card .god-domain {
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.8rem;
+  }
+
+  .god-card p { font-size: 0.88rem; color: #4a3a28; margin-bottom: 0; }
+
+  /* ── QUOTE BLOCK ── */
+  .quote-block {
+    border-left: 4px solid var(--gold);
+    padding: 1.5rem 2rem;
+    margin: 3rem 0;
+    background: rgba(200,146,10,0.05);
+    border-radius: 0 6px 6px 0;
+  }
+  .quote-block blockquote {
+    font-size: 1.3rem;
+    font-style: italic;
+    line-height: 1.6;
+    color: var(--ink);
+    margin-bottom: 0.8rem;
+  }
+  .quote-block cite {
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    color: var(--smoke);
+    text-transform: uppercase;
+  }
+
+  /* ── ATHENS CARD ── */
+  .athens-feature {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: start;
+    margin-top: 2rem;
+  }
+
+  .athens-sites {
+    list-style: none;
+    margin-top: 1.5rem;
+  }
+  .athens-sites li {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--papyrus-dark);
+    font-size: 0.92rem;
+  }
+  .athens-sites li:last-child { border-bottom: none; }
+
+  .site-num {
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    color: var(--gold);
+    font-weight: 600;
+    min-width: 28px;
+    margin-top: 2px;
+  }
+
+  .site-info strong {
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    color: var(--terracotta);
+    display: block;
+    margin-bottom: 0.2rem;
+  }
+
+  /* ── MYTHS ── */
+  .myths-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-top: 2.5rem;
+  }
+
+  .myth-card {
+    border: 1px solid var(--marble-dark);
+    border-radius: 6px;
+    overflow: hidden;
+    background: var(--marble);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .myth-card.visible { opacity: 1; transform: translateY(0); }
+
+  .myth-header {
+    background: var(--terracotta);
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .myth-header h3 {
+    color: var(--papyrus);
+    font-size: 1rem;
+    margin: 0;
+    font-family: 'Cinzel Decorative', serif;
+  }
+  .myth-emoji { font-size: 1.5rem; }
+
+  .myth-body { padding: 1.5rem; }
+  .myth-body p { font-size: 0.88rem; margin-bottom: 0; }
+
+  /* ── FUN FACTS TICKER ── */
+  .ticker-wrap {
+    background: var(--aegean);
+    padding: 0.8rem 0;
+    overflow: hidden;
+    position: relative;
+  }
+  .ticker-wrap::before, .ticker-wrap::after {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 80px;
+    z-index: 2;
+  }
+  .ticker-wrap::before { left: 0; background: linear-gradient(90deg, var(--aegean), transparent); }
+  .ticker-wrap::after { right: 0; background: linear-gradient(-90deg, var(--aegean), transparent); }
+
+  .ticker-track {
+    display: flex;
+    gap: 4rem;
+    width: max-content;
+    animation: ticker 40s linear infinite;
+  }
+
+  .ticker-item {
+    font-family: 'Cinzel', serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    color: var(--papyrus);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+  .ticker-item::before { content: '✦'; color: var(--gold-light); font-size: 0.6rem; }
+
+  /* ── QUIZ ── */
+  .quiz-section {
+    background: linear-gradient(135deg, var(--ink) 0%, #3a2f1e 100%);
+    padding: 5rem 2rem;
+  }
+  .quiz-inner { max-width: 680px; margin: 0 auto; text-align: center; }
+  .quiz-inner .section-label { justify-content: center; color: var(--gold-light); }
+  .quiz-inner .section-label::after { display: none; }
+  .quiz-inner h2 { color: var(--papyrus); }
+
+  .quiz-card {
+    background: rgba(245,230,200,0.06);
+    border: 1px solid rgba(200,146,10,0.3);
+    border-radius: 8px;
+    padding: 2.5rem;
+    text-align: left;
+    margin-top: 2rem;
+  }
+
+  .quiz-q {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    color: var(--papyrus);
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+  }
+
+  .quiz-options {
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .quiz-opt {
+    background: rgba(245,230,200,0.05);
+    border: 1px solid rgba(200,146,10,0.2);
+    border-radius: 4px;
+    padding: 0.9rem 1.2rem;
+    color: var(--papyrus-dark);
+    font-family: 'EB Garamond', serif;
+    font-size: 0.95rem;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.2s, border-color 0.2s, transform 0.15s;
+  }
+  .quiz-opt:hover { background: rgba(200,146,10,0.1); border-color: var(--gold); transform: translateX(4px); }
+  .quiz-opt.correct { background: rgba(26,92,122,0.3); border-color: var(--aegean-light); color: #a8d8ea; }
+  .quiz-opt.wrong { background: rgba(192,82,42,0.2); border-color: var(--terracotta-light); color: #f0a080; }
+  .quiz-opt:disabled { cursor: default; transform: none; }
+
+  .quiz-feedback {
+    margin-top: 1.2rem;
+    min-height: 2rem;
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 1rem;
+    color: var(--papyrus-dark);
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+  .quiz-feedback.show { opacity: 1; }
+
+  .quiz-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1.5rem;
+  }
+
+  .quiz-counter {
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    color: var(--smoke);
+    letter-spacing: 0.2em;
+  }
+
+  .btn-next {
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    background: var(--terracotta);
+    color: var(--papyrus);
+    border: none;
+    padding: 0.8rem 1.8rem;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background 0.2s;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .btn-next.show { opacity: 1; pointer-events: all; }
+  .btn-next:hover { background: var(--terracotta-light); }
+
+  .quiz-score {
+    display: none;
+    text-align: center;
+    padding: 2rem;
+  }
+  .quiz-score.show { display: block; }
+  .score-big {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 4rem;
+    color: var(--gold-light);
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+  .score-msg { color: var(--papyrus-dark); font-style: italic; font-size: 1.1rem; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--ink);
+    padding: 3rem 2rem;
+    text-align: center;
+    color: var(--smoke);
+  }
+  footer .footer-logo {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 1.4rem;
+    color: var(--gold-light);
+    margin-bottom: 0.8rem;
+  }
+  footer p { font-size: 0.85rem; margin-bottom: 0; }
+  footer strong { color: var(--terracotta-light); }
+
+  /* ── DIVIDER ── */
+  .ornament {
+    text-align: center;
+    color: var(--gold);
+    font-size: 1.2rem;
+    letter-spacing: 0.5rem;
+    margin: 1rem 0;
+    opacity: 0.5;
+  }
+
+  /* ── HIGHLIGHTS BOX ── */
+  .highlight-box {
+    background: linear-gradient(135deg, rgba(26,92,122,0.08), rgba(200,146,10,0.06));
+    border: 1px solid rgba(26,92,122,0.2);
+    border-radius: 6px;
+    padding: 1.5rem 2rem;
+    margin: 2rem 0;
+  }
+  .highlight-box h3 { margin-top: 0; color: var(--aegean); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes scrollPulse {
+    0%, 100% { transform: scaleY(1); opacity: 0.7; }
+    50% { transform: scaleY(1.3); opacity: 1; }
+  }
+
+  @keyframes ticker {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 680px) {
+    .timeline::before { left: 24px; }
+    .timeline-entry, .timeline-entry:nth-child(odd) { flex-direction: column; padding-left: 56px; }
+    .timeline-content { width: 100%; }
+    .timeline-entry:nth-child(odd) .timeline-content { margin-right: 0; }
+    .timeline-entry:nth-child(even) .timeline-content { margin-left: 0; }
+    .timeline-dot { left: 24px; }
+    .athens-feature { grid-template-columns: 1fr; gap: 1.5rem; }
+    .hero-columns { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-columns">
+    <div class="column" style="height:160px"></div>
+    <div class="column" style="height:200px"></div>
+    <div class="column" style="height:140px"></div>
+    <div class="column" style="height:220px"></div>
+    <div class="column" style="height:180px"></div>
+    <div class="column" style="height:160px"></div>
+    <div class="column" style="height:200px"></div>
+    <div class="column" style="height:140px"></div>
+  </div>
+
+  <p class="hero-eyebrow">Athens, Greece</p>
+  <h1>Ancient<span>Greece</span></h1>
+  <p class="hero-subtitle">A Living History · A Personal Journey</p>
+  <p class="hero-dedication">Made with love for <strong>Christine</strong> — welcome to the cradle of civilisation ❤️</p>
+
+  <div class="scroll-hint">
+    <span>Scroll to explore</span>
+    <div class="scroll-arrow"></div>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav>
+  <a href="#intro">Overview</a>
+  <a href="#timeline">Timeline</a>
+  <a href="#gods">The Gods</a>
+  <a href="#myths">Myths</a>
+  <a href="#athens">Athens Today</a>
+  <a href="#quiz">Quiz</a>
+</nav>
+
+<!-- FUN FACTS TICKER -->
+<div class="ticker-wrap" aria-hidden="true">
+  <div class="ticker-track">
+    <span class="ticker-item">Athens is the oldest continuously inhabited city in Europe</span>
+    <span class="ticker-item">The word "democracy" comes from Greek: demos (people) + kratos (power)</span>
+    <span class="ticker-item">The Parthenon was completed in 438 BCE</span>
+    <span class="ticker-item">Homer composed the Iliad and Odyssey around 800 BCE</span>
+    <span class="ticker-item">Socrates never wrote anything down — we know him through Plato</span>
+    <span class="ticker-item">The Olympics were held every four years starting in 776 BCE</span>
+    <span class="ticker-item">Ancient Greeks believed the Earth was at the centre of the universe</span>
+    <span class="ticker-item">The word "alphabet" comes from alpha + beta, the first two Greek letters</span>
+    <!-- duplicate for seamless loop -->
+    <span class="ticker-item">Athens is the oldest continuously inhabited city in Europe</span>
+    <span class="ticker-item">The word "democracy" comes from Greek: demos (people) + kratos (power)</span>
+    <span class="ticker-item">The Parthenon was completed in 438 BCE</span>
+    <span class="ticker-item">Homer composed the Iliad and Odyssey around 800 BCE</span>
+    <span class="ticker-item">Socrates never wrote anything down — we know him through Plato</span>
+    <span class="ticker-item">The Olympics were held every four years starting in 776 BCE</span>
+    <span class="ticker-item">Ancient Greeks believed the Earth was at the centre of the universe</span>
+    <span class="ticker-item">The word "alphabet" comes from alpha + beta, the first two Greek letters</span>
+  </div>
+</div>
+
+<!-- INTRO -->
+<section id="intro">
+  <p class="section-label">The Big Picture</p>
+  <h2>Why Does Ancient Greece Matter?</h2>
+
+  <p>Walk through Athens today and you are treading on 3,000 years of history. The people who lived here invented <strong>democracy</strong>, wrote the first great works of <strong>philosophy</strong> and <strong>drama</strong>, theorised <strong>geometry</strong> and <strong>physics</strong>, and gave the Western world many of the ideas it still runs on.</p>
+
+  <p>Ancient Greek civilisation broadly spans from around <strong>800 BCE</strong> — the age of Homer — to <strong>31 BCE</strong>, when Rome absorbed the last of the Hellenistic kingdoms. But Greek culture's influence stretches far beyond those dates. Every time you hear the word "democracy," "philosophy," "theatre," "marathon," or "Olympics," you are speaking Greek.</p>
+
+  <div class="quote-block">
+    <blockquote>"Wonder is the beginning of wisdom."</blockquote>
+    <cite>— Socrates (469–399 BCE)</cite>
+  </div>
+
+  <div class="highlight-box">
+    <h3>Three Periods to Know</h3>
+    <p><strong>Archaic Period (800–480 BCE)</strong> — City-states rise, Homer writes, the first Olympics are held, colonisation spreads Greek culture across the Mediterranean.</p>
+    <p><strong>Classical Period (480–323 BCE)</strong> — Athens at its peak. The Parthenon, Socrates, Plato, Aristotle, Sophocles, Herodotus. Democracy flourishes and crumbles.</p>
+    <p style="margin-bottom:0"><strong>Hellenistic Period (323–31 BCE)</strong> — Alexander the Great spreads Greek culture from Egypt to India. The world becomes cosmopolitan, multilingual, and deeply Greek in flavour.</p>
+  </div>
+</section>
+
+<!-- TIMELINE -->
+<div class="timeline-section" id="timeline">
+  <div class="timeline-inner">
+    <p class="section-label">Through the Ages</p>
+    <h2>A Timeline of Ancient Greece</h2>
+    <div class="ornament">· · ⬧ · ·</div>
+
+    <div class="timeline">
+
+      <div class="timeline-entry">
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <p class="timeline-date">c. 800 BCE</p>
+          <h3>Homer's Epics</h3>
+          <p>The <em>Iliad</em> and <em>Odyssey</em> are composed — the foundational texts of Western literature. They tell of the Trojan War and one man's epic journey home.</p>
+        </div>
+      </div>
+
+      <div class="timeline-entry">
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <p class="timeline-date">776 BCE</p>
+          <h3>The First Olympic Games</h3>
+          <p>Athletes gather at Olympia to compete in honour of Zeus. The Games will continue every four years for over a thousand years.</p>
+        </div>
+      </div>
+
+      <div class="timeline-entry">
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <p class="timeline-date">508 BCE</p>
+          <h3>Cleisthenes Invents Democracy</h3>
+          <p>The Athenian statesman Cleisthenes reforms the constitution, giving citizens (free men) the right to participate in government — the world's first democracy.</p>
+        </div>
+      </div>
+
+      <div class="timeline-entry">
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <p class="timeline-date">490–479 BCE</p>
+          <h3>The Persian Wars</h3>
+          <p>Greece defeats the mighty Persian Empire twice — at Marathon (490), Thermopylae (480), and Salamis (480). A small, divided civilisation defeats the world's largest empire.</p>
+        </div>
+      </div>
+
+      <div class="timeline-entry">
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <p class="timeline-date">447–432 BCE</p>
+          <h3>The Parthenon is Built</h3>
+          <p>Under statesman Pericles, the Parthenon is constructed on the Acropolis as a temple to Athena. It remains one of humanity's greatest architectural achievements.</p>
+        </div>
+      </div>
+
+      <div class="timeline-entry">
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <p class="timeline-date">399 BCE</p>
+          <h3>The Death of Socrates</h3>
+          <p>The philosopher Socrates is tried for "corrupting the youth" and executed by hemlock. His student Plato will preserve his ideas for eternity.</p>
+        </div>
+      </div>
+
+      <div class="timeline-entry">
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <p class="timeline-date">336–323 BCE</p>
+          <h3>Alexander the Great</h3>
+          <p>Alexander, tutored by Aristotle, builds the largest empire the world had ever seen — stretching from Greece to northern India — spreading Greek culture everywhere he goes.</p>
+        </div>
+      </div>
+
+      <div class="timeline-entry">
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <p class="timeline-date">31 BCE</p>
+          <h3>Rome Takes Over</h3>
+          <p>After the Battle of Actium, Rome absorbs the last Hellenistic kingdom. But Greek culture doesn't die — it becomes the backbone of the entire Roman Empire.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- GODS -->
+<section id="gods">
+  <p class="section-label">Mount Olympus</p>
+  <h2>The Twelve Olympians</h2>
+  <p>The ancient Greeks explained the world through a rich cast of gods who embodied human qualities — love, jealousy, wisdom, rage — on a divine scale. These twelve ruled from Mount Olympus, Greece's tallest peak.</p>
+
+  <div class="gods-grid">
+
+    <div class="god-card" data-symbol="⚡">
+      <div class="god-name">Zeus</div>
+      <div class="god-domain">King of the Gods · Sky · Thunder</div>
+      <p>Ruler of Olympus, wielder of lightning bolts. Famous for his many love affairs and his role as judge of gods and men. His Roman equivalent is Jupiter.</p>
+    </div>
+
+    <div class="god-card" data-symbol="🌊">
+      <div class="god-name">Poseidon</div>
+      <div class="god-domain">Sea · Earthquakes · Horses</div>
+      <p>Zeus's brother and god of the sea. Sailors prayed to him for safe passage. He competed with Athena for patronage of Athens — and lost. Roman: Neptune.</p>
+    </div>
+
+    <div class="god-card" data-symbol="🦉">
+      <div class="god-name">Athena</div>
+      <div class="god-domain">Wisdom · War Strategy · Crafts</div>
+      <p>Patron goddess of Athens, born fully armoured from Zeus's head. She favoured clever heroes like Odysseus. The city of Athens is named after her. Roman: Minerva.</p>
+    </div>
+
+    <div class="god-card" data-symbol="☀️">
+      <div class="god-name">Apollo</div>
+      <div class="god-domain">Sun · Music · Prophecy · Healing</div>
+      <p>God of light, music, and truth. The Oracle at Delphi was his sanctuary, where pilgrims travelled from across the world to receive divine prophecy. Roman: Apollo.</p>
+    </div>
+
+    <div class="god-card" data-symbol="🌙">
+      <div class="god-name">Artemis</div>
+      <div class="god-domain">Moon · Hunt · Wilderness</div>
+      <p>Apollo's twin sister, goddess of the hunt and the moon. Independent, fierce, and protector of young women. She roamed wild forests with her silver bow. Roman: Diana.</p>
+    </div>
+
+    <div class="god-card" data-symbol="❤️">
+      <div class="god-name">Aphrodite</div>
+      <div class="god-domain">Love · Beauty · Desire</div>
+      <p>Born from sea foam, she was the most beautiful of the gods. Her power caused gods and mortals alike to fall helplessly in love — often with catastrophic consequences. Roman: Venus.</p>
+    </div>
+
+    <div class="god-card" data-symbol="⚔️">
+      <div class="god-name">Ares</div>
+      <div class="god-domain">War · Violence · Courage</div>
+      <p>God of war — not strategy like Athena, but raw, bloody battle. He was powerful but often outwitted, and even the gods found him difficult to like. Roman: Mars.</p>
+    </div>
+
+    <div class="god-card" data-symbol="🔥">
+      <div class="god-name">Hephaestus</div>
+      <div class="god-domain">Fire · Forge · Craftsmanship</div>
+      <p>The divine blacksmith, lame and brilliant. He built the palaces of Olympus, forged Zeus's lightning bolts, and created armour for heroes like Achilles. Roman: Vulcan.</p>
+    </div>
+
+    <div class="god-card" data-symbol="🌿">
+      <div class="god-name">Demeter</div>
+      <div class="god-domain">Harvest · Grain · Seasons</div>
+      <p>Goddess of the earth's fertility. When her daughter Persephone was taken to the Underworld, Demeter's grief caused the first winter — the Greeks' explanation for the seasons.</p>
+    </div>
+
+    <div class="god-card" data-symbol="🍷">
+      <div class="god-name">Dionysus</div>
+      <div class="god-domain">Wine · Theatre · Ecstasy</div>
+      <p>God of wine and theatrical performance. His festivals gave birth to Greek theatre — tragedy and comedy both emerged from Dionysian rituals. Wild, liberating, dangerous. Roman: Bacchus.</p>
+    </div>
+
+    <div class="god-card" data-symbol="🪄">
+      <div class="god-name">Hermes</div>
+      <div class="god-domain">Messengers · Travel · Commerce · Thieves</div>
+      <p>The swift messenger of the gods, with winged sandals and a caduceus staff. He guided souls to the Underworld, delivered divine messages, and was the patron of tricksters. Roman: Mercury.</p>
+    </div>
+
+    <div class="god-card" data-symbol="🏹">
+      <div class="god-name">Hera</div>
+      <div class="god-domain">Marriage · Women · Queen of Olympus</div>
+      <p>Zeus's wife and queen of the gods. Fiercely devoted to marriage and deeply jealous of Zeus's many affairs, she often pursued his lovers and illegitimate children with frightening intensity. Roman: Juno.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- MYTHS -->
+<section id="myths" style="background: linear-gradient(180deg, var(--papyrus) 0%, #ede0c0 100%); padding-top: 5rem; padding-bottom: 5rem; max-width: none;">
+<div style="max-width: 960px; margin: 0 auto; padding: 0 2rem;">
+  <p class="section-label">Tales of Gods & Heroes</p>
+  <h2>Famous Myths to Know</h2>
+  <p>Greek myths weren't just stories — they were explanations of the world, moral lessons, and entertainment all at once. Here are some of the most famous.</p>
+
+  <div class="myths-grid">
+
+    <div class="myth-card">
+      <div class="myth-header">
+        <h3>The Trojan War</h3>
+        <span class="myth-emoji">⚔️</span>
+      </div>
+      <div class="myth-body">
+        <p>When Paris of Troy took the beautiful Helen from her husband Menelaus, the Greeks launched a thousand ships. Ten years of war followed, ending only when the Greeks hid soldiers inside a giant wooden horse — the ultimate trick. Homer told this story in the <em>Iliad</em>.</p>
+      </div>
+    </div>
+
+    <div class="myth-card">
+      <div class="myth-header">
+        <h3>Theseus & the Minotaur</h3>
+        <span class="myth-emoji">🐂</span>
+      </div>
+      <div class="myth-body">
+        <p>Every year, Athens sent seven young men and seven women to Crete as tribute to King Minos, fed to the Minotaur — a monster half-man, half-bull — in an inescapable labyrinth. Theseus volunteered to go, killed the beast, and escaped using a thread given by the Cretan princess Ariadne.</p>
+      </div>
+    </div>
+
+    <div class="myth-card">
+      <div class="myth-header">
+        <h3>Prometheus & Fire</h3>
+        <span class="myth-emoji">🔥</span>
+      </div>
+      <div class="myth-body">
+        <p>The Titan Prometheus stole fire from the gods and gave it to humanity, enabling civilisation. As punishment, Zeus chained him to a rock for eternity, where an eagle ate his liver each day — only for it to regenerate overnight. Hercules eventually freed him.</p>
+      </div>
+    </div>
+
+    <div class="myth-card">
+      <div class="myth-header">
+        <h3>Odysseus's Journey</h3>
+        <span class="myth-emoji">🌊</span>
+      </div>
+      <div class="myth-body">
+        <p>After the Trojan War, the hero Odysseus spent ten years trying to sail home to Ithaca, facing the Cyclops Polyphemus, the witch Circe, the Sirens, and the wrath of Poseidon. Homer's <em>Odyssey</em> remains one of the greatest adventure stories ever written.</p>
+      </div>
+    </div>
+
+    <div class="myth-card">
+      <div class="myth-header">
+        <h3>Icarus & the Sun</h3>
+        <span class="myth-emoji">☀️</span>
+      </div>
+      <div class="myth-body">
+        <p>The craftsman Daedalus built wings of feathers and wax to escape imprisonment. He warned his son Icarus not to fly too high or too low. Icarus, overcome by the thrill of flight, soared too close to the sun — the wax melted, and he fell into the sea. A timeless lesson in hubris.</p>
+      </div>
+    </div>
+
+    <div class="myth-card">
+      <div class="myth-header">
+        <h3>Persephone & the Underworld</h3>
+        <span class="myth-emoji">🌸</span>
+      </div>
+      <div class="myth-body">
+        <p>Hades, god of the Underworld, abducted the spring goddess Persephone and made her his queen. Her mother Demeter, goddess of the harvest, was so grief-stricken she let crops die. Zeus negotiated a compromise: Persephone spends six months below ground (winter) and six above (spring and summer).</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+</section>
+
+<!-- ATHENS TODAY -->
+<section id="athens">
+  <p class="section-label">Where Past Meets Present</p>
+  <h2>Ancient Athens — What You Can See Today</h2>
+
+  <p>Christine, you are in one of the luckiest positions possible — you are standing in the actual city where all of this happened. Here is what to look for.</p>
+
+  <div class="athens-feature">
+    <div>
+      <h3>The Acropolis</h3>
+      <p>The rocky hill at the heart of Athens was the city's sacred centre. The Parthenon, built in honour of Athena, sits at its summit — breathtaking even in ruins. Visit at sunrise to avoid the crowds and feel the full weight of 2,500 years of history.</p>
+
+      <h3>What "Acropolis" Means</h3>
+      <p>The word literally means "high city" (akros = high, polis = city). Every Greek city had one — a fortified hilltop refuge and religious centre. Athens' is simply the most famous.</p>
+
+      <div class="quote-block">
+        <blockquote>"Mighty indeed are the marks and monuments of our empire which we have left. Future ages will wonder at us."</blockquote>
+        <cite>— Pericles, Funeral Oration, 431 BCE</cite>
+      </div>
+    </div>
+
+    <div>
+      <ul class="athens-sites">
+        <li>
+          <span class="site-num">01</span>
+          <div class="site-info">
+            <strong>The Parthenon</strong>
+            Temple of Athena Parthenos. Completed 432 BCE. Note the subtle curves — the columns lean inward, the platform bows slightly. All to correct optical illusions.
+          </div>
+        </li>
+        <li>
+          <span class="site-num">02</span>
+          <div class="site-info">
+            <strong>The Erechtheion</strong>
+            Famous for its Caryatids — six sculpted female figures serving as columns. The ones you see are replicas; five originals are in the Acropolis Museum.
+          </div>
+        </li>
+        <li>
+          <span class="site-num">03</span>
+          <div class="site-info">
+            <strong>The Agora</strong>
+            The civic heart of ancient Athens. Socrates walked here. Aristotle taught here. Democracy was debated here. The reconstructed Stoa of Attalos is wonderful.
+          </div>
+        </li>
+        <li>
+          <span class="site-num">04</span>
+          <div class="site-info">
+            <strong>The Acropolis Museum</strong>
+            World-class museum right at the foot of the hill. Incredible sculptures including the Elgin Marbles dispute's Greek side. Don't miss it.
+          </div>
+        </li>
+        <li>
+          <span class="site-num">05</span>
+          <div class="site-info">
+            <strong>Theatre of Dionysus</strong>
+            The world's first theatre, carved into the south slope of the Acropolis. Sophocles, Euripides, and Aristophanes premiered their plays here to audiences of 17,000.
+          </div>
+        </li>
+        <li>
+          <span class="site-num">06</span>
+          <div class="site-info">
+            <strong>The National Archaeological Museum</strong>
+            The best collection of ancient Greek art in the world. The gold mask of Agamemnon alone is worth the trip.
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<div class="quiz-section" id="quiz">
+  <div class="quiz-inner">
+    <p class="section-label">Test Your Knowledge</p>
+    <h2>Can You Pass the Oracle's Test?</h2>
+    <p style="color: var(--papyrus-dark); font-style:italic;">The Oracle at Delphi demands answers. How much have you learned, Christine?</p>
+
+    <div class="quiz-card" id="quiz-card">
+      <div id="quiz-main">
+        <p class="quiz-q" id="q-text"></p>
+        <div class="quiz-options" id="q-options"></div>
+        <p class="quiz-feedback" id="q-feedback"></p>
+        <div class="quiz-nav">
+          <span class="quiz-counter" id="q-counter"></span>
+          <button class="btn-next" id="btn-next" onclick="nextQuestion()">Next Question →</button>
+        </div>
+      </div>
+      <div class="quiz-score" id="quiz-score">
+        <span class="score-big" id="score-num"></span>
+        <p class="score-msg" id="score-msg"></p>
+        <br>
+        <button class="btn-next show" onclick="restartQuiz()" style="margin:0 auto;display:block;">Try Again</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Ancient Greece</div>
+  <p>Made with love for <strong>Christine</strong> in Athens ❤️</p>
+  <p style="margin-top:0.5rem; font-size:0.75rem; opacity:0.5;">Designed by John · JohnPlusEnglish</p>
+</footer>
+
+<script>
+  // ── SCROLL REVEAL ──
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.timeline-entry, .god-card, .myth-card').forEach(el => observer.observe(el));
+
+  // Stagger god cards
+  document.querySelectorAll('.god-card').forEach((el, i) => {
+    el.style.transitionDelay = (i * 0.07) + 's';
+  });
+
+  // ── QUIZ ──
+  const questions = [
+    {
+      q: "Athens is named after which goddess?",
+      opts: ["Hera", "Aphrodite", "Athena", "Artemis"],
+      correct: 2,
+      feedback: "Correct! Athena won a contest against Poseidon for patronage of the city by offering an olive tree — more useful than Poseidon's saltwater spring."
+    },
+    {
+      q: "In which century was the Parthenon completed?",
+      opts: ["6th century BCE", "5th century BCE", "4th century BCE", "3rd century BCE"],
+      correct: 1,
+      feedback: "Right! The Parthenon was completed in 432 BCE, in the 5th century BCE, during the Golden Age of Athens under Pericles."
+    },
+    {
+      q: "What was the Agora in ancient Athens?",
+      opts: ["A royal palace", "A temple complex", "The main public gathering and marketplace", "A military fortress"],
+      correct: 2,
+      feedback: "Exactly! The Agora was the civic and commercial heart of Athens — where citizens debated politics, traded goods, and philosophers like Socrates walked and talked."
+    },
+    {
+      q: "Who was Socrates executed by, and how?",
+      opts: ["The Persians, by sword", "The Athenians, by hemlock", "The Spartans, in battle", "The gods, by lightning"],
+      correct: 1,
+      feedback: "Correct. Socrates was condemned by an Athenian jury of 500 citizens for 'corrupting the youth' and forced to drink hemlock poison in 399 BCE."
+    },
+    {
+      q: "What is the literal meaning of 'democracy'?",
+      opts: ["Rule by the wise", "Rule by the strong", "Rule by the gods", "Rule by the people"],
+      correct: 3,
+      feedback: "Yes! From the Greek demos (people) + kratos (power or rule). Athenian democracy only extended to free male citizens, but it was still a revolutionary concept."
+    },
+    {
+      q: "Which hero killed the Minotaur in the Labyrinth?",
+      opts: ["Hercules", "Perseus", "Theseus", "Achilles"],
+      correct: 2,
+      feedback: "Theseus! The Athenian hero entered the Cretan labyrinth, killed the half-bull monster, and escaped by following a thread left by the princess Ariadne."
+    },
+    {
+      q: "Alexander the Great was tutored as a boy by which philosopher?",
+      opts: ["Socrates", "Plato", "Aristotle", "Pythagoras"],
+      correct: 2,
+      feedback: "Aristotle! The philosopher was employed by King Philip II of Macedon to tutor his son Alexander from age 13. It's one of history's great teacher-student pairings."
+    },
+    {
+      q: "The myth of Icarus is traditionally understood as a warning about what?",
+      opts: ["The dangers of sea travel", "Hubris — excessive pride and overreaching", "The cruelty of the gods", "Disobeying one's parents"],
+      correct: 1,
+      feedback: "Hubris — the Greek concept of dangerous overconfidence or excessive pride. Icarus was warned, ignored the warning, and fell. The Greeks saw this as a fundamental human flaw."
+    }
+  ];
+
+  let current = 0;
+  let score = 0;
+  let answered = false;
+
+  function loadQuestion() {
+    answered = false;
+    const q = questions[current];
+    document.getElementById('q-text').textContent = q.q;
+    document.getElementById('q-counter').textContent = `${current + 1} of ${questions.length}`;
+    document.getElementById('q-feedback').textContent = '';
+    document.getElementById('q-feedback').classList.remove('show');
+    document.getElementById('btn-next').classList.remove('show');
+
+    const opts = document.getElementById('q-options');
+    opts.innerHTML = '';
+    q.opts.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'quiz-opt';
+      btn.textContent = opt;
+      btn.onclick = () => answer(i, btn);
+      opts.appendChild(btn);
+    });
+  }
+
+  function answer(idx, btn) {
+    if (answered) return;
+    answered = true;
+    const q = questions[current];
+    const all = document.querySelectorAll('.quiz-opt');
+
+    all.forEach(b => b.disabled = true);
+
+    if (idx === q.correct) {
+      btn.classList.add('correct');
+      score++;
+      document.getElementById('q-feedback').textContent = '✓ ' + q.feedback;
+    } else {
+      btn.classList.add('wrong');
+      all[q.correct].classList.add('correct');
+      document.getElementById('q-feedback').textContent = '✗ ' + q.feedback;
+    }
+
+    document.getElementById('q-feedback').classList.add('show');
+
+    if (current < questions.length - 1) {
+      document.getElementById('btn-next').classList.add('show');
+    } else {
+      setTimeout(showScore, 1800);
+    }
+  }
+
+  function nextQuestion() {
+    current++;
+    loadQuestion();
+  }
+
+  function showScore() {
+    document.getElementById('quiz-main').style.display = 'none';
+    const scoreEl = document.getElementById('quiz-score');
+    scoreEl.classList.add('show');
+    document.getElementById('score-num').textContent = score + '/' + questions.length;
+
+    const msgs = [
+      [0, 3, "The Oracle is unimpressed… but keep exploring!"],
+      [4, 5, "Not bad! The philosophers would be cautiously pleased."],
+      [6, 7, "Impressive! Socrates would argue you have potential."],
+      [8, 8, "Perfect score! You are a true child of Athens, Christine! 🏛️"]
+    ];
+
+    let msg = msgs[0][2];
+    for (const [lo, hi, m] of msgs) {
+      if (score >= lo && score <= hi) { msg = m; break; }
+    }
+    document.getElementById('score-msg').textContent = msg;
+  }
+
+  function restartQuiz() {
+    current = 0; score = 0; answered = false;
+    document.getElementById('quiz-main').style.display = '';
+    document.getElementById('quiz-score').classList.remove('show');
+    loadQuestion();
+  }
+
+  loadQuestion();
+</script>
+</body>
+</html>
