@@ -4,586 +4,740 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#1a3a6b">
-<title>Quiz Patente C-CE – Periodi di Guida e Riposo</title>
+<title>Quiz Patente C-CE</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: #f0f2f5;
-    color: #1a1a1a;
-    min-height: 100vh;
-  }
-
-  header {
-    background: #1a3a6b;
-    color: white;
-    padding: 16px 20px;
-    text-align: center;
-  }
-  header h1 { font-size: 1.1rem; font-weight: 700; line-height: 1.3; }
-  header p { font-size: 0.78rem; opacity: 0.75; margin-top: 4px; }
-
-  /* ── MENU ── */
-  #menu { padding: 16px; max-width: 540px; margin: 0 auto; }
-
-  .menu-title {
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #666;
-    margin: 16px 0 8px;
-  }
-
-  .topic-btn {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    background: white;
-    border: none;
-    border-radius: 10px;
-    padding: 14px 16px;
-    margin-bottom: 8px;
-    font-size: 0.9rem;
-    text-align: left;
-    cursor: pointer;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-    transition: background 0.15s;
-  }
-  .topic-btn:active { background: #f0f4ff; }
-  .topic-btn .count {
-    font-size: 0.75rem;
-    color: #888;
-    white-space: nowrap;
-    margin-left: 8px;
-  }
-  .topic-btn .arr { color: #1a3a6b; font-size: 1rem; }
-
-  .all-btn {
-    display: block;
-    width: 100%;
-    background: #1a3a6b;
-    color: white;
-    border: none;
-    border-radius: 10px;
-    padding: 16px;
-    font-size: 1rem;
-    font-weight: 700;
-    cursor: pointer;
-    margin-bottom: 8px;
-    box-shadow: 0 2px 6px rgba(26,58,107,0.3);
-  }
-
-  /* ── QUIZ ── */
-  #quiz { display: none; padding: 16px; max-width: 540px; margin: 0 auto; }
-
-  .quiz-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 16px;
-  }
-  .back-btn {
-    background: none;
-    border: none;
-    font-size: 1.4rem;
-    cursor: pointer;
-    color: #1a3a6b;
-    padding: 4px;
-  }
-  .quiz-topic { font-size: 0.85rem; font-weight: 600; color: #444; flex: 1; }
-
-  .progress-bar {
-    height: 5px;
-    background: #e0e0e0;
-    border-radius: 3px;
-    margin-bottom: 20px;
-    overflow: hidden;
-  }
-  .progress-fill {
-    height: 100%;
-    background: #1a3a6b;
-    border-radius: 3px;
-    transition: width 0.3s ease;
-  }
-
-  .q-counter {
-    font-size: 0.75rem;
-    color: #888;
-    margin-bottom: 10px;
-  }
-
-  .question-card {
-    background: white;
-    border-radius: 14px;
-    padding: 20px 18px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    margin-bottom: 16px;
-  }
-  .question-text {
-    font-size: 0.95rem;
-    line-height: 1.55;
-    color: #1a1a1a;
-  }
-
-  .vf-btns {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 12px;
-  }
-  .vf-btn {
-    padding: 18px 10px;
-    border: 2px solid #dde;
-    background: white;
-    border-radius: 12px;
-    font-size: 1.3rem;
-    font-weight: 800;
-    cursor: pointer;
-    transition: all 0.15s;
-    color: #333;
-  }
-  .vf-btn:active { transform: scale(0.97); }
-  .vf-btn.vero  { border-color: #2563eb; color: #2563eb; }
-  .vf-btn.falso { border-color: #dc2626; color: #dc2626; }
-
-  .vf-btn.correct { background: #dcfce7; border-color: #16a34a; color: #15803d; }
-  .vf-btn.wrong   { background: #fee2e2; border-color: #dc2626; color: #dc2626; }
-  .vf-btn.reveal  { background: #dcfce7; border-color: #16a34a; color: #15803d; }
-  .vf-btn:disabled { cursor: default; }
-
-  .feedback {
-    display: none;
-    text-align: center;
-    font-size: 1.4rem;
-    font-weight: 800;
-    margin-bottom: 14px;
-    padding: 10px;
-    border-radius: 10px;
-  }
-  .feedback.correct { display: block; background: #dcfce7; color: #15803d; }
-  .feedback.wrong   { display: block; background: #fee2e2; color: #b91c1c; }
-
-  .next-btn {
-    display: none;
-    width: 100%;
-    background: #1a3a6b;
-    color: white;
-    border: none;
-    border-radius: 12px;
-    padding: 15px;
-    font-size: 1rem;
-    font-weight: 700;
-    cursor: pointer;
-  }
-  .next-btn.visible { display: block; }
-
-  /* ── RESULTS ── */
-  #results { display: none; padding: 24px 16px; max-width: 540px; margin: 0 auto; text-align: center; }
-
-  .score-circle {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    background: #1a3a6b;
-    color: white;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 20px;
-  }
-  .score-circle .pct { font-size: 2rem; font-weight: 800; }
-  .score-circle .lbl { font-size: 0.7rem; opacity: 0.8; }
-
-  .result-msg { font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; }
-  .result-sub { font-size: 0.85rem; color: #666; margin-bottom: 24px; }
-
-  .result-btn {
-    display: block;
-    width: 100%;
-    padding: 15px;
-    border-radius: 12px;
-    border: none;
-    font-size: 1rem;
-    font-weight: 700;
-    cursor: pointer;
-    margin-bottom: 10px;
-  }
-  .result-btn.primary { background: #1a3a6b; color: white; }
-  .result-btn.secondary { background: white; color: #1a3a6b; border: 2px solid #1a3a6b; }
-
-  .review-list { text-align: left; margin-top: 20px; }
-  .review-item {
-    background: white;
-    border-radius: 10px;
-    padding: 14px;
-    margin-bottom: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.07);
-    font-size: 0.85rem;
-    line-height: 1.5;
-    border-left: 4px solid #16a34a;
-  }
-  .review-item.wrong { border-left-color: #dc2626; }
-  .review-item .ri-status { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
-  .review-item.wrong .ri-status { color: #dc2626; }
-  .review-item:not(.wrong) .ri-status { color: #16a34a; }
-  .review-item .ri-answer { margin-top: 4px; font-weight: 700; color: #1a3a6b; }
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f2f5;color:#1a1a1a;min-height:100vh}
+header{background:#1a3a6b;color:#fff;padding:14px 16px;text-align:center;position:sticky;top:0;z-index:100}
+header h1{font-size:1.05rem;font-weight:700}
+header p{font-size:.72rem;opacity:.7;margin-top:3px}
+.nav-tabs{display:flex;background:#142e58;border-bottom:2px solid #0f2040}
+.nav-tab{flex:1;padding:10px 4px;text-align:center;font-size:.72rem;font-weight:600;color:rgba(255,255,255,.6);cursor:pointer;border:none;background:none;text-transform:uppercase;letter-spacing:.04em}
+.nav-tab.active{color:#fff;border-bottom:2px solid #49b6ff;margin-bottom:-2px}
+.screen{display:none;padding:14px;max-width:560px;margin:0 auto}
+.screen.active{display:block}
+.all-btn{display:block;width:100%;background:#1a3a6b;color:#fff;border:none;border-radius:12px;padding:16px;font-size:1rem;font-weight:700;cursor:pointer;margin-bottom:10px;box-shadow:0 2px 8px rgba(26,58,107,.3)}
+.exam-btn{display:block;width:100%;background:#e8f4ff;color:#1a3a6b;border:2px solid #1a3a6b;border-radius:12px;padding:14px;font-size:.95rem;font-weight:700;cursor:pointer;margin-bottom:16px}
+.section-title{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#888;margin:14px 0 8px}
+.topic-btn{display:flex;align-items:center;justify-content:space-between;width:100%;background:#fff;border:none;border-radius:10px;padding:13px 14px;margin-bottom:7px;font-size:.88rem;text-align:left;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.topic-btn:active{background:#eef3ff}
+.topic-btn .meta{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.badge{font-size:.68rem;background:#e8f4ff;color:#1a3a6b;border-radius:20px;padding:2px 7px;white-space:nowrap;font-weight:600}
+.arr{color:#1a3a6b;font-size:.9rem}
+.quiz-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.back-btn{background:none;border:none;font-size:1.4rem;cursor:pointer;color:#1a3a6b;padding:2px 6px 2px 0}
+.quiz-meta{flex:1}
+.quiz-topic-name{font-size:.82rem;font-weight:600;color:#333;line-height:1.3}
+.quiz-mode-badge{font-size:.65rem;background:#fff3cd;color:#856404;border-radius:20px;padding:1px 6px;font-weight:600;display:inline-block;margin-top:2px}
+.progress-bar{height:4px;background:#e0e0e0;border-radius:2px;margin-bottom:14px;overflow:hidden}
+.progress-fill{height:100%;background:#1a3a6b;border-radius:2px;transition:width .3s ease}
+.q-counter{font-size:.72rem;color:#888;margin-bottom:10px}
+.question-card{background:#fff;border-radius:14px;padding:18px 16px;box-shadow:0 2px 8px rgba(0,0,0,.08);margin-bottom:14px}
+.question-text{font-size:.93rem;line-height:1.58;color:#1a1a1a}
+.vf-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.vf-btn{padding:16px 8px;border:2px solid #dde;background:#fff;border-radius:12px;font-size:1.2rem;font-weight:800;cursor:pointer;transition:all .15s;color:#333}
+.vf-btn.vero{border-color:#2563eb;color:#2563eb}
+.vf-btn.falso{border-color:#dc2626;color:#dc2626}
+.vf-btn.correct{background:#dcfce7;border-color:#16a34a;color:#15803d}
+.vf-btn.wrong{background:#fee2e2;border-color:#dc2626;color:#dc2626}
+.vf-btn.reveal{background:#dcfce7;border-color:#16a34a;color:#15803d}
+.vf-btn:disabled{cursor:default}
+.feedback{display:none;text-align:center;font-size:1.1rem;font-weight:800;margin-bottom:12px;padding:9px;border-radius:10px}
+.feedback.correct{display:block;background:#dcfce7;color:#15803d}
+.feedback.wrong{display:block;background:#fee2e2;color:#b91c1c}
+.next-btn{display:none;width:100%;background:#1a3a6b;color:#fff;border:none;border-radius:12px;padding:14px;font-size:.95rem;font-weight:700;cursor:pointer}
+.next-btn.visible{display:block}
+.timer-bar{display:flex;align-items:center;justify-content:space-between;background:#fff;border-radius:10px;padding:10px 14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.timer-label{font-size:.72rem;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.timer-display{font-size:1.4rem;font-weight:800;color:#1a3a6b;font-variant-numeric:tabular-nums}
+.timer-display.warning{color:#dc2626;animation:pulse .8s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.error-count{font-size:1rem;font-weight:700}
+.error-count.danger{color:#dc2626}
+#results-screen{display:none;padding:20px 16px;max-width:560px;margin:0 auto}
+.score-circle{width:110px;height:110px;border-radius:50%;background:#1a3a6b;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 16px}
+.score-circle .pct{font-size:1.9rem;font-weight:800}
+.score-circle .lbl{font-size:.65rem;opacity:.8}
+.result-msg{font-size:1.05rem;font-weight:700;text-align:center;margin-bottom:6px}
+.result-sub{font-size:.82rem;color:#666;text-align:center;margin-bottom:20px}
+.result-btn{display:block;width:100%;padding:14px;border-radius:12px;border:none;font-size:.95rem;font-weight:700;cursor:pointer;margin-bottom:8px}
+.result-btn.primary{background:#1a3a6b;color:#fff}
+.result-btn.secondary{background:#fff;color:#1a3a6b;border:2px solid #1a3a6b}
+.review-list{margin-top:18px}
+.review-item{background:#fff;border-radius:10px;padding:13px;margin-bottom:7px;box-shadow:0 1px 3px rgba(0,0,0,.07);font-size:.83rem;line-height:1.5;border-left:4px solid #16a34a}
+.review-item.wrong{border-left-color:#dc2626}
+.ri-status{font-size:.7rem;font-weight:700;text-transform:uppercase;margin-bottom:3px}
+.review-item.wrong .ri-status{color:#dc2626}
+.review-item:not(.wrong) .ri-status{color:#16a34a}
+.ri-answer{margin-top:4px;font-weight:700;color:#1a3a6b}
+#stats-screen{padding:14px;max-width:560px;margin:0 auto}
+.stats-card{background:#fff;border-radius:12px;padding:16px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.stats-card h3{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#888;margin-bottom:12px}
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #f0f0f0;font-size:.85rem;gap:8px}
+.stat-row:last-child{border-bottom:none}
+.stat-name{color:#333;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stat-pct{font-weight:700;color:#1a3a6b;font-size:.9rem;flex-shrink:0}
+.stat-bar-wrap{width:60px;height:6px;background:#e8e8e8;border-radius:3px;overflow:hidden;flex-shrink:0}
+.stat-bar{height:100%;background:#1a3a6b;border-radius:3px}
+.stat-bar.good{background:#16a34a}
+.stat-bar.bad{background:#dc2626}
+.stats-empty{text-align:center;color:#888;padding:40px 20px;font-size:.9rem}
+.clear-btn{display:block;width:100%;background:#fee2e2;color:#b91c1c;border:none;border-radius:10px;padding:12px;font-size:.88rem;font-weight:600;cursor:pointer;margin-top:12px}
+.notice{margin-top:20px;padding:12px;background:#fffbeb;border-radius:10px;font-size:.75rem;color:#92400e;line-height:1.5}
 </style>
 </head>
 <body>
 
 <header>
   <h1>Quiz Patente C-CE</h1>
-  <p>Periodi di Guida e Riposo · Reg. 561/2006/CE</p>
+  <p>Banca dati ministeriale · Reg. 561/2006/CE</p>
 </header>
 
-<!-- MENU -->
-<div id="menu">
-  <button class="all-btn" onclick="startQuiz('all')">▶ Tutte le domande (87)</button>
-
-  <div class="menu-title">Per argomento</div>
-  <div id="topic-list"></div>
+<div class="nav-tabs">
+  <button class="nav-tab active" onclick="showTab('menu')">📋 Argomenti</button>
+  <button class="nav-tab" onclick="showTab('stats')">📊 Statistiche</button>
 </div>
 
-<!-- QUIZ -->
-<div id="quiz">
+<div id="menu-screen" class="screen active">
+  <button class="all-btn" onclick="startQuiz('all','practice')">▶ Pratica — Tutte le domande</button>
+  <button class="exam-btn" onclick="startExam()">🎓 Simula Esame Reale (40 dom. · 40 min · max 4 errori)</button>
+  <div class="section-title">Pratica per argomento</div>
+  <div id="topic-list"></div>
+  <div class="notice">⚠️ I quesiti su segnali stradali, display del tachigrafo e simboli grafici non sono inclusi. Per quelli, usa <strong>patentisuperiori.com</strong>.</div>
+</div>
+
+<div id="quiz-screen" class="screen">
   <div class="quiz-header">
-    <button class="back-btn" onclick="showMenu()">←</button>
-    <div class="quiz-topic" id="quiz-topic-name"></div>
+    <button class="back-btn" onclick="exitQuiz()">←</button>
+    <div class="quiz-meta">
+      <div class="quiz-topic-name" id="quiz-topic-name"></div>
+      <span class="quiz-mode-badge" id="quiz-mode-badge"></span>
+    </div>
+  </div>
+  <div id="timer-bar" class="timer-bar" style="display:none">
+    <div>
+      <div class="timer-label">Tempo rimasto</div>
+      <div class="timer-display" id="timer-display">40:00</div>
+    </div>
+    <div style="text-align:right">
+      <div class="timer-label">Errori</div>
+      <div class="error-count" id="error-count">0 / 4</div>
+    </div>
   </div>
   <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
   <div class="q-counter" id="q-counter"></div>
-  <div class="question-card">
-    <div class="question-text" id="question-text"></div>
-  </div>
+  <div class="question-card"><div class="question-text" id="question-text"></div></div>
   <div class="vf-btns">
-    <button class="vf-btn vero"  id="btn-v" onclick="answer('V')">✓ VERO</button>
+    <button class="vf-btn vero" id="btn-v" onclick="answer('V')">✓ VERO</button>
     <button class="vf-btn falso" id="btn-f" onclick="answer('F')">✗ FALSO</button>
   </div>
   <div class="feedback" id="feedback"></div>
   <button class="next-btn" id="next-btn" onclick="nextQuestion()">Avanti →</button>
 </div>
 
-<!-- RESULTS -->
-<div id="results">
-  <div class="score-circle">
-    <span class="pct" id="res-pct"></span>
-    <span class="lbl">CORRETTO</span>
-  </div>
+<div id="results-screen">
+  <div class="score-circle"><span class="pct" id="res-pct"></span><span class="lbl">CORRETTO</span></div>
   <div class="result-msg" id="res-msg"></div>
   <div class="result-sub" id="res-sub"></div>
-  <button class="result-btn primary" id="retry-btn">Riprova</button>
-  <button class="result-btn secondary" onclick="showMenu()">← Scegli argomento</button>
+  <button class="result-btn primary" id="retry-btn">🔄 Riprova</button>
+  <button class="result-btn secondary" onclick="exitQuiz()">← Torna al menu</button>
   <div class="review-list" id="review-list"></div>
+</div>
+
+<div id="stats-screen" class="screen">
+  <div id="stats-content"></div>
 </div>
 
 <script>
 const TOPICS = [
   {
-    id: "disponibilita",
-    name: "Disponibilità e interruzioni",
-    questions: [
-      { q: 'Per "interruzione" si intende ogni periodo in cui il conducente non può guidare o svolgere altre mansioni', a: 'V' },
-      { q: 'Per "riposo" si intende ogni periodo ininterrotto durante il quale il conducente può disporre liberamente del suo tempo', a: 'V' },
-      { q: 'Il "tempo di disponibilità" comprende il tempo di attesa sul posto di lavoro e la multipresenza', a: 'V' },
-      { q: 'Per "interruzione" si intende ogni fermata effettuata con il veicolo durante la giornata lavorativa', a: 'F' },
-      { q: 'Per "disponibilità" si intende l\'assenso del lavoratore a svolgere mansioni al di fuori del normale orario di lavoro', a: 'F' },
+    id:'guida-riposo', name:'Periodi di guida e riposo', examQ:2,
+    questions:[
+      {q:'Per "interruzione" si intende ogni periodo in cui il conducente non può guidare o svolgere altre mansioni',a:'V'},
+      {q:'Per "riposo" si intende ogni periodo ininterrotto durante il quale il conducente può disporre liberamente del suo tempo',a:'V'},
+      {q:'Il "tempo di disponibilità" comprende il tempo di attesa sul posto di lavoro e la multipresenza',a:'V'},
+      {q:'Per "interruzione" si intende ogni fermata effettuata con il veicolo durante la giornata lavorativa',a:'F'},
+      {q:'Per "disponibilità" si intende l\'assenso del lavoratore a svolgere mansioni al di fuori del normale orario di lavoro',a:'F'},
+      {q:'Il reg. 561/2006/CE prevede disposizioni relative ai tempi di guida e di riposo',a:'V'},
+      {q:'Il reg. 561/2006/CE mira a migliorare le condizioni sociali dei lavoratori a cui si applica',a:'V'},
+      {q:'Il reg. 561/2006/CE mira ad aumentare il livello di sicurezza stradale',a:'V'},
+      {q:'Il reg. 561/2006/CE prevede disposizioni relative al tempo di guida massimo per giornata',a:'V'},
+      {q:'Il reg. 561/2006/CE prevede disposizioni relative ai tempi di guida minimi',a:'F'},
+      {q:'Il reg. 561/2006/CE mira ad aumentare il tempo di lavoro dei conducenti',a:'F'},
+      {q:'Il reg. 561/2006/CE prevede disposizioni sui compensi minimi dei conducenti',a:'F'},
+      {q:'Il reg. 561/2006/CE prevede disposizioni relativamente al trasporto di cose, ma non sul trasporto di persone',a:'F'},
+      {q:'Il periodo massimo di guida settimanale è di cinquantasei ore',a:'V'},
+      {q:'Il periodo massimo di guida settimanale è di 56 ore e la guida non deve superare le 90 ore nell\'arco di due settimane consecutive',a:'V'},
+      {q:'Il periodo di riposo giornaliero può essere frazionato in due parti: la prima di almeno 3 ore e la seconda di almeno 9 ore',a:'V'},
+      {q:'Il conducente, dopo sei periodi di guida, deve effettuare un riposo di 45 ore consecutive',a:'V'},
+      {q:'Si può parlare di multipresenza quando a bordo sono presenti almeno due conducenti, fatta salva la prima ora in cui la presenza del secondo è facoltativa',a:'V'},
+      {q:'Il periodo di riposo giornaliero può essere frazionato in due parti: la prima di almeno 9 ore e la seconda di almeno 3 ore',a:'F'},
+      {q:'Il conducente, dopo quattro periodi di guida, deve effettuare un riposo di 48 ore consecutive',a:'F'},
+      {q:'Il periodo massimo di guida settimanale è di quarantotto ore',a:'F'},
+      {q:'Il periodo massimo di guida settimanale è di 56 ore e la guida non deve superare le 100 ore in due settimane consecutive',a:'F'},
+      {q:'Dopo un periodo di guida di quattro ore e mezza, il conducente deve osservare un riposo di almeno 50 minuti consecutivi',a:'F'},
+      {q:'L\'impresa di trasporto non può promettere premi in denaro al conducente basati sulla maggior percorrenza chilometrica',a:'V'},
+      {q:'Il conducente è corresponsabile per le infrazioni al regolamento, anche se commesse su veicolo di proprietà dell\'impresa',a:'V'},
+      {q:'L\'impresa di trasporto non deve incoraggiare i conducenti a violare le disposizioni in materia di tempi di guida e di riposo',a:'V'},
+      {q:'L\'impresa di trasporto può decurtare lo stipendio al conducente che si rifiuti di guidare per più di 10 ore al giorno',a:'F'},
+      {q:'L\'impresa non risponde delle violazioni commesse dai conducenti cui abbia fornito istruzioni contrarie al regolamento, perché la responsabilità è esclusivamente del conducente',a:'F'},
+      {q:'Il periodo di guida giornaliero, di norma, non deve superare le nove ore',a:'V'},
+      {q:'Il periodo di guida giornaliero può essere esteso fino a dieci ore, non più di due volte nell\'arco della settimana',a:'V'},
+      {q:'Il periodo di guida giornaliero prevede una o più interruzioni di guida obbligatorie',a:'V'},
+      {q:'Il periodo di guida giornaliero può essere al massimo di otto ore',a:'F'},
+      {q:'Il periodo di guida giornaliero può essere di undici ore, per non più di due volte in una settimana',a:'F'},
+      {q:'Il periodo di riposo giornaliero regolare è di almeno undici ore',a:'V'},
+      {q:'Il periodo di riposo giornaliero ridotto è di almeno nove ore, non più di tre volte la settimana',a:'V'},
+      {q:'È vietato guidare per più di sei giorni consecutivi',a:'V'},
+      {q:'Il periodo di riposo giornaliero regolare è di almeno nove ore',a:'F'},
+      {q:'Il periodo di riposo giornaliero è un periodo in cui il conducente non può disporre liberamente del proprio tempo',a:'F'},
+      {q:'Il periodo di riposo settimanale regolare è di almeno 45 ore',a:'V'},
+      {q:'Il periodo di riposo settimanale ridotto deve essere recuperato',a:'V'},
+      {q:'Il periodo di riposo settimanale ridotto ha una durata minima di 24 ore ininterrotte',a:'V'},
+      {q:'Il periodo di riposo settimanale può essere di tipo regolare o ridotto',a:'V'},
+      {q:'Il periodo di riposo settimanale regolare è di almeno 30 ore',a:'F'},
+      {q:'Il conducente, a fronte di indennità in denaro, può rinunciare al periodo di riposo settimanale',a:'F'},
+      {q:'Il reg. 561/2006/CE si applica al trasporto su strada di cose con veicoli di massa massima superiore a 3,5 tonnellate',a:'V'},
+      {q:'Il reg. 561/2006/CE si applica al trasporto su strada di passeggeri con veicoli atti a trasportare più di nove persone compreso il conducente',a:'V'},
+      {q:'Il reg. 561/2006/CE si applica al trasporto di merci con veicoli di massa massima superiore a 2,5 tonnellate',a:'F'},
+      {q:'Il reg. 561/2006/CE si applica anche al trasporto su ferrovia',a:'F'},
+      {q:'Il conducente può superare i tempi massimi di guida solo per raggiungere un luogo di sosta appropriato, per salvaguardare la sicurezza',a:'V'},
+      {q:'Il conducente che deroga alla durata massima di guida per raggiungere un luogo di sosta deve annotarne i motivi sul foglio di registrazione',a:'V'},
+      {q:'Il conducente può superare i tempi massimi di guida per raggiungere il proprio domicilio',a:'F'},
+      {q:'È soggetto a sanzione amministrativa il conducente che supera i periodi di guida prescritti',a:'V'},
+      {q:'È soggetto a sanzione amministrativa il conducente che non osserva le interruzioni obbligatorie durante il viaggio',a:'V'},
+      {q:'È soggetto a sanzione amministrativa il conducente che non osserva i periodi di riposo minimi',a:'V'},
+      {q:'È soggetto alla revoca della patente il conducente che supera i periodi di guida prescritti',a:'F'},
+      {q:'Costituisce infrazione guidare per quattro ore consecutive, senza interruzioni',a:'F'},
+      {q:'È ammesso utilizzare un foglio di registrazione del cronotachigrafo analogico per più di 24 ore',a:'F'},
+      {q:'I tempi di disponibilità sono quelli nei quali il conducente deve tenersi a disposizione per riprendere prontamente il lavoro',a:'V'},
+      {q:'I periodi di permanenza a bordo del veicolo a fianco di un altro conducente (multipresenza) sono considerati tempi di disponibilità',a:'V'},
+      {q:'I periodi di permanenza in cuccetta durante la marcia del veicolo sono considerati tempi di disponibilità',a:'V'},
+      {q:'I periodi di tempo impiegati per la piccola manutenzione del veicolo sono considerati "altri lavori"',a:'V'},
+      {q:'I tempi definiti "altri lavori" sono considerati tempi di guida',a:'F'},
+      {q:'I tempi di disponibilità sono quelli durante i quali il conducente può disporre liberamente del proprio tempo',a:'F'},
     ]
   },
   {
-    id: "disposizioni",
-    name: "Disposizioni del Reg. 561/2006/CE",
-    questions: [
-      { q: 'Il regolamento prevede disposizioni relative ai tempi di guida e di riposo', a: 'V' },
-      { q: 'Il regolamento prevede disposizioni relative al massimo tempo di guida consentito in una settimana', a: 'V' },
-      { q: 'Il regolamento mira a migliorare le condizioni sociali dei lavoratori a cui si applica', a: 'V' },
-      { q: 'Il regolamento mira ad aumentare il livello di sicurezza stradale', a: 'V' },
-      { q: 'Il regolamento prevede disposizioni relative al tempo di guida massimo per giornata', a: 'V' },
-      { q: 'Il regolamento prevede disposizioni relative ai tempi di guida minimi', a: 'F' },
-      { q: 'Il regolamento prevede disposizioni relative al tempo di riposo massimo per settimana', a: 'F' },
-      { q: 'Il regolamento mira ad aumentare il tempo di lavoro dei conducenti', a: 'F' },
-      { q: 'Il regolamento prevede disposizioni sui compensi minimi dei conducenti', a: 'F' },
-      { q: 'Il regolamento prevede disposizioni relativamente al trasporto di cose, ma non sul trasporto di persone', a: 'F' },
+    id:'cronotachigrafo', name:'Impiego del cronotachigrafo', examQ:3,
+    questions:[
+      {q:'Il cronotachigrafo registra, tra l\'altro, i tempi di guida del conducente e la velocità del veicolo',a:'V'},
+      {q:'Il cronotachigrafo è un apparecchio di controllo dei tempi di guida',a:'V'},
+      {q:'Il cronotachigrafo può essere analogico o digitale',a:'V'},
+      {q:'Il cronotachigrafo registra i tempi di guida, gli altri tempi di lavoro, i tempi di disponibilità, le interruzioni e i tempi di riposo',a:'V'},
+      {q:'Il cronotachigrafo registra, in riferimento al veicolo, i chilometri percorsi e la velocità',a:'V'},
+      {q:'Il cronotachigrafo registra le conversazioni del conducente',a:'F'},
+      {q:'Il cronotachigrafo registra le frenate del veicolo',a:'F'},
+      {q:'Il cronotachigrafo può essere di tipo idraulico',a:'F'},
+      {q:'Il cronotachigrafo entra in funzione quando il conducente preme il tasto "START" sul cruscotto',a:'F'},
+      {q:'Il cronotachigrafo registra l\'itinerario percorso dal veicolo',a:'F'},
+      {q:'Il conducente di un veicolo con cronotachigrafo analogico, alla partenza, deve scrivere nome e cognome sul foglio di registrazione',a:'V'},
+      {q:'Il conducente di un veicolo con cronotachigrafo analogico deve scrivere il luogo di partenza sul foglio di registrazione',a:'V'},
+      {q:'Il conducente di un veicolo con cronotachigrafo analogico deve scrivere la data della partenza sul foglio di registrazione',a:'V'},
+      {q:'Il conducente di un veicolo con cronotachigrafo analogico deve scrivere il numero di targa del veicolo sul foglio di registrazione',a:'V'},
+      {q:'Il conducente di un veicolo con cronotachigrafo analogico deve scrivere la lettura del contachilometri alla partenza',a:'V'},
+      {q:'Se durante la stessa giornata il conducente usa due veicoli con cronotachigrafo analogico, deve usare lo stesso foglio compilando anche la parte posteriore',a:'V'},
+      {q:'Il conducente di un veicolo con cronotachigrafo analogico deve scrivere il nome dell\'azienda sul foglio di registrazione',a:'F'},
+      {q:'Il conducente di un veicolo con cronotachigrafo analogico deve scrivere numero e categoria della patente sul foglio di registrazione',a:'F'},
+      {q:'Il conducente di un veicolo con cronotachigrafo analogico deve far controfirmare il foglio di registrazione al titolare dell\'azienda',a:'F'},
+      {q:'Se durante la stessa giornata il conducente usa due veicoli con cronotachigrafo analogico, deve compilare due fogli di registrazione',a:'F'},
+      {q:'Il cronotachigrafo digitale registra le distanze, le velocità e i tempi di guida e di riposo del conducente',a:'V'},
+      {q:'Il tempo registrato sul cronotachigrafo digitale è in UTC (ora di Greenwich)',a:'V'},
+      {q:'Con il cronotachigrafo digitale è possibile memorizzare i dati di uno o due conducenti',a:'V'},
+      {q:'È possibile stampare i dati memorizzati dal cronotachigrafo digitale su scontrini cartacei',a:'V'},
+      {q:'Il cronotachigrafo digitale può registrare le attività di un solo conducente',a:'F'},
+      {q:'Il cronotachigrafo digitale memorizza dati relativi agli ultimi 5 anni',a:'F'},
+      {q:'I fogli di registrazione dei cronotachigrafi analogici devono garantire registrazioni leggibili per almeno un anno',a:'V'},
+      {q:'I fogli di registrazione dei cronotachigrafi analogici devono avere capacità minima di registrazione di 24 ore',a:'V'},
+      {q:'I fogli di registrazione dei cronotachigrafi analogici devono essere di tipo omologato',a:'V'},
+      {q:'I fogli di registrazione dei cronotachigrafi analogici devono avere capacità minima di registrazione di 48 ore',a:'F'},
+      {q:'I fogli di registrazione dei cronotachigrafi analogici sono "standard" e si usano indifferentemente su qualsiasi cronotachigrafo',a:'F'},
+      {q:'Nel cronotachigrafo digitale i dati sono memorizzati sia nella memoria interna che nella carta tachigrafica',a:'V'},
+      {q:'Nel cronotachigrafo digitale il sistema memorizza le attività del conducente degli ultimi 365 giorni almeno',a:'V'},
+      {q:'Il cronotachigrafo digitale è dotato di una stampante integrata',a:'V'},
+      {q:'Il cronotachigrafo digitale emette un segnale acustico se si guida senza la carta tachigrafica',a:'V'},
+      {q:'I dati della giornata lavorativa sono memorizzati solo nella memoria interna del cronotachigrafo digitale',a:'F'},
+      {q:'Il cronotachigrafo digitale memorizza al massimo le attività degli ultimi sette giorni',a:'F'},
+      {q:'In caso di guasto del cronotachigrafo su un viaggio superiore a sette giorni, il conducente deve ripararlo nel corso del viaggio',a:'V'},
+      {q:'In caso di guasto del cronotachigrafo su un viaggio inferiore a sette giorni, il conducente può ripararlo al rientro in sede',a:'V'},
+      {q:'In caso di guasto del cronotachigrafo il conducente deve provvedere alle registrazioni manuali della sua attività',a:'V'},
+      {q:'In caso di guasto del cronotachigrafo il conducente può evitare di effettuare le registrazioni',a:'F'},
+      {q:'In caso di guasto del cronotachigrafo il conducente deve necessariamente interrompere il viaggio',a:'F'},
+      {q:'L\'inserimento della carta tachigrafica nel cronotachigrafo digitale deve avvenire con chiave di accensione inserita e veicolo fermo',a:'V'},
+      {q:'L\'estrazione della carta tachigrafica può avvenire solo a veicolo fermo e con azione volontaria',a:'V'},
+      {q:'Prima di estrarre la carta tachigrafica a fine giornata è necessario impostare il selettore sulla modalità "tempi di riposo"',a:'V'},
+      {q:'Quando il veicolo è impiegato in attività fuori dal campo della normativa sociale, il conducente deve selezionare "OUT OF SCOPE"',a:'V'},
+      {q:'La carta tachigrafica del conducente deve essere inserita nel cronotachigrafo dalla presa in consegna fino alla riconsegna del veicolo',a:'V'},
+      {q:'La carta tachigrafica del conducente è a fondo bianco',a:'V'},
+      {q:'La carta tachigrafica del conducente può essere estratta solo a veicolo fermo',a:'V'},
+      {q:'La carta tachigrafica del conducente è rilasciata dal comune di residenza dell\'autista',a:'F'},
+      {q:'La carta tachigrafica dell\'azienda può essere usata dal conducente se ha smarrito la propria',a:'F'},
+      {q:'Il cronotachigrafo digitale è munito di sigilli e non deve essere manomesso dal conducente',a:'V'},
+      {q:'Il cronotachigrafo digitale deve essere tarato prima dell\'immissione del veicolo in circolazione',a:'V'},
+      {q:'Il cronotachigrafo digitale deve essere controllato, di norma, ogni due anni',a:'V'},
+      {q:'Il cronotachigrafo digitale può essere revisionato da qualunque officina idoneamente attrezzata',a:'F'},
+      {q:'Il cronotachigrafo digitale può essere riparato da qualunque officina meccanica',a:'F'},
+      {q:'Le carte tachigrafiche utilizzabili nel cronotachigrafo digitale sono di quattro tipi',a:'V'},
+      {q:'Le carte tachigrafiche hanno validità di cinque anni, ad eccezione di quella dell\'officina',a:'V'},
+      {q:'La carta tachigrafica dell\'officina ha validità amministrativa di un anno',a:'V'},
+      {q:'La carta tachigrafica del conducente è personale e non cedibile',a:'V'},
+      {q:'La carta tachigrafica del conducente ha validità di 5 anni',a:'V'},
+      {q:'Le carte tachigrafiche sono: carta conducente, carta azienda, carta officina e carta controllo',a:'V'},
+      {q:'La carta tachigrafica del conducente è rilasciata dagli uffici del lavoro',a:'F'},
+      {q:'La carta tachigrafica del conducente ha validità di 10 anni',a:'F'},
+      {q:'Le carte tachigrafiche sono di cinque tipi',a:'F'},
+      {q:'In caso di smarrimento della carta tachigrafica, il conducente ha 7 giorni per richiedere blocco e sostituzione alla Camera di Commercio',a:'V'},
+      {q:'In caso di smarrimento della carta tachigrafica è possibile guidare senza la carta per massimo 15 giorni di calendario',a:'V'},
+      {q:'In caso di smarrimento della carta tachigrafica è possibile guidare senza la carta per massimo 45 giorni',a:'F'},
+      {q:'In caso di rottura del cronotachigrafo digitale è consentito viaggiare con il dispositivo inefficiente per massimo 7 giorni',a:'V'},
+      {q:'In caso di rottura del cronotachigrafo digitale è consentito viaggiare con il dispositivo inefficiente per massimo 15 giorni',a:'F'},
     ]
   },
   {
-    id: "frazionamento",
-    name: "Frazionamento dei tempi di pausa e riposo",
-    questions: [
-      { q: 'Il periodo massimo di guida settimanale è di cinquantasei ore', a: 'V' },
-      { q: 'Il periodo massimo di guida settimanale è di cinquantasei ore e la guida non deve superare le novanta ore nell\'arco di due settimane consecutive', a: 'V' },
-      { q: 'Il periodo di riposo giornaliero può essere frazionato in due parti: la prima di almeno 3 ore e la seconda di almeno 9 ore', a: 'V' },
-      { q: 'Il conducente, dopo sei periodi di guida, deve effettuare un riposo di 45 ore consecutive', a: 'V' },
-      { q: 'Il conducente, dopo sei periodi di guida, può effettuare un riposo ridotto di almeno 24 ore consecutive, purché le restanti ore vengano recuperate entro la fine della terza settimana', a: 'V' },
-      { q: 'Si può parlare di multipresenza quando a bordo sono presenti almeno due conducenti per l\'intero periodo, fatta salva la prima ora nella quale la presenza del secondo conducente è facoltativa', a: 'V' },
-      { q: 'Il periodo di riposo giornaliero può essere frazionato in due parti: la prima di almeno 9 ore e la seconda di almeno 3 ore', a: 'F' },
-      { q: 'Il conducente, dopo quattro periodi di guida, deve effettuare un riposo di 48 ore consecutive', a: 'F' },
-      { q: 'Si può parlare di multipresenza quando a bordo sono presenti due conducenti per l\'intero periodo, fatte salve le prime tre ore dove la presenza del secondo conducente è facoltativa', a: 'F' },
-      { q: 'Il periodo massimo di guida settimanale è di quarantotto ore', a: 'F' },
-      { q: 'Il periodo massimo di guida settimanale è di cinquantasei ore e la guida non deve superare le cento ore nell\'arco di due settimane consecutive', a: 'F' },
-      { q: 'Dopo un periodo di guida di quattro ore e mezza, il conducente deve osservare un periodo di riposo di almeno 50 minuti consecutivi', a: 'F' },
+    id:'incidente', name:'Comportamento in caso di incidente', examQ:2,
+    questions:[
+      {q:'In caso di incidente con soli danni alle cose, il conducente ha l\'obbligo di fermarsi e fornire le proprie generalità',a:'V'},
+      {q:'In caso di incidente con solo due veicoli coinvolti, è opportuno avvalersi del modulo di Constatazione amichevole',a:'V'},
+      {q:'Nel modulo di Constatazione amichevole, il conducente deve riportare il luogo, le modalità e la data dell\'incidente',a:'V'},
+      {q:'Nel modulo di Constatazione amichevole, il conducente deve riportare un disegno schematico della dinamica dell\'incidente',a:'V'},
+      {q:'Nel modulo di Constatazione amichevole, il conducente deve riportare targa, polizza e compagnia assicurativa dei veicoli coinvolti',a:'V'},
+      {q:'Dopo un incidente, se il veicolo crea pericolo o intralcio, deve essere portato al più presto fuori dalla carreggiata',a:'V'},
+      {q:'Il conducente, in caso di incidente ricollegabile al suo comportamento, ha l\'obbligo di fermarsi e prestare assistenza ai feriti',a:'V'},
+      {q:'È punibile con la reclusione il conducente coinvolto in un incidente che non si fermi a prestare assistenza ai feriti',a:'V'},
+      {q:'Si deve richiedere l\'intervento dell\'autorità quando non sia possibile ripristinare la circolazione',a:'V'},
+      {q:'Si deve richiedere l\'intervento dell\'autorità quando l\'incidente ha provocato feriti',a:'V'},
+      {q:'In caso di incidente con soli danni alle cose, il conducente non ha l\'obbligo di fermarsi',a:'F'},
+      {q:'In caso di incidente con più di due veicoli coinvolti, è opportuno avvalersi del modulo di Constatazione amichevole',a:'F'},
+      {q:'Il conducente che si dia alla fuga non incorre nell\'arresto se è opportunamente assicurato',a:'F'},
+      {q:'Non si deve richiedere l\'intervento dell\'autorità quando un incidente ha provocato solamente un ferito',a:'F'},
+      {q:'In caso di incidente in galleria che blocca la marcia, occorre attivare la segnalazione luminosa di pericolo',a:'V'},
+      {q:'In caso di incidente in galleria che blocca il traffico, occorre spegnere il motore lasciando la chiave di accensione inserita',a:'V'},
+      {q:'In caso di incidente in galleria occorre avvertire rapidamente i servizi di emergenza',a:'V'},
+      {q:'In caso di incidente in galleria occorre suonare a fondo il clacson per avvertire gli altri conducenti',a:'F'},
+      {q:'In caso di incidente in galleria occorre invertire la marcia e sgomberare il luogo dell\'incidente',a:'F'},
+      {q:'Chiunque non abbia potuto evitare la caduta o lo spargimento di materie pericolose deve presegnalare la zona con il segnale mobile di pericolo',a:'V'},
+      {q:'Chiunque non abbia potuto evitare lo spargimento di materie pericolose deve rimuoverle o spargere sabbia per ripristinare l\'aderenza',a:'V'},
+      {q:'Il conducente che non abbia potuto evitare lo spargimento di materie pericolose può evitare la presegnalazione se esegue segnali sonori',a:'F'},
+      {q:'In caso di ingombro della carreggiata per avaria del veicolo, il conducente deve cercare di liberare il transito',a:'V'},
+      {q:'In caso di ingombro della carreggiata per avaria del veicolo, nei centri abitati il conducente deve sempre posizionare il segnale triangolare sulla carreggiata',a:'F'},
+      {q:'In caso di guasto che blocchi il veicolo in una galleria autostradale, occorre attivare la segnalazione luminosa di pericolo',a:'V'},
+      {q:'In caso di guasto che blocchi il veicolo in una galleria autostradale, occorre fermarsi sulla corsia di marcia attivando la segnalazione luminosa',a:'F'},
+      {q:'Di norma, non si può trainare o essere trainati da più di un veicolo',a:'V'},
+      {q:'Il traino di un veicolo in avaria è vietato in autostrada, salvo che il traino sia eseguito da veicolo autorizzato al soccorso',a:'V'},
+      {q:'Durante le operazioni di traino, il veicolo trainato deve mantenere in funzione la segnalazione luminosa di pericolo',a:'V'},
+      {q:'Il veicolo trainante un altro veicolo in avaria deve essere di almeno il 60% più pesante',a:'F'},
     ]
   },
   {
-    id: "impresa",
-    name: "Impresa di trasporto e responsabilità",
-    questions: [
-      { q: 'L\'impresa di trasporto non può promettere premi in denaro al conducente basati sulla maggior percorrenza chilometrica', a: 'V' },
-      { q: 'Il conducente è corresponsabile per le infrazioni al regolamento, anche se commesse alla guida di un veicolo di proprietà dell\'impresa', a: 'V' },
-      { q: 'L\'impresa di trasporto non deve incoraggiare i propri conducenti a violare le disposizioni in materia di tempi di guida e di riposo', a: 'V' },
-      { q: 'L\'impresa di trasporto può decurtare lo stipendio al conducente che si rifiuti di guidare per più di 10 ore al giorno', a: 'F' },
-      { q: 'L\'impresa di trasporto non risponde delle violazioni commesse dai conducenti cui abbia fornito istruzioni contrarie al regolamento, perché la responsabilità è esclusivamente del conducente', a: 'F' },
-      { q: 'L\'impresa di trasporto non è responsabile per le violazioni in materia di tempi di guida e di riposo commesse dai conducenti quando sono all\'estero', a: 'F' },
+    id:'dimensioni', name:'Dimensioni, massa e velocità', examQ:3,
+    questions:[
+      {q:'Salvo i veicoli ATP, ogni veicolo, compreso il suo carico, deve avere larghezza massima non superiore a 2,55 metri',a:'V'},
+      {q:'Salvo eccezioni, ogni veicolo, compreso il suo carico, deve avere altezza massima non superiore a 4 metri',a:'V'},
+      {q:'Ogni autoveicolo, esclusi autobus e semirimorchi, deve avere lunghezza massima non superiore a 12 metri',a:'V'},
+      {q:'La lunghezza massima di un autoarticolato è di 16,50 metri con avanzamento ralla con particolari caratteristiche',a:'V'},
+      {q:'La lunghezza massima di un autosnodato o di un autobus con rimorchio è di 18,75 metri',a:'V'},
+      {q:'La lunghezza massima di un autotreno è di 18,75 metri con particolari misure del complesso',a:'V'},
+      {q:'La massa massima ammessa sull\'asse più caricato non può superare le 12 tonnellate',a:'V'},
+      {q:'Salvo i veicoli ATP, ogni veicolo, compreso il suo carico, deve avere larghezza massima non superiore a 2,75 metri',a:'F'},
+      {q:'Salvo eccezioni, ogni veicolo, compreso il suo carico, deve avere altezza massima non superiore a 5 metri',a:'F'},
+      {q:'La lunghezza massima di un autoarticolato è di 18,75 metri',a:'F'},
+      {q:'La massa massima ammessa sull\'asse più caricato non può superare le 14 tonnellate',a:'F'},
+      {q:'La fascia di ingombro è la corona circolare occupata dal veicolo quando percorre una curva con il minimo raggio possibile di sterzata',a:'V'},
+      {q:'La fascia di ingombro di un veicolo deve avere il raggio esterno non superiore a 12,50 metri',a:'V'},
+      {q:'La fascia di ingombro di un veicolo deve avere il raggio interno superiore a 5,30 metri',a:'V'},
+      {q:'La fascia d\'ingombro si riduce se il veicolo è dotato di asse autosterzante posteriore',a:'V'},
+      {q:'La fascia d\'ingombro è lo spazio in larghezza che il veicolo occupa su strada rettilinea',a:'F'},
+      {q:'Azionando il freno motore dei veicoli pesanti, si crea una strozzatura del tubo di scarico tramite una valvola a farfalla',a:'V'},
+      {q:'Il freno-motore è particolarmente importante per ridurre il rischio di surriscaldamento degli elementi frenanti',a:'V'},
+      {q:'Con l\'azione del solo freno-motore non è possibile fermare il veicolo in distanze ragionevoli in tutte le situazioni',a:'V'},
+      {q:'Il freno motore funziona meglio quando il cambio è in folle',a:'F'},
+      {q:'Il freno motore serve a mantenere frenato il veicolo in sosta su strada in pendenza',a:'F'},
+      {q:'Il limitatore di velocità è un dispositivo che interviene sull\'iniezione del combustibile',a:'V'},
+      {q:'Il limitatore di velocità deve essere inviolabile: non deve essere possibile aumentare il livello della limitazione',a:'V'},
+      {q:'La velocità massima consentita dal limitatore ad un autobus deve essere di 100 km/h',a:'V'},
+      {q:'La velocità massima consentita dal limitatore ad un autocarro di massa superiore a 3,5 t deve essere di 90 km/h',a:'V'},
+      {q:'Il limitatore di velocità non deve essere montato sugli autobus che effettuano servizio pubblico urbano',a:'V'},
+      {q:'La velocità massima consentita dal limitatore ad un autobus deve essere di 80 km/h',a:'F'},
+      {q:'La velocità massima consentita dal limitatore ad un autocarro di massa superiore a 3,5 t deve essere di 100 km/h',a:'F'},
+      {q:'Il limitatore di velocità può essere disattivato dal conducente in caso di emergenza',a:'F'},
+      {q:'La circolazione con limitatore di velocità alterato comporta la revoca della patente di guida',a:'V'},
+      {q:'Il limite di massa complessiva a pieno carico per i veicoli a motore isolati a 2 assi è di 18 tonnellate',a:'V'},
+      {q:'Il limite di massa complessiva a pieno carico per i veicoli a motore isolati a 3 assi è di 25 tonnellate',a:'V'},
+      {q:'La massa complessiva a pieno carico è la massa massima autorizzata e corrisponde alla tara più il carico utile',a:'V'},
+      {q:'La portata (carico utile) è indicata sulla carta di circolazione',a:'V'},
+      {q:'La massa complessiva a pieno carico non è indicata nella carta di circolazione',a:'F'},
     ]
   },
   {
-    id: "guida-giornaliero",
-    name: "Periodo di guida giornaliero",
-    questions: [
-      { q: 'Il periodo di guida giornaliero, di norma, non deve superare le nove ore', a: 'V' },
-      { q: 'Il periodo di guida giornaliero può essere esteso fino a dieci ore, non più di due volte nell\'arco della settimana', a: 'V' },
-      { q: 'Il periodo di guida giornaliero prevede una o più interruzioni di guida obbligatorie', a: 'V' },
-      { q: 'Il periodo di guida giornaliero può essere al massimo di otto ore', a: 'F' },
-      { q: 'Il periodo di guida giornaliero, di norma, è di nove ore consecutive', a: 'F' },
-      { q: 'Il periodo di guida giornaliero può essere di undici ore, per non più di due volte in una settimana', a: 'F' },
-      { q: 'Il periodo di guida giornaliero può essere esteso a dodici ore, purché intervallato da almeno tre interruzioni di quarantacinque minuti', a: 'F' },
+    id:'rimorchi', name:'Aggancio rimorchi e semirimorchi', examQ:2,
+    questions:[
+      {q:'L\'agganciamento fra motrice e rimorchio avviene tramite campana e timone',a:'V'},
+      {q:'Il timone del rimorchio si collega alla campana tramite l\'occhione',a:'V'},
+      {q:'Gli organi di traino vanno periodicamente ingrassati',a:'V'},
+      {q:'La frenatura di un rimorchio con freno continuo e automatico è anticipata rispetto a quella della motrice',a:'V'},
+      {q:'Un rimorchio con freno ad inerzia non può superare i 3.500 kg di massa complessiva',a:'V'},
+      {q:'In caso di sganciamento accidentale del rimorchio con freno ad inerzia entra in funzione il freno di soccorso',a:'V'},
+      {q:'L\'agganciamento fra trattore stradale e semirimorchio avviene tramite ralla e perno',a:'V'},
+      {q:'L\'avanzamento ralla varia il carico trasmesso dal semirimorchio al trattore',a:'V'},
+      {q:'La ralla del trattore è dotata di ganascia e leva di blocco per garantire il bloccaggio del perno anche sotto sforzo',a:'V'},
+      {q:'Il perno del semirimorchio non può mai essere saldato per riparazione',a:'V'},
+      {q:'Il gancio a sfera è l\'organo di traino tipico per rimorchi superiori alle 3,5 t',a:'F'},
+      {q:'L\'agganciamento fra motrice e rimorchio avviene tramite ralla e perno',a:'F'},
+      {q:'Il sistema di aggancio dell\'autotreno è caratterizzato dalla presenza di una ralla sulla motrice',a:'F'},
+      {q:'Il valore dell\'avanzamento ralla può essere variato dall\'autista in funzione del tipo di strada',a:'F'},
+      {q:'Perno del semirimorchio e piano della ralla del trattore devono essere sempre lucidi e senza grasso',a:'F'},
+      {q:'Il distributore duplex viene azionato dal conducente tramite il pedale del freno',a:'V'},
+      {q:'Il distributore duplex è diviso in due sezioni: una per l\'asse anteriore e una per quello posteriore',a:'V'},
+      {q:'Nei rimorchi dotati di freni pneumatici, in caso di rottura dei tubi di collegamento si mette in funzione la frenatura automatica',a:'V'},
+      {q:'Il servoautodistributore garantisce la frenatura istantanea ed automatica del rimorchio in caso di sganciamento accidentale',a:'V'},
+      {q:'Il distributore duplex garantisce la frenatura di stazionamento',a:'F'},
+      {q:'Il distributore duplex viene comandato a mano per la frenatura di stazionamento',a:'F'},
+      {q:'Il circuito frenante del rimorchio è comandato da un secondo distributore duplex a valle del giunto di accoppiamento',a:'F'},
     ]
   },
   {
-    id: "riposo-giornaliero",
-    name: "Periodo di riposo giornaliero",
-    questions: [
-      { q: 'Il periodo di riposo giornaliero regolare è di almeno undici ore', a: 'V' },
-      { q: 'Il periodo di riposo giornaliero ridotto è di almeno nove ore, non più di tre volte la settimana', a: 'V' },
-      { q: 'È vietato guidare per più di sei giorni consecutivi', a: 'V' },
-      { q: 'Non si possono effettuare più di tre periodi di riposo giornaliero ridotto, tra due periodi di riposo settimanale', a: 'V' },
-      { q: 'Il periodo di riposo giornaliero regolare è di almeno nove ore', a: 'F' },
-      { q: 'Il periodo di riposo giornaliero deve essere pari al periodo di guida giornaliero', a: 'F' },
-      { q: 'Il periodo di riposo giornaliero regolare è di otto ore', a: 'F' },
-      { q: 'Il periodo di riposo giornaliero è un periodo durante il quale il conducente non può disporre liberamente del proprio tempo', a: 'F' },
-      { q: 'Il periodo di riposo giornaliero ridotto è quarantacinque minuti ogni quattro ore e mezza di guida', a: 'F' },
+    id:'motori', name:'Motori e sistemi di alimentazione', examQ:5,
+    questions:[
+      {q:'Il motore Diesel è un motore a combustione interna con accensione per compressione',a:'V'},
+      {q:'Nel motore Diesel il carburante viene iniettato ad alta pressione direttamente in camera di combustione',a:'V'},
+      {q:'Nel motore a scoppio (benzina) il ciclo si compone di quattro fasi: aspirazione, compressione, scoppio, scarico',a:'V'},
+      {q:'Il motore Diesel utilizza l\'olio motore come carburante',a:'F'},
+      {q:'Il motore a scoppio e il motore Diesel hanno il medesimo ciclo di funzionamento',a:'F'},
+      {q:'La frizione è il dispositivo che consente di collegare e scollegare il motore dalla trasmissione',a:'V'},
+      {q:'La frizione, quando è completamente innestata, trasmette tutto il moto del motore agli organi della trasmissione',a:'V'},
+      {q:'Il cambio di velocità serve a variare il rapporto di trasmissione tra il motore e le ruote motrici',a:'V'},
+      {q:'Il differenziale consente alle ruote di uno stesso asse di girare a velocità diverse in curva',a:'V'},
+      {q:'La frizione si usa solo in fase di partenza da fermo',a:'F'},
+      {q:'Il differenziale blocca le ruote di un asse allo stesso numero di giri',a:'F'},
+      {q:'Il turbocompressore serve ad aumentare la quantità di aria introdotta nel cilindro',a:'V'},
+      {q:'Il turbocompressore è azionato da una turbina messa in rotazione dai gas di scarico',a:'V'},
+      {q:'Il turbocompressore serve a ridurre i consumi aumentando la velocità massima',a:'F'},
+      {q:'L\'alternatore converte l\'energia meccanica del motore in energia elettrica',a:'V'},
+      {q:'L\'alternatore serve per caricare la batteria e alimentare i servizi elettrici del veicolo',a:'V'},
+      {q:'La batteria è l\'unica fonte di energia elettrica del veicolo anche con il motore acceso',a:'F'},
+      {q:'Il cambio automatico non richiede l\'utilizzo della frizione da parte del conducente',a:'V'},
+      {q:'I veicoli pesanti moderni sono spesso dotati di cambio automatico o semiautomatico',a:'V'},
+      {q:'Il sistema Common-rail nei motori Diesel prevede un serbatoio di carburante ad alta pressione comune a tutti gli iniettori',a:'V'},
+      {q:'Il Common-rail è un tipo di motore benzina ad iniezione diretta',a:'F'},
+      {q:'I veicoli ibridi combinano un motore a combustione interna con uno o più motori elettrici',a:'V'},
+      {q:'Il motore elettrico non produce emissioni allo scarico durante il funzionamento',a:'V'},
+      {q:'I veicoli ibridi non possono mai ricaricare la batteria in movimento',a:'F'},
+      {q:'I motori a gas GPL utilizzano lo stesso sistema di iniezione dei motori Diesel',a:'F'},
+      {q:'Il motore a combustione interna trasforma l\'energia chimica del carburante in energia meccanica',a:'V'},
+      {q:'Innestando un basso rapporto del cambio si ottiene un maggior effetto frenante del motore',a:'V'},
+      {q:'L\'effetto frenante del motore a scoppio è, a parità di cilindrata, generalmente maggiore di quello del motore Diesel',a:'V'},
+      {q:'L\'effetto frenante del motore Diesel è, a parità di cilindrata, generalmente maggiore di quello del motore a scoppio',a:'F'},
     ]
   },
   {
-    id: "riposo-settimanale",
-    name: "Periodo di riposo settimanale",
-    questions: [
-      { q: 'Il periodo di riposo settimanale regolare è di almeno 45 ore', a: 'V' },
-      { q: 'Il periodo di riposo settimanale ridotto deve essere recuperato', a: 'V' },
-      { q: 'Il periodo di riposo settimanale ridotto ha una durata minima di 24 ore ininterrotte', a: 'V' },
-      { q: 'Il periodo di riposo settimanale può essere di tipo regolare o ridotto', a: 'V' },
-      { q: 'Il periodo di riposo settimanale regolare è di almeno 30 ore', a: 'F' },
-      { q: 'Il periodo di riposo settimanale ridotto è al massimo di 24 ore continuative', a: 'F' },
-      { q: 'Il periodo di riposo settimanale regolare non può essere inferiore a 90 ore', a: 'F' },
-      { q: 'Il conducente, a fronte di indennità in denaro, può rinunciare al periodo di riposo settimanale', a: 'F' },
+    id:'pneumatici', name:'Manutenzione e impiego degli pneumatici', examQ:4,
+    questions:[
+      {q:'La pressione degli pneumatici influisce sul consumo di carburante del veicolo',a:'V'},
+      {q:'La pressione degli pneumatici deve essere verificata a freddo',a:'V'},
+      {q:'Uno pneumatico sgonfio aumenta la resistenza al rotolamento e il consumo di carburante',a:'V'},
+      {q:'La pressione eccessiva degli pneumatici riduce la superficie di contatto con il suolo e la tenuta di strada',a:'V'},
+      {q:'Il battistrada degli pneumatici deve avere profondità minima di 1,6 mm',a:'V'},
+      {q:'Pneumatici di diversa misura o tipo possono essere montati sullo stesso asse',a:'F'},
+      {q:'La pressione degli pneumatici va verificata a caldo, dopo un lungo percorso',a:'F'},
+      {q:'Un battistrada usurato riduce la distanza di frenata',a:'V'},
+      {q:'La temperatura degli pneumatici aumenta con la velocità e con il carico',a:'V'},
+      {q:'Gli pneumatici radiali e quelli diagonali possono essere montati indifferentemente sullo stesso asse',a:'F'},
+      {q:'Lo pneumatico tubeless non necessita di camera d\'aria',a:'V'},
+      {q:'In caso di foratura, uno pneumatico tubeless perde pressione più lentamente rispetto ad uno con camera d\'aria',a:'V'},
+      {q:'Il codice di velocità degli pneumatici indica la velocità massima alla quale possono girare con il carico previsto',a:'V'},
+      {q:'Il codice di carico degli pneumatici indica il carico massimo sopportabile',a:'V'},
+      {q:'Il codice di velocità degli pneumatici è indicato con un numero',a:'F'},
     ]
   },
   {
-    id: "quando",
-    name: "Quando si applica il Reg. 561/2006/CE",
-    questions: [
-      { q: 'Si applica al trasporto su strada di cose effettuato con veicoli di massa massima ammissibile superiore a 3,5 tonnellate', a: 'V' },
-      { q: 'Si applica al trasporto su strada di passeggeri effettuato con veicoli atti a trasportare più di nove persone compreso il conducente', a: 'V' },
-      { q: 'Si applica ad alcuni trasporti su strada effettuati all\'interno dell\'Unione Europea', a: 'V' },
-      { q: 'Si applica ad alcuni trasporti su strada effettuati fra l\'Unione Europea e i Paesi dello Spazio economico europeo', a: 'V' },
-      { q: 'Si applica al trasporto su strada di merci effettuato da veicoli di massa massima ammissibile superiore a 2,5 tonnellate', a: 'F' },
-      { q: 'Si applica al trasporto su strada di passeggeri effettuato con taxi o autobus', a: 'F' },
-      { q: 'Si applica anche al trasporto su ferrovia', a: 'F' },
-      { q: 'Si applica ai veicoli destinati al trasporto di cose, ma non a quelli adibiti al trasporto di persone', a: 'F' },
+    id:'freni', name:'Funzionamento di freno e acceleratore', examQ:3,
+    questions:[
+      {q:'L\'ABS impedisce il bloccaggio delle ruote durante la frenata',a:'V'},
+      {q:'L\'ABS riduce la distanza di frenata su superfici scivolose',a:'V'},
+      {q:'L\'ABS permette di mantenere il controllo direzionale del veicolo durante la frenata',a:'V'},
+      {q:'Con l\'ABS attivo si devono effettuare frenate a pompaggio',a:'F'},
+      {q:'L\'ABS è efficace solo su superfici asciutte',a:'F'},
+      {q:'Il freno di servizio è il freno principale utilizzato durante la marcia normale',a:'V'},
+      {q:'Il freno di stazionamento mantiene fermo il veicolo quando è parcheggiato',a:'V'},
+      {q:'Il freno di soccorso deve essere in grado di fermare il veicolo in caso di guasto del freno principale',a:'V'},
+      {q:'Il freno di stazionamento può essere utilizzato come freno di servizio in emergenza',a:'V'},
+      {q:'Il freno di servizio agisce solo sulle ruote anteriori nei veicoli pesanti',a:'F'},
+      {q:'Nei veicoli pesanti, l\'impianto frenante è tipicamente di tipo pneumatico',a:'V'},
+      {q:'Il rallentatore è un dispositivo frenante ausiliario che non provoca usura degli elementi frenanti',a:'V'},
+      {q:'Il rallentatore idraulico utilizza la resistenza di un liquido per rallentare la trasmissione',a:'V'},
+      {q:'Il rallentatore elettromagnetico provoca usura dei dischi freno quando è in funzione',a:'F'},
+      {q:'Il rallentatore può sostituire completamente il freno di servizio in qualsiasi situazione',a:'F'},
     ]
   },
   {
-    id: "superamento",
-    name: "Superamento dei tempi massimi di guida",
-    questions: [
-      { q: 'Il conducente può superare i tempi massimi di guida solo per raggiungere un luogo di sosta appropriato, al fine di salvaguardare la sicurezza', a: 'V' },
-      { q: 'Il conducente che deroga alla durata massima di guida per raggiungere un luogo di sosta deve annotarne i motivi sul foglio di registrazione o sul retro del ticket', a: 'V' },
-      { q: 'Il conducente può superare i tempi massimi di guida per raggiungere il proprio domicilio', a: 'F' },
-      { q: 'Il conducente può superare i tempi massimi di guida per raggiungere il deposito dell\'impresa proprietaria del veicolo', a: 'F' },
+    id:'guasti', name:'Guasti, sospensioni e ammortizzatori', examQ:3,
+    questions:[
+      {q:'Le sospensioni pneumatiche consentono di mantenere il veicolo ad altezza costante indipendentemente dal carico',a:'V'},
+      {q:'Le sospensioni pneumatiche offrono maggiore comfort rispetto a quelle meccaniche',a:'V'},
+      {q:'Un guasto alle sospensioni può influire sulla tenuta di strada del veicolo',a:'V'},
+      {q:'Gli ammortizzatori servono a smorzare le oscillazioni delle sospensioni',a:'V'},
+      {q:'Le sospensioni pneumatiche non sono adatte per i veicoli pesanti',a:'F'},
+      {q:'Un ammortizzatore usurato non ha effetti sulla stabilità del veicolo',a:'F'},
+      {q:'In caso di guasto allo sterzo, il conducente deve frenare bruscamente e fermarsi',a:'F'},
+      {q:'Il surriscaldamento dei freni può causare la riduzione dell\'efficienza frenante (fading)',a:'V'},
+      {q:'In caso di surriscaldamento dei freni è necessario fermarsi e lasciarli raffreddare prima di riprendere la marcia',a:'V'},
+      {q:'I freni a disco si surriscaldano più facilmente dei freni a tamburo',a:'F'},
+      {q:'Il cedimento di uno pneumatico in marcia può essere compensato con una brusca sterzata',a:'F'},
+      {q:'In caso di foratura di uno pneumatico posteriore, il veicolo tende a sbandare sul lato del pneumatico forato',a:'V'},
     ]
   },
   {
-    id: "altri-lavori",
-    name: 'Tempi definiti "altri lavori"',
-    questions: [
-      { q: 'I tempi di disponibilità sono quelli nei quali il conducente, pur non dovendo necessariamente rimanere sul posto di lavoro, deve tenersi a disposizione per poter prontamente riprendere il lavoro', a: 'V' },
-      { q: 'I periodi di permanenza a bordo del veicolo a fianco di un altro conducente (multipresenza) sono considerati tempi di disponibilità', a: 'V' },
-      { q: 'I periodi di permanenza in cuccetta durante la marcia del veicolo sono considerati tempi di disponibilità', a: 'V' },
-      { q: 'I periodi di tempo impiegati per la piccola manutenzione del veicolo sono considerati "altri lavori"', a: 'V' },
-      { q: 'I tempi definiti "altri lavori" sono considerati tempi di guida', a: 'F' },
-      { q: 'I tempi di disponibilità sono quelli durante i quali il conducente può disporre liberamente del proprio tempo', a: 'F' },
-      { q: 'I periodi di tempo impiegati per la pulizia del veicolo sono considerati "tempi di disponibilità"', a: 'F' },
+    id:'manutenzione', name:'Manutenzione veicoli e riparazioni', examQ:3,
+    questions:[
+      {q:'Il livello dell\'olio motore deve essere controllato a motore freddo o dopo qualche minuto dallo spegnimento',a:'V'},
+      {q:'Il liquido di raffreddamento deve essere controllato a motore freddo',a:'V'},
+      {q:'L\'olio motore deve essere sostituito periodicamente secondo le indicazioni del costruttore',a:'V'},
+      {q:'Le candele di accensione sono componenti tipiche del motore Diesel',a:'F'},
+      {q:'Il filtro dell\'aria va sostituito periodicamente per mantenere l\'efficienza del motore',a:'V'},
+      {q:'La cinghia di distribuzione non ha bisogno di manutenzione periodica',a:'F'},
+      {q:'Il liquido dei freni deve essere sostituito periodicamente perché assorbe umidità nel tempo',a:'V'},
+      {q:'Il liquido dei freni non va mai rabboccato',a:'F'},
+      {q:'I freni a disco si usurano più uniformemente dei freni a tamburo',a:'V'},
+      {q:'Le pastiglie dei freni devono essere sostituite quando il loro spessore scende sotto il limite previsto',a:'V'},
+      {q:'L\'olio del cambio non necessita di sostituzione periodica',a:'F'},
+      {q:'Prima di un lungo viaggio è buona norma controllare i livelli dei fluidi, la pressione degli pneumatici e i dispositivi di illuminazione',a:'V'},
     ]
   },
   {
-    id: "sanzioni",
-    name: "Tempi di pausa e riposo – Sanzioni",
-    questions: [
-      { q: 'È soggetto a sanzione amministrativa il conducente che supera i periodi di guida prescritti', a: 'V' },
-      { q: 'È soggetto a sanzione amministrativa il conducente che non osserva le interruzioni obbligatorie durante il viaggio', a: 'V' },
-      { q: 'È soggetto a sanzione amministrativa il conducente che è sprovvisto o tiene in modo incompleto o alterato l\'estratto del registro di servizio', a: 'V' },
-      { q: 'È soggetto a sanzione amministrativa il conducente che non osserva i periodi di riposo minimi', a: 'V' },
-      { q: 'È soggetto a sanzione amministrativa il conducente che non osserva i periodi di pausa o di riposo prescritti', a: 'V' },
-      { q: 'È soggetto alla revoca della patente il conducente che supera i periodi di guida prescritti', a: 'F' },
-      { q: 'È soggetto a sanzione amministrativa il conducente che effettua l\'interruzione di quarantacinque minuti dopo quattro ore e mezza di guida', a: 'F' },
-      { q: 'Costituisce infrazione guidare per quattro ore consecutive, senza interruzioni', a: 'F' },
-      { q: 'È ammesso utilizzare un foglio di registrazione del cronotachigrafo analogico per più di 24 ore', a: 'F' },
-      { q: 'È soggetto alla revoca della carta di qualificazione del conducente l\'autista che supera i periodi di guida prescritti', a: 'F' },
+    id:'merci', name:'Trasporto e consegna merci', examQ:1,
+    questions:[
+      {q:'Il conducente è responsabile della sicurezza del carico durante il trasporto',a:'V'},
+      {q:'Il carico deve essere assicurato in modo da non spostarsi durante il trasporto',a:'V'},
+      {q:'Il conducente deve verificare che il carico sia correttamente sistemato e fissato prima di partire',a:'V'},
+      {q:'Un carico mal distribuito può compromettere la stabilità del veicolo',a:'V'},
+      {q:'Il conducente non ha responsabilità sul modo in cui il carico è stato sistemato da terzi',a:'F'},
+      {q:'Il carico può sporgere posteriormente dal veicolo per una lunghezza illimitata',a:'F'},
+      {q:'Il carico che sporge posteriormente oltre un certo limite deve essere segnalato con appositi dispositivi',a:'V'},
+      {q:'Il peso del carico non influisce sulla distanza di frenata del veicolo',a:'F'},
+      {q:'La lettera di vettura (CMR) è il documento che accompagna le merci nel trasporto internazionale su strada',a:'V'},
+      {q:'Il conducente deve consegnare le merci solo al destinatario indicato nella lettera di vettura',a:'V'},
     ]
   },
 ];
 
-// State
-let currentQuestions = [];
-let currentIndex = 0;
-let score = 0;
-let answers = [];
-let currentTopicName = '';
-let currentTopicId = '';
+const EXAM_DISTRIBUTION = [
+  {id:'guida-riposo',n:2},{id:'cronotachigrafo',n:3},{id:'incidente',n:2},
+  {id:'dimensioni',n:3},{id:'rimorchi',n:2},{id:'motori',n:5},
+  {id:'pneumatici',n:4},{id:'freni',n:3},{id:'guasti',n:3},
+  {id:'manutenzione',n:3},{id:'merci',n:1},
+];
+const EXAM_TOTAL=40,EXAM_MINUTES=40,EXAM_MAX_ERRORS=4;
 
-// Build menu
-function buildMenu() {
-  const list = document.getElementById('topic-list');
-  TOPICS.forEach(t => {
-    const btn = document.createElement('button');
-    btn.className = 'topic-btn';
-    btn.innerHTML = `<span>${t.name}</span><span><span class="count">${t.questions.length} dom.</span> <span class="arr">›</span></span>`;
-    btn.onclick = () => startQuiz(t.id);
+let S={mode:null,topicId:null,questions:[],idx:0,score:0,errors:0,answers:[],timer:null,secondsLeft:0,finished:false};
+let stats=JSON.parse(localStorage.getItem('quizStats')||'{}');
+
+function buildMenu(){
+  const list=document.getElementById('topic-list');
+  TOPICS.forEach(t=>{
+    const btn=document.createElement('button');
+    btn.className='topic-btn';
+    btn.innerHTML=`<span>${t.name}</span><div class="meta"><span class="badge">${t.questions.length} dom.</span><span class="arr">›</span></div>`;
+    btn.onclick=()=>startQuiz(t.id,'practice');
     list.appendChild(btn);
   });
 }
 
-function startQuiz(topicId) {
-  if (topicId === 'all') {
-    currentQuestions = shuffle(TOPICS.flatMap(t => t.questions.map(q => ({...q, topic: t.name}))));
-    currentTopicName = 'Tutte le domande';
-    currentTopicId = 'all';
-  } else {
-    const t = TOPICS.find(t => t.id === topicId);
-    currentQuestions = shuffle([...t.questions]);
-    currentTopicName = t.name;
-    currentTopicId = topicId;
+function showTab(tab){
+  document.querySelectorAll('.nav-tab').forEach((el,i)=>el.classList.toggle('active',['menu','stats'][i]===tab));
+  document.querySelectorAll('.screen').forEach(el=>el.classList.remove('active'));
+  document.getElementById(tab+'-screen').classList.add('active');
+  if(tab==='stats')renderStats();
+}
+
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+
+function startQuiz(topicId,mode){
+  let questions;
+  if(topicId==='all'){questions=shuffle(TOPICS.flatMap(t=>t.questions.map(q=>({...q,topicId:t.id}))));}
+  else{const t=TOPICS.find(t=>t.id===topicId);questions=shuffle(t.questions.map(q=>({...q,topicId})));}
+  S={mode,topicId,questions,idx:0,score:0,errors:0,answers:[],timer:null,secondsLeft:0,finished:false};
+  const name=topicId==='all'?'Tutte le domande':TOPICS.find(t=>t.id===topicId)?.name;
+  document.getElementById('quiz-topic-name').textContent=name;
+  document.getElementById('quiz-mode-badge').textContent='🎯 Pratica';
+  document.getElementById('timer-bar').style.display='none';
+  showQuizScreen();renderQuestion();
+}
+
+function startExam(){
+  let questions=[];
+  EXAM_DISTRIBUTION.forEach(({id,n})=>{
+    const t=TOPICS.find(t=>t.id===id);if(!t)return;
+    const pool=shuffle(t.questions);
+    for(let i=0;i<Math.min(n,pool.length);i++)questions.push({...pool[i],topicId:id});
+  });
+  if(questions.length<EXAM_TOTAL){
+    const extra=shuffle(TOPICS.flatMap(t=>t.questions.map(q=>({...q,topicId:t.id}))));
+    for(const q of extra){if(questions.length>=EXAM_TOTAL)break;if(!questions.find(x=>x.q===q.q))questions.push(q);}
   }
-  currentIndex = 0;
-  score = 0;
-  answers = [];
-  document.getElementById('quiz-topic-name').textContent = currentTopicName;
-  showScreen('quiz');
-  renderQuestion();
+  questions=shuffle(questions.slice(0,EXAM_TOTAL));
+  S={mode:'exam',topicId:'exam',questions,idx:0,score:0,errors:0,answers:[],timer:null,secondsLeft:EXAM_MINUTES*60,finished:false};
+  document.getElementById('quiz-topic-name').textContent='Simulazione Esame';
+  document.getElementById('quiz-mode-badge').textContent='🎓 Esame ufficiale';
+  document.getElementById('timer-bar').style.display='flex';
+  updateTimerDisplay();startTimer();
+  showQuizScreen();renderQuestion();
 }
 
-function renderQuestion() {
-  const q = currentQuestions[currentIndex];
-  const total = currentQuestions.length;
-
-  document.getElementById('q-counter').textContent = `Domanda ${currentIndex + 1} di ${total}`;
-  document.getElementById('question-text').textContent = q.q;
-  document.getElementById('progress-fill').style.width = ((currentIndex / total) * 100) + '%';
-  document.getElementById('feedback').className = 'feedback';
-  document.getElementById('feedback').textContent = '';
-  document.getElementById('next-btn').className = 'next-btn';
-
-  const bv = document.getElementById('btn-v');
-  const bf = document.getElementById('btn-f');
-  bv.className = 'vf-btn vero';
-  bf.className = 'vf-btn falso';
-  bv.disabled = false;
-  bf.disabled = false;
+function showQuizScreen(){
+  document.querySelectorAll('.nav-tab').forEach(el=>el.style.display='none');
+  document.querySelectorAll('.screen').forEach(el=>el.classList.remove('active'));
+  document.getElementById('results-screen').style.display='none';
+  document.getElementById('quiz-screen').classList.add('active');
 }
 
-function answer(choice) {
-  const q = currentQuestions[currentIndex];
-  const correct = choice === q.a;
-  if (correct) score++;
-
-  answers.push({ q: q.q, given: choice, correct: q.a, ok: correct });
-
-  const bv = document.getElementById('btn-v');
-  const bf = document.getElementById('btn-f');
-  bv.disabled = true;
-  bf.disabled = true;
-
-  if (correct) {
-    const btn = choice === 'V' ? bv : bf;
-    btn.className = 'vf-btn correct';
-    document.getElementById('feedback').className = 'feedback correct';
-    document.getElementById('feedback').textContent = '✓ Corretto!';
-  } else {
-    const wrongBtn = choice === 'V' ? bv : bf;
-    const rightBtn = choice === 'V' ? bf : bv;
-    wrongBtn.className = 'vf-btn wrong';
-    rightBtn.className = 'vf-btn reveal';
-    document.getElementById('feedback').className = 'feedback wrong';
-    document.getElementById('feedback').textContent = `✗ Sbagliato — era ${q.a === 'V' ? 'VERO' : 'FALSO'}`;
-  }
-
-  document.getElementById('next-btn').className = 'next-btn visible';
-  document.getElementById('next-btn').textContent =
-    currentIndex < currentQuestions.length - 1 ? 'Avanti →' : 'Vedi risultati';
-}
-
-function nextQuestion() {
-  currentIndex++;
-  if (currentIndex < currentQuestions.length) {
-    renderQuestion();
-  } else {
-    showResults();
+function renderQuestion(){
+  const q=S.questions[S.idx];
+  document.getElementById('q-counter').textContent=`Domanda ${S.idx+1} di ${S.questions.length}`;
+  document.getElementById('question-text').textContent=q.q;
+  document.getElementById('progress-fill').style.width=((S.idx/S.questions.length)*100)+'%';
+  document.getElementById('feedback').className='feedback';
+  document.getElementById('next-btn').className='next-btn';
+  const bv=document.getElementById('btn-v'),bf=document.getElementById('btn-f');
+  bv.className='vf-btn vero';bf.className='vf-btn falso';
+  bv.disabled=false;bf.disabled=false;
+  if(S.mode==='exam'){
+    document.getElementById('error-count').textContent=`${S.errors} / ${EXAM_MAX_ERRORS}`;
+    document.getElementById('error-count').className='error-count'+(S.errors>=3?' danger':'');
   }
 }
 
-function showResults() {
-  const total = currentQuestions.length;
-  const pct = Math.round((score / total) * 100);
-  document.getElementById('res-pct').textContent = pct + '%';
+function answer(choice){
+  if(S.finished)return;
+  const q=S.questions[S.idx];
+  const ok=choice===q.a;
+  if(ok)S.score++;else S.errors++;
+  S.answers.push({q:q.q,given:choice,correct:q.a,ok,topicId:q.topicId});
+  if(!stats[q.topicId])stats[q.topicId]={correct:0,total:0};
+  stats[q.topicId].total++;
+  if(ok)stats[q.topicId].correct++;
+  localStorage.setItem('quizStats',JSON.stringify(stats));
+  const bv=document.getElementById('btn-v'),bf=document.getElementById('btn-f');
+  bv.disabled=true;bf.disabled=true;
+  if(ok){
+    (choice==='V'?bv:bf).className='vf-btn correct';
+    document.getElementById('feedback').className='feedback correct';
+    document.getElementById('feedback').textContent='✓ Corretto!';
+  }else{
+    (choice==='V'?bv:bf).className='vf-btn wrong';
+    (choice==='V'?bf:bv).className='vf-btn reveal';
+    document.getElementById('feedback').className='feedback wrong';
+    document.getElementById('feedback').textContent=`✗ Sbagliato — era ${q.a==='V'?'VERO':'FALSO'}`;
+  }
+  if(S.mode==='exam'){
+    document.getElementById('error-count').textContent=`${S.errors} / ${EXAM_MAX_ERRORS}`;
+    document.getElementById('error-count').className='error-count'+(S.errors>=3?' danger':'');
+    if(S.errors>EXAM_MAX_ERRORS){
+      document.getElementById('next-btn').textContent='Vedi risultati (non superato)';
+      document.getElementById('next-btn').className='next-btn visible';
+      return;
+    }
+  }
+  const isLast=S.idx>=S.questions.length-1;
+  document.getElementById('next-btn').className='next-btn visible';
+  document.getElementById('next-btn').textContent=isLast?'Vedi risultati':'Avanti →';
+}
 
-  let msg, sub;
-  if (pct === 100) { msg = '🏆 Perfetto!'; sub = 'Tutte le risposte corrette.'; }
-  else if (pct >= 80) { msg = '👍 Molto bene!'; sub = `${score} su ${total} corrette. Quasi in forma!`; }
-  else if (pct >= 60) { msg = '📚 Continua a studiare'; sub = `${score} su ${total} corrette. Ce la puoi fare.`; }
-  else { msg = '❌ Riprova'; sub = `${score} su ${total} corrette. Ripassa il materiale.`; }
+function nextQuestion(){
+  S.idx++;
+  if(S.idx<S.questions.length&&!(S.mode==='exam'&&S.errors>EXAM_MAX_ERRORS))renderQuestion();
+  else showResults();
+}
 
-  document.getElementById('res-msg').textContent = msg;
-  document.getElementById('res-sub').textContent = sub;
+function startTimer(){
+  if(S.timer)clearInterval(S.timer);
+  S.timer=setInterval(()=>{
+    S.secondsLeft--;updateTimerDisplay();
+    if(S.secondsLeft<=0){clearInterval(S.timer);showResults();}
+  },1000);
+}
 
-  document.getElementById('retry-btn').onclick = () => startQuiz(currentTopicId);
+function updateTimerDisplay(){
+  const m=Math.floor(S.secondsLeft/60),s=S.secondsLeft%60;
+  const el=document.getElementById('timer-display');
+  el.textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  el.className='timer-display'+(S.secondsLeft<120?' warning':'');
+}
 
-  const list = document.getElementById('review-list');
-  list.innerHTML = '<div style="font-weight:700;font-size:0.85rem;margin-bottom:10px;color:#444;">Riepilogo risposta per risposta:</div>';
-  answers.forEach(a => {
-    const div = document.createElement('div');
-    div.className = 'review-item' + (a.ok ? '' : ' wrong');
-    div.innerHTML = `
-      <div class="ri-status">${a.ok ? '✓ Corretto' : '✗ Sbagliato'}</div>
-      <div>${a.q}</div>
-      ${!a.ok ? `<div class="ri-answer">Risposta corretta: ${a.correct === 'V' ? 'VERO' : 'FALSO'}</div>` : ''}
-    `;
+function showResults(){
+  S.finished=true;
+  if(S.timer)clearInterval(S.timer);
+  document.getElementById('progress-fill').style.width='100%';
+  const total=S.questions.length;
+  const pct=Math.round((S.score/total)*100);
+  document.getElementById('res-pct').textContent=pct+'%';
+  let msg,sub;
+  if(S.mode==='exam'&&S.errors<=EXAM_MAX_ERRORS){msg='🏆 ESAME SUPERATO!';sub=`${S.score} corrette · ${S.errors} errori su ${EXAM_MAX_ERRORS} consentiti`;}
+  else if(S.mode==='exam'&&S.errors>EXAM_MAX_ERRORS){msg='❌ Esame non superato';sub=`${S.errors} errori — il massimo consentito è ${EXAM_MAX_ERRORS}. Riprova!`;}
+  else if(pct===100){msg='🏆 Perfetto!';sub='Tutte le risposte corrette.';}
+  else if(pct>=80){msg='👍 Molto bene!';sub=`${S.score} su ${total} corrette.`;}
+  else if(pct>=60){msg='📚 Continua a studiare';sub=`${S.score} su ${total} corrette.`;}
+  else{msg='❌ Ripassa il materiale';sub=`${S.score} su ${total} corrette.`;}
+  document.getElementById('res-msg').textContent=msg;
+  document.getElementById('res-sub').textContent=sub;
+  document.getElementById('retry-btn').onclick=()=>{if(S.mode==='exam')startExam();else startQuiz(S.topicId,'practice');};
+  const list=document.getElementById('review-list');
+  list.innerHTML='<div style="font-weight:700;font-size:.8rem;margin-bottom:10px;color:#555">Riepilogo risposta per risposta:</div>';
+  S.answers.forEach(a=>{
+    const div=document.createElement('div');
+    div.className='review-item'+(a.ok?'':' wrong');
+    div.innerHTML=`<div class="ri-status">${a.ok?'✓ Corretto':'✗ Sbagliato'}</div><div>${a.q}</div>${!a.ok?`<div class="ri-answer">Risposta corretta: ${a.correct==='V'?'VERO':'FALSO'}</div>`:''}`;
     list.appendChild(div);
   });
-
-  showScreen('results');
+  document.querySelectorAll('.nav-tab').forEach(el=>el.style.display='');
+  document.querySelectorAll('.screen').forEach(el=>el.classList.remove('active'));
+  document.getElementById('results-screen').style.display='block';
+  window.scrollTo(0,0);
 }
 
-function showMenu() {
-  showScreen('menu');
+function exitQuiz(){
+  if(S.timer)clearInterval(S.timer);
+  document.querySelectorAll('.nav-tab').forEach(el=>el.style.display='');
+  document.querySelectorAll('.screen').forEach(el=>el.classList.remove('active'));
+  document.getElementById('results-screen').style.display='none';
+  document.getElementById('menu-screen').classList.add('active');
+  document.querySelectorAll('.nav-tab')[0].classList.add('active');
+  window.scrollTo(0,0);
 }
 
-function showScreen(name) {
-  document.getElementById('menu').style.display = name === 'menu' ? 'block' : 'none';
-  document.getElementById('quiz').style.display = name === 'quiz' ? 'block' : 'none';
-  document.getElementById('results').style.display = name === 'results' ? 'block' : 'none';
-  window.scrollTo(0, 0);
+function renderStats(){
+  const el=document.getElementById('stats-content');
+  const hasData=Object.values(stats).some(s=>s.total>0);
+  if(!hasData){el.innerHTML='<div class="stats-empty">Nessuna sessione effettuata ancora.<br>Fai pratica per vedere le statistiche.</div>';return;}
+  let html='<div class="stats-card"><h3>Prestazioni per argomento</h3>';
+  TOPICS.forEach(t=>{
+    const s=stats[t.id];if(!s||s.total===0)return;
+    const pct=Math.round((s.correct/s.total)*100);
+    const barClass=pct>=75?'good':pct>=50?'':'bad';
+    html+=`<div class="stat-row"><div class="stat-name">${t.name}</div><div class="stat-bar-wrap"><div class="stat-bar ${barClass}" style="width:${pct}%"></div></div><div class="stat-pct">${pct}%</div></div>`;
+  });
+  const tQ=Object.values(stats).reduce((a,s)=>a+s.total,0);
+  const tC=Object.values(stats).reduce((a,s)=>a+s.correct,0);
+  const tP=tQ?Math.round((tC/tQ)*100):0;
+  html+=`</div><div class="stats-card"><h3>Totale</h3><div class="stat-row"><div class="stat-name">Domande risposte</div><div class="stat-pct">${tQ}</div></div><div class="stat-row"><div class="stat-name">Corrette</div><div class="stat-pct">${tC} (${tP}%)</div></div></div>`;
+  el.innerHTML=html;
+  const clearBtn=document.createElement('button');
+  clearBtn.className='clear-btn';clearBtn.textContent='🗑 Cancella statistiche';
+  clearBtn.onclick=()=>{if(confirm('Cancellare tutte le statistiche?')){stats={};localStorage.setItem('quizStats','{}');renderStats();}};
+  el.querySelector('.stats-card').appendChild(clearBtn);
 }
 
-function shuffle(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
+// PWA service worker for offline
+if('serviceWorker' in navigator){
+  const sw=`const C='qpc-v1';self.addEventListener('install',e=>e.waitUntil(caches.open(C).then(c=>c.add(location.pathname))));self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(res=>{caches.open(C).then(c=>c.put(e.request,res.clone()));return res;}))))`;
+  const blob=new Blob([sw],{type:'application/javascript'});
+  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{});
 }
 
 buildMenu();
