@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Patente C-CE – Periodi di Guida e Riposo</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f0f2f5;
+    color: #1a1a1a;
+    min-height: 100vh;
+  }
+
+  header {
+    background: #1a3a6b;
+    color: white;
+    padding: 16px 20px;
+    text-align: center;
+  }
+  header h1 { font-size: 1.1rem; font-weight: 700; line-height: 1.3; }
+  header p { font-size: 0.78rem; opacity: 0.75; margin-top: 4px; }
+
+  /* ── MENU ── */
+  #menu { padding: 16px; max-width: 540px; margin: 0 auto; }
+
+  .menu-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #666;
+    margin: 16px 0 8px;
+  }
+
+  .topic-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    background: white;
+    border: none;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    text-align: left;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    transition: background 0.15s;
+  }
+  .topic-btn:active { background: #f0f4ff; }
+  .topic-btn .count {
+    font-size: 0.75rem;
+    color: #888;
+    white-space: nowrap;
+    margin-left: 8px;
+  }
+  .topic-btn .arr { color: #1a3a6b; font-size: 1rem; }
+
+  .all-btn {
+    display: block;
+    width: 100%;
+    background: #1a3a6b;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 16px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-bottom: 8px;
+    box-shadow: 0 2px 6px rgba(26,58,107,0.3);
+  }
+
+  /* ── QUIZ ── */
+  #quiz { display: none; padding: 16px; max-width: 540px; margin: 0 auto; }
+
+  .quiz-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .back-btn {
+    background: none;
+    border: none;
+    font-size: 1.4rem;
+    cursor: pointer;
+    color: #1a3a6b;
+    padding: 4px;
+  }
+  .quiz-topic { font-size: 0.85rem; font-weight: 600; color: #444; flex: 1; }
+
+  .progress-bar {
+    height: 5px;
+    background: #e0e0e0;
+    border-radius: 3px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: #1a3a6b;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+  }
+
+  .q-counter {
+    font-size: 0.75rem;
+    color: #888;
+    margin-bottom: 10px;
+  }
+
+  .question-card {
+    background: white;
+    border-radius: 14px;
+    padding: 20px 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    margin-bottom: 16px;
+  }
+  .question-text {
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: #1a1a1a;
+  }
+
+  .vf-btns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .vf-btn {
+    padding: 18px 10px;
+    border: 2px solid #dde;
+    background: white;
+    border-radius: 12px;
+    font-size: 1.3rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: #333;
+  }
+  .vf-btn:active { transform: scale(0.97); }
+  .vf-btn.vero  { border-color: #2563eb; color: #2563eb; }
+  .vf-btn.falso { border-color: #dc2626; color: #dc2626; }
+
+  .vf-btn.correct { background: #dcfce7; border-color: #16a34a; color: #15803d; }
+  .vf-btn.wrong   { background: #fee2e2; border-color: #dc2626; color: #dc2626; }
+  .vf-btn.reveal  { background: #dcfce7; border-color: #16a34a; color: #15803d; }
+  .vf-btn:disabled { cursor: default; }
+
+  .feedback {
+    display: none;
+    text-align: center;
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin-bottom: 14px;
+    padding: 10px;
+    border-radius: 10px;
+  }
+  .feedback.correct { display: block; background: #dcfce7; color: #15803d; }
+  .feedback.wrong   { display: block; background: #fee2e2; color: #b91c1c; }
+
+  .next-btn {
+    display: none;
+    width: 100%;
+    background: #1a3a6b;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 15px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .next-btn.visible { display: block; }
+
+  /* ── RESULTS ── */
+  #results { display: none; padding: 24px 16px; max-width: 540px; margin: 0 auto; text-align: center; }
+
+  .score-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: #1a3a6b;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+  }
+  .score-circle .pct { font-size: 2rem; font-weight: 800; }
+  .score-circle .lbl { font-size: 0.7rem; opacity: 0.8; }
+
+  .result-msg { font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; }
+  .result-sub { font-size: 0.85rem; color: #666; margin-bottom: 24px; }
+
+  .result-btn {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    border-radius: 12px;
+    border: none;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-bottom: 10px;
+  }
+  .result-btn.primary { background: #1a3a6b; color: white; }
+  .result-btn.secondary { background: white; color: #1a3a6b; border: 2px solid #1a3a6b; }
+
+  .review-list { text-align: left; margin-top: 20px; }
+  .review-item {
+    background: white;
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+    font-size: 0.85rem;
+    line-height: 1.5;
+    border-left: 4px solid #16a34a;
+  }
+  .review-item.wrong { border-left-color: #dc2626; }
+  .review-item .ri-status { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
+  .review-item.wrong .ri-status { color: #dc2626; }
+  .review-item:not(.wrong) .ri-status { color: #16a34a; }
+  .review-item .ri-answer { margin-top: 4px; font-weight: 700; color: #1a3a6b; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Quiz Patente C-CE</h1>
+  <p>Periodi di Guida e Riposo · Reg. 561/2006/CE</p>
+</header>
+
+<!-- MENU -->
+<div id="menu">
+  <button class="all-btn" onclick="startQuiz('all')">▶ Tutte le domande (87)</button>
+
+  <div class="menu-title">Per argomento</div>
+  <div id="topic-list"></div>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz">
+  <div class="quiz-header">
+    <button class="back-btn" onclick="showMenu()">←</button>
+    <div class="quiz-topic" id="quiz-topic-name"></div>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+  <div class="q-counter" id="q-counter"></div>
+  <div class="question-card">
+    <div class="question-text" id="question-text"></div>
+  </div>
+  <div class="vf-btns">
+    <button class="vf-btn vero"  id="btn-v" onclick="answer('V')">✓ VERO</button>
+    <button class="vf-btn falso" id="btn-f" onclick="answer('F')">✗ FALSO</button>
+  </div>
+  <div class="feedback" id="feedback"></div>
+  <button class="next-btn" id="next-btn" onclick="nextQuestion()">Avanti →</button>
+</div>
+
+<!-- RESULTS -->
+<div id="results">
+  <div class="score-circle">
+    <span class="pct" id="res-pct"></span>
+    <span class="lbl">CORRETTO</span>
+  </div>
+  <div class="result-msg" id="res-msg"></div>
+  <div class="result-sub" id="res-sub"></div>
+  <button class="result-btn primary" id="retry-btn">Riprova</button>
+  <button class="result-btn secondary" onclick="showMenu()">← Scegli argomento</button>
+  <div class="review-list" id="review-list"></div>
+</div>
+
+<script>
+const TOPICS = [
+  {
+    id: "disponibilita",
+    name: "Disponibilità e interruzioni",
+    questions: [
+      { q: 'Per "interruzione" si intende ogni periodo in cui il conducente non può guidare o svolgere altre mansioni', a: 'V' },
+      { q: 'Per "riposo" si intende ogni periodo ininterrotto durante il quale il conducente può disporre liberamente del suo tempo', a: 'V' },
+      { q: 'Il "tempo di disponibilità" comprende il tempo di attesa sul posto di lavoro e la multipresenza', a: 'V' },
+      { q: 'Per "interruzione" si intende ogni fermata effettuata con il veicolo durante la giornata lavorativa', a: 'F' },
+      { q: 'Per "disponibilità" si intende l\'assenso del lavoratore a svolgere mansioni al di fuori del normale orario di lavoro', a: 'F' },
+    ]
+  },
+  {
+    id: "disposizioni",
+    name: "Disposizioni del Reg. 561/2006/CE",
+    questions: [
+      { q: 'Il regolamento prevede disposizioni relative ai tempi di guida e di riposo', a: 'V' },
+      { q: 'Il regolamento prevede disposizioni relative al massimo tempo di guida consentito in una settimana', a: 'V' },
+      { q: 'Il regolamento mira a migliorare le condizioni sociali dei lavoratori a cui si applica', a: 'V' },
+      { q: 'Il regolamento mira ad aumentare il livello di sicurezza stradale', a: 'V' },
+      { q: 'Il regolamento prevede disposizioni relative al tempo di guida massimo per giornata', a: 'V' },
+      { q: 'Il regolamento prevede disposizioni relative ai tempi di guida minimi', a: 'F' },
+      { q: 'Il regolamento prevede disposizioni relative al tempo di riposo massimo per settimana', a: 'F' },
+      { q: 'Il regolamento mira ad aumentare il tempo di lavoro dei conducenti', a: 'F' },
+      { q: 'Il regolamento prevede disposizioni sui compensi minimi dei conducenti', a: 'F' },
+      { q: 'Il regolamento prevede disposizioni relativamente al trasporto di cose, ma non sul trasporto di persone', a: 'F' },
+    ]
+  },
+  {
+    id: "frazionamento",
+    name: "Frazionamento dei tempi di pausa e riposo",
+    questions: [
+      { q: 'Il periodo massimo di guida settimanale è di cinquantasei ore', a: 'V' },
+      { q: 'Il periodo massimo di guida settimanale è di cinquantasei ore e la guida non deve superare le novanta ore nell\'arco di due settimane consecutive', a: 'V' },
+      { q: 'Il periodo di riposo giornaliero può essere frazionato in due parti: la prima di almeno 3 ore e la seconda di almeno 9 ore', a: 'V' },
+      { q: 'Il conducente, dopo sei periodi di guida, deve effettuare un riposo di 45 ore consecutive', a: 'V' },
+      { q: 'Il conducente, dopo sei periodi di guida, può effettuare un riposo ridotto di almeno 24 ore consecutive, purché le restanti ore vengano recuperate entro la fine della terza settimana', a: 'V' },
+      { q: 'Si può parlare di multipresenza quando a bordo sono presenti almeno due conducenti per l\'intero periodo, fatta salva la prima ora nella quale la presenza del secondo conducente è facoltativa', a: 'V' },
+      { q: 'Il periodo di riposo giornaliero può essere frazionato in due parti: la prima di almeno 9 ore e la seconda di almeno 3 ore', a: 'F' },
+      { q: 'Il conducente, dopo quattro periodi di guida, deve effettuare un riposo di 48 ore consecutive', a: 'F' },
+      { q: 'Si può parlare di multipresenza quando a bordo sono presenti due conducenti per l\'intero periodo, fatte salve le prime tre ore dove la presenza del secondo conducente è facoltativa', a: 'F' },
+      { q: 'Il periodo massimo di guida settimanale è di quarantotto ore', a: 'F' },
+      { q: 'Il periodo massimo di guida settimanale è di cinquantasei ore e la guida non deve superare le cento ore nell\'arco di due settimane consecutive', a: 'F' },
+      { q: 'Dopo un periodo di guida di quattro ore e mezza, il conducente deve osservare un periodo di riposo di almeno 50 minuti consecutivi', a: 'F' },
+    ]
+  },
+  {
+    id: "impresa",
+    name: "Impresa di trasporto e responsabilità",
+    questions: [
+      { q: 'L\'impresa di trasporto non può promettere premi in denaro al conducente basati sulla maggior percorrenza chilometrica', a: 'V' },
+      { q: 'Il conducente è corresponsabile per le infrazioni al regolamento, anche se commesse alla guida di un veicolo di proprietà dell\'impresa', a: 'V' },
+      { q: 'L\'impresa di trasporto non deve incoraggiare i propri conducenti a violare le disposizioni in materia di tempi di guida e di riposo', a: 'V' },
+      { q: 'L\'impresa di trasporto può decurtare lo stipendio al conducente che si rifiuti di guidare per più di 10 ore al giorno', a: 'F' },
+      { q: 'L\'impresa di trasporto non risponde delle violazioni commesse dai conducenti cui abbia fornito istruzioni contrarie al regolamento, perché la responsabilità è esclusivamente del conducente', a: 'F' },
+      { q: 'L\'impresa di trasporto non è responsabile per le violazioni in materia di tempi di guida e di riposo commesse dai conducenti quando sono all\'estero', a: 'F' },
+    ]
+  },
+  {
+    id: "guida-giornaliero",
+    name: "Periodo di guida giornaliero",
+    questions: [
+      { q: 'Il periodo di guida giornaliero, di norma, non deve superare le nove ore', a: 'V' },
+      { q: 'Il periodo di guida giornaliero può essere esteso fino a dieci ore, non più di due volte nell\'arco della settimana', a: 'V' },
+      { q: 'Il periodo di guida giornaliero prevede una o più interruzioni di guida obbligatorie', a: 'V' },
+      { q: 'Il periodo di guida giornaliero può essere al massimo di otto ore', a: 'F' },
+      { q: 'Il periodo di guida giornaliero, di norma, è di nove ore consecutive', a: 'F' },
+      { q: 'Il periodo di guida giornaliero può essere di undici ore, per non più di due volte in una settimana', a: 'F' },
+      { q: 'Il periodo di guida giornaliero può essere esteso a dodici ore, purché intervallato da almeno tre interruzioni di quarantacinque minuti', a: 'F' },
+    ]
+  },
+  {
+    id: "riposo-giornaliero",
+    name: "Periodo di riposo giornaliero",
+    questions: [
+      { q: 'Il periodo di riposo giornaliero regolare è di almeno undici ore', a: 'V' },
+      { q: 'Il periodo di riposo giornaliero ridotto è di almeno nove ore, non più di tre volte la settimana', a: 'V' },
+      { q: 'È vietato guidare per più di sei giorni consecutivi', a: 'V' },
+      { q: 'Non si possono effettuare più di tre periodi di riposo giornaliero ridotto, tra due periodi di riposo settimanale', a: 'V' },
+      { q: 'Il periodo di riposo giornaliero regolare è di almeno nove ore', a: 'F' },
+      { q: 'Il periodo di riposo giornaliero deve essere pari al periodo di guida giornaliero', a: 'F' },
+      { q: 'Il periodo di riposo giornaliero regolare è di otto ore', a: 'F' },
+      { q: 'Il periodo di riposo giornaliero è un periodo durante il quale il conducente non può disporre liberamente del proprio tempo', a: 'F' },
+      { q: 'Il periodo di riposo giornaliero ridotto è quarantacinque minuti ogni quattro ore e mezza di guida', a: 'F' },
+    ]
+  },
+  {
+    id: "riposo-settimanale",
+    name: "Periodo di riposo settimanale",
+    questions: [
+      { q: 'Il periodo di riposo settimanale regolare è di almeno 45 ore', a: 'V' },
+      { q: 'Il periodo di riposo settimanale ridotto deve essere recuperato', a: 'V' },
+      { q: 'Il periodo di riposo settimanale ridotto ha una durata minima di 24 ore ininterrotte', a: 'V' },
+      { q: 'Il periodo di riposo settimanale può essere di tipo regolare o ridotto', a: 'V' },
+      { q: 'Il periodo di riposo settimanale regolare è di almeno 30 ore', a: 'F' },
+      { q: 'Il periodo di riposo settimanale ridotto è al massimo di 24 ore continuative', a: 'F' },
+      { q: 'Il periodo di riposo settimanale regolare non può essere inferiore a 90 ore', a: 'F' },
+      { q: 'Il conducente, a fronte di indennità in denaro, può rinunciare al periodo di riposo settimanale', a: 'F' },
+    ]
+  },
+  {
+    id: "quando",
+    name: "Quando si applica il Reg. 561/2006/CE",
+    questions: [
+      { q: 'Si applica al trasporto su strada di cose effettuato con veicoli di massa massima ammissibile superiore a 3,5 tonnellate', a: 'V' },
+      { q: 'Si applica al trasporto su strada di passeggeri effettuato con veicoli atti a trasportare più di nove persone compreso il conducente', a: 'V' },
+      { q: 'Si applica ad alcuni trasporti su strada effettuati all\'interno dell\'Unione Europea', a: 'V' },
+      { q: 'Si applica ad alcuni trasporti su strada effettuati fra l\'Unione Europea e i Paesi dello Spazio economico europeo', a: 'V' },
+      { q: 'Si applica al trasporto su strada di merci effettuato da veicoli di massa massima ammissibile superiore a 2,5 tonnellate', a: 'F' },
+      { q: 'Si applica al trasporto su strada di passeggeri effettuato con taxi o autobus', a: 'F' },
+      { q: 'Si applica anche al trasporto su ferrovia', a: 'F' },
+      { q: 'Si applica ai veicoli destinati al trasporto di cose, ma non a quelli adibiti al trasporto di persone', a: 'F' },
+    ]
+  },
+  {
+    id: "superamento",
+    name: "Superamento dei tempi massimi di guida",
+    questions: [
+      { q: 'Il conducente può superare i tempi massimi di guida solo per raggiungere un luogo di sosta appropriato, al fine di salvaguardare la sicurezza', a: 'V' },
+      { q: 'Il conducente che deroga alla durata massima di guida per raggiungere un luogo di sosta deve annotarne i motivi sul foglio di registrazione o sul retro del ticket', a: 'V' },
+      { q: 'Il conducente può superare i tempi massimi di guida per raggiungere il proprio domicilio', a: 'F' },
+      { q: 'Il conducente può superare i tempi massimi di guida per raggiungere il deposito dell\'impresa proprietaria del veicolo', a: 'F' },
+    ]
+  },
+  {
+    id: "altri-lavori",
+    name: 'Tempi definiti "altri lavori"',
+    questions: [
+      { q: 'I tempi di disponibilità sono quelli nei quali il conducente, pur non dovendo necessariamente rimanere sul posto di lavoro, deve tenersi a disposizione per poter prontamente riprendere il lavoro', a: 'V' },
+      { q: 'I periodi di permanenza a bordo del veicolo a fianco di un altro conducente (multipresenza) sono considerati tempi di disponibilità', a: 'V' },
+      { q: 'I periodi di permanenza in cuccetta durante la marcia del veicolo sono considerati tempi di disponibilità', a: 'V' },
+      { q: 'I periodi di tempo impiegati per la piccola manutenzione del veicolo sono considerati "altri lavori"', a: 'V' },
+      { q: 'I tempi definiti "altri lavori" sono considerati tempi di guida', a: 'F' },
+      { q: 'I tempi di disponibilità sono quelli durante i quali il conducente può disporre liberamente del proprio tempo', a: 'F' },
+      { q: 'I periodi di tempo impiegati per la pulizia del veicolo sono considerati "tempi di disponibilità"', a: 'F' },
+    ]
+  },
+  {
+    id: "sanzioni",
+    name: "Tempi di pausa e riposo – Sanzioni",
+    questions: [
+      { q: 'È soggetto a sanzione amministrativa il conducente che supera i periodi di guida prescritti', a: 'V' },
+      { q: 'È soggetto a sanzione amministrativa il conducente che non osserva le interruzioni obbligatorie durante il viaggio', a: 'V' },
+      { q: 'È soggetto a sanzione amministrativa il conducente che è sprovvisto o tiene in modo incompleto o alterato l\'estratto del registro di servizio', a: 'V' },
+      { q: 'È soggetto a sanzione amministrativa il conducente che non osserva i periodi di riposo minimi', a: 'V' },
+      { q: 'È soggetto a sanzione amministrativa il conducente che non osserva i periodi di pausa o di riposo prescritti', a: 'V' },
+      { q: 'È soggetto alla revoca della patente il conducente che supera i periodi di guida prescritti', a: 'F' },
+      { q: 'È soggetto a sanzione amministrativa il conducente che effettua l\'interruzione di quarantacinque minuti dopo quattro ore e mezza di guida', a: 'F' },
+      { q: 'Costituisce infrazione guidare per quattro ore consecutive, senza interruzioni', a: 'F' },
+      { q: 'È ammesso utilizzare un foglio di registrazione del cronotachigrafo analogico per più di 24 ore', a: 'F' },
+      { q: 'È soggetto alla revoca della carta di qualificazione del conducente l\'autista che supera i periodi di guida prescritti', a: 'F' },
+    ]
+  },
+];
+
+// State
+let currentQuestions = [];
+let currentIndex = 0;
+let score = 0;
+let answers = [];
+let currentTopicName = '';
+let currentTopicId = '';
+
+// Build menu
+function buildMenu() {
+  const list = document.getElementById('topic-list');
+  TOPICS.forEach(t => {
+    const btn = document.createElement('button');
+    btn.className = 'topic-btn';
+    btn.innerHTML = `<span>${t.name}</span><span><span class="count">${t.questions.length} dom.</span> <span class="arr">›</span></span>`;
+    btn.onclick = () => startQuiz(t.id);
+    list.appendChild(btn);
+  });
+}
+
+function startQuiz(topicId) {
+  if (topicId === 'all') {
+    currentQuestions = shuffle(TOPICS.flatMap(t => t.questions.map(q => ({...q, topic: t.name}))));
+    currentTopicName = 'Tutte le domande';
+    currentTopicId = 'all';
+  } else {
+    const t = TOPICS.find(t => t.id === topicId);
+    currentQuestions = shuffle([...t.questions]);
+    currentTopicName = t.name;
+    currentTopicId = topicId;
+  }
+  currentIndex = 0;
+  score = 0;
+  answers = [];
+  document.getElementById('quiz-topic-name').textContent = currentTopicName;
+  showScreen('quiz');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = currentQuestions[currentIndex];
+  const total = currentQuestions.length;
+
+  document.getElementById('q-counter').textContent = `Domanda ${currentIndex + 1} di ${total}`;
+  document.getElementById('question-text').textContent = q.q;
+  document.getElementById('progress-fill').style.width = ((currentIndex / total) * 100) + '%';
+  document.getElementById('feedback').className = 'feedback';
+  document.getElementById('feedback').textContent = '';
+  document.getElementById('next-btn').className = 'next-btn';
+
+  const bv = document.getElementById('btn-v');
+  const bf = document.getElementById('btn-f');
+  bv.className = 'vf-btn vero';
+  bf.className = 'vf-btn falso';
+  bv.disabled = false;
+  bf.disabled = false;
+}
+
+function answer(choice) {
+  const q = currentQuestions[currentIndex];
+  const correct = choice === q.a;
+  if (correct) score++;
+
+  answers.push({ q: q.q, given: choice, correct: q.a, ok: correct });
+
+  const bv = document.getElementById('btn-v');
+  const bf = document.getElementById('btn-f');
+  bv.disabled = true;
+  bf.disabled = true;
+
+  if (correct) {
+    const btn = choice === 'V' ? bv : bf;
+    btn.className = 'vf-btn correct';
+    document.getElementById('feedback').className = 'feedback correct';
+    document.getElementById('feedback').textContent = '✓ Corretto!';
+  } else {
+    const wrongBtn = choice === 'V' ? bv : bf;
+    const rightBtn = choice === 'V' ? bf : bv;
+    wrongBtn.className = 'vf-btn wrong';
+    rightBtn.className = 'vf-btn reveal';
+    document.getElementById('feedback').className = 'feedback wrong';
+    document.getElementById('feedback').textContent = `✗ Sbagliato — era ${q.a === 'V' ? 'VERO' : 'FALSO'}`;
+  }
+
+  document.getElementById('next-btn').className = 'next-btn visible';
+  document.getElementById('next-btn').textContent =
+    currentIndex < currentQuestions.length - 1 ? 'Avanti →' : 'Vedi risultati';
+}
+
+function nextQuestion() {
+  currentIndex++;
+  if (currentIndex < currentQuestions.length) {
+    renderQuestion();
+  } else {
+    showResults();
+  }
+}
+
+function showResults() {
+  const total = currentQuestions.length;
+  const pct = Math.round((score / total) * 100);
+  document.getElementById('res-pct').textContent = pct + '%';
+
+  let msg, sub;
+  if (pct === 100) { msg = '🏆 Perfetto!'; sub = 'Tutte le risposte corrette.'; }
+  else if (pct >= 80) { msg = '👍 Molto bene!'; sub = `${score} su ${total} corrette. Quasi in forma!`; }
+  else if (pct >= 60) { msg = '📚 Continua a studiare'; sub = `${score} su ${total} corrette. Ce la puoi fare.`; }
+  else { msg = '❌ Riprova'; sub = `${score} su ${total} corrette. Ripassa il materiale.`; }
+
+  document.getElementById('res-msg').textContent = msg;
+  document.getElementById('res-sub').textContent = sub;
+
+  document.getElementById('retry-btn').onclick = () => startQuiz(currentTopicId);
+
+  const list = document.getElementById('review-list');
+  list.innerHTML = '<div style="font-weight:700;font-size:0.85rem;margin-bottom:10px;color:#444;">Riepilogo risposta per risposta:</div>';
+  answers.forEach(a => {
+    const div = document.createElement('div');
+    div.className = 'review-item' + (a.ok ? '' : ' wrong');
+    div.innerHTML = `
+      <div class="ri-status">${a.ok ? '✓ Corretto' : '✗ Sbagliato'}</div>
+      <div>${a.q}</div>
+      ${!a.ok ? `<div class="ri-answer">Risposta corretta: ${a.correct === 'V' ? 'VERO' : 'FALSO'}</div>` : ''}
+    `;
+    list.appendChild(div);
+  });
+
+  showScreen('results');
+}
+
+function showMenu() {
+  showScreen('menu');
+}
+
+function showScreen(name) {
+  document.getElementById('menu').style.display = name === 'menu' ? 'block' : 'none';
+  document.getElementById('quiz').style.display = name === 'quiz' ? 'block' : 'none';
+  document.getElementById('results').style.display = name === 'results' ? 'block' : 'none';
+  window.scrollTo(0, 0);
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+buildMenu();
+</script>
+</body>
+</html>
