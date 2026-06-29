@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Spotify Saver</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0e0e0e;
+  --surface: #181818;
+  --surface2: #222;
+  --surface3: #2a2a2a;
+  --border: rgba(255,255,255,0.08);
+  --border-h: rgba(255,255,255,0.16);
+  --text: #f1f1f1;
+  --muted: #888;
+  --dim: #555;
+  --green: #1DB954;
+  --green-d: rgba(29,185,84,0.12);
+  --red: #ff4444;
+  --blue: #3b82f6;
+  --purple: #a78bfa;
+  --amber: #fbbf24;
+  --r: 10px;
+  --font: 'Inter', system-ui, sans-serif;
+}
+
+body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; }
+
+/* ── SETUP SCREEN ── */
+#setup-screen {
+  max-width: 480px; margin: 6rem auto; padding: 2rem;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 16px;
+}
+#setup-screen h2 { font-size: 18px; font-weight: 600; margin-bottom: 6px; }
+#setup-screen p { font-size: 13px; color: var(--muted); margin-bottom: 1.5rem; line-height: 1.6; }
+.setup-field { margin-bottom: 14px; }
+.setup-field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 5px; }
+.setup-field input {
+  width: 100%; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 12px; font-size: 13px; color: var(--text);
+  font-family: var(--font); outline: none;
+}
+.setup-field input:focus { border-color: var(--green); }
+.setup-field input::placeholder { color: var(--dim); }
+.setup-hint { font-size: 11px; color: var(--dim); margin-top: 4px; line-height: 1.5; }
+.btn-primary {
+  width: 100%; background: var(--green); color: #000; border: none;
+  border-radius: 8px; padding: 11px; font-size: 14px; font-weight: 600;
+  font-family: var(--font); cursor: pointer; transition: opacity 0.15s; margin-top: 6px;
+}
+.btn-primary:hover { opacity: 0.85; }
+#setup-error { font-size: 12px; color: var(--red); margin-top: 8px; min-height: 16px; }
+
+/* ── HEADER ── */
+header {
+  padding: 1rem 1.5rem; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 12px;
+}
+.logo {
+  width: 30px; height: 30px; background: var(--green); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+header h1 { font-size: 16px; font-weight: 600; flex: 1; }
+.header-actions { display: flex; gap: 8px; align-items: center; }
+.sync-status { font-size: 11px; color: var(--dim); }
+.sync-status.syncing { color: var(--amber); }
+.sync-status.ok { color: var(--green); }
+.sync-status.err { color: var(--red); }
+.btn-icon {
+  background: transparent; border: 1px solid var(--border);
+  border-radius: 7px; padding: 5px 9px; color: var(--muted);
+  cursor: pointer; font-size: 12px; font-family: var(--font);
+  transition: all 0.12s;
+}
+.btn-icon:hover { border-color: var(--border-h); color: var(--text); }
+
+/* ── MAIN LAYOUT ── */
+.app { display: flex; height: calc(100vh - 53px); }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: 220px; flex-shrink: 0; border-right: 1px solid var(--border);
+  padding: 1.2rem 1rem; display: flex; flex-direction: column; gap: 1.2rem;
+  overflow-y: auto;
+}
+.sidebar-section-label {
+  font-size: 10px; color: var(--dim); text-transform: uppercase;
+  letter-spacing: 0.6px; margin-bottom: 7px; display: block;
+}
+.sidebar-item {
+  font-size: 13px; padding: 6px 10px; border-radius: 7px;
+  cursor: pointer; color: var(--muted); display: flex;
+  align-items: center; justify-content: space-between;
+  transition: all 0.1s;
+}
+.sidebar-item:hover { background: var(--surface2); color: var(--text); }
+.sidebar-item.active { background: var(--green-d); color: var(--green); }
+.sidebar-count {
+  font-size: 10px; background: var(--surface3); border-radius: 10px;
+  padding: 1px 6px; color: var(--dim);
+}
+.tag-dot {
+  width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-right: 6px;
+}
+
+/* ── CONTENT AREA ── */
+.content { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+
+/* ── TOP BAR ── */
+.topbar {
+  padding: 1rem 1.5rem; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+.search-wrap { position: relative; flex: 1; min-width: 180px; }
+.search-wrap input {
+  width: 100%; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 8px 12px 8px 32px; font-size: 13px;
+  color: var(--text); font-family: var(--font); outline: none;
+}
+.search-wrap input:focus { border-color: var(--green); }
+.search-wrap input::placeholder { color: var(--dim); }
+.search-icon {
+  position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+  color: var(--dim); font-size: 13px; pointer-events: none;
+}
+.topbar-right { display: flex; gap: 6px; align-items: center; }
+.sort-select {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 7px 10px; font-size: 12px; color: var(--muted);
+  font-family: var(--font); outline: none; cursor: pointer;
+}
+.view-toggle { display: flex; border: 1px solid var(--border); border-radius: 7px; overflow: hidden; }
+.view-btn {
+  background: transparent; border: none; padding: 6px 10px;
+  color: var(--dim); cursor: pointer; font-size: 13px; transition: all 0.1s;
+}
+.view-btn.active { background: var(--surface2); color: var(--text); }
+
+/* ── ADD BAR ── */
+.addbar {
+  padding: 1rem 1.5rem; border-bottom: 1px solid var(--border);
+  display: flex; gap: 10px; align-items: center;
+}
+.addbar input {
+  flex: 1; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; padding: 9px 12px; font-size: 13px; color: var(--text);
+  font-family: var(--font); outline: none; transition: border-color 0.15s;
+}
+.addbar input:focus { border-color: var(--green); }
+.addbar input::placeholder { color: var(--dim); }
+.btn-add {
+  background: var(--green); color: #000; border: none; border-radius: 8px;
+  padding: 9px 18px; font-size: 13px; font-weight: 600;
+  font-family: var(--font); cursor: pointer; white-space: nowrap; transition: opacity 0.15s;
+}
+.btn-add:hover { opacity: 0.85; }
+#add-error { font-size: 11px; color: var(--red); }
+
+/* ── TABLE VIEW ── */
+.table-wrap { flex: 1; overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead tr { border-bottom: 1px solid var(--border); }
+th {
+  text-align: left; padding: 10px 14px; font-size: 11px; font-weight: 500;
+  color: var(--dim); text-transform: uppercase; letter-spacing: 0.5px;
+  cursor: pointer; white-space: nowrap; user-select: none;
+}
+th:hover { color: var(--muted); }
+th .sort-arrow { margin-left: 4px; opacity: 0.4; }
+th.sorted .sort-arrow { opacity: 1; color: var(--green); }
+td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+tr:hover td { background: var(--surface); }
+.td-thumb {
+  width: 36px; height: 36px; border-radius: 5px; object-fit: cover;
+  background: var(--green); display: flex; align-items: center;
+  justify-content: center; flex-shrink: 0; overflow: hidden;
+}
+.td-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.td-title { font-weight: 500; color: var(--text); max-width: 260px; }
+.td-title a { color: inherit; text-decoration: none; }
+.td-title a:hover { color: var(--green); }
+.type-badge {
+  font-size: 10px; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 4px; padding: 1px 6px; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap;
+}
+.tag-pill {
+  font-size: 11px; background: var(--green-d); border: 1px solid rgba(29,185,84,0.22);
+  border-radius: 20px; padding: 1px 7px; color: var(--green);
+  display: inline-flex; align-items: center; gap: 3px; white-space: nowrap;
+}
+.tag-x { cursor: pointer; opacity: 0.5; font-size: 9px; }
+.tag-x:hover { opacity: 1; }
+.tags-cell { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.td-date { color: var(--muted); white-space: nowrap; font-size: 12px; }
+.td-actions { display: flex; gap: 6px; }
+.btn-sm {
+  font-size: 11px; background: transparent; border: 1px solid var(--border);
+  border-radius: 6px; padding: 4px 9px; color: var(--muted);
+  cursor: pointer; font-family: var(--font); transition: all 0.12s;
+  text-decoration: none; display: inline-block;
+}
+.btn-sm:hover { border-color: var(--green); color: var(--green); }
+.btn-del { }
+.btn-del:hover { border-color: var(--red) !important; color: var(--red) !important; }
+
+/* ── CARD VIEW ── */
+.card-grid {
+  padding: 1.5rem; display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px;
+}
+.song-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; overflow: hidden; transition: border-color 0.15s;
+  display: flex; flex-direction: column;
+}
+.song-card:hover { border-color: var(--border-h); }
+.card-art {
+  width: 100%; aspect-ratio: 1; background: var(--surface2);
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
+}
+.card-art img { width: 100%; height: 100%; object-fit: cover; }
+.card-body { padding: 10px 12px; flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.card-title {
+  font-size: 13px; font-weight: 500; line-height: 1.3;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.card-meta { font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.card-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.card-actions { display: flex; gap: 6px; margin-top: auto; padding-top: 6px; }
+
+/* ── TAG POPOVER ── */
+.tag-popover-wrap { position: relative; display: inline-block; }
+.add-tag-btn {
+  font-size: 11px; background: transparent;
+  border: 1px dashed var(--border-h); border-radius: 20px;
+  padding: 2px 8px; color: var(--dim); cursor: pointer;
+  font-family: var(--font); transition: all 0.12s; white-space: nowrap;
+}
+.add-tag-btn:hover { border-color: var(--green); color: var(--green); }
+.tag-dropdown {
+  position: absolute; bottom: calc(100% + 6px); left: 0; z-index: 200;
+  background: var(--surface3); border: 1px solid var(--border-h);
+  border-radius: 10px; padding: 10px; width: 270px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.6);
+}
+.tag-dropdown.below { bottom: auto; top: calc(100% + 6px); }
+.td-section { margin-bottom: 9px; }
+.td-section:last-child { margin-bottom: 0; }
+.td-section-label {
+  font-size: 10px; color: var(--dim); text-transform: uppercase;
+  letter-spacing: 0.6px; margin-bottom: 5px; display: block;
+}
+.preset-grid { display: flex; flex-wrap: wrap; gap: 4px; }
+.pt {
+  font-size: 11px; padding: 2px 8px; border-radius: 20px;
+  cursor: pointer; border: 1px solid transparent; font-family: var(--font);
+  transition: opacity 0.1s;
+}
+.pt:hover { opacity: 0.75; }
+.pt.applied { opacity: 0.3; cursor: default; pointer-events: none; }
+.pt-genre { background: rgba(29,185,84,0.12); border-color: rgba(29,185,84,0.25); color: #1DB954; }
+.pt-mood  { background: rgba(167,139,250,0.12); border-color: rgba(167,139,250,0.25); color: #a78bfa; }
+.pt-teach { background: rgba(59,130,246,0.12); border-color: rgba(59,130,246,0.25); color: #60a5fa; }
+.custom-input {
+  width: 100%; background: var(--surface2); border: 1px solid var(--green);
+  border-radius: 6px; padding: 6px 9px; font-size: 12px; color: var(--text);
+  font-family: var(--font); outline: none;
+}
+
+/* ── SUGGESTIONS ── */
+.suggestions { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; margin-bottom: 4px; }
+.sug-label { font-size: 10px; color: var(--dim); }
+.sug-tag {
+  font-size: 11px; padding: 2px 8px; border-radius: 20px; cursor: pointer;
+  border: 1px solid rgba(251,191,36,0.3); background: rgba(251,191,36,0.08);
+  color: #fbbf24; font-family: var(--font); transition: opacity 0.1s;
+}
+.sug-tag:hover { opacity: 0.7; }
+
+/* ── EMPTY / LOADING ── */
+.empty {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; color: var(--dim); gap: 10px; padding: 3rem;
+}
+.empty svg { opacity: 0.2; }
+.empty p { font-size: 13px; text-align: center; line-height: 1.6; }
+.skel { background: var(--surface2); border-radius: 4px; animation: sh 1.2s ease-in-out infinite; }
+@keyframes sh { 0%,100%{opacity:.3} 50%{opacity:.7} }
+
+/* ── MODAL ── */
+.modal-bg {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+  display: flex; align-items: center; justify-content: center; z-index: 300;
+}
+.modal {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 1.5rem; width: 360px; max-width: 90vw;
+}
+.modal h3 { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+.modal p { font-size: 12px; color: var(--muted); margin-bottom: 1rem; line-height: 1.6; }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1rem; }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- SETUP SCREEN -->
+<div id="setup-screen">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem">
+    <div style="width:32px;height:32px;background:#1DB954;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="black"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.65 14.42c-.19.31-.61.4-.92.2-2.52-1.54-5.69-1.89-9.43-1.03-.36.08-.72-.14-.8-.5-.08-.36.14-.72.5-.8 4.09-.94 7.59-.53 10.42 1.21.31.19.4.61.23.92zm1.24-2.76c-.24.38-.75.5-1.13.26-2.88-1.77-7.27-2.28-10.68-1.25-.44.14-.91-.12-1.04-.56-.14-.44.12-.91.56-1.04 3.9-1.18 8.73-.61 12.03 1.46.38.24.5.75.26 1.13zm.11-2.87C14.65 8.9 8.87 8.7 5.4 9.72c-.53.16-1.09-.14-1.25-.67s.14-1.09.67-1.25c4-.22 10.23.42 13.45 2.55.46.28.6.87.32 1.33-.28.45-.87.6-1.33.32z"/></svg>
+    </div>
+    <h2 style="margin:0">Spotify Saver — Setup</h2>
+  </div>
+  <p>Connect to your GitHub repo so your saved links persist across devices. Your data is stored as <code style="background:var(--surface2);padding:1px 5px;border-radius:4px;font-size:11px">spotify-db.json</code> in the repo you specify.</p>
+
+  <div class="setup-field">
+    <label>GitHub Personal Access Token</label>
+    <input type="password" id="s-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" />
+    <div class="setup-hint">Go to GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic). Generate one with <strong>repo</strong> scope.</div>
+  </div>
+  <div class="setup-field">
+    <label>Repository (owner/repo)</label>
+    <input type="text" id="s-repo" placeholder="johnplusenglish/spotify-saver" />
+  </div>
+  <div class="setup-field">
+    <label>Branch</label>
+    <input type="text" id="s-branch" placeholder="main" value="main" />
+  </div>
+
+  <button class="btn-primary" onclick="setupConnect()">Connect & Load</button>
+  <div id="setup-error"></div>
+</div>
+
+<!-- MAIN APP (hidden until connected) -->
+<div id="app" style="display:none; height:100vh; overflow:hidden; display:none; flex-direction:column;">
+
+  <header>
+    <div class="logo">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="black"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.65 14.42c-.19.31-.61.4-.92.2-2.52-1.54-5.69-1.89-9.43-1.03-.36.08-.72-.14-.8-.5-.08-.36.14-.72.5-.8 4.09-.94 7.59-.53 10.42 1.21.31.19.4.61.23.92zm1.24-2.76c-.24.38-.75.5-1.13.26-2.88-1.77-7.27-2.28-10.68-1.25-.44.14-.91-.12-1.04-.56-.14-.44.12-.91.56-1.04 3.9-1.18 8.73-.61 12.03 1.46.38.24.5.75.26 1.13zm.11-2.87C14.65 8.9 8.87 8.7 5.4 9.72c-.53.16-1.09-.14-1.25-.67s.14-1.09.67-1.25c4-.22 10.23.42 13.45 2.55.46.28.6.87.32 1.33-.28.45-.87.6-1.33.32z"/></svg>
+    </div>
+    <h1>Spotify Saver</h1>
+    <div class="header-actions">
+      <span id="sync-status" class="sync-status"></span>
+      <button class="btn-icon" onclick="syncNow()" title="Sync">↻ Sync</button>
+      <button class="btn-icon" onclick="showSettings()" title="Settings">⚙ Settings</button>
+    </div>
+  </header>
+
+  <div class="app">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div>
+        <span class="sidebar-section-label">Library</span>
+        <div class="sidebar-item active" id="filter-all" onclick="setFilter('all')">
+          All <span class="sidebar-count" id="count-all">0</span>
+        </div>
+        <div class="sidebar-item" id="filter-track" onclick="setFilter('track')">
+          Tracks <span class="sidebar-count" id="count-track">0</span>
+        </div>
+        <div class="sidebar-item" id="filter-album" onclick="setFilter('album')">
+          Albums <span class="sidebar-count" id="count-album">0</span>
+        </div>
+        <div class="sidebar-item" id="filter-playlist" onclick="setFilter('playlist')">
+          Playlists <span class="sidebar-count" id="count-playlist">0</span>
+        </div>
+        <div class="sidebar-item" id="filter-artist" onclick="setFilter('artist')">
+          Artists <span class="sidebar-count" id="count-artist">0</span>
+        </div>
+      </div>
+      <div>
+        <span class="sidebar-section-label">Tags</span>
+        <div id="sidebar-tags"></div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content" id="content-area">
+      <div class="addbar">
+        <input type="text" id="link-input" placeholder="Paste a Spotify link..." />
+        <button class="btn-add" onclick="addLink()">Add</button>
+        <span id="add-error"></span>
+      </div>
+      <div class="topbar">
+        <div class="search-wrap">
+          <span class="search-icon">⌕</span>
+          <input type="text" id="search-input" placeholder="Search titles, tags..." oninput="renderList()" />
+        </div>
+        <div class="topbar-right">
+          <select class="sort-select" id="sort-select" onchange="renderList()">
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+            <option value="title">Title A–Z</option>
+          </select>
+          <div class="view-toggle">
+            <button class="view-btn active" id="btn-table" onclick="setView('table')" title="Table">☰</button>
+            <button class="view-btn" id="btn-cards" onclick="setView('cards')" title="Cards">⊞</button>
+          </div>
+        </div>
+      </div>
+      <div id="list-area" style="flex:1;overflow-y:auto"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Settings modal -->
+<div id="settings-modal" class="modal-bg" style="display:none">
+  <div class="modal">
+    <h3>Settings</h3>
+    <p>Update your GitHub connection details. Changes take effect after reconnecting.</p>
+    <div class="setup-field"><label>Token</label><input type="password" id="m-token" /></div>
+    <div class="setup-field"><label>Repo</label><input type="text" id="m-repo" /></div>
+    <div class="setup-field"><label>Branch</label><input type="text" id="m-branch" /></div>
+    <div class="modal-actions">
+      <button class="btn-sm" onclick="hideSettings()">Cancel</button>
+      <button class="btn-sm" style="border-color:var(--green);color:var(--green)" onclick="saveSettings()">Save & Reconnect</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── CONFIG ─────────────────────────────────────────────────────────────────
+let cfg = { token:'', repo:'', branch:'main' };
+let db = { items: [] };
+let dbSha = null;
+let view = 'table';
+let activeFilter = 'all';
+let openPopover = null;
+let sortField = 'newest';
+
+const DB_FILE = 'spotify-db.json';
+
+// ── PRESETS & KEYWORDS ─────────────────────────────────────────────────────
+const PRESETS = {
+  genre:  ['pop','rock','jazz','soul','hip-hop','r&b','classical','electronic','indie','folk','reggae','metal','country','latin'],
+  mood:   ['chill','upbeat','melancholic','energetic','romantic','dark','motivating','happy','intense'],
+  lesson: ['listening','vocab','grammar','discussion','pronunciation','warmup','homework','demo','idioms','example']
+};
+const KW = [
+  {w:['jazz','blues','swing','bebop','bossa'],t:'jazz',c:'genre'},
+  {w:['rock','grunge','hard rock'],t:'rock',c:'genre'},
+  {w:['pop','dance','charts','hits'],t:'pop',c:'genre'},
+  {w:['hip hop','hip-hop','rap','trap','drill'],t:'hip-hop',c:'genre'},
+  {w:['soul','motown','gospel'],t:'soul',c:'genre'},
+  {w:['classical','symphony','concerto','orchestra','sonata'],t:'classical',c:'genre'},
+  {w:['electronic','techno','house','edm','synth','ambient'],t:'electronic',c:'genre'},
+  {w:['indie','alternative','lo-fi','lofi'],t:'indie',c:'genre'},
+  {w:['folk','acoustic','unplugged'],t:'folk',c:'genre'},
+  {w:['reggae','ska'],t:'reggae',c:'genre'},
+  {w:['latin','salsa','cumbia','flamenco'],t:'latin',c:'genre'},
+  {w:['country','bluegrass'],t:'country',c:'genre'},
+  {w:['chill','relax','sleep','calm','lounge'],t:'chill',c:'mood'},
+  {w:['workout','gym','run','energy','pump'],t:'energetic',c:'mood'},
+  {w:['sad','heartbreak','lonely'],t:'melancholic',c:'mood'},
+  {w:['happy','fun','joy','party','upbeat'],t:'happy',c:'mood'},
+  {w:['love','romance','romantic'],t:'romantic',c:'mood'},
+  {w:['focus','study','work'],t:'motivating',c:'mood'},
+  {w:['english','lesson','class','esl'],t:'lesson',c:'lesson'},
+  {w:['idiom','phrase','expression'],t:'idioms',c:'lesson'},
+  {w:['vocabulary','vocab'],t:'vocab',c:'lesson'},
+  {w:['pronunciation','phonetic','accent'],t:'pronunciation',c:'lesson'},
+];
+
+function getSuggestions(title, type, existing) {
+  const lo = title.toLowerCase();
+  const out = [];
+  for (const r of KW) {
+    if (existing.includes(r.t) || out.find(x=>x.t===r.t)) continue;
+    if (r.w.some(w=>lo.includes(w))) out.push(r);
+  }
+  if (type==='playlist' && !existing.includes('listening') && !out.find(x=>x.t==='listening'))
+    out.push({t:'listening',c:'lesson'});
+  return out.slice(0,5);
+}
+
+// ── GITHUB API ─────────────────────────────────────────────────────────────
+const ghHeaders = () => ({
+  'Authorization': `Bearer ${cfg.token}`,
+  'Accept': 'application/vnd.github+json',
+  'Content-Type': 'application/json'
+});
+
+async function ghGet() {
+  const r = await fetch(`https://api.github.com/repos/${cfg.repo}/contents/${DB_FILE}?ref=${cfg.branch}`, { headers: ghHeaders() });
+  if (r.status === 404) return null;
+  if (!r.ok) throw new Error(`GitHub ${r.status}`);
+  const d = await r.json();
+  dbSha = d.sha;
+  return JSON.parse(atob(d.content.replace(/\n/g,'')));
+}
+
+async function ghPut(data) {
+  const body = { message: 'Update spotify-db.json', content: btoa(JSON.stringify(data, null, 2)), branch: cfg.branch };
+  if (dbSha) body.sha = dbSha;
+  const r = await fetch(`https://api.github.com/repos/${cfg.repo}/contents/${DB_FILE}`, {
+    method: 'PUT', headers: ghHeaders(), body: JSON.stringify(body)
+  });
+  if (!r.ok) throw new Error(`GitHub ${r.status}`);
+  const d = await r.json();
+  dbSha = d.content.sha;
+}
+
+// ── SETUP ──────────────────────────────────────────────────────────────────
+async function setupConnect() {
+  const token  = document.getElementById('s-token').value.trim();
+  const repo   = document.getElementById('s-repo').value.trim();
+  const branch = document.getElementById('s-branch').value.trim() || 'main';
+  const errEl  = document.getElementById('setup-error');
+  errEl.textContent = '';
+
+  if (!token || !repo) { errEl.textContent = 'Token and repo are required.'; return; }
+
+  cfg = { token, repo, branch };
+  errEl.textContent = 'Connecting…';
+
+  try {
+    const existing = await ghGet();
+    if (existing) {
+      db = existing;
+    } else {
+      db = { items: [] };
+      await ghPut(db);
+    }
+    localStorage.setItem('spotify-saver-cfg', JSON.stringify(cfg));
+    launchApp();
+  } catch(e) {
+    errEl.textContent = `Connection failed: ${e.message}. Check your token and repo name.`;
+  }
+}
+
+function launchApp() {
+  document.getElementById('setup-screen').style.display = 'none';
+  const app = document.getElementById('app');
+  app.style.display = 'flex';
+  renderAll();
+}
+
+// ── SETTINGS MODAL ─────────────────────────────────────────────────────────
+function showSettings() {
+  document.getElementById('m-token').value = cfg.token;
+  document.getElementById('m-repo').value = cfg.repo;
+  document.getElementById('m-branch').value = cfg.branch;
+  document.getElementById('settings-modal').style.display = 'flex';
+}
+function hideSettings() { document.getElementById('settings-modal').style.display = 'none'; }
+function saveSettings() {
+  cfg.token  = document.getElementById('m-token').value.trim();
+  cfg.repo   = document.getElementById('m-repo').value.trim();
+  cfg.branch = document.getElementById('m-branch').value.trim() || 'main';
+  localStorage.setItem('spotify-saver-cfg', JSON.stringify(cfg));
+  hideSettings();
+  setSyncStatus('syncing','Reconnecting…');
+  ghGet().then(d => { if(d) db=d; renderAll(); setSyncStatus('ok','Synced'); }).catch(e=>setSyncStatus('err','Sync failed'));
+}
+
+// ── SYNC ───────────────────────────────────────────────────────────────────
+function setSyncStatus(cls, msg) {
+  const el = document.getElementById('sync-status');
+  el.className = 'sync-status ' + cls;
+  el.textContent = msg;
+}
+
+async function syncNow() {
+  setSyncStatus('syncing', '↻ Syncing…');
+  try {
+    const d = await ghGet(); if(d) db=d; renderAll();
+    setSyncStatus('ok', '✓ Synced');
+  } catch(e) { setSyncStatus('err', '✗ Failed'); }
+}
+
+async function persist() {
+  setSyncStatus('syncing', '↻ Saving…');
+  try { await ghPut(db); setSyncStatus('ok', '✓ Saved'); }
+  catch(e) { setSyncStatus('err', '✗ Save failed'); }
+}
+
+// ── SPOTIFY ────────────────────────────────────────────────────────────────
+function parseLink(url) {
+  try {
+    const u = new URL(url.trim());
+    if (!u.hostname.includes('spotify.com')) return null;
+    const parts = u.pathname.split('/').filter(Boolean);
+    const type = parts[0], id = parts[1]?.split('?')[0];
+    if (!id || !['track','album','playlist','artist','episode','show'].includes(type)) return null;
+    return { type, id, url: `https://open.spotify.com/${type}/${id}` };
+  } catch(e) { return null; }
+}
+function typeLabel(t) {
+  return {track:'Track',album:'Album',playlist:'Playlist',artist:'Artist',episode:'Episode',show:'Show'}[t]||t;
+}
+async function fetchMeta(p) {
+  try {
+    const r = await fetch(`https://open.spotify.com/oembed?url=${encodeURIComponent(p.url)}`);
+    if (!r.ok) throw new Error();
+    const d = await r.json();
+    return { title: d.title||'Spotify link', thumbnail: d.thumbnail_url||null };
+  } catch(e) { return { title:`${typeLabel(p.type)} — ${p.id}`, thumbnail:null }; }
+}
+
+// ── ADD ────────────────────────────────────────────────────────────────────
+async function addLink() {
+  const inp = document.getElementById('link-input');
+  const err = document.getElementById('add-error');
+  const val = inp.value.trim();
+  err.textContent = '';
+  if (!val) return;
+
+  const parsed = parseLink(val);
+  if (!parsed) { err.textContent = 'Not a valid Spotify link.'; return; }
+  if (db.items.find(s=>s.url===parsed.url)) { err.textContent = 'Already saved.'; return; }
+
+  inp.value = '';
+  inp.placeholder = 'Fetching metadata…';
+  const meta = await fetchMeta(parsed);
+  inp.placeholder = 'Paste a Spotify link…';
+
+  db.items.unshift({
+    id: Date.now(),
+    url: parsed.url, type: parsed.type,
+    title: meta.title, thumbnail: meta.thumbnail,
+    tags: [],
+    added: new Date().toISOString()
+  });
+
+  renderAll();
+  await persist();
+}
+
+// ── TAGS ───────────────────────────────────────────────────────────────────
+function applyTag(id, tag) {
+  tag = tag.trim().toLowerCase().replace(/\s+/g,'-');
+  if (!tag) return;
+  const s = db.items.find(x=>x.id===id);
+  if (s && !s.tags.includes(tag)) { s.tags.push(tag); renderAll(); persist(); }
+  openPopover = null; renderList();
+}
+function removeTag(id, tag) {
+  const s = db.items.find(x=>x.id===id);
+  if (s) { s.tags=s.tags.filter(t=>t!==tag); renderAll(); persist(); }
+}
+function deleteItem(id) {
+  if (!confirm('Remove this entry?')) return;
+  db.items = db.items.filter(s=>s.id!==id);
+  renderAll(); persist();
+}
+
+// ── VIEW / FILTER ──────────────────────────────────────────────────────────
+function setView(v) {
+  view = v;
+  document.getElementById('btn-table').classList.toggle('active', v==='table');
+  document.getElementById('btn-cards').classList.toggle('active', v==='cards');
+  renderList();
+}
+
+function setFilter(f) {
+  activeFilter = f;
+  document.querySelectorAll('.sidebar-item').forEach(el=>el.classList.remove('active'));
+  const el = document.getElementById('filter-'+f);
+  if (el) el.classList.add('active');
+  // deselect tag filters
+  document.querySelectorAll('.sidebar-tag-item').forEach(el=>el.classList.remove('active'));
+  if (!['all','track','album','playlist','artist'].includes(f)) {
+    document.querySelectorAll('.sidebar-tag-item').forEach(el=>{
+      if(el.dataset.tag===f) el.classList.add('active');
+    });
+  }
+  renderList();
+}
+
+function filteredSorted() {
+  const q = (document.getElementById('search-input')?.value||'').toLowerCase();
+  const sort = document.getElementById('sort-select')?.value || 'newest';
+  let items = db.items.filter(s => {
+    if (activeFilter==='all') return true;
+    if (['track','album','playlist','artist','episode','show'].includes(activeFilter)) return s.type===activeFilter;
+    return s.tags.includes(activeFilter);
+  });
+  if (q) items = items.filter(s => s.title.toLowerCase().includes(q) || s.tags.some(t=>t.includes(q)));
+  if (sort==='newest') items.sort((a,b)=>b.id-a.id);
+  else if (sort==='oldest') items.sort((a,b)=>a.id-b.id);
+  else items.sort((a,b)=>a.title.localeCompare(b.title));
+  return items;
+}
+
+// ── POPOVER ────────────────────────────────────────────────────────────────
+function togglePopover(id, below=false) {
+  openPopover = openPopover===id ? null : id;
+  renderList();
+  if (openPopover) {
+    setTimeout(()=>{ const el=document.getElementById('custag-'+id); if(el) el.focus(); }, 40);
+  }
+}
+function commitCustomTag(id) {
+  const el = document.getElementById('custag-'+id);
+  if (el) applyTag(id, el.value);
+  openPopover = null; renderList();
+}
+document.addEventListener('click', e=>{
+  if (!e.target.closest('.tag-popover-wrap') && openPopover!==null) {
+    openPopover=null; renderList();
+  }
+});
+
+function tagDropdownHtml(s, below=false) {
+  const sections = Object.entries(PRESETS).map(([cat,tags])=>{
+    const cls = {genre:'pt-genre',mood:'pt-mood',lesson:'pt-teach'}[cat];
+    return `<div class="td-section">
+      <span class="td-section-label">${cat}</span>
+      <div class="preset-grid">${tags.map(t=>`<button class="pt ${cls}${s.tags.includes(t)?' applied':''}"
+        onclick="applyTag(${s.id},'${t}')">${t}</button>`).join('')}</div>
+    </div>`;
+  }).join('');
+  return `<div class="tag-dropdown${below?' below':''}">
+    ${sections}
+    <div class="td-section">
+      <span class="td-section-label">custom</span>
+      <input class="custom-input" id="custag-${s.id}" placeholder="type & press Enter"
+        onkeydown="if(event.key==='Enter')commitCustomTag(${s.id});if(event.key==='Escape'){openPopover=null;renderList();}" />
+    </div>
+  </div>`;
+}
+
+// ── RENDER ─────────────────────────────────────────────────────────────────
+function renderAll() {
+  renderSidebar();
+  renderList();
+}
+
+function renderSidebar() {
+  ['all','track','album','playlist','artist'].forEach(f=>{
+    const el=document.getElementById('count-'+f);
+    if (!el) return;
+    if (f==='all') el.textContent=db.items.length;
+    else el.textContent=db.items.filter(s=>s.type===f).length;
+  });
+
+  // collect all tags
+  const tagMap = {};
+  db.items.forEach(s=>s.tags.forEach(t=>{ tagMap[t]=(tagMap[t]||0)+1; }));
+  const tags = Object.entries(tagMap).sort((a,b)=>b[1]-a[1]);
+
+  const container = document.getElementById('sidebar-tags');
+  if (tags.length===0) { container.innerHTML='<div style="font-size:12px;color:var(--dim);padding:4px 10px">No tags yet</div>'; return; }
+  container.innerHTML = tags.map(([t,c])=>`
+    <div class="sidebar-item sidebar-tag-item${activeFilter===t?' active':''}" data-tag="${t}" onclick="setFilter('${t}')">
+      <span>${t}</span>
+      <span class="sidebar-count">${c}</span>
+    </div>`).join('');
+}
+
+function spotifyIcon(size=22) {
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="black"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.65 14.42c-.19.31-.61.4-.92.2-2.52-1.54-5.69-1.89-9.43-1.03-.36.08-.72-.14-.8-.5-.08-.36.14-.72.5-.8 4.09-.94 7.59-.53 10.42 1.21.31.19.4.61.23.92zm1.24-2.76c-.24.38-.75.5-1.13.26-2.88-1.77-7.27-2.28-10.68-1.25-.44.14-.91-.12-1.04-.56-.14-.44.12-.91.56-1.04 3.9-1.18 8.73-.61 12.03 1.46.38.24.5.75.26 1.13zm.11-2.87C14.65 8.9 8.87 8.7 5.4 9.72c-.53.16-1.09-.14-1.25-.67s.14-1.09.67-1.25c4-.22 10.23.42 13.45 2.55.46.28.6.87.32 1.33-.28.45-.87.6-1.33.32z"/></svg>`;
+}
+
+function fmtDate(iso) {
+  try { return new Date(iso).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}); }
+  catch(e) { return iso; }
+}
+
+function renderList() {
+  const area = document.getElementById('list-area');
+  const items = filteredSorted();
+
+  if (items.length===0) {
+    area.innerHTML=`<div class="empty">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.65 14.42c-.19.31-.61.4-.92.2-2.52-1.54-5.69-1.89-9.43-1.03-.36.08-.72-.14-.8-.5-.08-.36.14-.72.5-.8 4.09-.94 7.59-.53 10.42 1.21.31.19.4.61.23.92zm1.24-2.76c-.24.38-.75.5-1.13.26-2.88-1.77-7.27-2.28-10.68-1.25-.44.14-.91-.12-1.04-.56-.14-.44.12-.91.56-1.04 3.9-1.18 8.73-.61 12.03 1.46.38.24.5.75.26 1.13zm.11-2.87C14.65 8.9 8.87 8.7 5.4 9.72c-.53.16-1.09-.14-1.25-.67s.14-1.09.67-1.25c4-.22 10.23.42 13.45 2.55.46.28.6.87.32 1.33-.28.45-.87.6-1.33.32z"/></svg>
+      <p>${db.items.length===0 ? 'No links saved yet.<br>Paste a Spotify link above to get started.' : 'No results for this filter.'}</p>
+    </div>`;
+    return;
+  }
+
+  if (view==='table') {
+    area.innerHTML = `<div class="table-wrap"><table>
+      <thead><tr>
+        <th></th>
+        <th>Title</th>
+        <th>Type</th>
+        <th>Tags</th>
+        <th>Added</th>
+        <th></th>
+      </tr></thead>
+      <tbody>${items.map(s=>{
+        const sugs = getSuggestions(s.title, s.type, s.tags);
+        const sugHtml = sugs.length ? `<div class="suggestions" style="margin-bottom:5px">
+          <span class="sug-label">suggest:</span>
+          ${sugs.map(sg=>`<button class="sug-tag" onclick="applyTag(${s.id},'${sg.t}')">${sg.t}</button>`).join('')}
+        </div>` : '';
+        const tagsHtml = s.tags.map(t=>`<span class="tag-pill">${t}<span class="tag-x" onclick="removeTag(${s.id},'${t}')">✕</span></span>`).join('');
+        const popover = openPopover===s.id ? tagDropdownHtml(s) : '';
+        return `<tr>
+          <td style="width:48px">
+            <div class="td-thumb" style="background:${s.thumbnail?'transparent':'#1DB954'}">
+              ${s.thumbnail?`<img src="${s.thumbnail}" alt=""/>`:spotifyIcon(18)}
+            </div>
+          </td>
+          <td class="td-title"><a href="${s.url}" target="_blank" rel="noopener">${s.title}</a></td>
+          <td><span class="type-badge">${typeLabel(s.type)}</span></td>
+          <td>
+            ${sugHtml}
+            <div class="tags-cell">
+              ${tagsHtml}
+              <div class="tag-popover-wrap">
+                <button class="add-tag-btn" onclick="event.stopPropagation();togglePopover(${s.id})">+ tag</button>
+                ${popover}
+              </div>
+            </div>
+          </td>
+          <td class="td-date">${fmtDate(s.added)}</td>
+          <td>
+            <div class="td-actions">
+              <a class="btn-sm" href="${s.url}" target="_blank" rel="noopener">Open ↗</a>
+              <button class="btn-sm btn-del" onclick="deleteItem(${s.id})">✕</button>
+            </div>
+          </td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table></div>`;
+  } else {
+    area.innerHTML = `<div class="card-grid">${items.map(s=>{
+      const tagsHtml = s.tags.map(t=>`<span class="tag-pill">${t}<span class="tag-x" onclick="removeTag(${s.id},'${t}')">✕</span></span>`).join('');
+      const sugs = getSuggestions(s.title, s.type, s.tags);
+      const sugHtml = sugs.length ? `<div class="suggestions">
+        <span class="sug-label">suggest:</span>
+        ${sugs.map(sg=>`<button class="sug-tag" onclick="applyTag(${s.id},'${sg.t}')">${sg.t}</button>`).join('')}
+      </div>` : '';
+      const popover = openPopover===s.id ? tagDropdownHtml(s, true) : '';
+      return `<div class="song-card">
+        <div class="card-art" style="background:${s.thumbnail?'#000':'#1DB954'}">
+          ${s.thumbnail?`<img src="${s.thumbnail}" alt=""/>`:spotifyIcon(40)}
+        </div>
+        <div class="card-body">
+          <div class="card-title" title="${s.title.replace(/"/g,'&quot;')}">${s.title}</div>
+          <div class="card-meta">
+            <span class="type-badge">${typeLabel(s.type)}</span>
+            <span>${fmtDate(s.added)}</span>
+          </div>
+          ${sugHtml}
+          <div class="card-tags">
+            ${tagsHtml}
+            <div class="tag-popover-wrap">
+              <button class="add-tag-btn" onclick="event.stopPropagation();togglePopover(${s.id},true)">+ tag</button>
+              ${popover}
+            </div>
+          </div>
+          <div class="card-actions">
+            <a class="btn-sm" href="${s.url}" target="_blank" rel="noopener">Open ↗</a>
+            <button class="btn-sm btn-del" onclick="deleteItem(${s.id})">✕</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('')}</div>`;
+  }
+}
+
+// ── INIT ───────────────────────────────────────────────────────────────────
+document.getElementById('link-input').addEventListener('keydown', e=>{ if(e.key==='Enter') addLink(); });
+
+const saved = localStorage.getItem('spotify-saver-cfg');
+if (saved) {
+  try {
+    cfg = JSON.parse(saved);
+    document.getElementById('s-token').value = cfg.token;
+    document.getElementById('s-repo').value = cfg.repo;
+    document.getElementById('s-branch').value = cfg.branch;
+    setSyncStatus && setSyncStatus('syncing','Loading…');
+    // auto-connect
+    ghGet().then(d=>{ if(d) db=d; launchApp(); setSyncStatus('ok','✓ Loaded'); })
+           .catch(()=>{ /* show setup */ });
+  } catch(e) {}
+}
+</script>
+</body>
+</html>
