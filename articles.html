@@ -167,7 +167,7 @@ body {
   overflow: hidden;
 }
 
-/* Panel collapse / expand button — sits on the panel/stage boundary */
+/* Panel collapse / expand button, sits on the panel/stage boundary */
 .panel-toggle {
   position: absolute;
   top: 14px;
@@ -996,7 +996,7 @@ body {
         <input type="text" id="tagInput" placeholder="Add tag, press Enter…">
       </div>
 
-      <label>Body — separate paragraphs with a blank line</label>
+      <label>Body (separate paragraphs with a blank line)</label>
       <textarea id="body" class="body-input" oninput="onEdit()"
         placeholder="Paste article body here.&#10;&#10;Leave a blank line between paragraphs.&#10;&#10;Acronyms like AI, MP, PDF render in small caps automatically."></textarea>
 
@@ -1031,6 +1031,8 @@ body {
     <div class="db-toolbar">
       <input type="text" class="db-search" id="dbSearch" placeholder="Search headline, body, or tag…" oninput="renderDatabank()">
       <button class="btn small ghost" onclick="clearFilters()">Clear filters</button>
+      <button class="btn small ghost" onclick="importDb()" title="Import articles from a JSON file">Import</button>
+      <button class="btn small ghost" onclick="exportDb()" title="Download all saved articles as JSON">Export</button>
     </div>
     <div class="db-filter-chips" id="dbFilterChips"></div>
     <div class="db-grid-wrap">
@@ -1058,8 +1060,8 @@ body {
     <div class="test-result" id="testResult"></div>
     <p class="hint">
       Used only for the AI features (URL fetch, image extract, question generation).
-      Stored in your browser's localStorage — never sent anywhere except Anthropic's API.
-      Leave blank if you're using this file inside Claude's preview (no key needed there — auth is automatic).
+      Stored in your browser's localStorage, never sent anywhere except Anthropic's API.
+      Leave blank if you're using this file inside Claude's preview (no key needed there, auth is automatic).
       <br><br>
       <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">Get an API key →</a>
       &nbsp;·&nbsp;
@@ -1431,7 +1433,7 @@ ${body}`
     setQsStatus('Generated ✓  Edit any question by tapping it below.', 'ok');
   } catch (err) {
     console.error(err);
-    setQsStatus('Failed — ' + (err.message || 'try again'), 'err');
+    setQsStatus('Failed. ' + (err.message || 'try again'), 'err');
   } finally {
     btn.disabled = false;
     btn.textContent = currentQuestions.length ? 'Regenerate questions' : origLabel;
@@ -1514,6 +1516,105 @@ function clearFilters() {
   activeFilters.clear();
   $('dbSearch').value = '';
   renderDatabank();
+}
+
+// ---- Export the whole databank as a JSON file ----
+function exportDb() {
+  if (!db.articles.length) {
+    alert('No saved articles to export yet.');
+    return;
+  }
+  const payload = {
+    format: 'article-magazine',
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    articles: db.articles
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const stamp = new Date().toISOString().slice(0, 10);
+  a.href = url;
+  a.download = 'article-magazine-databank-' + stamp + '.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ---- Import articles from a JSON file (merge by id) ----
+function importDb() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'application/json,.json';
+  input.style.display = 'none';
+  input.addEventListener('change', async (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const parsed = JSON.parse(text);
+      let incoming = null;
+      if (parsed && Array.isArray(parsed.articles)) {
+        incoming = parsed.articles;
+      } else if (Array.isArray(parsed)) {
+        incoming = parsed;
+      }
+      if (!incoming) throw new Error('File does not look like an article databank export.');
+
+      // Merge: existing ids get replaced only if imported is newer.
+      // New ids are added. Missing ids get generated.
+      const byId = new Map(db.articles.map(a => [a.id, a]));
+      let added = 0, updated = 0, skipped = 0;
+
+      incoming.forEach(item => {
+        if (!item || typeof item !== 'object') { skipped++; return; }
+        if (!item.headline && !item.body) { skipped++; return; }
+        // Sanitize
+        const article = {
+          id: item.id || uid(),
+          kicker: item.kicker || '',
+          headline: item.headline || 'Untitled',
+          standfirst: item.standfirst || '',
+          body: item.body || '',
+          imgUrl: item.imgUrl || '',
+          tags: Array.isArray(item.tags) ? item.tags.map(String) : [],
+          highlights: Array.isArray(item.highlights) ? item.highlights.map(String) : [],
+          questions: Array.isArray(item.questions) ? item.questions.map(String) : [],
+          createdAt: item.createdAt || Date.now(),
+          updatedAt: item.updatedAt || Date.now()
+        };
+        const existing = byId.get(article.id);
+        if (existing) {
+          if ((article.updatedAt || 0) > (existing.updatedAt || 0)) {
+            Object.assign(existing, article);
+            updated++;
+          } else {
+            skipped++;
+          }
+        } else {
+          db.articles.push(article);
+          byId.set(article.id, article);
+          added++;
+        }
+      });
+
+      persistDB();
+      renderDatabank();
+      const parts = [];
+      if (added) parts.push(added + ' added');
+      if (updated) parts.push(updated + ' updated');
+      if (skipped) parts.push(skipped + ' skipped');
+      alert('Import complete. ' + (parts.length ? parts.join(', ') + '.' : 'Nothing to import.'));
+    } catch (err) {
+      console.error(err);
+      alert('Import failed: ' + (err.message || 'invalid file'));
+    } finally {
+      document.body.removeChild(input);
+    }
+  });
+  document.body.appendChild(input);
+  input.click();
 }
 
 function renderDatabank() {
@@ -1719,7 +1820,7 @@ async function testCurrentKey() {
     resultEl.className = 'test-result ok';
     resultEl.textContent = result.via === 'key'
       ? '✓ Key works.'
-      : '✓ Connection works (via preview auth — key not needed here).';
+      : '✓ Connection works (via preview auth, key not needed here).';
   } else {
     resultEl.className = 'test-result err';
     resultEl.textContent = '✗ Could not reach the API with these credentials.';
@@ -1759,7 +1860,7 @@ function parseClaudeJSON(data) {
   return JSON.parse(clean);
 }
 
-// The extraction prompt — used for both image OCR and URL-cleaned text
+// The extraction prompt, used for both image OCR and URL-cleaned text
 const EXTRACTION_RULES =
 `Return ONLY a raw JSON object, no preamble, no markdown fences, with these keys:
 - "kicker": a short section label / topic tag that appears above the headline in a magazine (e.g. "Politics", "Robot-spotting", "The Americas"). Empty string if none.
@@ -1811,11 +1912,11 @@ $('imgUpload').addEventListener('change', async (e) => {
   } catch (err) {
     console.error(err);
     status.className = 'err';
-    status.textContent = 'Extraction failed — paste text manually.';
+    status.textContent = 'Extraction failed. Paste text manually.';
   }
 });
 
-// ---- URL fetch (via Claude API — CORS-safe) ----
+// ---- URL fetch (via Claude API, CORS-safe) ----
 // Tries web_fetch first (actual page content), falls back to web_search.
 async function fetchFromUrl() {
   const raw = $('urlInput').value.trim();
@@ -1856,7 +1957,7 @@ async function fetchFromUrl() {
       lastErr = e;
       // If the tool itself is unsupported, immediately try the next one
       if (!/tool|invalid|unknown|not.*support/i.test(e.message || '')) {
-        // Non-tool error — still try the next approach
+        // Non-tool error, still try the next approach
       }
     }
   }
@@ -1870,7 +1971,7 @@ async function fetchFromUrl() {
     $('urlInput').value = '';
   } else {
     const msg = (lastErr && lastErr.message) || 'Unable to reach the article.';
-    setImgStatus('Fetch failed — ' + msg + ' Try a screenshot instead.', 'err');
+    setImgStatus('Fetch failed. ' + msg + ' Try a screenshot instead.', 'err');
   }
 }
 
