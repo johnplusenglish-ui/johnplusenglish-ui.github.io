@@ -1,0 +1,2126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Article → Magazine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --red: #E3120B;
+  --ink: #111;
+  --paper: #FEFDF9;
+  --rule: #dad6cc;
+  --chrome-bg: #14171d;
+  --chrome-fg: #e8e6e0;
+  --chrome-muted: #8a8f99;
+  --chrome-border: #2a2e37;
+  --chrome-input: #1e222a;
+  --chrome-stage: #2a2e37;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+
+/* Subtle scrollbars on dark scrollable regions */
+.panel, .stage, .db-grid-wrap {
+  scrollbar-width: thin;
+  scrollbar-color: #3a3f4a transparent;
+}
+.panel::-webkit-scrollbar,
+.stage::-webkit-scrollbar,
+.db-grid-wrap::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.panel::-webkit-scrollbar-track,
+.stage::-webkit-scrollbar-track,
+.db-grid-wrap::-webkit-scrollbar-track {
+  background: transparent;
+}
+.panel::-webkit-scrollbar-thumb,
+.stage::-webkit-scrollbar-thumb,
+.db-grid-wrap::-webkit-scrollbar-thumb {
+  background: #3a3f4a;
+  border-radius: 4px;
+}
+.panel::-webkit-scrollbar-thumb:hover,
+.stage::-webkit-scrollbar-thumb:hover,
+.db-grid-wrap::-webkit-scrollbar-thumb:hover {
+  background: #4a5060;
+}
+/* Body textarea inherits the same thin scrollbar */
+.panel textarea {
+  scrollbar-width: thin;
+  scrollbar-color: #3a3f4a transparent;
+}
+.panel textarea::-webkit-scrollbar { width: 8px; }
+.panel textarea::-webkit-scrollbar-track { background: transparent; }
+.panel textarea::-webkit-scrollbar-thumb { background: #3a3f4a; border-radius: 4px; }
+.panel textarea::-webkit-scrollbar-thumb:hover { background: #4a5060; }
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, system-ui, sans-serif;
+  background: #0f1116;
+  color: var(--chrome-fg);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- top bar ---------- */
+.topbar {
+  background: var(--chrome-bg);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border-bottom: 1px solid var(--chrome-border);
+  flex-shrink: 0;
+}
+.topbar h1 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.topbar h1 .accent { color: var(--red); }
+.spacer { flex: 1; }
+
+.tabs {
+  display: flex;
+  gap: 2px;
+  background: #0f1116;
+  padding: 3px;
+  border-radius: 7px;
+  border: 1px solid var(--chrome-border);
+}
+.tab {
+  background: transparent;
+  color: var(--chrome-muted);
+  border: none;
+  padding: 6px 14px;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background .12s, color .12s;
+}
+.tab:hover { color: var(--chrome-fg); }
+.tab.active {
+  background: var(--chrome-input);
+  color: var(--chrome-fg);
+}
+
+.btn {
+  background: var(--chrome-input);
+  color: var(--chrome-fg);
+  border: 1px solid #333842;
+  padding: 7px 13px;
+  border-radius: 5px;
+  font: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+  transition: background .12s;
+}
+.btn:hover { background: #262b34; }
+.btn.primary { background: var(--red); border-color: var(--red); color: white; }
+.btn.primary:hover { background: #c40e07; }
+.btn.ghost { background: transparent; }
+.btn.ghost:hover { background: var(--chrome-input); }
+.btn.small { padding: 5px 10px; font-size: 12px; }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* ---------- tab panes ---------- */
+.tab-pane {
+  flex: 1;
+  min-height: 0;
+  display: none;
+}
+.tab-pane.active { display: flex; }
+
+/* ---------- editor pane ---------- */
+.workspace {
+  display: grid;
+  grid-template-columns: var(--panel-w, 380px) 1fr;
+  transition: grid-template-columns .25s ease;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  position: relative;
+}
+.workspace.panel-collapsed { --panel-w: 0px; }
+.panel {
+  background: #14171d;
+  padding: 18px 20px 28px;
+  overflow-y: auto;
+  border-right: 1px solid var(--chrome-border);
+  transition: opacity .18s ease, padding .25s ease;
+  min-width: 0;
+}
+.workspace.panel-collapsed .panel {
+  opacity: 0;
+  pointer-events: none;
+  padding-left: 0;
+  padding-right: 0;
+  overflow: hidden;
+}
+
+/* Panel collapse / expand button — sits on the panel/stage boundary */
+.panel-toggle {
+  position: absolute;
+  top: 14px;
+  left: var(--panel-w, 380px);
+  transform: translateX(-50%);
+  z-index: 60;
+  width: 30px;
+  height: 50px;
+  background: var(--red);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.4), 0 0 0 2px #14171d;
+  transition: left .25s ease, background .12s, transform .12s;
+}
+.panel-toggle:hover {
+  background: #c40e07;
+  transform: translateX(-50%) scale(1.06);
+}
+.panel-toggle svg { transition: transform .25s ease; }
+.workspace.panel-collapsed .panel-toggle {
+  left: 0;
+  transform: translateX(6px);
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  box-shadow: 3px 3px 10px rgba(0,0,0,0.4);
+}
+.workspace.panel-collapsed .panel-toggle:hover {
+  transform: translateX(6px) scale(1.06);
+}
+.workspace.panel-collapsed .panel-toggle svg { transform: rotate(180deg); }
+.panel label {
+  display: block;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--chrome-muted);
+  margin: 16px 0 6px;
+  font-weight: 600;
+}
+.panel label:first-of-type { margin-top: 0; }
+.panel input[type=text], .panel textarea {
+  width: 100%;
+  background: var(--chrome-input);
+  border: 1px solid #2f3540;
+  color: var(--chrome-fg);
+  padding: 8px 10px;
+  border-radius: 4px;
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-size: 13.5px;
+  line-height: 1.4;
+}
+.panel textarea { min-height: 200px; resize: vertical; }
+.panel textarea.body-input { min-height: 320px; }
+.panel input:focus, .panel textarea:focus {
+  outline: none;
+  border-color: var(--red);
+}
+.upload-btn { width: 100%; }
+.url-row {
+  display: flex;
+  gap: 6px;
+  align-items: stretch;
+}
+.url-row input {
+  flex: 1;
+  min-width: 0;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 12.5px !important;
+}
+.url-row .btn { flex-shrink: 0; }
+#imgStatus {
+  font-size: 12px;
+  color: var(--chrome-muted);
+  margin-top: 6px;
+  min-height: 16px;
+}
+#imgStatus.ok { color: #6bcf7f; }
+#imgStatus.err { color: #ff7a70; }
+
+/* Tag chips */
+.tag-input-wrap {
+  background: var(--chrome-input);
+  border: 1px solid #2f3540;
+  border-radius: 4px;
+  padding: 6px 6px 4px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  align-items: center;
+}
+.tag-input-wrap:focus-within { border-color: var(--red); }
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #2f3540;
+  color: var(--chrome-fg);
+  padding: 3px 4px 3px 9px;
+  border-radius: 3px;
+  font-size: 12px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  line-height: 1.4;
+}
+.tag-chip .x {
+  background: none;
+  border: none;
+  color: #8a8f99;
+  cursor: pointer;
+  padding: 0 4px;
+  font-size: 14px;
+  line-height: 1;
+  border-radius: 2px;
+}
+.tag-chip .x:hover { color: #ff7a70; }
+.tag-input-wrap input {
+  flex: 1;
+  min-width: 100px;
+  background: transparent !important;
+  border: none !important;
+  padding: 4px 4px !important;
+  font-size: 13px !important;
+  font-family: 'Inter', sans-serif !important;
+  color: var(--chrome-fg);
+}
+
+/* Save state hint */
+.save-state {
+  font-size: 11.5px;
+  color: var(--chrome-muted);
+  margin-right: 4px;
+}
+.save-state.dirty { color: #ffb84d; }
+.save-state.saved { color: #6bcf7f; }
+
+/* ---------- stage / preview ---------- */
+.stage {
+  overflow-y: auto;
+  padding: 32px;
+  background: var(--chrome-stage);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 0;
+}
+.article {
+  background: var(--paper);
+  color: var(--ink);
+  padding: 56px 64px 70px;
+  max-width: 780px;
+  width: 100%;
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-size: 15px;
+  line-height: 1.42;
+  box-shadow: 0 6px 40px rgba(0,0,0,0.35);
+}
+.article .kicker {
+  color: var(--red);
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-weight: 700;
+  font-size: 17px;
+  line-height: 1.1;
+  margin: 0 0 4px;
+}
+.article .headline {
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-weight: 900;
+  font-size: 54px;
+  line-height: 0.98;
+  letter-spacing: -0.018em;
+  margin: 0 0 42px;
+  color: var(--ink);
+}
+.article .standfirst {
+  font-weight: 700;
+  font-size: 17px;
+  line-height: 1.3;
+  margin: 0 0 22px;
+  max-width: 62%;
+}
+.article .body {
+  column-count: 2;
+  column-gap: 28px;
+  text-align: justify;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  orphans: 2;
+  widows: 2;
+}
+.article .body p {
+  margin: 0;
+  text-indent: 1.2em;
+}
+.article .body p:first-child { text-indent: 0; }
+.article .body p:first-child::first-letter {
+  font-family: inherit;
+  font-weight: 900;
+  font-size: 4.2em;
+  float: left;
+  line-height: 0.86;
+  padding: 4px 8px 0 0;
+  color: var(--ink);
+}
+.article .body .sc {
+  font-size: 0.82em;
+  letter-spacing: 0.055em;
+  font-weight: inherit;
+}
+.article .body .lede-caps {
+  font-size: 0.82em;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.article .end-mark {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: var(--red);
+  margin-left: 5px;
+  transform: translateY(-1px);
+}
+.article figure {
+  margin: 18px 0 4px;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+.article figure img {
+  width: 100%;
+  display: block;
+  background: #10318f;
+}
+
+/* ---------- highlighter ---------- */
+.article mark.hl {
+  background: linear-gradient(120deg, #ffef8a 0%, #ffe066 100%);
+  color: inherit;
+  padding: 0.02em 0.12em;
+  border-radius: 2px;
+  cursor: pointer;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  transition: filter .15s;
+}
+.article mark.hl:hover { filter: brightness(0.94); }
+
+.hl-bar {
+  position: fixed;
+  z-index: 200;
+  background: #14171d;
+  color: #fff;
+  border: 1px solid #333842;
+  border-radius: 6px;
+  padding: 3px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, calc(-100% - 10px));
+  transition: opacity .12s;
+}
+.hl-bar.visible { opacity: 1; pointer-events: auto; }
+.hl-bar button {
+  background: transparent;
+  color: #fff;
+  border: none;
+  padding: 6px 12px 6px 10px;
+  font: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
+.hl-bar button:hover { background: #2a2e37; }
+.hl-bar::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -5px;
+  width: 8px;
+  height: 8px;
+  background: #14171d;
+  border-right: 1px solid #333842;
+  border-bottom: 1px solid #333842;
+  transform: translateX(-50%) rotate(45deg);
+}
+
+/* Settings modal */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-backdrop[hidden] { display: none !important; }
+.modal {
+  background: var(--chrome-bg);
+  border: 1px solid var(--chrome-border);
+  border-radius: 10px;
+  padding: 24px 26px;
+  width: 480px;
+  max-width: 100%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+.modal h2 {
+  margin: 0 0 18px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.modal label {
+  display: block;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--chrome-muted);
+  margin: 0 0 6px;
+  font-weight: 600;
+}
+.modal input {
+  width: 100%;
+  background: var(--chrome-input);
+  border: 1px solid #2f3540;
+  color: var(--chrome-fg);
+  padding: 9px 11px;
+  border-radius: 5px;
+  font-family: 'SF Mono', ui-monospace, monospace;
+  font-size: 12.5px;
+}
+.modal input:focus { outline: none; border-color: var(--red); }
+.modal .hint {
+  font-size: 12.5px;
+  color: var(--chrome-muted);
+  margin: 12px 0 20px;
+  line-height: 1.55;
+}
+.modal .hint a {
+  color: #ff7a70;
+  text-decoration: none;
+}
+.modal .hint a:hover { text-decoration: underline; }
+.test-result {
+  font-size: 12.5px;
+  min-height: 18px;
+  margin: 8px 0 4px;
+  color: var(--chrome-muted);
+}
+.test-result.ok { color: #6bcf7f; }
+.test-result.err { color: #ff7a70; }
+.modal .modal-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+/* Settings gear tint when a key is stored */
+#settingsBtn.has-key {
+  color: #6bcf7f;
+  border-color: rgba(107,207,127,0.3);
+}
+
+/* Highlights section in article */
+.highlights {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 2px solid var(--ink);
+}
+.highlights h2 {
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--red);
+  margin: 0 0 14px;
+}
+.highlights ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  column-count: 2;
+  column-gap: 28px;
+}
+.highlights li {
+  break-inside: avoid;
+  padding: 3px 0;
+  font-size: 14.5px;
+  line-height: 1.35;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  color: var(--ink);
+}
+.highlights li .num {
+  color: var(--red);
+  font-weight: 700;
+  font-size: 12px;
+  min-width: 20px;
+  font-variant-numeric: tabular-nums;
+  padding-top: 1px;
+}
+.highlights li .txt { flex: 1; }
+.highlights li .rm {
+  background: none;
+  border: none;
+  color: #aaa;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 0 4px;
+  line-height: 1;
+  opacity: 0;
+  transition: opacity .12s, color .12s;
+}
+.highlights li:hover .rm { opacity: 1; }
+.highlights li .rm:hover { color: var(--red); }
+
+/* Food-for-thought questions */
+.qs-status {
+  font-size: 12px;
+  color: var(--chrome-muted);
+  margin-top: 6px;
+  min-height: 16px;
+}
+.qs-status.ok { color: #6bcf7f; }
+.qs-status.err { color: #ff7a70; }
+
+.questions {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 2px solid var(--ink);
+}
+.questions h2 {
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--red);
+  margin: 0 0 16px;
+}
+.questions ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  counter-reset: qcount;
+}
+.questions li {
+  counter-increment: qcount;
+  display: flex;
+  gap: 14px;
+  padding: 8px 0;
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-size: 15.5px;
+  line-height: 1.45;
+  color: var(--ink);
+  break-inside: avoid;
+}
+.questions li::before {
+  content: counter(qcount, decimal-leading-zero);
+  color: var(--red);
+  font-weight: 700;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  min-width: 22px;
+  padding-top: 3px;
+}
+
+/* ---------- databank ---------- */
+.databank {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #1a1d24;
+  overflow: hidden;
+  width: 100%;
+}
+.db-toolbar {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--chrome-border);
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.db-search {
+  flex: 1;
+  min-width: 220px;
+  background: var(--chrome-input);
+  border: 1px solid #2f3540;
+  color: var(--chrome-fg);
+  padding: 8px 12px;
+  border-radius: 5px;
+  font: inherit;
+  font-size: 13px;
+}
+.db-search:focus { outline: none; border-color: var(--red); }
+
+.db-filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0 24px 12px;
+  border-bottom: 1px solid var(--chrome-border);
+  min-height: 8px;
+}
+.filter-chip {
+  background: var(--chrome-input);
+  color: var(--chrome-muted);
+  border: 1px solid #2f3540;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .12s;
+}
+.filter-chip:hover { color: var(--chrome-fg); }
+.filter-chip.active {
+  background: var(--red);
+  color: white;
+  border-color: var(--red);
+}
+
+.db-grid-wrap {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px 60px;
+}
+.db-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+.card {
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: 6px;
+  padding: 20px 22px 16px;
+  cursor: pointer;
+  transition: transform .12s, box-shadow .12s;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 200px;
+  position: relative;
+  overflow: hidden;
+  font-family: 'Source Serif 4', Georgia, serif;
+  border-left: 3px solid var(--red);
+}
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+}
+.card .card-kicker {
+  color: var(--red);
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+}
+.card .card-headline {
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-weight: 900;
+  font-size: 22px;
+  line-height: 1.05;
+  margin: 0;
+  letter-spacing: -0.01em;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.card .card-standfirst {
+  font-size: 13.5px;
+  line-height: 1.35;
+  color: #444;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 0;
+}
+.card .card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: auto;
+  padding-top: 8px;
+}
+.card .card-tag {
+  background: #f0ede4;
+  color: #333;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  text-transform: lowercase;
+  letter-spacing: 0.02em;
+}
+.card .card-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--rule);
+  padding-top: 10px;
+  margin-top: 6px;
+  font-family: 'Inter', sans-serif;
+  font-size: 11.5px;
+  color: #777;
+}
+.card .card-meta .hl-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.card .card-meta .hl-count .dot {
+  width: 8px;
+  height: 8px;
+  background: #ffe066;
+  border-radius: 2px;
+}
+.card .card-delete {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(0,0,0,0.05);
+  border: none;
+  color: #888;
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  opacity: 0;
+  transition: opacity .12s, background .12s, color .12s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.card:hover .card-delete { opacity: 1; }
+.card-delete:hover {
+  background: var(--red);
+  color: white;
+}
+
+.db-empty {
+  text-align: center;
+  padding: 80px 20px;
+  color: var(--chrome-muted);
+  font-size: 14px;
+}
+.db-empty h3 {
+  color: var(--chrome-fg);
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-weight: 900;
+  font-size: 28px;
+  margin: 0 0 10px;
+}
+
+/* ---------- responsive ---------- */
+@media (max-width: 900px) {
+  .workspace {
+    grid-template-columns: 1fr;
+    grid-template-rows: var(--panel-h, 48vh) 1fr;
+    transition: grid-template-rows .25s ease;
+  }
+  .workspace.panel-collapsed {
+    grid-template-rows: 0 1fr;
+    --panel-w: unset;
+  }
+  .panel {
+    border-right: none;
+    border-bottom: 1px solid var(--chrome-border);
+    max-height: none;
+  }
+  .panel-toggle {
+    top: auto;
+    bottom: calc(100% - var(--panel-h, 48vh) - 25px);
+    left: 50%;
+    width: 50px;
+    height: 26px;
+    transform: translate(-50%, 0);
+  }
+  .panel-toggle:hover { transform: translate(-50%, 0) scale(1.06); }
+  .workspace.panel-collapsed .panel-toggle {
+    bottom: calc(100% - 26px);
+    left: 50%;
+    transform: translate(-50%, 0);
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.4);
+  }
+  .workspace.panel-collapsed .panel-toggle:hover {
+    transform: translate(-50%, 0) scale(1.06);
+  }
+  .workspace.panel-collapsed .panel-toggle svg { transform: rotate(90deg); }
+  .panel-toggle svg { transform: rotate(-90deg); }
+  .stage { padding: 16px; }
+  .article { padding: 28px 22px 40px; }
+  .article .body { column-count: 1; }
+  .article .headline { font-size: 38px; }
+  .article .standfirst { max-width: 100%; }
+  .topbar { flex-wrap: wrap; gap: 8px; }
+  .topbar h1 { font-size: 13px; }
+}
+
+/* ---------- print ---------- */
+@page {
+  size: A4;
+  margin: 0;
+}
+@media print {
+  html, body {
+    background: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  body { display: block; }
+  .topbar, .panel, .hl-bar, .databank, .panel-toggle { display: none !important; }
+  .tab-pane { display: flex !important; }
+  .workspace { display: block; }
+  .stage {
+    padding: 0 !important;
+    background: white !important;
+    overflow: visible !important;
+    display: block !important;
+  }
+  /* KEY TRICK: use white borders as page margins.
+     With @page margin: 0 the browser adds no headers/footers,
+     and box-decoration-break: clone repeats the borders on every
+     page when the article fragments across pages. */
+  .article {
+    box-shadow: none !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+    border-top: 16mm solid white !important;
+    border-bottom: 18mm solid white !important;
+    border-left: 18mm solid white !important;
+    border-right: 18mm solid white !important;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+  .article .body { orphans: 3; widows: 3; }
+  .article mark.hl {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    background: #ffe066 !important;
+  }
+  .highlights {
+    break-inside: avoid;
+    margin-top: 32px !important;
+  }
+  .highlights li .rm { display: none !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>Article <span class="accent">→</span> Magazine</h1>
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-tab="editor">Editor</button>
+    <button class="tab" data-tab="databank">Databank <span id="dbCount" style="opacity:.6;font-weight:400"></span></button>
+  </div>
+  <div class="spacer"></div>
+  <div id="editorActions" style="display:flex; gap:8px; align-items:center;">
+    <span class="save-state" id="saveState"></span>
+    <button class="btn ghost small" onclick="newArticle()">New</button>
+    <button class="btn" onclick="loadExample()">Example</button>
+    <button class="btn primary" onclick="saveArticle()">Save</button>
+    <button class="btn" id="pdfBtn" onclick="saveAsPDF()" title="Opens print dialog. Choose 'Save as PDF' as destination. If your browser adds a URL/date band, untick 'Headers and footers' under More settings.">Save PDF</button>
+  </div>
+  <button class="btn ghost small" id="settingsBtn" onclick="openSettings()" title="Settings" style="padding:6px 10px; font-size:15px;">⚙</button>
+</div>
+
+<!-- ================= EDITOR TAB ================= -->
+<div class="tab-pane active" data-tab="editor">
+  <div class="workspace" id="workspace">
+    <button class="panel-toggle" id="panelToggle" title="Collapse panel" onclick="togglePanel()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <aside class="panel">
+      <label>Import from URL</label>
+      <div class="url-row">
+        <input type="text" id="urlInput" placeholder="https://…" onkeydown="if(event.key==='Enter'){event.preventDefault();fetchFromUrl();}">
+        <button class="btn" id="fetchBtn" onclick="fetchFromUrl()">Fetch</button>
+      </div>
+
+      <label>Or extract from image</label>
+      <input type="file" id="imgUpload" accept="image/*" style="display:none">
+      <button class="btn upload-btn" onclick="document.getElementById('imgUpload').click()">
+        Upload article screenshot…
+      </button>
+      <div id="imgStatus"></div>
+
+      <label>Kicker</label>
+      <input type="text" id="kicker" placeholder="Robot-spotting" oninput="onEdit()">
+
+      <label>Headline</label>
+      <input type="text" id="headline" placeholder="Claude, MP" oninput="onEdit()">
+
+      <label>Standfirst</label>
+      <input type="text" id="standfirst" placeholder="Is AI writing taking over Westminster?" oninput="onEdit()">
+
+      <label>Tags</label>
+      <div class="tag-input-wrap" id="tagWrap" onclick="document.getElementById('tagInput').focus()">
+        <input type="text" id="tagInput" placeholder="Add tag, press Enter…">
+      </div>
+
+      <label>Body — separate paragraphs with a blank line</label>
+      <textarea id="body" class="body-input" oninput="onEdit()"
+        placeholder="Paste article body here.&#10;&#10;Leave a blank line between paragraphs.&#10;&#10;Acronyms like AI, MP, PDF render in small caps automatically."></textarea>
+
+      <button class="btn small" id="genQsBtn" onclick="generateQuestions()" style="margin-top:8px;width:100%;">
+        Generate 3 discussion questions
+      </button>
+      <div id="qsStatus" class="qs-status"></div>
+
+      <label>Image URL (optional)</label>
+      <input type="text" id="imgUrl" placeholder="https://…" oninput="onEdit()">
+    </aside>
+
+    <main class="stage">
+      <article class="article" id="preview">
+        <div id="previewMain"></div>
+        <section class="highlights" id="highlightsSection" hidden>
+          <h2>Highlights</h2>
+          <ol id="highlightsList"></ol>
+        </section>
+        <section class="questions" id="questionsSection" hidden>
+          <h2>Food for thought</h2>
+          <ol id="questionsList"></ol>
+        </section>
+      </article>
+    </main>
+  </div>
+</div>
+
+<!-- ================= DATABANK TAB ================= -->
+<div class="tab-pane" data-tab="databank">
+  <div class="databank">
+    <div class="db-toolbar">
+      <input type="text" class="db-search" id="dbSearch" placeholder="Search headline, body, or tag…" oninput="renderDatabank()">
+      <button class="btn small ghost" onclick="clearFilters()">Clear filters</button>
+    </div>
+    <div class="db-filter-chips" id="dbFilterChips"></div>
+    <div class="db-grid-wrap">
+      <div class="db-grid" id="dbGrid"></div>
+      <div class="db-empty" id="dbEmpty" hidden>
+        <h3>No saved articles yet</h3>
+        <p>Save an article from the Editor tab to see it here.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="hl-bar" id="hlBar">
+  <button onmousedown="event.preventDefault()" onclick="highlightSelection()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg>
+    Highlight
+  </button>
+</div>
+
+<div class="modal-backdrop" id="settingsModal" hidden onclick="if(event.target.id==='settingsModal')closeSettings()">
+  <div class="modal">
+    <h2>Settings</h2>
+    <label>Anthropic API key</label>
+    <input type="password" id="apiKeyInput" placeholder="sk-ant-…" autocomplete="off" spellcheck="false">
+    <div class="test-result" id="testResult"></div>
+    <p class="hint">
+      Used only for the AI features (URL fetch, image extract, question generation).
+      Stored in your browser's localStorage — never sent anywhere except Anthropic's API.
+      Leave blank if you're using this file inside Claude's preview (no key needed there — auth is automatic).
+      <br><br>
+      <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">Get an API key →</a>
+      &nbsp;·&nbsp;
+      <a href="https://www.anthropic.com/pricing" target="_blank" rel="noopener">See pricing →</a>
+    </p>
+    <div class="modal-actions">
+      <button class="btn ghost" onclick="closeSettings()">Cancel</button>
+      <button class="btn ghost" onclick="clearApiKey()">Remove key</button>
+      <button class="btn ghost" onclick="testCurrentKey()">Test</button>
+      <button class="btn primary" onclick="saveApiKey()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+// ============================================================
+// STATE
+// ============================================================
+const STORAGE_KEY = 'articleMagazine.v1';
+
+function loadDB() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return { articles: [] };
+    const parsed = JSON.parse(raw);
+    return { articles: parsed.articles || [] };
+  } catch { return { articles: [] }; }
+}
+function persistDB() { localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }
+
+let db = loadDB();
+let currentArticleId = null;   // id of the article currently loaded in editor, or null for new
+let currentTags = [];           // draft tags
+let currentQuestions = [];      // draft food-for-thought questions
+let activeFilters = new Set();  // tag filters in databank view
+let isDirty = false;            // has editor been modified since save?
+
+// Highlights: stored phrases, re-applied after each render
+const highlights = new Set();
+
+// ============================================================
+// UTIL
+// ============================================================
+function escapeHTML(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function uid() {
+  return 'a_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
+}
+function timeAgo(ts) {
+  const diff = (Date.now() - ts) / 1000;
+  if (diff < 60) return 'just now';
+  if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+  if (diff < 86400 * 7) return Math.floor(diff / 86400) + 'd ago';
+  const d = new Date(ts);
+  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+// ============================================================
+// EDITOR: rendering
+// ============================================================
+function withSmallCaps(text) {
+  return escapeHTML(text).replace(
+    /\b([A-Z][A-Z0-9]+)(&#39;s|'s)?\b/g,
+    (_, acro, poss) => '<span class="sc">' + acro + '</span>' + (poss || '')
+  );
+}
+function firstParaFormat(text) {
+  const esc = escapeHTML(text);
+  const m = esc.match(/^(\S)(\S*)(\s+)(\S+)([\s\S]*)$/);
+  if (!m) return withSmallCaps(text);
+  const [, first, restFirst, gap, second] = m;
+  const tailPlain = text.slice(first.length + restFirst.length + gap.length + second.length);
+  const tail = withSmallCaps(tailPlain);
+  return first + '<span class="lede-caps">' + restFirst + gap + second + '</span>' + tail;
+}
+
+function render() {
+  const kicker = $('kicker').value.trim();
+  const headline = $('headline').value.trim();
+  const standfirst = $('standfirst').value.trim();
+  const bodyText = $('body').value;
+  const imgUrl = $('imgUrl').value.trim();
+
+  const paras = bodyText.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
+
+  let bodyHTML = '';
+  paras.forEach((p, i) => {
+    let content = (i === 0) ? firstParaFormat(p) : withSmallCaps(p);
+    if (i === paras.length - 1) content += '<span class="end-mark"></span>';
+    bodyHTML += '<p>' + content + '</p>';
+  });
+
+  const figHTML = imgUrl
+    ? '<figure><img src="' + imgUrl.replace(/"/g,'&quot;') + '" alt=""></figure>'
+    : '';
+
+  $('previewMain').innerHTML =
+    (kicker ? '<div class="kicker">' + escapeHTML(kicker) + '</div>' : '')
+    + '<h1 class="headline">' + (escapeHTML(headline) || '&nbsp;') + '</h1>'
+    + (standfirst ? '<p class="standfirst">' + escapeHTML(standfirst) + '</p>' : '')
+    + '<div class="body">' + bodyHTML + figHTML + '</div>';
+
+  applyStoredHighlights();
+  updateCollation();
+  updateQuestionsSection();
+}
+
+function onEdit() {
+  render();
+  markDirty();
+}
+
+// ============================================================
+// EDITOR: tags
+// ============================================================
+function renderTags() {
+  const wrap = $('tagWrap');
+  const input = $('tagInput');
+  // remove existing chips
+  wrap.querySelectorAll('.tag-chip').forEach(c => c.remove());
+  currentTags.forEach(tag => {
+    const chip = document.createElement('span');
+    chip.className = 'tag-chip';
+    chip.innerHTML = escapeHTML(tag) + '<button class="x" title="Remove">×</button>';
+    chip.querySelector('.x').addEventListener('click', (e) => {
+      e.stopPropagation();
+      currentTags = currentTags.filter(t => t !== tag);
+      renderTags();
+      markDirty();
+    });
+    wrap.insertBefore(chip, input);
+  });
+}
+
+$('tagInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' || e.key === ',') {
+    e.preventDefault();
+    addTagFromInput();
+  } else if (e.key === 'Backspace' && !e.target.value && currentTags.length) {
+    currentTags.pop();
+    renderTags();
+    markDirty();
+  }
+});
+$('tagInput').addEventListener('blur', addTagFromInput);
+
+function addTagFromInput() {
+  const input = $('tagInput');
+  const val = input.value.trim().toLowerCase().replace(/,/g, '');
+  if (!val) return;
+  if (!currentTags.includes(val)) {
+    currentTags.push(val);
+    renderTags();
+    markDirty();
+  }
+  input.value = '';
+}
+
+// ============================================================
+// EDITOR: dirty state / save
+// ============================================================
+function markDirty() {
+  if (!isDirty) {
+    isDirty = true;
+    updateSaveState();
+  }
+}
+function markClean() {
+  isDirty = false;
+  updateSaveState();
+}
+function updateSaveState() {
+  const el = $('saveState');
+  if (!currentArticleId && !isDirty) { el.textContent = ''; el.className = 'save-state'; return; }
+  if (isDirty) { el.textContent = '• Unsaved'; el.className = 'save-state dirty'; }
+  else { el.textContent = '✓ Saved'; el.className = 'save-state saved'; }
+}
+
+function collectArticle() {
+  return {
+    kicker: $('kicker').value.trim(),
+    headline: $('headline').value.trim(),
+    standfirst: $('standfirst').value.trim(),
+    body: $('body').value,
+    imgUrl: $('imgUrl').value.trim(),
+    tags: [...currentTags],
+    highlights: [...highlights],
+    questions: [...currentQuestions]
+  };
+}
+
+function saveArticle() {
+  const data = collectArticle();
+  if (!data.headline && !data.body.trim()) {
+    alert('Add a headline or body before saving.');
+    return;
+  }
+  const now = Date.now();
+  if (currentArticleId) {
+    const idx = db.articles.findIndex(a => a.id === currentArticleId);
+    if (idx >= 0) {
+      db.articles[idx] = { ...db.articles[idx], ...data, updatedAt: now };
+    } else {
+      // vanished; create new
+      db.articles.push({ id: currentArticleId, ...data, createdAt: now, updatedAt: now });
+    }
+  } else {
+    currentArticleId = uid();
+    db.articles.push({ id: currentArticleId, ...data, createdAt: now, updatedAt: now });
+  }
+  persistDB();
+  markClean();
+  updateDbCount();
+}
+
+function newArticle() {
+  if (isDirty && !confirm('You have unsaved changes. Discard them?')) return;
+  currentArticleId = null;
+  currentTags = [];
+  currentQuestions = [];
+  highlights.clear();
+  ['kicker','headline','standfirst','body','imgUrl'].forEach(id => $(id).value = '');
+  $('tagInput').value = '';
+  $('imgStatus').textContent = '';
+  $('qsStatus').textContent = '';
+  renderTags();
+  render();
+  $('genQsBtn').textContent = 'Generate 3 discussion questions';
+  markClean();
+}
+
+function loadArticleIntoEditor(id) {
+  const article = db.articles.find(a => a.id === id);
+  if (!article) return;
+  if (isDirty && !confirm('You have unsaved changes. Discard them?')) return;
+  currentArticleId = article.id;
+  $('kicker').value = article.kicker || '';
+  $('headline').value = article.headline || '';
+  $('standfirst').value = article.standfirst || '';
+  $('body').value = article.body || '';
+  $('imgUrl').value = article.imgUrl || '';
+  currentTags = [...(article.tags || [])];
+  currentQuestions = [...(article.questions || [])];
+  highlights.clear();
+  (article.highlights || []).forEach(h => highlights.add(h));
+  renderTags();
+  render();
+  $('genQsBtn').textContent = currentQuestions.length ? 'Regenerate questions' : 'Generate 3 discussion questions';
+  markClean();
+  switchTab('editor');
+}
+
+// ============================================================
+// TAB SWITCHING
+// ============================================================
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.toggle('active', p.dataset.tab === name));
+  $('editorActions').style.display = (name === 'editor') ? 'flex' : 'none';
+  if (name === 'databank') renderDatabank();
+}
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => switchTab(t.dataset.tab));
+});
+
+function updateDbCount() {
+  const n = db.articles.length;
+  $('dbCount').textContent = n ? '(' + n + ')' : '';
+}
+
+// ============================================================
+// FOOD FOR THOUGHT (discussion questions)
+// ============================================================
+function updateQuestionsSection() {
+  const section = $('questionsSection');
+  const list = $('questionsList');
+  if (!currentQuestions.length) {
+    section.hidden = true;
+    list.innerHTML = '';
+    return;
+  }
+  section.hidden = false;
+  list.innerHTML = currentQuestions
+    .map(q => '<li>' + escapeHTML(q) + '</li>')
+    .join('');
+}
+
+async function generateQuestions() {
+  const body = $('body').value.trim();
+  if (!body || body.length < 100) {
+    setQsStatus('Add some article body first.', 'err');
+    return;
+  }
+  const btn = $('genQsBtn');
+  const origLabel = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Generating…';
+  setQsStatus('Generating questions with Claude…', '');
+
+  const headline = $('headline').value.trim();
+  const standfirst = $('standfirst').value.trim();
+
+  try {
+    const resp = await fetchAnthropic({
+      model: 'claude-haiku-4-5',
+      max_tokens: 800,
+      messages: [{
+        role: 'user',
+        content:
+`You are helping an English teacher prepare 3 discussion questions for an advanced adult learner class (C1-C2 CEFR).
+
+The teacher will read each question aloud to spark a chat. So the questions must SOUND like something a person would actually say at dinner, not something from an essay prompt or exam paper.
+
+RULES:
+- Each question 8 to 18 words. Shorter is better than longer.
+- Direct address: "Do you…", "Have you ever…", "What would you…", "Would you rather…", "When was the last time…"
+- NO nominalizations (like "the responsibility of manufacturers to…"). NO hedging clauses (like "to what extent do you think that…"). NO academic vocabulary (like "distorts our perception", "legitimate economic pressures").
+- Vary the three questions: one personal or experience-based, one opinion or hypothetical, one broader or provocative.
+- Don't repeat words or phrasing from the article verbatim.
+
+CRITICAL: NEVER use em-dashes (—) in the questions. Use commas, periods, "or", "and", or "but" instead. Em-dashes are a hallmark AI tell and the teacher hates them.
+
+GOOD examples (for other articles):
+- "Have you ever kept buying a brand out of pure nostalgia?"
+- "When was the last time a company let you down?"
+- "Would you pay double for a product made the old way?"
+
+BAD examples (avoid):
+- "To what extent do rising prices reflect genuine economic pressures versus corporate greed?"
+- "How might consumers reconcile their emotional attachment to heritage brands with modern realities?"
+
+Return ONLY a JSON array of exactly 3 strings. No preamble, no fences.
+
+Article:
+${headline}
+${standfirst}
+
+${body}`
+      }]
+    });
+    const data = await resp.json();
+    const text = (data.content || [])
+      .filter(b => b.type === 'text')
+      .map(b => b.text)
+      .join('')
+      .trim();
+    const cleaned = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+    let parsed;
+    try {
+      parsed = JSON.parse(cleaned);
+    } catch {
+      const match = cleaned.match(/\[[\s\S]*\]/);
+      if (!match) throw new Error('Could not parse questions');
+      parsed = JSON.parse(match[0]);
+    }
+    if (!Array.isArray(parsed) || parsed.length === 0) {
+      throw new Error('Unexpected response shape');
+    }
+    // Defensive filter: strip em-dashes even if the model slips one in
+    currentQuestions = parsed.slice(0, 3).map(q =>
+      String(q).replace(/\s*—\s*/g, ', ').replace(/\s*–\s*/g, ', ')
+    );
+    updateQuestionsSection();
+    markDirty();
+    setQsStatus('Generated ✓  Edit any question by tapping it below.', 'ok');
+  } catch (err) {
+    console.error(err);
+    setQsStatus('Failed — ' + (err.message || 'try again'), 'err');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = currentQuestions.length ? 'Regenerate questions' : origLabel;
+  }
+}
+
+function setQsStatus(text, cls) {
+  const s = $('qsStatus');
+  s.className = 'qs-status ' + (cls || '');
+  s.textContent = text;
+}
+
+// Allow clicking a question in the preview to edit it inline
+document.addEventListener('dblclick', (e) => {
+  const li = e.target.closest('#questionsList li');
+  if (!li) return;
+  const idx = [...li.parentNode.children].indexOf(li);
+  const current = currentQuestions[idx];
+  const next = prompt('Edit question:', current);
+  if (next && next.trim() && next !== current) {
+    currentQuestions[idx] = next.trim();
+    updateQuestionsSection();
+    markDirty();
+  }
+});
+
+// ============================================================
+// SAVE AS PDF (via browser's native print → Save as PDF)
+// ============================================================
+function saveAsPDF() {
+  window.print();
+}
+
+// ============================================================
+// PANEL COLLAPSE
+// ============================================================
+const PANEL_KEY = 'articleMagazine.panelCollapsed';
+function togglePanel() {
+  const ws = $('workspace');
+  const collapsed = ws.classList.toggle('panel-collapsed');
+  const btn = $('panelToggle');
+  btn.title = collapsed ? 'Expand panel' : 'Collapse panel';
+  localStorage.setItem(PANEL_KEY, collapsed ? '1' : '0');
+  // Any active selection popover would drift when the layout animates
+  hideBar();
+}
+// Restore saved state on load
+if (localStorage.getItem(PANEL_KEY) === '1') {
+  $('workspace').classList.add('panel-collapsed');
+  $('panelToggle').title = 'Expand panel';
+}
+
+// ============================================================
+// DATABANK
+// ============================================================
+function allTags() {
+  const s = new Set();
+  db.articles.forEach(a => (a.tags || []).forEach(t => s.add(t)));
+  return [...s].sort();
+}
+
+function renderFilterChips() {
+  const container = $('dbFilterChips');
+  const tags = allTags();
+  if (!tags.length) { container.innerHTML = ''; return; }
+  container.innerHTML = tags.map(t => {
+    const active = activeFilters.has(t) ? ' active' : '';
+    return '<button class="filter-chip' + active + '" data-tag="' + escapeHTML(t) + '">' + escapeHTML(t) + '</button>';
+  }).join('');
+  container.querySelectorAll('.filter-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const t = chip.dataset.tag;
+      if (activeFilters.has(t)) activeFilters.delete(t); else activeFilters.add(t);
+      renderDatabank();
+    });
+  });
+}
+
+function clearFilters() {
+  activeFilters.clear();
+  $('dbSearch').value = '';
+  renderDatabank();
+}
+
+function renderDatabank() {
+  updateDbCount();
+  renderFilterChips();
+  const grid = $('dbGrid');
+  const empty = $('dbEmpty');
+  const search = $('dbSearch').value.trim().toLowerCase();
+
+  let articles = [...db.articles].sort((a, b) => b.updatedAt - a.updatedAt);
+
+  if (activeFilters.size) {
+    articles = articles.filter(a => [...activeFilters].every(t => (a.tags || []).includes(t)));
+  }
+  if (search) {
+    articles = articles.filter(a => {
+      const hay = [
+        a.headline, a.kicker, a.standfirst, a.body,
+        (a.tags || []).join(' ')
+      ].join(' ').toLowerCase();
+      return hay.includes(search);
+    });
+  }
+
+  if (!articles.length) {
+    grid.innerHTML = '';
+    if (!db.articles.length) {
+      empty.hidden = false;
+      empty.innerHTML = '<h3>No saved articles yet</h3><p>Save an article from the Editor tab to see it here.</p>';
+    } else {
+      empty.hidden = false;
+      empty.innerHTML = '<h3>No matches</h3><p>Try clearing filters or searching for something else.</p>';
+    }
+    return;
+  }
+  empty.hidden = true;
+
+  grid.innerHTML = articles.map(a => cardHTML(a)).join('');
+  grid.querySelectorAll('.card').forEach(el => {
+    el.addEventListener('click', (e) => {
+      if (e.target.closest('.card-delete')) return;
+      loadArticleIntoEditor(el.dataset.id);
+    });
+    const del = el.querySelector('.card-delete');
+    if (del) del.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = el.dataset.id;
+      const a = db.articles.find(x => x.id === id);
+      if (confirm('Delete "' + (a.headline || 'Untitled') + '"?')) {
+        db.articles = db.articles.filter(x => x.id !== id);
+        if (currentArticleId === id) currentArticleId = null;
+        persistDB();
+        renderDatabank();
+      }
+    });
+  });
+}
+
+function cardHTML(a) {
+  const tagsHTML = (a.tags || []).slice(0, 6).map(t =>
+    '<span class="card-tag">' + escapeHTML(t) + '</span>'
+  ).join('');
+  const hlN = (a.highlights || []).length;
+  const qsN = (a.questions || []).length;
+  const metaBits = [];
+  metaBits.push(hlN
+    ? '<span class="hl-count"><span class="dot"></span>' + hlN + ' highlight' + (hlN === 1 ? '' : 's') + '</span>'
+    : '<span class="hl-count">No highlights</span>');
+  if (qsN) metaBits.push('<span>' + qsN + ' question' + (qsN === 1 ? '' : 's') + '</span>');
+  return '<div class="card" data-id="' + a.id + '">'
+    + '<button class="card-delete" title="Delete">×</button>'
+    + (a.kicker ? '<p class="card-kicker">' + escapeHTML(a.kicker) + '</p>' : '')
+    + '<h3 class="card-headline">' + escapeHTML(a.headline || 'Untitled') + '</h3>'
+    + (a.standfirst ? '<p class="card-standfirst">' + escapeHTML(a.standfirst) + '</p>' : '')
+    + (tagsHTML ? '<div class="card-tags">' + tagsHTML + '</div>' : '<div class="card-tags"></div>')
+    + '<div class="card-meta">'
+      + '<span class="hl-count">' + metaBits.join(' &nbsp;·&nbsp; ') + '</span>'
+      + '<span>' + timeAgo(a.updatedAt) + '</span>'
+    + '</div>'
+    + '</div>';
+}
+
+// ============================================================
+// API KEY MANAGEMENT
+// ============================================================
+const API_KEY_STORAGE = 'articleMagazine.apiKey';
+const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';
+
+function getApiKey() {
+  return localStorage.getItem(API_KEY_STORAGE) || '';
+}
+
+// Resilient API caller: tries user's key first (for local use), then
+// falls back to unauthenticated (which the Claude artifact preview
+// auto-authenticates). Works in both environments transparently.
+async function fetchAnthropic(bodyObj) {
+  const key = getApiKey();
+  const attempts = [];
+  if (key) attempts.push({ auth: 'key' });
+  attempts.push({ auth: 'none' });
+
+  const bodyJSON = JSON.stringify(bodyObj);
+  let lastStatus = null;
+  let lastErr = null;
+
+  for (const { auth } of attempts) {
+    const headers = auth === 'key'
+      ? {
+          'Content-Type': 'application/json',
+          'x-api-key': key,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        }
+      : { 'Content-Type': 'application/json' };
+    try {
+      const r = await fetch(ANTHROPIC_URL, { method: 'POST', headers, body: bodyJSON });
+      if (r.ok) return r;
+      lastStatus = r.status;
+      // If we get a proper API error (like 401 invalid key), still try fallback
+    } catch (e) {
+      lastErr = e;
+    }
+  }
+
+  const msg = lastStatus ? ('API returned ' + lastStatus) : (lastErr && lastErr.message) || 'Network error';
+  throw new Error(msg);
+}
+
+// Simple test-connection helper used by the settings modal
+async function testConnection(keyOverride) {
+  const key = keyOverride != null ? keyOverride : getApiKey();
+  const attempts = [];
+  if (key) attempts.push({ auth: 'key' });
+  attempts.push({ auth: 'none' });
+
+  const body = JSON.stringify({
+    model: 'claude-haiku-4-5',
+    max_tokens: 10,
+    messages: [{ role: 'user', content: 'ping' }]
+  });
+
+  for (const { auth } of attempts) {
+    const headers = auth === 'key'
+      ? {
+          'Content-Type': 'application/json',
+          'x-api-key': key,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        }
+      : { 'Content-Type': 'application/json' };
+    try {
+      const r = await fetch(ANTHROPIC_URL, { method: 'POST', headers, body });
+      if (r.ok) return { ok: true, via: auth };
+    } catch (e) { /* try next */ }
+  }
+  return { ok: false };
+}
+
+function updateSettingsBadge() {
+  const btn = $('settingsBtn');
+  if (getApiKey()) btn.classList.add('has-key');
+  else btn.classList.remove('has-key');
+}
+
+function openSettings() {
+  const current = getApiKey();
+  const input = $('apiKeyInput');
+  input.value = current || '';
+  input.placeholder = current
+    ? 'Key stored (ends …' + current.slice(-4) + ')'
+    : 'sk-ant-…';
+  $('testResult').textContent = '';
+  $('testResult').className = 'test-result';
+  $('settingsModal').hidden = false;
+  setTimeout(() => input.focus(), 50);
+}
+function closeSettings() { $('settingsModal').hidden = true; }
+function saveApiKey() {
+  const val = $('apiKeyInput').value.trim();
+  if (val) {
+    if (!/^sk-ant-/.test(val)) {
+      if (!confirm('That doesn\'t look like an Anthropic key (should start with "sk-ant-"). Save anyway?')) return;
+    }
+    localStorage.setItem(API_KEY_STORAGE, val);
+  }
+  updateSettingsBadge();
+  closeSettings();
+}
+function clearApiKey() {
+  if (!confirm('Remove the stored API key?')) return;
+  localStorage.removeItem(API_KEY_STORAGE);
+  $('apiKeyInput').value = '';
+  updateSettingsBadge();
+  closeSettings();
+}
+async function testCurrentKey() {
+  const val = $('apiKeyInput').value.trim();
+  const resultEl = $('testResult');
+  resultEl.className = 'test-result';
+  resultEl.textContent = 'Testing…';
+  const result = await testConnection(val);
+  if (result.ok) {
+    resultEl.className = 'test-result ok';
+    resultEl.textContent = result.via === 'key'
+      ? '✓ Key works.'
+      : '✓ Connection works (via preview auth — key not needed here).';
+  } else {
+    resultEl.className = 'test-result err';
+    resultEl.textContent = '✗ Could not reach the API with these credentials.';
+  }
+}
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && !$('settingsModal').hidden) closeSettings();
+});
+updateSettingsBadge();
+
+// ============================================================
+// ARTICLE EXTRACTION (image + URL)
+// ============================================================
+
+// Shared: populate editor fields from a parsed article object
+function applyExtracted(parsed) {
+  $('kicker').value = parsed.kicker || '';
+  $('headline').value = parsed.headline || '';
+  $('standfirst').value = parsed.standfirst || '';
+  $('body').value = parsed.body || '';
+  if (Array.isArray(parsed.tags) && parsed.tags.length) {
+    // Only add suggested tags that aren't already there
+    parsed.tags.forEach(t => {
+      const clean = String(t).trim().toLowerCase();
+      if (clean && !currentTags.includes(clean)) currentTags.push(clean);
+    });
+    renderTags();
+  }
+  render();
+  markDirty();
+}
+
+// Parse Claude's JSON response, tolerating markdown fences
+function parseClaudeJSON(data) {
+  const text = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('').trim();
+  const clean = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/,'').trim();
+  return JSON.parse(clean);
+}
+
+// The extraction prompt — used for both image OCR and URL-cleaned text
+const EXTRACTION_RULES =
+`Return ONLY a raw JSON object, no preamble, no markdown fences, with these keys:
+- "kicker": a short section label / topic tag that appears above the headline in a magazine (e.g. "Politics", "Robot-spotting", "The Americas"). Empty string if none.
+- "headline": the main article title.
+- "standfirst": the bold intro sentence between headline and body. Empty string if none.
+- "body": the full article text as ONE string, paragraphs separated by \\n\\n.
+- "tags": an array of 2–4 lowercase topic tags (single words or short phrases) capturing the article's subject matter.
+
+Rules for body:
+- Do NOT insert line breaks mid-paragraph.
+- Preserve em-dashes (—) and curly quotes.
+- Keep acronyms in uppercase (AI, MP, PDF).
+- Skip captions, page numbers, picture credits, ads, subscribe prompts, "related articles", author bios, and comments.
+- Do not include the headline or standfirst inside body.`;
+
+// ---- Image upload ----
+$('imgUpload').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const status = $('imgStatus');
+  status.className = '';
+  status.textContent = 'Reading image…';
+
+  const b64 = await new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result.split(',')[1]);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+
+  status.textContent = 'Extracting with Claude…';
+  try {
+    const resp = await fetchAnthropic({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 4000,
+      messages: [{
+        role: 'user',
+        content: [
+          { type: 'image', source: { type: 'base64', media_type: file.type, data: b64 } },
+          { type: 'text', text: 'Extract the article shown in this image.\n\n' + EXTRACTION_RULES + '\n\nAlso: fix OCR line breaks and merge hyphenated words split across lines ("techno-\\nlogy" -> "technology").' }
+        ]
+      }]
+    });
+    const data = await resp.json();
+    const parsed = parseClaudeJSON(data);
+    applyExtracted(parsed);
+    status.className = 'ok';
+    status.textContent = 'Extracted ✓  Edit any field to refine.';
+  } catch (err) {
+    console.error(err);
+    status.className = 'err';
+    status.textContent = 'Extraction failed — paste text manually.';
+  }
+});
+
+// ---- URL fetch (via Claude API — CORS-safe) ----
+// Tries web_fetch first (actual page content), falls back to web_search.
+async function fetchFromUrl() {
+  const raw = $('urlInput').value.trim();
+  if (!raw) return;
+
+  let url = raw;
+  if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+  try { new URL(url); } catch {
+    setImgStatus('That doesn\'t look like a valid URL.', 'err');
+    return;
+  }
+
+  const btn = $('fetchBtn');
+  btn.disabled = true;
+  btn.textContent = 'Fetching…';
+
+  const attempts = [
+    { label: 'reading page', tool: { type: 'web_fetch_20250910', name: 'web_fetch' } },
+    { label: 'searching web', tool: { type: 'web_search_20250305', name: 'web_search' } },
+  ];
+
+  let lastErr = null;
+  let parsed = null;
+
+  for (const attempt of attempts) {
+    setImgStatus('Fetching (' + attempt.label + ')…', '');
+    try {
+      const data = await callClaudeExtract(url, [attempt.tool]);
+      parsed = extractJSONFromClaude(data);
+      if (parsed && parsed.error) {
+        throw new Error(parsed.error);
+      }
+      if (parsed && parsed.body && parsed.body.length > 80) break; // got a real article
+      parsed = null;
+      lastErr = new Error('Response had no usable body text');
+    } catch (e) {
+      console.warn('Attempt failed:', attempt.label, e);
+      lastErr = e;
+      // If the tool itself is unsupported, immediately try the next one
+      if (!/tool|invalid|unknown|not.*support/i.test(e.message || '')) {
+        // Non-tool error — still try the next approach
+      }
+    }
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Fetch';
+
+  if (parsed) {
+    applyExtracted(parsed);
+    setImgStatus('Imported ✓  Edit any field to refine.', 'ok');
+    $('urlInput').value = '';
+  } else {
+    const msg = (lastErr && lastErr.message) || 'Unable to reach the article.';
+    setImgStatus('Fetch failed — ' + msg + ' Try a screenshot instead.', 'err');
+  }
+}
+
+async function callClaudeExtract(url, tools) {
+  const resp = await fetchAnthropic({
+    model: 'claude-sonnet-4-6',
+    max_tokens: 4000,
+    tools: tools,
+    messages: [{
+      role: 'user',
+      content:
+        'Read the article at this URL and structure it.\n\n' +
+        'URL: ' + url + '\n\n' +
+        'Steps:\n' +
+        '1. Use your available tool to fetch and read the article at that URL. Read the ACTUAL content, not just search snippets.\n' +
+        '2. Once you have the full article text, return ONLY a raw JSON object with the fields below. No preamble, no fences, no explanation.\n' +
+        '3. If you truly cannot access the article after trying, return: {"error": "brief reason"}\n\n' +
+        EXTRACTION_RULES
+    }]
+  });
+  return resp.json();
+}
+
+function extractJSONFromClaude(data) {
+  const textBlocks = (data.content || [])
+    .filter(b => b.type === 'text')
+    .map(b => b.text);
+  const finalText = textBlocks.join('\n').trim();
+  if (!finalText) return null;
+
+  const cleaned = finalText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/,'').trim();
+  try {
+    return JSON.parse(cleaned);
+  } catch {
+    const match = cleaned.match(/\{[\s\S]*\}/);
+    if (match) { try { return JSON.parse(match[0]); } catch {} }
+  }
+  return null;
+}
+
+function setImgStatus(text, cls) {
+  const s = $('imgStatus');
+  s.className = cls || '';
+  s.textContent = text;
+}
+
+// ============================================================
+// HIGHLIGHTER
+// ============================================================
+const bar = $('hlBar');
+
+function positionBar() {
+  const sel = window.getSelection();
+  if (!sel.rangeCount || sel.isCollapsed) return hideBar();
+  const text = sel.toString().trim();
+  if (!text) return hideBar();
+  const range = sel.getRangeAt(0);
+  const anchor = range.commonAncestorContainer;
+  const el = anchor.nodeType === 3 ? anchor.parentElement : anchor;
+  if (!el || !el.closest || !el.closest('#previewMain .body')) return hideBar();
+  const rect = range.getBoundingClientRect();
+  bar.style.left = (rect.left + rect.width / 2) + 'px';
+  bar.style.top = rect.top + 'px';
+  bar.classList.add('visible');
+}
+function hideBar() { bar.classList.remove('visible'); }
+
+document.addEventListener('mouseup', () => setTimeout(positionBar, 0));
+document.addEventListener('selectionchange', () => {
+  const sel = window.getSelection();
+  if (!sel.rangeCount || sel.isCollapsed || !sel.toString().trim()) hideBar();
+});
+window.addEventListener('scroll', hideBar, true);
+window.addEventListener('resize', hideBar);
+
+function highlightSelection() {
+  const sel = window.getSelection();
+  if (!sel.rangeCount || sel.isCollapsed) return;
+  const range = sel.getRangeAt(0);
+  const container = range.commonAncestorContainer;
+  const el = container.nodeType === 3 ? container.parentElement : container;
+  if (!el.closest('#previewMain .body')) return;
+
+  const text = sel.toString().trim();
+  if (!text) return;
+
+  try {
+    const mark = document.createElement('mark');
+    mark.className = 'hl';
+    mark.title = 'Click to remove';
+    mark.appendChild(range.extractContents());
+    range.insertNode(mark);
+    mark.querySelectorAll('mark.hl').forEach(inner => {
+      while (inner.firstChild) inner.parentNode.insertBefore(inner.firstChild, inner);
+      inner.remove();
+    });
+  } catch (e) {
+    console.warn('Highlight failed', e);
+    return;
+  }
+  highlights.add(text);
+  sel.removeAllRanges();
+  hideBar();
+  updateCollation();
+  markDirty();
+}
+
+document.addEventListener('click', (e) => {
+  const mark = e.target.closest('#previewMain mark.hl');
+  if (!mark) return;
+  const text = mark.textContent.trim();
+  unwrapMark(mark);
+  const stillPresent = [...document.querySelectorAll('#previewMain mark.hl')]
+    .some(m => m.textContent.trim() === text);
+  if (!stillPresent) highlights.delete(text);
+  updateCollation();
+  markDirty();
+});
+
+function unwrapMark(mark) {
+  const parent = mark.parentNode;
+  while (mark.firstChild) parent.insertBefore(mark.firstChild, mark);
+  parent.removeChild(mark);
+  parent.normalize();
+}
+
+function updateCollation() {
+  const marks = document.querySelectorAll('#previewMain mark.hl');
+  const list = $('highlightsList');
+  const section = $('highlightsSection');
+  const seen = new Set();
+  const items = [];
+  marks.forEach(m => {
+    const t = m.textContent.trim();
+    const key = t.toLowerCase();
+    if (t && !seen.has(key)) { seen.add(key); items.push(t); }
+  });
+  if (!items.length) {
+    section.hidden = true;
+    list.innerHTML = '';
+    return;
+  }
+  section.hidden = false;
+  list.innerHTML = items.map((t, i) =>
+    '<li>'
+    + '<span class="num">' + String(i + 1).padStart(2, '0') + '</span>'
+    + '<span class="txt">' + escapeHTML(t) + '</span>'
+    + '<button class="rm" data-text="' + escapeHTML(t).replace(/"/g, '&quot;') + '" title="Remove">×</button>'
+    + '</li>'
+  ).join('');
+}
+
+$('highlightsList').addEventListener('click', (e) => {
+  const btn = e.target.closest('.rm');
+  if (!btn) return;
+  const text = btn.dataset.text;
+  document.querySelectorAll('#previewMain mark.hl').forEach(m => {
+    if (m.textContent.trim() === text) unwrapMark(m);
+  });
+  highlights.delete(text);
+  updateCollation();
+  markDirty();
+});
+
+function applyStoredHighlights() {
+  if (!highlights.size) return;
+  const body = document.querySelector('#previewMain .body');
+  if (!body) return;
+  const phrases = [...highlights].sort((a, b) => b.length - a.length);
+  const walker = document.createTreeWalker(body, NodeFilter.SHOW_TEXT, {
+    acceptNode: n =>
+      n.parentElement && n.parentElement.closest('mark.hl')
+        ? NodeFilter.FILTER_REJECT
+        : NodeFilter.FILTER_ACCEPT
+  });
+  const nodes = [];
+  while (walker.nextNode()) nodes.push(walker.currentNode);
+  nodes.forEach(textNode => {
+    const text = textNode.textContent;
+    const matches = [];
+    phrases.forEach(phrase => {
+      let idx = 0;
+      while ((idx = text.indexOf(phrase, idx)) !== -1) {
+        matches.push({ start: idx, end: idx + phrase.length });
+        idx += phrase.length;
+      }
+    });
+    if (!matches.length) return;
+    matches.sort((a, b) => a.start - b.start);
+    const merged = [];
+    matches.forEach(m => {
+      if (!merged.length || m.start >= merged[merged.length - 1].end) merged.push(m);
+    });
+    const frag = document.createDocumentFragment();
+    let cursor = 0;
+    merged.forEach(m => {
+      if (m.start > cursor) frag.appendChild(document.createTextNode(text.slice(cursor, m.start)));
+      const mark = document.createElement('mark');
+      mark.className = 'hl';
+      mark.title = 'Click to remove';
+      mark.textContent = text.slice(m.start, m.end);
+      frag.appendChild(mark);
+      cursor = m.end;
+    });
+    if (cursor < text.length) frag.appendChild(document.createTextNode(text.slice(cursor)));
+    textNode.parentNode.replaceChild(frag, textNode);
+  });
+}
+
+// ============================================================
+// EXAMPLE
+// ============================================================
+function loadExample() {
+  if (isDirty && !confirm('You have unsaved changes. Discard them?')) return;
+  currentArticleId = null;
+  highlights.clear();
+  currentQuestions = [];
+  currentTags = ['politics', 'ai'];
+  $('kicker').value = 'Robot-spotting';
+  $('headline').value = 'Claude, MP';
+  $('standfirst').value = 'Is AI writing taking over Westminster?';
+  $('body').value =
+`What comes to mind, reading these sentences? “The challenge is not technical but political, requiring careful sequencing, clear communication, and sustained commitment.” Or: “Private ownership is not rewarding innovation but collecting a toll on Victorian infrastructure while deferring the investment required to keep it functional. The technology has not changed. The ownership has—and the ownership is the problem.”
+
+Boredom first, probably. Policy writing can be sandpaper-dry. But something else might stand out too, at least to anyone who often interacts with artificial-intelligence models like ChatGPT or Claude. Prose produced by those AI tools has a distinctive smell. One telltale whiff is a love of contrasts: “not technical but political”; “The technology has not changed. The ownership has”. Another is tricolons. Humans have long appreciated groups of three (Cicero studded his speeches with them), but AI’s enthusiasm is superhuman: “careful sequencing, clear communication, and sustained commitment”. And then there are the em-dashes—everywhere.
+
+Readers today can do better than guesswork and amateur stylometry, though. Over the past few years, AI detection technology has improved dramatically. These tools use similar machine-learning techniques to AI models. Pangram, a market leader, boasts of a 0.01% false-positive rate. A study by researchers at the University of Chicago found it had a “near-zero” error rate on longer texts.
+
+Pangram flags each of the policy papers those quotes came from as being mostly written by AI. One was by Louise Haigh, an MP and close adviser to Andy Burnham, Britain’s prime-minister-in-waiting. The other was “The Productive State”, a manifesto of nearly 70 pages published by Mainstream, a Labour group linked to Mr Burnham; it offers a “Framework for Manchesterism”, Mr Burnham’s still-loosely-defined economic programme. Ms Haigh said, in a statement to the Telegraph, that AI was used for “version control”. Mainstream told The Economist that one co-author used Claude to “expose line-level differences and unify the voice of both authors’ independently drafted sections through copy editing”.
+
+That raises two questions. Is this AI writing a problem? And why the links to Mr Burnham? Start with the first. Politics is full of prose not written by the apparent author: politicians have speechwriters, intellectuals employ research assistants. Perhaps AI is no different, even if the prose is clunkier. But people setting out ideas in politics are asking for something quite audacious: to reshape how a country is governed around what they think. Any writer knows how much putting words on a page can tighten one’s arguments. Even subcontracting that to an aide beats skipping the (sometimes painful) process entirely. AI certainly produces sloppy prose, but it also papers over sloppy thinking.
+
+Maybe that matters less if, as Ms Haigh and the “Productive State” authors say, AI is used only for a late polish. The trouble is that readers can detect whether AI wrote the final product, but not how authors used it. And when AI’s involvement is disclosed only after the press come knocking, trust takes some earning back.
+
+What about the potential Burnham factor? Mr Burnham’s coup was plotted slowly, but executed quickly. From the moment he won the Makerfield by-election, he was all but guaranteed to end up in Number 10. Yet he is still vague on many of the big questions facing Britain. That mismatch offers political entrepreneurs a chance to try to shape the wet clay of Burnhamism around their own priorities. The currency of ideas in Westminster is PDFs, ideally long ones. And when you need one quickly, who better to turn to than Claude?`;
+  renderTags();
+  render();
+  markClean();
+}
+
+// ============================================================
+// INIT
+// ============================================================
+updateDbCount();
+renderTags();
+if (!db.articles.length) {
+  loadExample();
+} else {
+  render(); // empty editor
+}
+</script>
+</body>
+</html>
