@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 :root {
   --red: #E3120B;
@@ -462,6 +463,51 @@ body {
   transform: translateX(-50%) rotate(45deg);
 }
 
+/* Highlight controls (undo/redo/clear-all) */
+.hl-toolbar {
+  position: fixed;
+  top: 62px;
+  right: 20px;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: rgba(20, 23, 29, 0.92);
+  padding: 4px;
+  border-radius: 8px;
+  border: 1px solid var(--chrome-border);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+}
+.hl-tool-btn {
+  background: transparent;
+  border: none;
+  color: var(--chrome-fg);
+  width: 32px;
+  height: 32px;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background .12s, color .12s;
+}
+.hl-tool-btn:hover:not(:disabled) { background: rgba(255,255,255,0.09); }
+.hl-tool-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.hl-tool-btn.danger:hover:not(:disabled) { color: #ff7a70; }
+.hl-tool-btn svg { width: 16px; height: 16px; }
+.hl-tool-divider {
+  width: 1px;
+  align-self: stretch;
+  background: var(--chrome-border);
+  margin: 2px 3px;
+}
+@media (max-width: 900px) {
+  .hl-toolbar { top: auto; bottom: 16px; right: 16px; }
+}
+
 /* Settings modal */
 .modal-backdrop {
   position: fixed;
@@ -902,7 +948,7 @@ body {
     print-color-adjust: exact;
   }
   body { display: block; }
-  .topbar, .panel, .hl-bar, .databank, .panel-toggle { display: none !important; }
+  .topbar, .panel, .hl-bar, .databank, .panel-toggle, .hl-toolbar { display: none !important; }
   .tab-pane { display: flex !important; }
   .workspace { display: block; }
   .stage {
@@ -958,12 +1004,25 @@ body {
     <button class="btn" onclick="loadExample()">Example</button>
     <button class="btn primary" onclick="saveArticle()">Save</button>
     <button class="btn" id="pdfBtn" onclick="saveAsPDF()" title="Opens print dialog. Choose 'Save as PDF' as destination. If your browser adds a URL/date band, untick 'Headers and footers' under More settings.">Save PDF</button>
+    <button class="btn" id="pngBtn" onclick="saveAsPNG()" title="Downloads the article as a single tall PNG image">Save PNG</button>
   </div>
   <button class="btn ghost small" id="settingsBtn" onclick="openSettings()" title="Settings" style="padding:6px 10px; font-size:15px;">⚙</button>
 </div>
 
 <!-- ================= EDITOR TAB ================= -->
 <div class="tab-pane active" data-tab="editor">
+  <div class="hl-toolbar" id="hlToolbar" aria-label="Highlight controls">
+    <button class="hl-tool-btn" id="undoBtn" onclick="undoHighlight()" title="Undo (⌘Z / Ctrl+Z)" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-15-6.7L3 13"/></svg>
+    </button>
+    <button class="hl-tool-btn" id="redoBtn" onclick="redoHighlight()" title="Redo (⌘⇧Z / Ctrl+Shift+Z)" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 15-6.7L21 13"/></svg>
+    </button>
+    <div class="hl-tool-divider"></div>
+    <button class="hl-tool-btn danger" id="clearAllBtn" onclick="clearAllHighlights()" title="Clear all highlights" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+    </button>
+  </div>
   <div class="workspace" id="workspace">
     <button class="panel-toggle" id="panelToggle" title="Collapse panel" onclick="togglePanel()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
@@ -1103,6 +1162,9 @@ let isDirty = false;            // has editor been modified since save?
 
 // Highlights: stored phrases, re-applied after each render
 const highlights = new Set();
+// Undo/redo history for highlights: array of snapshots (arrays of phrases)
+let hlHistory = [[]];
+let hlIndex = 0;
 
 // ============================================================
 // UTIL
@@ -1293,6 +1355,7 @@ function newArticle() {
   $('qsStatus').textContent = '';
   renderTags();
   render();
+  resetHlHistory();
   $('genQsBtn').textContent = 'Generate 3 discussion questions';
   markClean();
 }
@@ -1313,6 +1376,7 @@ function loadArticleIntoEditor(id) {
   (article.highlights || []).forEach(h => highlights.add(h));
   renderTags();
   render();
+  resetHlHistory();
   $('genQsBtn').textContent = currentQuestions.length ? 'Regenerate questions' : 'Generate 3 discussion questions';
   markClean();
   switchTab('editor');
@@ -1465,6 +1529,106 @@ document.addEventListener('dblclick', (e) => {
 // ============================================================
 function saveAsPDF() {
   window.print();
+}
+
+// ============================================================
+// SAVE AS PNG (via html2canvas)
+// ============================================================
+async function saveAsPNG() {
+  if (typeof html2canvas === 'undefined') {
+    alert('Image library did not load. Check your internet connection and refresh.');
+    return;
+  }
+
+  const btn = $('pngBtn');
+  const origLabel = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Generating…';
+
+  // Wait for fonts so text metrics are stable during capture
+  try { await document.fonts.ready; } catch {}
+
+  // Clone the article into an off-screen container with a fixed width so
+  // the two-column layout renders consistently regardless of viewport.
+  const CAPTURE_WIDTH = 960; // px
+  const original = $('preview');
+  const clone = original.cloneNode(true);
+
+  const container = document.createElement('div');
+  container.style.cssText = [
+    'position: fixed',
+    'top: 0',
+    'left: -20000px',
+    'width: ' + CAPTURE_WIDTH + 'px',
+    'background: #FEFDF9',
+    'z-index: -1',
+    'font-family: "Source Serif 4", Georgia, serif',
+  ].join(';');
+
+  // Neutralize on-screen chrome inside the clone
+  clone.style.cssText = [
+    'background: #FEFDF9',
+    'box-shadow: none',
+    'max-width: 100%',
+    'width: 100%',
+    'margin: 0',
+  ].join(';');
+
+  // Force highlights to render as solid, per-line yellow so they look right
+  // even if html2canvas ignores box-decoration-break
+  clone.querySelectorAll('mark.hl').forEach(m => {
+    m.style.background = '#ffe066';
+    m.style.color = '#111';
+    m.style.padding = '0.02em 0.12em';
+    m.style.borderRadius = '2px';
+    m.style.boxDecorationBreak = 'clone';
+    m.style.webkitBoxDecorationBreak = 'clone';
+  });
+
+  container.appendChild(clone);
+  document.body.appendChild(container);
+
+  // Build filename from headline
+  const headline = $('headline').value.trim() || 'article';
+  const filename = headline
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 60) + '.png';
+
+  try {
+    const canvas = await html2canvas(clone, {
+      scale: 2,                    // 2x for retina-quality
+      useCORS: true,
+      backgroundColor: '#FEFDF9',
+      logging: false,
+      windowWidth: CAPTURE_WIDTH,
+      width: CAPTURE_WIDTH,
+      height: clone.scrollHeight
+    });
+
+    await new Promise((resolve, reject) => {
+      canvas.toBlob(blob => {
+        if (!blob) return reject(new Error('Canvas conversion returned empty'));
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 100);
+        resolve();
+      }, 'image/png');
+    });
+  } catch (err) {
+    console.error(err);
+    alert('PNG generation failed: ' + (err.message || 'unknown error'));
+  } finally {
+    container.remove();
+    btn.disabled = false;
+    btn.textContent = origLabel;
+  }
 }
 
 // ============================================================
@@ -2019,6 +2183,84 @@ function setImgStatus(text, cls) {
 }
 
 // ============================================================
+// HIGHLIGHT UNDO / REDO / CLEAR
+// ============================================================
+function pushHlHistory() {
+  hlHistory = hlHistory.slice(0, hlIndex + 1);
+  hlHistory.push([...highlights]);
+  hlIndex = hlHistory.length - 1;
+  // Cap history at 100 entries
+  if (hlHistory.length > 100) {
+    hlHistory = hlHistory.slice(hlHistory.length - 100);
+    hlIndex = hlHistory.length - 1;
+  }
+  updateHlControls();
+}
+
+function resetHlHistory() {
+  hlHistory = [[...highlights]];
+  hlIndex = 0;
+  updateHlControls();
+}
+
+function undoHighlight() {
+  if (hlIndex <= 0) return;
+  hlIndex--;
+  restoreHlFromHistory();
+}
+
+function redoHighlight() {
+  if (hlIndex >= hlHistory.length - 1) return;
+  hlIndex++;
+  restoreHlFromHistory();
+}
+
+function restoreHlFromHistory() {
+  const snapshot = hlHistory[hlIndex] || [];
+  highlights.clear();
+  snapshot.forEach(h => highlights.add(h));
+  render();
+  markDirty();
+  updateHlControls();
+}
+
+function clearAllHighlights() {
+  if (!highlights.size) return;
+  if (!confirm('Remove all ' + highlights.size + ' highlight' + (highlights.size === 1 ? '' : 's') + '?')) return;
+  highlights.clear();
+  pushHlHistory();
+  render();
+  markDirty();
+}
+
+function updateHlControls() {
+  const undo = $('undoBtn');
+  const redo = $('redoBtn');
+  const clr = $('clearAllBtn');
+  if (!undo) return;
+  undo.disabled = hlIndex <= 0;
+  redo.disabled = hlIndex >= hlHistory.length - 1;
+  clr.disabled = highlights.size === 0;
+}
+
+// Keyboard shortcuts (only outside inputs)
+document.addEventListener('keydown', (e) => {
+  const isTyping = e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA';
+  if (isTyping) return;
+  const meta = e.metaKey || e.ctrlKey;
+  if (!meta) return;
+  if (e.key === 'z' && !e.shiftKey) {
+    e.preventDefault();
+    undoHighlight();
+  } else if ((e.key === 'z' && e.shiftKey) || e.key === 'y') {
+    e.preventDefault();
+    redoHighlight();
+  }
+});
+
+updateHlControls();
+
+// ============================================================
 // HIGHLIGHTER
 // ============================================================
 const bar = $('hlBar');
@@ -2077,6 +2319,7 @@ function highlightSelection() {
   hideBar();
   updateCollation();
   markDirty();
+  pushHlHistory();
 }
 
 document.addEventListener('click', (e) => {
@@ -2089,6 +2332,7 @@ document.addEventListener('click', (e) => {
   if (!stillPresent) highlights.delete(text);
   updateCollation();
   markDirty();
+  pushHlHistory();
 });
 
 function unwrapMark(mark) {
@@ -2134,6 +2378,7 @@ $('highlightsList').addEventListener('click', (e) => {
   highlights.delete(text);
   updateCollation();
   markDirty();
+  pushHlHistory();
 });
 
 function applyStoredHighlights() {
@@ -2209,6 +2454,7 @@ Maybe that matters less if, as Ms Haigh and the “Productive State” authors s
 What about the potential Burnham factor? Mr Burnham’s coup was plotted slowly, but executed quickly. From the moment he won the Makerfield by-election, he was all but guaranteed to end up in Number 10. Yet he is still vague on many of the big questions facing Britain. That mismatch offers political entrepreneurs a chance to try to shape the wet clay of Burnhamism around their own priorities. The currency of ideas in Westminster is PDFs, ideally long ones. And when you need one quickly, who better to turn to than Claude?`;
   renderTags();
   render();
+  resetHlHistory();
   markClean();
 }
 
@@ -2221,6 +2467,7 @@ if (!db.articles.length) {
   loadExample();
 } else {
   render(); // empty editor
+  resetHlHistory();
 }
 </script>
 </body>
