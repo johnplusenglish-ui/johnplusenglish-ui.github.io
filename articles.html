@@ -492,13 +492,24 @@ body {
 
 /* ---------- stage / preview ---------- */
 .stage {
-  overflow-y: auto;
+  overflow: auto;
   padding: 2.5rem;
   background: var(--bg);
   display: flex;
-  justify-content: center;
+  /* flex-start + auto margins so the page stays centred but never gets
+     clipped on the left once it grows wider than the stage */
+  justify-content: flex-start;
   align-items: flex-start;
   min-height: 0;
+}
+/* Zoom scales the page instead of reflowing it, so line breaks and column
+   fills stay exactly where they will be on paper. Only applied once the user
+   actually zooms, so the default responsive width is untouched. */
+.stage.zoomed .article {
+  zoom: var(--zoom, 1);
+  width: 820px;
+  max-width: none;
+  flex: 0 0 auto;   /* stop flex from shrinking the page back down to fit */
 }
 .article {
   background: var(--paper);
@@ -506,6 +517,7 @@ body {
   padding: 3.4rem 4rem 4.4rem;
   max-width: 820px;
   width: 100%;
+  margin: 0 auto;
   font-family: var(--serif);
   font-size: 15.5px;
   line-height: 1.44;
@@ -729,6 +741,22 @@ body {
   background: var(--line);
   margin: 3px 3px;
 }
+.zoom-readout {
+  background: none;
+  border: none;
+  color: var(--muted-2);
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  min-width: 44px;
+  height: 30px;
+  padding: 0 2px;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: background .12s, color .12s;
+}
+.zoom-readout:hover { background: var(--field); color: var(--ink); }
 @media (max-width: 900px) {
   .hl-toolbar { top: auto; bottom: 16px; right: 16px; }
 }
@@ -1194,6 +1222,7 @@ body {
      and box-decoration-break: clone repeats the borders on every
      page when the article fragments across pages. */
   .article {
+    zoom: 1 !important;           /* on-screen zoom must never affect the PDF */
     box-shadow: none !important;
     max-width: 100% !important;
     width: 100% !important;
@@ -1273,6 +1302,17 @@ body {
     <div class="hl-tool-divider"></div>
     <button class="hl-tool-btn danger" id="clearAllBtn" onclick="clearAllHighlights()" title="Clear all highlights" disabled>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+    </button>
+    <div class="hl-tool-divider"></div>
+    <button class="hl-tool-btn" id="zoomOutBtn" onclick="stepZoom(-1)" title="Zoom out">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </button>
+    <button class="zoom-readout" id="zoomLevel" onclick="setZoom(1)" title="Reset to 100%">100%</button>
+    <button class="hl-tool-btn" id="zoomInBtn" onclick="stepZoom(1)" title="Zoom in">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </button>
+    <button class="hl-tool-btn" id="zoomFitBtn" onclick="fitZoom()" title="Fit page to width">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg>
     </button>
   </div>
   <div class="workspace" id="workspace">
@@ -2995,6 +3035,76 @@ function applyStoredHighlights() {
     });
   });
 }
+
+// ============================================================
+// PAGE ZOOM
+// ============================================================
+// Scales the whole page rather than reflowing it, so what you see at any
+// zoom level is exactly how the PDF will break. Never affects print or PNG.
+const ZOOM_KEY = 'articleMagazine.zoom';
+const ZOOM_MIN = 0.35;
+const ZOOM_MAX = 2.5;
+const PAGE_W = 820;              // matches .stage.zoomed .article width
+let zoom = 1;
+
+const stageEl = () => document.querySelector('.tab-pane[data-tab="editor"] .stage');
+
+function applyZoom(persist = true) {
+  zoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, zoom));
+  const stage = stageEl();
+  if (!stage) return;
+  stage.style.setProperty('--zoom', zoom);
+  stage.classList.toggle('zoomed', Math.abs(zoom - 1) > 0.005);
+  $('zoomLevel').textContent = Math.round(zoom * 100) + '%';
+  $('zoomOutBtn').disabled = zoom <= ZOOM_MIN + 0.005;
+  $('zoomInBtn').disabled = zoom >= ZOOM_MAX - 0.005;
+  if (persist) localStorage.setItem(ZOOM_KEY, String(zoom));
+  hideBar(); // the selection popover would otherwise float away from its text
+}
+
+function setZoom(z) {
+  zoom = Math.round(z * 100) / 100;
+  applyZoom();
+}
+
+function stepZoom(dir) {
+  setZoom(zoom + dir * (zoom < 1 ? 0.1 : 0.25));
+}
+
+// Scale so a full page width fits the visible stage
+function fitZoom() {
+  const stage = stageEl();
+  if (!stage) return;
+  const cs = getComputedStyle(stage);
+  const inner = stage.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+  setZoom(inner / PAGE_W);
+}
+
+// Zoom toward the pointer so the bit you are looking at stays put
+function zoomAt(next, clientX, clientY) {
+  const stage = stageEl();
+  const rect = stage.getBoundingClientRect();
+  const before = zoom;
+  const x = clientX - rect.left + stage.scrollLeft;
+  const y = clientY - rect.top + stage.scrollTop;
+  setZoom(next);
+  const k = zoom / before;
+  stage.scrollLeft = x * k - (clientX - rect.left);
+  stage.scrollTop = y * k - (clientY - rect.top);
+}
+
+// Cmd/Ctrl + wheel, and trackpad pinch (which arrives as a ctrlKey wheel)
+document.addEventListener('wheel', (e) => {
+  const stage = stageEl();
+  if (!stage || !stage.contains(e.target)) return;
+  if (!e.ctrlKey && !e.metaKey) return;
+  e.preventDefault();
+  zoomAt(zoom * Math.exp(-e.deltaY * 0.0035), e.clientX, e.clientY);
+}, { passive: false });
+
+const storedZoom = parseFloat(localStorage.getItem(ZOOM_KEY));
+if (storedZoom > 0) zoom = storedZoom;
+applyZoom(false);
 
 // ============================================================
 // EXAMPLE
