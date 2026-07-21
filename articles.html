@@ -880,6 +880,19 @@ body {
   font-variant-numeric: tabular-nums;
 }
 .highlights li .txt { flex: 1; }
+.highlights li .term { display: block; }
+.highlights li .gloss {
+  display: block;
+  font-size: 0.82rem;
+  line-height: 1.3;
+  color: var(--muted-2);
+  margin-top: 1px;
+}
+.highlights li .gloss .pos {
+  font-style: italic;
+  color: var(--muted);
+  margin-right: 0.3em;
+}
 .highlights li .rm {
   background: none;
   border: none;
@@ -1356,6 +1369,13 @@ body {
       <div class="field-note">Blank line between paragraphs. <code>##&nbsp;text</code> makes a subhead, <code>&gt;&nbsp;text</code> makes a pull quote.</div>
       <div class="doc-stats" id="docStats"></div>
 
+      <label>Glossary</label>
+      <div class="qs-head" style="margin-top:0;">
+        <button class="btn small" id="glossBtn" onclick="fetchGlosses()">Get definitions</button>
+        <button class="btn small ghost" id="glossClearBtn" onclick="clearGlosses()" hidden>Clear</button>
+      </div>
+      <div id="glossStatus" class="field-note">Highlight words in the article, then pull short definitions from johnplusdictionary.</div>
+
       <label>Discussion questions</label>
       <div class="qs-head">
         <button class="btn small" id="genQsBtn" onclick="generateQuestions()">Generate questions</button>
@@ -1433,6 +1453,25 @@ body {
       &nbsp;·&nbsp;
       <a href="https://www.anthropic.com/pricing" target="_blank" rel="noopener">See pricing →</a>
     </p>
+
+    <div style="border-top:1px solid var(--line); margin:0 0 1.25rem;"></div>
+
+    <label>Dictionary site</label>
+    <input type="text" id="dictUrlInput" placeholder="https://johnplusdictionary.com" autocomplete="off" spellcheck="false" style="font-family:var(--sans); margin-bottom:0.7rem;">
+    <label>Dictionary access token</label>
+    <input type="password" id="glossTokenInput" placeholder="the GLOSS_TOKEN you set on the site" autocomplete="off" spellcheck="false">
+    <div class="test-result" id="dictTestResult"></div>
+    <p class="hint">
+      Lets the Glossary button look words up in your own dictionary instead of
+      using the API key above. Words it already has are free and instant;
+      anything new is written and saved to your dictionary at the same time.
+      <br><br>
+      This must match the <code style="font-family:'SF Mono',ui-monospace,monospace">GLOSS_TOKEN</code>
+      environment variable on the site.
+    </p>
+    <div class="modal-actions" style="margin-bottom:1.25rem;">
+      <button class="btn" onclick="testDictionary()">Test dictionary</button>
+    </div>
     <div class="modal-actions">
       <button class="btn ghost" onclick="closeSettings()">Cancel</button>
       <button class="btn ghost" onclick="clearApiKey()">Remove key</button>
@@ -1466,6 +1505,7 @@ let db = loadDB();
 let currentArticleId = null;   // id of the article currently loaded in editor, or null for new
 let currentTags = [];           // draft tags
 let currentQuestions = [];      // draft food-for-thought questions
+let currentGlosses = {};        // lowercased highlight text -> {word, pos, gloss}
 let activeFilters = new Set();  // tag filters in databank view
 let isDirty = false;            // has editor been modified since save?
 
@@ -1697,7 +1737,12 @@ function collectArticle() {
     imgUrl: $('imgUrl').value.trim(),
     tags: [...currentTags],
     highlights: [...highlights],
-    questions: currentQuestions.map(q => q.trim()).filter(Boolean)
+    questions: currentQuestions.map(q => q.trim()).filter(Boolean),
+    // drop glosses whose highlight has since been removed
+    glosses: Object.fromEntries(
+      Object.entries(currentGlosses)
+        .filter(([k]) => [...highlights].some(h => h.trim().toLowerCase() === k))
+    )
   };
 }
 
@@ -1731,6 +1776,7 @@ function newArticle() {
   currentArticleId = null;
   currentTags = [];
   currentQuestions = [];
+  currentGlosses = {};
   highlights.clear();
   ['kicker','headline','standfirst','dateline','body','imgUrl'].forEach(id => $(id).value = '');
   $('tagInput').value = '';
@@ -1756,6 +1802,7 @@ function loadArticleIntoEditor(id) {
   $('imgUrl').value = article.imgUrl || '';
   currentTags = [...(article.tags || [])];
   currentQuestions = [...(article.questions || [])];
+  currentGlosses = { ...(article.glosses || {}) };
   highlights.clear();
   (article.highlights || []).forEach(h => highlights.add(h));
   renderTags();
@@ -2068,6 +2115,7 @@ function saveAsPDFMobile() {
         gap: 8px !important;
       }
       .highlights li .num { min-width: 16px !important; font-size: 9.5px !important; }
+      .highlights li .gloss { font-size: 9.5px !important; line-height: 1.25 !important; }
       .questions li {
         font-size: 12px !important;
         padding: 5px 0 !important;
@@ -2317,6 +2365,7 @@ function importDb() {
           tags: Array.isArray(item.tags) ? item.tags.map(String) : [],
           highlights: Array.isArray(item.highlights) ? item.highlights.map(String) : [],
           questions: Array.isArray(item.questions) ? item.questions.map(String) : [],
+          glosses: (item.glosses && typeof item.glosses === 'object') ? item.glosses : {},
           createdAt: item.createdAt || Date.now(),
           updatedAt: item.updatedAt || Date.now()
         };
@@ -2524,6 +2573,14 @@ function openSettings() {
     : 'sk-ant-…';
   $('testResult').textContent = '';
   $('testResult').className = 'test-result';
+  $('dictUrlInput').value = localStorage.getItem(DICT_URL_KEY) || '';
+  const tok = getGlossToken();
+  $('glossTokenInput').value = tok;
+  $('glossTokenInput').placeholder = tok
+    ? 'Token stored (ends …' + tok.slice(-4) + ')'
+    : 'the GLOSS_TOKEN you set on the site';
+  $('dictTestResult').textContent = '';
+  $('dictTestResult').className = 'test-result';
   $('settingsModal').hidden = false;
   setTimeout(() => input.focus(), 50);
 }
@@ -2536,7 +2593,14 @@ function saveApiKey() {
     }
     localStorage.setItem(API_KEY_STORAGE, val);
   }
+  // Dictionary settings save alongside the key
+  const url = $('dictUrlInput').value.trim();
+  if (url) localStorage.setItem(DICT_URL_KEY, url);
+  else localStorage.removeItem(DICT_URL_KEY);
+  const tok = $('glossTokenInput').value.trim();
+  if (tok) localStorage.setItem(GLOSS_TOKEN_KEY, tok);
   updateSettingsBadge();
+  updateGlossControls();
   closeSettings();
 }
 function clearApiKey() {
@@ -2938,13 +3002,20 @@ function updateCollation() {
     return;
   }
   section.hidden = false;
-  list.innerHTML = items.map((t, i) =>
-    '<li>'
-    + '<span class="num">' + String(i + 1).padStart(2, '0') + '</span>'
-    + '<span class="txt">' + escapeHTML(t) + '</span>'
-    + '<button class="rm" data-text="' + escapeHTML(t).replace(/"/g, '&quot;') + '" title="Remove">×</button>'
-    + '</li>'
-  ).join('');
+  list.innerHTML = items.map((t, i) => {
+    const g = currentGlosses[t.trim().toLowerCase()];
+    const glossHTML = (g && g.gloss)
+      ? '<span class="gloss">'
+        + (g.pos ? '<span class="pos">' + escapeHTML(g.pos) + '</span>' : '')
+        + escapeHTML(g.gloss) + '</span>'
+      : '';
+    return '<li>'
+      + '<span class="num">' + String(i + 1).padStart(2, '0') + '</span>'
+      + '<span class="txt"><span class="term">' + escapeHTML(t) + '</span>' + glossHTML + '</span>'
+      + '<button class="rm" data-text="' + escapeHTML(t).replace(/"/g, '&quot;') + '" title="Remove">×</button>'
+      + '</li>';
+  }).join('');
+  updateGlossControls();
 }
 
 $('highlightsList').addEventListener('click', (e) => {
@@ -3037,6 +3108,168 @@ function applyStoredHighlights() {
 }
 
 // ============================================================
+// GLOSSARY (definitions from johnplusdictionary)
+// ============================================================
+// The dictionary site already does the hard part: it checks its cache, and on
+// a miss it writes a fresh entry and saves it. So we just hand it the list of
+// highlighted phrases. Known words cost nothing; new ones get added to the
+// dictionary as a side effect, which is the point.
+const DICT_URL_KEY = 'articleMagazine.dictUrl';
+const GLOSS_TOKEN_KEY = 'articleMagazine.glossToken';
+const DEFAULT_DICT_URL = 'https://johnplusdictionary.com';
+
+function getDictUrl() {
+  return (localStorage.getItem(DICT_URL_KEY) || DEFAULT_DICT_URL).replace(/\/+$/, '');
+}
+function getGlossToken() { return localStorage.getItem(GLOSS_TOKEN_KEY) || ''; }
+
+function setGlossStatus(text, cls) {
+  const s = $('glossStatus');
+  s.className = 'field-note ' + (cls || '');
+  s.textContent = text;
+}
+
+function updateGlossControls() {
+  const btn = $('glossBtn');
+  const clr = $('glossClearBtn');
+  if (!btn) return;
+  const n = highlights.size;
+  const have = Object.keys(currentGlosses).length;
+  btn.disabled = n === 0;
+  btn.textContent = have ? 'Update definitions' : 'Get definitions';
+  clr.hidden = have === 0;
+}
+
+// The highlight list in the article is the source of truth for order + dedupe
+function highlightTerms() {
+  const seen = new Set();
+  const out = [];
+  document.querySelectorAll('#previewMain mark.hl').forEach(m => {
+    const t = m.textContent.trim();
+    const k = t.toLowerCase();
+    if (t && !seen.has(k)) { seen.add(k); out.push(t); }
+  });
+  return out;
+}
+
+async function callDictionary(words, preview) {
+  const token = getGlossToken();
+  if (!token) throw new Error('No dictionary token. Add one under Settings.');
+  let resp;
+  try {
+    resp = await fetch(getDictUrl() + '/api/gloss', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Gloss-Token': token },
+      body: JSON.stringify({ words, preview: !!preview })
+    });
+  } catch (e) {
+    // A blocked cross-origin request surfaces here as a bare TypeError
+    throw new Error('Could not reach ' + getDictUrl() + '. Check the site is up and the address is right.');
+  }
+  if (resp.status === 403) throw new Error('The dictionary rejected the token. Check it under Settings.');
+  if (!resp.ok) throw new Error('Dictionary returned ' + resp.status + '.');
+  const data = await resp.json();
+  return data.results || [];
+}
+
+async function fetchGlosses() {
+  const terms = highlightTerms();
+  if (!terms.length) { setGlossStatus('Highlight some words first.', 'err'); return; }
+
+  const btn = $('glossBtn');
+  const label = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Checking…';
+  setGlossStatus('Checking which words your dictionary already has…', '');
+
+  try {
+    // Step 1: preview. Never generates, never writes. Lets us show exactly
+    // what is about to be created before spending anything.
+    const preview = await callDictionary(terms, true);
+    const missing = preview.filter(r => r.source === 'missing').map(r => r.input);
+    const known = preview.length - missing.length;
+
+    if (missing.length) {
+      const shown = missing.slice(0, 12).join(', ') + (missing.length > 12 ? ', …' : '');
+      const ok = confirm(
+        known + ' of ' + preview.length + ' already in your dictionary.\n\n'
+        + missing.length + ' will be written as new entries and saved there:\n' + shown
+        + '\n\nApproximate cost: ' + (missing.length * 0.3).toFixed(1) + 'p. Continue?'
+      );
+      if (!ok) {
+        setGlossStatus('Cancelled. Nothing was written.', '');
+        btn.disabled = false; btn.textContent = label;
+        updateGlossControls();
+        return;
+      }
+    }
+
+    btn.textContent = 'Fetching…';
+    setGlossStatus(missing.length
+      ? 'Writing ' + missing.length + ' new ' + (missing.length === 1 ? 'entry' : 'entries') + '…'
+      : 'Fetching definitions…', '');
+
+    // Step 2: the real call.
+    const results = await callDictionary(terms, false);
+    let added = 0, failed = 0;
+    results.forEach(r => {
+      if (r.source === 'failed' || !r.gloss) { failed++; return; }
+      if (r.source === 'generated') added++;
+      currentGlosses[r.input.trim().toLowerCase()] = {
+        word: r.word, pos: r.pos || '', gloss: r.gloss
+      };
+    });
+
+    updateCollation();
+    markDirty();
+    const bits = [];
+    bits.push((results.length - failed) + ' defined');
+    if (added) bits.push(added + ' added to your dictionary');
+    if (failed) bits.push(failed + ' could not be looked up');
+    setGlossStatus(bits.join(' · '), failed ? 'err' : 'ok');
+  } catch (err) {
+    console.error(err);
+    setGlossStatus(err.message, 'err');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = label;
+    updateGlossControls();
+  }
+}
+
+function clearGlosses() {
+  if (!Object.keys(currentGlosses).length) return;
+  if (!confirm('Remove the definitions from this article? Your dictionary keeps its entries.')) return;
+  currentGlosses = {};
+  updateCollation();
+  markDirty();
+  setGlossStatus('Definitions removed from this article.', '');
+}
+
+async function testDictionary() {
+  const el = $('dictTestResult');
+  el.className = 'test-result';
+  el.textContent = 'Testing…';
+  // Use whatever is currently typed in, not what was last saved
+  const prevUrl = localStorage.getItem(DICT_URL_KEY);
+  const prevTok = localStorage.getItem(GLOSS_TOKEN_KEY);
+  localStorage.setItem(DICT_URL_KEY, $('dictUrlInput').value.trim() || DEFAULT_DICT_URL);
+  localStorage.setItem(GLOSS_TOKEN_KEY, $('glossTokenInput').value.trim());
+  try {
+    // preview mode: proves the round trip without generating or writing
+    await callDictionary(['dictionary'], true);
+    el.className = 'test-result ok';
+    el.textContent = 'Connected. The dictionary answered.';
+  } catch (e) {
+    el.className = 'test-result err';
+    el.textContent = e.message;
+  } finally {
+    if (prevUrl === null) localStorage.removeItem(DICT_URL_KEY); else localStorage.setItem(DICT_URL_KEY, prevUrl);
+    if (prevTok === null) localStorage.removeItem(GLOSS_TOKEN_KEY); else localStorage.setItem(GLOSS_TOKEN_KEY, prevTok);
+  }
+}
+
+// ============================================================
 // PAGE ZOOM
 // ============================================================
 // Scales the whole page rather than reflowing it, so what you see at any
@@ -3114,6 +3347,7 @@ function loadExample() {
   currentArticleId = null;
   highlights.clear();
   currentQuestions = [];
+  currentGlosses = {};
   currentTags = ['politics', 'ai'];
   $('kicker').value = 'Robot-spotting';
   $('headline').value = 'Claude, MP';
