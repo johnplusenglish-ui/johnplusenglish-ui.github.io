@@ -19,6 +19,8 @@
     --line-strong: #d3c7a9;
     --sea: #123a4c;
     --sea-deep: #0d2c3b;
+    --sea-light: #35708a;
+    --grid: rgba(210,230,238,0.11);
     --land: #e9dec3;
     --land-line: #c3b58f;
     --gold: #b78d2e;
@@ -376,6 +378,13 @@
   .city-card .cc-name { font-family: var(--serif); font-size: 1.35rem; font-weight: 600; }
   .city-card .cc-meta { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0.2rem 0 0.5rem; }
   .city-card .cc-blurb { font-size: 0.9rem; color: var(--ink-soft); }
+  .city-card .cc-tid { list-style: none; margin-top: 0.6rem; display: flex; flex-direction: column; gap: 0.32rem; }
+  .city-card .cc-tid li { position: relative; padding-left: 0.95rem; font-size: 0.82rem; color: var(--ink-soft); line-height: 1.38; }
+  .city-card .cc-tid li::before { content: ''; position: absolute; left: 0; top: 0.5rem; width: 5px; height: 5px; border-radius: 50%; background: var(--gold); }
+
+  /* compass rose */
+  .map-compass { position: absolute; top: 10px; right: 10px; width: 46px; height: 46px; z-index: 5; opacity: 0.92; pointer-events: none; }
+  .map-compass svg { width: 100%; height: 100%; display: block; }
 
   /* ---------- Odyssey ---------- */
   .ody-layout { display: grid; grid-template-columns: 1fr 360px; gap: 1.25rem; align-items: start; }
@@ -648,6 +657,7 @@
           <div class="cc-name" id="cc-name"></div>
           <div class="cc-meta" id="cc-meta"></div>
           <div class="cc-blurb" id="cc-blurb"></div>
+          <ul class="cc-tid" id="cc-tid"></ul>
         </div>
         <h4>Around this moment</h4>
         <div class="ev-list" id="ev-list"></div>
@@ -768,38 +778,38 @@ const ERAS = [
 
 // Cities: appear on the map once "founded"; persist afterwards
 const CITIES = [
-  { n:'Athens', g:'Ἀθῆναι', lon:23.728, lat:37.983, f:-1400, big:1, b:'Cradle of democracy, drama and philosophy. Its Acropolis, crowned by the Parthenon, is the emblem of the classical world.' },
-  { n:'Sparta', g:'Σπάρτη', lon:22.43, lat:37.08, f:-900, big:1, b:'The militarist state of Laconia. Boys entered the agoge at seven; the city needed no walls. Rival and opposite of Athens.' },
-  { n:'Corinth', g:'Κόρινθος', lon:22.93, lat:37.94, f:-900, b:'Rich trading city astride its isthmus, controlling two seas. Mother-city of Syracuse and Corcyra.' },
-  { n:'Thebes', g:'Θῆβαι', lon:23.32, lat:38.32, f:-1400, b:'Chief city of Boeotia and setting of the Oedipus myth. Under Epaminondas it briefly broke Spartan power.' },
-  { n:'Argos', g:'Ἄργος', lon:22.72, lat:37.63, f:-1600, b:'One of the oldest continuously inhabited cities in Greece, heart of the Argolid.' },
-  { n:'Mycenae', g:'Μυκῆναι', lon:22.756, lat:37.731, f:-1700, b:'"Rich in gold." Citadel of Agamemnon and the leading power of Bronze Age Greece, entered through the Lion Gate.' },
-  { n:'Tiryns', g:'Τίρυνς', lon:22.80, lat:37.60, f:-1600, b:'Mycenaean fortress whose Cyclopean walls the Greeks believed were built by giants.' },
-  { n:'Pylos', g:'Πύλος', lon:21.695, lat:37.03, f:-1600, b:'Palace of wise old Nestor. Its burnt archive of Linear B tablets preserved the Mycenaean world.' },
-  { n:'Olympia', g:'Ὀλυμπία', lon:21.63, lat:37.638, f:-776, b:'Sanctuary of Zeus and home of the Olympic Games from 776 BC. Held a gold-and-ivory Zeus, one of the Seven Wonders.' },
-  { n:'Delphi', g:'Δελφοί', lon:22.50, lat:38.482, f:-800, big:1, b:'The oracle of Apollo, "navel of the world." Kings and cities came to hear the Pythia\'s riddling prophecies.' },
-  { n:'Corcyra', g:'Κόρκυρα', lon:19.92, lat:39.62, f:-734, b:'Corfu. Wealthy Corinthian colony, traditionally identified with the Phaeacians\' island of Scheria.' },
-  { n:'Delos', g:'Δῆλος', lon:25.268, lat:37.40, f:-1000, b:'Sacred birthplace of Apollo and Artemis, and treasury of the Delian League.' },
-  { n:'Naxos', g:'Νάξος', lon:25.43, lat:37.10, f:-1000, b:'Largest of the Cyclades, where Theseus abandoned Ariadne and Dionysus found her.' },
-  { n:'Knossos', g:'Κνωσός', lon:25.16, lat:35.298, f:-2000, big:1, b:'The great Minoan palace of Crete, a maze of halls behind the myth of the Labyrinth and the Minotaur.' },
-  { n:'Miletus', g:'Μίλητος', lon:27.277, lat:37.53, f:-1000, b:'Wealthiest Ionian city and cradle of philosophy and science: home of Thales, Anaximander and Anaximenes.' },
-  { n:'Ephesus', g:'Ἔφεσος', lon:27.34, lat:37.94, f:-1000, b:'Ionian metropolis whose Temple of Artemis was a Wonder of the World. Home of Heraclitus.' },
-  { n:'Halicarnassus', g:'Ἁλικαρνασσός', lon:27.42, lat:37.038, f:-900, b:'Birthplace of Herodotus, the "father of history," and site of the Mausoleum, another Wonder.' },
-  { n:'Samos', g:'Σάμος', lon:26.97, lat:37.75, f:-1000, b:'Island of Pythagoras and the ambitious tyrant Polycrates, with a vast temple of Hera.' },
-  { n:'Chios', g:'Χίος', lon:26.14, lat:38.37, f:-1000, b:'One of several islands claiming to be Homer\'s birthplace, and home of a guild of epic reciters.' },
-  { n:'Mytilene', g:'Μυτιλήνη', lon:26.55, lat:39.11, f:-1000, b:'Chief city of Lesbos, home of the poets Sappho and Alcaeus.' },
-  { n:'Rhodes', g:'Ῥόδος', lon:28.223, lat:36.44, f:-408, b:'Island city and Hellenistic sea-power. Its harbour bore the Colossus, a Wonder toppled by earthquake.' },
-  { n:'Troy', g:'Ἴλιον', lon:26.239, lat:39.957, f:-3000, big:1, b:'Ilion, the citadel of Priam. Excavated by Schliemann, it lies behind the Iliad and the Trojan War.' },
-  { n:'Byzantium', g:'Βυζάντιον', lon:28.98, lat:41.01, f:-667, b:'Megarian colony commanding the Bosphorus, the gateway to the Black Sea. Later Constantinople.' },
-  { n:'Syracuse', g:'Συράκουσαι', lon:15.293, lat:37.07, f:-733, big:1, b:'Greatest Greek city of Sicily. It shattered the Athenian expedition of 415 BC and was home to Archimedes.' },
-  { n:'Akragas', g:'Ἀκράγας', lon:13.583, lat:37.31, f:-580, b:'Sicilian city famed for wealth and a valley of Doric temples. Agrigento today.' },
-  { n:'Cyrene', g:'Κυρήνη', lon:21.86, lat:32.825, f:-631, b:'Greek city in Libya, rich on the silphium trade and home to mathematicians and a school of philosophy.' },
-  { n:'Alexandria', g:'Ἀλεξάνδρεια', lon:29.92, lat:31.20, f:-331, big:1, b:'Alexander\'s Egyptian foundation and capital of the Ptolemies. Its Library and Lighthouse made it the mind of the Hellenistic world.' },
-  { n:'Pella', g:'Πέλλα', lon:22.52, lat:40.76, f:-400, b:'Capital of Macedon and birthplace of Alexander the Great. Aristotle tutored him nearby.' },
-  { n:'Thessalonica', g:'Θεσσαλονίκη', lon:22.94, lat:40.64, f:-315, b:'Macedonian city founded by Cassander and named for Alexander\'s half-sister.' },
-  { n:'Dodona', g:'Δωδώνη', lon:20.788, lat:39.546, f:-1000, b:'Oldest Greek oracle, in Epirus, where priests read the will of Zeus in the rustling of an oak.' },
-  { n:'Epidaurus', g:'Ἐπίδαυρος', lon:23.079, lat:37.596, f:-800, b:'Healing sanctuary of Asclepius, with the most perfect surviving Greek theatre.' },
-  { n:'Pergamon', g:'Πέργαμον', lon:27.18, lat:39.13, f:-281, b:'Hilltop Attalid capital of the Hellenistic age, with a great altar of Zeus and a library to rival Alexandria\'s.' }
+  { n:'Athens', g:'Ἀθῆναι', lon:23.728, lat:37.983, f:-1400, big:1, b:'Cradle of democracy, drama and philosophy. Its Acropolis, crowned by the Parthenon, is the emblem of the classical world.', r:'Attica', tid:['Birthplace of democracy, refounded by Cleisthenes in 508 BC.','Its Acropolis is crowned by the Parthenon, temple of Athena.','Home to Socrates, Plato, and the first theatres of tragedy and comedy.'] },
+  { n:'Sparta', g:'Σπάρτη', lon:22.43, lat:37.08, f:-900, big:1, b:'The militarist state of Laconia. Boys entered the agoge at seven; the city needed no walls. Rival and opposite of Athens.', r:'Laconia', tid:['Boys were taken for the military agoge at the age of seven.','So sure of its soldiers that it never built city walls.','Sent the 300 under Leonidas to die at Thermopylae.'] },
+  { n:'Corinth', g:'Κόρινθος', lon:22.93, lat:37.94, f:-900, b:'Rich trading city astride its isthmus, controlling two seas. Mother-city of Syracuse and Corcyra.', r:'Corinthia', tid:['Grew rich controlling the isthmus between two seas.','Ships were dragged overland on a paved slipway, the diolkos.','Mother-city of Syracuse; sacked by Rome in 146 BC.'] },
+  { n:'Thebes', g:'Θῆβαι', lon:23.32, lat:38.32, f:-1400, b:'Chief city of Boeotia and setting of the Oedipus myth. Under Epaminondas it briefly broke Spartan power.', r:'Boeotia', tid:['Setting of the myths of Oedipus and Antigone.','Under Epaminondas it broke Spartan power at Leuctra in 371 BC.','Alexander razed it in 335 BC, sparing only the poet Pindar\'s house.'] },
+  { n:'Argos', g:'Ἄργος', lon:22.72, lat:37.63, f:-1600, b:'One of the oldest continuously inhabited cities in Greece, heart of the Argolid.', r:'the Argolid', tid:['One of the oldest continuously inhabited towns in Greece.','Sacred to the goddess Hera, with a great temple nearby.','Its tyrant Pheidon was among the first Greeks to mint coins.'] },
+  { n:'Mycenae', g:'Μυκῆναι', lon:22.756, lat:37.731, f:-1700, b:'"Rich in gold." Citadel of Agamemnon and the leading power of Bronze Age Greece, entered through the Lion Gate.', r:'the Argolid', tid:['Homer\'s citadel \'rich in gold\', home of Agamemnon.','Entered through the Lion Gate, Europe\'s oldest monumental sculpture.','Schliemann unearthed its golden shaft-grave masks in 1876.'] },
+  { n:'Tiryns', g:'Τίρυνς', lon:22.80, lat:37.60, f:-1600, b:'Mycenaean fortress whose Cyclopean walls the Greeks believed were built by giants.', r:'the Argolid', tid:['Ringed by \'Cyclopean\' walls the Greeks thought giants had raised.','A mighty Mycenaean fortress, linked in myth to Heracles.'] },
+  { n:'Pylos', g:'Πύλος', lon:21.695, lat:37.03, f:-1600, b:'Palace of wise old Nestor. Its burnt archive of Linear B tablets preserved the Mycenaean world.', r:'Messenia', tid:['Palace of wise old King Nestor of the Iliad.','Its burnt archive of Linear B tablets preserved Mycenaean Greek.','Nearby, Athens trapped a Spartan force at Sphacteria in 425 BC.'] },
+  { n:'Olympia', g:'Ὀλυμπία', lon:21.63, lat:37.638, f:-776, b:'Sanctuary of Zeus and home of the Olympic Games from 776 BC. Held a gold-and-ivory Zeus, one of the Seven Wonders.', r:'Elis', tid:['Host of the Olympic Games every four years from 776 BC.','Held Phidias\' gold-and-ivory Zeus, one of the Seven Wonders.','A sacred truce paused all wars so athletes could travel.'] },
+  { n:'Delphi', g:'Δελφοί', lon:22.50, lat:38.482, f:-800, big:1, b:'The oracle of Apollo, "navel of the world." Kings and cities came to hear the Pythia\'s riddling prophecies.', r:'Phocis', tid:['Home of Apollo\'s oracle, the \'navel of the world\'.','The priestess Pythia delivered famously riddling prophecies.','Carved at the shrine: \'know thyself\' and \'nothing in excess\'.'] },
+  { n:'Corcyra', g:'Κόρκυρα', lon:19.92, lat:39.62, f:-734, b:'Corfu. Wealthy Corinthian colony, traditionally identified with the Phaeacians\' island of Scheria.', r:'the Ionian islands', tid:['Corfu today; a wealthy Corinthian colony.','Traditionally the island of the Phaeacians in the Odyssey.','A quarrel over it helped ignite the Peloponnesian War.'] },
+  { n:'Delos', g:'Δῆλος', lon:25.268, lat:37.40, f:-1000, b:'Sacred birthplace of Apollo and Artemis, and treasury of the Delian League.', r:'the Cyclades', tid:['Sacred birthplace of Apollo and Artemis.','No one was permitted to be born or to die on the holy island.','Treasury and meeting-place of the Delian League.'] },
+  { n:'Naxos', g:'Νάξος', lon:25.43, lat:37.10, f:-1000, b:'Largest of the Cyclades, where Theseus abandoned Ariadne and Dionysus found her.', r:'the Cyclades', tid:['Largest and greenest of the Cyclades.','Where Theseus abandoned Ariadne, and Dionysus found her.','Its huge unfinished marble gateway still stands today.'] },
+  { n:'Knossos', g:'Κνωσός', lon:25.16, lat:35.298, f:-2000, big:1, b:'The great Minoan palace of Crete, a maze of halls behind the myth of the Labyrinth and the Minotaur.', r:'Crete', tid:['The great Minoan palace, a maze of over a thousand rooms.','The origin of the myth of the Labyrinth and the Minotaur.','Its frescoes show acrobats leaping over charging bulls.'] },
+  { n:'Miletus', g:'Μίλητος', lon:27.277, lat:37.53, f:-1000, b:'Wealthiest Ionian city and cradle of philosophy and science: home of Thales, Anaximander and Anaximenes.', r:'Ionia', tid:['The wealthiest Ionian city and the cradle of philosophy.','Home of Thales, first to ask what the world is made of.','Its revolt in 499 BC lit the fuse of the Persian Wars.'] },
+  { n:'Ephesus', g:'Ἔφεσος', lon:27.34, lat:37.94, f:-1000, b:'Ionian metropolis whose Temple of Artemis was a Wonder of the World. Home of Heraclitus.', r:'Ionia', tid:['Its Temple of Artemis was a Wonder of the World.','Home of the \'obscure\' philosopher Heraclitus.','One of the largest cities of the ancient Mediterranean.'] },
+  { n:'Halicarnassus', g:'Ἁλικαρνασσός', lon:27.42, lat:37.038, f:-900, b:'Birthplace of Herodotus, the "father of history," and site of the Mausoleum, another Wonder.', r:'Caria', tid:['Birthplace of Herodotus, the father of history.','Site of the Mausoleum, tomb of King Mausolus and a Wonder.'] },
+  { n:'Samos', g:'Σάμος', lon:26.97, lat:37.75, f:-1000, b:'Island of Pythagoras and the ambitious tyrant Polycrates, with a vast temple of Hera.', r:'Ionia', tid:['Home of the mathematician Pythagoras.','Under the tyrant Polycrates it ruled the eastern Aegean.','Its water tunnel was dug from both ends and met in the middle.'] },
+  { n:'Chios', g:'Χίος', lon:26.14, lat:38.37, f:-1000, b:'One of several islands claiming to be Homer\'s birthplace, and home of a guild of epic reciters.', r:'the Aegean', tid:['One of seven cities claiming to be Homer\'s birthplace.','Long famed for its wine and its fragrant mastic resin.'] },
+  { n:'Mytilene', g:'Μυτιλήνη', lon:26.55, lat:39.11, f:-1000, b:'Chief city of Lesbos, home of the poets Sappho and Alcaeus.', r:'Lesbos', tid:['Chief city of Lesbos, home of the poet Sappho.','Its revolt prompted Athens\' merciful second ship of 427 BC.'] },
+  { n:'Rhodes', g:'Ῥόδος', lon:28.223, lat:36.44, f:-408, b:'Island city and Hellenistic sea-power. Its harbour bore the Colossus, a Wonder toppled by earthquake.', r:'the Dodecanese', tid:['Its harbour bore the Colossus, a Wonder toppled by earthquake.','A great Hellenistic sea-power and centre of learning.'] },
+  { n:'Troy', g:'Ἴλιον', lon:26.239, lat:39.957, f:-3000, big:1, b:'Ilion, the citadel of Priam. Excavated by Schliemann, it lies behind the Iliad and the Trojan War.', r:'the Troad', tid:['The citadel of Priam, besieged in Homer\'s Iliad.','Rediscovered by Heinrich Schliemann in the 1870s.','It guards the mouth of the Hellespont and the Black Sea trade.'] },
+  { n:'Byzantium', g:'Βυζάντιον', lon:28.98, lat:41.01, f:-667, b:'Megarian colony commanding the Bosphorus, the gateway to the Black Sea. Later Constantinople.', r:'Thrace', tid:['Commands the Bosphorus, gateway to the Black Sea.','A colony of Megara, founded around 667 BC.','Later refounded by Constantine as Constantinople.'] },
+  { n:'Syracuse', g:'Συράκουσαι', lon:15.293, lat:37.07, f:-733, big:1, b:'Greatest Greek city of Sicily. It shattered the Athenian expedition of 415 BC and was home to Archimedes.', r:'Sicily', tid:['The greatest Greek city of the west.','It annihilated the Athenian expedition of 415 BC.','Home of Archimedes, killed by a Roman soldier in 212 BC.'] },
+  { n:'Akragas', g:'Ἀκράγας', lon:13.583, lat:37.31, f:-580, b:'Sicilian city famed for wealth and a valley of Doric temples. Agrigento today.', r:'Sicily', tid:['Agrigento today, famed for its Valley of the Temples.','Pindar called it \'the most beautiful city of mortals\'.'] },
+  { n:'Cyrene', g:'Κυρήνη', lon:21.86, lat:32.825, f:-631, b:'Greek city in Libya, rich on the silphium trade and home to mathematicians and a school of philosophy.', r:'Libya', tid:['A wealthy Greek city on the North African coast.','Grew rich on silphium, a prized and now-extinct plant.','Home of Eratosthenes, who measured the earth.'] },
+  { n:'Alexandria', g:'Ἀλεξάνδρεια', lon:29.92, lat:31.20, f:-331, big:1, b:'Alexander\'s Egyptian foundation and capital of the Ptolemies. Its Library and Lighthouse made it the mind of the Hellenistic world.', r:'Egypt', tid:['Founded by Alexander the Great in 331 BC.','Its Library aimed to hold every book in the world.','Its Lighthouse, the Pharos, was a Wonder of the World.'] },
+  { n:'Pella', g:'Πέλλα', lon:22.52, lat:40.76, f:-400, b:'Capital of Macedon and birthplace of Alexander the Great. Aristotle tutored him nearby.', r:'Macedon', tid:['Capital of Macedon and birthplace of Alexander the Great.','Aristotle tutored the young prince at nearby Mieza.'] },
+  { n:'Thessalonica', g:'Θεσσαλονίκη', lon:22.94, lat:40.64, f:-315, b:'Macedonian city founded by Cassander and named for Alexander\'s half-sister.', r:'Macedon', tid:['Founded around 315 BC by Alexander\'s general Cassander.','Named after Alexander\'s half-sister, Thessalonike.'] },
+  { n:'Dodona', g:'Δωδώνη', lon:20.788, lat:39.546, f:-1000, b:'Oldest Greek oracle, in Epirus, where priests read the will of Zeus in the rustling of an oak.', r:'Epirus', tid:['The oldest oracle in Greece, sacred to Zeus.','Its priests read the god\'s will in the rustling of a holy oak.'] },
+  { n:'Epidaurus', g:'Ἐπίδαυρος', lon:23.079, lat:37.596, f:-800, b:'Healing sanctuary of Asclepius, with the most perfect surviving Greek theatre.', r:'the Argolid', tid:['Healing sanctuary of Asclepius, god of medicine.','Its theatre seats 14,000 and carries a whisper to the back row.'] },
+  { n:'Pergamon', g:'Πέργαμον', lon:27.18, lat:39.13, f:-281, b:'Hilltop Attalid capital of the Hellenistic age, with a great altar of Zeus and a library to rival Alexandria\'s.', r:'Mysia', tid:['Brilliant Hellenistic capital of the Attalid kings.','Its Great Altar of Zeus is a masterpiece of ancient sculpture.','Its library rivalled Alexandria\'s; parchment is named after it.'] }
 ];
 
 // Battles / turning points: pins that flare near their year
@@ -1536,6 +1546,21 @@ function attachMapPanZoom(svg, home, zoomHostId) {
 
 const ZOOM_CTRL = id => `<div class="map-zoom" id="${id}"><button data-z="in" aria-label="Zoom in">+</button><button data-z="out" aria-label="Zoom out">−</button><button data-z="reset" aria-label="Reset view">⟲</button></div>`;
 
+// smooth a closed polygon (rounds the corners of the empire hulls)
+function centroid(pts) { let x = 0, y = 0; for (const p of pts) { x += p[0]; y += p[1]; } return [x / pts.length, y / pts.length]; }
+function smoothClosedPath(pts) {
+  if (!pts || pts.length < 3) return '';
+  const mid = (a, b) => [(a[0]+b[0])/2, (a[1]+b[1])/2];
+  const m0 = mid(pts[pts.length-1], pts[0]);
+  let d = `M${m0[0].toFixed(1)} ${m0[1].toFixed(1)}`;
+  for (let i = 0; i < pts.length; i++) {
+    const cur = pts[i], nxt = pts[(i+1) % pts.length], m = mid(cur, nxt);
+    d += `Q${cur[0].toFixed(1)} ${cur[1].toFixed(1)} ${m[0].toFixed(1)} ${m[1].toFixed(1)}`;
+  }
+  return d + 'Z';
+}
+const COMPASS_SVG = `<svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="18.5" fill="rgba(251,247,238,0.92)" stroke="var(--line-strong)" stroke-width="1"/><polygon points="22,8 26.5,22 22,19 17.5,22" fill="var(--terra)"/><polygon points="22,36 17.5,22 22,25 26.5,22" fill="#9a927f"/><circle cx="22" cy="22" r="1.3" fill="var(--ink)"/><text x="22" y="7.6" text-anchor="middle" font-family="Outfit" font-weight="700" font-size="5.4" fill="var(--ink)">N</text></svg>`;
+
 /* ============================================================
    ATLAS
    ============================================================ */
@@ -1545,21 +1570,30 @@ let currentYear = -480, playTimer = null, selectedCity = null;
 function buildAtlas() {
   // viewBox focused on the Aegean / Greek heartland
   const vx = PX(19.0), vy = PY(41.5), vw = PX(29.2) - PX(19.0), vh = PY(34.4) - PY(41.5);
+  let gridD = '';
+  for (let lon = 12; lon <= 36; lon += 2) gridD += `M${PX(lon).toFixed(1)} ${PY(GEO.LAT_MAX).toFixed(1)}L${PX(lon).toFixed(1)} ${PY(GEO.LAT_MIN).toFixed(1)}`;
+  for (let lat = 32; lat <= 40; lat += 2) gridD += `M${PX(GEO.LON_MIN).toFixed(1)} ${PY(lat).toFixed(1)}L${PX(GEO.LON_MAX).toFixed(1)} ${PY(lat).toFixed(1)}`;
   const svg = `
   <svg id="atlas-svg" class="pz-map" viewBox="${vx.toFixed(1)} ${vy.toFixed(1)} ${vw.toFixed(1)} ${vh.toFixed(1)}" preserveAspectRatio="xMidYMid meet">
-    <rect x="0" y="0" width="${FULL_W.toFixed(1)}" height="${FULL_H.toFixed(1)}" fill="var(--sea)"/>
-    <g id="atlas-empires"></g>
+    <defs>
+      <linearGradient id="seaGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#164a5f"/><stop offset="1" stop-color="#0e2b3a"/></linearGradient>
+      <filter id="coastglow" x="-4%" y="-4%" width="108%" height="108%"><feGaussianBlur stdDeviation="1.6"/></filter>
+    </defs>
+    <rect x="0" y="0" width="${FULL_W.toFixed(1)}" height="${FULL_H.toFixed(1)}" fill="url(#seaGrad)"/>
+    <path d="${gridD}" fill="none" stroke="var(--grid)" stroke-width="0.35"/>
+    <path d="${COAST_D}" fill="none" stroke="var(--sea-light)" stroke-width="3.2" stroke-linejoin="round" opacity="0.55" filter="url(#coastglow)"/>
     <path d="${COAST_D}" fill="var(--land)" stroke="var(--land-line)" stroke-width="0.5" stroke-linejoin="round" fill-rule="evenodd"/>
+    <g id="atlas-empires"></g>
     <g id="atlas-regions"></g>
-    <g id="atlas-cities"></g>
     <g id="atlas-battles"></g>
+    <g id="atlas-cities"></g>
   </svg>`;
   const toolbar = `
     <div class="map-toolbar">
       ${['cities','regions','empires','battles'].map(l =>
         `<button class="layer-chip on" data-layer="${l}">${l}</button>`).join('')}
     </div>
-    <div class="map-hint">Drag to pan · scroll to zoom</div>
+    <div class="map-compass">${COMPASS_SVG}</div>
     <div class="map-legend" id="atlas-legend"></div>
     ${ZOOM_CTRL('atlas-zoom')}`;
   document.getElementById('atlas-map').innerHTML = svg + toolbar;
@@ -1609,53 +1643,68 @@ function renderAtlas() {
   document.getElementById('era-dates').textContent = fmtYear(era.start) + ' to ' + fmtYear(era.end);
   document.getElementById('era-sum').textContent = era.sum;
 
-  // empires (hulls)
+  // empires (soft, smoothed spheres of power)
   const emp = document.getElementById('atlas-empires');
   let eh = '';
   if (layers.empires) {
     for (const b of BLOCS) {
       if (currentYear >= b.from && currentYear <= b.to) {
-        eh += `<path d="${hullPath(b.pts)}" fill="${b.color}" fill-opacity="0.16" stroke="${b.color}" stroke-opacity="0.55" stroke-width="0.8" stroke-dasharray="3 2"/>`;
+        const hp = hull(b.pts);
+        eh += `<path d="${smoothClosedPath(hp)}" fill="${b.color}" fill-opacity="0.11" stroke="${b.color}" stroke-opacity="0.42" stroke-width="0.7"/>`;
       }
     }
   }
   emp.innerHTML = eh;
 
-  // regions
+  // region labels (spaced italic, cartographic)
   const reg = document.getElementById('atlas-regions');
   reg.innerHTML = layers.regions ? REGIONS.map(r =>
-    `<text x="${PX(r.lon).toFixed(1)}" y="${PY(r.lat).toFixed(1)}" fill="${r.sea?'#cfe0e6':'#8a7a54'}" font-family="Outfit" font-size="${((r.sea?4.4:4)*M).toFixed(1)}" font-weight="600" letter-spacing="1.2" text-anchor="middle" opacity="${r.sea?0.6:0.75}" style="text-transform:uppercase">${r.n}</text>`
+    `<text x="${PX(r.lon).toFixed(1)}" y="${PY(r.lat).toFixed(1)}" text-anchor="middle" fill="${r.sea?'#a6c6d3':'#7a6c49'}" paint-order="stroke" stroke="${r.sea?'rgba(14,43,58,0.45)':'rgba(243,236,221,0.55)'}" stroke-width="${(0.9*M).toFixed(1)}" font-family="Cormorant Garamond" font-style="italic" font-weight="500" font-size="${((r.sea?5:4.6)*M).toFixed(1)}" letter-spacing="${(2*M).toFixed(1)}" opacity="${r.sea?0.72:0.92}" style="text-transform:uppercase">${r.n}</text>`
   ).join('') : '';
 
-  // cities
+  // cities: markers, tooltips, and de-cluttered labels
   const cg = document.getElementById('atlas-cities');
   let ch = '';
   if (layers.cities) {
-    for (const c of CITIES) {
-      if (currentYear >= c.f) {
-        const x = PX(c.lon), y = PY(c.lat), r = (c.big ? 2.6 : 1.9) * dotM;
-        const sel = selectedCity === c.n;
-        ch += `<g class="cty" style="cursor:pointer" data-city="${c.n}">
-          <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(r+ (sel?2.4:0)).toFixed(1)}" fill="${sel?'var(--gold)':'#fff'}" opacity="${sel?0.35:0}"/>
-          <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}" fill="${sel?'var(--gold)':'var(--terra)'}" stroke="#fff" stroke-width="0.6"/>
-          ${c.big ? `<text x="${(x+r+1.2).toFixed(1)}" y="${(y+1.4*M).toFixed(1)}" fill="#2a2114" font-family="Cormorant Garamond" font-weight="600" font-size="${(5.4*M).toFixed(1)}">${c.n}</text>` : ''}
-        </g>`;
+    const active = CITIES.filter(c => currentYear >= c.f);
+    const rank = c => (c.n === selectedCity ? 3 : c.big ? 2 : 1);
+    const order = [...active].sort((a, b) => rank(b) - rank(a));
+    const placed = [];
+    for (const c of active) { const x = PX(c.lon), y = PY(c.lat), rr = (c.big ? 2.6 : 1.9) * dotM; placed.push({ x1: x - rr, y1: y - rr, x2: x + rr, y2: y + rr }); }
+    const hits = bx => placed.some(p => !(bx.x2 < p.x1 || bx.x1 > p.x2 || bx.y2 < p.y1 || bx.y1 > p.y2));
+    for (const c of order) {
+      const x = PX(c.lon), y = PY(c.lat), r = (c.big ? 2.6 : 1.9) * dotM, sel = selectedCity === c.n;
+      let g = `<g class="cty" style="cursor:pointer" data-city="${c.n}"><title>${c.n} · ${c.g}</title>`;
+      if (sel) g += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(r + 2.8).toFixed(1)}" fill="var(--gold)" opacity="0.28"/>`;
+      g += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(r + 0.9).toFixed(1)}" fill="#fff"/>`;
+      g += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r.toFixed(1)}" fill="${sel ? 'var(--gold)' : 'var(--terra)'}"/>`;
+      const fs = (c.big ? 5.2 : 4.2) * M, w = c.n.length * fs * 0.52, h = fs * 1.05, gap = r + 1.4;
+      const cands = [
+        { ax: 'start', x1: x + gap, x2: x + gap + w, tx: x + gap },
+        { ax: 'end', x1: x - gap - w, x2: x - gap, tx: x - gap }
+      ];
+      for (const cd of cands) {
+        const bx = { x1: cd.x1, y1: y - h * 0.6, x2: cd.x2, y2: y + h * 0.5 };
+        if (!hits(bx) || sel) {
+          g += `<text x="${cd.tx.toFixed(1)}" y="${(y + fs * 0.34).toFixed(1)}" text-anchor="${cd.ax}" fill="#2a2114" paint-order="stroke" stroke="rgba(243,236,221,0.85)" stroke-width="${(1.1 * M).toFixed(1)}" font-family="Cormorant Garamond" font-weight="${c.big ? 600 : 500}" font-size="${fs.toFixed(1)}">${c.n}</text>`;
+          placed.push(bx);
+          break;
+        }
       }
+      ch += g + `</g>`;
     }
   }
   cg.innerHTML = ch;
   cg.querySelectorAll('.cty').forEach(g => g.addEventListener('click', () => selectCity(g.dataset.city)));
 
-  // battles (flare near their year)
+  // battles: small crossed markers near their year
   const bg = document.getElementById('atlas-battles');
   let bh = '';
   if (layers.battles) {
     for (const e of EVENTS) {
-      if (e.lon && Math.abs(e.y - currentYear) <= 25) {
-        const x = PX(e.lon), y = PY(e.lat);
-        const near = Math.abs(e.y - currentYear) <= 8;
-        bh += `<g><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${near?4.5:3}" fill="none" stroke="var(--gold)" stroke-width="0.9" opacity="${near?0.9:0.4}"/>
-          <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="1.2" fill="var(--gold)"/></g>`;
+      if (e.lon && Math.abs(e.y - currentYear) <= 20) {
+        const x = PX(e.lon), y = PY(e.lat), near = Math.abs(e.y - currentYear) <= 8, s = 1.3;
+        bh += `<g opacity="${near ? 0.9 : 0.35}"><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${near ? 3.4 : 2.5}" fill="none" stroke="var(--gold)" stroke-width="0.7"/><path d="M${(x-s).toFixed(1)} ${(y-s).toFixed(1)}L${(x+s).toFixed(1)} ${(y+s).toFixed(1)}M${(x-s).toFixed(1)} ${(y+s).toFixed(1)}L${(x+s).toFixed(1)} ${(y-s).toFixed(1)}" stroke="var(--gold)" stroke-width="0.7"/></g>`;
       }
     }
   }
@@ -1683,8 +1732,9 @@ function selectCity(name) {
     card.classList.remove('hidden');
     document.getElementById('cc-grk').textContent = c.g;
     document.getElementById('cc-name').textContent = c.n;
-    document.getElementById('cc-meta').textContent = 'Founded / prominent from ' + fmtYear(c.f);
+    document.getElementById('cc-meta').textContent = (c.r ? c.r + '  ·  ' : '') + 'from ' + fmtYear(c.f);
     document.getElementById('cc-blurb').textContent = c.b;
+    document.getElementById('cc-tid').innerHTML = (c.tid || []).map(t => `<li>${t}</li>`).join('');
     if (isMobile()) setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'center' }), 30);
   } else {
     card.classList.add('hidden');
