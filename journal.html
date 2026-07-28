@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Journal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fafaf7;
+    --ink: #1a1a1a;
+    --muted: #8a8a85;
+    --line: #ececea;
+    --morning: #e8c98a;
+    --evening: #6b7a99;
+    --danger: #b84a3e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    font-weight: 300;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+  button, input, textarea { font-family: inherit; font-weight: inherit; color: inherit; }
+  button { cursor: pointer; background: none; border: none; }
+  input, textarea { background: none; border: none; outline: none; }
+
+  .auth-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem; }
+  .auth-card { width: 100%; max-width: 360px; text-align: center; }
+  .auth-card h1 { font-weight: 200; font-size: 2.5rem; letter-spacing: -0.02em; margin-bottom: 0.5rem; }
+  .auth-card p { color: var(--muted); font-size: 0.95rem; margin-bottom: 2.5rem; }
+  .auth-card input {
+    width: 100%; padding: 0.9rem 0; border-bottom: 1px solid var(--line);
+    font-size: 1rem; text-align: center; letter-spacing: 0.05em;
+    transition: border-color 0.2s; margin-bottom: 1rem;
+  }
+  .auth-card input:focus { border-bottom-color: var(--ink); }
+  .auth-card button.primary {
+    width: 100%; padding: 0.9rem; background: var(--ink); color: var(--bg);
+    border-radius: 999px; font-size: 0.95rem; letter-spacing: 0.03em;
+    margin-top: 1rem; transition: opacity 0.2s;
+  }
+  .auth-card button.primary:hover { opacity: 0.85; }
+  .auth-card button.primary:disabled { opacity: 0.4; cursor: not-allowed; }
+  .error { color: var(--danger); font-size: 0.85rem; margin-top: 1rem; min-height: 1.2em; }
+  .hint { font-size: 0.75rem; color: var(--muted); margin-top: 2rem; line-height: 1.6; }
+
+  .app { display: none; min-height: 100vh; }
+  .app.visible { display: block; }
+
+  header {
+    padding: 2rem 3rem 1.5rem;
+    display: flex; justify-content: space-between; align-items: baseline;
+    border-bottom: 1px solid var(--line);
+  }
+  header h1 { font-weight: 200; font-size: 1.6rem; letter-spacing: -0.01em; }
+  header .actions button {
+    font-size: 0.85rem; color: var(--muted); letter-spacing: 0.03em; transition: color 0.2s;
+  }
+  header .actions button:hover { color: var(--ink); }
+
+  .layout { display: grid; grid-template-columns: 340px 1fr; min-height: calc(100vh - 82px); }
+  .sidebar {
+    border-right: 1px solid var(--line);
+    padding: 1.5rem; overflow-y: auto; max-height: calc(100vh - 82px);
+  }
+
+  .cal-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
+  .cal-nav .month-label { font-size: 1rem; font-weight: 400; letter-spacing: 0.02em; }
+  .cal-nav button {
+    padding: 0.3rem 0.7rem; color: var(--muted); font-size: 1.1rem;
+    border-radius: 999px; transition: color 0.2s;
+  }
+  .cal-nav button:hover:not(:disabled) { color: var(--ink); }
+  .cal-nav button:disabled { opacity: 0.25; cursor: not-allowed; }
+
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+  .cal-dow {
+    text-align: center; font-size: 0.65rem; color: var(--muted);
+    letter-spacing: 0.1em; text-transform: uppercase; padding: 0.5rem 0 0.75rem;
+  }
+  .cal-day {
+    aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-size: 0.85rem; border-radius: 8px; cursor: pointer;
+    transition: all 0.15s; position: relative; color: var(--ink);
+  }
+  .cal-day:hover:not(.disabled):not(.blank) { background: rgba(0,0,0,0.05); }
+  .cal-day.blank { cursor: default; }
+  .cal-day.disabled { color: var(--line); cursor: not-allowed; }
+  .cal-day.today { font-weight: 500; }
+  .cal-day.today::before {
+    content: ''; position: absolute; inset: 0; border: 1px solid var(--ink); border-radius: 8px;
+  }
+  .cal-day.selected { background: var(--ink); color: var(--bg); }
+  .cal-day.selected:hover { background: var(--ink); }
+  .cal-day .dots { position: absolute; bottom: 6px; display: flex; gap: 3px; }
+  .cal-day .dot { width: 4px; height: 4px; border-radius: 50%; }
+  .cal-day .dot.morning { background: var(--morning); }
+  .cal-day .dot.evening { background: var(--evening); }
+  .cal-day.selected .dot.morning, .cal-day.selected .dot.evening { background: var(--bg); }
+
+  .cal-legend {
+    display: flex; gap: 1.25rem; justify-content: center; margin-top: 1.5rem;
+    font-size: 0.7rem; color: var(--muted); letter-spacing: 0.05em;
+  }
+  .cal-legend .item { display: flex; align-items: center; gap: 0.4rem; }
+  .cal-legend .swatch { width: 8px; height: 8px; border-radius: 50%; }
+
+  main { padding: 3rem 4rem; max-width: 820px; width: 100%; }
+  .day-header { margin-bottom: 2.5rem; }
+  .day-header .date { font-size: 2rem; font-weight: 200; letter-spacing: -0.01em; }
+  .day-header .sub {
+    font-size: 0.8rem; color: var(--muted); letter-spacing: 0.1em;
+    text-transform: uppercase; margin-top: 0.3rem;
+  }
+
+  .slot { border-top: 1px solid var(--line); padding: 2rem 0; }
+  .slot.hidden { display: none; }
+  .slot-header { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 1rem; }
+
+  /* Mode toggle */
+  .mode-toggle {
+    display: inline-flex;
+    gap: 0.15rem;
+    background: rgba(0,0,0,0.03);
+    padding: 0.2rem;
+    border-radius: 999px;
+    margin-top: 0.75rem;
+  }
+  .mode-toggle button {
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+    transition: all 0.15s;
+  }
+  .mode-toggle button:hover { color: var(--ink); }
+  .mode-toggle button.active {
+    background: var(--card);
+    color: var(--ink);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+  .slot-marker { width: 8px; height: 8px; border-radius: 50%; }
+  .slot.morning .slot-marker { background: var(--morning); }
+  .slot.evening .slot-marker { background: var(--evening); }
+  .slot-label {
+    font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted);
+  }
+  .slot-body {
+    width: 100%; font-size: 1.05rem; line-height: 1.75; font-weight: 300;
+    resize: none; overflow: hidden; min-height: 3.5rem;
+    display: block;
+  }
+  .slot-body::placeholder { color: var(--muted); opacity: 0.5; }
+
+  /* Archive view */
+  .archive-view {
+    display: none;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 3rem 2rem 6rem;
+  }
+  .archive-view.visible { display: block; }
+  .archive-empty {
+    color: var(--muted);
+    font-size: 0.95rem;
+    text-align: center;
+    padding: 4rem 0;
+    font-style: italic;
+  }
+  .archive-day {
+    margin-bottom: 4rem;
+  }
+  .archive-day-header {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .archive-day-date {
+    font-size: 1.4rem;
+    font-weight: 300;
+    letter-spacing: -0.01em;
+  }
+  .archive-day-dow {
+    font-size: 0.75rem;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+  .archive-slot {
+    margin-bottom: 1.75rem;
+  }
+  .archive-slot:last-child { margin-bottom: 0; }
+  .archive-slot-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.6rem;
+  }
+  .archive-slot-marker { width: 6px; height: 6px; border-radius: 50%; }
+  .archive-slot.morning .archive-slot-marker { background: var(--morning); }
+  .archive-slot.evening .archive-slot-marker { background: var(--evening); }
+  .archive-slot-text {
+    font-size: 1rem;
+    line-height: 1.75;
+    font-weight: 300;
+    white-space: pre-wrap;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .archive-slot-text:hover { opacity: 0.7; }
+
+  .save-indicator {
+    position: fixed; bottom: 2rem; right: 2rem; font-size: 0.75rem;
+    color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase;
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .save-indicator.visible { opacity: 1; }
+
+  @media (max-width: 820px) {
+    header { padding: 1.5rem; }
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { max-height: none; border-right: none; border-bottom: 1px solid var(--line); }
+    main { padding: 2rem 1.5rem; }
+    .day-header .date { font-size: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<div id="setup" class="auth-wrap">
+  <div class="auth-card">
+    <h1>Journal</h1>
+    <p>Set a password to encrypt your entries.<br>There is no recovery — remember it.</p>
+    <input type="password" id="setup-pw1" placeholder="Password" autocomplete="new-password">
+    <input type="password" id="setup-pw2" placeholder="Confirm password" autocomplete="new-password">
+    <button class="primary" id="setup-btn">Create journal</button>
+    <div class="error" id="setup-error"></div>
+    <div class="hint">AES-GCM encryption with a key derived from your password (PBKDF2, 250k iterations). Data stays in this browser only.</div>
+    <div class="hint" style="margin-top:1rem;"><button id="setup-restore-btn" style="text-decoration:underline; color:var(--muted); font-size:0.75rem;">Restore from backup instead</button></div>
+  </div>
+</div>
+
+<div id="login" class="auth-wrap" style="display:none;">
+  <div class="auth-card">
+    <h1>Journal</h1>
+    <p>Enter your password to unlock.</p>
+    <input type="password" id="login-pw" placeholder="Password" autocomplete="current-password">
+    <button class="primary" id="login-btn">Unlock</button>
+    <div class="error" id="login-error"></div>
+    <div class="hint"><button id="login-restore-btn" style="text-decoration:underline; color:var(--muted); font-size:0.75rem;">Restore from backup</button></div>
+  </div>
+</div>
+
+<div id="app" class="app">
+  <header>
+    <h1>Journal</h1>
+    <div class="actions" style="display:flex; gap:1.5rem;">
+      <button id="export-btn">Export</button>
+      <button id="import-app-btn">Import</button>
+      <button id="view-toggle-btn">Archive</button>
+      <button id="lock-btn">Lock</button>
+    </div>
+  </header>
+  <div class="layout" id="editor-layout">
+    <aside class="sidebar">
+      <div class="cal-nav">
+        <button id="prev-month" aria-label="Previous month">‹</button>
+        <div class="month-label" id="month-label"></div>
+        <button id="next-month" aria-label="Next month">›</button>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+      <div class="cal-legend">
+        <div class="item"><span class="swatch" style="background:var(--morning)"></span>Morning</div>
+        <div class="item"><span class="swatch" style="background:var(--evening)"></span>Evening</div>
+      </div>
+    </aside>
+    <main>
+      <div class="day-header">
+        <div class="date" id="day-date"></div>
+        <div class="sub" id="day-sub"></div>
+        <div class="mode-toggle">
+          <button data-mode="both" class="active">Both</button>
+          <button data-mode="morning">Morning only</button>
+          <button data-mode="evening">Evening only</button>
+        </div>
+      </div>
+      <div class="slot morning" id="slot-morning">
+        <div class="slot-header">
+          <span class="slot-marker"></span><span class="slot-label">Morning</span>
+        </div>
+        <textarea class="slot-body" id="morning-body" placeholder="How are you starting the day?"></textarea>
+      </div>
+      <div class="slot evening" id="slot-evening">
+        <div class="slot-header">
+          <span class="slot-marker"></span><span class="slot-label">Evening</span>
+        </div>
+        <textarea class="slot-body" id="evening-body" placeholder="Reflect on the day."></textarea>
+      </div>
+    </main>
+  </div>
+  <div class="archive-view" id="archive-view"></div>
+  <div class="save-indicator" id="save-indicator">Saved</div>
+</div>
+
+<input type="file" id="import-file" accept="application/json,.json" style="display:none;">
+
+<script>
+const enc = new TextEncoder();
+const dec = new TextDecoder();
+
+async function deriveKey(password, salt) {
+  const baseKey = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt, iterations: 250000, hash: 'SHA-256' },
+    baseKey, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']
+  );
+}
+async function encryptData(key, obj) {
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, enc.encode(JSON.stringify(obj)));
+  return { iv: b64(iv), ct: b64(new Uint8Array(ct)) };
+}
+async function decryptData(key, payload) {
+  const iv = fromB64(payload.iv);
+  const ct = fromB64(payload.ct);
+  const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ct);
+  return JSON.parse(dec.decode(pt));
+}
+function b64(bytes) { return btoa(String.fromCharCode(...bytes)); }
+function fromB64(str) { return Uint8Array.from(atob(str), c => c.charCodeAt(0)); }
+
+const STORE_KEY = 'journal_v2';
+function loadStore() { const raw = localStorage.getItem(STORE_KEY); return raw ? JSON.parse(raw) : null; }
+function saveStore(store) { localStorage.setItem(STORE_KEY, JSON.stringify(store)); }
+
+const START_DATE = new Date(2026, 6, 13); // Mon 13 July 2026
+START_DATE.setHours(0,0,0,0);
+
+let cryptoKey = null;
+let entries = {};
+let selectedDate = null;
+let viewYear, viewMonth;
+let saveTimer = null;
+
+(function init() {
+  const store = loadStore();
+  if (!store) {
+    document.getElementById('setup').style.display = 'flex';
+    document.getElementById('setup-pw1').focus();
+  } else {
+    document.getElementById('login').style.display = 'flex';
+    document.getElementById('login-pw').focus();
+  }
+})();
+
+document.getElementById('setup-btn').addEventListener('click', setupJournal);
+document.getElementById('setup-pw2').addEventListener('keydown', e => { if (e.key === 'Enter') setupJournal(); });
+
+async function setupJournal() {
+  const pw1 = document.getElementById('setup-pw1').value;
+  const pw2 = document.getElementById('setup-pw2').value;
+  const err = document.getElementById('setup-error');
+  err.textContent = '';
+  if (pw1.length < 6) { err.textContent = 'Use at least 6 characters.'; return; }
+  if (pw1 !== pw2) { err.textContent = 'Passwords do not match.'; return; }
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const key = await deriveKey(pw1, salt);
+  const verifier = await encryptData(key, { v: 'journal-ok' });
+  const encEntries = await encryptData(key, {});
+  saveStore({ salt: b64(salt), verifier, entries: encEntries });
+  cryptoKey = key;
+  entries = {};
+  enterApp();
+}
+
+document.getElementById('login-btn').addEventListener('click', unlock);
+document.getElementById('login-pw').addEventListener('keydown', e => { if (e.key === 'Enter') unlock(); });
+
+async function unlock() {
+  const pw = document.getElementById('login-pw').value;
+  const err = document.getElementById('login-error');
+  err.textContent = '';
+  const btn = document.getElementById('login-btn');
+  btn.disabled = true; btn.textContent = 'Unlocking…';
+  try {
+    const store = loadStore();
+    const salt = fromB64(store.salt);
+    const key = await deriveKey(pw, salt);
+    const check = await decryptData(key, store.verifier);
+    if (check.v !== 'journal-ok') throw new Error('bad');
+    entries = await decryptData(key, store.entries);
+    cryptoKey = key;
+    document.getElementById('login-pw').value = '';
+    enterApp();
+  } catch (e) {
+    err.textContent = 'Incorrect password.';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Unlock';
+  }
+}
+
+function enterApp() {
+  document.getElementById('setup').style.display = 'none';
+  document.getElementById('login').style.display = 'none';
+  document.getElementById('app').classList.add('visible');
+  const today = new Date(); today.setHours(0,0,0,0);
+  const initialDate = today >= START_DATE ? today : START_DATE;
+  viewYear = initialDate.getFullYear();
+  viewMonth = initialDate.getMonth();
+  selectedDate = ymd(initialDate);
+  renderCalendar();
+  renderDay();
+}
+
+document.getElementById('lock-btn').addEventListener('click', () => {
+  cryptoKey = null; entries = {}; selectedDate = null;
+  document.getElementById('app').classList.remove('visible');
+  document.getElementById('login').style.display = 'flex';
+  document.getElementById('login-pw').focus();
+});
+
+document.getElementById('prev-month').addEventListener('click', () => {
+  const first = new Date(viewYear, viewMonth, 1);
+  const startFirst = new Date(START_DATE.getFullYear(), START_DATE.getMonth(), 1);
+  if (first <= startFirst) return;
+  viewMonth--;
+  if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+  renderCalendar();
+});
+document.getElementById('next-month').addEventListener('click', () => {
+  viewMonth++;
+  if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+  renderCalendar();
+});
+
+function renderCalendar() {
+  const monthName = new Date(viewYear, viewMonth, 1)
+    .toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+  document.getElementById('month-label').textContent = monthName;
+  const atStart = viewYear === START_DATE.getFullYear() && viewMonth === START_DATE.getMonth();
+  document.getElementById('prev-month').disabled = atStart;
+
+  const grid = document.getElementById('cal-grid');
+  grid.innerHTML = '';
+  ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'cal-dow';
+    el.textContent = d;
+    grid.appendChild(el);
+  });
+
+  const firstOfMonth = new Date(viewYear, viewMonth, 1);
+  const offset = (firstOfMonth.getDay() + 6) % 7;
+  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+  const today = new Date(); today.setHours(0,0,0,0);
+  const todayKey = ymd(today);
+
+  for (let i = 0; i < offset; i++) {
+    const blank = document.createElement('div');
+    blank.className = 'cal-day blank';
+    grid.appendChild(blank);
+  }
+  for (let d = 1; d <= daysInMonth; d++) {
+    const date = new Date(viewYear, viewMonth, d);
+    const key = ymd(date);
+    const cell = document.createElement('div');
+    cell.className = 'cal-day';
+    const before = date < START_DATE;
+    if (before) cell.classList.add('disabled');
+    if (key === todayKey && !before) cell.classList.add('today');
+    if (key === selectedDate) cell.classList.add('selected');
+
+    const num = document.createElement('div');
+    num.textContent = d;
+    cell.appendChild(num);
+
+    const entry = entries[key];
+    if (entry && (entry.morning || entry.evening)) {
+      const dots = document.createElement('div');
+      dots.className = 'dots';
+      if (entry.morning) { const dot = document.createElement('span'); dot.className = 'dot morning'; dots.appendChild(dot); }
+      if (entry.evening) { const dot = document.createElement('span'); dot.className = 'dot evening'; dots.appendChild(dot); }
+      cell.appendChild(dots);
+    }
+
+    if (!before) {
+      cell.addEventListener('click', () => {
+        selectedDate = key;
+        renderCalendar();
+        renderDay();
+      });
+    }
+    grid.appendChild(cell);
+  }
+}
+
+function renderDay() {
+  const date = fromYmd(selectedDate);
+  document.getElementById('day-date').textContent =
+    date.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' });
+  document.getElementById('day-sub').textContent = date.getFullYear();
+  const entry = entries[selectedDate] || { morning: '', evening: '' };
+  const morn = document.getElementById('morning-body');
+  const eve = document.getElementById('evening-body');
+  morn.value = entry.morning || '';
+  eve.value = entry.evening || '';
+  applyMode(entry.mode || 'both');
+  autoGrow(morn);
+  autoGrow(eve);
+}
+
+function applyMode(mode) {
+  document.querySelectorAll('.mode-toggle button').forEach(b => {
+    b.classList.toggle('active', b.dataset.mode === mode);
+  });
+  document.getElementById('slot-morning').classList.toggle('hidden', mode === 'evening');
+  document.getElementById('slot-evening').classList.toggle('hidden', mode === 'morning');
+}
+
+function autoGrow(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.max(el.scrollHeight, 56) + 'px';
+}
+
+document.getElementById('morning-body').addEventListener('input', e => {
+  if (!entries[selectedDate]) entries[selectedDate] = { morning: '', evening: '' };
+  entries[selectedDate].morning = e.target.value;
+  autoGrow(e.target);
+  scheduleSave();
+});
+document.getElementById('evening-body').addEventListener('input', e => {
+  if (!entries[selectedDate]) entries[selectedDate] = { morning: '', evening: '' };
+  entries[selectedDate].evening = e.target.value;
+  autoGrow(e.target);
+  scheduleSave();
+});
+
+function scheduleSave() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async () => {
+    const e = entries[selectedDate];
+    // Only delete if truly empty AND no custom mode set
+    if (e && !e.morning && !e.evening && (!e.mode || e.mode === 'both')) {
+      delete entries[selectedDate];
+    }
+    await persist();
+    renderCalendar();
+    const ind = document.getElementById('save-indicator');
+    ind.classList.add('visible');
+    setTimeout(() => ind.classList.remove('visible'), 900);
+  }, 400);
+}
+
+async function persist() {
+  if (!cryptoKey) return;
+  const store = loadStore();
+  store.entries = await encryptData(cryptoKey, entries);
+  saveStore(store);
+}
+
+// ---------- Export / Import ----------
+document.getElementById('export-btn').addEventListener('click', () => {
+  const store = loadStore();
+  if (!store) return;
+  const payload = {
+    format: 'journal-backup',
+    version: 2,
+    exportedAt: new Date().toISOString(),
+    data: store
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const today = new Date().toISOString().slice(0, 10);
+  a.href = url;
+  a.download = `journal-backup-${today}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById('login-restore-btn').addEventListener('click', () => {
+  document.getElementById('import-file').click();
+});
+document.getElementById('setup-restore-btn').addEventListener('click', () => {
+  document.getElementById('import-file').click();
+});
+
+document.getElementById('import-file').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  try {
+    const text = await file.text();
+    const payload = JSON.parse(text);
+    if (payload.format !== 'journal-backup' || !payload.data || !payload.data.salt || !payload.data.verifier || !payload.data.entries) {
+      throw new Error('Invalid backup file');
+    }
+    const existing = loadStore();
+    if (existing) {
+      const ok = confirm('This will replace your current journal data in this browser. Continue?');
+      if (!ok) { e.target.value = ''; return; }
+    }
+    saveStore(payload.data);
+    // Route to login screen
+    document.getElementById('setup').style.display = 'none';
+    document.getElementById('login').style.display = 'flex';
+    document.getElementById('login-error').textContent = '';
+    document.getElementById('login-pw').value = '';
+    document.getElementById('login-pw').focus();
+    e.target.value = '';
+    // Small confirmation
+    const ind = document.getElementById('save-indicator');
+    ind.textContent = 'Restored — enter password';
+    ind.classList.add('visible');
+    setTimeout(() => { ind.classList.remove('visible'); ind.textContent = 'Saved'; }, 2200);
+  } catch (err) {
+    alert('Could not read that file: ' + err.message);
+    e.target.value = '';
+  }
+});
+
+// ---------- Mode toggle ----------
+document.querySelectorAll('.mode-toggle button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const mode = btn.dataset.mode;
+    if (!entries[selectedDate]) entries[selectedDate] = { morning: '', evening: '' };
+    entries[selectedDate].mode = mode;
+    applyMode(mode);
+    scheduleSave();
+  });
+});
+
+// ---------- In-app Import ----------
+document.getElementById('import-app-btn').addEventListener('click', () => {
+  if (!confirm('Importing a backup will replace all entries in this browser. Continue?')) return;
+  document.getElementById('import-file').click();
+});
+
+// ---------- Archive view ----------
+let archiveMode = false;
+document.getElementById('view-toggle-btn').addEventListener('click', () => {
+  archiveMode = !archiveMode;
+  document.getElementById('view-toggle-btn').textContent = archiveMode ? 'Back' : 'Archive';
+  document.getElementById('editor-layout').style.display = archiveMode ? 'none' : 'grid';
+  document.getElementById('archive-view').classList.toggle('visible', archiveMode);
+  if (archiveMode) renderArchive();
+});
+
+function renderArchive() {
+  const container = document.getElementById('archive-view');
+  const keys = Object.keys(entries)
+    .filter(k => entries[k].morning || entries[k].evening)
+    .sort((a, b) => b.localeCompare(a)); // newest first
+
+  if (keys.length === 0) {
+    container.innerHTML = '<div class="archive-empty">No entries yet. Start writing on the calendar.</div>';
+    return;
+  }
+
+  container.innerHTML = keys.map(k => {
+    const d = fromYmd(k);
+    const dateStr = d.toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' });
+    const dowStr = d.toLocaleDateString(undefined, { weekday: 'long' });
+    const e = entries[k];
+    let html = `<div class="archive-day">
+      <div class="archive-day-header">
+        <div class="archive-day-date">${escapeHtml(dateStr)}</div>
+        <div class="archive-day-dow">${escapeHtml(dowStr)}</div>
+      </div>`;
+    if (e.morning) {
+      html += `<div class="archive-slot morning">
+        <div class="archive-slot-label"><span class="archive-slot-marker"></span>Morning</div>
+        <div class="archive-slot-text" data-date="${k}">${escapeHtml(e.morning)}</div>
+      </div>`;
+    }
+    if (e.evening) {
+      html += `<div class="archive-slot evening">
+        <div class="archive-slot-label"><span class="archive-slot-marker"></span>Evening</div>
+        <div class="archive-slot-text" data-date="${k}">${escapeHtml(e.evening)}</div>
+      </div>`;
+    }
+    html += '</div>';
+    return html;
+  }).join('');
+
+  // Clicking an entry jumps back to edit that day
+  container.querySelectorAll('.archive-slot-text').forEach(el => {
+    el.addEventListener('click', () => {
+      const dateKey = el.getAttribute('data-date');
+      const d = fromYmd(dateKey);
+      viewYear = d.getFullYear();
+      viewMonth = d.getMonth();
+      selectedDate = dateKey;
+      archiveMode = false;
+      document.getElementById('view-toggle-btn').textContent = 'Archive';
+      document.getElementById('editor-layout').style.display = 'grid';
+      document.getElementById('archive-view').classList.remove('visible');
+      renderCalendar();
+      renderDay();
+    });
+  });
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function ymd(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+function fromYmd(s) {
+  const [y, m, d] = s.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+</script>
+</body>
+</html>
