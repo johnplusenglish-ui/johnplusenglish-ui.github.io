@@ -1,399 +1,512 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shrink It · John+English</title>
+<title>Shrink It — John + English</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --sun:#FFB347;--sky:#2176FF;--sky-light:#E8EEFF;
-  --sea:#1DD3B0;--sea-light:#E4FBF7;
-  --coral:#FF6B6B;--coral-light:#FFE8E8;
-  --lavender:#9B72CF;--lavender-light:#F0E8FA;
-  --cream:#F7F6F3;--ink:#2D3047;--muted:#7A7D8E;
-  --border:#E8E5DF;--card:#fff;--radius:14px;
-  --b2:#2EC4B6;--b2-light:#2EC4B626;
-  --c1:#2176FF;--c1-light:#E8F2FD;
-  --shadow-lg:0 8px 32px rgba(45,48,71,.14);
-  --shadow-md:0 4px 12px rgba(45,48,71,.08)
+  --sky:#2176FF;--sky-light:#E8EEFF;--sea:#1DD3B0;--sea-light:#E4FBF7;
+  --coral:#FF6B6B;--coral-light:#FFE8E8;--lavender:#9B72CF;--lavender-light:#F0E8FA;
+  --cream:#F7F6F3;--ink:#2D3047;--muted:#7A7D8E;--border:#E8E5DF;--card:#fff;
+  --radius:14px;--radius-sm:10px;
+  --shadow-sm:0 1px 3px rgba(45,48,71,.06);--shadow-md:0 4px 14px rgba(45,48,71,.08);
+  --accent:#2176FF;--accent-light:#E8EEFF;
 }
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;min-height:100vh}
+:root{
+  --sky:#2176FF;--sky-light:#E8EEFF;--sea:#1DD3B0;--sea-light:#E4FBF7;
+  --coral:#FF6B6B;--coral-light:#FFE8E8;--lavender:#9B72CF;--lavender-light:#F0E8FA;
+  --cream:#F7F6F3;--ink:#2D3047;--muted:#7A7D8E;--border:#E8E5DF;--card:#fff;
+  --radius:14px;--radius-sm:10px;
+  --shadow-sm:0 1px 3px rgba(45,48,71,.06);--shadow-md:0 4px 14px rgba(45,48,71,.08);
+  --accent:#E9C46A;--accent-light:#FDF6E3;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
 body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,var(--border) 1px,transparent 1px);background-size:28px 28px;opacity:.4;pointer-events:none;z-index:0}
-.topnav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(247,246,243,.88);backdrop-filter:blur(16px);border-bottom:1.5px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between}
-.nav-logo{font-size:1.3rem;font-weight:800;letter-spacing:-.02em;color:var(--ink);text-decoration:none}
-.nav-logo span{color:#2563EB}
-.topnav-links{display:flex;gap:1.2rem}
-.topnav-links a{font-size:.8rem;font-weight:600;color:var(--muted);text-decoration:none}
-.topnav-links a:hover{color:var(--sky)}
-.back-link-wrap{max-width:760px;margin:0 auto;padding:4.2rem 2rem 0;position:relative;z-index:1}
-.wf-back-link{display:inline-flex;align-items:center;gap:.35rem;font-size:.82rem;font-weight:600;color:var(--muted);text-decoration:none}
-.wf-back-link:hover{color:var(--ink)}
-.hero{padding:1.4rem 2rem 1.8rem;max-width:760px;margin:0 auto;text-align:center;position:relative;z-index:1}
-.hero-badge{display:inline-flex;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.3rem .9rem;border-radius:6px;margin-bottom:.7rem;color:var(--sun);background:#FFF5E6;border:1px solid rgba(255,179,71,.25)}
-.hero h1{font-size:clamp(1.8rem,3.6vw,2.6rem);line-height:1.1;letter-spacing:-.02em;margin-bottom:.6rem;font-weight:900}
-.hero-sub{font-size:.95rem;color:var(--muted);max-width:460px;margin:0 auto;line-height:1.6}
-.main{max-width:760px;margin:0 auto;padding:0 2rem 4rem;position:relative;z-index:1}
+.topnav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(247,246,243,.88);backdrop-filter:blur(16px);border-bottom:1.5px solid var(--border);height:52px;padding:0 2rem;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-family:'Outfit',sans-serif;font-size:1.3rem;font-weight:800;letter-spacing:-.02em;color:var(--ink);text-decoration:none;cursor:pointer;background:none;border:none}
+.nav-logo span{color:var(--sky)}
+.topnav-links{display:flex;gap:1.2rem;align-items:center}
+.topnav-links a,.topnav-links button{font-size:.85rem;font-weight:600;color:var(--muted);text-decoration:none;transition:color .2s;background:none;border:none;cursor:pointer;font-family:'Outfit',sans-serif}
+.topnav-links a:hover,.topnav-links button:hover{color:var(--sky)}
+.sidebar-toggle{display:none;align-items:center;gap:.4rem;background:none;border:none;cursor:pointer;color:var(--ink);padding:.3rem}
+.sidebar-toggle svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2}
 
-/* CONTROLS */
-.controls-bar{position:sticky;top:52px;z-index:100;background:rgba(247,246,243,.95);backdrop-filter:blur(12px);padding:.8rem 2rem;border-bottom:1px solid var(--border);margin-bottom:2rem}
-.controls-inner{max-width:760px;margin:0 auto;display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}
-.filter-label{font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);flex-shrink:0}
-.filter-pill{font-family:'Outfit',sans-serif;font-size:.8rem;font-weight:600;padding:.35rem .8rem;border-radius:10px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap}
-.filter-pill:hover{border-color:var(--ink);color:var(--ink)}
-.filter-pill.active.level-b2{background:var(--b2);color:#fff;border-color:var(--b2)}
-.filter-pill.active.level-c1{background:var(--c1);color:#fff;border-color:var(--c1)}
-.filter-pill.active.topic{background:var(--ink);color:#fff;border-color:var(--ink)}
-.filter-divider{width:1px;height:20px;background:var(--border);flex-shrink:0}
-.card-count{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--muted);margin-left:auto}
+/* ── App shell: sidebar + content pane ── */
+.app-shell{display:flex;align-items:flex-start;padding-top:52px;min-height:100vh;position:relative;z-index:1}
+.sidebar{width:300px;flex-shrink:0;height:calc(100vh - 52px);position:sticky;top:52px;overflow-y:auto;border-right:1.5px solid var(--border);padding:1.3rem 1rem 3rem}
+.sidebar-header{padding:.3rem .5rem 1.1rem}
+.sidebar-header h1{font-family:'Outfit',sans-serif;font-size:1.25rem;font-weight:900;letter-spacing:-.01em;margin-bottom:.25rem}
+.sidebar-header p{font-size:.72rem;color:var(--muted);line-height:1.5}
+.list-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);margin-bottom:.9rem}
+.group-head{font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding:.42rem 1rem;background:var(--cream);border-bottom:1.5px solid var(--border)}
+.row{display:flex;align-items:center;gap:.7rem;padding:.55rem .9rem;border-bottom:1px solid var(--border);text-decoration:none;color:var(--ink);transition:background .12s;width:100%;background:none;border-left:3px solid transparent;border-right:none;border-top:none;cursor:pointer;font-family:'Outfit',sans-serif;text-align:left}
+.row:last-child{border-bottom:none}
+.row.avail:hover{background:var(--cream)}
+.row.active{background:var(--cream);border-left-color:var(--rowaccent,var(--ink))}
+.row.active .row-name{color:var(--rowaccent,var(--ink))}
+.row.soon{opacity:.4;cursor:default}
+.row-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.row-icon svg{width:15px;height:15px;stroke-width:1.8;fill:none;stroke:currentColor}
+.row-text{flex:1;min-width:0}
+.row-name{font-size:.85rem;font-weight:700;line-height:1.25}
+.row-desc{font-size:.68rem;color:var(--muted);font-weight:400;margin-top:.05rem;line-height:1.35}
+.row-arr{font-size:.85rem;color:var(--muted);transition:transform .15s;flex-shrink:0}
+.row.avail:hover .row-arr{transform:translateX(3px)}
+.soon-tag{font-family:'JetBrains Mono',monospace;font-size:.56rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);background:var(--cream);border:1.5px solid var(--border);border-radius:5px;padding:.12rem .45rem;flex-shrink:0}
+.sidebar-backdrop{display:none}
 
-/* CARD */
-.shrink-card{background:var(--card);border-radius:22px;border:2px solid var(--border);box-shadow:var(--shadow-lg);overflow:hidden;margin-bottom:1.6rem}
-.card-top{padding:.8rem 1.4rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1.5px solid var(--border)}
-.card-meta{display:flex;gap:.6rem;align-items:center}
-.level-badge{font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:700;padding:.2rem .5rem;border-radius:5px}
-.level-badge.b2{background:var(--b2-light);color:var(--b2)}
-.level-badge.c1{background:var(--c1-light);color:var(--c1)}
-.topic-badge{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
-.card-num{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--muted)}
+.content-pane{flex:1;min-width:0;position:relative;z-index:1}
+.empty-pane{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:7rem 2rem;color:var(--muted);min-height:60vh}
+.empty-pane-badge{display:inline-flex;align-items:center;gap:.4rem;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--sky);background:var(--sky-light);padding:.3rem .9rem;border-radius:6px;margin-bottom:1rem}
+.empty-pane h2{font-family:'Outfit',sans-serif;font-size:1.7rem;font-weight:900;color:var(--ink);margin-bottom:.6rem;letter-spacing:-.01em}
+.empty-pane p{font-size:.92rem;max-width:360px;line-height:1.6}
 
-/* ORIGINAL TEXT */
-.original-area{padding:1.6rem 1.8rem}
-.area-label{font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:.8rem;display:flex;align-items:center;gap:.5rem}
-.word-count{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--muted);background:var(--cream);padding:.15rem .45rem;border-radius:4px;border:1px solid var(--border)}
-.original-text{font-size:1rem;color:var(--ink);line-height:1.75}
+/* ── Topic view (lives inside .content-pane) ── */
+#view-topic{display:none;position:relative;z-index:1}
+.page-header{padding:2.6rem 2.4rem 1.5rem;max-width:900px;margin:0 auto;position:relative;z-index:1}
+.back-link{display:inline-flex;align-items:center;gap:.4rem;font-size:.85rem;font-weight:600;color:var(--muted);text-decoration:none;margin-bottom:1.2rem;transition:color .2s;background:none;border:none;cursor:pointer;font-family:'Outfit',sans-serif;padding:0}
+.back-link:hover{color:var(--sky)}
+.back-link svg{width:14px;height:14px;flex-shrink:0}
+.topic-hero{display:flex;align-items:flex-start;gap:1.2rem}
+.topic-icon{width:52px;height:52px;border-radius:12px;background:var(--accent-light);color:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.topic-icon svg{width:24px;height:24px;stroke-width:1.8;fill:none;stroke:currentColor}
+.page-header h1{font-family:'Outfit',sans-serif;font-size:clamp(1.8rem,4vw,2.6rem);font-weight:900;letter-spacing:-.01em;line-height:1.1;margin-bottom:.4rem}
+.tabs-wrap{max-width:900px;margin:0 auto;padding:0 2rem;position:relative;z-index:1}
+.tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:2rem;align-items:center}
+.tab{font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;padding:.7rem 1.4rem;border:none;background:none;color:var(--muted);cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-2px;transition:color .2s}
+.tab:hover{color:var(--ink)}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.main{max-width:900px;margin:0 auto;padding:0 2rem 4rem;position:relative;z-index:1}
+.panel{display:none}
+.panel.active{display:block}
+.level-select{margin-bottom:1.7rem}
+.level-label{display:block;font-family:'JetBrains Mono',monospace;font-size:.66rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.6rem}
+.segmented{display:inline-flex;flex-wrap:wrap;gap:.25rem;background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:.3rem;box-shadow:var(--shadow-sm)}
+.seg{font-family:'Outfit',sans-serif;display:flex;flex-direction:column;align-items:flex-start;gap:.1rem;padding:.5rem 1rem;border:none;border-radius:12px;background:transparent;color:var(--ink);cursor:pointer;transition:all .18s;text-align:left;line-height:1.25}
+.seg:hover{background:var(--cream)}
+.seg .seg-main{font-size:.82rem;font-weight:800;letter-spacing:.01em}
+.seg .seg-sub{font-size:.65rem;font-weight:500;color:var(--muted)}
+.seg.active{background:var(--ink);color:#fff}
+.seg.active .seg-sub{color:rgba(255,255,255,.7)}
+@media(max-width:600px){.segmented{width:100%;justify-content:space-between}.seg{flex:1;align-items:center;text-align:center;padding:.5rem .3rem}.seg .seg-main{font-size:.74rem;white-space:nowrap}.seg .seg-sub{font-size:.6rem}}
+.pos-card{margin-bottom:1rem;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);transition:box-shadow .18s,transform .18s}
+.pos-card:hover{box-shadow:var(--shadow-md)}
+.pos-head{display:flex;align-items:center;gap:.6rem;padding:.85rem 1.1rem;cursor:pointer;user-select:none;border-left:4px solid var(--posc,var(--border));background:var(--post,var(--cream));transition:filter .12s}
+.pos-head:hover{filter:brightness(.97)}
+.pos-label{font-size:.85rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--ink)}
+.pos-count{font-family:'JetBrains Mono',monospace;font-size:.66rem;font-weight:600;color:var(--ink);opacity:.55;background:rgba(255,255,255,.55);padding:.1rem .5rem;border-radius:20px}
+.pos-chevron{margin-left:auto;font-size:.7rem;color:var(--ink);opacity:.45;transition:transform .2s}
+.pos-card.collapsed .pos-chevron{transform:rotate(-90deg)}
+.pos-card.collapsed .pos-body{display:none}
+.pos-body{padding:.2rem 0}
+.word-row{border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s;padding:.65rem 1.1rem}
+.word-row:last-child{border-bottom:none}
+.word-row:hover,.word-row.open{background:var(--cream)}
+.wr-main{display:flex;align-items:center;gap:.5rem}
+.wr-term{font-weight:800;font-size:.92rem;line-height:1.4}
+.wr-arr{margin-left:auto;font-size:1rem;color:var(--border);transition:transform .15s,color .15s;flex-shrink:0;padding-left:.5rem}
+.word-row.open .wr-arr{transform:rotate(90deg);color:var(--muted)}
+.wr-def{font-size:.82rem;color:var(--muted);line-height:1.4;margin-top:.18rem}
+.wr-ex{display:none;font-size:.79rem;font-style:italic;color:var(--ink);opacity:.85;margin-top:.4rem;padding:.5rem .7rem;border-radius:8px;border-left:2.5px solid var(--posc,var(--border));background:var(--post,var(--cream));line-height:1.5}
+.word-row.open .wr-ex{display:block}
+.conv-controls{display:flex;align-items:center;gap:.5rem;margin-bottom:1.2rem}
+.conv-ctrl-label{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-right:.2rem}
+.conv-hide-btn{font-family:'Outfit',sans-serif;font-size:.8rem;font-weight:700;padding:.35rem .8rem;border:1.5px solid var(--border);border-radius:20px;background:var(--card);color:var(--muted);cursor:pointer;transition:all .18s}
+.conv-hide-btn:hover{border-color:var(--ink);color:var(--ink)}
+.conv-hide-btn.active-a{background:var(--sky);border-color:var(--sky);color:#fff}
+.conv-hide-btn.active-b{background:var(--sea);border-color:var(--sea);color:#fff}
+.hide-a .conv-speaker-a ~ span{visibility:hidden}
+.hide-b .conv-speaker-b ~ span{visibility:hidden}
+.conv-section{margin-bottom:1.4rem;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm)}
+.conv-section.collapsed .cat-body{display:none}
+.conv-section.collapsed .cat-chevron{transform:rotate(-90deg)}
+.conv-header{display:flex;align-items:center;justify-content:space-between;gap:.7rem;padding:.5rem 1rem;background:var(--sea-light);border-bottom:1.5px solid var(--border);border-left:3px solid var(--sea);cursor:pointer;user-select:none}
+.conv-title{font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--sea)}
+.conv-entry{border-bottom:1px solid var(--border);padding:.65rem 1rem}
+.conv-entry:last-child{border-bottom:none}
+.conv-dialogue{display:flex;flex-direction:column;gap:.25rem;margin-bottom:.35rem}
+.conv-line{font-size:.82rem;line-height:1.5;display:grid;grid-template-columns:16px 1fr;gap:.5rem}
+.conv-speaker{font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:700;padding-top:.18rem}
+.conv-speaker-a{color:var(--sky)}
+.conv-speaker-b{color:var(--sea)}
+.conv-note{font-size:.73rem;color:var(--muted);font-style:italic;padding-left:24px}
+.print-btn{margin-left:auto;display:inline-flex;align-items:center;gap:.45rem;font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:600;padding:.45rem .9rem;border:1.5px solid var(--border);border-radius:10px;background:var(--card);color:var(--ink);cursor:pointer;transition:all .18s;flex-shrink:0}
+.print-btn:hover{border-color:var(--ink);background:var(--ink);color:var(--cream)}
+@media print{.print-btn{display:none}}
+.empty-state{text-align:center;padding:3rem;color:var(--muted);font-size:.9rem}
+.tap-hint{font-size:.75rem;color:var(--muted);margin-bottom:.8rem;font-style:italic}
+@media(max-width:900px){
+  .sidebar-toggle{display:inline-flex}
+  .app-shell{padding-top:52px}
+  .sidebar{position:fixed;top:52px;left:0;bottom:0;width:85vw;max-width:340px;transform:translateX(-100%);transition:transform .25s ease;z-index:160;background:var(--cream);box-shadow:var(--shadow-md)}
+  .sidebar.open{transform:translateX(0)}
+  .sidebar-backdrop{display:none;position:fixed;inset:52px 0 0 0;background:rgba(45,48,71,.35);z-index:150}
+  .sidebar-backdrop.open{display:block}
+  .content-pane{width:100%}
+}
+@media(max-width:600px){.page-header{padding:1.8rem 1.2rem 1.2rem}.main,.tabs-wrap{padding:0 1.2rem 3rem}.empty-pane{padding:4rem 1.2rem}}
 
-/* MODEL ANSWER */
-.model-area{padding:1.4rem 1.8rem;background:var(--sea-light);border-top:1.5px solid var(--sea);display:none}
-.model-area.show{display:block}
-.model-label{font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--sea);margin-bottom:.7rem;display:flex;align-items:center;gap:.5rem}
-.model-text{font-size:.97rem;color:var(--ink);line-height:1.65;font-weight:600}
-.model-note{font-size:.82rem;color:var(--muted);margin-top:.6rem;font-style:italic;line-height:1.5}
+.cat-group{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);margin-bottom:.9rem}
+.cat-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;gap:.5rem;border:none;background:var(--cream);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding:.55rem 1rem;border-bottom:1.5px solid var(--border);transition:color .15s;text-align:left}
+.cat-toggle:hover{color:var(--ink)}
+.cat-chevron{transition:transform .2s;font-size:.7rem;flex-shrink:0}
+.cat-group.open .cat-chevron{transform:rotate(180deg)}
+.cat-rows{display:none}
+.cat-group.open .cat-rows{display:block}
+.cat-group:last-child{margin-bottom:0}
 
-/* TIMER */
-.timer-section{display:flex;flex-direction:column;align-items:center;gap:.9rem;margin-bottom:1.6rem}
-.timer-ring{position:relative;width:120px;height:120px;cursor:pointer}
-.timer-ring svg{transform:rotate(-90deg)}
-.timer-ring circle{fill:none;stroke-width:6}
-.timer-bg{stroke:var(--border)}
-.timer-progress{stroke:var(--ink);stroke-linecap:round;transition:stroke-dashoffset .1s linear;stroke-dasharray:339;stroke-dashoffset:0}
-.timer-ring.warning .timer-progress{stroke:var(--sun)}
-.timer-ring.danger .timer-progress{stroke:var(--coral)}
-.timer-display{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.timer-secs{font-family:'JetBrains Mono',monospace;font-size:2rem;font-weight:700;color:var(--ink);line-height:1}
-.timer-hint{font-size:.62rem;color:var(--muted);margin-top:.15rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
-.timer-presets{display:flex;gap:.4rem;flex-wrap:wrap;justify-content:center;align-items:center}
-.preset-btn{font-family:'JetBrains Mono',monospace;font-size:.65rem;font-weight:700;padding:.28rem .7rem;border-radius:6px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s}
-.preset-btn:hover{border-color:var(--ink);color:var(--ink)}
-.preset-btn.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+html,body{height:100%}
+.content-pane{padding:0;height:calc(100vh - 52px);overflow:hidden}
+.embed-frame{width:100%;height:100%;border:none;display:block;background:var(--cream)}
 
-.action-row{display:flex;gap:.7rem;justify-content:center;flex-wrap:wrap}
-.btn-primary{font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;padding:.7rem 1.8rem;border-radius:12px;border:none;background:var(--ink);color:#fff;cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:.45rem}
-.btn-primary:hover{background:#1a1d2e;transform:translateY(-1px)}
-.btn-primary svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
-.btn-secondary{font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:600;padding:.55rem 1.2rem;border-radius:10px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:.4rem}
-.btn-secondary:hover{border-color:var(--ink);color:var(--ink)}
-.btn-secondary svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.btn-reveal{font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;padding:.55rem 1.4rem;border-radius:10px;border:1.5px solid var(--sea);background:var(--card);color:var(--sea);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:.4rem}
-.btn-reveal:hover{background:var(--sea);color:#fff}
-.btn-reveal svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-
-@media(max-width:600px){.topnav{padding:0 1.2rem}.back-link-wrap,.hero,.main{padding-left:1.2rem;padding-right:1.2rem}.controls-bar{padding:.8rem 1.2rem}}
 </style>
 </head>
 <body>
-<nav class="topnav">
-  <a href="index.html" class="nav-logo">john<span>plus</span>english</a>
-  <div class="topnav-links"><a href="index.html">Home</a><a href="index.html#group-fun">Fun Tools</a></div>
+<div class="topnav">
+  <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Toggle menu">
+    <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+  </button>
+  <a class="nav-logo" href="tools.html" style="text-decoration:none">john<span>+</span>english</a>
+  <div class="topnav-links">
+    <a href="tools.html">All Tools</a>
+  </div>
+</div>
+
+<div class="app-shell">
+<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <h1>John + English</h1>
+    <p>Every study tool, one sidebar.</p>
+  </div>
+  <div class="cat-group" data-cat="study-tools">
+    <button class="cat-toggle" onclick="toggleCatGroup(this)">
+      <span style="display:flex;align-items:center;gap:.6rem"><span class="row-icon" style="width:22px;height:22px;background:#E4FBF7;color:#1DD3B0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="13" y2="11"/></svg></span>Study Tools</span>
+      <span class="cat-chevron">&#9662;</span>
+    </button>
+    <div class="cat-rows">
+<a class="row avail" href="prepositions.html">
+      <div class="row-icon" style="background:var(--sky-light);color:var(--sky)"><svg viewBox="0 0 24 24"><path d="M12 21s7-7.5 7-12a7 7 0 00-14 0c0 4.5 7 12 7 12z"></path><circle cx="12" cy="9" r="2.5"></circle></svg></div>
+      <div class="row-text"><div class="row-name">Prepositions</div><div class="row-desc">Guide, tests, cloze, sorting &amp; flashcards</div></div>
+      <span class="row-arr">›</span>
+    </a>
+    <a class="row avail" href="phrasal-verbs.html">
+      <div class="row-icon" style="background:var(--sea-light);color:var(--sea)"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"></path></svg></div>
+      <div class="row-text"><div class="row-name">Phrasal Verbs</div><div class="row-desc">List, matching, gap fill &amp; flashcards</div></div>
+      <span class="row-arr">›</span>
+    </a>
+    <a class="row avail" href="idioms.html">
+      <div class="row-icon" style="background:var(--coral-light);color:var(--coral)"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"></path></svg></div>
+      <div class="row-text"><div class="row-name">Idioms</div><div class="row-desc">List, matching, right or wrong &amp; flashcards</div></div>
+      <span class="row-arr">›</span>
+    </a>
+    <a class="row avail" href="adjectives.html">
+      <div class="row-icon" style="background:var(--lavender-light);color:var(--lavender)"><svg viewBox="0 0 24 24"><path d="M20.59 13.41L13.42 20.58a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg></div>
+      <div class="row-text"><div class="row-name">Adjectives</div><div class="row-desc">Synonyms, confusable pairs, quiz &amp; flashcards</div></div>
+      <span class="row-arr">›</span>
+    </a>
+    <a class="row avail" href="tools.html#collocations" style="--rowaccent:#E9C46A">
+      <div class="row-icon" style="background:#FDF6E3;color:#E9C46A"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="9" height="10" rx="1.5"></rect><rect x="12" y="7" width="9" height="10" rx="1.5"></rect></svg></div>
+      <div class="row-text"><div class="row-name">Collocations</div><div class="row-desc">Guide, browsable list &amp; flashcards</div></div>
+      <span class="row-arr">›</span>
+    </a>
+    <a class="row avail" href="tools.html#fixed-expressions" style="--rowaccent:#7B3FF2">
+      <div class="row-icon" style="background:#F0E8FA;color:#7B3FF2"><svg viewBox="0 0 24 24"><path d="M8 21c2-.3 4-1.5 4-6V6c0-1-.6-1.6-1.6-1.6H4.6C3.6 4.4 3 5 3 6v6c0 1 .6 1.6 1.6 1.6H6c0 2-1 3-2 3.4V21z"></path><path d="M18 21c2-.3 4-1.5 4-6V6c0-1-.6-1.6-1.6-1.6h-5.8c-1 0-1.6.6-1.6 1.6v6c0 1 .6 1.6 1.6 1.6H16c0 2-1 3-2 3.4V21z"></path></svg></div>
+      <div class="row-text"><div class="row-name">Fixed Expressions</div><div class="row-desc">Browse by function &amp; gap-fill practice</div></div>
+      <span class="row-arr">›</span>
+    </a>
+    <a class="row avail" href="tools.html#word-banks" style="--rowaccent:#3D5A80">
+      <div class="row-icon" style="background:#E4EAF2;color:#3D5A80"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"></path><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"></path></svg></div>
+      <div class="row-text"><div class="row-name">Word Banks</div><div class="row-desc">14 topic-based vocabulary lists</div></div>
+      <span class="row-arr">›</span>
+    </a>
+    <a class="row avail" href="word-formation.html">
+      <div class="row-icon" style="background:#E0F5F2;color:#2A9D8F"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect></svg></div>
+      <div class="row-text"><div class="row-name">Word Formation</div><div class="row-desc">Prefixes, suffixes, word families &amp; practice</div></div>
+      <span class="row-arr">›</span>
+    </a>
+    </div>
+  </div>
+
+  <div class="cat-group" data-cat="grammar">
+    <button class="cat-toggle" onclick="toggleCatGroup(this)">
+      <span style="display:flex;align-items:center;gap:.6rem"><span class="row-icon" style="width:22px;height:22px;background:#E8EEFF;color:#2176FF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span>Grammar</span>
+      <span class="cat-chevron">&#9662;</span>
+    </button>
+    <div class="cat-rows">
+<a class="row avail" href="a1-grammar.html">
+      <div class="row-icon" style="background:#E8EEFF;color:#2176FF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
+      <div class="row-text"><div class="row-name">A1 Beginner</div><div class="row-desc">Foundational structures &amp; guided practice</div></div>
+      <span class="row-arr">›</span>
+    </a>
+    <a class="row avail" href="a2-grammar.html">
+      <div class="row-icon" style="background:#E8EEFF;color:#2176FF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
+      <div class="row-text"><div class="row-name">A2 Elementary</div><div class="row-desc">Elementary grammar with real-world examples</div></div>
+      <span class="row-arr">›</span>
+    </a>
+    <a class="row avail" href="b1-grammar.html">
+      <div class="row-icon" style="background:#E8EEFF;color:#2176FF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
+      <div class="row-text"><div class="row-name">B1 Pre-intermediate</div><div class="row-desc">Pre-intermediate structures &amp; exercises</div></div>
+      <span class="row-arr">›</span>
+    </a>
+    <a class="row avail" href="b2-grammar.html">
+      <div class="row-icon" style="background:#E8EEFF;color:#2176FF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
+      <div class="row-text"><div class="row-name">B2 Upper-intermediate</div><div class="row-desc">Upper-intermediate grammar in depth</div></div>
+      <span class="row-arr">›</span>
+    </a>
+    <a class="row avail" href="c1-grammar.html">
+      <div class="row-icon" style="background:#E8EEFF;color:#2176FF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
+      <div class="row-text"><div class="row-name">C1 Advanced</div><div class="row-desc">Advanced structures for fluent accuracy</div></div>
+      <span class="row-arr">›</span>
+    </a>
+    <a class="row avail" href="grammar-guides.html">
+      <div class="row-icon" style="background:#E8EEFF;color:#2176FF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+      <div class="row-text"><div class="row-name">Grammar Guides</div><div class="row-desc">Searchable reference across every level</div></div>
+      <span class="row-arr">›</span>
+    </a>
+    </div>
+  </div>
+
+  <div class="cat-group" data-cat="speaking-activities">
+    <button class="cat-toggle" onclick="toggleCatGroup(this)">
+      <span style="display:flex;align-items:center;gap:.6rem"><span class="row-icon" style="width:22px;height:22px;background:#FFF5E6;color:#c97800"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="12" y2="13"/></svg></span>Speaking Activities</span>
+      <span class="cat-chevron">&#9662;</span>
+    </button>
+    <div class="cat-rows">
+<a class="row avail" href="tools.html#role-play-cards" style="--rowaccent:#FF6B6B">
+  <div class="row-icon" style="background:var(--coral-light);color:var(--coral)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div>
+  <div class="row-text"><div class="row-name">Role Play Cards</div><div class="row-desc">200 pair role-play scenarios across 4 levels</div></div>
+  <span class="row-arr">›</span>
+</a>
+<a class="row avail" href="tools.html#speaking-questions" style="--rowaccent:#2176FF">
+  <div class="row-icon" style="background:#E8EEFF;color:#2176FF"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div>
+  <div class="row-text"><div class="row-name">Speaking Topics</div><div class="row-desc">1,000 questions across 50 topics &middot; roulette &amp; timer</div></div>
+  <span class="row-arr">›</span>
+</a>
+<a class="row avail" href="tools.html#quick-debates" style="--rowaccent:#1DD3B0">
+  <div class="row-icon" style="background:#E4FBF7;color:#1DD3B0"><svg viewBox="0 0 24 24"><path d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 21l1.9-4.5A7.9 7.9 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg></div>
+  <div class="row-text"><div class="row-name">Quick Debates</div><div class="row-desc">180 debate topics with phrase bubbles, vocab &amp; a timer</div></div>
+  <span class="row-arr">›</span>
+</a>
+<a class="row avail" href="tools.html#collaborative-tasks" style="--rowaccent:var(--lavender)">
+  <div class="row-icon" style="background:var(--lavender-light);color:var(--lavender)"><svg viewBox="0 0 24 24"><path d="M18 16.98h-5.99c-1.1 0-1.95.94-2.48 1.9A4 4 0 0 1 2 17c.01-.7.2-1.4.57-2"></path><path d="m6 17 3.13-5.78c.53-.97.1-2.18-.5-3.1a4 4 0 1 1 6.89-4.06"></path><path d="m12 6 3.13 5.73C15.66 12.7 16.9 13 18 13a4 4 0 0 1 0 8"></path></svg></div>
+  <div class="row-text"><div class="row-name">Collaborative Tasks</div><div class="row-desc">30 info-gap &amp; problem-solving cards for pairs and groups</div></div>
+  <span class="row-arr">›</span>
+</a>
+<a class="row avail" href="tools.html#would-you-rather" style="--rowaccent:#E9C46A">
+  <div class="row-icon" style="background:#FDF6E3;color:#E9C46A"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v6"></path><path d="M12 10L6 20"></path><path d="M12 10L18 20"></path><path d="M4 20h4"></path><path d="M16 20h4"></path></svg></div>
+  <div class="row-text"><div class="row-name">Would You Rather</div><div class="row-desc">99 dilemmas to debate, plus a Quickfire timed mode</div></div>
+  <span class="row-arr">›</span>
+</a>
+    <a class="row avail" href="exam-photos-speaking.html">
+      <div class="row-icon" style="background:#E4EAF2;color:#3D5A80"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="9" cy="9" r="2"></circle><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path></svg></div>
+      <div class="row-text"><div class="row-name">Exam Photos</div><div class="row-desc">Photo description prompts for B2/C1/C2 speaking exams</div></div>
+      <span class="row-arr">›</span>
+    </a>
+    <a class="row avail" href="speaking-by-grammar.html">
+      <div class="row-icon" style="background:#FAE8E8;color:#BC4749"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h.01M7 20v-4"></path><path d="M12 20V10"></path><path d="M17 20V4"></path><path d="M22 20v-8"></path></svg></div>
+      <div class="row-text"><div class="row-name">Speaking by Grammar</div><div class="row-desc">Browse mode, Challenge Mode &amp; scored Grammar Auction</div></div>
+      <span class="row-arr">›</span>
+    </a>
+<a class="row avail" href="tools.html#interview-questions" style="--rowaccent:#2A9D8F">
+  <div class="row-icon" style="background:#E0F5F2;color:#2A9D8F"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 00-3-3.87"></path><path d="M16 3.13a4 4 0 010 7.75"></path></svg></div>
+  <div class="row-text"><div class="row-name">Interview Questions</div><div class="row-desc">Question bank, 2-min timed practice &amp; interviewer/candidate role play</div></div>
+  <span class="row-arr">›</span>
+</a>
+    </div>
+  </div>
+
+  <div class="cat-group" data-cat="use-of-english">
+    <button class="cat-toggle" onclick="toggleCatGroup(this)">
+      <span style="display:flex;align-items:center;gap:.6rem"><span class="row-icon" style="width:22px;height:22px;background:#F0E8FA;color:#9B72CF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a5 5 0 00-5 5c0 1.5.67 2.84 1.72 3.76C6.11 12.04 5 14.15 5 16.5c0 .28.02.55.05.82A3.5 3.5 0 008.5 21h7a3.5 3.5 0 003.45-3.68c.03-.27.05-.54.05-.82 0-2.35-1.11-4.46-2.72-6.74A5 5 0 0012 2z"/><line x1="12" y1="10" x2="12" y2="14"/></svg></span>Use of English</span>
+      <span class="cat-chevron">&#9662;</span>
+    </button>
+    <div class="cat-rows">
+<a class="row avail" href="uoe-b1.html">
+      <div class="row-icon" style="background:#F0E8FA;color:#9B72CF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+      <div class="row-text"><div class="row-name">B1 Preliminary</div><div class="row-desc">Reading &amp; Use of English, B1 Preliminary format</div></div>
+      <span class="row-arr">›</span>
+    </a>
+    <a class="row avail" href="uoe-b2.html">
+      <div class="row-icon" style="background:#F0E8FA;color:#9B72CF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+      <div class="row-text"><div class="row-name">B2 First</div><div class="row-desc">Cloze, word formation &amp; KWT, B2 First format</div></div>
+      <span class="row-arr">›</span>
+    </a>
+    <a class="row avail" href="uoe-c1.html">
+      <div class="row-icon" style="background:#F0E8FA;color:#9B72CF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+      <div class="row-text"><div class="row-name">C1 Advanced</div><div class="row-desc">Cloze, word formation &amp; KWT, C1 Advanced format</div></div>
+      <span class="row-arr">›</span>
+    </a>
+    <a class="row avail" href="uoe-c2.html">
+      <div class="row-icon" style="background:#F0E8FA;color:#9B72CF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+      <div class="row-text"><div class="row-name">C2 Proficiency</div><div class="row-desc">Cloze, word formation &amp; KWT, C2 Proficiency format</div></div>
+      <span class="row-arr">›</span>
+    </a>
+    </div>
+  </div>
+
+  <div class="cat-group" data-cat="writing-skills">
+    <button class="cat-toggle" onclick="toggleCatGroup(this)">
+      <span style="display:flex;align-items:center;gap:.6rem"><span class="row-icon" style="width:22px;height:22px;background:#FFE8E8;color:#FF6B6B"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span>Writing Skills</span>
+      <span class="cat-chevron">&#9662;</span>
+    </button>
+    <div class="cat-rows">
+<a class="row avail" href="writing-skills.html">
+      <div class="row-icon" style="background:#FFE8E8;color:#FF6B6B"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+      <div class="row-text"><div class="row-name">Writing Skills</div><div class="row-desc">Essays, emails, reports &amp; reviews reference</div></div>
+      <span class="row-arr">›</span>
+    </a>
+    <a class="row avail" href="ielts-writing.html">
+      <div class="row-icon" style="background:#FFE8E8;color:#FF6B6B"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+      <div class="row-text"><div class="row-name">IELTS</div><div class="row-desc">Task 1 &amp; Task 2, Academic &amp; General Training</div></div>
+      <span class="row-arr">›</span>
+    </a>
+    <a class="row avail" href="b2-writing.html">
+      <div class="row-icon" style="background:#FFE8E8;color:#FF6B6B"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+      <div class="row-text"><div class="row-name">B2 First</div><div class="row-desc">Article, email, report &amp; review practice</div></div>
+      <span class="row-arr">›</span>
+    </a>
+    <a class="row avail" href="c1-writing.html">
+      <div class="row-icon" style="background:#FFE8E8;color:#FF6B6B"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+      <div class="row-text"><div class="row-name">C1 Advanced</div><div class="row-desc">Advanced writing tasks &amp; model answers</div></div>
+      <span class="row-arr">›</span>
+    </a>
+    <a class="row avail" href="c2-writing.html">
+      <div class="row-icon" style="background:#FFE8E8;color:#FF6B6B"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+      <div class="row-text"><div class="row-name">C2 Proficiency</div><div class="row-desc">Proficiency-level writing &amp; band descriptors</div></div>
+      <span class="row-arr">›</span>
+    </a>
+    <a class="row avail" href="creative-writing.html">
+      <div class="row-icon" style="background:#FFE8E8;color:#FF6B6B"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg></div>
+      <div class="row-text"><div class="row-name">Creative Writing</div><div class="row-desc">Story prompts, genres &amp; a free-writing toolkit</div></div>
+      <span class="row-arr">›</span>
+    </a>
+    </div>
+  </div>
+
+  <div class="cat-group" data-cat="exam-speaking">
+    <button class="cat-toggle" onclick="toggleCatGroup(this)">
+      <span style="display:flex;align-items:center;gap:.6rem"><span class="row-icon" style="width:22px;height:22px;background:#E8EEFF;color:#2176FF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 10a7 7 0 0014 0"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg></span>Exam Speaking</span>
+      <span class="cat-chevron">&#9662;</span>
+    </button>
+    <div class="cat-rows">
+<a class="row avail" href="ielts-speaking.html">
+      <div class="row-icon" style="background:#E8EEFF;color:#2176FF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></div>
+      <div class="row-text"><div class="row-name">IELTS</div><div class="row-desc"></div></div>
+      <span class="row-arr">›</span>
+    </a>
+    <a class="row avail" href="exam-photos-speaking.html">
+      <div class="row-icon" style="background:#E8EEFF;color:#2176FF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg></div>
+      <div class="row-text"><div class="row-name">Exam Photos</div><div class="row-desc"></div></div>
+      <span class="row-arr">›</span>
+    </a>
+    </div>
+  </div>
+
+  <div class="cat-group" data-cat="fun-tools">
+    <button class="cat-toggle" onclick="toggleCatGroup(this)">
+      <span style="display:flex;align-items:center;gap:.6rem"><span class="row-icon" style="width:22px;height:22px;background:#E8FBF2;color:#2aaa7a"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span>Fun Tools</span>
+      <span class="cat-chevron">&#9662;</span>
+    </button>
+    <div class="cat-rows">
+<a class="row avail" href="chat-activity.html">
+      <div class="row-icon" style="background:#E8FBF2;color:#2aaa7a"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+      <div class="row-text"><div class="row-name">Chat Activity</div><div class="row-desc">30 WhatsApp-style vocabulary scenarios</div></div>
+      <span class="row-arr">›</span>
+    </a>
+    <a class="row avail" href="taboo.html">
+      <div class="row-icon" style="background:#E8FBF2;color:#2aaa7a"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></div>
+      <div class="row-text"><div class="row-name">Taboo Cards</div><div class="row-desc">172 describe-it-without-the-word cards</div></div>
+      <span class="row-arr">›</span>
+    </a>
+    <a class="row avail" href="odd-one-out.html">
+      <div class="row-icon" style="background:#E8FBF2;color:#2aaa7a"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+      <div class="row-text"><div class="row-name">Odd One Out</div><div class="row-desc">67 spot-the-odd-one-out questions</div></div>
+      <span class="row-arr">›</span>
+    </a>
+    <a class="row avail" href="story-dice.html">
+      <div class="row-icon" style="background:#E8FBF2;color:#2aaa7a"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="3"/><circle cx="8" cy="8" r="1" fill="currentColor"/><circle cx="16" cy="8" r="1" fill="currentColor"/><circle cx="8" cy="16" r="1" fill="currentColor"/><circle cx="16" cy="16" r="1" fill="currentColor"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg></div>
+      <div class="row-text"><div class="row-name">Story Dice</div><div class="row-desc">132 dice faces for improvised storytelling</div></div>
+      <span class="row-arr">›</span>
+    </a>
+    <a class="row avail" href="hot-takes.html">
+      <div class="row-icon" style="background:#E8FBF2;color:#2aaa7a"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="9" y1="10" x2="15" y2="10"/><line x1="9" y1="14" x2="13" y2="14"/></svg></div>
+      <div class="row-text"><div class="row-name">Hot Takes</div><div class="row-desc">71 agree-or-disagree discussion prompts</div></div>
+      <span class="row-arr">›</span>
+    </a>
+    <a class="row avail" href="accent-challenge.html">
+      <div class="row-icon" style="background:#E8FBF2;color:#2aaa7a"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></div>
+      <div class="row-text"><div class="row-name">Accent Challenge</div><div class="row-desc">52 accent &amp; pronunciation styles</div></div>
+      <span class="row-arr">›</span>
+    </a>
+    <button class="row soon" disabled>
+      <div class="row-icon" style="background:#E8FBF2;color:#2aaa7a"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M18.4 6.6a8 8 0 0 1 0 11.8M5.6 6.6a8 8 0 0 0 0 11.8"/></svg></div>
+      <div class="row-text"><div class="row-name">Word Tennis</div><div class="row-desc">Not built yet</div></div>
+      <span class="soon-tag">Soon</span>
+    </button>
+    <a class="row avail" href="shrink-it.html">
+      <div class="row-icon" style="background:#E8FBF2;color:#2aaa7a"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="10" y1="14" x2="3" y2="21"/><line x1="21" y1="3" x2="14" y2="10"/></svg></div>
+      <div class="row-text"><div class="row-name">Shrink It</div><div class="row-desc">18 passages to summarise under pressure</div></div>
+      <span class="row-arr">›</span>
+    </a>
+    <a class="row avail" href="conversation-roulette.html">
+      <div class="row-icon" style="background:#E8FBF2;color:#2aaa7a"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/></svg></div>
+      <div class="row-text"><div class="row-name">Conversation Roulette</div><div class="row-desc">70 random topic + role combinations</div></div>
+      <span class="row-arr">›</span>
+    </a>
+    <a class="row avail" href="alibi.html">
+      <div class="row-icon" style="background:#E8FBF2;color:#2aaa7a"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
+      <div class="row-text"><div class="row-name">Alibi</div><div class="row-desc">8 courtroom interrogation scenarios</div></div>
+      <span class="row-arr">›</span>
+    </a>
+    </div>
+  </div>
+
+  <div class="cat-group" data-cat="lesson-plans">
+    <button class="cat-toggle" disabled style="cursor:default">
+      <span style="display:flex;align-items:center;gap:.6rem"><span class="row-icon" style="width:22px;height:22px;background:#F7F6F3;color:#7A7D8E"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span>Lesson Plans</span>
+      <span class="soon-tag">Soon</span>
+    </button>
+  </div>
+
+  <div class="cat-group" data-cat="resources">
+    <a class="row avail" href="resources.html" style="border-radius:var(--radius)">
+      <div class="row-icon" style="background:#F7F6F3;color:#7A7D8E"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="11" x2="12" y2="17"/><polyline points="9 14 12 17 15 14"/></svg></div>
+      <div class="row-text"><div class="row-name">Resources</div><div class="row-desc">Printable PDFs</div></div>
+      <span class="row-arr">&rsaquo;</span>
+    </a>
+  </div>
 </nav>
-<div class="back-link-wrap">
-  <a href="index.html" aria-label="Back to Home" style="display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;background:#fff;border:1.5px solid #E8E5DF;color:#7A7D8E;text-decoration:none;margin-bottom:1.2rem;box-shadow:0 1px 3px rgba(45,48,71,.06);transition:all .2s" onmouseover="this.style.color='#2D3047';this.style.boxShadow='0 4px 14px rgba(45,48,71,.08)';this.style.transform='translateY(-2px)'" onmouseout="this.style.color='#7A7D8E';this.style.boxShadow='0 1px 3px rgba(45,48,71,.06)';this.style.transform='translateY(0)'"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></a>
+
+<div class="content-pane">
+  <iframe class="embed-frame" src="shrink-it-content.html" title="Shrink It"></iframe>
 </div>
-<section class="hero">
-  <span class="hero-badge">Fun Tools</span>
-  <h1>Shrink It</h1>
-  <p class="hero-sub">Read the paragraph. Reduce it to one sentence without losing the meaning. You have 90 seconds.</p>
-</section>
-<div class="controls-bar">
-  <div class="controls-inner">
-    <div style="display:flex;align-items:center;gap:.4rem;flex-shrink:0">
-      <span class="filter-label">Level</span>
-      <button class="filter-pill level-b2 active" onclick="toggleLevel('b2',this)">B2</button>
-      <button class="filter-pill level-c1 active" onclick="toggleLevel('c1',this)">C1</button>
-    </div>
-    <div class="filter-divider"></div>
-    <div style="display:flex;align-items:flex-start;gap:.4rem">
-      <span class="filter-label" style="margin-top:.45rem;flex-shrink:0">Topic</span>
-      <div id="topicFilters" style="display:flex;flex-wrap:wrap;gap:.4rem"></div>
-    </div>
-    <span class="card-count" id="cardCount"></span>
-  </div>
 </div>
-<div class="main">
-  <div id="cardWrap"></div>
-  <div class="timer-section">
-    <div class="timer-ring" id="timerRing" onclick="toggleTimer()">
-      <svg width="120" height="120" viewBox="0 0 120 120">
-        <circle class="timer-bg" cx="60" cy="60" r="54"/>
-        <circle class="timer-progress" id="timerArc" cx="60" cy="60" r="54"/>
-      </svg>
-      <div class="timer-display">
-        <div class="timer-secs" id="timerDisplay">90</div>
-        <div class="timer-hint" id="timerHint">tap to start</div>
-      </div>
-    </div>
-    <div class="timer-presets">
-      <span class="filter-label">Timer</span>
-      <button class="preset-btn" onclick="setDuration(60,this)">60s</button>
-      <button class="preset-btn active" onclick="setDuration(90,this)">90s</button>
-      <button class="preset-btn" onclick="setDuration(120,this)">2 min</button>
-      <button class="preset-btn" onclick="setDuration(0,this)">No timer</button>
-    </div>
-  </div>
-  <div class="action-row">
-    <button class="btn-secondary" onclick="skipCard()">
-      <svg viewBox="0 0 24 24"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>
-      Skip
-    </button>
-    <button class="btn-reveal" onclick="revealModel()">
-      <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-      Show model
-    </button>
-    <button class="btn-primary" onclick="nextCard()">
-      Next
-      <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-    </button>
-    <button class="btn-secondary" onclick="rebuildDeck()">
-      <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.03"/></svg>
-      Shuffle
-    </button>
-  </div>
-</div>
+
 <script>
-var TEXTS = [
-  // B2
-  {l:'b2',topic:'Work',
-   text:'Many people who work in offices spend a large part of their day in meetings. These meetings often last for a long time, involve a lot of people, and frequently end without any clear decisions being made. As a result, employees often feel that the time they spend in meetings could have been used more productively doing their actual work.',
-   words:65,
-   model:'Office workers spend too much time in unproductive meetings that rarely lead to clear outcomes.',
-   note:'Key ideas to keep: meetings, time wasted, no clear decisions. Everything else can go.'},
-
-  {l:'b2',topic:'Technology',
-   text:'Smartphones have changed the way we communicate with each other. Instead of calling or meeting in person, many people now prefer to send short text messages or use social media apps to stay in touch. Some people believe this has made communication easier and more convenient, while others argue that it has made our relationships less meaningful and more superficial.',
-   words:60,
-   model:'Smartphones have made communication easier but may have made our relationships less meaningful.',
-   note:'The "some say / others say" structure can be collapsed into one balanced sentence.'},
-
-  {l:'b2',topic:'Education',
-   text:'Learning a foreign language takes a long time and requires a great deal of effort. Students need to practise regularly, build up their vocabulary, and develop an understanding of grammar rules. Despite all this work, many people who study a foreign language never reach a level where they feel truly comfortable using it in real conversations.',
-   words:52,
-   model:'Despite requiring significant time and effort, most foreign language learners never reach genuine conversational fluency.',
-   note:'The three requirements (practice, vocabulary, grammar) are details — the key point is effort vs result.'},
-
-  {l:'b2',topic:'Society',
-   text:'Cities around the world are growing rapidly as more and more people move from rural areas to urban centres in search of work and better living conditions. This growth puts enormous pressure on housing, transport, and public services. While cities offer more opportunities, they can also be expensive, overcrowded, and stressful places to live.',
-   words:55,
-   model:'Rapid urban growth creates both opportunities and serious pressures on infrastructure and quality of life.',
-   note:'The cause (rural-urban migration) can be condensed. The tension between opportunity and problems is the core.'},
-
-  {l:'b2',topic:'Food & Lifestyle',
-   text:'In recent years, there has been a significant increase in the number of people choosing not to eat meat. Some do this for environmental reasons, as the production of meat uses large amounts of water and land and contributes significantly to greenhouse gas emissions. Others choose a vegetarian or vegan diet for health reasons, or because they are concerned about the welfare of animals.',
-   words:63,
-   model:'More people are avoiding meat for environmental, health, and ethical reasons.',
-   note:'Three reasons: environment, health, animal welfare. Everything else is supporting detail.'},
-
-  {l:'b2',topic:'Work',
-   text:'Working from home became much more common during the pandemic, and many employees discovered that they were just as productive — or even more productive — at home as they were in the office. As a result, many companies have continued to offer flexible or remote working arrangements. However, some employers and employees have found that working from home makes it harder to collaborate, maintain company culture, and separate work from personal life.',
-   words:72,
-   model:'Remote working has proved productive for many but raises concerns about collaboration, culture, and work-life boundaries.',
-   note:'Keep the tension: productivity benefits vs social/cultural costs.'},
-
-  {l:'b2',topic:'Society',
-   text:'Social media platforms allow people to share their opinions and experiences with a large audience very easily. This can be positive, as it gives ordinary people a voice and allows important stories to be shared widely. However, it also means that false information can spread very quickly, and that people can face harassment or abuse from strangers without any consequences.',
-   words:59,
-   model:'Social media empowers ordinary voices but also enables misinformation and online abuse to spread rapidly.',
-   note:'The for/against structure compresses neatly into one balanced sentence.'},
-
-  {l:'b2',topic:'Technology',
-   text:'Many children and teenagers spend several hours every day looking at screens — watching videos, playing games, or scrolling through social media. Parents and doctors have raised concerns about the effects this has on young people\'s sleep, concentration, and mental health. At the same time, digital skills are increasingly important in modern life, and spending time online is not always harmful.',
-   words:60,
-   model:'Excessive screen time raises health concerns for young people, though digital literacy is also increasingly essential.',
-   note:'Don\'t list all the harms individually. Keep the tension between concern and necessity.'},
-
-  {l:'b2',topic:'Food & Lifestyle',
-   text:'Travelling is something that many people dream about and save up for. It can be a wonderful way to experience different cultures, try new foods, and gain a new perspective on the world. However, it is also expensive, exhausting, and can have a negative environmental impact, particularly when it involves long-haul flights. For some people, the reality of travelling does not match the expectations.',
-   words:65,
-   model:'Travel broadens your perspective and experience, but comes with significant financial, physical, and environmental costs.',
-   note:'The "reality vs expectation" point is too specific for a one-sentence summary. Stay with the core tension.'},
-
-  {l:'b2',topic:'Education',
-   text:'Many schools still use traditional methods of teaching, where the teacher stands at the front of the classroom and delivers information to students who sit quietly and take notes. Some educators argue that this approach is outdated and that students learn better through more active, collaborative, and creative methods. Others, however, believe that direct instruction from an experienced teacher remains one of the most effective ways to learn.',
-   words:70,
-   model:'Traditional teacher-led instruction is increasingly challenged by active learning approaches, though both have proven value.',
-   note:'Compress the two sides without listing the methods in detail.'},
-
-  // C1
-  {l:'c1',topic:'Society',
-   text:'The concept of meritocracy — the idea that people succeed based on their talent, effort, and ability rather than their background or connections — is widely celebrated in Western societies as a fair and just way of organising the world. However, critics argue that genuine meritocracy is largely a myth. They point out that factors such as socioeconomic background, access to quality education, and social networks play a far more significant role in determining a person\'s success than innate ability or hard work alone. In this view, the belief in meritocracy may actually cause harm by encouraging people to attribute failure to personal inadequacy rather than systemic inequality.',
-   words:112,
-   model:'Meritocracy is celebrated as fair, but critics argue it obscures how background and privilege largely determine success, causing people to blame themselves for structural failures.',
-   note:'Three things to keep: the claim of fairness, the counterargument, and the consequence. "Innate ability" and "hard work" are examples — don\'t need both.'},
-
-  {l:'c1',topic:'Technology',
-   text:'The widespread adoption of artificial intelligence in the workplace has the potential to transform entire industries. Proponents argue that AI will take over repetitive, low-skill tasks and free workers to focus on more creative, strategic, and interpersonal work. Sceptics, however, point out that many of the jobs most vulnerable to automation are held by people who lack the education or resources to retrain for the kind of roles that AI is unlikely to replace. The result, they warn, could be significant structural unemployment concentrated among already disadvantaged groups.',
-   words:90,
-   model:'AI may liberate skilled workers from repetitive tasks, but risks concentrating unemployment among those least able to adapt.',
-   note:'The core tension: liberation for some, displacement for others. Don\'t list the job types in detail.'},
-
-  {l:'c1',topic:'Psychology',
-   text:'Resilience — the capacity to recover from adversity — is frequently cited as one of the most important qualities a person can develop. Self-help literature, corporate training programmes, and educational curricula increasingly emphasise the importance of building resilience in individuals. However, some psychologists and social critics have begun to challenge this framing. They argue that an excessive focus on individual resilience places the burden of dealing with difficult circumstances on the individual, when the real problem may be the circumstances themselves. In their view, encouraging resilience can sometimes function as a way of normalising conditions that should instead be challenged and changed.',
-   words:100,
-   model:'While resilience is widely valued, over-emphasising it as an individual quality can obscure the need to address the systemic conditions that create adversity in the first place.',
-   note:'The key shift: from individual virtue to systemic critique. That tension is the whole point.'},
-
-  {l:'c1',topic:'Society',
-   text:'Privacy, once considered a fundamental right in democratic societies, is under increasing pressure from multiple directions. Governments justify mass surveillance in the name of national security; corporations collect and monetise vast quantities of personal data in exchange for free services; and individuals voluntarily share intimate details of their lives on social media platforms. The cumulative effect of these developments is that genuine privacy has become increasingly difficult to maintain — and yet public resistance to this erosion remains, for the most part, remarkably limited.',
-   words:85,
-   model:'Privacy is being eroded simultaneously by state surveillance, corporate data collection, and individuals\' own behaviour, yet public resistance to this loss remains surprisingly weak.',
-   note:'Three sources of erosion + the paradox of weak resistance = the whole paragraph in one sentence.'},
-
-  {l:'c1',topic:'Work',
-   text:'The concept of work-life balance has become central to contemporary discussions about wellbeing and workplace culture. Yet critics have pointed out that the very notion of "balance" implies an equivalence between the two sides — as though work and life are separate, equally weighted domains that need to be managed in proportion. In practice, for many workers — particularly those in low-paid or insecure employment — work does not sit alongside life in any balanced way. It dominates it. In this sense, the language of work-life balance may be more relevant to a specific class of professional, salaried worker than it is to the workforce as a whole.',
-   words:104,
-   model:'The concept of work-life balance, while appealing, assumes a kind of separation and equality between work and personal life that is only realistic for relatively privileged workers.',
-   note:'The critique of the concept itself is the main point. Don\'t get lost in the examples.'},
-
-  {l:'c1',topic:'Society',
-   text:'Nostalgia is a powerful emotional force that shapes how individuals and societies understand the past. It tends to idealise what has been lost — focusing on the positive elements of earlier times while ignoring the difficulties, injustices, and limitations that also characterised them. Politicians have long understood the power of nostalgic sentiment, using appeals to a golden past as a way of generating support and creating a sense of shared identity. The danger of this is that nostalgic political movements can lead people to pursue a return to conditions that either never existed as remembered or that benefited only some at the expense of others.',
-   words:99,
-   model:'Nostalgia selectively idealises the past, and when exploited politically it can drive movements that pursue a vision of history that was never fully real or was only ever beneficial to some.',
-   note:'Nostalgia + its selective nature + political exploitation + the danger = four ideas that compress into one sentence.'},
-
-  {l:'c1',topic:'Language',
-   text:'The question of whether language shapes thought, or whether thought shapes language, has occupied linguists and philosophers for centuries. The Sapir-Whorf hypothesis, in its strong form, proposed that the language a person speaks determines the way they think and perceive reality. This extreme version has largely been discredited, but a weaker version — that language influences certain aspects of cognition without fully determining it — continues to attract empirical support. Studies have shown, for example, that speakers of languages with different colour terminology perceive and remember colours differently, suggesting that language does at least partially shape perception.',
-   words:95,
-   model:'While the strong claim that language determines thought has been largely rejected, evidence supports a weaker version: that language influences how we perceive and remember certain aspects of reality.',
-   note:'The key move from strong to weak form of the hypothesis is the whole argument. Keep that and the supporting evidence briefly.'},
-
-  {l:'c1',topic:'Psychology',
-   text:'Confirmation bias — the tendency to seek out and favour information that confirms what we already believe, while discounting or ignoring evidence that contradicts our existing views — is one of the most well-documented and pervasive cognitive biases. It affects not just ordinary members of the public but scientists, doctors, judges, and other professionals who are trained to think rationally and objectively. The digital media environment has arguably made confirmation bias more damaging, as algorithms increasingly serve people content that aligns with their existing preferences, creating echo chambers that reinforce rather than challenge pre-existing beliefs.',
-   words:96,
-   model:'Confirmation bias — our tendency to favour information that confirms existing beliefs — affects everyone, and is amplified by digital algorithms that entrench rather than challenge our views.',
-   note:'Define it, note it\'s universal, note the digital aggravation. Everything else is elaboration.'},
-];
-
-var TOPICS=['All'];
-TEXTS.forEach(function(t){if(TOPICS.indexOf(t.topic)===-1)TOPICS.push(t.topic);});
-TOPICS.sort(function(a,b){return a==='All'?-1:b==='All'?1:a.localeCompare(b);});
-
-var activeLevels={b2:true,c1:true};
-var activeTopic='All';
-var deck=[];
-var currentIdx=0;
-var timerDuration=90;
-var timerRemaining=90;
-var timerInterval=null;
-var timerRunning=false;
-
-function buildTopicFilters(){
-  var el=document.getElementById('topicFilters');
-  el.innerHTML=TOPICS.map(function(t){
-    return '<button class="filter-pill topic'+(t===activeTopic?' active':'')+'" onclick="setTopic(\''+t+'\',this)">'+t+'</button>';
-  }).join('');
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarBackdrop').classList.toggle('open');
 }
-function toggleLevel(lv,btn){
-  var other=lv==='b2'?'c1':'b2';
-  if(activeLevels[lv]&&!activeLevels[other])return;
-  activeLevels[lv]=!activeLevels[lv];
-  btn.classList.toggle('active',activeLevels[lv]);
-  rebuildDeck();
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarBackdrop').classList.remove('open');
 }
-function setTopic(t,btn){
-  activeTopic=t;
-  document.querySelectorAll('.filter-pill.topic').forEach(function(b){b.classList.remove('active');});
-  btn.classList.add('active');
-  rebuildDeck();
+function toggleCatGroup(btn){
+  btn.closest('.cat-group').classList.toggle('open');
 }
-function getFiltered(){return TEXTS.filter(function(t){return activeLevels[t.l]&&(activeTopic==='All'||t.topic===activeTopic);});}
-function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
-
-function rebuildDeck(){
-  stopTimer();timerRemaining=timerDuration;updateTimerDisplay();
-  document.getElementById('timerRing').classList.remove('warning','danger');
-  deck=shuffle(getFiltered().slice());
-  currentIdx=0;
-  document.getElementById('cardCount').textContent=deck.length+' passages';
-  renderCard();
-}
-
-function renderCard(){
-  var wrap=document.getElementById('cardWrap');
-  if(!deck.length){wrap.innerHTML='<div style="text-align:center;padding:3rem;color:var(--muted)">No passages match that filter.</div>';return;}
-  if(currentIdx>=deck.length){
-    wrap.innerHTML='<div style="text-align:center;padding:3rem;background:var(--card);border-radius:20px;border:2px solid var(--border);box-shadow:var(--shadow-md)"><div style="font-size:2rem;margin-bottom:.5rem">✂️</div><div style="font-weight:900;font-size:1.2rem;margin-bottom:.5rem">All done!</div><button class="btn-primary" onclick="rebuildDeck()" style="margin:.5rem auto 0;display:flex">Play again</button></div>';
-    stopTimer();return;
+(function(){
+  var here = location.pathname.split('/').pop() || 'index.html';
+  var link = document.querySelector('.sidebar a.row[href="' + here + '"]');
+  if (link) {
+    link.classList.add('active');
+    var group = link.closest('.cat-group');
+    if (group) group.classList.add('open');
   }
-  var t=deck[currentIdx];
-  wrap.innerHTML='<div class="shrink-card">'
-    +'<div class="card-top"><div class="card-meta"><span class="level-badge '+t.l+'">'+(t.l==='b2'?'B2':'C1')+'</span><span class="topic-badge">'+t.topic+'</span></div><span class="card-num">'+(currentIdx+1)+' / '+deck.length+'</span></div>'
-    +'<div class="original-area"><div class="area-label">Original text <span class="word-count">'+t.words+' words</span></div><div class="original-text">'+t.text+'</div></div>'
-    +'<div class="model-area" id="modelArea"><div class="model-label">Model answer</div><div class="model-text">'+t.model+'</div><div class="model-note">💡 '+t.note+'</div></div>'
-    +'</div>';
-}
-
-function revealModel(){
-  var el=document.getElementById('modelArea');
-  if(el)el.classList.add('show');
-  stopTimer();
-}
-
-function nextCard(){
-  stopTimer();currentIdx++;
-  timerRemaining=timerDuration;updateTimerDisplay();
-  document.getElementById('timerRing').classList.remove('warning','danger');
-  renderCard();
-}
-function skipCard(){
-  stopTimer();
-  var t=deck.splice(currentIdx,1)[0];
-  deck.splice(Math.min(currentIdx+3,deck.length),0,t);
-  timerRemaining=timerDuration;updateTimerDisplay();
-  document.getElementById('timerRing').classList.remove('warning','danger');
-  renderCard();
-}
-
-function setDuration(s,btn){
-  timerDuration=s;timerRemaining=s;
-  document.querySelectorAll('.preset-btn').forEach(function(b){b.classList.remove('active');});
-  btn.classList.add('active');stopTimer();
-  document.getElementById('timerRing').classList.remove('warning','danger');
-  if(s===0){document.getElementById('timerDisplay').textContent='--';document.getElementById('timerHint').textContent='no timer';}
-  else{updateTimerDisplay();document.getElementById('timerHint').textContent='tap to start';}
-}
-function toggleTimer(){if(timerDuration===0)return;timerRunning?stopTimer():startTimer();}
-function startTimer(){
-  if(timerDuration===0)return;
-  if(timerRemaining<=0)timerRemaining=timerDuration;
-  timerRunning=true;document.getElementById('timerHint').textContent='tap to pause';
-  timerInterval=setInterval(function(){timerRemaining--;updateTimerDisplay();if(timerRemaining<=0){stopTimer();timerExpired();}},1000);
-}
-function stopTimer(){clearInterval(timerInterval);timerRunning=false;if(timerDuration>0&&timerRemaining>0)document.getElementById('timerHint').textContent='tap to start';}
-function timerExpired(){
-  document.getElementById('timerHint').textContent='time\'s up!';
-  document.getElementById('timerRing').classList.add('danger');
-  revealModel();
-  var f=0,iv=setInterval(function(){document.getElementById('timerRing').style.opacity=document.getElementById('timerRing').style.opacity==='0.4'?'1':'0.4';if(++f>5){clearInterval(iv);document.getElementById('timerRing').style.opacity='1';}},200);
-}
-function updateTimerDisplay(){
-  if(timerDuration===0)return;
-  document.getElementById('timerDisplay').textContent=timerRemaining;
-  var r=timerRemaining/timerDuration;
-  document.getElementById('timerArc').style.strokeDashoffset=339*(1-r);
-  var ring=document.getElementById('timerRing');ring.classList.remove('warning','danger');
-  if(r<=0.25)ring.classList.add('danger');else if(r<=0.5)ring.classList.add('warning');
-}
-document.addEventListener('DOMContentLoaded',function(){buildTopicFilters();rebuildDeck();});
+})();
 </script>
 </body>
 </html>
