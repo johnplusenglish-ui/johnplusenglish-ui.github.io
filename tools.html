@@ -24,12 +24,19 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .topnav-links{display:flex;gap:1.2rem;align-items:center}
 .topnav-links a,.topnav-links button{font-size:.85rem;font-weight:600;color:var(--muted);text-decoration:none;transition:color .2s;background:none;border:none;cursor:pointer;font-family:'Outfit',sans-serif}
 .topnav-links a:hover,.topnav-links button:hover{color:var(--sky)}
-.sidebar-toggle{display:none;align-items:center;gap:.4rem;background:none;border:none;cursor:pointer;color:var(--ink);padding:.3rem}
+.sidebar-toggle{display:inline-flex;align-items:center;gap:.4rem;background:none;border:none;cursor:pointer;color:var(--ink);padding:.3rem;border-radius:8px;transition:background .15s}
+.sidebar-toggle:hover{background:var(--border)}
 .sidebar-toggle svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2}
+@media(min-width:901px){
+  .sidebar{transition:width .2s ease,padding .2s ease,border-color .2s ease}
+  .sidebar.collapsed{width:0;min-width:0;padding-left:0;padding-right:0;border-right-color:transparent;overflow:hidden}
+  .sidebar.collapsed .sidebar-header,.sidebar.collapsed .cat-group{opacity:0}
+}
 
 /* ── App shell: sidebar + content pane ── */
 .app-shell{display:flex;align-items:flex-start;padding-top:52px;min-height:100vh;position:relative;z-index:1}
-.sidebar{width:300px;flex-shrink:0;height:calc(100vh - 52px);position:sticky;top:52px;overflow-y:auto;border-right:1.5px solid var(--border);padding:1.3rem 1rem 3rem}
+.sidebar{width:300px;flex-shrink:0;height:calc(100vh - 52px);position:sticky;top:52px;overflow-y:auto;overflow-x:hidden;border-right:1.5px solid var(--border);padding:1.3rem 1rem 3rem}
+.sidebar-header,.sidebar>.cat-group,.sidebar>.list-card{min-width:268px}
 .sidebar-header{padding:.3rem .5rem 1.1rem}
 .sidebar-header h1{font-family:'Outfit',sans-serif;font-size:1.25rem;font-weight:900;letter-spacing:-.01em;margin-bottom:.25rem}
 .sidebar-header p{font-size:.72rem;color:var(--muted);line-height:1.5}
@@ -6332,13 +6339,23 @@ function deselectTopic(skipHash){
   if (!skipHash) history.pushState({tool:null}, '', location.pathname);
 }
 function toggleSidebar(){
-  document.getElementById('sidebar').classList.toggle('open');
+  const sidebar = document.getElementById('sidebar');
+  sidebar.classList.toggle('open');
+  sidebar.classList.toggle('collapsed');
   document.getElementById('sidebarBackdrop').classList.toggle('open');
+  try { localStorage.setItem('jpe-sidebar-collapsed', sidebar.classList.contains('collapsed') ? '1' : '0'); } catch(e) {}
 }
 function closeSidebar(){
   document.getElementById('sidebar').classList.remove('open');
   document.getElementById('sidebarBackdrop').classList.remove('open');
 }
+(function restoreSidebarCollapse(){
+  try {
+    if (localStorage.getItem('jpe-sidebar-collapsed') === '1') {
+      document.getElementById('sidebar').classList.add('collapsed');
+    }
+  } catch(e) {}
+})();
 function routeFromHash(){
   const hash = location.hash.replace('#','');
   if (hash.startsWith('word-banks/')) {
