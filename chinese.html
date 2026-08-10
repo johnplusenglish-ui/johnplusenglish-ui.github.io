@@ -191,12 +191,6 @@
     gap:12px;
     margin-bottom:16px;
   }
-  .recorders.single{
-    grid-template-columns:1fr;
-    max-width:220px;
-    margin-left:auto;
-    margin-right:auto;
-  }
   .recorder{
     border:1.5px solid var(--line);
     border-radius:14px;
@@ -305,24 +299,47 @@
     margin-bottom:12px;
     position:relative;
   }
+  .entry:not(.editing) .entry-edit{display:none;}
+  .entry.editing .entry-view{display:none;}
+  .entry-edit{padding-top:4px;}
+  .entry-edit .field{margin-bottom:12px;}
+  .entry-edit .recorders{margin-bottom:12px;}
+  .entry-edit-actions{
+    display:flex;
+    gap:10px;
+  }
+  .entry-edit-actions .save-btn{flex:1;}
+  .cancel-btn{
+    flex:1;
+    background:#fff;
+    border:1.5px solid var(--line);
+    color:var(--ink);
+    border-radius:12px;
+    padding:14px;
+    font-family:'Outfit',sans-serif;
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+  }
+  .cancel-btn:hover{background:var(--bg);}
   .entry .en{
     font-size:17px;
     font-weight:600;
     color:var(--ink);
-    margin:0 32px 4px 0;
+    margin:0 64px 4px 0;
   }
   .entry .zh{
     font-size:16px;
     font-weight:500;
     color:var(--cobalt-dark);
-    margin:0 32px 2px 0;
+    margin:0 64px 2px 0;
   }
   .entry .pinyin{
     font-size:13px;
     font-weight:500;
     font-style:italic;
     color:var(--muted);
-    margin:0 32px 12px 0;
+    margin:0 64px 12px 0;
   }
   .entry .audios{
     display:flex;
@@ -333,34 +350,38 @@
     display:flex;
     align-items:center;
     gap:8px;
-    background:var(--cobalt-soft);
+    background:var(--coral-soft);
     border-radius:999px;
     padding:4px 10px 4px 4px;
   }
-  .audio-chip.zh-chip{background:var(--coral-soft);}
   .audio-chip .tag{
     font-size:10px;
     font-weight:800;
-    color:var(--cobalt);
-    width:20px;
+    color:var(--coral-dark);
+    padding:0 2px;
+    min-width:20px;
     text-align:center;
   }
-  .audio-chip.zh-chip .tag{color:var(--coral-dark);}
   .audio-chip audio{height:28px;max-width:150px;}
-  .delete-btn{
+  .entry-actions{
     position:absolute;
     top:14px;
     right:14px;
+    display:flex;
+    gap:2px;
+  }
+  .icon-btn{
     background:none;
     border:none;
     cursor:pointer;
     color:var(--muted);
-    padding:4px;
+    padding:6px;
     border-radius:8px;
     line-height:0;
   }
-  .delete-btn:hover{color:var(--coral-dark);background:var(--coral-soft);}
-  .delete-btn svg{width:16px;height:16px;fill:currentColor;}
+  .icon-btn svg{width:16px;height:16px;fill:currentColor;}
+  .icon-btn.edit-btn:hover{color:var(--cobalt-dark);background:var(--cobalt-soft);}
+  .icon-btn.delete-btn:hover{color:var(--coral-dark);background:var(--coral-soft);}
   .empty{
     text-align:center;
     color:var(--muted);
@@ -400,28 +421,15 @@
       <input type="text" id="en-input" placeholder="e.g. How are you today?">
     </div>
     <div class="field">
-      <label for="zh-input">Chinese phrase</label>
-      <input type="text" id="zh-input" placeholder="e.g. 你今天好吗？">
+      <label for="zh-input">Chinese phrase (Traditional)</label>
+      <input type="text" id="zh-input" placeholder="e.g. 你今天好嗎？" lang="zh-Hant">
     </div>
     <div class="field">
       <label for="pinyin-input">Pinyin (how to say it)</label>
       <input type="text" id="pinyin-input" placeholder="e.g. Nǐ jīntiān hǎo ma?">
     </div>
 
-    <div class="recorders single">
-      <div class="recorder" data-lang="zh">
-        <div class="rec-label">Chinese audio</div>
-        <button class="rec-btn" type="button" data-action="toggle">
-          <svg viewBox="0 0 24 24"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a1 1 0 0 0-2 0 3 3 0 0 1-6 0 1 1 0 0 0-2 0 5 5 0 0 0 4 4.9V18H9a1 1 0 0 0 0 2h6a1 1 0 0 0 0-2h-2v-2.1A5 5 0 0 0 17 11z"/></svg>
-        </button>
-        <div class="rec-timer">Tap to record</div>
-        <div class="rec-preview">
-          <audio controls></audio>
-          <button class="rec-redo" type="button" data-action="redo">Re-record</button>
-        </div>
-        <div class="rec-error"></div>
-      </div>
-    </div>
+    <div class="recorders" id="new-recorders"></div>
 
     <button class="save-btn" id="save-btn" disabled>Save phrase</button>
   </div>
@@ -570,16 +578,30 @@
     });
   }
 
-  var recorders = {};
+  // ---- reusable audio recorder component ----
 
-  function setupRecorder(lang){
-    var root = document.querySelector('.recorder[data-lang="' + lang + '"]');
-    var btn = root.querySelector('[data-action="toggle"]');
-    var timer = root.querySelector('.rec-timer');
-    var preview = root.querySelector('.rec-preview');
-    var audioEl = root.querySelector('audio');
-    var redoBtn = root.querySelector('[data-action="redo"]');
-    var errorEl = root.querySelector('.rec-error');
+  function createRecorder(labelText){
+    var root = document.createElement("div");
+    root.className = "recorder";
+    root.innerHTML =
+      '<div class="rec-label"></div>' +
+      '<button class="rec-btn" type="button">' +
+        '<svg viewBox="0 0 24 24"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a1 1 0 0 0-2 0 3 3 0 0 1-6 0 1 1 0 0 0-2 0 5 5 0 0 0 4 4.9V18H9a1 1 0 0 0 0 2h6a1 1 0 0 0 0-2h-2v-2.1A5 5 0 0 0 17 11z"/></svg>' +
+      '</button>' +
+      '<div class="rec-timer">Tap to record</div>' +
+      '<div class="rec-preview">' +
+        '<audio controls></audio>' +
+        '<button class="rec-redo" type="button">Re-record</button>' +
+      '</div>' +
+      '<div class="rec-error"></div>';
+
+    root.querySelector(".rec-label").textContent = labelText;
+    var btn = root.querySelector(".rec-btn");
+    var timer = root.querySelector(".rec-timer");
+    var preview = root.querySelector(".rec-preview");
+    var audioEl = root.querySelector("audio");
+    var redoBtn = root.querySelector(".rec-redo");
+    var errorEl = root.querySelector(".rec-error");
 
     var state = {
       mediaRecorder:null,
@@ -589,6 +611,12 @@
       startedAt:0,
       timerInterval:null
     };
+
+    var changeHandler = null;
+
+    function fireChange(){
+      if(changeHandler) changeHandler();
+    }
 
     function showError(msg){
       errorEl.textContent = msg;
@@ -603,7 +631,7 @@
     }
 
     function startTimer(){
-      state.startedAt = Date.now ? Date.now() : new Date().getTime();
+      state.startedAt = new Date().getTime();
       state.timerInterval = setInterval(function(){
         timer.textContent = formatTime(new Date().getTime() - state.startedAt);
       }, 200);
@@ -611,6 +639,14 @@
 
     function stopTimer(){
       clearInterval(state.timerInterval);
+    }
+
+    function showBlob(blob){
+      state.blob = blob;
+      audioEl.src = URL.createObjectURL(blob);
+      preview.classList.add("show");
+      btn.style.display = "none";
+      timer.textContent = "";
     }
 
     function reset(){
@@ -633,17 +669,14 @@
           if(e.data && e.data.size > 0) state.chunks.push(e.data);
         };
         mr.onstop = function(){
-          state.blob = new Blob(state.chunks, {type: mr.mimeType || "audio/webm"});
-          audioEl.src = URL.createObjectURL(state.blob);
-          preview.classList.add("show");
-          btn.style.display = "none";
+          showBlob(new Blob(state.chunks, {type: mr.mimeType || "audio/webm"}));
           stream.getTracks().forEach(function(t){ t.stop(); });
-          updateSaveState();
+          fireChange();
         };
         mr.start();
         btn.classList.add("recording");
         startTimer();
-      }).catch(function(err){
+      }).catch(function(){
         showError("Microphone access denied or unavailable.");
       });
     }
@@ -666,15 +699,19 @@
 
     redoBtn.addEventListener("click", function(){
       reset();
+      fireChange();
     });
 
-    recorders[lang] = {
+    return {
+      el: root,
       getBlob: function(){ return state.blob; },
-      reset: reset
+      setBlob: showBlob,
+      reset: reset,
+      onChange: function(fn){ changeHandler = fn; }
     };
   }
 
-  setupRecorder("zh");
+  // ---- new-phrase form ----
 
   var enInput = document.getElementById("en-input");
   var zhInput = document.getElementById("zh-input");
@@ -682,11 +719,20 @@
   var saveBtn = document.getElementById("save-btn");
   var listEl = document.getElementById("list");
 
+  var newRecorderContainer = document.getElementById("new-recorders");
+  var newRec1 = createRecorder("Chinese audio 1");
+  var newRec2 = createRecorder("Chinese audio 2");
+  newRecorderContainer.appendChild(newRec1.el);
+  newRecorderContainer.appendChild(newRec2.el);
+
   function updateSaveState(){
     var hasText = enInput.value.trim() !== "" || zhInput.value.trim() !== "" || pinyinInput.value.trim() !== "";
-    var hasAudio = !!recorders.zh.getBlob();
+    var hasAudio = !!newRec1.getBlob() || !!newRec2.getBlob();
     saveBtn.disabled = !(hasText || hasAudio);
   }
+
+  newRec1.onChange(updateSaveState);
+  newRec2.onChange(updateSaveState);
 
   enInput.addEventListener("input", updateSaveState);
   zhInput.addEventListener("input", updateSaveState);
@@ -696,66 +742,56 @@
     return "p_" + new Date().getTime().toString(36) + "_" + Math.random().toString(36).slice(2,8);
   }
 
-  function renderEntry(entry){
-    var el = document.createElement("div");
-    el.className = "entry";
-    el.dataset.id = entry.id;
+  // ---- encrypt/decrypt an entry (shared by create + edit) ----
 
-    var del = document.createElement("button");
-    del.className = "delete-btn";
-    del.type = "button";
-    del.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 7h12l-1 13H7L6 7zm3-3h6l1 2H8l1-2zM9 10v7m6-7v7"/></svg>';
-    del.addEventListener("click", function(){
-      deleteEntry(entry.id).then(function(){ el.remove(); checkEmpty(); });
+  function buildStoredEntry(id, createdAt, enText, zhText, pinyinText, blob1, blob2){
+    var payload = JSON.stringify({en:enText, zh:zhText, pinyin:pinyinText});
+    return encryptText(payload).then(function(textEnc){
+      var step1 = blob1 ? blob1.arrayBuffer().then(encryptBuffer) : Promise.resolve(null);
+      return step1.then(function(enc1){
+        var step2 = blob2 ? blob2.arrayBuffer().then(encryptBuffer) : Promise.resolve(null);
+        return step2.then(function(enc2){
+          return {
+            id: id,
+            createdAt: createdAt,
+            textIv: textEnc.iv,
+            textCipher: textEnc.cipher,
+            audio1Iv: enc1 ? enc1.iv : null,
+            audio1Cipher: enc1 ? enc1.cipher : null,
+            audio1Type: blob1 ? blob1.type : null,
+            audio2Iv: enc2 ? enc2.iv : null,
+            audio2Cipher: enc2 ? enc2.cipher : null,
+            audio2Type: blob2 ? blob2.type : null
+          };
+        });
+      });
     });
-    el.appendChild(del);
+  }
 
-    if(entry.en){
-      var enP = document.createElement("p");
-      enP.className = "en";
-      enP.textContent = entry.en;
-      el.appendChild(enP);
-    }
-    if(entry.zh){
-      var zhP = document.createElement("p");
-      zhP.className = "zh";
-      zhP.textContent = entry.zh;
-      el.appendChild(zhP);
-    }
-    if(entry.pinyin){
-      var pinyinP = document.createElement("p");
-      pinyinP.className = "pinyin";
-      pinyinP.textContent = entry.pinyin;
-      el.appendChild(pinyinP);
-    }
-
-    var audios = document.createElement("div");
-    audios.className = "audios";
-
-    if(entry.zhAudio){
-      var chip2 = document.createElement("div");
-      chip2.className = "audio-chip zh-chip";
-      chip2.innerHTML = '<span class="tag">中</span>';
-      var a2 = document.createElement("audio");
-      a2.controls = true;
-      a2.src = URL.createObjectURL(entry.zhAudio);
-      chip2.appendChild(a2);
-      audios.appendChild(chip2);
-    }
-    if(audios.children.length) el.appendChild(audios);
-
-    listEl.insertBefore(el, listEl.firstChild);
+  function decryptAudioSlot(iv, cipher, type){
+    if(!cipher) return Promise.resolve(null);
+    return decryptBuffer(iv, cipher).then(function(buf){
+      return new Blob([buf], {type: type || "audio/webm"});
+    });
   }
 
   function decryptEntry(entry){
     return decryptText(entry.textIv, entry.textCipher).then(function(json){
       var data = JSON.parse(json);
-      if(entry.audioCipher){
-        return decryptBuffer(entry.audioIv, entry.audioCipher).then(function(buf){
-          return {id:entry.id, en:data.en, zh:data.zh, pinyin:data.pinyin, zhAudio:new Blob([buf], {type: entry.audioType || "audio/webm"}), createdAt:entry.createdAt};
-        });
-      }
-      return {id:entry.id, en:data.en, zh:data.zh, pinyin:data.pinyin, zhAudio:null, createdAt:entry.createdAt};
+      return Promise.all([
+        decryptAudioSlot(entry.audio1Iv, entry.audio1Cipher, entry.audio1Type),
+        decryptAudioSlot(entry.audio2Iv, entry.audio2Cipher, entry.audio2Type)
+      ]).then(function(blobs){
+        return {
+          id: entry.id,
+          createdAt: entry.createdAt,
+          en: data.en,
+          zh: data.zh,
+          pinyin: data.pinyin,
+          audio1: blobs[0],
+          audio2: blobs[1]
+        };
+      });
     });
   }
 
@@ -768,50 +804,204 @@
     }
   }
 
+  function makeTextField(labelText, placeholder, value, langAttr){
+    var wrap = document.createElement("div");
+    wrap.className = "field";
+    var label = document.createElement("label");
+    label.textContent = labelText;
+    var input = document.createElement("input");
+    input.type = "text";
+    input.placeholder = placeholder;
+    input.value = value || "";
+    if(langAttr) input.lang = langAttr;
+    wrap.appendChild(label);
+    wrap.appendChild(input);
+    return {wrap:wrap, input:input};
+  }
+
+  // ---- rendering a saved entry, with inline edit mode ----
+
+  function renderEntry(entry){
+    var data = entry;
+
+    var el = document.createElement("div");
+    el.className = "entry";
+    el.dataset.id = data.id;
+
+    var viewEl = document.createElement("div");
+    viewEl.className = "entry-view";
+    var editEl = document.createElement("div");
+    editEl.className = "entry-edit";
+    el.appendChild(viewEl);
+    el.appendChild(editEl);
+
+    listEl.insertBefore(el, listEl.firstChild);
+
+    function paintView(){
+      viewEl.innerHTML = "";
+
+      var actions = document.createElement("div");
+      actions.className = "entry-actions";
+
+      var editBtn = document.createElement("button");
+      editBtn.className = "icon-btn edit-btn";
+      editBtn.type = "button";
+      editBtn.title = "Edit";
+      editBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M4 20h4.4l10.4-10.4-4.4-4.4L4 15.6V20zm2-3.8L15.4 6.6l1.8 1.8L7.8 18H6v-1.8zM19.7 5.3l-2-2a1 1 0 0 0-1.4 0L15 4.6l3.4 3.4 1.3-1.3a1 1 0 0 0 0-1.4z"/></svg>';
+      editBtn.addEventListener("click", openEdit);
+
+      var delBtn = document.createElement("button");
+      delBtn.className = "icon-btn delete-btn";
+      delBtn.type = "button";
+      delBtn.title = "Delete";
+      delBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 7h12l-1 13H7L6 7zm3-3h6l1 2H8l1-2zM9 10v7m6-7v7"/></svg>';
+      delBtn.addEventListener("click", function(){
+        deleteEntry(data.id).then(function(){ el.remove(); checkEmpty(); });
+      });
+
+      actions.appendChild(editBtn);
+      actions.appendChild(delBtn);
+      viewEl.appendChild(actions);
+
+      if(data.en){
+        var enP = document.createElement("p");
+        enP.className = "en";
+        enP.textContent = data.en;
+        viewEl.appendChild(enP);
+      }
+      if(data.zh){
+        var zhP = document.createElement("p");
+        zhP.className = "zh";
+        zhP.textContent = data.zh;
+        viewEl.appendChild(zhP);
+      }
+      if(data.pinyin){
+        var pinyinP = document.createElement("p");
+        pinyinP.className = "pinyin";
+        pinyinP.textContent = data.pinyin;
+        viewEl.appendChild(pinyinP);
+      }
+
+      var audios = document.createElement("div");
+      audios.className = "audios";
+      [data.audio1, data.audio2].forEach(function(blob, i){
+        if(!blob) return;
+        var chip = document.createElement("div");
+        chip.className = "audio-chip";
+        chip.innerHTML = '<span class="tag">中' + (i+1) + '</span>';
+        var a = document.createElement("audio");
+        a.controls = true;
+        a.src = URL.createObjectURL(blob);
+        chip.appendChild(a);
+        audios.appendChild(chip);
+      });
+      if(audios.children.length) viewEl.appendChild(audios);
+    }
+
+    // build the edit form once; re-populated each time it is opened
+    var enField = makeTextField("English phrase", "e.g. How are you today?", data.en);
+    var zhField = makeTextField("Chinese phrase (Traditional)", "e.g. 你今天好嗎？", data.zh, "zh-Hant");
+    var pyField = makeTextField("Pinyin (how to say it)", "e.g. Nǐ jīntiān hǎo ma?", data.pinyin);
+
+    editEl.appendChild(enField.wrap);
+    editEl.appendChild(zhField.wrap);
+    editEl.appendChild(pyField.wrap);
+
+    var editRecorders = document.createElement("div");
+    editRecorders.className = "recorders";
+    var er1 = createRecorder("Chinese audio 1");
+    var er2 = createRecorder("Chinese audio 2");
+    editRecorders.appendChild(er1.el);
+    editRecorders.appendChild(er2.el);
+    editEl.appendChild(editRecorders);
+
+    var actionsRow = document.createElement("div");
+    actionsRow.className = "entry-edit-actions";
+    var cancelBtn = document.createElement("button");
+    cancelBtn.className = "cancel-btn";
+    cancelBtn.type = "button";
+    cancelBtn.textContent = "Cancel";
+    var saveEditBtn = document.createElement("button");
+    saveEditBtn.className = "save-btn";
+    saveEditBtn.type = "button";
+    saveEditBtn.textContent = "Save changes";
+    actionsRow.appendChild(cancelBtn);
+    actionsRow.appendChild(saveEditBtn);
+    editEl.appendChild(actionsRow);
+
+    function openEdit(){
+      enField.input.value = data.en || "";
+      zhField.input.value = data.zh || "";
+      pyField.input.value = data.pinyin || "";
+      er1.reset();
+      er2.reset();
+      if(data.audio1) er1.setBlob(data.audio1);
+      if(data.audio2) er2.setBlob(data.audio2);
+      saveEditBtn.disabled = false;
+      el.classList.add("editing");
+    }
+
+    cancelBtn.addEventListener("click", function(){
+      el.classList.remove("editing");
+    });
+
+    saveEditBtn.addEventListener("click", function(){
+      saveEditBtn.disabled = true;
+      var newEn = enField.input.value.trim();
+      var newZh = zhField.input.value.trim();
+      var newPinyin = pyField.input.value.trim();
+      var blob1 = er1.getBlob();
+      var blob2 = er2.getBlob();
+
+      buildStoredEntry(data.id, data.createdAt, newEn, newZh, newPinyin, blob1, blob2).then(function(stored){
+        return putEntry(stored);
+      }).then(function(){
+        data.en = newEn;
+        data.zh = newZh;
+        data.pinyin = newPinyin;
+        data.audio1 = blob1;
+        data.audio2 = blob2;
+        paintView();
+        el.classList.remove("editing");
+      }).catch(function(e){
+        console.error("Failed to update phrase:", e);
+        saveEditBtn.disabled = false;
+      });
+    });
+
+    paintView();
+  }
+
   saveBtn.addEventListener("click", function(){
     saveBtn.disabled = true;
-    var audioBlob = recorders.zh.getBlob();
-    var payload = JSON.stringify({
-      en: enInput.value.trim(),
-      zh: zhInput.value.trim(),
-      pinyin: pinyinInput.value.trim()
-    });
+    var enText = enInput.value.trim();
+    var zhText = zhInput.value.trim();
+    var pinyinText = pinyinInput.value.trim();
+    var blob1 = newRec1.getBlob();
+    var blob2 = newRec2.getBlob();
     var id = makeId();
     var createdAt = new Date().getTime();
 
-    encryptText(payload).then(function(textEnc){
-      var audioStep = audioBlob
-        ? audioBlob.arrayBuffer().then(encryptBuffer)
-        : Promise.resolve(null);
-
-      return audioStep.then(function(audioEnc){
-        var storedEntry = {
-          id: id,
-          createdAt: createdAt,
-          textIv: textEnc.iv,
-          textCipher: textEnc.cipher,
-          audioIv: audioEnc ? audioEnc.iv : null,
-          audioCipher: audioEnc ? audioEnc.cipher : null,
-          audioType: audioBlob ? audioBlob.type : null
-        };
-        return putEntry(storedEntry);
-      });
+    buildStoredEntry(id, createdAt, enText, zhText, pinyinText, blob1, blob2).then(function(stored){
+      return putEntry(stored);
     }).then(function(){
       var emptyMsg = listEl.querySelector(".empty");
       if(emptyMsg) emptyMsg.remove();
       renderEntry({
         id: id,
-        en: enInput.value.trim(),
-        zh: zhInput.value.trim(),
-        pinyin: pinyinInput.value.trim(),
-        zhAudio: audioBlob,
-        createdAt: createdAt
+        createdAt: createdAt,
+        en: enText,
+        zh: zhText,
+        pinyin: pinyinText,
+        audio1: blob1,
+        audio2: blob2
       });
 
       enInput.value = "";
       zhInput.value = "";
       pinyinInput.value = "";
-      recorders.zh.reset();
+      newRec1.reset();
+      newRec2.reset();
       updateSaveState();
     }).catch(function(e){
       console.error("Failed to save phrase:", e);
@@ -832,7 +1022,6 @@
     });
   }
 
-  var gateEl = document.getElementById("gate");
   var gateTitle = document.getElementById("gate-title");
   var gateSub = document.getElementById("gate-sub");
   var gateForm = document.getElementById("gate-form");
