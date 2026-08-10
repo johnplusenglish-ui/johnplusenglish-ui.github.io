@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EN / ZH Phrasebook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cobalt:#0047ab;
+    --cobalt-dark:#00337d;
+    --cobalt-soft:#eaf0fb;
+    --coral:#ff4d4d;
+    --coral-dark:#e0393f;
+    --coral-soft:#ffe9e8;
+    --bg:#f5f6fa;
+    --card:#ffffff;
+    --ink:#101828;
+    --muted:#667085;
+    --line:#e5e7f0;
+    --radius:18px;
+    --shadow:0 1px 2px rgba(16,24,40,.04), 0 14px 30px -18px rgba(16,24,40,.22);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Outfit',sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    min-height:100vh;
+  }
+  body:not(.unlocked) header, body:not(.unlocked) main{
+    display:none;
+  }
+  #gate{
+    position:fixed;
+    inset:0;
+    background:linear-gradient(135deg,var(--cobalt),var(--cobalt-dark));
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    z-index:1000;
+  }
+  body.unlocked #gate{display:none;}
+  .gate-card{
+    background:var(--card);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:28px 24px;
+    max-width:340px;
+    width:100%;
+    text-align:center;
+  }
+  .gate-card h2{
+    margin:0 0 6px;
+    font-size:20px;
+    font-weight:800;
+    color:var(--ink);
+  }
+  .gate-sub{
+    margin:0 0 18px;
+    font-size:13px;
+    color:var(--muted);
+  }
+  .gate-card input[type=password]{
+    width:100%;
+    border:1.5px solid var(--line);
+    border-radius:12px;
+    padding:12px 14px;
+    font-family:'Outfit',sans-serif;
+    font-size:16px;
+    margin-bottom:10px;
+    background:#fafbfd;
+  }
+  .gate-card input[type=password]:focus{
+    outline:none;
+    border-color:var(--cobalt);
+    background:#fff;
+  }
+  .gate-btn{
+    width:100%;
+    background:var(--cobalt);
+    color:#fff;
+    border:none;
+    border-radius:12px;
+    padding:13px;
+    font-family:'Outfit',sans-serif;
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+    margin-top:4px;
+  }
+  .gate-btn:hover{background:var(--cobalt-dark);}
+  .gate-btn:disabled{opacity:.5;cursor:not-allowed;}
+  .gate-error{
+    font-size:12px;
+    color:var(--coral-dark);
+    min-height:16px;
+    margin-top:8px;
+    font-weight:600;
+  }
+  .gate-warn{
+    font-size:11px;
+    color:var(--muted);
+    margin-top:14px;
+    line-height:1.5;
+  }
+  header{
+    position:relative;
+    background:linear-gradient(135deg,var(--cobalt),var(--cobalt-dark));
+    color:#fff;
+    padding:28px 20px 34px;
+    text-align:center;
+  }
+  .lock-btn{
+    position:absolute;
+    top:18px;
+    right:16px;
+    background:rgba(255,255,255,.15);
+    border:none;
+    border-radius:10px;
+    width:36px;
+    height:36px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    color:#fff;
+  }
+  .lock-btn:hover{background:rgba(255,255,255,.25);}
+  .lock-btn svg{width:16px;height:16px;fill:currentColor;}
+  header h1{
+    margin:0 0 4px;
+    font-size:26px;
+    font-weight:800;
+    letter-spacing:-0.02em;
+  }
+  header p{
+    margin:0;
+    font-size:14px;
+    opacity:.85;
+    font-weight:500;
+  }
+  main{
+    max-width:640px;
+    margin:-20px auto 60px;
+    padding:0 16px;
+  }
+  .card{
+    background:var(--card);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    border:1px solid var(--line);
+    padding:20px;
+    margin-bottom:16px;
+  }
+  .field{
+    margin-bottom:14px;
+  }
+  .field label{
+    display:block;
+    font-size:12px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    color:var(--muted);
+    margin-bottom:6px;
+  }
+  .field input[type=text]{
+    width:100%;
+    border:1.5px solid var(--line);
+    border-radius:12px;
+    padding:12px 14px;
+    font-family:'Outfit',sans-serif;
+    font-size:16px;
+    color:var(--ink);
+    background:#fafbfd;
+    transition:border-color .15s;
+  }
+  .field input[type=text]:focus{
+    outline:none;
+    border-color:var(--cobalt);
+    background:#fff;
+  }
+  .recorders{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    margin-bottom:16px;
+  }
+  .recorders.single{
+    grid-template-columns:1fr;
+    max-width:220px;
+    margin-left:auto;
+    margin-right:auto;
+  }
+  .recorder{
+    border:1.5px solid var(--line);
+    border-radius:14px;
+    padding:12px;
+    background:#fafbfd;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:8px;
+    text-align:center;
+  }
+  .recorder .rec-label{
+    font-size:11px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    color:var(--muted);
+  }
+  .rec-btn{
+    width:52px;
+    height:52px;
+    border-radius:50%;
+    border:none;
+    background:var(--coral);
+    color:#fff;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow:0 4px 12px -4px rgba(255,77,77,.6);
+    transition:transform .1s, background .15s;
+  }
+  .rec-btn:active{transform:scale(.94);}
+  .rec-btn.recording{
+    background:var(--coral-dark);
+    animation:pulse 1.2s infinite;
+  }
+  .rec-btn svg{width:20px;height:20px;fill:#fff;}
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(255,77,77,.5);}
+    70%{box-shadow:0 0 0 12px rgba(255,77,77,0);}
+    100%{box-shadow:0 0 0 0 rgba(255,77,77,0);}
+  }
+  .rec-timer{
+    font-size:12px;
+    font-weight:600;
+    color:var(--muted);
+    min-height:16px;
+  }
+  .rec-preview{
+    width:100%;
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+  }
+  .rec-preview.show{display:flex;}
+  .rec-preview audio{width:100%;height:32px;}
+  .rec-redo{
+    background:none;
+    border:none;
+    color:var(--cobalt);
+    font-size:11px;
+    font-weight:700;
+    cursor:pointer;
+    text-decoration:underline;
+    font-family:'Outfit',sans-serif;
+  }
+  .rec-error{
+    font-size:11px;
+    color:var(--coral-dark);
+    display:none;
+  }
+  .save-btn{
+    width:100%;
+    background:var(--cobalt);
+    color:#fff;
+    border:none;
+    border-radius:12px;
+    padding:14px;
+    font-family:'Outfit',sans-serif;
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+    transition:background .15s, opacity .15s;
+  }
+  .save-btn:hover{background:var(--cobalt-dark);}
+  .save-btn:disabled{
+    opacity:.4;
+    cursor:not-allowed;
+  }
+  .list-heading{
+    font-size:13px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    color:var(--muted);
+    margin:24px 4px 10px;
+  }
+  .entry{
+    background:var(--card);
+    border-radius:var(--radius);
+    border:1px solid var(--line);
+    box-shadow:var(--shadow);
+    padding:16px 18px;
+    margin-bottom:12px;
+    position:relative;
+  }
+  .entry .en{
+    font-size:17px;
+    font-weight:600;
+    color:var(--ink);
+    margin:0 32px 4px 0;
+  }
+  .entry .zh{
+    font-size:16px;
+    font-weight:500;
+    color:var(--cobalt-dark);
+    margin:0 32px 2px 0;
+  }
+  .entry .pinyin{
+    font-size:13px;
+    font-weight:500;
+    font-style:italic;
+    color:var(--muted);
+    margin:0 32px 12px 0;
+  }
+  .entry .audios{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .audio-chip{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:var(--cobalt-soft);
+    border-radius:999px;
+    padding:4px 10px 4px 4px;
+  }
+  .audio-chip.zh-chip{background:var(--coral-soft);}
+  .audio-chip .tag{
+    font-size:10px;
+    font-weight:800;
+    color:var(--cobalt);
+    width:20px;
+    text-align:center;
+  }
+  .audio-chip.zh-chip .tag{color:var(--coral-dark);}
+  .audio-chip audio{height:28px;max-width:150px;}
+  .delete-btn{
+    position:absolute;
+    top:14px;
+    right:14px;
+    background:none;
+    border:none;
+    cursor:pointer;
+    color:var(--muted);
+    padding:4px;
+    border-radius:8px;
+    line-height:0;
+  }
+  .delete-btn:hover{color:var(--coral-dark);background:var(--coral-soft);}
+  .delete-btn svg{width:16px;height:16px;fill:currentColor;}
+  .empty{
+    text-align:center;
+    color:var(--muted);
+    font-size:14px;
+    padding:30px 10px;
+  }
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="gate-card">
+    <h2 id="gate-title">Set a password</h2>
+    <p class="gate-sub" id="gate-sub">Choose a password to protect your saved phrases.</p>
+    <form id="gate-form" autocomplete="off">
+      <input type="password" id="gate-pw" placeholder="Password" autocomplete="new-password">
+      <input type="password" id="gate-pw2" placeholder="Confirm password" autocomplete="new-password">
+      <button class="gate-btn" type="submit" id="gate-submit">Set password</button>
+      <div class="gate-error" id="gate-error"></div>
+    </form>
+    <p class="gate-warn">There is no password reset. If you forget it, saved phrases cannot be recovered.</p>
+  </div>
+</div>
+
+<header>
+  <button class="lock-btn" id="lock-btn" type="button" title="Lock">
+    <svg viewBox="0 0 24 24"><path d="M6 10V8a6 6 0 0 1 12 0v2h1a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V11a1 1 0 0 1 1-1h1zm2 0h8V8a4 4 0 0 0-8 0v2zm4 4a1.5 1.5 0 0 0-1 2.62V18h2v-1.38A1.5 1.5 0 0 0 12 14z"/></svg>
+  </button>
+  <h1>EN / ZH Phrasebook</h1>
+  <p>Type a phrase, record your voice, save it</p>
+</header>
+
+<main>
+  <div class="card">
+    <div class="field">
+      <label for="en-input">English phrase</label>
+      <input type="text" id="en-input" placeholder="e.g. How are you today?">
+    </div>
+    <div class="field">
+      <label for="zh-input">Chinese phrase</label>
+      <input type="text" id="zh-input" placeholder="e.g. 你今天好吗？">
+    </div>
+    <div class="field">
+      <label for="pinyin-input">Pinyin (how to say it)</label>
+      <input type="text" id="pinyin-input" placeholder="e.g. Nǐ jīntiān hǎo ma?">
+    </div>
+
+    <div class="recorders single">
+      <div class="recorder" data-lang="zh">
+        <div class="rec-label">Chinese audio</div>
+        <button class="rec-btn" type="button" data-action="toggle">
+          <svg viewBox="0 0 24 24"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a1 1 0 0 0-2 0 3 3 0 0 1-6 0 1 1 0 0 0-2 0 5 5 0 0 0 4 4.9V18H9a1 1 0 0 0 0 2h6a1 1 0 0 0 0-2h-2v-2.1A5 5 0 0 0 17 11z"/></svg>
+        </button>
+        <div class="rec-timer">Tap to record</div>
+        <div class="rec-preview">
+          <audio controls></audio>
+          <button class="rec-redo" type="button" data-action="redo">Re-record</button>
+        </div>
+        <div class="rec-error"></div>
+      </div>
+    </div>
+
+    <button class="save-btn" id="save-btn" disabled>Save phrase</button>
+  </div>
+
+  <div class="list-heading">Saved phrases</div>
+  <div id="list"></div>
+</main>
+
+<script>
+(function(){
+  "use strict";
+
+  var DB_NAME = "phrasebook-db";
+  var STORE = "entries";
+  var dbPromise = new Promise(function(resolve, reject){
+    var req = indexedDB.open(DB_NAME, 1);
+    req.onupgradeneeded = function(){
+      var db = req.result;
+      if(!db.objectStoreNames.contains(STORE)){
+        db.createObjectStore(STORE, {keyPath:"id"});
+      }
+    };
+    req.onsuccess = function(){ resolve(req.result); };
+    req.onerror = function(){ reject(req.error); };
+  });
+
+  function withStore(mode, fn){
+    return dbPromise.then(function(db){
+      return new Promise(function(resolve, reject){
+        var tx = db.transaction(STORE, mode);
+        var store = tx.objectStore(STORE);
+        var result = fn(store);
+        tx.oncomplete = function(){ resolve(result); };
+        tx.onerror = function(){ reject(tx.error); };
+      });
+    });
+  }
+
+  function getAllEntries(){
+    return withStore("readonly", function(store){
+      return new Promise(function(resolve, reject){
+        var req = store.getAll();
+        req.onsuccess = function(){ resolve(req.result); };
+        req.onerror = function(){ reject(req.error); };
+      });
+    }).then(function(p){ return p; });
+  }
+
+  function putEntry(entry){
+    return withStore("readwrite", function(store){ store.put(entry); });
+  }
+
+  function deleteEntry(id){
+    return withStore("readwrite", function(store){ store.delete(id); });
+  }
+
+  var AUTH_KEY = "phrasebook_auth_v1";
+  var cryptoKey = null;
+
+  function randBytes(n){ return crypto.getRandomValues(new Uint8Array(n)); }
+
+  function bufToB64(buf){
+    var bytes = buf instanceof Uint8Array ? buf : new Uint8Array(buf);
+    var bin = "";
+    for(var i=0;i<bytes.length;i++) bin += String.fromCharCode(bytes[i]);
+    return btoa(bin);
+  }
+
+  function b64ToBytes(b64){
+    var bin = atob(b64);
+    var bytes = new Uint8Array(bin.length);
+    for(var i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
+    return bytes;
+  }
+
+  function deriveKey(password, salt){
+    var enc = new TextEncoder();
+    return crypto.subtle.importKey("raw", enc.encode(password), {name:"PBKDF2"}, false, ["deriveKey"]).then(function(baseKey){
+      return crypto.subtle.deriveKey(
+        {name:"PBKDF2", salt:salt, iterations:150000, hash:"SHA-256"},
+        baseKey,
+        {name:"AES-GCM", length:256},
+        false,
+        ["encrypt","decrypt"]
+      );
+    });
+  }
+
+  function encryptText(text){
+    var iv = randBytes(12);
+    return crypto.subtle.encrypt({name:"AES-GCM", iv:iv}, cryptoKey, new TextEncoder().encode(text)).then(function(cipher){
+      return {iv:iv, cipher:new Uint8Array(cipher)};
+    });
+  }
+
+  function decryptText(iv, cipher){
+    return crypto.subtle.decrypt({name:"AES-GCM", iv:iv}, cryptoKey, cipher).then(function(plain){
+      return new TextDecoder().decode(plain);
+    });
+  }
+
+  function encryptBuffer(buf){
+    var iv = randBytes(12);
+    return crypto.subtle.encrypt({name:"AES-GCM", iv:iv}, cryptoKey, buf).then(function(cipher){
+      return {iv:iv, cipher:new Uint8Array(cipher)};
+    });
+  }
+
+  function decryptBuffer(iv, cipher){
+    return crypto.subtle.decrypt({name:"AES-GCM", iv:iv}, cryptoKey, cipher);
+  }
+
+  function getAuthRecord(){
+    var raw = localStorage.getItem(AUTH_KEY);
+    return raw ? JSON.parse(raw) : null;
+  }
+
+  function setupPassword(password){
+    var salt = randBytes(16);
+    return deriveKey(password, salt).then(function(key){
+      cryptoKey = key;
+      return encryptText("phrasebook-ok");
+    }).then(function(v){
+      localStorage.setItem(AUTH_KEY, JSON.stringify({
+        salt: bufToB64(salt),
+        iv: bufToB64(v.iv),
+        cipher: bufToB64(v.cipher)
+      }));
+    });
+  }
+
+  function tryLogin(password){
+    var rec = getAuthRecord();
+    var salt = b64ToBytes(rec.salt);
+    return deriveKey(password, salt).then(function(key){
+      var prevKey = cryptoKey;
+      cryptoKey = key;
+      return decryptText(b64ToBytes(rec.iv), b64ToBytes(rec.cipher)).then(function(plain){
+        if(plain === "phrasebook-ok") return true;
+        cryptoKey = prevKey;
+        return false;
+      }).catch(function(){
+        cryptoKey = prevKey;
+        return false;
+      });
+    });
+  }
+
+  var recorders = {};
+
+  function setupRecorder(lang){
+    var root = document.querySelector('.recorder[data-lang="' + lang + '"]');
+    var btn = root.querySelector('[data-action="toggle"]');
+    var timer = root.querySelector('.rec-timer');
+    var preview = root.querySelector('.rec-preview');
+    var audioEl = root.querySelector('audio');
+    var redoBtn = root.querySelector('[data-action="redo"]');
+    var errorEl = root.querySelector('.rec-error');
+
+    var state = {
+      mediaRecorder:null,
+      chunks:[],
+      blob:null,
+      stream:null,
+      startedAt:0,
+      timerInterval:null
+    };
+
+    function showError(msg){
+      errorEl.textContent = msg;
+      errorEl.style.display = "block";
+    }
+
+    function formatTime(ms){
+      var s = Math.floor(ms/1000);
+      var mm = Math.floor(s/60);
+      var ss = s % 60;
+      return (mm<10?"0":"")+mm+":"+(ss<10?"0":"")+ss;
+    }
+
+    function startTimer(){
+      state.startedAt = Date.now ? Date.now() : new Date().getTime();
+      state.timerInterval = setInterval(function(){
+        timer.textContent = formatTime(new Date().getTime() - state.startedAt);
+      }, 200);
+    }
+
+    function stopTimer(){
+      clearInterval(state.timerInterval);
+    }
+
+    function reset(){
+      state.blob = null;
+      btn.style.display = "flex";
+      preview.classList.remove("show");
+      audioEl.removeAttribute("src");
+      timer.textContent = "Tap to record";
+      errorEl.style.display = "none";
+    }
+
+    function startRecording(){
+      errorEl.style.display = "none";
+      navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
+        state.stream = stream;
+        state.chunks = [];
+        var mr = new MediaRecorder(stream);
+        state.mediaRecorder = mr;
+        mr.ondataavailable = function(e){
+          if(e.data && e.data.size > 0) state.chunks.push(e.data);
+        };
+        mr.onstop = function(){
+          state.blob = new Blob(state.chunks, {type: mr.mimeType || "audio/webm"});
+          audioEl.src = URL.createObjectURL(state.blob);
+          preview.classList.add("show");
+          btn.style.display = "none";
+          stream.getTracks().forEach(function(t){ t.stop(); });
+          updateSaveState();
+        };
+        mr.start();
+        btn.classList.add("recording");
+        startTimer();
+      }).catch(function(err){
+        showError("Microphone access denied or unavailable.");
+      });
+    }
+
+    function stopRecording(){
+      if(state.mediaRecorder && state.mediaRecorder.state !== "inactive"){
+        state.mediaRecorder.stop();
+      }
+      btn.classList.remove("recording");
+      stopTimer();
+    }
+
+    btn.addEventListener("click", function(){
+      if(btn.classList.contains("recording")){
+        stopRecording();
+      } else {
+        startRecording();
+      }
+    });
+
+    redoBtn.addEventListener("click", function(){
+      reset();
+    });
+
+    recorders[lang] = {
+      getBlob: function(){ return state.blob; },
+      reset: reset
+    };
+  }
+
+  setupRecorder("zh");
+
+  var enInput = document.getElementById("en-input");
+  var zhInput = document.getElementById("zh-input");
+  var pinyinInput = document.getElementById("pinyin-input");
+  var saveBtn = document.getElementById("save-btn");
+  var listEl = document.getElementById("list");
+
+  function updateSaveState(){
+    var hasText = enInput.value.trim() !== "" || zhInput.value.trim() !== "" || pinyinInput.value.trim() !== "";
+    var hasAudio = !!recorders.zh.getBlob();
+    saveBtn.disabled = !(hasText || hasAudio);
+  }
+
+  enInput.addEventListener("input", updateSaveState);
+  zhInput.addEventListener("input", updateSaveState);
+  pinyinInput.addEventListener("input", updateSaveState);
+
+  function makeId(){
+    return "p_" + new Date().getTime().toString(36) + "_" + Math.random().toString(36).slice(2,8);
+  }
+
+  function renderEntry(entry){
+    var el = document.createElement("div");
+    el.className = "entry";
+    el.dataset.id = entry.id;
+
+    var del = document.createElement("button");
+    del.className = "delete-btn";
+    del.type = "button";
+    del.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 7h12l-1 13H7L6 7zm3-3h6l1 2H8l1-2zM9 10v7m6-7v7"/></svg>';
+    del.addEventListener("click", function(){
+      deleteEntry(entry.id).then(function(){ el.remove(); checkEmpty(); });
+    });
+    el.appendChild(del);
+
+    if(entry.en){
+      var enP = document.createElement("p");
+      enP.className = "en";
+      enP.textContent = entry.en;
+      el.appendChild(enP);
+    }
+    if(entry.zh){
+      var zhP = document.createElement("p");
+      zhP.className = "zh";
+      zhP.textContent = entry.zh;
+      el.appendChild(zhP);
+    }
+    if(entry.pinyin){
+      var pinyinP = document.createElement("p");
+      pinyinP.className = "pinyin";
+      pinyinP.textContent = entry.pinyin;
+      el.appendChild(pinyinP);
+    }
+
+    var audios = document.createElement("div");
+    audios.className = "audios";
+
+    if(entry.zhAudio){
+      var chip2 = document.createElement("div");
+      chip2.className = "audio-chip zh-chip";
+      chip2.innerHTML = '<span class="tag">中</span>';
+      var a2 = document.createElement("audio");
+      a2.controls = true;
+      a2.src = URL.createObjectURL(entry.zhAudio);
+      chip2.appendChild(a2);
+      audios.appendChild(chip2);
+    }
+    if(audios.children.length) el.appendChild(audios);
+
+    listEl.insertBefore(el, listEl.firstChild);
+  }
+
+  function decryptEntry(entry){
+    return decryptText(entry.textIv, entry.textCipher).then(function(json){
+      var data = JSON.parse(json);
+      if(entry.audioCipher){
+        return decryptBuffer(entry.audioIv, entry.audioCipher).then(function(buf){
+          return {id:entry.id, en:data.en, zh:data.zh, pinyin:data.pinyin, zhAudio:new Blob([buf], {type: entry.audioType || "audio/webm"}), createdAt:entry.createdAt};
+        });
+      }
+      return {id:entry.id, en:data.en, zh:data.zh, pinyin:data.pinyin, zhAudio:null, createdAt:entry.createdAt};
+    });
+  }
+
+  function checkEmpty(){
+    if(!listEl.children.length){
+      listEl.innerHTML = '<div class="empty">No phrases saved yet. Add your first one above.</div>';
+    } else {
+      var emptyMsg = listEl.querySelector(".empty");
+      if(emptyMsg) emptyMsg.remove();
+    }
+  }
+
+  saveBtn.addEventListener("click", function(){
+    saveBtn.disabled = true;
+    var audioBlob = recorders.zh.getBlob();
+    var payload = JSON.stringify({
+      en: enInput.value.trim(),
+      zh: zhInput.value.trim(),
+      pinyin: pinyinInput.value.trim()
+    });
+    var id = makeId();
+    var createdAt = new Date().getTime();
+
+    encryptText(payload).then(function(textEnc){
+      var audioStep = audioBlob
+        ? audioBlob.arrayBuffer().then(encryptBuffer)
+        : Promise.resolve(null);
+
+      return audioStep.then(function(audioEnc){
+        var storedEntry = {
+          id: id,
+          createdAt: createdAt,
+          textIv: textEnc.iv,
+          textCipher: textEnc.cipher,
+          audioIv: audioEnc ? audioEnc.iv : null,
+          audioCipher: audioEnc ? audioEnc.cipher : null,
+          audioType: audioBlob ? audioBlob.type : null
+        };
+        return putEntry(storedEntry);
+      });
+    }).then(function(){
+      var emptyMsg = listEl.querySelector(".empty");
+      if(emptyMsg) emptyMsg.remove();
+      renderEntry({
+        id: id,
+        en: enInput.value.trim(),
+        zh: zhInput.value.trim(),
+        pinyin: pinyinInput.value.trim(),
+        zhAudio: audioBlob,
+        createdAt: createdAt
+      });
+
+      enInput.value = "";
+      zhInput.value = "";
+      pinyinInput.value = "";
+      recorders.zh.reset();
+      updateSaveState();
+    }).catch(function(e){
+      console.error("Failed to save phrase:", e);
+      saveBtn.disabled = false;
+    });
+  });
+
+  function initApp(){
+    getAllEntries().then(function(entries){
+      entries.sort(function(a,b){ return a.createdAt - b.createdAt; });
+      return Promise.all(entries.map(decryptEntry));
+    }).then(function(plainEntries){
+      plainEntries.forEach(renderEntry);
+      checkEmpty();
+    }).catch(function(e){
+      console.error("Failed to load saved phrases:", e);
+      listEl.innerHTML = '<div class="empty">Could not load saved phrases.</div>';
+    });
+  }
+
+  var gateEl = document.getElementById("gate");
+  var gateTitle = document.getElementById("gate-title");
+  var gateSub = document.getElementById("gate-sub");
+  var gateForm = document.getElementById("gate-form");
+  var gatePw = document.getElementById("gate-pw");
+  var gatePw2 = document.getElementById("gate-pw2");
+  var gateSubmit = document.getElementById("gate-submit");
+  var gateError = document.getElementById("gate-error");
+  var lockBtn = document.getElementById("lock-btn");
+
+  var isSetupMode = !getAuthRecord();
+
+  if(!isSetupMode){
+    gateTitle.textContent = "Enter password";
+    gateSub.textContent = "Unlock your saved phrases.";
+    gatePw2.style.display = "none";
+    gateSubmit.textContent = "Unlock";
+  }
+
+  function unlock(){
+    document.body.classList.add("unlocked");
+    initApp();
+  }
+
+  gateForm.addEventListener("submit", function(e){
+    e.preventDefault();
+    gateError.textContent = "";
+    var pw = gatePw.value;
+    if(!pw){
+      gateError.textContent = "Enter a password.";
+      return;
+    }
+    gateSubmit.disabled = true;
+
+    if(isSetupMode){
+      var pw2 = gatePw2.value;
+      if(pw !== pw2){
+        gateError.textContent = "Passwords do not match.";
+        gateSubmit.disabled = false;
+        return;
+      }
+      if(pw.length < 4){
+        gateError.textContent = "Use at least 4 characters.";
+        gateSubmit.disabled = false;
+        return;
+      }
+      setupPassword(pw).then(unlock);
+    } else {
+      tryLogin(pw).then(function(ok){
+        if(ok){
+          unlock();
+        } else {
+          gateError.textContent = "Incorrect password.";
+          gatePw.value = "";
+          gatePw.focus();
+          gateSubmit.disabled = false;
+        }
+      });
+    }
+  });
+
+  lockBtn.addEventListener("click", function(){
+    location.reload();
+  });
+
+  gatePw.focus();
+
+})();
+</script>
+
+</body>
+</html>
