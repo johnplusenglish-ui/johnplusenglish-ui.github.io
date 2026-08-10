@@ -342,27 +342,30 @@
     margin:0 64px 12px 0;
   }
   .entry .audios{
-    display:flex;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
     gap:10px;
-    flex-wrap:wrap;
+    margin-top:4px;
   }
-  .audio-chip{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    background:var(--coral-soft);
-    border-radius:999px;
-    padding:4px 10px 4px 4px;
+  .audio-card{
+    border:1.5px solid var(--line);
+    border-radius:14px;
+    padding:10px 12px;
+    background:#fafbfd;
   }
-  .audio-chip .tag{
-    font-size:10px;
-    font-weight:800;
+  .audio-card .audio-card-label{
+    font-size:11px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.05em;
     color:var(--coral-dark);
-    padding:0 2px;
-    min-width:20px;
-    text-align:center;
+    margin-bottom:6px;
   }
-  .audio-chip audio{height:28px;max-width:150px;}
+  .audio-card audio{
+    width:100%;
+    height:32px;
+    display:block;
+  }
   .entry-actions{
     position:absolute;
     top:14px;
@@ -402,7 +405,7 @@
       <button class="gate-btn" type="submit" id="gate-submit">Set password</button>
       <div class="gate-error" id="gate-error"></div>
     </form>
-    <p class="gate-warn">There is no password reset. If you forget it, saved phrases cannot be recovered.</p>
+    <p class="gate-warn">There is no password reset. If you forget it, saved phrases cannot be recovered. This device stays unlocked until you tap the lock icon.</p>
   </div>
 </div>
 
@@ -512,7 +515,7 @@
         {name:"PBKDF2", salt:salt, iterations:150000, hash:"SHA-256"},
         baseKey,
         {name:"AES-GCM", length:256},
-        false,
+        true,
         ["encrypt","decrypt"]
       );
     });
@@ -545,6 +548,30 @@
   function getAuthRecord(){
     var raw = localStorage.getItem(AUTH_KEY);
     return raw ? JSON.parse(raw) : null;
+  }
+
+  var SESSION_KEY = "phrasebook_session_v1";
+
+  function persistSession(){
+    return crypto.subtle.exportKey("raw", cryptoKey).then(function(raw){
+      localStorage.setItem(SESSION_KEY, bufToB64(raw));
+    }).catch(function(){});
+  }
+
+  function clearSession(){
+    localStorage.removeItem(SESSION_KEY);
+  }
+
+  function tryRestoreSession(){
+    if(!getAuthRecord()) return Promise.resolve(false);
+    var raw = localStorage.getItem(SESSION_KEY);
+    if(!raw) return Promise.resolve(false);
+    return crypto.subtle.importKey("raw", b64ToBytes(raw), {name:"AES-GCM"}, true, ["encrypt","decrypt"]).then(function(key){
+      cryptoKey = key;
+      return true;
+    }).catch(function(){
+      return false;
+    });
   }
 
   function setupPassword(password){
@@ -886,14 +913,17 @@
       audios.className = "audios";
       [data.audio1, data.audio2].forEach(function(blob, i){
         if(!blob) return;
-        var chip = document.createElement("div");
-        chip.className = "audio-chip";
-        chip.innerHTML = '<span class="tag">中' + (i+1) + '</span>';
+        var card = document.createElement("div");
+        card.className = "audio-card";
+        var label = document.createElement("div");
+        label.className = "audio-card-label";
+        label.textContent = "Recording " + (i+1);
         var a = document.createElement("audio");
         a.controls = true;
         a.src = URL.createObjectURL(blob);
-        chip.appendChild(a);
-        audios.appendChild(chip);
+        card.appendChild(label);
+        card.appendChild(a);
+        audios.appendChild(card);
       });
       if(audios.children.length) viewEl.appendChild(audios);
     }
@@ -1042,6 +1072,7 @@
 
   function unlock(){
     document.body.classList.add("unlocked");
+    persistSession();
     initApp();
   }
 
@@ -1083,10 +1114,17 @@
   });
 
   lockBtn.addEventListener("click", function(){
+    clearSession();
     location.reload();
   });
 
-  gatePw.focus();
+  tryRestoreSession().then(function(restored){
+    if(restored){
+      unlock();
+    } else {
+      gatePw.focus();
+    }
+  });
 
 })();
 </script>
