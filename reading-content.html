@@ -27,15 +27,19 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 
 .wrap{max-width:960px;margin:0 auto;padding:0 2rem 4rem;position:relative;z-index:1}
 
-/* topic grid */
-.topic-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.8rem;margin-top:1.6rem}
-.topic-card{display:flex;flex-direction:column;align-items:flex-start;gap:.4rem;text-align:left;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:1.1rem 1.2rem;cursor:pointer;font-family:'Outfit',sans-serif;box-shadow:var(--shadow-sm);transition:box-shadow .18s,transform .18s,border-color .18s}
-.topic-card:hover{box-shadow:var(--shadow-md);border-color:var(--accent);transform:translateY(-1px)}
-.topic-tag{font-size:.64rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
-.topic-title{font-size:.98rem;font-weight:800;line-height:1.3;color:var(--ink)}
-.topic-open{margin-top:.2rem;font-size:.76rem;font-weight:600;color:var(--muted);display:inline-flex;align-items:center;gap:.2rem}
-.topic-arr{transition:transform .15s}
-.topic-card:hover .topic-arr{transform:translateX(3px)}
+/* topic list, grouped by subject */
+.topic-list{margin-top:1.8rem}
+.topic-group{margin-bottom:1.7rem}
+.topic-group-header{display:flex;align-items:center;gap:.55rem;font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);padding-bottom:.5rem;margin-bottom:.5rem;border-bottom:1.5px solid var(--border)}
+.topic-group-count{font-weight:600;color:var(--muted);background:var(--cream);border-radius:20px;padding:.1rem .55rem;font-size:.66rem;letter-spacing:0;text-transform:none}
+.topic-group-list{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm)}
+.topic-row{display:flex;align-items:center;gap:.9rem;width:100%;text-align:left;padding:.8rem 1.1rem;border:none;background:none;cursor:pointer;font-family:'Outfit',sans-serif;border-bottom:1px solid var(--border);transition:background .12s}
+.topic-row:last-child{border-bottom:none}
+.topic-row:hover{background:var(--cream)}
+.topic-row-region{flex-shrink:0;width:132px;font-size:.72rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
+.topic-row-title{flex:1;font-size:.94rem;font-weight:700;color:var(--ink);line-height:1.35}
+.topic-row-arr{color:var(--muted);font-size:1rem;flex-shrink:0}
+.topic-row:hover .topic-row-arr{color:var(--accent)}
 
 /* reading view */
 #readingView{display:none}
@@ -67,7 +71,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .hl-hint{font-size:.75rem;color:var(--muted);margin:-.9rem 0 1.3rem;font-style:italic}
 @media print{.hl-hint{display:none}}
 
-@media(max-width:600px){.wrap{padding:0 1.2rem 3rem}.hero{padding:1.6rem 1.2rem 1rem}.topic-grid{grid-template-columns:1fr}.segmented{width:100%;justify-content:space-between}.seg{flex:1;align-items:center;text-align:center;padding:.5rem .3rem}.seg .seg-main{font-size:.74rem}.seg .seg-sub{font-size:.58rem}.print-btn{margin-left:0;margin-top:.6rem}}
+@media(max-width:600px){.wrap{padding:0 1.2rem 3rem}.hero{padding:1.6rem 1.2rem 1rem}.topic-row{flex-wrap:wrap}.topic-row-region{width:100%;order:1}.topic-row-title{order:2;width:100%}.topic-row-arr{display:none}.segmented{width:100%;justify-content:space-between}.seg{flex:1;align-items:center;text-align:center;padding:.5rem .3rem}.seg .seg-main{font-size:.74rem}.seg .seg-sub{font-size:.58rem}.print-btn{margin-left:0;margin-top:.6rem}}
 </style>
 <style>.topnav{display:none!important}</style></head>
 <body>
@@ -86,38 +90,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 </div>
 
 <div class="wrap">
-  <div id="topicGrid" class="topic-grid">
-<button class="topic-card" onclick="openPassage('finland-basic-income')"><span class="topic-tag">Finland · Policy</span><span class="topic-title">Finland&#x27;s Basic Income Experiment</span><span class="topic-open">Read <span class="topic-arr">&rsaquo;</span></span></button>
-<button class="topic-card" onclick="openPassage('wow-signal')"><span class="topic-tag">United States · Science</span><span class="topic-title">The Wow! Signal: SETI&#x27;s Unexplained Mystery</span><span class="topic-open">Read <span class="topic-arr">&rsaquo;</span></span></button>
-<button class="topic-card" onclick="openPassage('japan-kodokushi')"><span class="topic-tag">Japan · Society</span><span class="topic-title">Kodokushi: Japan&#x27;s Lonely Deaths</span><span class="topic-open">Read <span class="topic-arr">&rsaquo;</span></span></button>
-<button class="topic-card" onclick="openPassage('theranos-elizabeth-holmes')"><span class="topic-tag">United States · Business</span><span class="topic-title">The Rise and Fall of Theranos</span><span class="topic-open">Read <span class="topic-arr">&rsaquo;</span></span></button>
-<button class="topic-card" onclick="openPassage('great-emu-war')"><span class="topic-tag">Australia · History</span><span class="topic-title">The Great Emu War of 1932</span><span class="topic-open">Read <span class="topic-arr">&rsaquo;</span></span></button>
-<button class="topic-card" onclick="openPassage('octopus-cognition')"><span class="topic-tag">Global · Nature</span><span class="topic-title">Octopus Intelligence: A Different Kind of Mind</span><span class="topic-open">Read <span class="topic-arr">&rsaquo;</span></span></button>
-<button class="topic-card" onclick="openPassage('chernobyl-wildlife')"><span class="topic-tag">Ukraine · Nature</span><span class="topic-title">Chernobyl&#x27;s Unexpected Wildlife</span><span class="topic-open">Read <span class="topic-arr">&rsaquo;</span></span></button>
-<button class="topic-card" onclick="openPassage('estonia-e-residency')"><span class="topic-tag">Estonia · Policy</span><span class="topic-title">Estonia: The World&#x27;s First Digital Nation</span><span class="topic-open">Read <span class="topic-arr">&rsaquo;</span></span></button>
-<button class="topic-card" onclick="openPassage('miracle-on-the-hudson')"><span class="topic-tag">United States · History</span><span class="topic-title">The Miracle on the Hudson</span><span class="topic-open">Read <span class="topic-arr">&rsaquo;</span></span></button>
-<button class="topic-card" onclick="openPassage('kpop-idol-machine')"><span class="topic-tag">South Korea · Business</span><span class="topic-title">The Business Machine Behind K-pop</span><span class="topic-open">Read <span class="topic-arr">&rsaquo;</span></span></button>
-<button class="topic-card" onclick="openPassage('library-of-alexandria')"><span class="topic-tag">Egypt · History</span><span class="topic-title">The Library of Alexandria: Myth and Reality</span><span class="topic-open">Read <span class="topic-arr">&rsaquo;</span></span></button>
-<button class="topic-card" onclick="openPassage('ocean-twilight-zone')"><span class="topic-tag">Ocean · Science</span><span class="topic-title">The Ocean&#x27;s Twilight Zone</span><span class="topic-open">Read <span class="topic-arr">&rsaquo;</span></span></button>
-<button class="topic-card" onclick="openPassage('dutch-flood-engineering')"><span class="topic-tag">Netherlands · Engineering</span><span class="topic-title">How the Dutch Learned to Beat the Sea</span><span class="topic-open">Read <span class="topic-arr">&rsaquo;</span></span></button>
-<button class="topic-card" onclick="openPassage('psychology-of-procrastination')"><span class="topic-tag">Global · Psychology</span><span class="topic-title">Procrastination Isn&#x27;t Laziness: It&#x27;s Emotion Management</span><span class="topic-open">Read <span class="topic-arr">&rsaquo;</span></span></button>
-<button class="topic-card" onclick="openPassage('mongol-empire-legacy')"><span class="topic-tag">Asia · History</span><span class="topic-title">The Mongol Empire&#x27;s Forgotten Legacy: Builders, Not Just Destroyers</span><span class="topic-open">Read <span class="topic-arr">&rsaquo;</span></span></button>
-<button class="topic-card" onclick="openPassage('fast-fashion-true-cost')"><span class="topic-tag">Global · Business</span><span class="topic-title">The True Cost of a Five-Dollar T-Shirt</span><span class="topic-open">Read <span class="topic-arr">&rsaquo;</span></span></button>
-<button class="topic-card" onclick="openPassage('stanislav-petrov-the-man-who-said-no')"><span class="topic-tag">Soviet Union · History</span><span class="topic-title">The Man Who Said No to Nuclear War</span><span class="topic-open">Read <span class="topic-arr">&rsaquo;</span></span></button>
-<button class="topic-card" onclick="openPassage('bhutan-gross-national-happiness')"><span class="topic-tag">Bhutan · Policy</span><span class="topic-title">Bhutan&#x27;s Experiment: Measuring a Nation&#x27;s Happiness Instead of Its Income</span><span class="topic-open">Read <span class="topic-arr">&rsaquo;</span></span></button>
-<button class="topic-card" onclick="openPassage('teen-sleep-science')"><span class="topic-tag">Global · Science</span><span class="topic-title">Why Teenagers Can&#x27;t Just &#x27;Go to Bed Earlier&#x27;</span><span class="topic-open">Read <span class="topic-arr">&rsaquo;</span></span></button>
-<button class="topic-card" onclick="openPassage('container-shipping-silk-road')"><span class="topic-tag">Global · Business</span><span class="topic-title">The Box That Built the Modern World</span><span class="topic-open">Read <span class="topic-arr">&rsaquo;</span></span></button>
-<button class="topic-card" onclick="openPassage('ai-consciousness')"><span class="topic-tag">Global · Science</span><span class="topic-title">Fluent but Empty? AI and the Question of Consciousness</span><span class="topic-open">Read <span class="topic-arr">&rsaquo;</span></span></button>
-<button class="topic-card" onclick="openPassage('irish-famine')"><span class="topic-tag">Ireland · History</span><span class="topic-title">An Gorta Mór: Ireland&#x27;s Great Hunger</span><span class="topic-open">Read <span class="topic-arr">&rsaquo;</span></span></button>
-<button class="topic-card" onclick="openPassage('free-solo-climbing')"><span class="topic-tag">United States · Psychology</span><span class="topic-title">The Climber Whose Brain Doesn&#x27;t Flinch</span><span class="topic-open">Read <span class="topic-arr">&rsaquo;</span></span></button>
-<button class="topic-card" onclick="openPassage('vertical-farming')"><span class="topic-tag">Global · Business</span><span class="topic-title">Farming Upward: The Promise and Price of Vertical Farms</span><span class="topic-open">Read <span class="topic-arr">&rsaquo;</span></span></button>
-<button class="topic-card" onclick="openPassage('tulip-mania')"><span class="topic-tag">Netherlands · History</span><span class="topic-title">Tulip Mania: The World&#x27;s First Financial Bubble?</span><span class="topic-open">Read <span class="topic-arr">&rsaquo;</span></span></button>
-<button class="topic-card" onclick="openPassage('loneliness-epidemic')"><span class="topic-tag">Global · Society</span><span class="topic-title">The Loneliness Epidemic</span><span class="topic-open">Read <span class="topic-arr">&rsaquo;</span></span></button>
-<button class="topic-card" onclick="openPassage('tenochtitlan-engineering')"><span class="topic-tag">Mexico · History</span><span class="topic-title">Tenochtitlan: The Engineering of an Island Capital</span><span class="topic-open">Read <span class="topic-arr">&rsaquo;</span></span></button>
-<button class="topic-card" onclick="openPassage('deepfakes-liars-dividend')"><span class="topic-tag">Global · Technology</span><span class="topic-title">Deepfakes and the Death of &#x27;Seeing Is Believing&#x27;</span><span class="topic-open">Read <span class="topic-arr">&rsaquo;</span></span></button>
-<button class="topic-card" onclick="openPassage('antarctic-treaty')"><span class="topic-tag">Antarctica · Policy</span><span class="topic-title">The Antarctic Treaty: Owning Nothing, Governing Everything</span><span class="topic-open">Read <span class="topic-arr">&rsaquo;</span></span></button>
-<button class="topic-card" onclick="openPassage('svalbard-seed-vault')"><span class="topic-tag">Norway · Science</span><span class="topic-title">The Svalbard Global Seed Vault: Humanity&#x27;s Backup Copy</span><span class="topic-open">Read <span class="topic-arr">&rsaquo;</span></span></button>
-  </div>
+  <div id="topicGrid" class="topic-list"></div>
 
   <div id="readingView">
     <button class="back-link" onclick="closePassage()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>All passages</button>
@@ -399,6 +372,38 @@ function setLevel(lvl){
   renderPassageBody();
 }
 
+function groupedTopics(){
+  const groups = {};
+  READING_PASSAGES.forEach(function(p){
+    const parts = p.tag.split(' · ');
+    const region = parts[0];
+    const category = parts[1] || 'General';
+    if (!groups[category]) groups[category] = [];
+    groups[category].push({id: p.id, title: p.title, region: region});
+  });
+  const catNames = Object.keys(groups).sort();
+  catNames.forEach(function(c){
+    groups[c].sort(function(a, b){ return a.title.localeCompare(b.title); });
+  });
+  return {catNames: catNames, groups: groups};
+}
+
+function renderTopicGrid(){
+  const grouped = groupedTopics();
+  let html = '';
+  grouped.catNames.forEach(function(cat){
+    const items = grouped.groups[cat];
+    html += '<div class="topic-group">';
+    html += '<div class="topic-group-header">' + escapeHtml(cat) + '<span class="topic-group-count">' + items.length + '</span></div>';
+    html += '<div class="topic-group-list">';
+    items.forEach(function(it){
+      html += '<button class="topic-row" onclick="openPassage(\'' + it.id + '\')"><span class="topic-row-region">' + escapeHtml(it.region) + '</span><span class="topic-row-title">' + escapeHtml(it.title) + '</span><span class="topic-row-arr">&rsaquo;</span></button>';
+    });
+    html += '</div></div>';
+  });
+  document.getElementById('topicGrid').innerHTML = html;
+}
+
 function openPassage(id){
   currentPassage = id;
   currentLevel = 'B2';
@@ -416,7 +421,7 @@ function openPassage(id){
 function closePassage(){
   currentPassage = null;
   document.getElementById('readingView').style.display = 'none';
-  document.getElementById('topicGrid').style.display = 'grid';
+  document.getElementById('topicGrid').style.display = 'block';
   window.scrollTo(0,0);
   history.replaceState(null, '', location.pathname);
 }
@@ -620,6 +625,8 @@ async function exportPNG(){
     btn.innerHTML = originalLabel;
   }
 }
+
+renderTopicGrid();
 
 (function(){
   const hash = location.hash.replace('#','');
