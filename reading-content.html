@@ -59,9 +59,13 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .print-btn svg{width:14px;height:14px}
 @media print{.print-btn,.back-link,.topnav,.hero{display:none!important}}
 
-.passage-body{max-width:700px;font-size:1.02rem;line-height:1.85}
+.passage-body{max-width:700px;font-size:1.02rem;line-height:1.85;-webkit-user-select:text;user-select:text}
 .passage-body p{margin-bottom:1.1rem}
 .passage-body p:last-child{margin-bottom:0}
+.passage-body mark.hl{background:#FFE08A;color:inherit;padding:.05em 0;border-radius:2px;cursor:pointer;transition:background .15s;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.passage-body mark.hl:hover{background:#FFD35C}
+.hl-hint{font-size:.75rem;color:var(--muted);margin:-.9rem 0 1.3rem;font-style:italic}
+@media print{.hl-hint{display:none}}
 
 @media(max-width:600px){.wrap{padding:0 1.2rem 3rem}.hero{padding:1.6rem 1.2rem 1rem}.topic-grid{grid-template-columns:1fr}.segmented{width:100%;justify-content:space-between}.seg{flex:1;align-items:center;text-align:center;padding:.5rem .3rem}.seg .seg-main{font-size:.74rem}.seg .seg-sub{font-size:.58rem}.print-btn{margin-left:0;margin-top:.6rem}}
 </style>
@@ -123,7 +127,9 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
       <span class="level-label">Level</span>
       <div class="segmented" id="levelSeg"></div>
       <button class="print-btn" onclick="window.print()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Print</button>
+      <button class="print-btn" id="exportBtn" onclick="exportPNG()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>Export PNG</button>
     </div>
+    <p class="hl-hint">Select any text to highlight it. Tap a highlight to remove it.</p>
     <div class="passage-body" id="passageBody"></div>
   </div>
 </div>
@@ -267,12 +273,114 @@ function escapeHtml(s){
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
+/* ---- highlight storage (per passage + level, persisted in localStorage) ---- */
+const HL_KEY = 'jpe-reading-highlights';
+
+function loadHighlights(){
+  try { return JSON.parse(localStorage.getItem(HL_KEY)) || {}; } catch(e){ return {}; }
+}
+function saveHighlights(){
+  try { localStorage.setItem(HL_KEY, JSON.stringify(highlightStore)); } catch(e){}
+}
+let highlightStore = loadHighlights();
+
+function hlKey(id, level){ return id + '|' + level; }
+
+function getHighlights(id, level){
+  return highlightStore[hlKey(id, level)] || [];
+}
+
+function mergeRanges(ranges){
+  const sorted = ranges.slice().sort(function(a,b){ return a.start - b.start || a.end - b.end; });
+  const out = [];
+  sorted.forEach(function(r){
+    const last = out[out.length - 1];
+    if (last && r.start <= last.end) {
+      last.end = Math.max(last.end, r.end);
+    } else {
+      out.push({start: r.start, end: r.end});
+    }
+  });
+  return out;
+}
+
+function addHighlight(id, level, para, start, end){
+  const key = hlKey(id, level);
+  const list = highlightStore[key] || [];
+  const sameParaRanges = list.filter(function(r){ return r.para === para; }).map(function(r){ return {start:r.start, end:r.end}; });
+  sameParaRanges.push({start:start, end:end});
+  const merged = mergeRanges(sameParaRanges).map(function(r){ return {para:para, start:r.start, end:r.end}; });
+  const otherParas = list.filter(function(r){ return r.para !== para; });
+  highlightStore[key] = otherParas.concat(merged);
+  saveHighlights();
+}
+
+function removeHighlight(id, level, para, start, end){
+  const key = hlKey(id, level);
+  const list = highlightStore[key] || [];
+  highlightStore[key] = list.filter(function(r){ return !(r.para === para && r.start === start && r.end === end); });
+  saveHighlights();
+}
+
+function renderParaHtml(text, ranges){
+  const sorted = ranges.slice().sort(function(a,b){ return a.start - b.start; });
+  let out = '';
+  let pos = 0;
+  sorted.forEach(function(r){
+    if (r.start > pos) out += escapeHtml(text.slice(pos, r.start));
+    out += '<mark class="hl" data-start="' + r.start + '" data-end="' + r.end + '">' + escapeHtml(text.slice(r.start, r.end)) + '</mark>';
+    pos = Math.max(pos, r.end);
+  });
+  if (pos < text.length) out += escapeHtml(text.slice(pos));
+  return out;
+}
+
 function renderPassageBody(){
   const p = READING_PASSAGES.find(function(x){ return x.id === currentPassage; });
   const paras = p.levels[currentLevel].split(/\n\s*\n/).filter(Boolean);
-  document.getElementById('passageBody').innerHTML = paras.map(function(para){
-    return '<p>' + escapeHtml(para) + '</p>';
+  const ranges = getHighlights(currentPassage, currentLevel);
+  document.getElementById('passageBody').innerHTML = paras.map(function(para, i){
+    const paraRanges = ranges.filter(function(r){ return r.para === i; });
+    return '<p data-para="' + i + '">' + renderParaHtml(para, paraRanges) + '</p>';
   }).join('');
+}
+
+/* ---- turning a text selection into a stored highlight ---- */
+function getOffsetWithinPara(paraEl, node, offset){
+  let total = 0;
+  let found = false;
+  function walk(n){
+    if (found) return;
+    if (n.nodeType === 3) {
+      if (n === node) { total += offset; found = true; return; }
+      total += n.textContent.length;
+    } else {
+      for (let i = 0; i < n.childNodes.length; i++) {
+        walk(n.childNodes[i]);
+        if (found) return;
+      }
+    }
+  }
+  walk(paraEl);
+  return total;
+}
+
+function handleSelection(){
+  const sel = window.getSelection();
+  if (!sel || sel.isCollapsed || sel.rangeCount === 0) return;
+  const range = sel.getRangeAt(0);
+  const startEl = range.startContainer.nodeType === 3 ? range.startContainer.parentElement : range.startContainer;
+  const endEl = range.endContainer.nodeType === 3 ? range.endContainer.parentElement : range.endContainer;
+  const startPara = startEl && startEl.closest('p[data-para]');
+  const endPara = endEl && endEl.closest('p[data-para]');
+  if (!startPara || !endPara || startPara !== endPara) { sel.removeAllRanges(); return; }
+  const paraIndex = parseInt(startPara.getAttribute('data-para'), 10);
+  const start = getOffsetWithinPara(startPara, range.startContainer, range.startOffset);
+  const end = getOffsetWithinPara(startPara, range.endContainer, range.endOffset);
+  sel.removeAllRanges();
+  if (end <= start) return;
+  addHighlight(currentPassage, currentLevel, paraIndex, start, end);
+  renderPassageBody();
 }
 
 function renderLevelSeg(){
@@ -311,6 +419,206 @@ function closePassage(){
   document.getElementById('topicGrid').style.display = 'grid';
   window.scrollTo(0,0);
   history.replaceState(null, '', location.pathname);
+}
+
+(function(){
+  const body = document.getElementById('passageBody');
+  body.addEventListener('mouseup', handleSelection);
+  body.addEventListener('touchend', function(){ setTimeout(handleSelection, 0); });
+  body.addEventListener('click', function(e){
+    const mark = e.target.closest('mark.hl');
+    if (!mark) return;
+    const p = mark.closest('p[data-para]');
+    const para = parseInt(p.getAttribute('data-para'), 10);
+    const start = parseInt(mark.getAttribute('data-start'), 10);
+    const end = parseInt(mark.getAttribute('data-end'), 10);
+    removeHighlight(currentPassage, currentLevel, para, start, end);
+    renderPassageBody();
+  });
+})();
+
+/* ---- export the current passage + level as a shareable PNG ---- */
+function roundRect(ctx, x, y, w, h, r){
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+function wrapPlainText(measure, text, font, maxWidth){
+  measure.font = font;
+  const words = text.split(/\s+/);
+  const lines = [];
+  let line = '';
+  words.forEach(function(w){
+    const test = line ? line + ' ' + w : w;
+    if (line && measure.measureText(test).width > maxWidth) {
+      lines.push(line);
+      line = w;
+    } else {
+      line = test;
+    }
+  });
+  if (line) lines.push(line);
+  return lines;
+}
+
+function wrapParaWords(measure, text, paraIndex, ranges, font, maxWidth){
+  measure.font = font;
+  const paraRanges = mergeRanges(ranges.filter(function(r){ return r.para === paraIndex; }));
+  const words = [];
+  const re = /\S+/g;
+  let m;
+  while ((m = re.exec(text))) {
+    const wStart = m.index, wEnd = m.index + m[0].length;
+    const hl = paraRanges.some(function(r){ return wEnd > r.start && wStart < r.end; });
+    words.push({text: m[0], hl: hl});
+  }
+  const spaceWidth = measure.measureText(' ').width;
+  const lines = [];
+  let line = [];
+  let lineWidth = 0;
+  words.forEach(function(w){
+    const ww = measure.measureText(w.text).width;
+    const extra = line.length ? spaceWidth + ww : ww;
+    if (line.length && lineWidth + extra > maxWidth) {
+      lines.push(line);
+      line = [];
+      lineWidth = 0;
+    }
+    line.push(w);
+    lineWidth += line.length > 1 ? spaceWidth + ww : ww;
+  });
+  if (line.length) lines.push(line);
+  return lines;
+}
+
+async function exportPNG(){
+  const btn = document.getElementById('exportBtn');
+  const originalLabel = btn.innerHTML;
+  btn.disabled = true;
+  btn.style.opacity = '.6';
+
+  try {
+    if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch(e){} }
+
+    const p = READING_PASSAGES.find(function(x){ return x.id === currentPassage; });
+    const paras = p.levels[currentLevel].split(/\n\s*\n/).filter(Boolean);
+    const ranges = getHighlights(currentPassage, currentLevel);
+
+    const scale = 2;
+    const width = 900;
+    const pad = 56;
+    const contentWidth = width - pad * 2;
+    const bodyFontSize = 21;
+    const bodyLineHeight = Math.round(bodyFontSize * 1.7);
+    const paraGap = 20;
+    const titleFontSize = 34;
+    const tagFont = '700 14px Outfit, sans-serif';
+    const titleFont = '800 ' + titleFontSize + 'px Outfit, sans-serif';
+    const bodyFont = '400 ' + bodyFontSize + 'px Outfit, sans-serif';
+    const footerFont = '600 14px Outfit, sans-serif';
+
+    const measure = document.createElement('canvas').getContext('2d');
+    const titleLines = wrapPlainText(measure, p.title, titleFont, contentWidth);
+    const paraLineGroups = paras.map(function(para, i){
+      return wrapParaWords(measure, para, i, ranges, bodyFont, contentWidth);
+    });
+
+    measure.font = tagFont;
+    const tagText = p.tag.toUpperCase() + '   ' + currentLevel;
+    const tagW = measure.measureText(tagText).width;
+
+    let h = pad;
+    h += 30 + 20;
+    h += titleLines.length * (titleFontSize * 1.22);
+    h += 28;
+    paraLineGroups.forEach(function(lines){ h += lines.length * bodyLineHeight + paraGap; });
+    h += 24;
+    h += 30;
+    h += pad;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.ceil(width * scale);
+    canvas.height = Math.ceil(h * scale);
+    const ctx = canvas.getContext('2d');
+    ctx.scale(scale, scale);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, width, h);
+
+    let y = pad;
+
+    ctx.font = tagFont;
+    ctx.fillStyle = '#F4E9DD';
+    roundRect(ctx, pad, y, tagW + 24, 30, 8);
+    ctx.fill();
+    ctx.fillStyle = '#8B5A3C';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(tagText, pad + 12, y + 16);
+    ctx.textBaseline = 'alphabetic';
+    y += 30 + 20;
+
+    ctx.font = titleFont;
+    ctx.fillStyle = '#2D3047';
+    titleLines.forEach(function(line){
+      y += titleFontSize;
+      ctx.fillText(line, pad, y);
+      y += titleFontSize * 0.22;
+    });
+    y += 28;
+
+    ctx.font = bodyFont;
+    paraLineGroups.forEach(function(lines){
+      lines.forEach(function(line){
+        y += bodyLineHeight;
+        let x = pad;
+        const spaceWidth = ctx.measureText(' ').width;
+        line.forEach(function(w){
+          const ww = ctx.measureText(w.text).width;
+          if (w.hl) {
+            ctx.fillStyle = '#FFE08A';
+            ctx.fillRect(x - 2, y - bodyFontSize, ww + 4, bodyFontSize + 8);
+          }
+          ctx.fillStyle = '#2D3047';
+          ctx.fillText(w.text, x, y);
+          x += ww + spaceWidth;
+        });
+      });
+      y += paraGap;
+    });
+
+    y += 4;
+    ctx.strokeStyle = '#E8E5DF';
+    ctx.beginPath();
+    ctx.moveTo(pad, y);
+    ctx.lineTo(width - pad, y);
+    ctx.stroke();
+    y += 30;
+    ctx.font = footerFont;
+    ctx.fillStyle = '#7A7D8E';
+    ctx.fillText('johnplusenglish.com  ·  Reading  ·  ' + currentLevel, pad, y);
+
+    await new Promise(function(resolve){
+      canvas.toBlob(function(blob){
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = currentPassage + '-' + currentLevel + '.png';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+        resolve();
+      }, 'image/png');
+    });
+  } finally {
+    btn.disabled = false;
+    btn.style.opacity = '';
+    btn.innerHTML = originalLabel;
+  }
 }
 
 (function(){
