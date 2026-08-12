@@ -52,11 +52,11 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 
 .level-select{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.6rem;margin-bottom:1.6rem}
 .segmented{display:inline-flex;flex-wrap:wrap;gap:.25rem;background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:.3rem;box-shadow:var(--shadow-sm)}
-.seg{font-family:'Outfit',sans-serif;display:flex;flex-direction:column;align-items:flex-start;gap:.1rem;padding:.5rem 1.1rem;border:none;border-radius:12px;background:transparent;color:var(--ink);cursor:pointer;transition:all .18s;text-align:left;line-height:1.25}
+.seg{font-family:'Outfit',sans-serif;display:flex;flex-direction:column;align-items:flex-start;gap:.1rem;padding:.5rem 1.1rem;border:none;border-radius:12px;background:transparent;color:var(--segc,var(--ink));cursor:pointer;transition:all .18s;text-align:left;line-height:1.25}
 .seg:hover{background:var(--cream)}
 .seg .seg-main{font-size:.82rem;font-weight:800;letter-spacing:.01em}
 .seg .seg-sub{font-size:.65rem;font-weight:500;color:var(--muted)}
-.seg.active{background:var(--accent);color:#fff}
+.seg.active{background:var(--segc,var(--accent));color:#fff}
 .seg.active .seg-sub{color:rgba(255,255,255,.75)}
 .level-actions{display:flex;align-items:center;gap:.5rem}
 .icon-btn{display:inline-flex;align-items:center;gap:.45rem;font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:600;padding:.5rem .95rem;border:1.5px solid var(--border);border-radius:10px;background:var(--card);color:var(--ink);cursor:pointer;transition:all .18s;box-shadow:var(--shadow-sm)}
@@ -363,12 +363,14 @@ function handleSelection(){
   renderPassageBody();
 }
 
+const LEVEL_COLORS = {B1:'#FF6B6B', B2:'#2EC4B6', C1:'#2176FF', C2:'#9B72CF'};
+
 function renderLevelSeg(){
   const seg = document.getElementById('levelSeg');
   let html = '';
   ['B1','B2','C1','C2'].forEach(function(lvl){
     const wc = WORD_COUNTS[currentPassage][lvl];
-    html += '<button class="seg' + (lvl===currentLevel?' active':'') + '" onclick="setLevel(\'' + lvl + '\')"><span class="seg-main">' + lvl + '</span><span class="seg-sub">' + wc + ' words</span></button>';
+    html += '<button class="seg' + (lvl===currentLevel?' active':'') + '" style="--segc:' + LEVEL_COLORS[lvl] + '" onclick="setLevel(\'' + lvl + '\')"><span class="seg-main">' + lvl + '</span><span class="seg-sub">' + wc + ' words</span></button>';
   });
   seg.innerHTML = html;
 }
