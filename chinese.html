@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{
     --cobalt:#0047ab;
@@ -43,6 +44,7 @@
     justify-content:center;
     padding:20px;
     z-index:1000;
+    overflow-y:auto;
   }
   body.unlocked #gate{display:none;}
   .gate-card{
@@ -53,6 +55,7 @@
     max-width:340px;
     width:100%;
     text-align:center;
+    margin:auto;
   }
   .gate-card h2{
     margin:0 0 6px;
@@ -65,7 +68,8 @@
     font-size:13px;
     color:var(--muted);
   }
-  .gate-card input[type=password]{
+  .gate-card input[type=password],
+  .gate-card input[type=email]{
     width:100%;
     border:1.5px solid var(--line);
     border-radius:12px;
@@ -75,7 +79,8 @@
     margin-bottom:10px;
     background:#fafbfd;
   }
-  .gate-card input[type=password]:focus{
+  .gate-card input[type=password]:focus,
+  .gate-card input[type=email]:focus{
     outline:none;
     border-color:var(--cobalt);
     background:#fff;
@@ -102,12 +107,33 @@
     margin-top:8px;
     font-weight:600;
   }
+  .gate-info{
+    font-size:12px;
+    color:var(--cobalt);
+    min-height:16px;
+    margin-top:4px;
+    font-weight:600;
+  }
   .gate-warn{
     font-size:11px;
     color:var(--muted);
     margin-top:14px;
     line-height:1.5;
   }
+  .link-btn{
+    background:none;
+    border:none;
+    color:var(--cobalt);
+    font-size:12px;
+    font-weight:700;
+    text-decoration:underline;
+    cursor:pointer;
+    margin-top:10px;
+    font-family:'Outfit',sans-serif;
+    display:block;
+    width:100%;
+  }
+  .link-btn.danger{color:var(--coral-dark);}
   header{
     position:relative;
     background:linear-gradient(135deg,var(--cobalt),var(--cobalt-dark));
@@ -142,6 +168,12 @@
     margin:0;
     font-size:14px;
     opacity:.85;
+    font-weight:500;
+  }
+  .account-line{
+    margin:8px 0 0;
+    font-size:11px;
+    opacity:.7;
     font-weight:500;
   }
   main{
@@ -290,6 +322,33 @@
     color:var(--muted);
     margin:24px 4px 10px;
   }
+  .broken-banner{
+    background:var(--coral-soft);
+    border:1.5px solid var(--coral);
+    border-radius:14px;
+    padding:12px 14px;
+    margin-bottom:14px;
+    font-size:13px;
+    color:var(--coral-dark);
+    display:none;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .broken-banner.show{display:flex;}
+  .broken-banner button{
+    background:var(--coral-dark);
+    color:#fff;
+    border:none;
+    border-radius:10px;
+    padding:8px 12px;
+    font-family:'Outfit',sans-serif;
+    font-size:12px;
+    font-weight:700;
+    cursor:pointer;
+    white-space:nowrap;
+  }
   .entry{
     background:var(--card);
     border-radius:var(--radius);
@@ -340,6 +399,12 @@
     font-style:italic;
     color:var(--muted);
     margin:0 64px 12px 0;
+  }
+  .entry .broken-text{
+    font-size:14px;
+    font-style:italic;
+    color:var(--muted);
+    margin:0 64px 0 0;
   }
   .entry .audios{
     display:grid;
@@ -397,24 +462,40 @@
 
 <div id="gate">
   <div class="gate-card">
-    <h2 id="gate-title">Set a password</h2>
-    <p class="gate-sub" id="gate-sub">Choose a password to protect your saved phrases.</p>
-    <form id="gate-form" autocomplete="off">
-      <input type="password" id="gate-pw" placeholder="Password" autocomplete="new-password">
-      <input type="password" id="gate-pw2" placeholder="Confirm password" autocomplete="new-password">
-      <button class="gate-btn" type="submit" id="gate-submit">Set password</button>
+    <div id="gate-normal">
+      <h2 id="gate-title">Sign in</h2>
+      <p class="gate-sub" id="gate-sub">Sign in to sync your saved phrases across devices.</p>
+      <form id="gate-form" autocomplete="off">
+        <input type="email" id="gate-email" placeholder="Email" autocomplete="email">
+        <input type="password" id="gate-pw" placeholder="Password" autocomplete="current-password">
+        <input type="password" id="gate-pw2" placeholder="Confirm password" autocomplete="new-password" style="display:none;">
+        <button class="gate-btn" type="submit" id="gate-submit">Sign in</button>
+      </form>
       <div class="gate-error" id="gate-error"></div>
-    </form>
-    <p class="gate-warn">There is no password reset. If you forget it, saved phrases cannot be recovered. This device stays unlocked until you tap the lock icon.</p>
+      <div class="gate-info" id="gate-info"></div>
+      <button class="link-btn" id="toggle-mode-btn" type="button">Need an account? Create one</button>
+      <button class="link-btn" id="forgot-pw-btn" type="button">Forgot password?</button>
+      <p class="gate-warn">Your phrases are encrypted with your password before they ever leave this device. If you reset your password by email, phrases saved under the old password can no longer be unlocked (you can remove them once signed in).</p>
+    </div>
+    <div id="gate-recovery" style="display:none;">
+      <h2>Set a new password</h2>
+      <p class="gate-sub">Choose a new password for your account.</p>
+      <input type="password" id="recovery-pw" placeholder="New password">
+      <input type="password" id="recovery-pw2" placeholder="Confirm new password">
+      <button class="gate-btn" id="recovery-submit" type="button">Set new password</button>
+      <div class="gate-error" id="recovery-error"></div>
+      <p class="gate-warn">Phrases saved under your old password will no longer be readable. You can remove them once you're signed in.</p>
+    </div>
   </div>
 </div>
 
 <header>
-  <button class="lock-btn" id="lock-btn" type="button" title="Lock">
+  <button class="lock-btn" id="lock-btn" type="button" title="Sign out">
     <svg viewBox="0 0 24 24"><path d="M6 10V8a6 6 0 0 1 12 0v2h1a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V11a1 1 0 0 1 1-1h1zm2 0h8V8a4 4 0 0 0-8 0v2zm4 4a1.5 1.5 0 0 0-1 2.62V18h2v-1.38A1.5 1.5 0 0 0 12 14z"/></svg>
   </button>
   <h1>EN / ZH Phrasebook</h1>
   <p>Type a phrase, record your voice, save it</p>
+  <p class="account-line" id="account-line"></p>
 </header>
 
 <main>
@@ -438,6 +519,10 @@
   </div>
 
   <div class="list-heading">Saved phrases</div>
+  <div class="broken-banner" id="broken-banner">
+    <span id="broken-banner-text"></span>
+    <button id="broken-banner-fix" type="button">Delete unreadable phrases</button>
+  </div>
   <div id="list"></div>
 </main>
 
@@ -445,52 +530,12 @@
 (function(){
   "use strict";
 
-  var DB_NAME = "phrasebook-db";
-  var STORE = "entries";
-  var dbPromise = new Promise(function(resolve, reject){
-    var req = indexedDB.open(DB_NAME, 1);
-    req.onupgradeneeded = function(){
-      var db = req.result;
-      if(!db.objectStoreNames.contains(STORE)){
-        db.createObjectStore(STORE, {keyPath:"id"});
-      }
-    };
-    req.onsuccess = function(){ resolve(req.result); };
-    req.onerror = function(){ reject(req.error); };
-  });
+  var SUPABASE_URL = "https://iozaszewivurkuuotkhy.supabase.co";
+  var SUPABASE_ANON_KEY = "sb_publishable_DYXNEBIa2KorYWiRZCoabw_9CrepY0-";
+  var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  function withStore(mode, fn){
-    return dbPromise.then(function(db){
-      return new Promise(function(resolve, reject){
-        var tx = db.transaction(STORE, mode);
-        var store = tx.objectStore(STORE);
-        var result = fn(store);
-        tx.oncomplete = function(){ resolve(result); };
-        tx.onerror = function(){ reject(tx.error); };
-      });
-    });
-  }
-
-  function getAllEntries(){
-    return withStore("readonly", function(store){
-      return new Promise(function(resolve, reject){
-        var req = store.getAll();
-        req.onsuccess = function(){ resolve(req.result); };
-        req.onerror = function(){ reject(req.error); };
-      });
-    }).then(function(p){ return p; });
-  }
-
-  function putEntry(entry){
-    return withStore("readwrite", function(store){ store.put(entry); });
-  }
-
-  function deleteEntry(id){
-    return withStore("readwrite", function(store){ store.delete(id); });
-  }
-
-  var AUTH_KEY = "phrasebook_auth_v1";
   var cryptoKey = null;
+  var currentUserEmail = null;
 
   function randBytes(n){ return crypto.getRandomValues(new Uint8Array(n)); }
 
@@ -508,6 +553,15 @@
     return bytes;
   }
 
+  function uuidToBytes(uuid){
+    var hex = uuid.replace(/-/g, "");
+    var bytes = new Uint8Array(16);
+    for(var i=0;i<16;i++){
+      bytes[i] = parseInt(hex.substr(i*2, 2), 16);
+    }
+    return bytes;
+  }
+
   function deriveKey(password, salt){
     var enc = new TextEncoder();
     return crypto.subtle.importKey("raw", enc.encode(password), {name:"PBKDF2"}, false, ["deriveKey"]).then(function(baseKey){
@@ -519,6 +573,10 @@
         ["encrypt","decrypt"]
       );
     });
+  }
+
+  function deriveKeyForUser(password, userId){
+    return deriveKey(password, uuidToBytes(userId));
   }
 
   function encryptText(text){
@@ -545,12 +603,7 @@
     return crypto.subtle.decrypt({name:"AES-GCM", iv:iv}, cryptoKey, cipher);
   }
 
-  function getAuthRecord(){
-    var raw = localStorage.getItem(AUTH_KEY);
-    return raw ? JSON.parse(raw) : null;
-  }
-
-  var SESSION_KEY = "phrasebook_session_v1";
+  var SESSION_KEY = "phrasebook_cryptokey_v1";
 
   function persistSession(){
     return crypto.subtle.exportKey("raw", cryptoKey).then(function(raw){
@@ -563,45 +616,45 @@
   }
 
   function tryRestoreSession(){
-    if(!getAuthRecord()) return Promise.resolve(false);
-    var raw = localStorage.getItem(SESSION_KEY);
-    if(!raw) return Promise.resolve(false);
-    return crypto.subtle.importKey("raw", b64ToBytes(raw), {name:"AES-GCM"}, true, ["encrypt","decrypt"]).then(function(key){
-      cryptoKey = key;
-      return true;
-    }).catch(function(){
-      return false;
-    });
-  }
-
-  function setupPassword(password){
-    var salt = randBytes(16);
-    return deriveKey(password, salt).then(function(key){
-      cryptoKey = key;
-      return encryptText("phrasebook-ok");
-    }).then(function(v){
-      localStorage.setItem(AUTH_KEY, JSON.stringify({
-        salt: bufToB64(salt),
-        iv: bufToB64(v.iv),
-        cipher: bufToB64(v.cipher)
-      }));
-    });
-  }
-
-  function tryLogin(password){
-    var rec = getAuthRecord();
-    var salt = b64ToBytes(rec.salt);
-    return deriveKey(password, salt).then(function(key){
-      var prevKey = cryptoKey;
-      cryptoKey = key;
-      return decryptText(b64ToBytes(rec.iv), b64ToBytes(rec.cipher)).then(function(plain){
-        if(plain === "phrasebook-ok") return true;
-        cryptoKey = prevKey;
-        return false;
+    return supabase.auth.getSession().then(function(res){
+      var session = res.data && res.data.session;
+      if(!session) return false;
+      var raw = localStorage.getItem(SESSION_KEY);
+      if(!raw) return false;
+      return crypto.subtle.importKey("raw", b64ToBytes(raw), {name:"AES-GCM"}, true, ["encrypt","decrypt"]).then(function(key){
+        cryptoKey = key;
+        currentUserEmail = session.user.email;
+        return true;
       }).catch(function(){
-        cryptoKey = prevKey;
         return false;
       });
+    });
+  }
+
+  // ---- Supabase-backed storage ----
+
+  function getAllEntries(){
+    return supabase.from("phrases").select("*").then(function(res){
+      if(res.error) throw res.error;
+      return res.data;
+    });
+  }
+
+  function putEntry(entry){
+    return supabase.from("phrases").upsert(entry).then(function(res){
+      if(res.error) throw res.error;
+    });
+  }
+
+  function deleteEntry(id){
+    return supabase.from("phrases").delete().eq("id", id).then(function(res){
+      if(res.error) throw res.error;
+    });
+  }
+
+  function deleteEntries(ids){
+    return supabase.from("phrases").delete().in("id", ids).then(function(res){
+      if(res.error) throw res.error;
     });
   }
 
@@ -745,6 +798,9 @@
   var pinyinInput = document.getElementById("pinyin-input");
   var saveBtn = document.getElementById("save-btn");
   var listEl = document.getElementById("list");
+  var brokenBanner = document.getElementById("broken-banner");
+  var brokenBannerText = document.getElementById("broken-banner-text");
+  var brokenBannerFix = document.getElementById("broken-banner-fix");
 
   var newRecorderContainer = document.getElementById("new-recorders");
   var newRec1 = createRecorder("Chinese audio 1");
@@ -780,38 +836,38 @@
         return step2.then(function(enc2){
           return {
             id: id,
-            createdAt: createdAt,
-            textIv: textEnc.iv,
-            textCipher: textEnc.cipher,
-            audio1Iv: enc1 ? enc1.iv : null,
-            audio1Cipher: enc1 ? enc1.cipher : null,
-            audio1Type: blob1 ? blob1.type : null,
-            audio2Iv: enc2 ? enc2.iv : null,
-            audio2Cipher: enc2 ? enc2.cipher : null,
-            audio2Type: blob2 ? blob2.type : null
+            created_at: createdAt,
+            text_iv: bufToB64(textEnc.iv),
+            text_cipher: bufToB64(textEnc.cipher),
+            audio1_iv: enc1 ? bufToB64(enc1.iv) : null,
+            audio1_cipher: enc1 ? bufToB64(enc1.cipher) : null,
+            audio1_type: blob1 ? blob1.type : null,
+            audio2_iv: enc2 ? bufToB64(enc2.iv) : null,
+            audio2_cipher: enc2 ? bufToB64(enc2.cipher) : null,
+            audio2_type: blob2 ? blob2.type : null
           };
         });
       });
     });
   }
 
-  function decryptAudioSlot(iv, cipher, type){
-    if(!cipher) return Promise.resolve(null);
-    return decryptBuffer(iv, cipher).then(function(buf){
+  function decryptAudioSlot(ivB64, cipherB64, type){
+    if(!cipherB64) return Promise.resolve(null);
+    return decryptBuffer(b64ToBytes(ivB64), b64ToBytes(cipherB64)).then(function(buf){
       return new Blob([buf], {type: type || "audio/webm"});
     });
   }
 
   function decryptEntry(entry){
-    return decryptText(entry.textIv, entry.textCipher).then(function(json){
+    return decryptText(b64ToBytes(entry.text_iv), b64ToBytes(entry.text_cipher)).then(function(json){
       var data = JSON.parse(json);
       return Promise.all([
-        decryptAudioSlot(entry.audio1Iv, entry.audio1Cipher, entry.audio1Type),
-        decryptAudioSlot(entry.audio2Iv, entry.audio2Cipher, entry.audio2Type)
+        decryptAudioSlot(entry.audio1_iv, entry.audio1_cipher, entry.audio1_type),
+        decryptAudioSlot(entry.audio2_iv, entry.audio2_cipher, entry.audio2_type)
       ]).then(function(blobs){
         return {
           id: entry.id,
-          createdAt: entry.createdAt,
+          createdAt: entry.created_at,
           en: data.en,
           zh: data.zh,
           pinyin: data.pinyin,
@@ -1002,6 +1058,59 @@
     paintView();
   }
 
+  function renderBrokenEntry(rawEntry){
+    var el = document.createElement("div");
+    el.className = "entry";
+    el.dataset.id = rawEntry.id;
+    el.dataset.broken = "1";
+
+    var actions = document.createElement("div");
+    actions.className = "entry-actions";
+    var delBtn = document.createElement("button");
+    delBtn.className = "icon-btn delete-btn";
+    delBtn.type = "button";
+    delBtn.title = "Delete";
+    delBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 7h12l-1 13H7L6 7zm3-3h6l1 2H8l1-2zM9 10v7m6-7v7"/></svg>';
+    delBtn.addEventListener("click", function(){
+      deleteEntry(rawEntry.id).then(function(){ el.remove(); checkEmpty(); updateBrokenBanner(); });
+    });
+    actions.appendChild(delBtn);
+    el.appendChild(actions);
+
+    var p = document.createElement("p");
+    p.className = "broken-text";
+    p.textContent = "Could not unlock this phrase (probably saved under a different password).";
+    el.appendChild(p);
+
+    listEl.insertBefore(el, listEl.firstChild);
+  }
+
+  function updateBrokenBanner(){
+    var count = listEl.querySelectorAll('.entry[data-broken="1"]').length;
+    if(count > 0){
+      brokenBannerText.textContent = count + (count === 1 ? " phrase" : " phrases") + " could not be unlocked.";
+      brokenBanner.classList.add("show");
+    } else {
+      brokenBanner.classList.remove("show");
+    }
+  }
+
+  brokenBannerFix.addEventListener("click", function(){
+    var brokenEls = Array.prototype.slice.call(listEl.querySelectorAll('.entry[data-broken="1"]'));
+    var ids = brokenEls.map(function(el){ return el.dataset.id; });
+    if(!ids.length) return;
+    brokenBannerFix.disabled = true;
+    deleteEntries(ids).then(function(){
+      brokenEls.forEach(function(el){ el.remove(); });
+      updateBrokenBanner();
+      checkEmpty();
+    }).catch(function(e){
+      console.error("Failed to delete unreadable phrases:", e);
+    }).then(function(){
+      brokenBannerFix.disabled = false;
+    });
+  });
+
   saveBtn.addEventListener("click", function(){
     saveBtn.disabled = true;
     var enText = enInput.value.trim();
@@ -1040,35 +1149,77 @@
   });
 
   function initApp(){
+    if(currentUserEmail){
+      document.getElementById("account-line").textContent = "Signed in as " + currentUserEmail;
+    }
     getAllEntries().then(function(entries){
-      entries.sort(function(a,b){ return a.createdAt - b.createdAt; });
-      return Promise.all(entries.map(decryptEntry));
-    }).then(function(plainEntries){
-      plainEntries.forEach(renderEntry);
+      entries.sort(function(a,b){ return a.created_at - b.created_at; });
+      return Promise.all(entries.map(function(e){
+        return decryptEntry(e).then(function(plain){ return {ok:true, plain:plain}; }).catch(function(err){
+          console.error("Could not decrypt entry", e.id, err);
+          return {ok:false, raw:e};
+        });
+      }));
+    }).then(function(results){
+      results.forEach(function(r){
+        if(r.ok){ renderEntry(r.plain); } else { renderBrokenEntry(r.raw); }
+      });
       checkEmpty();
+      updateBrokenBanner();
     }).catch(function(e){
       console.error("Failed to load saved phrases:", e);
       listEl.innerHTML = '<div class="empty">Could not load saved phrases.</div>';
     });
   }
 
+  // ---- auth gate ----
+
+  var gateNormal = document.getElementById("gate-normal");
+  var gateRecovery = document.getElementById("gate-recovery");
   var gateTitle = document.getElementById("gate-title");
   var gateSub = document.getElementById("gate-sub");
   var gateForm = document.getElementById("gate-form");
+  var gateEmail = document.getElementById("gate-email");
   var gatePw = document.getElementById("gate-pw");
   var gatePw2 = document.getElementById("gate-pw2");
   var gateSubmit = document.getElementById("gate-submit");
   var gateError = document.getElementById("gate-error");
+  var gateInfo = document.getElementById("gate-info");
+  var toggleModeBtn = document.getElementById("toggle-mode-btn");
+  var forgotPwBtn = document.getElementById("forgot-pw-btn");
   var lockBtn = document.getElementById("lock-btn");
 
-  var isSetupMode = !getAuthRecord();
+  var recoveryPw = document.getElementById("recovery-pw");
+  var recoveryPw2 = document.getElementById("recovery-pw2");
+  var recoverySubmit = document.getElementById("recovery-submit");
+  var recoveryError = document.getElementById("recovery-error");
 
-  if(!isSetupMode){
-    gateTitle.textContent = "Enter password";
-    gateSub.textContent = "Unlock your saved phrases.";
-    gatePw2.style.display = "none";
-    gateSubmit.textContent = "Unlock";
+  var mode = "signin";
+
+  function updateGateUI(){
+    gateError.textContent = "";
+    gateInfo.textContent = "";
+    if(mode === "signup"){
+      gateTitle.textContent = "Create account";
+      gateSub.textContent = "Set a password. It also encrypts your phrases, so remember it well.";
+      gatePw2.style.display = "block";
+      gateSubmit.textContent = "Create account";
+      toggleModeBtn.textContent = "Already have an account? Sign in";
+      gatePw.autocomplete = "new-password";
+    } else {
+      gateTitle.textContent = "Sign in";
+      gateSub.textContent = "Sign in to sync your saved phrases across devices.";
+      gatePw2.style.display = "none";
+      gateSubmit.textContent = "Sign in";
+      toggleModeBtn.textContent = "Need an account? Create one";
+      gatePw.autocomplete = "current-password";
+    }
   }
+
+  toggleModeBtn.addEventListener("click", function(){
+    mode = mode === "signin" ? "signup" : "signin";
+    updateGateUI();
+  });
 
   function unlock(){
     document.body.classList.add("unlocked");
@@ -1079,50 +1230,130 @@
   gateForm.addEventListener("submit", function(e){
     e.preventDefault();
     gateError.textContent = "";
+    gateInfo.textContent = "";
+    var email = gateEmail.value.trim();
     var pw = gatePw.value;
-    if(!pw){
-      gateError.textContent = "Enter a password.";
+    if(!email || !pw){
+      gateError.textContent = "Enter your email and password.";
       return;
     }
     gateSubmit.disabled = true;
 
-    if(isSetupMode){
+    if(mode === "signup"){
       var pw2 = gatePw2.value;
       if(pw !== pw2){
         gateError.textContent = "Passwords do not match.";
         gateSubmit.disabled = false;
         return;
       }
-      if(pw.length < 4){
-        gateError.textContent = "Use at least 4 characters.";
+      if(pw.length < 6){
+        gateError.textContent = "Use at least 6 characters.";
         gateSubmit.disabled = false;
         return;
       }
-      setupPassword(pw).then(unlock);
-    } else {
-      tryLogin(pw).then(function(ok){
-        if(ok){
-          unlock();
-        } else {
-          gateError.textContent = "Incorrect password.";
-          gatePw.value = "";
-          gatePw.focus();
+      supabase.auth.signUp({email:email, password:pw}).then(function(res){
+        if(res.error){
+          gateError.textContent = res.error.message;
           gateSubmit.disabled = false;
+          return;
         }
+        if(!res.data.session){
+          gateInfo.textContent = "Check your email to confirm your account, then sign in.";
+          mode = "signin";
+          updateGateUI();
+          gateSubmit.disabled = false;
+          return;
+        }
+        currentUserEmail = res.data.user.email;
+        deriveKeyForUser(pw, res.data.user.id).then(function(key){
+          cryptoKey = key;
+          unlock();
+        });
+      });
+    } else {
+      supabase.auth.signInWithPassword({email:email, password:pw}).then(function(res){
+        if(res.error){
+          gateError.textContent = res.error.message;
+          gateSubmit.disabled = false;
+          return;
+        }
+        currentUserEmail = res.data.user.email;
+        deriveKeyForUser(pw, res.data.user.id).then(function(key){
+          cryptoKey = key;
+          unlock();
+        });
       });
     }
   });
 
+  forgotPwBtn.addEventListener("click", function(){
+    gateError.textContent = "";
+    gateInfo.textContent = "";
+    var email = gateEmail.value.trim();
+    if(!email){
+      gateError.textContent = "Enter your email first, then tap Forgot password.";
+      return;
+    }
+    supabase.auth.resetPasswordForEmail(email, {redirectTo: window.location.href}).then(function(res){
+      if(res.error){
+        gateError.textContent = res.error.message;
+      } else {
+        gateInfo.textContent = "Check your email for a password reset link.";
+      }
+    });
+  });
+
+  recoverySubmit.addEventListener("click", function(){
+    recoveryError.textContent = "";
+    var pw = recoveryPw.value;
+    var pw2 = recoveryPw2.value;
+    if(pw.length < 6){
+      recoveryError.textContent = "Use at least 6 characters.";
+      return;
+    }
+    if(pw !== pw2){
+      recoveryError.textContent = "Passwords do not match.";
+      return;
+    }
+    recoverySubmit.disabled = true;
+    supabase.auth.updateUser({password: pw}).then(function(res){
+      if(res.error){
+        recoveryError.textContent = res.error.message;
+        recoverySubmit.disabled = false;
+        return;
+      }
+      var user = res.data.user;
+      currentUserEmail = user.email;
+      deriveKeyForUser(pw, user.id).then(function(key){
+        cryptoKey = key;
+        gateRecovery.style.display = "none";
+        gateNormal.style.display = "block";
+        unlock();
+      });
+    });
+  });
+
   lockBtn.addEventListener("click", function(){
     clearSession();
-    location.reload();
+    supabase.auth.signOut().then(function(){
+      location.reload();
+    });
   });
+
+  supabase.auth.onAuthStateChange(function(event, session){
+    if(event === "PASSWORD_RECOVERY"){
+      gateNormal.style.display = "none";
+      gateRecovery.style.display = "block";
+    }
+  });
+
+  updateGateUI();
 
   tryRestoreSession().then(function(restored){
     if(restored){
       unlock();
     } else {
-      gatePw.focus();
+      gateEmail.focus();
     }
   });
 
