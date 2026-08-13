@@ -291,6 +291,17 @@
     text-decoration:underline;
     font-family:'Outfit',sans-serif;
   }
+  .rec-upload-btn{
+    background:none;
+    border:none;
+    color:var(--cobalt);
+    font-size:11px;
+    font-weight:700;
+    cursor:pointer;
+    text-decoration:underline;
+    font-family:'Outfit',sans-serif;
+    margin-top:2px;
+  }
   .rec-error{
     font-size:11px;
     color:var(--coral-dark);
@@ -673,6 +684,8 @@
         '<audio controls></audio>' +
         '<button class="rec-redo" type="button">Re-record</button>' +
       '</div>' +
+      '<button class="rec-upload-btn" type="button">Upload a file</button>' +
+      '<input class="rec-file-input" type="file" accept="audio/*" style="display:none;">' +
       '<div class="rec-error"></div>';
 
     root.querySelector(".rec-label").textContent = labelText;
@@ -681,7 +694,10 @@
     var preview = root.querySelector(".rec-preview");
     var audioEl = root.querySelector("audio");
     var redoBtn = root.querySelector(".rec-redo");
+    var uploadBtn = root.querySelector(".rec-upload-btn");
+    var fileInput = root.querySelector(".rec-file-input");
     var errorEl = root.querySelector(".rec-error");
+    var MAX_UPLOAD_BYTES = 20 * 1024 * 1024;
 
     var state = {
       mediaRecorder:null,
@@ -780,6 +796,24 @@
     redoBtn.addEventListener("click", function(){
       reset();
       fireChange();
+    });
+
+    uploadBtn.addEventListener("click", function(){
+      fileInput.click();
+    });
+
+    fileInput.addEventListener("change", function(){
+      var file = fileInput.files && fileInput.files[0];
+      if(!file) return;
+      if(file.size > MAX_UPLOAD_BYTES){
+        showError("File is too large (max 20MB).");
+        fileInput.value = "";
+        return;
+      }
+      errorEl.style.display = "none";
+      showBlob(file);
+      fireChange();
+      fileInput.value = "";
     });
 
     return {
