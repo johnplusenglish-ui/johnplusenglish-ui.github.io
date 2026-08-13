@@ -609,21 +609,41 @@ function buildMap(c) {
 
   const river = m.river ? `<path d="${polyline(m.river)}" fill="none" stroke="#7fa8bd" stroke-width="${(2.4*M).toFixed(2)}" stroke-linejoin="round" stroke-linecap="round" opacity="0.9"/>` : '';
 
-  const regions = m.regions.map(r =>
-    `<text x="${PX(r.lon).toFixed(1)}" y="${PY(r.lat).toFixed(1)}" text-anchor="middle" fill="${r.sea ? '#7e97a1' : '#8a8069'}" paint-order="stroke" stroke="rgba(246,244,239,0.65)" stroke-width="${(2.4*M).toFixed(2)}" font-family="PT Serif" font-style="italic" font-size="${((r.sea?11.5:11)*M).toFixed(2)}" letter-spacing="${(2.6*M).toFixed(2)}" opacity="0.95">${r.n}</text>`).join('');
-
   // city markers, with simple label collision avoidance
   const placed = [];
   const hits = b => placed.some(p => !(b.x2 < p.x1 || b.x1 > p.x2 || b.y2 < p.y1 || b.y1 > p.y2));
   const rOf = ct => (ct.big ? 4.4 : 3.1) * M;
-  for (const ct of m.cities) {
-    const x = PX(ct.lon), y = PY(ct.lat), r = rOf(ct);
-    placed.push({ x1:x-r, y1:y-r, x2:x+r, y2:y+r });
+
+  // Cities that sit only a few kilometres apart in reality (Giza and Memphis, Tanis
+  // and Avaris...) can project to almost the same point once a map is zoomed in.
+  // Nudge overlapping dots apart in a few relaxation passes so every marker stays
+  // visible and distinct, without touching the underlying coordinates.
+  const pts = m.cities.map(ct => ({ ct, x: PX(ct.lon), y: PY(ct.lat) }));
+  const minGap = 2.4 * M;
+  for (let pass = 0; pass < 4; pass++) {
+    for (let i = 0; i < pts.length; i++) {
+      for (let j = i + 1; j < pts.length; j++) {
+        const a = pts[i], b = pts[j];
+        const need = rOf(a.ct) + rOf(b.ct) + minGap;
+        let dx = b.x - a.x, dy = b.y - a.y;
+        let dist = Math.hypot(dx, dy);
+        if (dist === 0) { dx = 1; dy = 0; dist = 1; }
+        if (dist < need) {
+          const push = (need - dist) / 2, ux = dx / dist, uy = dy / dist;
+          a.x -= ux * push; a.y -= uy * push;
+          b.x += ux * push; b.y += uy * push;
+        }
+      }
+    }
+  }
+  for (const p of pts) {
+    const r = rOf(p.ct);
+    placed.push({ x1:p.x-r, y1:p.y-r, x2:p.x+r, y2:p.y+r });
   }
   let dots = '';
-  const order = [...m.cities].sort((a,b) => (b.big?1:0) - (a.big?1:0));
-  for (const ct of order) {
-    const x = PX(ct.lon), y = PY(ct.lat), r = rOf(ct);
+  const order = [...pts].sort((a,b) => (b.ct.big?1:0) - (a.ct.big?1:0));
+  for (const p of order) {
+    const ct = p.ct, x = p.x, y = p.y, r = rOf(ct);
     let g = `<g><title>${ct.n}</title><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(r+1.7*M).toFixed(2)}" fill="#fffefb"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r.toFixed(2)}" fill="${ct.big ? c.accent : '#5c5751'}"/>`;
     const fs = (ct.big ? 12.5 : 10.5) * M, w = ct.n.length * fs * 0.5, h = fs, gap = r + 2.6*M;
     for (const cd of [{ax:'start',x1:x+gap,x2:x+gap+w,tx:x+gap},{ax:'end',x1:x-gap-w,x2:x-gap,tx:x-gap}]) {
@@ -635,6 +655,27 @@ function buildMap(c) {
       }
     }
     dots += g + '</g>';
+  }
+
+  // Region labels are background context, not headline information, so they are only
+  // drawn where there is genuinely clear space: checked against every city dot and
+  // label already placed, tried at a couple of vertical offsets, and skipped rather
+  // than left to collide if no clear spot can be found nearby.
+  let regions = '';
+  for (const r of m.regions) {
+    const fs = (r.sea ? 11.5 : 11) * M, ls = 2.6 * M;
+    const w = r.n.length * (fs * 0.58 + ls);
+    const x = PX(r.lon), yBase = PY(r.lat);
+    let spot = null;
+    for (const dy of [0, -2.1*fs, 2.1*fs]) {
+      const y = yBase + dy;
+      const bx = { x1:x-w/2, y1:y-fs*0.65, x2:x+w/2, y2:y+fs*0.55 };
+      if (!hits(bx)) { spot = { y, bx }; break; }
+    }
+    if (!spot) continue;
+    placed.push(spot.bx);
+    const opacity = r.sea ? 0.8 : 0.62;
+    regions += `<text x="${x.toFixed(1)}" y="${spot.y.toFixed(1)}" text-anchor="middle" fill="${r.sea ? '#7e97a1' : '#8a8069'}" paint-order="stroke" stroke="rgba(246,244,239,0.65)" stroke-width="${(2.4*M).toFixed(2)}" font-family="PT Serif" font-style="italic" font-size="${fs.toFixed(2)}" letter-spacing="${ls.toFixed(2)}" opacity="${opacity}">${r.n}</text>`;
   }
 
   const svg = `<svg id="the-map" viewBox="${vx.toFixed(1)} ${vy.toFixed(1)} ${vw.toFixed(1)} ${vh.toFixed(1)}" preserveAspectRatio="xMidYMid meet">
