@@ -60,7 +60,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .row-icon svg{width:15px;height:15px;stroke-width:1.8;fill:none;stroke:currentColor}
 .row-text{flex:1;min-width:0}
 .row-name{font-size:.85rem;font-weight:700;line-height:1.25;display:flex;align-items:center;gap:.55rem}
-.sidebar .row-name::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--catdot,transparent);flex-shrink:0}
+.sidebar .row-name::before{content:'';display:inline-block;width:4px;height:4px;border-radius:50%;background:var(--catdot,transparent);flex-shrink:0}
 .row-desc{font-size:.68rem;color:var(--muted);font-weight:400;margin-top:.05rem;line-height:1.35}
 .row-arr{font-size:.85rem;color:var(--muted);transition:transform .15s;flex-shrink:0}
 .row.avail:hover .row-arr{transform:translateX(3px)}
@@ -935,21 +935,27 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 @media(max-width:640px){#view-interview-questions .iq-practice-card{padding:1.8rem 1.2rem}}
 
 
-/* ── Sitewide category accordion (single shell) ── */
-.cat-group{background:var(--card);border:1.5px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--shadow-sm);margin-bottom:.35rem}
-.cat-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;gap:.5rem;border:none;background:transparent;cursor:pointer;font-family:Outfit,sans-serif;font-size:.64rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--ink);padding:.65rem .8rem;border-radius:10px;transition:background .15s,color .15s;text-align:left}
+/* ── Sitewide category accordion (single shell) — folder-tab styling ──
+   Closed rows stay flat (just a colour spine + hairline divider, no boxed
+   rectangles) so the list reads as one strip, not a stack of cards. Only
+   the OPEN category gets a real tab treatment: rounded, shadowed, and
+   pushed out past the sidebar edge like a folder tab pulled forward. */
+.cat-group{background:transparent;border:none;border-bottom:1px solid var(--border);border-left:4px solid var(--catdot,var(--border));overflow:hidden;margin:0;box-shadow:none;position:relative;transition:margin .18s ease,box-shadow .18s ease,background .18s ease,border-color .18s ease}
+.cat-group:last-child{border-bottom:none}
+.cat-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;gap:.5rem;border:none;background:transparent;cursor:pointer;font-family:Outfit,sans-serif;font-size:.64rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--ink);padding:.65rem .8rem;transition:background .15s,color .15s;text-align:left}
 .cat-toggle:focus{outline:none}
 .cat-toggle:focus-visible{background:var(--cream);color:var(--ink)}
 .cat-group.open .cat-toggle{color:var(--ink)}
 .cat-toggle:hover{background:var(--cream);color:var(--ink)}
-.cat-group.open .cat-toggle{border-bottom:1.5px solid var(--border)}
 .cat-chevron{font-size:.7rem;flex-shrink:0}
 .cat-group.open .cat-chevron{transform:rotate(180deg)}
 .cat-rows{max-height:0;overflow:hidden}
 .cat-group.open .cat-rows{max-height:600px}
+.sidebar.js-anim .cat-group{transition:margin .18s ease,box-shadow .18s ease,background .18s ease,border-color .18s ease}
 .sidebar.js-anim .cat-rows{transition:max-height .22s ease}
 .sidebar.js-anim .cat-chevron{transition:transform .22s ease}
-.cat-group:last-child{margin-bottom:0}
+.cat-group.open{margin:.3rem -1rem .3rem 0;border-bottom:1.5px solid var(--catdot,var(--border));border-radius:0 22px 22px 0;background:color-mix(in srgb,var(--catdot,var(--ink)) 9%,var(--card));box-shadow:var(--shadow-md);z-index:2}
+@media(prefers-reduced-motion:reduce){.cat-group,.sidebar.js-anim .cat-group{transition:none}}
 
 .back-pill{display:inline-flex;align-items:center;gap:.4rem;font-family:'Outfit',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-decoration:none;background:var(--card);border:1.5px solid var(--border);border-radius:999px;padding:.5rem 1.1rem .5rem .85rem;cursor:pointer;transition:all .18s;margin-bottom:1.2rem;box-shadow:var(--shadow-sm)}
 .back-pill:hover{color:var(--sky);border-color:var(--sky);box-shadow:var(--shadow-md);transform:translateY(-1px)}
