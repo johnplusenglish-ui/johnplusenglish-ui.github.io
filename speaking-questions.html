@@ -141,25 +141,6 @@ mark{background:var(--sun);color:var(--ink);border-radius:2px;padding:0 1px}
 .focus-btn.close:hover{color:var(--ink)}
 .focus-counter{font-family:Outfit,sans-serif;font-size:.82rem;color:var(--muted)}
 
-/* Student name picker */
-.name-picker{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:1rem 1.4rem;margin-top:1rem;box-shadow:0 2px 12px rgba(45,48,71,.04)}
-.name-picker-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;margin-bottom:.8rem}
-.name-picker-title{font-family:Outfit,sans-serif;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--sea);display:flex;align-items:center;gap:.4rem}
-.name-input-row{display:flex;gap:.4rem;margin-bottom:.6rem}
-.name-input{font-family:'Outfit',sans-serif;font-size:.85rem;padding:.45rem .8rem;border:1.5px solid var(--border);border-radius:8px;background:var(--cream);color:var(--ink);flex:1;outline:none;transition:border-color .15s}
-.name-input:focus{border-color:var(--sea)}
-.name-add-btn{font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:700;padding:.45rem .9rem;border:1.5px solid var(--sea);border-radius:8px;background:var(--sea);color:#fff;cursor:pointer;transition:opacity .15s;white-space:nowrap}
-.name-add-btn:hover{opacity:.85}
-.name-tags{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.8rem}
-.name-tag{font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:600;padding:.25rem .6rem;border:1.5px solid var(--border);border-radius:5px;background:var(--cream);color:var(--ink);display:flex;align-items:center;gap:.3rem}
-.name-tag .remove{cursor:pointer;color:var(--muted);font-size:.7rem;transition:color .15s;padding:0 2px}
-.name-tag .remove:hover{color:var(--coral)}
-.name-pick-btn{font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;padding:.55rem 1.4rem;border:1.5px solid var(--sun);border-radius:10px;background:var(--card);color:var(--sun);cursor:pointer;transition:all .15s;width:100%}
-.name-pick-btn:hover{background:var(--sun);color:#fff}
-.name-result{text-align:center;margin-top:.6rem;font-family:'Outfit',sans-serif;font-size:1.5rem;font-weight:800;color:var(--ink);min-height:2rem}
-.name-result.spin{animation:nameSpin .6s ease-out}
-@keyframes nameSpin{0%{opacity:0;transform:translateY(10px)}50%{opacity:.5}100%{opacity:1;transform:translateY(0)}}
-
 /* Deck toolbar */
 .deck-toolbar{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;padding:.6rem 1.4rem;border-bottom:1px solid var(--border);background:var(--cream)}
 .deck-tool-btn{font-family:'Outfit',sans-serif;font-size:.75rem;font-weight:700;padding:.3rem .7rem;border:1.5px solid var(--border);border-radius:8px;background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap}
@@ -199,7 +180,7 @@ nav{padding:.75rem 1.2rem}.nav-links{gap:1rem}.nav-links a{font-size:.78rem}
 }
 
 @media print{
-nav,.page-header,.controls,.deck-nav,.timer-section,footer,.search-wrap,.name-picker,.focus-overlay{display:none}
+nav,.page-header,.controls,.deck-nav,.timer-section,footer,.search-wrap,.focus-overlay{display:none}
 .main{padding:0;margin:0}
 .deck{box-shadow:none;border:1px solid #ccc}
 }
@@ -279,20 +260,6 @@ nav,.page-header,.controls,.deck-nav,.timer-section,footer,.search-wrap,.name-pi
 <button class="timer-restart" id="timerRestart" onclick="restartTimer()">Restart</button>
 </div>
 <div class="timer-progress"><div class="timer-progress-fill" id="timerProgress"></div></div>
-</div>
-<div class="name-picker" id="namePicker">
-<div class="name-picker-header">
-<span class="name-picker-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-.15em"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Student Picker</span>
-<span style="font-size:.72rem;color:var(--muted);cursor:pointer" onclick="clearAllNames()" title="Clear all names">Clear all</span>
-</div>
-<div class="name-input-row">
-<input type="text" class="name-input" id="nameInput" placeholder="Add student name..." onkeydown="if(event.key==='Enter')addName()">
-<button class="name-add-btn" onclick="addName()">Add</button>
-</div>
-<div class="name-tags" id="nameTags"></div>
-<button class="name-pick-btn" id="namePickBtn" onclick="pickName()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-.15em"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg> Pick a random student</button>
-<div class="name-result" id="nameResult"></div>
-</div>
 </div>
 
 <!-- Focus mode overlay -->
@@ -692,56 +659,6 @@ document.addEventListener('keydown', function(e) {
     if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') focusNav(-1);
   }
 });
-
-// ── Student Name Picker ──
-var studentNames = JSON.parse(localStorage.getItem('speakingStudents') || '[]');
-function renderNames() {
-  var box = document.getElementById('nameTags');
-  if (studentNames.length === 0) { box.innerHTML = '<span style="font-size:.8rem;color:var(--muted)">No students added yet.</span>'; return; }
-  var h = '';
-  studentNames.forEach(function(name, i) {
-    h += '<span class="name-tag">' + name + '<span class="remove" onclick="removeName(' + i + ')">&times;</span></span>';
-  });
-  box.innerHTML = h;
-}
-function addName() {
-  var input = document.getElementById('nameInput');
-  var name = input.value.trim();
-  if (!name) return;
-  studentNames.push(name);
-  localStorage.setItem('speakingStudents', JSON.stringify(studentNames));
-  input.value = '';
-  renderNames();
-}
-function removeName(idx) {
-  studentNames.splice(idx, 1);
-  localStorage.setItem('speakingStudents', JSON.stringify(studentNames));
-  renderNames();
-}
-function clearAllNames() {
-  if (studentNames.length === 0) return;
-  studentNames = [];
-  localStorage.setItem('speakingStudents', JSON.stringify(studentNames));
-  document.getElementById('nameResult').textContent = '';
-  renderNames();
-}
-function pickName() {
-  if (studentNames.length === 0) return;
-  var el = document.getElementById('nameResult');
-  var count = 0;
-  var interval = setInterval(function() {
-    el.textContent = studentNames[Math.floor(Math.random() * studentNames.length)];
-    count++;
-    if (count > 10) {
-      clearInterval(interval);
-      el.textContent = studentNames[Math.floor(Math.random() * studentNames.length)];
-      el.className = 'name-result';
-      void el.offsetWidth;
-      el.className = 'name-result spin';
-    }
-  }, 60);
-}
-renderNames();
 
 buildTopicGrid();
 </script>
