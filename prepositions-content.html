@@ -274,8 +274,21 @@ a.tab{text-decoration:none}
 .cloze-score-msg{color:var(--muted);font-size:.88rem}
 
 /* Cloze picker layout (PV-style) */
-.cloze-picker{display:grid;grid-template-columns:300px 1fr;gap:1.2rem;align-items:start}
+.cloze-picker{display:grid;grid-template-columns:300px 1fr;gap:1.2rem;align-items:start;transition:grid-template-columns .22s ease}
+.cloze-picker.sb-collapsed{grid-template-columns:52px 1fr}
 .cloze-sidebar{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);display:flex;flex-direction:column}
+/* Collapsible, mirroring the site's own sidebar collapse affordance — a
+   header bar with a chevron toggle that shrinks the list down to a narrow
+   rail, letting the passage/exercise column take the freed space. */
+.cloze-sidebar-header{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.7rem .9rem;border-bottom:1px solid var(--border)}
+.cloze-sidebar.collapsed .cloze-sidebar-header{border-bottom:none;justify-content:center;padding:.7rem .4rem}
+.cloze-sidebar-header-label{font-family:Outfit,sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cloze-sidebar.collapsed .cloze-sidebar-header-label{display:none}
+.cloze-sidebar-toggle{width:26px;height:26px;border-radius:7px;border:1.5px solid var(--border);background:transparent;display:flex;align-items:center;justify-content:center;color:var(--muted);cursor:pointer;transition:all .15s;flex-shrink:0}
+.cloze-sidebar-toggle:hover{border-color:var(--sea);color:var(--sea)}
+.cloze-sidebar-toggle svg{width:13px;height:13px;transition:transform .2s ease}
+.cloze-sidebar.collapsed .cloze-sidebar-toggle svg{transform:rotate(180deg)}
+.cloze-sidebar.collapsed .cloze-sidebar-scroll,.cloze-sidebar.collapsed .cloze-sidebar-footer{display:none}
 .cloze-sidebar-scroll{flex:1;overflow-y:auto;padding:.5rem;max-height:70vh}
 .cloze-sidebar-scroll::-webkit-scrollbar{width:4px}
 .cloze-sidebar-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
@@ -283,6 +296,11 @@ a.tab{text-decoration:none}
 .cloze-reset{font-family:'Outfit',sans-serif;font-size:.72rem;font-weight:600;padding:.35rem .7rem;border:1.5px solid var(--border);border-radius:6px;background:transparent;color:var(--muted);cursor:pointer;transition:all .15s;width:100%}
 .cloze-reset:hover{border-color:var(--coral);color:var(--coral)}
 .cloze-sb-item{padding:.7rem .8rem;border-radius:8px;cursor:pointer;transition:background .15s;display:grid;grid-template-columns:26px 22px 1fr auto;gap:.6rem;align-items:center;margin-bottom:.15rem}
+/* The cloze list itself drops the old status-dot column (replaced by a
+   trailing period on the number) — scoped by ID so the still-shared
+   .cloze-sb-item markup used by the (currently hidden) Mistakes list keeps
+   its original 4-column layout untouched. */
+#clozeSidebarList .cloze-sb-item{grid-template-columns:34px 1fr auto}
 .cloze-sb-item:hover{background:var(--cream)}
 .cloze-sb-item.active{background:var(--sea);color:#fff}
 .cloze-sb-item.active .cloze-sb-n,.cloze-sb-item.active .cloze-sb-topic{color:rgba(255,255,255,.78)}
@@ -1143,7 +1161,11 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
       <p class="pd">Read each passage and fill in the missing prepositions. 20 texts across modern topics, 8 gaps each. Your progress is saved on this device.</p>
     </div>
     <div class="cloze-picker" id="clozePicker">
-      <div class="cloze-sidebar">
+      <div class="cloze-sidebar" id="clozeSidebarWrap">
+        <div class="cloze-sidebar-header" onclick="clozeToggleSidebar()">
+          <span class="cloze-sidebar-header-label">All Texts</span>
+          <button class="cloze-sidebar-toggle" type="button" aria-label="Collapse list" onclick="event.stopPropagation();clozeToggleSidebar()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+        </div>
         <div class="cloze-sidebar-scroll" id="clozeSidebarList"></div>
         <div class="cloze-sidebar-footer">
           <button class="cloze-reset" onclick="clozeResetProgress()" title="Clear saved progress for all texts">Reset progress</button>
@@ -1904,6 +1926,22 @@ var clozePassages=[{"title": "Remote Work Revolution", "topic": "Work & Technolo
 
 // Open Cloze Tests
 var CLOZE_STORAGE_KEY = 'jpe_prep_cloze_progress_v1';
+var CLOZE_SIDEBAR_COLLAPSED_KEY = 'jpe_prep_cloze_sidebar_collapsed_v1';
+
+function clozeToggleSidebar() {
+  var sb = document.getElementById('clozeSidebarWrap');
+  var picker = document.getElementById('clozePicker');
+  var collapsed = sb.classList.toggle('collapsed');
+  picker.classList.toggle('sb-collapsed', collapsed);
+  try { localStorage.setItem(CLOZE_SIDEBAR_COLLAPSED_KEY, collapsed ? '1' : '0'); } catch(e) {}
+}
+(function clozeRestoreSidebarState() {
+  var collapsed = false;
+  try { collapsed = localStorage.getItem(CLOZE_SIDEBAR_COLLAPSED_KEY) === '1'; } catch(e) {}
+  if (!collapsed) return;
+  document.getElementById('clozeSidebarWrap').classList.add('collapsed');
+  document.getElementById('clozePicker').classList.add('sb-collapsed');
+})();
 
 function clozeGetProgress() {
   try {
@@ -1950,8 +1988,7 @@ function clozeRenderSidebar() {
   clozePassages.forEach(function(t, i) {
     var status = clozeGetStatus(i);
     var isActive = i === activeIdx;
-    var num = String(i + 1).padStart(2, '0');
-    var dotCls = status.state === 'done' ? 'done' : (status.state === 'partial' ? 'partial' : '');
+    var num = String(i + 1).padStart(2, '0') + '.';
     var right = '';
     if (status.state === 'done') {
       right = '<span class="cloze-sb-tick"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>';
@@ -1961,7 +1998,6 @@ function clozeRenderSidebar() {
     }
     html += '<div class="cloze-sb-item' + (isActive ? ' active' : '') + '" data-idx="' + i + '" onclick="clozeRenderPreview(' + i + ')">';
     html += '<span class="cloze-sb-n">' + num + '</span>';
-    html += '<span class="cloze-sb-dot ' + dotCls + '"></span>';
     html += '<div class="cloze-sb-body"><span class="cloze-sb-title">' + t.title + '</span><span class="cloze-sb-topic">' + t.topic + '</span></div>';
     html += '<div class="cloze-sb-right">' + right + '</div>';
     html += '</div>';
