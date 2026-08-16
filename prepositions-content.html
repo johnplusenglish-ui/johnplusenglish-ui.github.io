@@ -763,9 +763,13 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
    that isn't claiming to be open. The active tab gets its "open" signal from
    its own border below instead: a floating outline would trace the whole
    shape, including the bottom edge that's supposed to merge into the panel,
-   redrawing a line exactly where we just removed one. */
+   redrawing a line exactly where we just removed one. Suppressed
+   unconditionally (not just under :focus-visible) because Safari's native
+   focus ring ignores :focus-visible support gaps and, worse, ignores the
+   element's own border-radius — it draws a uniformly rounded halo around
+   all four corners regardless, which closes the open bottom right back up. */
 .tab:not(.active):focus-visible{outline:2px solid var(--sea);outline-offset:2px}
-.tab.active:focus-visible{outline:none}
+.tab.active{outline:none}
 /* The open tab: teal border across the top and sides marks it as selected;
    the bottom border switches to page-cream and goes thicker (3px vs the
    strip's 1.5px baseline) so it fully covers the baseline rather than just
