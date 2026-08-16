@@ -401,12 +401,17 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
 .oc-sb-item.active{background:#2176FF;color:#fff}
 .oc-sb-item.active .oc-sb-num,.oc-sb-item.active .oc-sb-theme{color:rgba(255,255,255,.85)}
 .oc-sb-num{font-family:Outfit,sans-serif;font-size:.75rem;color:var(--muted);font-weight:700;flex-shrink:0}
-.oc-sb-dot{width:8px;height:8px;border-radius:50%;background:var(--border);flex-shrink:0;transition:all .15s}
-.oc-sb-item.active .oc-sb-dot{background:#fff}
-.oc-sb-item.completed .oc-sb-dot{background:#5DDEA0}
 .oc-sb-text{flex:1;min-width:0}
 .oc-sb-title{font-family:'Outfit',sans-serif;font-weight:700;font-size:.92rem;line-height:1.25;display:block}
 .oc-sb-theme{font-family:'Outfit',sans-serif;font-size:.78rem;color:var(--muted);display:block;margin-top:.15rem}
+.oc-sb-right{display:flex;align-items:center;gap:.3rem;flex-shrink:0}
+.oc-sb-tick{display:flex;align-items:center;justify-content:center;width:15px;height:15px;flex-shrink:0}
+.oc-sb-item.active .oc-sb-tick svg{stroke:#fff}
+.oc-sb-score{font-family:Outfit,sans-serif;font-size:.68rem;font-weight:700;padding:.15rem .45rem;border-radius:5px;background:rgba(22,163,74,.1);color:#16A34A;white-space:nowrap}
+.oc-sb-score.partial{background:rgba(245,158,11,.12);color:#C67400}
+.oc-sb-item.active .oc-sb-score{background:rgba(255,255,255,.22);color:#fff}
+.oc-reset-link{font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:600;color:var(--muted);background:none;border:none;cursor:pointer;padding:.4rem .2rem;transition:color .15s}
+.oc-reset-link:hover{color:#FF6B6B}
 .oc-content{background:var(--card);border:1.5px solid var(--border);border-radius:18px;padding:2rem 2.25rem;box-shadow:0 4px 18px rgba(45,48,71,.05)}
 .oc-title{font-family:'Outfit',serif;font-size:1.8rem;color:var(--ink);font-weight:400;margin-bottom:.4rem}
 .oc-meta{font-family:Outfit,sans-serif;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:#2176FF;font-weight:700;margin-bottom:1.5rem}
@@ -1192,10 +1197,13 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
     <section class="practice-pane" id="practice-cloze">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:1.25rem;flex-wrap:wrap;">
         <p class="oc-intro" style="margin-bottom:0;flex:1;">Read each passage and fill in the missing idioms using the word bank. 6 gaps per text.</p>
-        <button class="pv-print-btn" id="ocPrintBtn" onclick="ocOpenPrint()" aria-label="Print options">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-          Print
-        </button>
+        <div style="display:flex;align-items:center;gap:.5rem;flex-shrink:0;">
+          <button type="button" class="oc-reset-link" onclick="idiomsClozeResetProgress()">Reset progress</button>
+          <button class="pv-print-btn" id="ocPrintBtn" onclick="ocOpenPrint()" aria-label="Print options">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+            Print
+          </button>
+        </div>
       </div>
       <div class="oc-layout">
         <nav class="oc-sidebar" id="oc-sidebar"></nav>
@@ -2727,11 +2735,36 @@ const CLOZE_PASSAGES = [
 
 /* ============ OPEN CLOZE ============ */
 (function(){
-  const STATE = {
-    activeId: null,
-    completed: new Set()
-  };
+  const STATE = { activeId: null };
   const $ = id => document.getElementById(id);
+
+  // ─── Progress tracking (localStorage) ───
+  const CLOZE_STORAGE_KEY = 'jpe_idioms_cloze_progress_v1';
+  function getProgress(){
+    try { var raw = localStorage.getItem(CLOZE_STORAGE_KEY); if (!raw) return {}; return JSON.parse(raw) || {}; }
+    catch(e) { return {}; }
+  }
+  function saveScore(id, correct, total){
+    try {
+      var prog = getProgress();
+      var prev = prog[id];
+      if (!prev || correct > prev.correct) {
+        prog[id] = { correct: correct, total: total };
+        localStorage.setItem(CLOZE_STORAGE_KEY, JSON.stringify(prog));
+      }
+    } catch(e) {}
+  }
+  function getStatus(id){
+    var p = getProgress()[id];
+    if (!p) return { state: 'new', correct: 0, total: 0 };
+    if (p.correct === p.total) return { state: 'done', correct: p.correct, total: p.total };
+    return { state: 'partial', correct: p.correct, total: p.total };
+  }
+  window.idiomsClozeResetProgress = function(){
+    if (!confirm('Clear saved progress for all Gap Fill texts? This cannot be undone.')) return;
+    try { localStorage.removeItem(CLOZE_STORAGE_KEY); } catch(e) {}
+    renderSidebar();
+  };
 
   // Build a quick lookup from canonical idiom -> data entry
   const IDIOM_INDEX = {};
@@ -2778,14 +2811,22 @@ const CLOZE_PASSAGES = [
     sb.innerHTML = CLOZE_PASSAGES.map((p, i) => {
       const num = String(i+1).padStart(2,'0');
       const active = STATE.activeId === p.id ? ' active' : '';
-      const done = STATE.completed.has(p.id) ? ' completed' : '';
+      const status = getStatus(p.id);
+      const done = status.state === 'done' ? ' completed' : '';
+      let right = '';
+      if (status.state === 'done') {
+        right = '<span class="oc-sb-tick"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>'
+              + '<span class="oc-sb-score">' + status.correct + '/' + status.total + '</span>';
+      } else if (status.state === 'partial') {
+        right = '<span class="oc-sb-score partial">' + status.correct + '/' + status.total + '</span>';
+      }
       return '<a class="oc-sb-item'+active+done+'" data-id="'+p.id+'">'+
         '<span class="oc-sb-num">'+num+'</span>'+
-        '<span class="oc-sb-dot"></span>'+
         '<span class="oc-sb-text">'+
           '<span class="oc-sb-title">'+escapeHtml(p.title)+'</span>'+
           '<span class="oc-sb-theme">'+escapeHtml(p.theme)+'</span>'+
         '</span>'+
+        '<span class="oc-sb-right">'+right+'</span>'+
       '</a>';
     }).join('');
     sb.querySelectorAll('.oc-sb-item').forEach(el => {
@@ -2900,12 +2941,12 @@ const CLOZE_PASSAGES = [
       }
     });
     const total = inputs.length;
+    saveScore(STATE.activeId, correct, total);
+    renderSidebar();
     const result = $('oc-result');
     if(correct === total){
       result.className = 'oc-result show full';
       result.textContent = '✓ Perfect — all '+total+' correct!';
-      STATE.completed.add(STATE.activeId);
-      renderSidebar();
     } else {
       result.className = 'oc-result show partial';
       result.textContent = correct+' of '+total+' correct. Try again or reveal the answers.';
