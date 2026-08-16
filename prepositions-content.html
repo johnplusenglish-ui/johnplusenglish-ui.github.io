@@ -751,36 +751,34 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .page-header h1{font-family:'Outfit',sans-serif;font-size:clamp(1.8rem,4vw,2.6rem);font-weight:900;letter-spacing:-.01em;line-height:1.1}
 .tabs-wrap{max-width:960px;margin:0 auto;padding:0 2rem;position:relative;z-index:1}
 /* ── Folder-style tabs ──
-   Every tab is a closed, rounded-top shape whose bottom border sits exactly
-   on the strip baseline (matched 1.5px + margin-bottom:-1.5px), so wrapped
-   rows still read as complete folder tabs. Only the active tab paints its
-   bottom border in --card, punching a gap in the baseline so the tab opens
-   into the panel below, like the front folder pulled forward. */
-.tabs{display:flex;gap:4px;row-gap:4px;border-bottom:1.5px solid var(--border);margin-bottom:1.5rem;align-items:flex-end;flex-wrap:wrap;padding-top:8px}
-.tab{position:relative;font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;padding:.6rem 1.15rem;color:var(--muted);cursor:pointer;white-space:nowrap;background:color-mix(in srgb,var(--ink) 4%,transparent);border:1.5px solid var(--border);border-radius:12px 12px 0 0;margin-bottom:-1.5px;transition:background .18s,color .18s,box-shadow .18s,border-color .18s}
+   This page ships an older, unrelated .tabs/.tab/.tab.active rule set from
+   earlier in the file (a leftover shared header style) using the SAME
+   selectors. Two rounds of trying to win that cascade fight on a per-property
+   basis (border-color, then border-bottom-color) rendered inconsistently
+   across browsers, so this drops the fight entirely: every property that
+   matters here is explicitly set (never left for "the other rule doesn't
+   touch this one so it's fine"), and the baseline is drawn as its own layer
+   that sits BEHIND the tabs in normal paint order — tabs cover it by simply
+   existing over it, the same way any element covers its parent's background,
+   with no border-color matching or occlusion patches required. */
+.tabs{display:flex;gap:4px;row-gap:4px;border-bottom:none;position:relative;margin-bottom:1.5rem;align-items:flex-end;flex-wrap:wrap;padding-top:8px}
+.tabs::before{content:'';position:absolute;left:0;right:0;bottom:0;height:1.5px;background:var(--border)}
+.tab{position:relative;font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;padding:.6rem 1.15rem;color:var(--muted);cursor:pointer;white-space:nowrap;background:color-mix(in srgb,var(--ink) 4%,transparent);border:1.5px solid var(--border);border-radius:12px 12px 0 0;transition:background .18s,color .18s,box-shadow .18s,border-color .18s}
 .tab:not(.active):hover{background:color-mix(in srgb,var(--ink) 8%,transparent);color:var(--ink)}
 /* Closed tabs can show a normal focus ring — a full loop reads fine on a tab
-   that isn't claiming to be open. The active tab gets its "open" signal from
-   its own border below instead: a floating outline would trace the whole
-   shape, including the bottom edge that's supposed to merge into the panel,
-   redrawing a line exactly where we just removed one. Suppressed
+   that isn't claiming to be open. The active tab suppresses its outline
    unconditionally (not just under :focus-visible) because Safari's native
-   focus ring ignores :focus-visible support gaps and, worse, ignores the
-   element's own border-radius — it draws a uniformly rounded halo around
-   all four corners regardless, which closes the open bottom right back up. */
+   focus ring ignores the element's own border-radius — it draws a uniformly
+   rounded halo around all four corners regardless, closing the open bottom
+   right back up. */
 .tab:not(.active):focus-visible{outline:2px solid var(--sea);outline-offset:2px}
 .tab.active{outline:none}
-/* The open tab: a plain teal border on all four sides marks it as selected —
-   this page ships an older, unrelated .tab/.tab.active rule set from earlier
-   in the file (a leftover shared header style), and per-side border colors
-   fought that rule for cascade priority in a way that rendered inconsistently
-   across browsers. A single-value border-color sidesteps that entirely.
-   The bottom edge of the tab (and the grey strip baseline under it) is then
-   physically covered by a plain cream rectangle in ::after — occlusion
-   instead of color-matching, so there's no reliance on two borders lining
-   up to the sub-pixel across engines. */
-.tab.active{background:var(--cream);border-color:var(--sea);color:var(--sea);padding-top:calc(.6rem + 3px);box-shadow:0 -3px 10px rgba(45,48,71,.06);z-index:2}
-.tab.active::after{content:'';position:absolute;left:-2px;right:-2px;bottom:-5px;height:6px;background:var(--cream);pointer-events:none}
+/* The open tab: teal border, but explicitly NO bottom border at all (not
+   "bottom border in the page color" — an actual zero-width border, so there
+   is no color for the legacy rule above to contest). Its own solid
+   background is what hides the ::before baseline underneath it, via plain
+   paint order — nothing here depends on colors or pixel widths lining up. */
+.tab.active{background:var(--cream);border-color:var(--sea);border-bottom:none!important;color:var(--sea);padding-top:calc(.6rem + 3px);box-shadow:0 -3px 10px rgba(45,48,71,.06);z-index:2}
 @media(max-width:600px){.tab{padding:.55rem .85rem;font-size:.82rem}.tab.active{padding-top:calc(.55rem + 3px)}}
 @media(prefers-reduced-motion:reduce){.tab{transition:none}}
 </style>
