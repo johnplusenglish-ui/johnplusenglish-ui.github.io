@@ -750,10 +750,22 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .topic-icon svg{width:24px;height:24px;stroke-width:1.8;fill:none;stroke:currentColor}
 .page-header h1{font-family:'Outfit',sans-serif;font-size:clamp(1.8rem,4vw,2.6rem);font-weight:900;letter-spacing:-.01em;line-height:1.1}
 .tabs-wrap{max-width:960px;margin:0 auto;padding:0 2rem;position:relative;z-index:1}
-.tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:1.5rem;align-items:center;flex-wrap:wrap}
-.tab{font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;padding:.7rem 1.2rem;border:none;background:none;color:var(--muted);cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-2px;transition:color .2s;white-space:nowrap}
-.tab:hover{color:var(--ink)}
-.tab.active{color:var(--sea);border-bottom-color:var(--sea)}
+/* ── Folder-style tabs ──
+   Every tab is a closed, rounded-top shape whose bottom border sits exactly
+   on the strip baseline (matched 1.5px + margin-bottom:-1.5px), so wrapped
+   rows still read as complete folder tabs. Only the active tab paints its
+   bottom border in --card, punching a gap in the baseline so the tab opens
+   into the panel below, like the front folder pulled forward. */
+.tabs{display:flex;gap:4px;row-gap:4px;border-bottom:1.5px solid var(--border);margin-bottom:1.5rem;align-items:flex-end;flex-wrap:wrap;padding-top:8px}
+.tab{position:relative;font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;padding:.6rem 1.15rem;color:var(--muted);cursor:pointer;white-space:nowrap;background:color-mix(in srgb,var(--ink) 4%,transparent);border:1.5px solid var(--border);border-radius:12px 12px 0 0;margin-bottom:-1.5px;transition:background .18s,color .18s,box-shadow .18s}
+.tab:not(.active):hover{background:color-mix(in srgb,var(--ink) 8%,transparent);color:var(--ink)}
+.tab:focus-visible{outline:2px solid var(--sea);outline-offset:2px}
+/* The open tab paints a 3px cream bottom edge over the 1.5px baseline, rather
+   than matching it exactly — an exact match leaves a hairline of the baseline
+   showing through wherever the two round to different device pixels. */
+.tab.active{background:var(--cream);border-bottom:3px solid var(--cream);margin-bottom:-3px;color:var(--sea);padding-top:calc(.6rem + 3px);padding-bottom:calc(.6rem - 1.5px);box-shadow:0 -3px 10px rgba(45,48,71,.06);z-index:2}
+@media(max-width:600px){.tab{padding:.55rem .85rem;font-size:.82rem}.tab.active{padding-top:calc(.55rem + 3px);padding-bottom:calc(.55rem - 1.5px)}}
+@media(prefers-reduced-motion:reduce){.tab{transition:none}}
 </style>
 <style>.topnav{display:none!important}</style></head>
 <body>
@@ -780,11 +792,13 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
     <button class="tab active" data-tab="guide" role="tab">Guide</button>
       <button class="tab" data-tab="dependent" role="tab">Dependent</button>
       <button class="tab" data-tab="phrases" role="tab">Phrases</button>
+      <!-- Hidden for now — panels below are intact, uncomment to bring back:
       <button class="tab" data-tab="test" role="tab">Test</button>
-      <button class="tab" data-tab="cloze" role="tab">Open Cloze</button>
       <button class="tab" data-tab="heatmap" role="tab">Sorting</button>
-      <button class="tab" data-tab="flashcards" role="tab">Flashcards</button>
       <button class="tab" data-tab="errors" role="tab">Mistakes</button>
+      -->
+      <button class="tab" data-tab="cloze" role="tab">Open Cloze</button>
+      <button class="tab" data-tab="flashcards" role="tab">Flashcards</button>
   </div>
 </div>
 
@@ -2760,10 +2774,6 @@ var guideSections = {
     <b>ON</b> = think of a <em>surface</em> (on the table, on Monday, on the bus)<br>
     <b>AT</b> = think of a <em>point</em> (at the door, at 3pm, at the bus stop)</div>
     
-    <div class="guide-cta-row">
-      <span class="guide-cta-text">Test yourself:</span>
-      <button class="btn sec" onclick="document.querySelector('[data-tab=errors]').click()" style="border-radius:7px;font-size:.82rem">Common Mistakes tab →</button>
-    </div>
   `
 };
 
