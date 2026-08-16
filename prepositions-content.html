@@ -770,13 +770,18 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
    all four corners regardless, which closes the open bottom right back up. */
 .tab:not(.active):focus-visible{outline:2px solid var(--sea);outline-offset:2px}
 .tab.active{outline:none}
-/* The open tab: teal border across the top and sides marks it as selected;
-   the bottom border switches to page-cream and goes thicker (3px vs the
-   strip's 1.5px baseline) so it fully covers the baseline rather than just
-   matching it — an exact match leaves a hairline showing wherever the two
-   round to different device pixels. */
-.tab.active{background:var(--cream);border-color:var(--sea) var(--sea) var(--cream) var(--sea);border-width:1.5px 1.5px 3px 1.5px;margin-bottom:-3px;color:var(--sea);padding-top:calc(.6rem + 3px);padding-bottom:calc(.6rem - 1.5px);box-shadow:0 -3px 10px rgba(45,48,71,.06);z-index:2}
-@media(max-width:600px){.tab{padding:.55rem .85rem;font-size:.82rem}.tab.active{padding-top:calc(.55rem + 3px);padding-bottom:calc(.55rem - 1.5px)}}
+/* The open tab: a plain teal border on all four sides marks it as selected —
+   this page ships an older, unrelated .tab/.tab.active rule set from earlier
+   in the file (a leftover shared header style), and per-side border colors
+   fought that rule for cascade priority in a way that rendered inconsistently
+   across browsers. A single-value border-color sidesteps that entirely.
+   The bottom edge of the tab (and the grey strip baseline under it) is then
+   physically covered by a plain cream rectangle in ::after — occlusion
+   instead of color-matching, so there's no reliance on two borders lining
+   up to the sub-pixel across engines. */
+.tab.active{background:var(--cream);border-color:var(--sea);color:var(--sea);padding-top:calc(.6rem + 3px);box-shadow:0 -3px 10px rgba(45,48,71,.06);z-index:2}
+.tab.active::after{content:'';position:absolute;left:-2px;right:-2px;bottom:-5px;height:6px;background:var(--cream);pointer-events:none}
+@media(max-width:600px){.tab{padding:.55rem .85rem;font-size:.82rem}.tab.active{padding-top:calc(.55rem + 3px)}}
 @media(prefers-reduced-motion:reduce){.tab{transition:none}}
 </style>
 <style>.topnav{display:none!important}</style></head>
