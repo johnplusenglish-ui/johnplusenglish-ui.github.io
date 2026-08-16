@@ -951,10 +951,37 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .topic-icon svg{width:24px;height:24px;stroke-width:1.8;fill:none;stroke:currentColor}
 .page-header h1{font-family:'Outfit',sans-serif;font-size:clamp(1.8rem,4vw,2.6rem);line-height:1.1;letter-spacing:-.01em;font-weight:900;color:var(--ink)}
 .tabs-wrap{max-width:960px;margin:0 auto;padding:0 2rem;position:relative;z-index:1}
-.tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:1.5rem;align-items:center;flex-wrap:wrap}
-.tab{font-family:'Outfit',sans-serif;padding:.7rem 1.2rem;font-size:.88rem;font-weight:700;cursor:pointer;border:none;background:none;color:var(--muted);border-bottom:2.5px solid transparent;margin-bottom:-2px;transition:color .2s;white-space:nowrap}
-.tab:hover{color:var(--ink)}
-.tab.active{color:var(--sea);border-bottom-color:var(--sea)}
+/* ── Folder-style tabs ──
+   This page ships an older, unrelated .tabs/.tab/.tab.active rule set from
+   earlier in the file (a leftover shared header style) using the SAME
+   selectors. Two rounds of trying to win that cascade fight on a per-property
+   basis (border-color, then border-bottom-color) rendered inconsistently
+   across browsers, so this drops the fight entirely: every property that
+   matters here is explicitly set (never left for "the other rule doesn't
+   touch this one so it's fine"), and the baseline is drawn as its own layer
+   that sits BEHIND the tabs in normal paint order — tabs cover it by simply
+   existing over it, the same way any element covers its parent's background,
+   with no border-color matching or occlusion patches required. */
+.tabs{display:flex;gap:4px;row-gap:4px;border-bottom:none;position:relative;margin-bottom:1.5rem;align-items:flex-end;flex-wrap:wrap;padding-top:8px}
+.tabs::before{content:'';position:absolute;left:0;right:0;bottom:0;height:1.5px;background:var(--border)}
+.tab{position:relative;font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;padding:.6rem 1.15rem;color:var(--muted);cursor:pointer;white-space:nowrap;background:color-mix(in srgb,var(--ink) 4%,transparent);border:1.5px solid var(--border);border-radius:12px 12px 0 0;transition:background .18s,color .18s,box-shadow .18s,border-color .18s}
+.tab:not(.active):hover{background:color-mix(in srgb,var(--ink) 8%,transparent);color:var(--ink)}
+/* Closed tabs can show a normal focus ring — a full loop reads fine on a tab
+   that isn't claiming to be open. The active tab suppresses its outline
+   unconditionally (not just under :focus-visible) because Safari's native
+   focus ring ignores the element's own border-radius — it draws a uniformly
+   rounded halo around all four corners regardless, closing the open bottom
+   right back up. */
+.tab:not(.active):focus-visible{outline:2px solid var(--sea);outline-offset:2px}
+.tab.active{outline:none}
+/* The open tab: teal border, but explicitly NO bottom border at all (not
+   "bottom border in the page color" — an actual zero-width border, so there
+   is no color for the legacy rule above to contest). Its own solid
+   background is what hides the ::before baseline underneath it, via plain
+   paint order — nothing here depends on colors or pixel widths lining up. */
+.tab.active{background:var(--cream);border-color:var(--sea);border-bottom:none!important;color:var(--sea);padding-top:calc(.6rem + 3px);box-shadow:0 -3px 10px rgba(45,48,71,.06);z-index:2}
+@media(max-width:600px){.tab{padding:.55rem .85rem;font-size:.82rem}.tab.active{padding-top:calc(.55rem + 3px)}}
+@media(prefers-reduced-motion:reduce){.tab{transition:none}}
 .back-pill{display:inline-flex;align-items:center;gap:.4rem;font-family:'Outfit',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-decoration:none;background:var(--card);border:1.5px solid var(--border);border-radius:999px;padding:.5rem 1.1rem .5rem .85rem;cursor:pointer;transition:all .18s;margin-bottom:1.2rem;box-shadow:var(--shadow-sm)}
 .back-pill:hover{color:var(--sky);border-color:var(--sky);box-shadow:var(--shadow-md);transform:translateY(-1px)}
 .back-pill svg{width:13px;height:13px;flex-shrink:0}
