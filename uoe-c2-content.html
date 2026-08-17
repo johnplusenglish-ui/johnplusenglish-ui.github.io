@@ -25,8 +25,18 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,252,247,
 .page-desc{color:var(--muted);font-size:1rem;line-height:1.7;white-space:nowrap}
 .parts-section{max-width:1200px;margin:0 auto;padding:0 2rem 4rem;position:relative;z-index:1}
 /* ── Sidebar layout ── */
-.uoe-layout{display:grid;grid-template-columns:200px 1fr;gap:1.2rem;align-items:start}
+.uoe-layout{display:grid;grid-template-columns:200px 1fr;gap:1.2rem;align-items:start;transition:grid-template-columns .22s ease}
+.uoe-layout.sb-collapsed{grid-template-columns:52px 1fr}
 .uoe-sidebar{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);display:flex;flex-direction:column;position:sticky;top:80px;max-height:calc(100vh - 100px);overflow:hidden}
+.uoe-sidebar-header{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.7rem .9rem;border-bottom:1px solid var(--border)}
+.uoe-sidebar.collapsed .uoe-sidebar-header{border-bottom:none;justify-content:center;padding:.7rem .4rem}
+.uoe-sidebar-header-label{font-family:Outfit,sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.uoe-sidebar.collapsed .uoe-sidebar-header-label{display:none}
+.uoe-sidebar-toggle{width:26px;height:26px;border-radius:7px;border:1.5px solid var(--border);background:transparent;display:flex;align-items:center;justify-content:center;color:var(--muted);cursor:pointer;transition:all .15s;flex-shrink:0}
+.uoe-sidebar-toggle:hover{border-color:var(--accent);color:var(--accent)}
+.uoe-sidebar-toggle svg{width:13px;height:13px;transition:transform .2s ease}
+.uoe-sidebar.collapsed .uoe-sidebar-toggle svg{transform:rotate(180deg)}
+.uoe-sidebar.collapsed .uoe-sidebar-scroll,.uoe-sidebar.collapsed .uoe-sidebar-footer{display:none}
 .uoe-sidebar-scroll{flex:1;overflow-y:auto;padding:.5rem}
 .uoe-sidebar-scroll::-webkit-scrollbar{width:4px}
 .uoe-sidebar-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
@@ -407,9 +417,13 @@ footer{text-align:center;padding:2.5rem 2rem;font-size:.8rem;color:var(--muted);
   <p class="page-desc">Cambridge exam practice for C2 Proficiency. Work through complete tests or filter by part.</p>
 </div>
 <div class="parts-section reveal">
-  <div class="uoe-layout">
+  <div class="uoe-layout" id="uoeLayout">
     <!-- Sidebar -->
-    <div class="uoe-sidebar">
+    <div class="uoe-sidebar" id="uoeSidebarWrap">
+      <div class="uoe-sidebar-header" onclick="toggleSidebarCollapse('uoeLayout','uoeSidebarWrap','jpe_uoe_c2_sidebar_collapsed_v1')">
+        <span class="uoe-sidebar-header-label">All Tests</span>
+        <button class="uoe-sidebar-toggle" type="button" aria-label="Collapse list" onclick="event.stopPropagation();toggleSidebarCollapse('uoeLayout','uoeSidebarWrap','jpe_uoe_c2_sidebar_collapsed_v1')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      </div>
       <div class="uoe-sidebar-scroll" id="uoeSidebarList"></div>
       <div class="uoe-sidebar-footer">
         <button class="pt-reset" style="width:100%" onclick="ptReset()">Reset All Progress</button>
@@ -592,6 +606,22 @@ let p4Checked = false;
 // ══════════════════════════════════════════
 //  SIDEBAR
 // ══════════════════════════════════════════
+function toggleSidebarCollapse(layoutId, sidebarId, storageKey) {
+  const sb = document.getElementById(sidebarId);
+  const layout = document.getElementById(layoutId);
+  const collapsed = sb.classList.toggle('collapsed');
+  layout.classList.toggle('sb-collapsed', collapsed);
+  try { localStorage.setItem(storageKey, collapsed ? '1' : '0'); } catch(e) {}
+}
+function restoreSidebarCollapse(layoutId, sidebarId, storageKey) {
+  let collapsed = false;
+  try { collapsed = localStorage.getItem(storageKey) === '1'; } catch(e) {}
+  if (!collapsed) return;
+  document.getElementById(sidebarId).classList.add('collapsed');
+  document.getElementById(layoutId).classList.add('sb-collapsed');
+}
+restoreSidebarCollapse('uoeLayout','uoeSidebarWrap','jpe_uoe_c2_sidebar_collapsed_v1');
+
 function buildSidebar() {
   const data = ptGet();
   const list = document.getElementById('uoeSidebarList');

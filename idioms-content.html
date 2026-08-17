@@ -394,8 +394,19 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
 
 /* ============ OPEN CLOZE ============ */
 .oc-intro{margin-bottom:1.5rem;color:var(--muted);font-size:.95rem;line-height:1.5}
-.oc-layout{display:grid;grid-template-columns:minmax(160px,max-content) 1fr;gap:1.25rem;align-items:start}
-.oc-sidebar{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:.75rem;display:flex;flex-direction:column;gap:.4rem;position:sticky;top:1rem;max-height:calc(100vh - 2rem);overflow-y:auto}
+.oc-layout{display:grid;grid-template-columns:minmax(160px,max-content) 1fr;gap:1.25rem;align-items:start;transition:grid-template-columns .22s ease}
+.oc-layout.sb-collapsed{grid-template-columns:52px 1fr}
+.oc-sidebar-wrap{background:var(--card);border:1.5px solid var(--border);border-radius:14px;display:flex;flex-direction:column;position:sticky;top:1rem;max-height:calc(100vh - 2rem)}
+.oc-sidebar-header{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.7rem .9rem;border-bottom:1px solid var(--border)}
+.oc-sidebar-wrap.collapsed .oc-sidebar-header{border-bottom:none;justify-content:center;padding:.7rem .4rem}
+.oc-sidebar-header-label{font-family:Outfit,sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.oc-sidebar-wrap.collapsed .oc-sidebar-header-label{display:none}
+.oc-sidebar-toggle{width:26px;height:26px;border-radius:7px;border:1.5px solid var(--border);background:transparent;display:flex;align-items:center;justify-content:center;color:var(--muted);cursor:pointer;transition:all .15s;flex-shrink:0}
+.oc-sidebar-toggle:hover{border-color:#2176FF;color:#2176FF}
+.oc-sidebar-toggle svg{width:13px;height:13px;transition:transform .2s ease}
+.oc-sidebar-wrap.collapsed .oc-sidebar-toggle svg{transform:rotate(180deg)}
+.oc-sidebar-wrap.collapsed .oc-sidebar{display:none}
+.oc-sidebar{padding:.75rem;display:flex;flex-direction:column;gap:.4rem;overflow-y:auto;flex:1}
 .oc-sb-item{display:flex;align-items:center;gap:.75rem;padding:.85rem .85rem;border-radius:10px;cursor:pointer;transition:all .15s;border:1.5px solid transparent;background:transparent}
 .oc-sb-item:hover{background:var(--cream)}
 .oc-sb-item.active{background:#2176FF;color:#fff}
@@ -443,7 +454,8 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
 
 @media (max-width:760px){
   .oc-layout{grid-template-columns:1fr}
-  .oc-sidebar{position:static;max-height:none;flex-direction:row;overflow-x:auto}
+  .oc-sidebar-wrap{position:static;max-height:none}
+  .oc-sidebar{flex-direction:row;overflow-x:auto}
   .oc-sb-item{flex-shrink:0;min-width:200px}
   .oc-content{padding:1.5rem 1.25rem}
   .oc-passage{font-size:1rem;line-height:2}
@@ -1203,8 +1215,14 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
           </button>
         </div>
       </div>
-      <div class="oc-layout">
-        <nav class="oc-sidebar" id="oc-sidebar"></nav>
+      <div class="oc-layout" id="ocLayout">
+        <div class="oc-sidebar-wrap" id="ocSidebarWrap">
+          <div class="oc-sidebar-header" onclick="toggleSidebarCollapse('ocLayout','ocSidebarWrap','jpe_idioms_oc_sidebar_collapsed_v1')">
+            <span class="oc-sidebar-header-label">All Texts</span>
+            <button class="oc-sidebar-toggle" type="button" aria-label="Collapse list" onclick="event.stopPropagation();toggleSidebarCollapse('ocLayout','ocSidebarWrap','jpe_idioms_oc_sidebar_collapsed_v1')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+          </div>
+          <nav class="oc-sidebar" id="oc-sidebar"></nav>
+        </div>
         <div class="oc-content" id="oc-content"></div>
       </div>
     </section>
@@ -2697,6 +2715,21 @@ const CLOZE_PASSAGES = [
 ];
 
 /* ============ OPEN CLOZE ============ */
+function toggleSidebarCollapse(layoutId, sidebarId, storageKey) {
+  const sb = document.getElementById(sidebarId);
+  const layout = document.getElementById(layoutId);
+  const collapsed = sb.classList.toggle('collapsed');
+  layout.classList.toggle('sb-collapsed', collapsed);
+  try { localStorage.setItem(storageKey, collapsed ? '1' : '0'); } catch(e) {}
+}
+function restoreSidebarCollapse(layoutId, sidebarId, storageKey) {
+  let collapsed = false;
+  try { collapsed = localStorage.getItem(storageKey) === '1'; } catch(e) {}
+  if (!collapsed) return;
+  document.getElementById(sidebarId).classList.add('collapsed');
+  document.getElementById(layoutId).classList.add('sb-collapsed');
+}
+restoreSidebarCollapse('ocLayout','ocSidebarWrap','jpe_idioms_oc_sidebar_collapsed_v1');
 (function(){
   const STATE = { activeId: null };
   const $ = id => document.getElementById(id);
