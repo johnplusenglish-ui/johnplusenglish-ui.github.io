@@ -1,0 +1,85 @@
+/* ══════════════════════════════════════════════════════════════════
+   Shared exercise-button layer — johnplusenglish.com Study Tools
+   ══════════════════════════════════════════════════════════════════
+   One button language for every exercise (flashcards, matching, gap-fill,
+   quiz cards) across every Study Tools page. Each page keeps its own
+   identity color via --tab-active (already defined per-page); this file
+   never hardcodes a color, so linking it does not flatten page identity.
+
+   Requires these custom properties already defined on the page's own
+   :root: --tab-active (falls back to --sea if missing), --radius-sm
+   (falls back to 10px), --card, --ink, --border, --muted, --mint, --coral.
+
+   .ex-btn-primary   — the one "confirm/go" action per screen
+                        (Start session, Check Answers, Next set…)
+   .ex-btn-secondary — neutral/alternate action (Show Answers, New set,
+                        Back to setup, End session…)
+   .ex-btn-feedback   — binary self-report or judgment pair (Know it /
+                        Don't know it, Correct / Wrong…). Set the
+                        --fb-color custom property inline per button:
+                        style="--fb-color:var(--mint)" or var(--coral).
+   .ex-reset-link     — the one "reset my progress" control, styled as a
+                        quiet text link, not a boxed button.
+   ══════════════════════════════════════════════════════════════════ */
+
+.ex-btn-primary{
+  font-family:'Outfit',sans-serif;
+  background:var(--tab-active, var(--sea));
+  color:#fff;
+  border:none;
+  border-radius:var(--radius-sm, 10px);
+  padding:.75rem 1.5rem;
+  font-weight:700;
+  font-size:.92rem;
+  cursor:pointer;
+  transition:background .18s, transform .18s, box-shadow .18s;
+}
+.ex-btn-primary:hover{
+  background:color-mix(in srgb, var(--tab-active, var(--sea)) 88%, black);
+  transform:translateY(-1px);
+}
+.ex-btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.ex-btn-primary:focus-visible{outline:2px solid var(--tab-active, var(--sea));outline-offset:2px}
+
+.ex-btn-secondary{
+  font-family:'Outfit',sans-serif;
+  background:var(--card);
+  color:var(--ink);
+  border:1.5px solid var(--border);
+  border-radius:var(--radius-sm, 10px);
+  padding:.75rem 1.25rem;
+  font-weight:600;
+  font-size:.88rem;
+  cursor:pointer;
+  transition:border-color .18s, color .18s;
+}
+.ex-btn-secondary:hover{border-color:var(--ink);color:var(--ink)}
+.ex-btn-secondary:focus-visible{outline:2px solid var(--tab-active, var(--sea));outline-offset:2px}
+
+.ex-btn-feedback{
+  background:var(--card);
+  border:1.5px solid var(--fb-color, var(--border));
+  color:var(--fb-color, var(--ink));
+  border-radius:var(--radius-sm, 10px);
+  padding:.75rem 1.5rem;
+  font-weight:600;
+  font-size:.9rem;
+  cursor:pointer;
+  transition:all .15s;
+}
+.ex-btn-feedback:hover{background:var(--fb-color, var(--ink));color:#fff}
+.ex-btn-feedback:focus-visible{outline:2px solid var(--fb-color, var(--ink));outline-offset:2px}
+
+.ex-reset-link{
+  background:none;
+  border:none;
+  color:var(--muted);
+  font-family:'Outfit',sans-serif;
+  font-weight:600;
+  font-size:.8rem;
+  cursor:pointer;
+  transition:color .18s;
+  padding:0;
+}
+.ex-reset-link:hover{color:var(--coral)}
+.ex-reset-link:focus-visible{outline:2px solid var(--coral);outline-offset:2px}
