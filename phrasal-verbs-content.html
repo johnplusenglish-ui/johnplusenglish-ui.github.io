@@ -907,10 +907,13 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
 .mg-bar strong{color:var(--ink);font-weight:700}
 .mg-progress{width:100%;height:4px;background:var(--border);border-radius:2px;margin-bottom:1.5rem;overflow:hidden}
 .mg-progress-fill{height:100%;background:var(--sea);border-radius:2px;transition:width .3s ease}
+.mg-connections{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1rem;min-height:1.6rem}
+.mg-conn-chip{font-family:Outfit,sans-serif;font-size:.78rem;font-weight:700;color:#14532d;background:#dcfce7;border:1.5px solid #16a34a;border-radius:6px;padding:.25rem .6rem}
 .mg-cols{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
 .mg-col-head{font-family:Outfit,sans-serif;font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.75rem;padding-left:.25rem}
 .mg-col{display:flex;flex-direction:column;gap:.55rem}
 .mg-item{font-family:'Outfit',sans-serif;font-size:.92rem;font-weight:600;color:var(--ink);background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:.75rem 1rem;cursor:pointer;transition:all .15s;line-height:1.35;position:relative;user-select:none}
+.mg-item-label{display:inline-block;min-width:1.4em;font-weight:800;opacity:.5;margin-right:.4em}
 .mg-item:hover:not(.matched):not(.wrong){border-color:var(--sea);background:#fff;transform:translateY(-1px);box-shadow:0 3px 10px rgba(29,211,176,.1)}
 .mg-item.selected{border-color:var(--sea);background:rgba(29,211,176,.08);box-shadow:0 0 0 2px rgba(29,211,176,.25)}
 .mg-item.matched{border-color:#16a34a;background:#dcfce7;color:#14532d;cursor:default;opacity:.7}
@@ -1427,13 +1430,17 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
       </div>
 
       <div class="mg-session" id="pv-mg-session" hidden>
-        <div class="mg-exit-row"><button type="button" class="mg-exit-btn" id="pv-mg-exit-btn">End session</button></div>
+        <div class="mg-exit-row">
+          <button type="button" class="mg-exit-btn" id="pv-mg-new-btn">New set</button>
+          <button type="button" class="mg-exit-btn" id="pv-mg-exit-btn">End session</button>
+        </div>
         <div class="mg-set-label" id="pv-mg-set-label"></div>
         <div class="mg-bar">
           <span><strong id="pv-mg-matched">0</strong> of <strong id="pv-mg-set-size">8</strong> matched</span>
           <span><strong id="pv-mg-mistakes">0</strong> mistakes</span>
         </div>
         <div class="mg-progress"><div class="mg-progress-fill" id="pv-mg-progress-fill"></div></div>
+        <div class="mg-connections" id="pv-mg-connections"></div>
         <div class="mg-cols" id="pv-mg-cols">
           <div>
             <div class="mg-col-head">Phrasal Verb</div>
@@ -2427,6 +2434,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
     el('pv-mg-set-size').textContent = pairs.length;
     el('pv-mg-set-done').hidden = true;
     el('pv-mg-cols').style.display = '';
+    el('pv-mg-connections').innerHTML = '';
     updateSetLabel();
     renderGrid(pairs);
     updateBar();
@@ -2437,20 +2445,28 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
     var right = shuffle(pairs.map(function(p,i){ return {idx:i, text:p.def}; }));
     var leftCol = el('pv-mg-left'); leftCol.innerHTML = '';
     var rightCol = el('pv-mg-right'); rightCol.innerHTML = '';
-    left.forEach(function(item){
+    left.forEach(function(item,i){
+      var label = String(i + 1);
       var btn = document.createElement('button');
-      btn.type = 'button'; btn.className = 'mg-item'; btn.textContent = item.text;
-      btn.dataset.idx = item.idx; btn.dataset.side = 'left';
+      btn.type = 'button'; btn.className = 'mg-item';
+      btn.innerHTML = '<span class="mg-item-label">' + label + '.</span>' + escHtml(item.text);
+      btn.dataset.idx = item.idx; btn.dataset.side = 'left'; btn.dataset.label = label;
       btn.addEventListener('click', function(){ handleClick(btn); });
       leftCol.appendChild(btn);
     });
-    right.forEach(function(item){
+    right.forEach(function(item,i){
+      var label = String.fromCharCode(65 + i);
       var btn = document.createElement('button');
-      btn.type = 'button'; btn.className = 'mg-item'; btn.textContent = item.text;
-      btn.dataset.idx = item.idx; btn.dataset.side = 'right';
+      btn.type = 'button'; btn.className = 'mg-item';
+      btn.innerHTML = '<span class="mg-item-label">' + label + '.</span>' + escHtml(item.text);
+      btn.dataset.idx = item.idx; btn.dataset.side = 'right'; btn.dataset.label = label;
       btn.addEventListener('click', function(){ handleClick(btn); });
       rightCol.appendChild(btn);
     });
+  }
+
+  function escHtml(s){
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
 
   function handleClick(btn){
@@ -2471,6 +2487,9 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
     var idx1 = parseInt(state.selected.dataset.idx);
     var idx2 = parseInt(btn.dataset.idx);
     if(idx1 === idx2){
+      var leftBtn = state.selected.dataset.side === 'left' ? state.selected : btn;
+      var rightBtn = state.selected.dataset.side === 'left' ? btn : state.selected;
+      addConnection(leftBtn.dataset.label, rightBtn.dataset.label);
       state.selected.classList.remove('selected');
       state.selected.classList.add('matched');
       btn.classList.add('matched');
@@ -2492,6 +2511,13 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
     document.querySelectorAll('#pv-mg-left .mg-item, #pv-mg-right .mg-item').forEach(function(b){
       b.classList.remove('selected','wrong');
     });
+  }
+
+  function addConnection(leftLabel, rightLabel){
+    var chip = document.createElement('span');
+    chip.className = 'mg-conn-chip';
+    chip.textContent = leftLabel + '–' + rightLabel;
+    el('pv-mg-connections').appendChild(chip);
   }
 
   function updateBar(){
@@ -2537,6 +2563,9 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
     el('pv-mg-session').hidden = true;
     el('pv-mg-complete').hidden = true;
     updatePoolCount();
+  });
+  el('pv-mg-new-btn').addEventListener('click', function(){
+    startSession();
   });
 
   updatePoolCount();
