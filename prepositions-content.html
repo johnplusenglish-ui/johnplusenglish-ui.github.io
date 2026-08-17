@@ -569,8 +569,8 @@ footer{text-align:center;padding:3rem 2rem;font-size:.8rem;color:var(--muted);bo
 .srs-empty-sub{color:var(--muted);font-size:.9rem}
 .print-btn{display:inline-flex;align-items:center;gap:.45rem;background:var(--card);color:var(--ink);border:1.5px solid var(--border);border-radius:10px;padding:.55rem 1rem;font-family:'Outfit',sans-serif;font-weight:600;font-size:.88rem;cursor:pointer;transition:all .15s;white-space:nowrap}
 .print-btn:hover{border-color:var(--ink);color:var(--ink)}
-#listPrintModal,#guidePrintModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:9999;align-items:flex-start;justify-content:center;padding-top:4vh;overflow-y:auto}
-#listPrintModal.open,#guidePrintModal.open{display:flex}
+#guidePrintModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:9999;align-items:flex-start;justify-content:center;padding-top:4vh;overflow-y:auto}
+#guidePrintModal.open{display:flex}
 #listPrintModalBox{background:var(--card);border-radius:16px;padding:1.75rem 2rem;width:520px;max-width:94vw;box-shadow:0 8px 32px rgba(0,0,0,.18);margin-bottom:2rem}
 #listPrintModalBox h3{font-family:'Outfit',sans-serif;font-size:1.2rem;font-weight:400;margin:0 0 1.25rem}
 .lp-section{margin-bottom:1.1rem}
@@ -581,12 +581,6 @@ footer{text-align:center;padding:3rem 2rem;font-size:.8rem;color:var(--muted);bo
 .lp-cat-opt input{accent-color:var(--sea);cursor:pointer}
 .lp-selall{display:flex;gap:.5rem;margin-bottom:.4rem}
 .lp-selall button{font-family:'Outfit',sans-serif;font-size:.75rem;font-weight:600;color:var(--sea);background:none;border:none;cursor:pointer;padding:0;text-decoration:underline}
-.lp-type-row,.lp-format-row{display:flex;gap:.5rem;flex-wrap:wrap}
-.lp-type-btn{font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:600;padding:.4rem .9rem;border:1.5px solid var(--border);border-radius:8px;background:var(--card);cursor:pointer;transition:all .15s;color:var(--muted)}
-.lp-type-btn.active{background:var(--sea);color:#fff;border-color:var(--sea)}
-.lp-radio-opt{display:flex;align-items:center;gap:.4rem;font-size:.85rem;cursor:pointer;padding:.35rem .5rem;border:1.5px solid var(--border);border-radius:8px;transition:all .15s}
-.lp-radio-opt:has(input:checked){border-color:var(--sea);background:#f0fdfb}
-.lp-radio-opt input{accent-color:var(--sea)}
 .lp-footer{display:flex;gap:.75rem;justify-content:flex-end;margin-top:1.4rem;padding-top:1rem;border-top:1px solid var(--border)}
 #guidePrintModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:9999;align-items:center;justify-content:center}
 #guidePrintModal.open{display:flex}
@@ -881,7 +875,6 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
       <div class="controls">
         <button class="view-btn on" onclick="depSetView('alpha',this)">Alphabetical</button>
         <button class="view-btn" onclick="depSetView('cat',this)">By Category</button>
-        <button class="print-btn" onclick="printStudyView('dep')" style="margin-left:auto"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg> Print</button>
       </div>
       <div id="dep_alphaView">
         <div class="type-filters">
@@ -969,8 +962,6 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
     <h2 class="pt">Prepositional Phrases</h2>
     <p class="pd">Fixed phrases built around a preposition.</p>
     <div class="ex-study-view active" id="pp_study_view">
-      
-      <div style="display:flex;justify-content:flex-end;margin-bottom:.5rem"><button class="print-btn" onclick="printStudyView('pp')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg> Print</button></div>
       <input class="search-box" type="text" id="pp_searchBox" placeholder="Search phrases, definitions, or examples…" oninput="ppDoSearch()">
       <div class="search-count" id="pp_searchCount"></div>
       <div id="pp_studyContent"></div>
@@ -1265,45 +1256,6 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 
 
 
-
-<div id="listPrintModal">
-  <div id="listPrintModalBox">
-    <h3 id="listPrintTitle">Print</h3>
-    <input type="hidden" id="listPrintPrefix" value="dep">
-
-    <div class="lp-section">
-      <div class="lp-label">Categories</div>
-      <div class="lp-selall">
-        <button onclick="listPrintSelectAll(true)">Select all</button>
-        <button onclick="listPrintSelectAll(false)">Deselect all</button>
-      </div>
-      <div class="lp-cats-scroll" id="listPrintCats"></div>
-    </div>
-
-    <div class="lp-section" id="listPrintTypeRow">
-      <div class="lp-label">Word type</div>
-      <div class="lp-type-row">
-        <button class="lp-type-btn active" data-type="all" onclick="document.querySelectorAll('.lp-type-btn').forEach(function(b){b.classList.remove('active')});this.classList.add('active')">All</button>
-        <button class="lp-type-btn" data-type="V" onclick="document.querySelectorAll('.lp-type-btn').forEach(function(b){b.classList.remove('active')});this.classList.add('active')">Verbs</button>
-        <button class="lp-type-btn" data-type="N" onclick="document.querySelectorAll('.lp-type-btn').forEach(function(b){b.classList.remove('active')});this.classList.add('active')">Nouns</button>
-        <button class="lp-type-btn" data-type="Adj" onclick="document.querySelectorAll('.lp-type-btn').forEach(function(b){b.classList.remove('active')});this.classList.add('active')">Adjectives</button>
-      </div>
-    </div>
-
-    <div class="lp-section">
-      <div class="lp-label">Format</div>
-      <div class="lp-format-row">
-        <label class="lp-radio-opt"><input type="radio" name="lpFormat" value="full" checked> Full <span style="font-size:.75rem;color:var(--muted);margin-left:.25rem">(with examples)</span></label>
-        <label class="lp-radio-opt"><input type="radio" name="lpFormat" value="compact"> Compact <span style="font-size:.75rem;color:var(--muted);margin-left:.25rem">(definition only)</span></label>
-      </div>
-    </div>
-
-    <div class="lp-footer">
-      <button class="guide-print-cancel" onclick="listPrintModalClose()">Cancel</button>
-      <button class="guide-print-go" onclick="listPrintGo()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg> Print</button>
-    </div>
-  </div>
-</div>
 
 <div id="guidePrintModal">
   <div id="listPrintModalBox">
@@ -2845,103 +2797,6 @@ function guideNav(el, section) {
 }
 
 
-// Print study view
-// Print study view
-function printStudyView(prefix){
-  // Build modal instead of printing directly
-  var modal = document.getElementById('listPrintModal');
-  var isDoc = prefix === 'dep';
-  document.getElementById('listPrintTitle').textContent = isDoc ? 'Print Dependent Prepositions' : 'Print Prepositional Phrases';
-  document.getElementById('listPrintPrefix').value = prefix;
-
-  // Populate category checkboxes
-  var data = isDoc ? dep_D : pp_D;
-  var cats = Object.keys(data);
-  var cBox = document.getElementById('listPrintCats');
-  cBox.innerHTML = cats.map(function(c){
-    var label = isDoc ? c.replace(/^\d+\.\s*/,'') : c;
-    return '<label class="lp-cat-opt"><input type="checkbox" class="lp-cat-cb" value="'+c+'" checked> '+label+'</label>';
-  }).join('');
-
-  // Show/hide word type filter (dep only)
-  document.getElementById('listPrintTypeRow').style.display = isDoc ? 'flex' : 'none';
-
-  // Reset selections
-  document.querySelectorAll('.lp-type-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.type==='all'); });
-  document.querySelector('input[name="lpFormat"][value="full"]').checked = true;
-
-  modal.classList.add('open');
-}
-
-function listPrintSelectAll(v){
-  document.querySelectorAll('.lp-cat-cb').forEach(function(cb){ cb.checked = v; });
-}
-
-function listPrintGo(){
-  var prefix = document.getElementById('listPrintPrefix').value;
-  var data = prefix === 'dep' ? dep_D : pp_D;
-  var format = document.querySelector('input[name="lpFormat"]:checked').value;
-  var activeType = document.querySelector('.lp-type-btn.active');
-  var wtype = activeType ? activeType.dataset.type : 'all';
-
-  var selectedCats = [];
-  document.querySelectorAll('.lp-cat-cb:checked').forEach(function(cb){ selectedCats.push(cb.value); });
-  if(!selectedCats.length){ alert('Select at least one category.'); return; }
-
-  var title = prefix === 'dep' ? 'Dependent Prepositions' : 'Prepositional Phrases';
-  var printWin = window.open('','_blank');
-  printWin.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>'+title+'</title>');
-  printWin.document.write('<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">');
-  printWin.document.write('<style>');
-  printWin.document.write('*{box-sizing:border-box}body{font-family:Outfit,sans-serif;color:#2D3047;padding:1.5rem 2rem;max-width:820px;margin:0 auto}');
-  printWin.document.write('h1{font-family:"Outfit",sans-serif;font-size:1.6rem;font-weight:400;margin:0 0 .2rem}');
-  printWin.document.write('.meta{font-size:.75rem;color:#7A7D8E;margin-bottom:1.5rem}');
-  printWin.document.write('h2{font-family:"Outfit",sans-serif;font-size:1.15rem;font-weight:400;margin:1.4rem 0 .5rem;padding-bottom:.3rem;border-bottom:1.5px solid #2D3047;color:#2D3047}');
-  printWin.document.write('table{width:100%;border-collapse:collapse;margin-bottom:.5rem;font-size:.82rem}');
-  printWin.document.write('th{text-align:left;font-family:Outfit,sans-serif;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:#7A7D8E;padding:.3rem .4rem;border-bottom:1px solid #eee}');
-  printWin.document.write('td{padding:.35rem .4rem;border-bottom:1px solid #f0f0f0;vertical-align:top}');
-  printWin.document.write('.combo{font-weight:700;color:#2D3047}.prep{font-family:Outfit,sans-serif;font-size:.72rem;font-weight:600;color:#2A9D8F}');
-  printWin.document.write('.typ{font-family:Outfit,sans-serif;font-size:.65rem;background:#f0f0f0;padding:.1rem .3rem;border-radius:3px;color:#7A7D8E}');
-  printWin.document.write('.def{color:#7A7D8E;font-style:italic}.ex{font-size:.8rem;color:#2D3047}');
-  printWin.document.write('.ex b{color:#2A9D8F}');
-  printWin.document.write('@media print{body{padding:.75rem}h2{page-break-after:avoid}tr{page-break-inside:avoid}}');
-  printWin.document.write('</style></head><body>');
-  printWin.document.write('<div style="text-align:right;font-size:.7rem;color:#7A7D8E;margin-bottom:1.5rem">johnplusenglish.com</div>');
-  printWin.document.write('<h1>'+title+'</h1>');
-  printWin.document.write('<div class="meta">'+selectedCats.length+' categor'+(selectedCats.length===1?'y':'ies')+(wtype!=='all'?' · '+wtype+'s only':'')+' · '+(format==='full'?'with examples':'compact')+'</div>');
-
-  selectedCats.forEach(function(cat){
-    var entries = data[cat];
-    if(!entries) return;
-    var filtered = wtype === 'all' ? entries : entries.filter(function(e){ return e[1]===wtype; });
-    if(!filtered.length) return;
-    var label = prefix === 'dep' ? cat.replace(/^\d+\.\s*/,'') : cat;
-    printWin.document.write('<h2>'+label+'</h2>');
-    if(format === 'compact'){
-      printWin.document.write('<table><tr><th>Expression</th><th>Prep</th><th>Type</th><th>Meaning</th></tr>');
-      filtered.forEach(function(e){
-        printWin.document.write('<tr><td class="combo">'+e[0]+'</td><td class="prep">'+e[4]+'</td><td><span class="typ">'+e[1]+'</span></td><td class="def">'+e[2]+'</td></tr>');
-      });
-    } else {
-      printWin.document.write('<table><tr><th>Expression</th><th>Prep</th><th>Type</th><th>Meaning</th><th>Example</th></tr>');
-      filtered.forEach(function(e){
-        var ex = e[3].replace(/___/g,'<u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>').replace(/<b>/g,'<b>');
-        printWin.document.write('<tr><td class="combo">'+e[0]+'</td><td class="prep">'+e[4]+'</td><td><span class="typ">'+e[1]+'</span></td><td class="def">'+e[2]+'</td><td class="ex">'+ex+'</td></tr>');
-      });
-    }
-    printWin.document.write('</table>');
-  });
-
-  printWin.document.write('</body></html>');
-  printWin.document.close();
-  setTimeout(function(){ printWin.print(); }, 400);
-  listPrintModalClose();
-}
-
-function listPrintModalClose(){
-  document.getElementById('listPrintModal').classList.remove('open');
-}
-
 function clozePrintCurrent(){
   var idx = window.clozeSelectedIdx;
   if(idx === undefined) return;
@@ -3634,9 +3489,6 @@ function guidePrintGo() {
 
 document.getElementById('guidePrintModal').addEventListener('click', function(e) {
   if (e.target === this) guidePrintModalClose();
-});
-document.getElementById('listPrintModal').addEventListener('click', function(e) {
-  if (e.target === this) listPrintModalClose();
 });
 
 
