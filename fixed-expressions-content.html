@@ -60,11 +60,13 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .cat-block.collapsed .cat-body{display:none}
 .cat-body{background:var(--card);border:1.5px solid var(--border);border-top:none;border-radius:0 0 var(--radius) var(--radius);overflow:hidden;box-shadow:var(--shadow-sm)}
 
-.expr-row{border-bottom:1px solid var(--border);padding:.75rem 1rem;cursor:pointer;transition:background .1s}
+.expr-row{display:grid;grid-template-columns:1.3em 1fr;align-items:baseline;gap:.5rem;border-bottom:1px solid var(--border);padding:.75rem 1rem;cursor:pointer;transition:background .1s}
 .expr-row:last-child{border-bottom:none}
 .expr-row:hover{background:#f9f8f5}
 .expr-row.open{background:var(--cream)}
-.expr-top{display:flex;align-items:center;gap:.5rem}
+.expr-num{font-family:Outfit,sans-serif;font-size:.68rem;font-weight:500;color:var(--muted)}
+.expr-body{min-width:0}
+.expr-top{display:flex;align-items:baseline;gap:.5rem}
 .expr-text{font-weight:800;font-size:.9rem;flex:1}
 .expr-arr{font-size:.9rem;color:var(--border);transition:transform .15s;flex-shrink:0}
 .expr-row.open .expr-arr{transform:rotate(90deg);color:var(--muted)}
@@ -238,14 +240,17 @@ function renderBrowse() {
       + '<span class="cat-label">' + c.label + '</span>'
       + '<span class="cat-chevron">&#9660;</span>'
       + '</div><div class="cat-body">';
-    items.forEach(item => {
+    items.forEach((item, i) => {
       html += '<div class="expr-row" onclick="this.classList.toggle(&apos;open&apos;)">'
+        + '<span class="expr-num">' + String(i + 1).padStart(2, '0') + '</span>'
+        + '<div class="expr-body">'
         + '<div class="expr-top">'
         + '<span class="expr-text">' + item.expr + '</span>'
         + '<span class="expr-arr">›</span>'
         + '</div>'
         + '<div class="expr-def">' + item.def + '</div>'
         + '<div class="expr-ex">' + item.ex + '</div>'
+        + '</div>'
         + '</div>';
     });
     html += '</div></div>';
