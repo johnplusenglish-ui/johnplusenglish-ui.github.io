@@ -52,10 +52,10 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 
 #browse-content{display:grid;grid-template-columns:1fr 1fr;gap:1rem;align-items:start}
 .cat-block{margin-bottom:0}
-.cat-head{display:flex;align-items:center;gap:.5rem;padding:.65rem 1rem;border-radius:var(--radius) var(--radius) 0 0;border:1.5px solid var(--border);border-bottom:none;border-left:4px solid var(--catc,var(--border));background:color-mix(in srgb,var(--catc,var(--ink)) 8%,var(--card));cursor:pointer;user-select:none;transition:filter .12s}
-.cat-head:hover{filter:brightness(.97)}
+.cat-head{display:flex;align-items:center;gap:.5rem;padding:.65rem 1rem;border-radius:var(--radius) var(--radius) 0 0;border:1.5px solid var(--border);border-bottom:none;background:var(--card);cursor:pointer;user-select:none;transition:background .12s}
+.cat-head:hover{background:var(--cream)}
 .cat-label{font-size:.9rem;font-weight:800;color:var(--ink)}
-.cat-chevron{margin-left:auto;font-size:.7rem;color:var(--ink);opacity:.45;transition:transform .2s}
+.cat-chevron{margin-left:auto;font-size:.7rem;color:var(--muted);transition:transform .2s}
 .cat-block.collapsed .cat-chevron{transform:rotate(-90deg)}
 .cat-block.collapsed .cat-body{display:none}
 .cat-body{background:var(--card);border:1.5px solid var(--border);border-top:none;border-radius:0 0 var(--radius) var(--radius);overflow:hidden;box-shadow:var(--shadow-sm)}
@@ -74,19 +74,31 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 
 /* ============ OPEN CLOZE ============ */
 .oc-intro{margin-bottom:1.5rem;color:var(--muted);font-size:.95rem;line-height:1.5}
-.oc-layout{display:grid;grid-template-columns:minmax(160px,max-content) 1fr;gap:1.25rem;align-items:start}
-.oc-sidebar{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:.75rem;display:flex;flex-direction:column;gap:.5rem;position:sticky;top:68px;max-height:calc(100vh - 84px);overflow-y:auto}
-.oc-sb-item{display:flex;align-items:center;gap:.75rem;padding:.75rem;border-radius:10px;cursor:pointer;transition:all .15s;border:1.5px solid transparent;background:transparent}
+.oc-layout{display:grid;grid-template-columns:300px 1fr;gap:1.25rem;align-items:start;transition:grid-template-columns .22s ease}
+.oc-layout.sb-collapsed{grid-template-columns:52px 1fr}
+.oc-sidebar{background:var(--card);border:1.5px solid var(--border);border-radius:14px;display:flex;flex-direction:column;position:sticky;top:68px;max-height:calc(100vh - 84px)}
+.oc-sidebar-header{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.75rem 1rem;border-bottom:1px solid var(--border);cursor:pointer}
+.oc-sidebar.collapsed .oc-sidebar-header{border-bottom:none;justify-content:center;padding:.75rem .5rem}
+.oc-sidebar-header-label{font-family:Outfit,sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.oc-sidebar.collapsed .oc-sidebar-header-label{display:none}
+.oc-sidebar-toggle{width:26px;height:26px;border-radius:7px;border:1.5px solid var(--border);background:transparent;display:flex;align-items:center;justify-content:center;color:var(--muted);cursor:pointer;transition:all .15s;flex-shrink:0}
+.oc-sidebar-toggle:hover{border-color:var(--sea);color:var(--sea)}
+.oc-sidebar-toggle svg{width:13px;height:13px;transition:transform .2s ease}
+.oc-sidebar.collapsed .oc-sidebar-toggle svg{transform:rotate(180deg)}
+.oc-sidebar.collapsed .oc-sidebar-scroll{display:none}
+.oc-sidebar-scroll{flex:1;overflow-y:auto;padding:.5rem;max-height:70vh}
+.oc-sidebar-scroll::-webkit-scrollbar{width:4px}
+.oc-sidebar-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.oc-sb-item{display:grid;grid-template-columns:22px 1fr auto;gap:.6rem;align-items:center;padding:.6rem .65rem;border-radius:8px;cursor:pointer;transition:background .15s;margin-bottom:.15rem}
 .oc-sb-item:hover{background:var(--cream)}
-.oc-sb-item.active{background:#2176FF;color:#fff}
-.oc-sb-item.active .oc-sb-num,.oc-sb-item.active .oc-sb-theme{color:rgba(255,255,255,.85)}
-.oc-sb-num{font-family:Outfit,sans-serif;font-size:.75rem;color:var(--muted);font-weight:700;flex-shrink:0}
-.oc-sb-dot{width:8px;height:8px;border-radius:50%;background:var(--border);flex-shrink:0;transition:all .15s}
-.oc-sb-item.active .oc-sb-dot{background:#fff}
-.oc-sb-item.completed .oc-sb-dot{background:#5DDEA0}
-.oc-sb-text{flex:1;min-width:0}
-.oc-sb-title{font-family:'Outfit',sans-serif;font-weight:700;font-size:.92rem;line-height:1.25;display:block}
-.oc-sb-theme{font-family:'Outfit',sans-serif;font-size:.78rem;color:var(--muted);display:block;margin-top:.25rem}
+.oc-sb-item.active{background:var(--sea);color:#fff}
+.oc-sb-item.active .oc-sb-num,.oc-sb-item.active .oc-sb-theme{color:rgba(255,255,255,.78)}
+.oc-sb-num{font-family:Outfit,sans-serif;font-size:.68rem;font-weight:500;color:var(--muted);text-align:right}
+.oc-sb-text{min-width:0;display:flex;flex-direction:column;gap:1px}
+.oc-sb-title{font-family:'Outfit',sans-serif;font-weight:700;font-size:.85rem;line-height:1.3;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.oc-sb-item.active .oc-sb-title{color:#fff}
+.oc-sb-theme{font-family:'Outfit',sans-serif;font-size:.72rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.oc-sb-tick{display:flex;align-items:center;justify-content:center;width:16px;height:16px;flex-shrink:0}
 .oc-content{background:var(--card);border:1.5px solid var(--border);border-radius:18px;padding:2rem 2rem;box-shadow:0 4px 18px rgba(45,48,71,.05)}
 .oc-title{font-family:'Outfit',sans-serif;font-size:1.8rem;color:var(--ink);font-weight:400;margin-bottom:.5rem}
 .oc-meta{font-family:Outfit,sans-serif;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:#2176FF;font-weight:700;margin-bottom:1.5rem}
@@ -123,8 +135,10 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
   .topnav{padding:0 1rem}
   #browse-content{grid-template-columns:1fr}
   .oc-layout{grid-template-columns:1fr}
-  .oc-sidebar{position:static;max-height:none;flex-direction:row;overflow-x:auto}
-  .oc-sb-item{flex-shrink:0;min-width:200px}
+  .oc-sidebar{position:static;max-height:none}
+  .oc-sidebar-toggle{display:none}
+  .oc-sidebar-scroll{display:flex;flex-direction:row;overflow-x:auto;overflow-y:hidden;max-height:none;gap:.4rem}
+  .oc-sb-item{flex-shrink:0;min-width:180px;margin-bottom:0}
   .oc-content{padding:1.5rem 1.25rem}
   .oc-passage{font-size:1rem;line-height:2}
 }
@@ -189,8 +203,14 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
   <!-- PRACTICE TAB -->
   <div class="tab-content" id="tab-practice">
     <p class="oc-intro">Read each passage and fill in the missing expressions using the word bank. Click a word, then click a gap.</p>
-    <div class="oc-layout">
-      <nav class="oc-sidebar" id="oc-sidebar"></nav>
+    <div class="oc-layout" id="oc-layout">
+      <nav class="oc-sidebar" id="oc-sidebar">
+        <div class="oc-sidebar-header" onclick="toggleOcSidebar()">
+          <span class="oc-sidebar-header-label">All Passages</span>
+          <button class="oc-sidebar-toggle" type="button" aria-label="Collapse list" onclick="event.stopPropagation();toggleOcSidebar()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+        </div>
+        <div class="oc-sidebar-scroll" id="oc-sidebar-scroll"></div>
+      </nav>
       <div class="oc-content" id="oc-content"></div>
     </div>
   </div>
@@ -213,7 +233,7 @@ function renderBrowse() {
   CATS.forEach(c => {
     const items = activeReg === 'all' ? c.items : c.items.filter(i => i.reg === activeReg);
     if (!items.length) return;
-    html += '<div class="cat-block collapsed" style="--catc:' + c.color + '">'
+    html += '<div class="cat-block collapsed">'
       + '<div class="cat-head" onclick="this.parentElement.classList.toggle(&apos;collapsed&apos;)">'
       + '<span class="cat-label">' + c.label + '</span>'
       + '<span class="cat-chevron">&#9660;</span>'
@@ -321,7 +341,6 @@ const PASSAGES = [
     text: 'The new gym near my flat is fantastic. The classes are excellent, and {1}, they have a sauna and a pool. {2}, parking is free, which is rare around here. {3}, it does get absolutely packed between six and eight in the evening. {4}, the changing rooms are quite small for such a busy place. {5}, the monthly fee is very reasonable compared to other gyms. So {6}, I\'d still recommend it despite the crowds.',
     answers: ['what\'s more','on top of that','that being said','to make matters worse','on the flip side','on the other hand']
   },
-,
   {
     title: 'The Job Interview',
     cat: 'Advice & Career',
@@ -378,17 +397,36 @@ let selectedWord = null;
 let answers = {};
 let checked = {};
 
-function renderSidebar() {
+var OC_SIDEBAR_COLLAPSED_KEY = 'jpe_fe_practice_sidebar_collapsed_v1';
+function toggleOcSidebar() {
   var sb = document.getElementById('oc-sidebar');
+  var layout = document.getElementById('oc-layout');
+  var collapsed = sb.classList.toggle('collapsed');
+  layout.classList.toggle('sb-collapsed', collapsed);
+  try { localStorage.setItem(OC_SIDEBAR_COLLAPSED_KEY, collapsed ? '1' : '0'); } catch(e) {}
+}
+(function restoreOcSidebarState() {
+  var collapsed = false;
+  try { collapsed = localStorage.getItem(OC_SIDEBAR_COLLAPSED_KEY) === '1'; } catch(e) {}
+  if (!collapsed) return;
+  document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('oc-sidebar').classList.add('collapsed');
+    document.getElementById('oc-layout').classList.add('sb-collapsed');
+  });
+})();
+
+function renderSidebar() {
+  var sb = document.getElementById('oc-sidebar-scroll');
   var html = '';
   PASSAGES.forEach(function(p, i) {
-    var cls = i === currentPassage ? ' active' : '';
-    if (checked[i]) cls += ' completed';
+    var isActive = i === currentPassage;
+    var cls = isActive ? ' active' : '';
+    var tick = checked[i] ? '<span class="oc-sb-tick"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="' + (isActive ? '#fff' : '#16A34A') + '" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : '';
     html += '<div class="oc-sb-item' + cls + '" onclick="selectPassage(' + i + ')">'
       + '<span class="oc-sb-num">' + String(i+1).padStart(2,'0') + '</span>'
-      + '<span class="oc-sb-dot"></span>'
       + '<div class="oc-sb-text"><span class="oc-sb-title">' + p.title + '</span>'
       + '<span class="oc-sb-theme">' + p.cat + '</span></div>'
+      + tick
       + '</div>';
   });
   sb.innerHTML = html;
