@@ -5,11 +5,11 @@ Generates one static PDF per word bank into pdfs/<bank-id>.pdf.
 Reads the same TOPICS/GROUPS data word-banks-content.html embeds (the two
 inline <script type="application/json"> blocks), builds a standalone HTML
 sheet per bank (mirroring the lpHead/lpStudyList markup in
-word-banks-content.html — keep the two in sync if that CSS changes), and
+word-banks-content.html - keep the two in sync if that CSS changes), and
 prints each straight to PDF with headless Chrome's --no-pdf-header-footer.
 
 That flag suppresses Chrome's own date/URL header and footer at the print
-API level, with no CSS trade-offs — the thing the in-browser Print/Download
+API level, with no CSS trade-offs - the thing the in-browser Print/Download
 buttons can't do, since a site visitor's own interactive print dialog has
 no equivalent switch. Building standalone one-bank-at-a-time HTML files
 (rather than driving the live app page) sidesteps a real problem: writing
@@ -142,7 +142,7 @@ def main():
                 sys.exit(1)
             print(f'[{i}/{len(topics)}] {bank_id}.pdf ({pdf_path.stat().st_size // 1024} KB)')
 
-    print(f'\nDone — {len(topics)} PDFs written to {OUT_DIR}')
+    print(f'\nDone - {len(topics)} PDFs written to {OUT_DIR}')
 
 
 if __name__ == '__main__':
