@@ -30,11 +30,16 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
 .topic-icon svg{width:24px;height:24px;stroke-width:1.8;fill:none;stroke:currentColor}
 .page-header h1{font-size:clamp(1.8rem,4vw,2.6rem);font-weight:900;letter-spacing:-.01em;line-height:1.1;margin:0}
 
-/* Mode toggle */
-.mode-toggle{display:flex;gap:0;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;width:fit-content;margin-bottom:1.2rem}
-.mode-btn{font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:600;padding:.55rem 1.5rem;background:var(--card);color:var(--muted);border:none;cursor:pointer;transition:all .15s}
-.mode-btn:hover{color:var(--ink)}
-.mode-btn.on{background:var(--ink);color:var(--cream)}
+/* Mode tabs (folder style, matches prepositions-content.html) */
+.mode-toggle{display:flex;gap:4px;row-gap:4px;position:relative;margin-bottom:1.5rem;align-items:flex-end;flex-wrap:wrap;padding-top:8px}
+.mode-toggle::before{content:'';position:absolute;left:0;right:0;bottom:0;height:1.5px;background:var(--border)}
+.mode-btn{position:relative;font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;padding:.5rem 1.25rem;color:var(--muted);background:color-mix(in srgb,var(--ink) 4%,transparent);border:1.5px solid var(--border);border-radius:12px 12px 0 0;cursor:pointer;transition:background .18s,color .18s,box-shadow .18s,border-color .18s}
+.mode-btn:not(.on):hover{background:color-mix(in srgb,var(--ink) 8%,transparent);color:var(--ink)}
+.mode-btn:not(.on):focus-visible{outline:2px solid var(--sea);outline-offset:2px}
+.mode-btn.on{outline:none;background:var(--cream);border-color:#2176FF;border-bottom:none!important;color:#2176FF;padding-top:calc(.5rem + 3px);box-shadow:0 -3px 10px rgba(45,48,71,.06);z-index:2}
+.mode-btn:nth-child(2).on{border-color:#50C878;color:#50C878}
+@media(max-width:600px){.mode-btn{padding:.5rem .75rem;font-size:.82rem}.mode-btn.on{padding-top:calc(.5rem + 3px)}}
+@media(prefers-reduced-motion:reduce){.mode-btn{transition:none}}
 
 .controls{max-width:960px;margin:0 auto;padding:0 2rem 1rem;position:relative;z-index:1}
 .ctrl-row{display:flex;gap:.8rem;flex-wrap:wrap;align-items:center}
@@ -220,9 +225,9 @@ footer{text-align:center;padding:3rem 2rem;font-size:.8rem;color:var(--muted);bo
 </div>
 
 <div class="controls">
-<div class="mode-toggle">
-<button class="mode-btn on" onclick="setMode('debates',this)">Debates</button>
-<button class="mode-btn" onclick="setMode('phrases',this)">Phrase Bank</button>
+<div class="mode-toggle" role="tablist">
+<button class="mode-btn on" role="tab" onclick="setMode('debates',this)">Debates</button>
+<button class="mode-btn" role="tab" onclick="setMode('phrases',this)">Phrase Bank</button>
 </div>
 
 <div class="debate-view" id="debateView">
