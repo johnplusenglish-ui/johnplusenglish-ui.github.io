@@ -150,22 +150,22 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
 
 /* Timer — unified design */
 .timer-section{max-width:800px;margin:.8rem auto 0}
-.timer-controls{display:flex;align-items:center;gap:.5rem;justify-content:center;flex-wrap:wrap;margin-bottom:.4rem}
-.timer-pill{font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:700;padding:.35rem .7rem;border:1.5px solid var(--border);border-radius:6px;background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s}
-.timer-pill:hover{border-color:var(--sea);color:var(--sea)}
-.timer-pill.active{border-color:var(--sea);background:var(--sea);color:#fff}
-.timer-play{font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:700;padding:.5rem 1.2rem;border:1.5px solid var(--sea);border-radius:8px;background:var(--sea);color:#fff;cursor:pointer;transition:all .15s}
-.timer-play:hover{opacity:.9}
-.timer-play.paused{background:var(--sun);border-color:var(--sun)}
-.timer-display{font-family:'JetBrains Mono',monospace;font-size:1.5rem;font-weight:700;color:var(--ink);min-width:60px;text-align:center;transition:color .3s}
-.timer-display.warn{color:var(--coral)}
-.timer-display.done{color:var(--sea)}
-.timer-restart{font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:700;padding:.35rem .7rem;border:1.5px solid var(--border);border-radius:6px;background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s;display:none}
-.timer-restart:hover{border-color:var(--ink);color:var(--ink)}
-.timer-restart.show{display:inline-block}
-.timer-progress{width:100%;height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:.3rem}
+.timer-progress{width:100%;height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:.6rem}
 .timer-progress-fill{height:100%;background:var(--sea);border-radius:3px;transition:width .3s linear;width:0%}
 .timer-progress-fill.warn{background:var(--coral)}
+.timer-controls{display:flex;align-items:center;justify-content:center}
+.timer-btn-wrap{display:inline-flex;border-radius:10px;overflow:hidden;border:1.5px solid var(--border)}
+.timer-btn{font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;padding:.55rem 1.2rem;border:none;background:var(--card);color:var(--ink);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:.5rem;min-width:96px;justify-content:center}
+.timer-btn:hover{background:var(--cream)}
+.timer-btn-icon{font-size:.8em;line-height:1}
+.timer-btn .timer-btn-time{font-family:'JetBrains Mono',monospace}
+.timer-btn.running{color:var(--sea)}
+.timer-btn.paused{color:var(--sun)}
+.timer-btn.warn,.timer-btn.done{color:var(--coral)}
+.timer-edit-btn{font-family:'Outfit',sans-serif;padding:.55rem .8rem;border:none;border-left:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center}
+.timer-edit-btn:hover{color:var(--ink);background:var(--cream)}
+.timer-duration-edit{display:none;align-items:baseline;gap:.3rem;font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;padding:.5rem .8rem;border:1.5px solid var(--ink);border-radius:10px;background:var(--card);color:var(--ink)}
+.timer-duration-input{font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;border:none;background:transparent;color:var(--ink);width:4.2ch;text-align:center;outline:none;padding:0}
 
 /* Grid view */
 .grid-view{display:none;grid-template-columns:1fr 1fr;gap:.8rem}
@@ -283,18 +283,7 @@ nav,.filters,.card-nav,.timer-section,.phrases-toggle,.view-toggle,.filters-acti
 <button onclick="nextTask()">Next &rarr;</button>
 </div>
 <div id="taskCard"></div>
-<div class="timer-section">
-<div class="timer-controls">
-<span class="timer-pill" data-secs="120" onclick="selectTime(120,this)">2 min</span>
-<span class="timer-pill" data-secs="300" onclick="selectTime(300,this)">5 min</span>
-<span class="timer-pill" data-secs="600" onclick="selectTime(600,this)">10 min</span>
-<span class="timer-pill" data-secs="900" onclick="selectTime(900,this)">15 min</span>
-<button class="timer-play" id="timerPlay" onclick="toggleTimer()">&#9654; Start</button>
-<span class="timer-display" id="timerDisplay">0:00</span>
-<button class="timer-restart" id="timerRestart" onclick="restartTimer()">Restart</button>
-</div>
-<div class="timer-progress"><div class="timer-progress-fill" id="timerProgress"></div></div>
-</div>
+<div id="timerMount"></div>
 </div>
 <div class="grid-view" id="gridView"></div>
 </div>
@@ -1009,93 +998,137 @@ function togglePhrases(btn){
   btn.innerHTML=p.classList.contains('open')?'Useful phrases &#9652;':'Useful phrases &#9662;';
 }
 
-// Timer — unified: select time, Start/Pause button, Restart, progress bar
-var timerSeconds=0, timerTotal=0, timerRunning=false, timerPaused=false;
-
-function selectTime(secs,pill){
-  // If timer is running, stop it first
-  if(timerRunning||timerPaused) resetTimer();
-  timerTotal=secs;timerSeconds=secs;
-  document.querySelectorAll('.timer-pill').forEach(function(p){p.classList.remove('active');});
-  pill.classList.add('active');
-  document.getElementById('timerRestart').className='timer-restart show';
-  document.getElementById('timerPlay').textContent='\u25B6 Start';
-  document.getElementById('timerPlay').className='timer-play';
-  updateTimerDisplay();
-  document.getElementById('timerProgress').style.width='0%';
-  document.getElementById('timerProgress').className='timer-progress-fill';
+// ===== Reusable timer widget (multi-instance: one button, m:ss typing, progress bar on top) =====
+var timerState = {};
+function timerFormatTime(totalSeconds){
+  var m=Math.floor(totalSeconds/60), s=totalSeconds%60;
+  return m+':'+(s<10?'0':'')+s;
 }
-
-function toggleTimer(){
-  if(!timerTotal) return;
-  var btn=document.getElementById('timerPlay');
-  if(!timerRunning&&!timerPaused){
-    // Start
-    timerRunning=true;
-    btn.textContent='\u23F8 Pause';btn.className='timer-play';
-    runTimer();
-  } else if(timerRunning){
-    // Pause
-    clearInterval(timerInterval);timerInterval=null;
-    timerRunning=false;timerPaused=true;
-    btn.textContent='\u25B6 Resume';btn.className='timer-play paused';
-  } else {
-    // Resume
-    timerPaused=false;timerRunning=true;
-    btn.textContent='\u23F8 Pause';btn.className='timer-play';
-    runTimer();
-  }
+function timerParseTime(str){
+  var parts=String(str).trim().split(':');
+  var m, s;
+  if(parts.length>=2){ m=parseInt(parts[0],10); s=parseInt(parts[1],10); }
+  else { m=parseInt(parts[0],10); s=0; }
+  if(isNaN(m)) m=0;
+  if(isNaN(s)||s<0||s>59) s=0;
+  var total=m*60+s;
+  if(!total || total<1) return null;
+  return Math.min(total,5999);
 }
-
-function runTimer(){
-  var disp=document.getElementById('timerDisplay');
-  var prog=document.getElementById('timerProgress');
-  timerInterval=setInterval(function(){
-    timerSeconds--;
-    var pct=((timerTotal-timerSeconds)/timerTotal)*100;
+function timerWidgetHTML(id, defaultSecs, locked){
+  var editBits = locked ? '' :
+    '<button class="timer-edit-btn" id="timerEditBtn-'+id+'" onclick="timerEditDuration(\''+id+'\')" title="Edit duration" aria-label="Edit timer duration"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>'+
+    '<span class="timer-duration-edit" id="timerDurationEdit-'+id+'"><input type="text" inputmode="numeric" class="timer-duration-input" id="timerDurationInput-'+id+'" placeholder="'+timerFormatTime(defaultSecs)+'" onblur="timerCommitDuration(\''+id+'\')" onkeydown="if(event.key===\'Enter\'){this.blur()}else if(event.key===\'Escape\'){timerCancelEdit(\''+id+'\')}"></span>';
+  return ''+
+    '<div class="timer-section">'+
+      '<div class="timer-progress"><div class="timer-progress-fill" id="timerProgress-'+id+'"></div></div>'+
+      '<div class="timer-controls">'+
+        '<span class="timer-btn-wrap">'+
+          '<button class="timer-btn" id="timerBtn-'+id+'" onclick="timerHandleClick(\''+id+'\')"><span class="timer-btn-icon" id="timerBtnIcon-'+id+'">&#9654;</span><span id="timerBtnLabel-'+id+'"></span></button>'+
+          editBits+
+        '</span>'+
+      '</div>'+
+    '</div>';
+}
+function timerInit(id, defaultSecs, locked){
+  timerState[id] = {interval:null, seconds:defaultSecs, total:defaultSecs, running:false, paused:false, defaultSecs:defaultSecs, locked:!!locked};
+  timerUpdateBtn(id);
+}
+function timerSelectDuration(id, secs){
+  var st = timerState[id];
+  clearInterval(st.interval); st.interval=null;
+  st.running=false; st.paused=false;
+  st.total=secs; st.seconds=secs;
+  var prog = document.getElementById('timerProgress-'+id);
+  prog.style.width='0%'; prog.className='timer-progress-fill';
+  timerUpdateBtn(id);
+}
+function timerEditDuration(id){
+  var st = timerState[id];
+  if(st.locked) return;
+  clearInterval(st.interval); st.interval=null; st.running=false; st.paused=false;
+  var input=document.getElementById('timerDurationInput-'+id);
+  input.value=timerFormatTime(st.defaultSecs);
+  document.getElementById('timerBtn-'+id).style.display='none';
+  document.getElementById('timerEditBtn-'+id).style.display='none';
+  document.getElementById('timerDurationEdit-'+id).style.display='inline-flex';
+  input.focus();
+  input.select();
+}
+function timerCommitDuration(id){
+  var st = timerState[id];
+  if(st._canceling){ st._canceling=false; return; }
+  var parsed=timerParseTime(document.getElementById('timerDurationInput-'+id).value);
+  if(parsed) st.defaultSecs=parsed;
+  document.getElementById('timerDurationEdit-'+id).style.display='none';
+  document.getElementById('timerBtn-'+id).style.display='inline-flex';
+  timerSelectDuration(id, st.defaultSecs);
+}
+function timerCancelEdit(id){
+  var st = timerState[id];
+  st._canceling=true;
+  document.getElementById('timerDurationEdit-'+id).style.display='none';
+  document.getElementById('timerBtn-'+id).style.display='inline-flex';
+  timerUpdateBtn(id);
+}
+function timerHandleClick(id){
+  var st = timerState[id];
+  if(!st.running && !st.paused && st.seconds<=0 && st.total>0){ timerSelectDuration(id, st.defaultSecs); return; }
+  timerToggle(id);
+}
+function timerToggle(id){
+  var st = timerState[id];
+  if(!st.total) return;
+  if(!st.running && !st.paused){ st.running=true; timerTick(id); }
+  else if(st.running){ clearInterval(st.interval); st.interval=null; st.running=false; st.paused=true; }
+  else{ st.paused=false; st.running=true; timerTick(id); }
+  timerUpdateBtn(id);
+}
+function timerTick(id){
+  var st = timerState[id];
+  var prog=document.getElementById('timerProgress-'+id);
+  st.interval=setInterval(function(){
+    st.seconds--;
+    var pct=((st.total-st.seconds)/st.total)*100;
     prog.style.width=pct+'%';
-    if(timerSeconds<=10&&timerSeconds>0){disp.className='timer-display warn';prog.className='timer-progress-fill warn';}
-    if(timerSeconds<=0){
-      clearInterval(timerInterval);timerInterval=null;timerRunning=false;
-      disp.className='timer-display done';disp.textContent='0:00';
-      prog.style.width='100%';prog.className='timer-progress-fill warn';
-      document.getElementById('timerPlay').textContent='\u25B6 Start';
-      document.getElementById('timerPlay').className='timer-play';
-    } else {
-      updateTimerDisplay();
+    if(st.seconds<=10 && st.seconds>0){ prog.className='timer-progress-fill warn'; }
+    if(st.seconds<=0){
+      clearInterval(st.interval); st.interval=null; st.running=false;
+      prog.style.width='100%'; prog.className='timer-progress-fill warn';
+      setTimeout(function(){
+        if(!st.running && !st.paused && st.seconds<=0){ timerSelectDuration(id, st.defaultSecs); }
+      },2500);
     }
+    timerUpdateBtn(id);
   },1000);
 }
-
-function restartTimer(){
-  if(!timerTotal)return;
-  clearInterval(timerInterval);timerInterval=null;
-  timerSeconds=timerTotal;timerRunning=false;timerPaused=false;
-  document.getElementById('timerDisplay').className='timer-display';
-  document.getElementById('timerProgress').style.width='0%';
-  document.getElementById('timerProgress').className='timer-progress-fill';
-  document.getElementById('timerPlay').textContent='\u25B6 Start';
-  document.getElementById('timerPlay').className='timer-play';
-  updateTimerDisplay();
+function timerUpdateBtn(id){
+  var st = timerState[id];
+  var btn=document.getElementById('timerBtn-'+id);
+  var icon=document.getElementById('timerBtnIcon-'+id);
+  var label=document.getElementById('timerBtnLabel-'+id);
+  var editBtn=document.getElementById('timerEditBtn-'+id);
+  if(editBtn) editBtn.style.display = st.locked ? 'none' : 'inline-flex';
+  if(st.running){
+    icon.innerHTML='&#9208;';
+    label.innerHTML='<span class="timer-btn-time">'+timerFormatTime(st.seconds)+'</span>';
+    btn.className='timer-btn running'+(st.seconds<=10?' warn':'');
+  } else if(st.paused){
+    icon.innerHTML='&#9654;';
+    label.innerHTML='<span class="timer-btn-time">'+timerFormatTime(st.seconds)+'</span>';
+    btn.className='timer-btn paused';
+  } else if(st.seconds<=0 && st.total>0){
+    icon.innerHTML='&#8635;';
+    label.textContent='Done';
+    btn.className='timer-btn done';
+  } else {
+    icon.innerHTML='&#9654;';
+    label.innerHTML='<span class="timer-btn-time">'+timerFormatTime(st.defaultSecs)+'</span>';
+    btn.className='timer-btn';
+  }
 }
-
-function resetTimer(){
-  clearInterval(timerInterval);timerInterval=null;
-  timerRunning=false;timerPaused=false;timerTotal=0;timerSeconds=0;
-  document.getElementById('timerDisplay').textContent='0:00';
-  document.getElementById('timerDisplay').className='timer-display';
-  document.getElementById('timerProgress').style.width='0%';
-  document.getElementById('timerProgress').className='timer-progress-fill';
-  document.querySelectorAll('.timer-pill').forEach(function(p){p.classList.remove('active');});
-  document.getElementById('timerRestart').className='timer-restart';
-  document.getElementById('timerPlay').textContent='\u25B6 Start';
-  document.getElementById('timerPlay').className='timer-play';
-}
-
-function updateTimerDisplay(){
-  var m=Math.floor(timerSeconds/60),s=timerSeconds%60;
-  document.getElementById('timerDisplay').textContent=m+':'+(s<10?'0':'')+s;
-}
+document.getElementById('timerMount').innerHTML = timerWidgetHTML('main', 300, false);
+timerInit('main', 300, false);
 
 document.addEventListener('keydown',function(e){if(currentView==='single'){if(e.key==='ArrowLeft')prevTask();if(e.key==='ArrowRight')nextTask();}});
 init();
