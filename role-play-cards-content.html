@@ -75,6 +75,15 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .rp-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);transition:box-shadow .3s}
 .rp-card:hover{box-shadow:var(--shadow-md)}
 
+/* Prev/next card pills — half-overlap the card edge, same shape as the sidebar collapse pill */
+.card-nav-wrap{position:relative}
+.card-nav-btn{position:absolute;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;background:var(--card);border:1.5px solid var(--border);color:var(--muted);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm);cursor:pointer;z-index:2;transition:background .15s,border-color .15s,color .15s,box-shadow .15s}
+.card-nav-btn:hover{background:var(--sky);border-color:var(--sky);color:#fff;box-shadow:var(--shadow-md)}
+.card-nav-btn:disabled{opacity:.35;cursor:default;pointer-events:none}
+.card-nav-btn svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.4}
+.card-nav-prev{left:-16px}
+.card-nav-next{right:-16px}
+
 .rp-header{display:flex;justify-content:space-between;align-items:center;padding:.9rem 1.25rem;border-bottom:1.5px solid var(--border);flex-wrap:wrap;gap:.5rem}
 .rp-header-left{display:flex;align-items:center;gap:.6rem}
 .rp-number{font-family:'Outfit',sans-serif;font-size:1.05rem;font-weight:800;color:var(--accent)}
@@ -153,7 +162,7 @@ footer{text-align:center;padding:3rem 2rem;font-size:.8rem;color:var(--muted);bo
 @media print{
 body{background:#fff}
 body::before{display:none}
-.topnav,.page-header,.mode-toggle-wrap,.setup-bar,.timer-section,.rp-phrases-toggle,footer{display:none!important}
+.topnav,.page-header,.mode-toggle-wrap,.setup-bar,.timer-section,.rp-phrases-toggle,.card-nav-btn,footer{display:none!important}
 .card-viewer{margin:0;padding:0;max-width:none}
 .rp-card{box-shadow:none;border:1px solid #ccc;break-inside:avoid}
 .rp-roles,.rp-roles.three-col,.rp-roles.four-col{grid-template-columns:1fr 1fr}
@@ -240,7 +249,11 @@ body::before{display:none}
 
 <div class="card-viewer">
 <div class="single-view" id="singleView">
+<div class="card-nav-wrap">
 <div class="rp-card" id="rpCard"></div>
+<button class="card-nav-btn card-nav-prev" id="cardPrevBtn" onclick="goCard(-1)" title="Previous role play (&larr;)" aria-label="Previous role play"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+<button class="card-nav-btn card-nav-next" id="cardNextBtn" onclick="goCard(1)" title="Next role play (&rarr;)" aria-label="Next role play"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>
+</div>
 <div id="timerMount"></div>
 </div>
 <div class="grid-view" id="gridView"></div>
@@ -1173,7 +1186,7 @@ function applyFilters(){
 }
 
 function renderCard(){
-  if(filtered.length===0){document.getElementById('rpCard').innerHTML='<div style="padding:3rem;text-align:center;color:var(--muted)">No role plays match this filter.</div>';return}
+  if(filtered.length===0){document.getElementById('rpCard').innerHTML='<div style="padding:3rem;text-align:center;color:var(--muted)">No role plays match this filter.</div>';document.getElementById('cardPrevBtn').disabled=true;document.getElementById('cardNextBtn').disabled=true;return}
   var d=filtered[cardIdx];
   var activePhrases=getActivePhrases();
   var bc=d.lvl==='Simple'?'badge-simple':d.lvl==='Everyday'?'badge-everyday':d.lvl==='Fun'?'badge-fun':'badge-advanced';
@@ -1199,6 +1212,8 @@ function renderCard(){
   if(activePhrases[d.id]){h+='<ul>';activePhrases[d.id].forEach(function(p){h+='<li>'+p+'</li>'});h+='</ul>';}
   h+='</div></div>';
   document.getElementById('rpCard').innerHTML=h;
+  document.getElementById('cardPrevBtn').disabled=cardIdx===0;
+  document.getElementById('cardNextBtn').disabled=cardIdx>=filtered.length-1;
 }
 
 function goCard(dir){
