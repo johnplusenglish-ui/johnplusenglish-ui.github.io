@@ -147,7 +147,7 @@
   .empty{padding:2.5rem;text-align:center;color:var(--muted);font-size:.85rem;grid-column:1/-1}
 
   /* ---------------- select + print ---------------- */
-  .bar-actions{display:flex;align-items:center;gap:.4rem;margin-left:auto}
+  .bar-actions{display:flex;align-items:center;flex-wrap:wrap;gap:.4rem;margin-left:auto}
   .mini{font-size:.72rem;font-weight:700;color:var(--muted);background:var(--card);border:1.5px solid var(--border);
         border-radius:8px;padding:.42rem .7rem;cursor:pointer;transition:all .15s;white-space:nowrap}
   .mini:hover{border-color:var(--ink);color:var(--ink)}
@@ -409,6 +409,7 @@ function renderBrowse(){
       </select>
     <div class="bar-actions">
       <button class="mini ${selMode?'on':''}" id="selToggle">${selMode?'Done selecting':'Select words'}</button>
+      <button class="print-btn" id="dlBtn"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download PDF</button>
       <button class="print-btn" id="printBtn"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg> Print</button>
     </div>
   </div>`;
@@ -475,6 +476,8 @@ function wire(){
   if(st) st.addEventListener('click',()=>{selMode=!selMode;render()});
   const pb=document.getElementById('printBtn');
   if(pb) pb.addEventListener('click',lpOpen);
+  const db=document.getElementById('dlBtn');
+  if(db) db.addEventListener('click',dlBankPDF);
   const pa=document.getElementById('pickAll');
   if(pa) pa.addEventListener('click',()=>{
     curShown.forEach(e=>{const k=pickKey(bankId,e); picked.set(k, curRows[k] || {b:bankId,t:e.t,p:e.p,d:e.d,x:e.x,tier:e.tier})});
@@ -688,6 +691,17 @@ function lpPrint(){
   w.document.close();
   setTimeout(()=>{ w.focus(); w.print(); }, 500);
   lpClose();
+}
+
+/* one-click: whole bank, study list, straight to the print dialog (Save as PDF) */
+function dlBankPDF(){
+  const words = lpWords('bank');
+  if(!words.length){ alert('There are no words to download.'); return; }
+  const w = window.open('', '_blank');
+  if(!w){ alert('Your browser blocked the download window. Allow pop-ups for this site, then try again.'); return; }
+  w.document.write(lpStudyList(words, disp(bank().title), true, true, true));
+  w.document.close();
+  setTimeout(()=>{ w.focus(); w.print(); }, 500);
 }
 
 loadPicks();
