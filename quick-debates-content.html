@@ -727,7 +727,8 @@ function selectDuration(secs){
   updateTimerBtn();
 }
 function editDuration(){
-  if(timerRunning||timerPaused) return; // only editable before it's been started
+  // Always editable, even mid-countdown — stop it first so committing starts clean.
+  clearInterval(timerInterval); timerInterval=null; timerRunning=false; timerPaused=false;
   var input=document.getElementById('timerDurationInput');
   input.value=timerMinutes;
   document.getElementById('timerBtn').style.display='none';
@@ -787,26 +788,23 @@ function updateTimerBtn(){
   var editBtn=document.getElementById('timerEditBtn');
   var m=Math.floor(timerSeconds/60),s=timerSeconds%60;
   var mmss=m+':'+(s<10?'0':'')+s;
+  editBtn.style.display='inline-flex';
   if(timerRunning){
     icon.innerHTML='&#9208;';
     label.innerHTML='<span class="timer-btn-time">'+mmss+'</span>';
     btn.className='timer-btn'+(timerSeconds<=10?' warn':'');
-    editBtn.style.display='none';
   } else if(timerPaused){
     icon.innerHTML='&#9654;';
     label.innerHTML='<span class="timer-btn-time">'+mmss+'</span>';
     btn.className='timer-btn paused';
-    editBtn.style.display='none';
   } else if(timerSeconds<=0 && timerTotal>0){
     icon.innerHTML='&#8635;';
     label.textContent='Done';
     btn.className='timer-btn done';
-    editBtn.style.display='none';
   } else {
     icon.innerHTML='&#9654;';
     label.textContent=timerMinutes+' min';
     btn.className='timer-btn';
-    editBtn.style.display='inline-flex';
   }
 }
 
