@@ -307,7 +307,9 @@ let selMode=false;                 /* word-picking mode */
 let curShown=[];                   /* entries currently rendered in Browse */
 const curRows={};                  /* row key -> entry, for the click handler */
 const picked=new Map();            /* row key -> entry, spans banks */
-const shutGroups = new Set();
+/* menus start collapsed; the group holding the current bank opens so it's visible */
+const shutGroups = new Set(GROUPS.map(g=>g.name));
+GROUPS.forEach(g=>{ if(g.ids.includes(bankId)) shutGroups.delete(g.name); });
 const bank = () => TOPICS[bankId];
 const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 const disp = t => t.replace(/&amp;/g,'&');
