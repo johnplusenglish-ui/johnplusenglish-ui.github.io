@@ -649,14 +649,40 @@ function downloadDebatePng() {
 
   function doCapture() {
     var card = document.getElementById('debateCard');
+    var vocab = card.querySelector('.vocab-section');
+    var followup = card.querySelector('.followup-section');
+    var followupPhrasesEl = document.getElementById('followupPhrases');
+    var origGrid = card.style.gridTemplateColumns;
+    var origWidth = card.style.width;
+    var origVocabDisplay = vocab ? vocab.style.display : '';
+    var origFollowupDisplay = followup ? followup.style.display : '';
+    var origFpDisplay = followupPhrasesEl ? followupPhrasesEl.style.display : '';
+
+    // Always render the wide (desktop) two-column layout and drop vocab/follow-up, regardless of current viewport/toggle state.
+    // The card itself must be widened too — the grid override alone is powerless while a narrow mobile viewport still caps the container.
+    card.style.width = '896px';
+    card.style.gridTemplateColumns = '280px 1fr';
+    if (vocab) vocab.style.display = 'none';
+    if (followup) followup.style.display = 'none';
+    if (followupPhrasesEl) followupPhrasesEl.style.display = 'none';
+
+    function restoreCardState() {
+      card.style.width = origWidth;
+      card.style.gridTemplateColumns = origGrid;
+      if (vocab) vocab.style.display = origVocabDisplay;
+      if (followup) followup.style.display = origFollowupDisplay;
+      if (followupPhrasesEl) followupPhrasesEl.style.display = origFpDisplay;
+    }
+
     html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function(canvas) {
+      restoreCardState();
       var d = filtered[idx];
       var link = document.createElement('a');
       link.download = (d && d.title ? d.title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') : 'debate') + '.png';
       link.href = canvas.toDataURL('image/png');
       link.click();
       restore();
-    }).catch(function(){ restore(); });
+    }).catch(function(){ restoreCardState(); restore(); });
   }
   function restore() {
     btn.innerHTML = origHtml;
