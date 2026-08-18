@@ -603,85 +603,152 @@ function lpGroups(words, byHead){
   return out;
 }
 
+/* Chrome only suppresses its own printed date/URL header and footer when
+   @page{margin:0} — but a box's top/bottom padding only ever paints on the
+   FIRST/LAST fragment of something that's split across pages (CSS
+   Fragmentation spec), so a single continuously-flowing sheet loses its
+   margin at every *internal* page break the moment @page margin goes to 0.
+   The fix is to stop relying on page-break fragmentation for margins at
+   all: the content below is pre-split in JS into discrete, non-fragmenting
+   `.page` boxes (one physical A4 sheet each, forced with break-after:page),
+   each carrying its own padding — which paints in full on every single one,
+   internal breaks included. Deliberately under-fills each page (rather than
+   measuring real rendered heights) so a page can never overflow into the
+   next: a little blank space at the foot of a page is a fine trade for
+   never risking clipped or overlapping content. */
+const PAGE_CM = {w:21, vPad:1.7, hPad:1.9};
+
+function paginateFlat(entries, firstCap, restCap){
+  const pages = [];
+  let idx = 0, cap = firstCap;
+  while (idx < entries.length){
+    const taken = [];
+    while (taken.length < cap && idx < entries.length){ taken.push(entries[idx]); idx++; }
+    while (taken.length && taken[taken.length-1].isHead && idx < entries.length){
+      idx--; taken.pop();
+    }
+    if (taken.length) pages.push(taken);
+    cap = restCap;
+  }
+  return pages;
+}
+
 function lpHead(title, words){
-  const banks = [...new Set(words.map(e=>e.b))].map(b=>disp(TOPICS[b].title));
-  const sub = words.length+' word'+(words.length===1?'':'s')+' · '+
-              (banks.length>2 ? banks.length+' word banks' : banks.join(', '));
   return '<!DOCTYPE html><html><head><meta charset="utf-8"><title>'+esc(title)+'</title>'+
     '<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">'+
     '<meta name="color-scheme" content="light">'+
     '<style>'+
     '*{box-sizing:border-box}'+
     'html{color-scheme:light;background:#fff}'+
-    'body{font-family:Outfit,sans-serif;background:#fff;color:#2D3047;padding:1.5rem 2rem;max-width:820px;margin:0 auto;font-size:10.5pt;line-height:1.5}'+
+    'html,body{margin:0;background:#fff}'+
+    'body{font-family:Outfit,sans-serif;color:#2D3047;font-size:10.5pt;line-height:1.5}'+
+    '.page{width:'+PAGE_CM.w+'cm;padding:'+PAGE_CM.vPad+'cm '+PAGE_CM.hPad+'cm;margin:0 auto}'+
+    '.page.brk{break-after:page;page-break-after:always}'+
     '.brand{text-align:right;font-size:.7rem;color:#7A7D8E;margin-bottom:1.1rem}'+
     'h1{font-size:1.5rem;font-weight:800;letter-spacing:-.02em;margin:0 0 .15rem}'+
     '.sub{font-size:.78rem;color:#7A7D8E;margin-bottom:1.3rem;padding-bottom:.7rem;border-bottom:1.5px solid #2D3047}'+
     'h2{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#3D5A80;'+
-       'margin:1.1rem 0 .5rem;padding-bottom:.2rem;border-bottom:1px solid #ddd;break-after:avoid;page-break-after:avoid}'+
-    'h2:first-of-type{margin-top:0}'+
+       'margin:1.1rem 0 .5rem;padding-bottom:.2rem;border-bottom:1px solid #ddd}'+
+    'h2:first-child{margin-top:0}'+
     '.cols{display:grid;gap:0 1.8rem}'+
-    '.item{break-inside:avoid;page-break-inside:avoid;margin-bottom:.5rem}'+
+    '.item{margin-bottom:.5rem}'+
     '.term{font-weight:800}'+
     '.pos{font-size:.72em;color:#9598a6;margin-left:.35em}'+
     '.def{font-size:.9em;color:#3a3d52}'+
     '.ex{font-size:.85em;font-style:italic;color:#6b6e80;margin-top:.05rem}'+
     'ol.ws{margin:0;padding-left:1.4rem}'+
-    'ol.ws li{break-inside:avoid;page-break-inside:avoid;margin-bottom:.85rem}'+
+    'ol.ws li{margin-bottom:.85rem}'+
     '.line{border-bottom:1px solid #b9bcc9;height:1.15rem;max-width:260px;margin-top:.3rem}'+
-    '.key{margin-top:1.8rem;padding-top:.8rem;border-top:1.5px solid #2D3047}'+
     '.key h2{border:none;margin:0 0 .4rem;padding:0}'+
-    '.keygrid{display:grid;grid-template-columns:repeat(3,1fr);gap:.15rem 1.5rem;font-size:.85em}'+
-    '.kitem{break-inside:avoid;page-break-inside:avoid}'+
+    '.keyrow{display:grid;grid-template-columns:repeat(3,1fr);gap:0 1.5rem;font-size:.85em}'+
     '.kitem b{font-weight:700;margin-right:.3em;color:#3D5A80}'+
-    /* @page{margin:0} removes the strip Chrome reserves for its own printed
-       date/URL header and footer; body padding stands in as the page margin.
-       Safe now that nothing on the sheet uses CSS multi-column (column-count)
-       any more — that combination is what produced the dark page-break
-       band Chrome renders when a multicol box gets fragmented across pages. */
-    '@page{margin:0}'+
-    '@media print{body{padding:1.7cm 1.9cm}}'+
-    '</style></head><body>'+
-    '<div class="brand">johnplusenglish.com</div>'+
-    '<h1>'+esc(title)+'</h1><div class="sub">'+esc(sub)+'</div>';
+    '@page{size:A4;margin:0}'+
+    '</style></head><body>';
 }
 
-function lpStudyList(words, title, defs, ex, byHead){
+function lpTitleBlock(title, words){
+  const banks = [...new Set(words.map(e=>e.b))].map(b=>disp(TOPICS[b].title));
+  const sub = words.length+' word'+(words.length===1?'':'s')+' · '+
+              (banks.length>2 ? banks.length+' word banks' : banks.join(', '));
+  return '<div class="brand">johnplusenglish.com</div>'+
+         '<h1>'+esc(title)+'</h1><div class="sub">'+esc(sub)+'</div>';
+}
+
+function lpRenderPages(pages, title, words){
   let h = lpHead(title, words);
-  const cols = defs ? 2 : 3;
-  lpGroups(words, byHead).forEach(g=>{
-    if(g.label) h += '<h2>'+esc(g.label)+'</h2>';
-    h += '<div class="cols" style="grid-template-columns:repeat('+cols+',1fr)">';
-    g.items.forEach(e=>{
-      h += '<div class="item"><span class="term">'+esc(e.t)+'</span>'+
-           (byHead?'':'<span class="pos">'+esc(e.p)+'</span>')+
-           (defs && e.d ? '<div class="def">'+esc(e.d)+'</div>' : '')+
-           (ex && e.x ? '<div class="ex">'+esc(e.x)+'</div>' : '')+
-           '</div>';
-    });
+  pages.forEach((pg,pi)=>{
+    h += '<div class="page'+(pi<pages.length-1?' brk':'')+'">';
+    if (pi===0) h += lpTitleBlock(title, words);
+    h += pg.map(e=>e.html).join('');
     h += '</div>';
   });
   return h+'</body></html>';
 }
 
-function lpWorksheet(words, title, ex, byHead){
-  let h = lpHead(title, words), n = 0;
-  const key = [];
+function lpStudyList(words, title, defs, ex, byHead){
+  const cols = defs ? 2 : 3;
+  const entries = [];
   lpGroups(words, byHead).forEach(g=>{
-    if(g.label) h += '<h2>'+esc(g.label)+'</h2>';
-    h += '<ol class="ws" start="'+(n+1)+'">';
+    if (g.label) entries.push({isHead:true, html:'<h2>'+esc(g.label)+'</h2>'});
+    for (let i=0; i<g.items.length; i+=cols){
+      const rowHtml = g.items.slice(i, i+cols).map(e=>
+        '<div class="item"><span class="term">'+esc(e.t)+'</span>'+
+        (byHead?'':'<span class="pos">'+esc(e.p)+'</span>')+
+        (defs && e.d ? '<div class="def">'+esc(e.d)+'</div>' : '')+
+        (ex && e.x ? '<div class="ex">'+esc(e.x)+'</div>' : '')+
+        '</div>'
+      ).join('');
+      entries.push({isHead:false, html:'<div class="cols" style="grid-template-columns:repeat('+cols+',1fr)">'+rowHtml+'</div>'});
+    }
+  });
+  const [firstCap, restCap] = defs ? [6, 8] : [18, 24];
+  return lpRenderPages(paginateFlat(entries, firstCap, restCap), title, words);
+}
+
+function lpWorksheet(words, title, ex, byHead){
+  const entries = [];
+  const key = [];
+  let n = 0;
+  lpGroups(words, byHead).forEach(g=>{
+    if (g.label) entries.push({isHead:true, html:'<h2>'+esc(g.label)+'</h2>'});
     g.items.forEach(e=>{
       n++; key.push(e.t);
       const blanked = ex ? lpBlank(e.x, e.t) : '';
-      h += '<li><div class="def">'+esc(e.d)+'</div>'+
-           (blanked ? '<div class="ex">'+blanked+'</div>' : '')+
-           '<div class="line"></div></li>';
+      entries.push({isHead:false, num:n, html:
+        '<li><div class="def">'+esc(e.d)+'</div>'+
+        (blanked ? '<div class="ex">'+blanked+'</div>' : '')+
+        '<div class="line"></div></li>'
+      });
     });
-    h += '</ol>';
   });
-  h += '<div class="key"><h2>Answer key</h2><div class="keygrid">';
-  key.forEach((t,i)=>{ h += '<div class="kitem"><b>'+(i+1)+'.</b>'+esc(t)+'</div>'; });
-  return h+'</div></div></body></html>';
+  const pages = paginateFlat(entries, 5, 7);
+  let h = lpHead(title, words);
+  pages.forEach((pg,pi)=>{
+    h += '<div class="page brk">';
+    if (pi===0) h += lpTitleBlock(title, words);
+    let olOpen = false;
+    pg.forEach(e=>{
+      if (e.isHead){ if (olOpen){ h+='</ol>'; olOpen=false; } h += e.html; }
+      else {
+        if (!olOpen){ h += '<ol class="ws" start="'+e.num+'">'; olOpen = true; }
+        h += e.html;
+      }
+    });
+    if (olOpen) h += '</ol>';
+    h += '</div>';
+  });
+
+  const keyRows = [];
+  for (let i=0; i<key.length; i+=3){
+    keyRows.push({isHead:false, html:'<div class="keyrow">'+key.slice(i,i+3).map((t,j)=>
+      '<div class="kitem"><b>'+(i+j+1)+'.</b>'+esc(t)+'</div>').join('')+'</div>'});
+  }
+  const keyEntries = [{isHead:true, html:'<h2>Answer key</h2>'}, ...keyRows];
+  const keyPages = paginateFlat(keyEntries, 30, 35);
+  keyPages.forEach((pg,pi)=>{
+    h += '<div class="page key'+(pi<keyPages.length-1?' brk':'')+'">'+pg.map(e=>e.html).join('')+'</div>';
+  });
+  return h+'</body></html>';
 }
 
 function lpPrint(){
