@@ -620,7 +620,7 @@ function lpHead(title, words){
     'h2{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#3D5A80;'+
        'margin:1.1rem 0 .5rem;padding-bottom:.2rem;border-bottom:1px solid #ddd;break-after:avoid;page-break-after:avoid}'+
     'h2:first-of-type{margin-top:0}'+
-    '.cols{column-gap:1.8rem}'+
+    '.cols{display:grid;gap:0 1.8rem}'+
     '.item{break-inside:avoid;page-break-inside:avoid;margin-bottom:.5rem}'+
     '.term{font-weight:800}'+
     '.pos{font-size:.72em;color:#9598a6;margin-left:.35em}'+
@@ -629,10 +629,18 @@ function lpHead(title, words){
     'ol.ws{margin:0;padding-left:1.4rem}'+
     'ol.ws li{break-inside:avoid;page-break-inside:avoid;margin-bottom:.85rem}'+
     '.line{border-bottom:1px solid #b9bcc9;height:1.15rem;max-width:260px;margin-top:.3rem}'+
-    '.key{margin-top:1.8rem;padding-top:.8rem;border-top:1.5px solid #2D3047;break-inside:avoid;page-break-inside:avoid}'+
+    '.key{margin-top:1.8rem;padding-top:.8rem;border-top:1.5px solid #2D3047}'+
     '.key h2{border:none;margin:0 0 .4rem;padding:0}'+
-    '.key ol{margin:0;padding-left:1.3rem;column-count:3;column-gap:1.5rem;font-size:.85em}'+
-    '@media print{body{padding:.75rem}}'+
+    '.keygrid{display:grid;grid-template-columns:repeat(3,1fr);gap:.15rem 1.5rem;font-size:.85em}'+
+    '.kitem{break-inside:avoid;page-break-inside:avoid}'+
+    '.kitem b{font-weight:700;margin-right:.3em;color:#3D5A80}'+
+    /* @page{margin:0} removes the strip Chrome reserves for its own printed
+       date/URL header and footer; body padding stands in as the page margin.
+       Safe now that nothing on the sheet uses CSS multi-column (column-count)
+       any more — that combination is what produced the dark page-break
+       band Chrome renders when a multicol box gets fragmented across pages. */
+    '@page{margin:0}'+
+    '@media print{body{padding:1.7cm 1.9cm}}'+
     '</style></head><body>'+
     '<div class="brand">johnplusenglish.com</div>'+
     '<h1>'+esc(title)+'</h1><div class="sub">'+esc(sub)+'</div>';
@@ -643,7 +651,7 @@ function lpStudyList(words, title, defs, ex, byHead){
   const cols = defs ? 2 : 3;
   lpGroups(words, byHead).forEach(g=>{
     if(g.label) h += '<h2>'+esc(g.label)+'</h2>';
-    h += '<div class="cols" style="column-count:'+cols+'">';
+    h += '<div class="cols" style="grid-template-columns:repeat('+cols+',1fr)">';
     g.items.forEach(e=>{
       h += '<div class="item"><span class="term">'+esc(e.t)+'</span>'+
            (byHead?'':'<span class="pos">'+esc(e.p)+'</span>')+
@@ -671,9 +679,9 @@ function lpWorksheet(words, title, ex, byHead){
     });
     h += '</ol>';
   });
-  h += '<div class="key"><h2>Answer key</h2><ol>';
-  key.forEach(t=>{ h += '<li>'+esc(t)+'</li>'; });
-  return h+'</ol></div></body></html>';
+  h += '<div class="key"><h2>Answer key</h2><div class="keygrid">';
+  key.forEach((t,i)=>{ h += '<div class="kitem"><b>'+(i+1)+'.</b>'+esc(t)+'</div>'; });
+  return h+'</div></div></body></html>';
 }
 
 function lpPrint(){
