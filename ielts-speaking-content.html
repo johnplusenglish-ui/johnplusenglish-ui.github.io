@@ -22,11 +22,19 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
 .nav-links a{font-size:.85rem;font-weight:600;color:var(--muted);text-decoration:none;transition:color .2s}
 .nav-links a:hover{color:var(--ielts)}
 
-.page-header{padding:3rem 2rem 1rem;max-width:960px;margin:0 auto}
+.page-header{padding:2rem 2rem 1rem;max-width:960px;margin:0 auto;position:relative;z-index:1}
 .back-link{display:inline-flex;align-items:center;gap:.4rem;font-size:.85rem;font-weight:600;color:var(--muted);text-decoration:none;margin-bottom:1.2rem;transition:color .2s}
 .back-link:hover{color:var(--ink)}
 .section-label{font-family:Outfit,sans-serif;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ielts);margin-bottom:.5rem;font-weight:500}
-.page-title{font-family:'Outfit',sans-serif;font-size:clamp(2rem,5vw,3rem);margin-bottom:.8rem;font-weight:900;line-height:1.1}
+.topic-hero{display:flex;align-items:flex-start;gap:1.2rem}
+.topic-icon{width:52px;height:52px;border-radius:12px;background:color-mix(in srgb,#2D3047 8%,#fff);color:#2D3047;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.topic-icon svg{width:24px;height:24px;stroke-width:1.8;fill:none;stroke:currentColor}
+.page-title{font-family:'Outfit',sans-serif;font-size:clamp(1.8rem,4vw,2.6rem);line-height:1.1;letter-spacing:-.01em;font-weight:900}
+.page-title em{font-style:italic;color:var(--ielts);position:relative}
+.page-title em::after{content:'';position:absolute;bottom:3px;left:-2px;right:-2px;height:6px;background:var(--sun);opacity:.35;border-radius:4px;z-index:-1}
+.hero-meta{display:flex;justify-content:flex-start;gap:1.2rem;flex-wrap:wrap;margin-top:.8rem;font-family:Outfit,sans-serif;font-size:.7rem;color:var(--muted)}
+.hero-meta span{display:inline-flex;align-items:center;gap:.35rem}
+.hero-meta strong{color:var(--ink);font-weight:500}
 .page-desc{color:var(--muted);font-size:1.05rem;max-width:600px;line-height:1.7;margin-bottom:1.5rem}
 
 .main-area{max-width:960px;margin:0 auto;padding:0 2rem 4rem;position:relative;z-index:1}
@@ -76,14 +84,18 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
 .lbl:first-child{margin-top:14px}
 
 /* Timer */
-.timer-row{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--cream);border-radius:var(--radius-sm);margin-top:12px;margin-bottom:4px;border:1.5px solid var(--border);font-size:.84rem;color:var(--muted)}
+.timer-row{position:relative;overflow:hidden;display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--cream);border-radius:var(--radius-sm);margin-top:12px;margin-bottom:4px;border:1.5px solid var(--border);font-size:.84rem;color:var(--muted)}
 .timer-row strong{color:var(--ink);font-weight:700}
-.timer-display{font-family:'JetBrains Mono',monospace;font-size:.95rem;font-weight:500;color:var(--ink);min-width:44px;text-align:center;display:none}
-.timer-display.visible{display:inline}
-.timer-btn{margin-left:auto;background:var(--ielts);color:#fff;border:none;border-radius:10px;padding:6px 16px;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;font-family:'Outfit',sans-serif}
+.timer-progress-fill{position:absolute;left:0;top:0;height:3px;background:var(--sea);width:0%;transition:width .3s linear}
+.timer-progress-fill.warn{background:var(--coral)}
+.timer-btn{margin-left:auto;background:var(--ielts);color:#fff;border:none;border-radius:10px;padding:6px 16px;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;font-family:'Outfit',sans-serif;display:inline-flex;align-items:center;gap:6px}
 .timer-btn:hover{background:#E07E00}
+.timer-btn-icon{font-size:.85em;line-height:1}
+.timer-btn .timer-btn-time{font-family:'JetBrains Mono',monospace}
 .timer-btn.running{background:var(--p3)}
 .timer-btn.running:hover{background:#B56200}
+.timer-btn.paused{background:var(--sun)}
+.timer-btn.warn,.timer-btn.done{background:var(--coral)}
 
 /* Questions list */
 .q-list{display:flex;flex-direction:column;gap:7px;margin-top:4px}
@@ -234,13 +246,15 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
 .pm-go{font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:700;padding:.55rem 1.4rem;border:none;border-radius:10px;background:var(--ielts);color:#fff;cursor:pointer;transition:all .15s}
 .pm-go:hover{background:#E07E00}
 
-/* ── Main tabs ── */
-.main-tabs{display:flex;gap:0;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;width:fit-content;margin-bottom:1.8rem}
-.main-tab{font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:600;padding:.6rem 1.6rem;background:var(--card);color:var(--muted);border:none;cursor:pointer;transition:all .15s}
+/* ── Main tabs (folder-style, sticky menu bar) ── */
+.main-tabs-wrap{position:sticky;top:52px;z-index:100;background:var(--cream);padding:1rem 2rem .8rem;border-bottom:1px solid var(--border);margin-bottom:1.5rem}
+.main-tabs{display:flex;gap:4px;row-gap:4px;max-width:fit-content;margin:0}
+.main-tab{position:relative;font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;padding:.6rem 1.15rem;border-radius:12px 12px 0 0;cursor:pointer;border:1.5px solid var(--border);background:color-mix(in srgb,var(--ink) 4%,transparent);color:var(--muted);transition:background .18s,color .18s,box-shadow .18s,border-color .18s;white-space:nowrap}
 .main-tab:hover{color:var(--ink)}
-.main-tab.on{background:var(--ielts);color:#fff}
+.main-tab.on{outline:none;background:var(--cream);border-color:var(--tab-accent,var(--ielts));border-bottom:none!important;color:var(--tab-accent,var(--ielts));padding-top:calc(.6rem + 3px);box-shadow:0 -3px 10px rgba(45,48,71,.06);z-index:2}
 .main-tab-panel{display:none}
 .main-tab-panel.active{display:block}
+@media(max-width:700px){.main-tabs-wrap{padding:.8rem 1.2rem .6rem}}
 
 /* ── Cue card grid ── */
 .cc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;margin-top:1rem}
@@ -368,8 +382,18 @@ body.test-select-mode .mode-pill.test-selected.active{border-color:var(--ielts)}
 
 <div class="page-header">
   <a href="index.html#exam-speaking" class="back-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</a>
-  <div class="section-label">Exam Speaking</div>
-  <h1 class="page-title">IELTS Speaking</h1>
+  <div class="topic-hero">
+    <div class="topic-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></div>
+    <div>
+      <h1 class="page-title">IELTS <em>Speaking</em></h1>
+      <div class="hero-meta">
+        <span><strong>3</strong> parts</span>
+        <span><strong>11–14</strong> min</span>
+        <span><strong>25</strong> topics</span>
+        <span><strong>50</strong> cue cards</span>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="main-area">
@@ -440,11 +464,17 @@ body.test-select-mode .mode-pill.test-selected.active{border-color:var(--ielts)}
     </div>
   </div>
 
-  <!-- Main tabs -->
+</div>
+
+<!-- Main tabs (sticky menu bar, folder tabs) -->
+<div class="main-tabs-wrap">
   <div class="main-tabs">
-    <button class="main-tab on" onclick="switchMainTab('tests',this)">Tests</button>
-    <button class="main-tab" onclick="switchMainTab('cuecards',this)">Cue Cards</button>
+    <button class="main-tab on" onclick="switchMainTab('tests',this)" style="--tab-accent:var(--ielts)">Tests</button>
+    <button class="main-tab" onclick="switchMainTab('cuecards',this)" style="--tab-accent:var(--lavender)">Cue Cards</button>
   </div>
+</div>
+
+<div class="main-area">
 
   <!-- TESTS TAB -->
   <div class="main-tab-panel active" id="tab-tests">
@@ -1191,6 +1221,8 @@ function renderLongTurn() {
       ${timerHTML('lt-prep', 60)}
       ${timerHTML('lt-speak', 120)}
     </div>`;
+  timerInit('lt-prep', 60, true);
+  timerInit('lt-speak', 120, true);
   shuffleLT();
 }
 
@@ -1216,11 +1248,7 @@ function shuffleLT() {
     </div>` : ''}`;
   // reset timers
   ['lt-prep','lt-speak'].forEach(id => {
-    const btn = document.getElementById('tb-'+id);
-    const disp = document.getElementById('td-'+id);
-    if (timers['tb-'+id]) { clearInterval(timers['tb-'+id]); timers['tb-'+id]=null; }
-    if (btn) { btn.textContent='Start Timer'; btn.classList.remove('running'); }
-    if (disp) disp.classList.remove('visible');
+    if (timerState[id]) timerSelectDuration(id, timerState[id].defaultSecs);
   });
 }
 
@@ -1249,10 +1277,10 @@ function timerHTML(id, secs) {
   const label = isPrep ? 'Preparation time: <strong>1 min</strong>' : (m > 0 ? `${m} min${s > 0 ? ' '+s+' sec' : ''}` : `${s} sec`);
   const labelHTML = isPrep ? label : `Speaking time: <strong>${label}</strong>`;
   return `<div class="timer-row">
+    <div class="timer-progress-fill" id="timerProgress-${id}"></div>
     <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="5.5"/><path d="M7 4v3l2 1"/></svg>
     <span>${labelHTML}</span>
-    <span class="timer-display" id="td-${id}"></span>
-    <button class="timer-btn" id="tb-${id}" data-secs="${secs}">Start Timer</button>
+    <button class="timer-btn" id="timerBtn-${id}" data-secs="${secs}" onclick="timerHandleClick('${id}')"><span class="timer-btn-icon" id="timerBtnIcon-${id}">&#9654;</span><span id="timerBtnLabel-${id}"></span></button>
   </div>`;
 }
 
@@ -1365,47 +1393,93 @@ function renderTests() {
 
     </div>`;
   }).join('');
+
+  tests.forEach(t => {
+    const id = `t${t.id}`;
+    timerInit(`${id}-p1`, 270, true);
+    timerInit(`${id}-p2-prep`, 60, true);
+    timerInit(`${id}-p2-speak`, 120, true);
+    timerInit(`${id}-p3`, 270, true);
+  });
 }
 
 function toggle(id) {
   document.getElementById(id).classList.toggle('open');
 }
 
-// Timer logic
-const timers = {};
-document.addEventListener('click', e => {
-  const btn = e.target.closest('.timer-btn');
-  if (!btn) return;
-  const id = btn.id;
-  const display = document.getElementById(id.replace('tb-','td-'));
-  if (timers[id]) {
-    clearInterval(timers[id]);
-    timers[id] = null;
-    btn.textContent = 'Start Timer';
-    btn.classList.remove('running');
-    display.classList.remove('visible');
-    return;
-  }
-  let remaining = parseInt(btn.dataset.secs);
-  display.classList.add('visible');
-  btn.textContent = 'Stop';
-  btn.classList.add('running');
-  const tick = () => {
-    const m = Math.floor(remaining/60), s = remaining%60;
-    display.textContent = `${m}:${String(s).padStart(2,'0')}`;
-    if (remaining <= 0) {
-      clearInterval(timers[id]);
-      timers[id] = null;
-      btn.textContent = 'Start Timer';
-      btn.classList.remove('running');
-      display.textContent = 'Time!';
-      setTimeout(() => display.classList.remove('visible'), 3000);
+// ===== Reusable timer widget engine (multi-instance, locked to official exam durations) =====
+var timerState = {};
+function timerFormatTime(totalSeconds){
+  var m=Math.floor(totalSeconds/60), s=totalSeconds%60;
+  return m+':'+(s<10?'0':'')+s;
+}
+function timerInit(id, defaultSecs, locked){
+  timerState[id] = {interval:null, seconds:defaultSecs, total:defaultSecs, running:false, paused:false, defaultSecs:defaultSecs, locked:!!locked};
+  timerUpdateBtn(id);
+}
+function timerSelectDuration(id, secs){
+  var st = timerState[id];
+  clearInterval(st.interval); st.interval=null;
+  st.running=false; st.paused=false;
+  st.total=secs; st.seconds=secs;
+  var prog = document.getElementById('timerProgress-'+id);
+  prog.style.width='0%'; prog.className='timer-progress-fill';
+  timerUpdateBtn(id);
+}
+function timerHandleClick(id){
+  var st = timerState[id];
+  if(!st.running && !st.paused && st.seconds<=0 && st.total>0){ timerSelectDuration(id, st.defaultSecs); return; }
+  timerToggle(id);
+}
+function timerToggle(id){
+  var st = timerState[id];
+  if(!st.total) return;
+  if(!st.running && !st.paused){ st.running=true; timerTick(id); }
+  else if(st.running){ clearInterval(st.interval); st.interval=null; st.running=false; st.paused=true; }
+  else{ st.paused=false; st.running=true; timerTick(id); }
+  timerUpdateBtn(id);
+}
+function timerTick(id){
+  var st = timerState[id];
+  var prog=document.getElementById('timerProgress-'+id);
+  st.interval=setInterval(function(){
+    st.seconds--;
+    var pct=((st.total-st.seconds)/st.total)*100;
+    prog.style.width=pct+'%';
+    if(st.seconds<=10 && st.seconds>0){ prog.className='timer-progress-fill warn'; }
+    if(st.seconds<=0){
+      clearInterval(st.interval); st.interval=null; st.running=false;
+      prog.style.width='100%'; prog.className='timer-progress-fill warn';
+      setTimeout(function(){
+        if(!st.running && !st.paused && st.seconds<=0){ timerSelectDuration(id, st.defaultSecs); }
+      },2500);
     }
-    remaining--;
-  };
-  tick();
-  timers[id] = setInterval(tick, 1000);
-});
+    timerUpdateBtn(id);
+  },1000);
+}
+function timerUpdateBtn(id){
+  var st = timerState[id];
+  var btn=document.getElementById('timerBtn-'+id);
+  var icon=document.getElementById('timerBtnIcon-'+id);
+  var label=document.getElementById('timerBtnLabel-'+id);
+  if(st.running){
+    icon.innerHTML='&#9208;';
+    label.innerHTML='<span class="timer-btn-time">'+timerFormatTime(st.seconds)+'</span>';
+    btn.className='timer-btn running'+(st.seconds<=10?' warn':'');
+  } else if(st.paused){
+    icon.innerHTML='&#9654;';
+    label.innerHTML='<span class="timer-btn-time">'+timerFormatTime(st.seconds)+'</span>';
+    btn.className='timer-btn paused';
+  } else if(st.seconds<=0 && st.total>0){
+    icon.innerHTML='&#8635;';
+    label.textContent='Done';
+    btn.className='timer-btn done';
+  } else {
+    icon.innerHTML='&#9654;';
+    label.innerHTML='<span class="timer-btn-time">'+timerFormatTime(st.defaultSecs)+'</span>';
+    btn.className='timer-btn';
+  }
+}
 
 // Test selector — use event delegation since pills are generated dynamically
 var testSelectMode = false;
