@@ -112,7 +112,8 @@
   .wb-body{padding:1rem 1.25rem 1.5rem}
 
   /* filters: plain dropdowns, big enough to hit */
-  .bar{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.85rem}
+  .bar{display:flex;align-items:center;justify-content:space-between;gap:.5rem .85rem;flex-wrap:wrap;margin-bottom:.85rem}
+  .bar-filters{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
   .sel{font-size:.82rem;font-weight:600;background:var(--card);border:1.5px solid var(--border);
        border-radius:9px;padding:.5rem .6rem;color:var(--ink);cursor:pointer;min-height:38px}
   .sel:hover{border-color:var(--ink)}
@@ -147,7 +148,7 @@
   .empty{padding:2.5rem;text-align:center;color:var(--muted);font-size:.85rem;grid-column:1/-1}
 
   /* ---------------- select + print ---------------- */
-  .bar-actions{display:flex;align-items:center;flex-wrap:wrap;gap:.4rem;margin-left:auto}
+  .bar-actions{display:flex;align-items:center;flex-wrap:wrap;gap:.4rem}
   .mini{font-size:.72rem;font-weight:700;color:var(--muted);background:var(--card);border:1.5px solid var(--border);
         border-radius:8px;padding:.42rem .7rem;cursor:pointer;transition:all .15s;white-space:nowrap}
   .mini:hover{border-color:var(--ink);color:var(--ink)}
@@ -397,6 +398,7 @@ function renderBrowse(){
   curShown = list;
 
   let h=`<div class="bar">
+    <div class="bar-filters">
     <select class="sel ${pos!=='all'?'set':''}" id="posSel">
         <option value="all">All types (${searched.length})</option>`;
   POS_ORDER.forEach(p=>{ if(!g[p])return;
@@ -407,9 +409,10 @@ function renderBrowse(){
           const l = v==='all'?'All levels':'Tier '+v.slice(-1)+' · '+['Essential','Intermediate','Advanced'][+v.slice(-1)-1];
           return `<option value="${v}" ${v===tier?'selected':''}>${l}</option>`}).join('')}
       </select>
+    </div>
     <div class="bar-actions">
       <button class="mini ${selMode?'on':''}" id="selToggle">${selMode?'Done selecting':'Select words'}</button>
-      <a class="print-btn" id="dlBtn" href="pdfs/${bankId}.pdf" download><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download PDF</a>
+      <a class="print-btn" id="dlBtn" href="pdfs/${bankId}.pdf" download><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> PDF</a>
       <button class="print-btn" id="printBtn"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg> Print</button>
     </div>
   </div>`;
@@ -642,12 +645,12 @@ function lpSub(words){
 
 /* This is deliberately the SIMPLE version: one continuous flow, normal
    @page margins, no manual pagination. It relies on the browser's own
-   print-header/footer setting — fine for on-demand custom prints (the
+   print-header/footer setting - fine for on-demand custom prints (the
    Print dialog here has scope/format choices Save-as-PDF users can adjust
    themselves). The default one-click "Download PDF" per bank instead links
    to a real, pre-built PDF (see build-word-bank-pdfs.py) generated with
    headless Chrome's --no-pdf-header-footer flag, which suppresses the
-   header/footer at the API level with no CSS trade-offs at all — that's
+   header/footer at the API level with no CSS trade-offs at all - that's
    not achievable from here, inside a page the visitor's own browser is
    interactively printing. */
 function lpStudyList(words, title, defs, ex, byHead){
