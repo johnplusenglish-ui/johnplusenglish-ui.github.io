@@ -238,8 +238,7 @@ footer{text-align:center;padding:3rem 2rem;font-size:.8rem;color:var(--muted);bo
 <select class="debate-select" id="debateSelect" onchange="selectDebate(this.value)"><option value="">Browse by topic...</option></select>
 <div class="ctrl-spacer"></div>
 <div style="display:flex;gap:.8rem;flex-shrink:0">
-<button class="action-btn" onclick="resetDebates()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg> Reset</button>
-<button class="action-btn" onclick="randomDebate()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg> Random</button>
+<button class="action-btn" id="downloadPngBtn" onclick="downloadDebatePng()" title="Download as PNG"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
 <button class="action-btn" onclick="window.print()" title="Print"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></button>
 </div>
 </div>
@@ -630,6 +629,39 @@ function render() {
   document.getElementById('counter').textContent = (idx+1) + ' / ' + filtered.length;
   document.getElementById('prevBtn').disabled = idx === 0;
   document.getElementById('nextBtn').disabled = idx >= filtered.length - 1;
+}
+
+function downloadDebatePng() {
+  var btn = document.getElementById('downloadPngBtn');
+  var origHtml = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>';
+
+  if (typeof html2canvas === 'undefined') {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+    s.onload = function(){ doCapture(); };
+    s.onerror = function(){ restore(); };
+    document.head.appendChild(s);
+  } else {
+    doCapture();
+  }
+
+  function doCapture() {
+    var card = document.getElementById('debateCard');
+    html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function(canvas) {
+      var d = filtered[idx];
+      var link = document.createElement('a');
+      link.download = (d && d.title ? d.title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') : 'debate') + '.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      restore();
+    }).catch(function(){ restore(); });
+  }
+  function restore() {
+    btn.innerHTML = origHtml;
+    btn.disabled = false;
+  }
 }
 
 function setPBLevel(lvl, btn) {
