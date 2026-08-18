@@ -88,24 +88,19 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
 .card-counter{font-family:Outfit,sans-serif;font-size:.85rem;color:var(--muted)}
 
 .timer-section{max-width:800px;margin:.8rem auto 0}
-.timer-controls{display:flex;align-items:center;gap:.5rem;justify-content:center;flex-wrap:wrap;margin-bottom:.4rem}
-.timer-duration-wrap{display:inline-flex}
-.timer-duration{font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:700;padding:.35rem .7rem;border:1.5px solid var(--sea);border-radius:6px;background:var(--sea);color:#fff;cursor:pointer;transition:opacity .15s;display:inline-flex;align-items:center;gap:.35rem}
-.timer-duration:hover{opacity:.85}
-.timer-duration svg{flex-shrink:0;opacity:.85}
-.timer-duration-input{display:none;font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:700;padding:.35rem .5rem;border:1.5px solid var(--sea);border-radius:6px;background:var(--card);color:var(--ink);width:52px;text-align:center;outline:none}
-.timer-play{font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:700;padding:.5rem 1.2rem;border:1.5px solid var(--sea);border-radius:8px;background:var(--sea);color:#fff;cursor:pointer;transition:all .15s}
-.timer-play:hover{opacity:.9}
-.timer-play.paused{background:var(--sun);border-color:var(--sun)}
-.timer-display{font-family:'JetBrains Mono',monospace;font-size:1.5rem;font-weight:700;color:var(--ink);min-width:60px;text-align:center;transition:color .3s}
-.timer-display.warn{color:var(--coral)}
-.timer-display.done{color:var(--sea)}
-.timer-restart{font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:700;padding:.35rem .7rem;border:1.5px solid var(--border);border-radius:6px;background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s;display:none}
-.timer-restart:hover{border-color:var(--ink);color:var(--ink)}
-.timer-restart.show{display:inline-block}
-.timer-progress{width:100%;height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:.3rem}
+.timer-progress{width:100%;height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:.6rem}
 .timer-progress-fill{height:100%;background:var(--sea);border-radius:3px;transition:width .3s linear;width:0%}
 .timer-progress-fill.warn{background:var(--coral)}
+.timer-controls{display:flex;align-items:center;justify-content:center}
+.timer-btn-wrap{display:inline-flex}
+.timer-btn{font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;padding:.55rem 1.3rem;border:none;border-radius:10px;background:var(--sea);color:#fff;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:.5rem;min-width:110px;justify-content:center}
+.timer-btn:hover{opacity:.9}
+.timer-btn .timer-btn-time{font-family:'JetBrains Mono',monospace}
+.timer-btn.paused{background:var(--sun)}
+.timer-btn.warn,.timer-btn.done{background:var(--coral)}
+.timer-edit-icon{flex-shrink:0;opacity:.85}
+.timer-edit-icon:hover{opacity:1}
+.timer-duration-input{display:none;font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;padding:.5rem .6rem;border:1.5px solid var(--sea);border-radius:10px;background:var(--card);color:var(--ink);width:70px;text-align:center;outline:none}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(46,196,182,.3)}50%{box-shadow:0 0 0 6px rgba(46,196,182,0)}}
 
 /* Phrase bank */
@@ -257,16 +252,16 @@ footer{text-align:center;padding:3rem 2rem;font-size:.8rem;color:var(--muted);bo
 <button class="nav-btn primary" id="nextBtn" onclick="go(1)">Next &rarr;</button>
 </div>
 <div class="timer-section">
+<div class="timer-progress"><div class="timer-progress-fill" id="timerProgress"></div></div>
 <div class="timer-controls">
-<span class="timer-duration-wrap">
-<button class="timer-duration" id="timerDurationBtn" onclick="editDuration()"><span id="timerDurationLabel">3</span> min<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+<span class="timer-btn-wrap">
+<button class="timer-btn" id="timerBtn" onclick="handleTimerClick()">
+<span id="timerBtnLabel">3 min</span>
+<svg class="timer-edit-icon" id="timerEditIcon" onclick="event.stopPropagation();editDuration()" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+</button>
 <input type="number" class="timer-duration-input" id="timerDurationInput" min="1" max="60" onblur="commitDuration()" onkeydown="if(event.key==='Enter'){this.blur()}else if(event.key==='Escape'){cancelEditDuration()}">
 </span>
-<button class="timer-play" id="timerPlay" onclick="toggleTimer()">&#9654; Start</button>
-<span class="timer-display" id="timerDisplay">0:00</span>
-<button class="timer-restart" id="timerRestart" onclick="restartTimer()">Restart</button>
 </div>
-<div class="timer-progress"><div class="timer-progress-fill" id="timerProgress"></div></div>
 </div>
 </div>
 
@@ -716,22 +711,21 @@ function renderPB() {
   document.getElementById('pbGrid').innerHTML = h;
 }
 
-// Timer
+// Timer \u2014 one button: idle shows "X min" + edit pencil, click starts; click again pauses/resumes;
+// when it finishes, click resets back to idle. Progress bar sits above the button.
 var timerInterval = null, timerSeconds = 0, timerTotal = 0, timerRunning = false, timerPaused = false;
 var timerMinutes = 3, cancelingDurationEdit = false;
 
 function selectDuration(secs){
-  if(timerRunning||timerPaused) resetTimer();
-  timerTotal=secs;timerSeconds=secs;
-  document.getElementById('timerRestart').className='timer-restart show';
-  document.getElementById('timerPlay').textContent='\u25B6 Start';
-  document.getElementById('timerPlay').className='timer-play';
-  updateTimerDisplay();
+  clearInterval(timerInterval); timerInterval=null;
+  timerRunning=false; timerPaused=false;
+  timerTotal=secs; timerSeconds=secs;
   document.getElementById('timerProgress').style.width='0%';
   document.getElementById('timerProgress').className='timer-progress-fill';
+  updateTimerBtn();
 }
 function editDuration(){
-  var btn=document.getElementById('timerDurationBtn');
+  var btn=document.getElementById('timerBtn');
   var input=document.getElementById('timerDurationInput');
   input.value=timerMinutes;
   btn.style.display='none';
@@ -741,50 +735,62 @@ function editDuration(){
 }
 function commitDuration(){
   if(cancelingDurationEdit){ cancelingDurationEdit=false; return; }
-  var btn=document.getElementById('timerDurationBtn');
-  var input=document.getElementById('timerDurationInput');
-  var val=parseInt(input.value,10);
+  var val=parseInt(document.getElementById('timerDurationInput').value,10);
   if(val && val>=1) timerMinutes=Math.min(60,val);
-  document.getElementById('timerDurationLabel').textContent=timerMinutes;
-  input.style.display='none';
-  btn.style.display='inline-flex';
+  document.getElementById('timerDurationInput').style.display='none';
+  document.getElementById('timerBtn').style.display='inline-flex';
   selectDuration(timerMinutes*60);
 }
 function cancelEditDuration(){
   cancelingDurationEdit=true;
   document.getElementById('timerDurationInput').style.display='none';
-  document.getElementById('timerDurationBtn').style.display='inline-flex';
+  document.getElementById('timerBtn').style.display='inline-flex';
+}
+function handleTimerClick(){
+  if(!timerRunning && !timerPaused && timerSeconds<=0 && timerTotal>0){ selectDuration(timerMinutes*60); return; }
+  toggleTimer();
 }
 function toggleTimer(){
   if(!timerTotal) return;
-  var btn=document.getElementById('timerPlay');
-  if(!timerRunning&&!timerPaused){timerRunning=true;btn.textContent='\u23F8 Pause';btn.className='timer-play';runTimerTick();}
-  else if(timerRunning){clearInterval(timerInterval);timerInterval=null;timerRunning=false;timerPaused=true;btn.textContent='\u25B6 Resume';btn.className='timer-play paused';}
-  else{timerPaused=false;timerRunning=true;btn.textContent='\u23F8 Pause';btn.className='timer-play';runTimerTick();}
+  if(!timerRunning&&!timerPaused){ timerRunning=true; runTimerTick(); }
+  else if(timerRunning){ clearInterval(timerInterval); timerInterval=null; timerRunning=false; timerPaused=true; }
+  else{ timerPaused=false; timerRunning=true; runTimerTick(); }
+  updateTimerBtn();
 }
 function runTimerTick(){
-  var disp=document.getElementById('timerDisplay');var prog=document.getElementById('timerProgress');
+  var prog=document.getElementById('timerProgress');
   timerInterval=setInterval(function(){
-    timerSeconds--;var pct=((timerTotal-timerSeconds)/timerTotal)*100;prog.style.width=pct+'%';
-    if(timerSeconds<=10&&timerSeconds>0){disp.className='timer-display warn';prog.className='timer-progress-fill warn';}
-    if(timerSeconds<=0){clearInterval(timerInterval);timerInterval=null;timerRunning=false;disp.className='timer-display done';disp.textContent='0:00';prog.style.width='100%';prog.className='timer-progress-fill warn';document.getElementById('timerPlay').textContent='\u25B6 Start';document.getElementById('timerPlay').className='timer-play';}
-    else{updateTimerDisplay();}
+    timerSeconds--;
+    var pct=((timerTotal-timerSeconds)/timerTotal)*100;
+    prog.style.width=pct+'%';
+    if(timerSeconds<=10&&timerSeconds>0){ prog.className='timer-progress-fill warn'; }
+    if(timerSeconds<=0){ clearInterval(timerInterval); timerInterval=null; timerRunning=false; prog.style.width='100%'; prog.className='timer-progress-fill warn'; }
+    updateTimerBtn();
   },1000);
 }
-function restartTimer(){
-  if(!timerTotal)return;clearInterval(timerInterval);timerInterval=null;timerSeconds=timerTotal;timerRunning=false;timerPaused=false;
-  document.getElementById('timerDisplay').className='timer-display';document.getElementById('timerProgress').style.width='0%';document.getElementById('timerProgress').className='timer-progress-fill';
-  document.getElementById('timerPlay').textContent='\u25B6 Start';document.getElementById('timerPlay').className='timer-play';updateTimerDisplay();
-}
-function resetTimer(){
-  clearInterval(timerInterval);timerInterval=null;timerRunning=false;timerPaused=false;timerTotal=0;timerSeconds=0;
-  document.getElementById('timerDisplay').textContent='0:00';document.getElementById('timerDisplay').className='timer-display';
-  document.getElementById('timerProgress').style.width='0%';document.getElementById('timerProgress').className='timer-progress-fill';
-  document.getElementById('timerRestart').className='timer-restart';document.getElementById('timerPlay').textContent='\u25B6 Start';document.getElementById('timerPlay').className='timer-play';
-}
-function updateTimerDisplay(){
+function updateTimerBtn(){
+  var btn=document.getElementById('timerBtn');
+  var label=document.getElementById('timerBtnLabel');
+  var icon=document.getElementById('timerEditIcon');
   var m=Math.floor(timerSeconds/60),s=timerSeconds%60;
-  document.getElementById('timerDisplay').textContent=m+':'+(s<10?'0':'')+s;
+  var mmss=m+':'+(s<10?'0':'')+s;
+  if(timerRunning){
+    label.innerHTML='<span class="timer-btn-time">'+mmss+'</span>';
+    btn.className='timer-btn'+(timerSeconds<=10?' warn':'');
+    icon.style.display='none';
+  } else if(timerPaused){
+    label.innerHTML='<span class="timer-btn-time">'+mmss+'</span>';
+    btn.className='timer-btn paused';
+    icon.style.display='none';
+  } else if(timerSeconds<=0 && timerTotal>0){
+    label.textContent='Done \u21BB';
+    btn.className='timer-btn done';
+    icon.style.display='none';
+  } else {
+    label.textContent=timerMinutes+' min';
+    btn.className='timer-btn';
+    icon.style.display='';
+  }
 }
 
 document.addEventListener('keydown', function(e) { if (e.key === 'ArrowLeft') go(-1); if (e.key === 'ArrowRight') go(1); });
