@@ -38,10 +38,39 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
 /* Controls */
 .controls{max-width:960px;margin:0 auto;padding:0 2rem 1rem;position:relative;z-index:1}
 .controls-top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.8rem;margin-bottom:1.2rem}
-.level-toggle{display:flex;gap:0;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;width:fit-content}
-.level-btn{font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:600;padding:.5rem 1.4rem;background:var(--card);color:var(--muted);border:none;cursor:pointer;transition:all .15s}
-.level-btn:hover{color:var(--ink)}
-.level-btn.on{background:var(--ink);color:var(--cream)}
+.level-toggle{display:flex;gap:4px;row-gap:4px;position:relative;align-items:flex-end;flex-wrap:wrap;padding-top:8px}
+.level-toggle::before{content:'';position:absolute;left:0;right:0;bottom:0;height:1.5px;background:var(--border)}
+.level-btn{position:relative;font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;padding:.5rem 1.25rem;color:var(--muted);background:color-mix(in srgb,var(--ink) 4%,transparent);border:1.5px solid var(--border);border-radius:12px 12px 0 0;cursor:pointer;transition:background .18s,color .18s,box-shadow .18s,border-color .18s}
+.level-btn:not(.on):hover{background:color-mix(in srgb,var(--ink) 8%,transparent);color:var(--ink)}
+.level-btn:not(.on):focus-visible{outline:2px solid var(--sea);outline-offset:2px}
+.level-btn.on{outline:none;background:var(--cream);border-color:#2176FF;border-bottom:none!important;color:#2176FF;padding-top:calc(.5rem + 3px);box-shadow:0 -3px 10px rgba(45,48,71,.06);z-index:2}
+.level-btn:nth-child(2).on{border-color:#50C878;color:#50C878}
+@media(max-width:600px){.level-btn{padding:.5rem .75rem;font-size:.82rem}.level-btn.on{padding-top:calc(.5rem + 3px)}}
+@media(prefers-reduced-motion:reduce){.level-btn{transition:none}}
+
+/* Topic category picker */
+.topic-picker{display:grid;grid-template-columns:220px 1fr;gap:1.25rem;align-items:start;transition:grid-template-columns .22s ease}
+.topic-picker.sb-collapsed{grid-template-columns:52px 1fr}
+.rp-sidebar{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);display:flex;flex-direction:column}
+.rp-sidebar-header{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.75rem 1rem;border-bottom:1px solid var(--border);cursor:pointer}
+.rp-sidebar.collapsed .rp-sidebar-header{border-bottom:none;justify-content:center;padding:.75rem .5rem}
+.rp-sidebar-header-label{font-family:'Outfit',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rp-sidebar.collapsed .rp-sidebar-header-label{display:none}
+.rp-sidebar-toggle{width:26px;height:26px;border-radius:7px;border:1.5px solid var(--border);background:transparent;display:flex;align-items:center;justify-content:center;color:var(--muted);cursor:pointer;transition:all .15s;flex-shrink:0}
+.rp-sidebar-toggle:hover{border-color:var(--sky);color:var(--sky)}
+.rp-sidebar-toggle svg{width:13px;height:13px;transition:transform .2s ease}
+.rp-sidebar.collapsed .rp-sidebar-toggle svg{transform:rotate(180deg)}
+.rp-sidebar.collapsed .rp-sidebar-scroll{display:none}
+.rp-sidebar-scroll{padding:.5rem}
+.rp-cat-item{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.65rem .75rem;border-radius:8px;cursor:pointer;transition:background .12s;margin-bottom:.15rem;font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:600;color:var(--ink)}
+.rp-cat-item:hover{background:var(--cream)}
+.rp-cat-item.active{background:var(--sky);color:#fff}
+.rp-cat-count{font-family:Outfit,sans-serif;font-size:.68rem;font-weight:600;color:var(--muted);background:var(--cream);padding:.15rem .5rem;border-radius:999px;flex-shrink:0}
+.rp-cat-item.active .rp-cat-count{background:rgba(255,255,255,.2);color:#fff}
+.rp-content-head{display:flex;align-items:center;gap:.6rem;margin-bottom:.8rem}
+.rp-content-head h2{font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:700;color:var(--ink)}
+.rp-content-head .rp-cat-count{background:var(--sand);color:var(--sun)}
+@media(max-width:640px){.topic-picker{grid-template-columns:1fr}}
 
 /* Topic grid */
 .topic-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.5rem;margin-bottom:.5rem}
@@ -189,16 +218,6 @@ nav,.page-header,.controls,.deck-nav,.timer-section,footer,.search-wrap,.focus-o
 .main{padding:0;margin:0}
 .deck{box-shadow:none;border:1px solid #ccc}
 }
-.topic-group{margin-bottom:6px}
-.topic-group-toggle{width:100%;display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:all .2s;user-select:none;box-shadow:var(--shadow-sm)}
-.topic-group-toggle:hover{box-shadow:var(--shadow-md)}
-.topic-group.open .topic-group-toggle{border-radius:var(--radius) var(--radius) 0 0;border-bottom-color:transparent}
-.topic-group-name{font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;color:var(--ink);flex:1;text-align:left}
-.topic-group-count{font-family:Outfit,sans-serif;font-size:.62rem;font-weight:500;padding:2px 8px;border-radius:6px;letter-spacing:.3px;background:rgba(155,114,207,.1);color:var(--lavender)}
-.topic-group-chevron{color:var(--muted);transition:transform .25s;font-size:.75rem;flex-shrink:0}
-.topic-group.open .topic-group-chevron{transform:rotate(180deg)}
-.topic-group-body{display:none;padding:10px 14px 14px;background:var(--card);border:1.5px solid var(--border);border-top:none;border-radius:0 0 var(--radius) var(--radius);box-shadow:var(--shadow-sm)}
-.topic-group.open .topic-group-body{display:block}
 .topnav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(247,246,243,.88);backdrop-filter:blur(16px);border-bottom:1.5px solid #E8E5DF;padding:0 2rem;display:flex;align-items:center;justify-content:space-between}
 .nav-logo{font-family:'Outfit',sans-serif;font-size:1.3rem;font-weight:800;letter-spacing:-.02em;color:#2D3047;text-decoration:none}
 .nav-logo span{color:#2563EB}
@@ -232,9 +251,9 @@ nav,.page-header,.controls,.deck-nav,.timer-section,footer,.search-wrap,.focus-o
 
 <div class="controls">
 <div class="controls-top">
-<div class="level-toggle">
-<button class="level-btn on" onclick="setLevel('simple',this)">Simple</button>
-<button class="level-btn" onclick="setLevel('advanced',this)">Advanced</button>
+<div class="level-toggle" role="tablist">
+<button class="level-btn on" role="tab" onclick="setLevel('simple',this)">Simple</button>
+<button class="level-btn" role="tab" onclick="setLevel('advanced',this)">Advanced</button>
 </div>
 <div style="display:flex;gap:.5rem;flex-wrap:wrap">
 <button class="action-btn" onclick="openFocusMode()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> Focus mode</button>
@@ -301,45 +320,74 @@ var topicGroups = [
   {label: 'Culture, Language & Ideas', indices: [13, 16, 17, 24, 25, 33, 40, 41, 42, 43]},
   {label: 'Health, Nature & Travel', indices: [4, 6, 14, 22, 31]}
 ];
-function buildTopicGrid() {
-  var g = document.getElementById('topicGrid');
-  var h = '';
-  topicGroups.forEach(function(group, gi) {
-    var isOpen = gi === 0;
-    h += '<div class="topic-group' + (isOpen ? ' open' : '') + '">';
-    h += '<div class="topic-group-toggle" onclick="toggleTopicGroup(this)">';
-    h += '<span class="topic-group-name">' + group.label + '</span>';
-    h += '<span class="topic-group-count">' + group.indices.length + '</span>';
-    h += '<span class="topic-group-chevron">&#9660;</span>';
-    h += '</div>';
-    h += '<div class="topic-group-body"><div class="topic-grid">';
-    group.indices.forEach(function(i) {
-      var t = topics[i];
-      if (!t) return;
-      h += '<button class="topic-btn" data-idx="' + i + '" onclick="selectTopic(' + i + ',this)">';
-      h += t.name;
-      h += '</button>';
-    });
-    h += '</div></div></div>';
-  });
-  g.innerHTML = h;
+var currentCatIdx = 0;
+var TOPIC_SIDEBAR_COLLAPSED_KEY = 'jpe-speaking-questions-sidebar-collapsed';
+
+function groupIndexForTopic(idx) {
+  for (var i = 0; i < topicGroups.length; i++) {
+    if (topicGroups[i].indices.indexOf(idx) !== -1) return i;
+  }
+  return 0;
 }
-function toggleTopicGroup(el) {
-  el.parentElement.classList.toggle('open');
+
+function buildTopicGrid() {
+  var collapsed = false;
+  try { collapsed = localStorage.getItem(TOPIC_SIDEBAR_COLLAPSED_KEY) === '1'; } catch(e){}
+  var menuHtml = '';
+  topicGroups.forEach(function(group, gi) {
+    menuHtml += '<div class="rp-cat-item' + (gi === currentCatIdx ? ' active' : '') + '" onclick="selectCategory(' + gi + ')"><span class="rp-cat-name">' + group.label + '</span><span class="rp-cat-count">' + group.indices.length + '</span></div>';
+  });
+  var html =
+    '<div class="topic-picker' + (collapsed ? ' sb-collapsed' : '') + '" id="topicPicker">' +
+      '<div class="rp-sidebar' + (collapsed ? ' collapsed' : '') + '" id="rpSidebarWrap">' +
+        '<div class="rp-sidebar-header" onclick="toggleTopicSidebar()">' +
+          '<span class="rp-sidebar-header-label">Categories</span>' +
+          '<button class="rp-sidebar-toggle" type="button" aria-label="Collapse categories" onclick="event.stopPropagation();toggleTopicSidebar()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>' +
+        '</div>' +
+        '<div class="rp-sidebar-scroll" id="rpCatMenu">' + menuHtml + '</div>' +
+      '</div>' +
+      '<div id="rpContent"></div>' +
+    '</div>';
+  document.getElementById('topicGrid').innerHTML = html;
+  renderCategoryContent();
+}
+
+function selectCategory(idx) {
+  currentCatIdx = idx;
+  document.querySelectorAll('#rpCatMenu .rp-cat-item').forEach(function(el, i) { el.classList.toggle('active', i === idx); });
+  renderCategoryContent();
+}
+
+function renderCategoryContent() {
+  var group = topicGroups[currentCatIdx];
+  var h = '<div class="topic-grid">';
+  group.indices.forEach(function(i) {
+    var t = topics[i];
+    if (!t) return;
+    h += '<button class="topic-btn' + (i === currentTopicIdx ? ' on' : '') + '" data-idx="' + i + '" onclick="selectTopic(' + i + ',this)">' + t.name + '</button>';
+  });
+  h += '</div>';
+  document.getElementById('rpContent').innerHTML = h;
+}
+
+function toggleTopicSidebar() {
+  var sb = document.getElementById('rpSidebarWrap');
+  var picker = document.getElementById('topicPicker');
+  var collapsed = sb.classList.toggle('collapsed');
+  picker.classList.toggle('sb-collapsed', collapsed);
+  try { localStorage.setItem(TOPIC_SIDEBAR_COLLAPSED_KEY, collapsed ? '1' : '0'); } catch(e){}
 }
 
 function selectTopic(idx, btn) {
-  document.querySelectorAll('.topic-btn').forEach(function(b) { b.classList.remove('on'); });
-  if (btn) {
-    btn.classList.add('on');
-  } else {
-    var b = document.querySelector('.topic-btn[data-idx="'+idx+'"]');
-    if (b) {
-      b.classList.add('on');
-      var group = b.closest('.topic-group');
-      if (group && !group.classList.contains('open')) group.classList.add('open');
-    }
+  var gi = groupIndexForTopic(idx);
+  if (gi !== currentCatIdx) {
+    currentCatIdx = gi;
+    document.querySelectorAll('#rpCatMenu .rp-cat-item').forEach(function(el, i) { el.classList.toggle('active', i === gi); });
+    renderCategoryContent();
   }
+  document.querySelectorAll('.topic-btn').forEach(function(b) { b.classList.remove('on'); });
+  var targetBtn = btn || document.querySelector('.topic-btn[data-idx="'+idx+'"]');
+  if (targetBtn) targetBtn.classList.add('on');
   currentTopicIdx = idx;
   renderDeck();
 }
