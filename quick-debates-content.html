@@ -92,14 +92,15 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
 .timer-progress-fill{height:100%;background:var(--sea);border-radius:3px;transition:width .3s linear;width:0%}
 .timer-progress-fill.warn{background:var(--coral)}
 .timer-controls{display:flex;align-items:center;justify-content:center}
-.timer-btn-wrap{display:inline-flex}
-.timer-btn{font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;padding:.55rem 1.3rem;border:none;border-radius:10px;background:var(--sea);color:#fff;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:.5rem;min-width:110px;justify-content:center}
-.timer-btn:hover{opacity:.9}
+.timer-btn-wrap{display:inline-flex;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(45,48,71,.1)}
+.timer-btn{font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;padding:.55rem 1.2rem;border:none;background:var(--sea);color:#fff;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:.5rem;min-width:96px;justify-content:center}
+.timer-btn:hover{opacity:.92}
+.timer-btn-icon{font-size:.8em;line-height:1}
 .timer-btn .timer-btn-time{font-family:'JetBrains Mono',monospace}
 .timer-btn.paused{background:var(--sun)}
 .timer-btn.warn,.timer-btn.done{background:var(--coral)}
-.timer-edit-icon{flex-shrink:0;opacity:.85}
-.timer-edit-icon:hover{opacity:1}
+.timer-edit-btn{font-family:'Outfit',sans-serif;padding:.55rem .8rem;border:none;border-left:1.5px solid rgba(255,255,255,.35);background:var(--sea);color:#fff;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center}
+.timer-edit-btn:hover{opacity:.92}
 .timer-duration-input{display:none;font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;padding:.5rem .6rem;border:1.5px solid var(--sea);border-radius:10px;background:var(--card);color:var(--ink);width:70px;text-align:center;outline:none}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(46,196,182,.3)}50%{box-shadow:0 0 0 6px rgba(46,196,182,0)}}
 
@@ -256,9 +257,10 @@ footer{text-align:center;padding:3rem 2rem;font-size:.8rem;color:var(--muted);bo
 <div class="timer-controls">
 <span class="timer-btn-wrap">
 <button class="timer-btn" id="timerBtn" onclick="handleTimerClick()">
+<span class="timer-btn-icon" id="timerBtnIcon">&#9654;</span>
 <span id="timerBtnLabel">3 min</span>
-<svg class="timer-edit-icon" id="timerEditIcon" onclick="event.stopPropagation();editDuration()" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
 </button>
+<button class="timer-edit-btn" id="timerEditBtn" onclick="editDuration()" title="Edit duration" aria-label="Edit timer duration"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
 <input type="number" class="timer-duration-input" id="timerDurationInput" min="1" max="60" onblur="commitDuration()" onkeydown="if(event.key==='Enter'){this.blur()}else if(event.key==='Escape'){cancelEditDuration()}">
 </span>
 </div>
@@ -725,10 +727,11 @@ function selectDuration(secs){
   updateTimerBtn();
 }
 function editDuration(){
-  var btn=document.getElementById('timerBtn');
+  if(timerRunning||timerPaused) return; // only editable before it's been started
   var input=document.getElementById('timerDurationInput');
   input.value=timerMinutes;
-  btn.style.display='none';
+  document.getElementById('timerBtn').style.display='none';
+  document.getElementById('timerEditBtn').style.display='none';
   input.style.display='inline-block';
   input.focus();
   input.select();
@@ -745,6 +748,7 @@ function cancelEditDuration(){
   cancelingDurationEdit=true;
   document.getElementById('timerDurationInput').style.display='none';
   document.getElementById('timerBtn').style.display='inline-flex';
+  updateTimerBtn();
 }
 function handleTimerClick(){
   if(!timerRunning && !timerPaused && timerSeconds<=0 && timerTotal>0){ selectDuration(timerMinutes*60); return; }
@@ -764,32 +768,45 @@ function runTimerTick(){
     var pct=((timerTotal-timerSeconds)/timerTotal)*100;
     prog.style.width=pct+'%';
     if(timerSeconds<=10&&timerSeconds>0){ prog.className='timer-progress-fill warn'; }
-    if(timerSeconds<=0){ clearInterval(timerInterval); timerInterval=null; timerRunning=false; prog.style.width='100%'; prog.className='timer-progress-fill warn'; }
+    if(timerSeconds<=0){
+      clearInterval(timerInterval); timerInterval=null; timerRunning=false;
+      prog.style.width='100%'; prog.className='timer-progress-fill warn';
+      // Give the teacher a moment to see it finished, then return to ready automatically \u2014
+      // no separate "click Done to reset" step to remember.
+      setTimeout(function(){
+        if(!timerRunning && !timerPaused && timerSeconds<=0){ selectDuration(timerMinutes*60); }
+      },2500);
+    }
     updateTimerBtn();
   },1000);
 }
 function updateTimerBtn(){
   var btn=document.getElementById('timerBtn');
+  var icon=document.getElementById('timerBtnIcon');
   var label=document.getElementById('timerBtnLabel');
-  var icon=document.getElementById('timerEditIcon');
+  var editBtn=document.getElementById('timerEditBtn');
   var m=Math.floor(timerSeconds/60),s=timerSeconds%60;
   var mmss=m+':'+(s<10?'0':'')+s;
   if(timerRunning){
+    icon.innerHTML='&#9208;';
     label.innerHTML='<span class="timer-btn-time">'+mmss+'</span>';
     btn.className='timer-btn'+(timerSeconds<=10?' warn':'');
-    icon.style.display='none';
+    editBtn.style.display='none';
   } else if(timerPaused){
+    icon.innerHTML='&#9654;';
     label.innerHTML='<span class="timer-btn-time">'+mmss+'</span>';
     btn.className='timer-btn paused';
-    icon.style.display='none';
+    editBtn.style.display='none';
   } else if(timerSeconds<=0 && timerTotal>0){
-    label.textContent='Done \u21BB';
+    icon.innerHTML='&#8635;';
+    label.textContent='Done';
     btn.className='timer-btn done';
-    icon.style.display='none';
+    editBtn.style.display='none';
   } else {
+    icon.innerHTML='&#9654;';
     label.textContent=timerMinutes+' min';
     btn.className='timer-btn';
-    icon.style.display='';
+    editBtn.style.display='inline-flex';
   }
 }
 
