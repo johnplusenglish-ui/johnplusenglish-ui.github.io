@@ -36,9 +36,15 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
 /* Filters */
 .filters{max-width:960px;margin:0 auto;padding:1.2rem 2rem .5rem;position:relative;z-index:2}
 .filters-top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.8rem;margin-bottom:1rem}
-.view-toggle{display:flex;border:1.5px solid var(--border);border-radius:8px;overflow:hidden}
-.view-btn{font-family:'Outfit',sans-serif;font-size:.8rem;font-weight:700;padding:.5rem 1.2rem;border:none;background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
-.view-btn.on{background:var(--ink);color:#fff}
+.view-toggle{display:flex;gap:4px;row-gap:4px;position:relative;align-items:flex-end;flex-wrap:wrap;padding-top:8px}
+.view-toggle::before{content:'';position:absolute;left:0;right:0;bottom:0;height:1.5px;background:var(--border)}
+.view-btn{position:relative;font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;padding:.5rem 1.25rem;color:var(--muted);background:color-mix(in srgb,var(--ink) 4%,transparent);border:1.5px solid var(--border);border-radius:12px 12px 0 0;cursor:pointer;transition:background .18s,color .18s,box-shadow .18s,border-color .18s}
+.view-btn:not(.on):hover{background:color-mix(in srgb,var(--ink) 8%,transparent);color:var(--ink)}
+.view-btn:not(.on):focus-visible{outline:2px solid var(--sea);outline-offset:2px}
+.view-btn.on{outline:none;background:var(--cream);border-color:#2176FF;border-bottom:none!important;color:#2176FF;padding-top:calc(.5rem + 3px);box-shadow:0 -3px 10px rgba(45,48,71,.06);z-index:2}
+.view-btn:nth-child(2).on{border-color:#50C878;color:#50C878}
+@media(max-width:600px){.view-btn{padding:.5rem .75rem;font-size:.82rem}.view-btn.on{padding-top:calc(.5rem + 3px)}}
+@media(prefers-reduced-motion:reduce){.view-btn{transition:none}}
 .filters-actions{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
 .action-btn{font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:600;padding:.45rem 1rem;border:1.5px solid var(--border);border-radius:10px;background:var(--card);color:var(--ink);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:.4rem}
 .action-btn:hover{border-color:var(--ink);background:var(--cream)}
@@ -244,9 +250,9 @@ nav,.filters,.card-nav,.timer-section,.phrases-toggle,.view-toggle,.filters-acti
 <div class="filters">
 <div class="filters-top">
 <div style="display:flex;gap:.8rem;align-items:center;flex-wrap:wrap">
-<div class="view-toggle">
-<button class="view-btn on" onclick="setView('single',this)">Card View</button>
-<button class="view-btn" onclick="setView('grid',this)">Browse All</button>
+<div class="view-toggle" role="tablist">
+<button class="view-btn on" role="tab" onclick="setView('single',this)">Card View</button>
+<button class="view-btn" role="tab" onclick="setView('grid',this)">Browse All</button>
 </div>
 <div class="group-size">
 <span class="filter-label">Group</span>
