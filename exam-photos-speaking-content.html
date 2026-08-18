@@ -106,14 +106,23 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
 .task-q.gen{background:var(--sand);border-left:3px solid var(--sun)}
 
 /* Timer */
-.timer-row{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--cream);border-radius:var(--radius-sm);margin-top:12px;border:1.5px solid var(--border);font-size:.84rem;color:var(--muted)}
+.timer-row{position:relative;overflow:hidden;display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--cream);border-radius:var(--radius-sm);margin-top:12px;border:1.5px solid var(--border);font-size:.84rem;color:var(--muted)}
 .timer-row strong{color:var(--ink);font-weight:700}
-.timer-display{font-family:'JetBrains Mono',monospace;font-size:.95rem;font-weight:500;color:var(--ink);min-width:44px;text-align:center;display:none}
-.timer-display.visible{display:inline}
-.timer-btn{margin-left:auto;background:var(--sky);color:#fff;border:none;border-radius:10px;padding:6px 16px;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;font-family:'Outfit',sans-serif}
-.timer-btn:hover{background:#3A7DC4;transform:translateY(-1px)}
+.timer-progress-fill{position:absolute;left:0;top:0;height:3px;background:var(--sea);width:0%;transition:width .3s linear}
+.timer-progress-fill.warn{background:var(--coral)}
+.timer-btn-wrap{margin-left:auto;display:inline-flex;border-radius:10px;overflow:hidden}
+.timer-btn{background:var(--sky);color:#fff;border:none;padding:6px 16px;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;font-family:'Outfit',sans-serif;display:inline-flex;align-items:center;gap:6px}
+.timer-btn:hover{background:#3A7DC4}
+.timer-btn-icon{font-size:.85em;line-height:1}
+.timer-btn .timer-btn-time{font-family:'JetBrains Mono',monospace}
 .timer-btn.running{background:var(--coral)}
 .timer-btn.running:hover{background:#E55A5A}
+.timer-btn.paused{background:var(--sun)}
+.timer-btn.done{background:var(--coral)}
+.timer-edit-btn{font-family:'Outfit',sans-serif;padding:6px 10px;border:none;border-left:1.5px solid rgba(255,255,255,.35);background:var(--sky);color:#fff;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center}
+.timer-edit-btn:hover{background:#3A7DC4}
+.timer-duration-edit{display:none;align-items:baseline;gap:.3rem;font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:700;padding:6px 10px;border:1.5px solid var(--ink);border-radius:10px;background:var(--card);color:var(--ink);margin-left:auto}
+.timer-duration-input{font-family:'JetBrains Mono',monospace;font-size:.9rem;font-weight:700;border:none;background:transparent;color:var(--ink);width:4.2ch;text-align:center;outline:none;padding:0}
 
 /* Guided prompts */
 .prompts-list{display:flex;flex-direction:column;gap:8px;margin-top:2px}
@@ -151,15 +160,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
 .print-btn{display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:7px 16px;border-radius:10px;font-size:.78rem;font-weight:700;cursor:pointer;border:1.5px solid var(--border);background:var(--card);color:var(--muted);font-family:'Outfit',sans-serif;transition:all .2s}
 .print-btn:hover{border-color:var(--ink);color:var(--ink)}
 .print-btn svg{flex-shrink:0}
-
-.gen-timer-row{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--cream);border-radius:var(--radius-sm);margin-top:12px;border:1.5px solid var(--border);font-size:.84rem;color:var(--muted)}
-.gen-timer-row strong{color:var(--ink);font-weight:700}
-.gen-timer-btns{display:flex;gap:5px;margin-left:auto}
-.gen-timer-btn{background:var(--card);color:var(--ink);border:1.5px solid var(--border);border-radius:10px;padding:5px 13px;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;font-family:'Outfit',sans-serif}
-.gen-timer-btn:hover{border-color:var(--sky);color:var(--sky)}
-.gen-timer-btn.running{background:var(--coral);color:#fff;border-color:var(--coral)}
-.gen-timer-display{font-family:'JetBrains Mono',monospace;font-size:.95rem;font-weight:500;color:var(--ink);min-width:44px;text-align:center;display:none}
-.gen-timer-display.visible{display:inline}
 
 .img-slot.c1-faded{opacity:.3;transition:opacity .25s;filter:grayscale(30%)}
 
@@ -492,16 +492,24 @@ function langBox(level) {
 }
 
 function genTimerHTML(id) {
-  return `<div class="gen-timer-row"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="5.5"/><path d="M7 4v3l2 1"/></svg><span>Timer</span><span class="gen-timer-display" id="gtd-${id}"></span><div class="gen-timer-btns"><button class="gen-timer-btn" id="gtb-${id}-60" data-secs="60" data-gid="${id}">1 min</button><button class="gen-timer-btn" id="gtb-${id}-120" data-secs="120" data-gid="${id}">2 min</button><button class="gen-timer-btn" id="gtb-${id}-180" data-secs="180" data-gid="${id}">3 min</button></div></div>`;
+  return timerHTML(id, 60, false, 'Timer');
 }
 
 function printBtn(id) {
   return `<button class="print-btn" onclick="printCard('${id}')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>Print</button>`;
 }
 
-function timerHTML(id, secs) {
+function timerHTML(id, secs, locked, labelText) {
   const m = Math.floor(secs/60), s = secs%60;
-  return `<div class="timer-row"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="5.5"/><path d="M7 4v3l2 1"/></svg><span>Speaking time: <strong>${m>0?m+' min':''}${s>0?' '+s+' sec':''}</strong></span><span class="timer-display" id="td-${id}">${m}:${String(s).padStart(2,'0')}</span><button class="timer-btn" id="tb-${id}" data-secs="${secs}">Start Timer</button></div>`;
+  const labelHTML = labelText !== undefined ? labelText : `Speaking time: <strong>${m>0?m+' min':''}${s>0?' '+s+' sec':''}</strong>`;
+  const editBits = locked ? '' :
+    `<button class="timer-edit-btn" id="timerEditBtn-${id}" onclick="timerEditDuration('${id}')" title="Edit duration" aria-label="Edit timer duration"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button><span class="timer-duration-edit" id="timerDurationEdit-${id}"><input type="text" inputmode="numeric" class="timer-duration-input" id="timerDurationInput-${id}" placeholder="${timerFormatTime(secs)}" onblur="timerCommitDuration('${id}')" onkeydown="if(event.key==='Enter'){this.blur()}else if(event.key==='Escape'){timerCancelEdit('${id}')}"></span>`;
+  return `<div class="timer-row">
+    <div class="timer-progress-fill" id="timerProgress-${id}"></div>
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="5.5"/><path d="M7 4v3l2 1"/></svg>
+    <span>${labelHTML}</span>
+    <span class="timer-btn-wrap"><button class="timer-btn" id="timerBtn-${id}" onclick="timerHandleClick('${id}')"><span class="timer-btn-icon" id="timerBtnIcon-${id}">&#9654;</span><span id="timerBtnLabel-${id}"></span></button>${editBits}</span>
+  </div>`;
 }
 
 function subDrop(label, level, content, openByDefault=false) {
@@ -516,7 +524,7 @@ function renderB2() {
     h += `<div class="acc-card" id="${id}"><div class="acc-header" onclick="toggle('${id}')"><div class="acc-title"><span class="set-badge b2">Set ${i+1}</span>${s.topic}</div><span class="chevron">▾</span></div><div class="acc-body">`;
     h += `<div class="lbl">Your two photos</div>`;
     h += imgs(s.photos, '', ['Photo 1','Photo 2']);
-    h += timerHTML(id, 60);
+    h += timerHTML(id, 60, true);
     h += `<div class="task-q b2">${s.question}</div>`;
     h += subDrop('Useful Language', 'b2', langBox('b2'));
     h += subDrop('Guided Prompts', 'b2', promptsList(prompts.b2, 'b2'));
@@ -526,6 +534,7 @@ function renderB2() {
     h += `</div></div>`;
   });
   el.innerHTML = h;
+  b2Sets.forEach((s,i) => timerInit(`b2-${i}`, 60, true));
 }
 
 function renderC1() {
@@ -536,7 +545,7 @@ function renderC1() {
     h += `<div class="acc-card" id="${id}"><div class="acc-header" onclick="toggle('${id}')"><div class="acc-title"><span class="set-badge c1">Set ${i+1}</span>${s.topic}</div><span class="chevron">▾</span></div><div class="acc-body">`;
     h += `<div class="lbl">Choose two of these three photos — click the one you're <em>not</em> using</div>`;
     h += `<div class="img-row grid-3" id="${id}-imgrow">${s.photos.map((u,pi)=>`<div class="img-slot" data-photo="${pi+1}" onclick="toggleC1Photo(this,'${id}')"><span class="img-label">${pi+1}</span><img src="${u}" alt="Photo ${pi+1}" loading="lazy"></div>`).join('')}</div>`;
-    h += timerHTML(id, 60);
+    h += timerHTML(id, 60, true);
     h += `<div class="task-q c1">${s.question}</div>`;
     h += subDrop('Useful Language', 'c1', langBox('c1'));
     h += subDrop('Guided Prompts', 'c1', promptsList(prompts.c1, 'c1'));
@@ -546,6 +555,7 @@ function renderC1() {
     h += `</div></div>`;
   });
   el.innerHTML = h;
+  c1Sets.forEach((s,i) => timerInit(`c1-${i}`, 60, true));
 }
 
 function renderC2() {
@@ -561,13 +571,13 @@ function renderC2() {
     h += `<div class="phase-tabs"><button class="phase-tab active" onclick="switchPhase(this,'${id}',1)">Phase 1 — Discuss (~1 min)</button><button class="phase-tab" onclick="switchPhase(this,'${id}',2)">Phase 2 — Discuss &amp; Decide (~3 min)</button></div>`;
     // Phase 1
     h += `<div class="phase-block active" id="${id}-p1">`;
-    h += timerHTML(id+'-p1', 60);
+    h += timerHTML(id+'-p1', 60, true);
     h += `<div class="task-q c2">The examiner has selected photos ${s.p1Photos}. ${s.p1Q}</div>`;
     h += subDrop('Guided Prompts (Phase 1)', 'c2', promptsList(prompts.c2p1, 'c2'));
     h += `</div>`;
     // Phase 2
     h += `<div class="phase-block" id="${id}-p2">`;
-    h += timerHTML(id+'-p2', 180);
+    h += timerHTML(id+'-p2', 180, true);
     h += `<div class="task-q c2">${s.p2Q}</div>`;
     h += subDrop('Guided Prompts (Phase 2)', 'c2', promptsList(prompts.c2p2, 'c2'));
     h += `</div>`;
@@ -576,6 +586,11 @@ function renderC2() {
     h += `</div></div>`;
   });
   el.innerHTML = h;
+  c2Sets.forEach((s,i) => {
+    const id = `c2-${i}`;
+    timerInit(`${id}-p1`, 60, true);
+    timerInit(`${id}-p2`, 180, true);
+  });
 }
 
 function renderGen() {
@@ -594,6 +609,7 @@ function renderGen() {
     h += `</div></div>`;
   });
   el.innerHTML = h;
+  genSets.forEach((s,i) => timerInit(`gen-${i}`, 60, false));
 }
 
 // ── Accordion toggle ──
@@ -617,41 +633,120 @@ function switchPhase(btn, cardId, phase) {
   }
 }
 
-// ── Timer logic (event delegation) ──
-const timers = {};
-document.addEventListener('click', e => {
-  const btn = e.target.closest('.timer-btn');
-  if (!btn) return;
-  const id = btn.id;
-  const display = document.getElementById(id.replace('tb-','td-'));
-  if (timers[id]) {
-    clearInterval(timers[id]);
-    timers[id] = null;
-    btn.textContent = 'Start Timer';
-    btn.classList.remove('running');
-    display.classList.remove('visible');
-    return;
-  }
-  let remaining = parseInt(btn.dataset.secs);
-  display.classList.add('visible');
-  btn.textContent = 'Stop';
-  btn.classList.add('running');
-  const tick = () => {
-    const m = Math.floor(remaining/60), s = remaining%60;
-    display.textContent = `${m}:${String(s).padStart(2,'0')}`;
-    if (remaining <= 0) {
-      clearInterval(timers[id]);
-      timers[id] = null;
-      btn.textContent = 'Start Timer';
-      btn.classList.remove('running');
-      display.textContent = "Time!";
-      setTimeout(() => display.classList.remove('visible'), 3000);
+// ── Reusable timer widget engine (multi-instance; locked = official exam duration, unlocked = editable m:ss) ──
+var timerState = {};
+function timerFormatTime(totalSeconds){
+  var m=Math.floor(totalSeconds/60), s=totalSeconds%60;
+  return m+':'+(s<10?'0':'')+s;
+}
+function timerParseTime(str){
+  var parts=String(str).trim().split(':');
+  var m, s;
+  if(parts.length>=2){ m=parseInt(parts[0],10); s=parseInt(parts[1],10); }
+  else { m=parseInt(parts[0],10); s=0; }
+  if(isNaN(m)) m=0;
+  if(isNaN(s)||s<0||s>59) s=0;
+  var total=m*60+s;
+  if(!total || total<1) return null;
+  return Math.min(total,5999);
+}
+function timerInit(id, defaultSecs, locked){
+  timerState[id] = {interval:null, seconds:defaultSecs, total:defaultSecs, running:false, paused:false, defaultSecs:defaultSecs, locked:!!locked};
+  timerUpdateBtn(id);
+}
+function timerSelectDuration(id, secs){
+  var st = timerState[id];
+  clearInterval(st.interval); st.interval=null;
+  st.running=false; st.paused=false;
+  st.total=secs; st.seconds=secs;
+  var prog = document.getElementById('timerProgress-'+id);
+  prog.style.width='0%'; prog.className='timer-progress-fill';
+  timerUpdateBtn(id);
+}
+function timerEditDuration(id){
+  var st = timerState[id];
+  if(st.locked) return;
+  clearInterval(st.interval); st.interval=null; st.running=false; st.paused=false;
+  var input=document.getElementById('timerDurationInput-'+id);
+  input.value=timerFormatTime(st.defaultSecs);
+  document.getElementById('timerBtn-'+id).style.display='none';
+  document.getElementById('timerEditBtn-'+id).style.display='none';
+  document.getElementById('timerDurationEdit-'+id).style.display='inline-flex';
+  input.focus();
+  input.select();
+}
+function timerCommitDuration(id){
+  var st = timerState[id];
+  if(st._canceling){ st._canceling=false; return; }
+  var parsed=timerParseTime(document.getElementById('timerDurationInput-'+id).value);
+  if(parsed) st.defaultSecs=parsed;
+  document.getElementById('timerDurationEdit-'+id).style.display='none';
+  document.getElementById('timerBtn-'+id).style.display='inline-flex';
+  timerSelectDuration(id, st.defaultSecs);
+}
+function timerCancelEdit(id){
+  var st = timerState[id];
+  st._canceling=true;
+  document.getElementById('timerDurationEdit-'+id).style.display='none';
+  document.getElementById('timerBtn-'+id).style.display='inline-flex';
+  timerUpdateBtn(id);
+}
+function timerHandleClick(id){
+  var st = timerState[id];
+  if(!st.running && !st.paused && st.seconds<=0 && st.total>0){ timerSelectDuration(id, st.defaultSecs); return; }
+  timerToggle(id);
+}
+function timerToggle(id){
+  var st = timerState[id];
+  if(!st.total) return;
+  if(!st.running && !st.paused){ st.running=true; timerTick(id); }
+  else if(st.running){ clearInterval(st.interval); st.interval=null; st.running=false; st.paused=true; }
+  else{ st.paused=false; st.running=true; timerTick(id); }
+  timerUpdateBtn(id);
+}
+function timerTick(id){
+  var st = timerState[id];
+  var prog=document.getElementById('timerProgress-'+id);
+  st.interval=setInterval(function(){
+    st.seconds--;
+    var pct=((st.total-st.seconds)/st.total)*100;
+    prog.style.width=pct+'%';
+    if(st.seconds<=10 && st.seconds>0){ prog.className='timer-progress-fill warn'; }
+    if(st.seconds<=0){
+      clearInterval(st.interval); st.interval=null; st.running=false;
+      prog.style.width='100%'; prog.className='timer-progress-fill warn';
+      setTimeout(function(){
+        if(!st.running && !st.paused && st.seconds<=0){ timerSelectDuration(id, st.defaultSecs); }
+      },2500);
     }
-    remaining--;
-  };
-  tick();
-  timers[id] = setInterval(tick, 1000);
-});
+    timerUpdateBtn(id);
+  },1000);
+}
+function timerUpdateBtn(id){
+  var st = timerState[id];
+  var btn=document.getElementById('timerBtn-'+id);
+  var icon=document.getElementById('timerBtnIcon-'+id);
+  var label=document.getElementById('timerBtnLabel-'+id);
+  var editBtn=document.getElementById('timerEditBtn-'+id);
+  if(editBtn) editBtn.style.display = st.locked ? 'none' : 'inline-flex';
+  if(st.running){
+    icon.innerHTML='&#9208;';
+    label.innerHTML='<span class="timer-btn-time">'+timerFormatTime(st.seconds)+'</span>';
+    btn.className='timer-btn running'+(st.seconds<=10?' warn':'');
+  } else if(st.paused){
+    icon.innerHTML='&#9654;';
+    label.innerHTML='<span class="timer-btn-time">'+timerFormatTime(st.seconds)+'</span>';
+    btn.className='timer-btn paused';
+  } else if(st.seconds<=0 && st.total>0){
+    icon.innerHTML='&#8635;';
+    label.textContent='Done';
+    btn.className='timer-btn done';
+  } else {
+    icon.innerHTML='&#9654;';
+    label.innerHTML='<span class="timer-btn-time">'+timerFormatTime(st.defaultSecs)+'</span>';
+    btn.className='timer-btn';
+  }
+}
 
 // ── Chip toggle (used language) ──
 document.addEventListener('click', e => {
@@ -676,48 +771,6 @@ function toggleC1Photo(slot, cardId) {
     if (fadedCount < 1) slot.classList.add('c1-faded');
   }
 }
-
-// ── Gen timer ──
-const genTimers = {};
-document.addEventListener('click', e => {
-  const btn = e.target.closest('.gen-timer-btn');
-  if (!btn) return;
-  const gid = btn.dataset.gid;
-  const secs = parseInt(btn.dataset.secs);
-  const display = document.getElementById(`gtd-${gid}`);
-  const allBtns = btn.closest('.gen-timer-btns').querySelectorAll('.gen-timer-btn');
-  // if this timer is already running, stop it
-  if (genTimers[gid] && btn.classList.contains('running')) {
-    clearInterval(genTimers[gid]);
-    genTimers[gid] = null;
-    btn.classList.remove('running');
-    display.classList.remove('visible');
-    return;
-  }
-  // stop any running timer for this card
-  if (genTimers[gid]) {
-    clearInterval(genTimers[gid]);
-    genTimers[gid] = null;
-    allBtns.forEach(b => b.classList.remove('running'));
-  }
-  let remaining = secs;
-  display.classList.add('visible');
-  btn.classList.add('running');
-  const tick = () => {
-    const m = Math.floor(remaining/60), s = remaining%60;
-    display.textContent = `${m}:${String(s).padStart(2,'0')}`;
-    if (remaining <= 0) {
-      clearInterval(genTimers[gid]);
-      genTimers[gid] = null;
-      btn.classList.remove('running');
-      display.textContent = 'Time!';
-      setTimeout(() => display.classList.remove('visible'), 3000);
-    }
-    remaining--;
-  };
-  tick();
-  genTimers[gid] = setInterval(tick, 1000);
-});
 
 // ── Print card ──
 function printCard(id) {
