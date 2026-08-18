@@ -66,12 +66,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
 .debate-content{padding:1.8rem 2rem;display:flex;flex-direction:column;align-items:center}
 .debate-top{display:flex;justify-content:space-between;align-items:center;width:100%;margin-bottom:.8rem}
 .debate-title{font-family:'Outfit',sans-serif;font-size:1.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.02em}
-.debate-level{font-family:Outfit,sans-serif;font-size:1rem;font-weight:700}
-.debate-level.b1{color:var(--coral)}
-.debate-level.b2{color:#16A88D}
-.debate-level.c1{color:var(--sky)}
-.debate-level.c2{color:var(--lavender)}
-.debate-level.fun{color:#FF9100}
+.debate-level{font-family:Outfit,sans-serif;font-size:1rem;font-weight:700;color:var(--level-color, var(--sky))}
 .debate-question{font-size:1rem;font-weight:700;text-align:center;margin-bottom:1.5rem;max-width:500px}
 .bubbles{display:flex;flex-wrap:wrap;justify-content:center;gap:1rem;margin-bottom:1.5rem}
 .bubble{width:145px;height:145px;border-radius:50%;border:1.5px solid var(--level-color, var(--sky));display:flex;align-items:center;justify-content:center;text-align:center;font-size:.82rem;font-weight:600;color:var(--ink);padding:.8rem;line-height:1.35;transition:all .25s;cursor:pointer;background:var(--card);user-select:none}
@@ -304,6 +299,7 @@ var debateFollowup = {"Happiness": ["What makes you happy?", "Can money make you
 var followupPhrases = {"B1": ["I think...", "Maybe, but...", "I agree because...", "I don't agree because...", "What about you?"], "B2": ["Personally, I think ...", "I'm not entirely sure, but ...", "I see what you mean, but ...", "That might be true, however ...", "I'd have to disagree there."], "C1": ["I'd be inclined to say ...", "It's hard to say for certain, but ...", "I take your point, though I'd argue ...", "That's debatable \u2014 you could also say ...", "I'd challenge that assumption."], "C2": ["My instinct would be to say ...", "I wouldn't go so far as to claim ...", "With respect, I think that oversimplifies it.", "That's one way of looking at it, but ...", "I'd fundamentally question that premise."], "Fun": ["Personally, I think ...", "I'm not so sure about that ...", "That's fair, but ...", "OK but imagine this ...", "I'd have to disagree there."]};
 var filtered = debates.slice();
 var idx = 0;
+var currentFilter = 'all';
 var pbLevel = 'B1';
 var colors = ['#2176FF','#1DD3B0','#FF6B6B','#9B72CF','#FFB347','#5DDEA0','#2176FF','#1DD3B0','#FF6B6B','#9B72CF','#FFB347'];
 
@@ -320,6 +316,7 @@ function setMode(mode, btn) {
 function setLevel(lvl, btn) {
   document.querySelectorAll('.lvl-btn').forEach(function(b){b.classList.remove('on')});
   btn.classList.add('on');
+  currentFilter = lvl;
   if (lvl === 'all') filtered = debates.slice();
   else filtered = debates.filter(function(d){return d.level === lvl});
   idx = 0; function populateDropdown() {
@@ -614,9 +611,10 @@ function render() {
   h += '</ol></div></div>';
   h += '</div>';
   document.getElementById('debateCard').innerHTML = h;
-  // Set level colour on card
+  // Set level colour on card (neutral grey when browsing "All"; the level's own colour when filtered to it)
   var levelColors = {'B1':'#FF6B6B','B2':'#16A88D','C1':'#2176FF','C2':'#9B72CF','Fun':'#FF9100'};
-  document.getElementById('debateCard').style.setProperty('--level-color', levelColors[d.level] || '#2176FF');
+  var cardColor = currentFilter === 'all' ? '#7A7D8E' : (levelColors[d.level] || '#2176FF');
+  document.getElementById('debateCard').style.setProperty('--level-color', cardColor);
   // Add floating followup phrases container
   var fpDiv = document.createElement('div');
   fpDiv.id = 'followupPhrases';
