@@ -75,7 +75,6 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
 /* toggle-btn on removed */
 
 /* Task side-nav (Task 1 / Task 2 picker, replaces the old stacked accordion cards) */
-.content-area.active{display:grid;grid-template-columns:200px 1fr;gap:1.25rem;align-items:start}
 .task-sidebar{display:flex;flex-direction:column;gap:.4rem;position:sticky;top:70px}
 .task-nav-item{display:flex;align-items:center;gap:.6rem;padding:.65rem .75rem;border-radius:10px;cursor:pointer;font-family:'Outfit',sans-serif;color:var(--muted);border:1.5px solid var(--border);background:var(--card);transition:all .15s;text-align:left;width:100%}
 .task-nav-item:hover{color:var(--ink);border-color:var(--task-accent,var(--sky))}
@@ -214,7 +213,7 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
 
 /* Content Area */
 .content-area{display:none}
-.content-area.active{display:block}
+.content-area.active{display:grid;grid-template-columns:200px 1fr;gap:1.25rem;align-items:start}
 
 /* Band Descriptors Section */
 .band-section{margin:2rem 0 0;position:relative;z-index:1;border-top:1.5px solid var(--border);padding-top:2rem}
@@ -457,7 +456,7 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
 <!-- Main Content -->
 <div class="content-area active" id="academic-content">
 
-  <nav class="task-sidebar">
+  <div class="task-sidebar">
     <button class="task-nav-item active" style="--task-accent:#FFB347" onclick="switchTaskCard(this,0)">
       <span class="task-nav-dot"></span>
       <span class="task-nav-text"><span class="task-nav-label">Task 1</span><span class="task-nav-title">Report Writing</span></span>
@@ -468,7 +467,7 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
       <span class="task-nav-text"><span class="task-nav-label">Task 2</span><span class="task-nav-title">Essay Writing</span></span>
       <span class="task-nav-count">25</span>
     </button>
-  </nav>
+  </div>
 
   <!-- Task 1: Report Writing -->
   <div class="pill-group">
@@ -2374,7 +2373,7 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
 <!-- General Training Content -->
 <div class="content-area" id="general-content">
 
-  <nav class="task-sidebar">
+  <div class="task-sidebar">
     <button class="task-nav-item active" style="--task-accent:#1DD3B0" onclick="switchTaskCard(this,0)">
       <span class="task-nav-dot"></span>
       <span class="task-nav-text"><span class="task-nav-label">Task 1</span><span class="task-nav-title">Letter Writing</span></span>
@@ -2385,7 +2384,7 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
       <span class="task-nav-text"><span class="task-nav-label">Task 2</span><span class="task-nav-title">Essay Writing</span></span>
       <span class="task-nav-count">25</span>
     </button>
-  </nav>
+  </div>
 
   <!-- Task 1: Letter Writing -->
   <div class="pill-group">
@@ -2937,8 +2936,8 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
   </div>
 
   <!-- Task 2: Essay Writing -->
-  <div class="pill-group task2-theme">
-    <div class="pill-group-header" onclick="togglePillGroup(this)">
+  <div class="pill-group task2-theme task-hidden">
+    <div class="pill-group-header">
       <div class="pill-group-header-left">
         <div class="pg-icon" style="background:rgba(74,144,217,.13);color:var(--sky)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
         <div>
@@ -2948,7 +2947,6 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
       </div>
       <div style="display:flex;align-items:center;gap:.8rem">
         <span class="pill-group-badge">25 tasks</span>
-        <span class="pill-group-icon">▼</span>
       </div>
       <button class="print-btn" onclick="showPrintModal(this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Print</button>
     </div>
@@ -4284,11 +4282,16 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
 <!-- Band Descriptors -->
 
 <script>
-// Toggle pill group expansion
-function togglePillGroup(header) {
-  header.classList.toggle('expanded');
-  const content = header.nextElementSibling;
-  content.classList.toggle('expanded');
+// Switch between Task 1 / Task 2 via the side-nav
+function switchTaskCard(btn, index) {
+  const groups = btn.closest('.content-area').querySelectorAll(':scope > .pill-group');
+  groups.forEach((g, i) => {
+    g.classList.toggle('task-hidden', i !== index);
+    const content = g.querySelector('.pill-group-content');
+    if (content) content.classList.toggle('expanded', i === index);
+  });
+  btn.parentElement.querySelectorAll('.task-nav-item').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
   updateWordCounter();
 }
 
