@@ -31,6 +31,18 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .topic-icon svg{width:24px;height:24px;stroke-width:1.8;fill:none;stroke:currentColor}
 .page-header h1{font-size:clamp(1.8rem,4vw,2.6rem);font-weight:900;letter-spacing:-.01em;line-height:1.1;margin:0}
 
+/* Mode tabs (folder style) */
+.mode-toggle-wrap{max-width:960px;margin:0 auto;padding:0 2rem;position:relative;z-index:1}
+.mode-toggle{display:flex;gap:4px;row-gap:4px;position:relative;align-items:flex-end;flex-wrap:wrap;padding-top:8px;margin-bottom:1.2rem}
+.mode-toggle::before{content:'';position:absolute;left:0;right:0;bottom:0;height:1.5px;background:var(--border)}
+.mode-btn{position:relative;font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;padding:.5rem 1.25rem;color:var(--muted);background:color-mix(in srgb,var(--ink) 4%,transparent);border:1.5px solid var(--border);border-radius:12px 12px 0 0;cursor:pointer;transition:background .18s,color .18s,box-shadow .18s,border-color .18s}
+.mode-btn:not(.on):hover{background:color-mix(in srgb,var(--ink) 8%,transparent);color:var(--ink)}
+.mode-btn:not(.on):focus-visible{outline:2px solid var(--sea);outline-offset:2px}
+.mode-btn.on{outline:none;background:var(--cream);border-color:#2176FF;border-bottom:none!important;color:#2176FF;padding-top:calc(.5rem + 3px);box-shadow:0 -3px 10px rgba(45,48,71,.06);z-index:2}
+.mode-btn:nth-child(2).on{border-color:#50C878;color:#50C878}
+@media(max-width:600px){.mode-btn{padding:.5rem .75rem;font-size:.82rem}.mode-btn.on{padding-top:calc(.5rem + 3px)}}
+@media(prefers-reduced-motion:reduce){.mode-btn{transition:none}}
+
 /* Setup bar (replaces .filters + .stats-bar) */
 .setup-bar{position:sticky;top:52px;z-index:100;background:rgba(247,246,243,.95);backdrop-filter:blur(12px);border-top:1.5px solid var(--border);border-bottom:1.5px solid var(--border);padding:.65rem 2rem;margin-bottom:1.6rem}
 .setup-inner{max-width:960px;margin:0 auto}
@@ -190,7 +202,7 @@ footer{text-align:center;padding:3rem 2rem;font-size:.8rem;color:var(--muted);bo
 @media print{
 body{background:#fff}
 body::before{display:none}
-.topnav,.page-header,.setup-bar,.timer-section,.run-bar,.rp-phrases-toggle,footer{display:none!important}
+.topnav,.page-header,.mode-toggle-wrap,.setup-bar,.timer-section,.run-bar,.rp-phrases-toggle,footer{display:none!important}
 .card-viewer{margin:0;padding:0;max-width:none}
 .rp-card{box-shadow:none;border:1px solid #ccc;break-inside:avoid}
 .rp-roles,.rp-roles.three-col,.rp-roles.four-col{grid-template-columns:1fr 1fr}
@@ -249,6 +261,13 @@ body::before{display:none}
 </div>
 </div>
 
+<div class="mode-toggle-wrap">
+<div class="mode-toggle" role="tablist">
+<button class="mode-btn on" role="tab" id="tab-single" onclick="setView('single')">Play</button>
+<button class="mode-btn" role="tab" id="tab-grid" onclick="setView('grid')">Browse All</button>
+</div>
+</div>
+
 <div class="setup-bar" id="setupBar">
 <div class="setup-inner">
 <div class="setup-row">
@@ -258,7 +277,6 @@ body::before{display:none}
 <span class="setup-summary" id="setupSummary">All levels &middot; All topics &middot; 2 students</span>
 </button>
 <span class="card-count" id="statsBar"></span>
-<button class="icon-btn" id="browseToggle" onclick="toggleBrowse()" title="Browse all role plays" aria-label="Browse all role plays" aria-pressed="false"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></button>
 </div>
 <div class="setup-body" id="setupBody">
 <div class="setup-group"><span class="filter-label">Level</span><div class="filter-pills" id="levelPills"></div></div>
@@ -1327,17 +1345,13 @@ function openFromGrid(i){
 
 function setView(view){
   currentView=view;
-  var b=document.getElementById('browseToggle');
   var grid=view==='grid';
-  b.classList.toggle('on',grid);
-  b.setAttribute('aria-pressed',grid?'true':'false');
-  var t=grid?'Back to card view':'Browse all role plays';
-  b.title=t;b.setAttribute('aria-label',t);
+  document.getElementById('tab-single').classList.toggle('on',!grid);
+  document.getElementById('tab-grid').classList.toggle('on',grid);
   document.getElementById('singleView').classList.toggle('hidden',grid);
   document.getElementById('gridView').classList.toggle('active',grid);
   if(grid)renderGrid();else renderCard();
 }
-function toggleBrowse(){setView(currentView==='grid'?'single':'grid');}
 
 // Keyboard navigation
 document.addEventListener('keydown',function(e){
