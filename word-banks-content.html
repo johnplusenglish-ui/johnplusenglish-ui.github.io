@@ -113,17 +113,11 @@
 
   /* filters: plain dropdowns, big enough to hit */
   .bar{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.85rem}
-  .fld{display:flex;align-items:center;gap:.4rem}
-  .fld label{font-size:.58rem;font-weight:800;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);
-             flex:none;min-width:3rem}
   .sel{font-size:.82rem;font-weight:600;background:var(--card);border:1.5px solid var(--border);
        border-radius:9px;padding:.5rem .6rem;color:var(--ink);cursor:pointer;min-height:38px}
   .sel:hover{border-color:var(--ink)}
   .sel:focus{outline:none;border-color:var(--accent)}
   .sel.set{border-color:var(--accent);color:var(--accent)}
-  .find{flex:1;min-width:150px;font-size:.82rem;background:var(--card);border:1.5px solid var(--border);
-        border-radius:9px;padding:.5rem .65rem;color:var(--ink);min-height:38px}
-  .find:focus{outline:none;border-color:var(--accent)}
 
   .sheet{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:0 2.2rem;align-items:start}
   .gh{grid-column:1/-1;font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;
@@ -308,7 +302,7 @@ const POS_SHORT  = {'n.':'Nouns','adj.':'Adjectives','v.':'Verbs','phr.v.':'Phra
 const GROUP_COLOR = ['#2176FF','#E76F51','#2A9D8F','#9B72CF','#FFB347','#D97706','#3D5A80'];
 const hashId = decodeURIComponent(location.hash.slice(1));
 let bankId = (hashId && TOPICS[hashId]) ? hashId : GROUPS[0].ids[0];
-let tab='browse', pos='all', tier='all', find='', railQ='';
+let tab='browse', pos='all', tier='all', railQ='';
 let selMode=false;                 /* word-picking mode */
 let curShown=[];                   /* entries currently rendered in Browse */
 const curRows={};                  /* row key -> entry, for the click handler */
@@ -395,27 +389,22 @@ function render(){
 }
 
 function renderBrowse(){
-  const all = entries(bankId, tier);
-  const q = find.toLowerCase();
-  const searched = q ? all.filter(e=>(e.t+' '+e.d+' '+e.x).toLowerCase().includes(q)) : all;
+  const searched = entries(bankId, tier);
   const g = byPos(searched);
   const list = pos==='all' ? searched : (g[pos]||[]);
   curShown = list;
 
   let h=`<div class="bar">
-    <div class="fld"><label for="posSel">Type</label>
-      <select class="sel ${pos!=='all'?'set':''}" id="posSel">
+    <select class="sel ${pos!=='all'?'set':''}" id="posSel">
         <option value="all">All types (${searched.length})</option>`;
   POS_ORDER.forEach(p=>{ if(!g[p])return;
     h+=`<option value="${p}" ${pos===p?'selected':''}>${POS_LABELS[p]} (${g[p].length})</option>`});
-  h+=`</select></div>
-    <div class="fld"><label for="tierSel">Level</label>
-      <select class="sel ${tier!=='all'?'set':''}" id="tierSel">
+  h+=`</select>
+    <select class="sel ${tier!=='all'?'set':''}" id="tierSel">
         ${['all','tier1','tier2','tier3'].map(v=>{
           const l = v==='all'?'All levels':'Tier '+v.slice(-1)+' · '+['Essential','Intermediate','Advanced'][+v.slice(-1)-1];
           return `<option value="${v}" ${v===tier?'selected':''}>${l}</option>`}).join('')}
-      </select></div>
-    <input class="find" id="find" type="search" placeholder="Search this bank…" value="${esc(find)}">
+      </select>
     <div class="bar-actions">
       <button class="mini ${selMode?'on':''}" id="selToggle">${selMode?'Done selecting':'Select words'}</button>
       <button class="print-btn" id="printBtn"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg> Print</button>
@@ -494,9 +483,6 @@ function wire(){
   if(selMode) updatePickCount();
   const ps=document.getElementById('posSel'); if(ps) ps.addEventListener('change',e=>{pos=e.target.value;render()});
   const t=document.getElementById('tierSel'); if(t) t.addEventListener('change',e=>{tier=e.target.value;pos='all';render()});
-  const f=document.getElementById('find');
-  if(f) f.addEventListener('input',e=>{find=e.target.value;render();
-    const n=document.getElementById('find'); if(n){n.focus();n.setSelectionRange(n.value.length,n.value.length)}});
 }
 
 document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{tab=t.dataset.tab;render()}));
@@ -505,7 +491,7 @@ document.getElementById('totalN').textContent =
   Object.keys(TOPICS).reduce((n,id)=>n+count(id),0);
 function goBank(id, skipHash){
   if (!TOPICS[id]) return;
-  bankId = id; pos='all'; find='';
+  bankId = id; pos='all';
   if (!skipHash) history.pushState({bank:id}, '', '#'+id);
   renderRail(); render();
   /* stacked layout: the menu sits above the pane, so bring the pane into view */
