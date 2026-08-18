@@ -1477,7 +1477,7 @@ function depRender(){
 function depShowAll(el){
   document.querySelectorAll('#dep_alphaSidebar .dep-sb-item').forEach(function(s){s.classList.remove('active')});
   el.classList.add('active');
-  var html='<h3>All Entries (A\u2013Z)</h3><div class="study-content-count">'+window.depFilteredEntries.length+' entries</div>';
+  var html='';
   window.depSortedLetters.forEach(function(l){
     html+='<div class="alpha-header">'+l+'</div>';
     window.depLetters[l].forEach(function(e){html+=depEntryHTML(e)});
@@ -1643,18 +1643,15 @@ function ppRender(){
 function ppShowAllPreps(el){
   document.querySelectorAll('#pp_alphaSidebar .dep-sb-item').forEach(function(s){s.classList.remove('active')});
   el.classList.add('active');
-  var total=0;
-  var html='<h3>All Prepositional Phrases</h3>';
+  var html='';
   var cats=Object.keys(pp_D);
   cats.forEach(function(cat){
     var filtered=[];
     pp_D[cat].forEach(function(e){if(ppMatchesFilter({co:e[0],ty:e[1],df:e[2],ex:e[3],an:e[4]}))filtered.push(e)});
     if(filtered.length===0)return;
-    total+=filtered.length;
     html+='<div class="alpha-header">'+cat+'</div>';
     filtered.forEach(function(e){html+=ppEntryHTML({co:e[0],ty:e[1],df:e[2],ex:e[3],an:e[4]})});
   });
-  html='<h3>All Prepositional Phrases</h3><div class="study-content-count">'+total+' entries</div>'+html.replace('<h3>All Prepositional Phrases</h3>','');
   document.getElementById('pp_alphaContent').innerHTML=html;
 }
 
