@@ -116,21 +116,24 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .caught-btn.minus:hover{border-color:var(--muted)}
 
 /* TIMER */
-.timer-row{display:flex;align-items:center;justify-content:center;gap:1.4rem;padding:.8rem 1.6rem;border-top:1.5px solid var(--border);flex-wrap:wrap}
-.timer-ring{position:relative;width:80px;height:80px;cursor:pointer;flex-shrink:0}
-.timer-ring svg{transform:rotate(-90deg)}
-.timer-ring circle{fill:none;stroke-width:5}
-.timer-bg{stroke:var(--border)}
-.timer-progress{stroke:var(--ink);stroke-linecap:round;transition:stroke-dashoffset .1s linear;stroke-dasharray:226;stroke-dashoffset:0}
-.timer-ring.warning .timer-progress{stroke:var(--sun)}
-.timer-ring.danger .timer-progress{stroke:var(--coral)}
-.timer-display{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.timer-secs{font-family:'JetBrains Mono',monospace;font-size:1.4rem;font-weight:700;color:var(--ink);line-height:1}
-.timer-hint{font-size:.55rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
-.timer-presets{display:flex;gap:.35rem;flex-wrap:wrap;align-items:center}
-.preset-btn{font-family:Outfit,sans-serif;font-size:.63rem;font-weight:700;padding:.25rem .65rem;border-radius:6px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s}
-.preset-btn:hover{border-color:var(--ink);color:var(--ink)}
-.preset-btn.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.timer-row{padding:.8rem 1.6rem;border-top:1.5px solid var(--border)}
+.timer-section{max-width:800px;margin:0 auto}
+.timer-progress{width:100%;height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:.6rem}
+.timer-progress-fill{height:100%;background:var(--sea);border-radius:3px;transition:width .3s linear;width:0%}
+.timer-progress-fill.warn{background:var(--coral)}
+.timer-controls{display:flex;align-items:center;justify-content:center}
+.timer-btn-wrap{display:inline-flex;border-radius:10px;overflow:hidden;border:1.5px solid var(--border)}
+.timer-btn{font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;padding:.55rem 1.2rem;border:none;background:var(--card);color:var(--ink);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:.5rem;min-width:96px;justify-content:center}
+.timer-btn:hover{background:var(--cream)}
+.timer-btn-icon{font-size:.8em;line-height:1}
+.timer-btn .timer-btn-time{font-family:'JetBrains Mono',monospace}
+.timer-btn.running{color:var(--sea)}
+.timer-btn.paused{color:var(--sun)}
+.timer-btn.warn,.timer-btn.done{color:var(--coral)}
+.timer-edit-btn{font-family:'Outfit',sans-serif;padding:.55rem .8rem;border:none;border-left:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center}
+.timer-edit-btn:hover{color:var(--ink);background:var(--cream)}
+.timer-duration-edit{display:none;align-items:baseline;gap:.3rem;font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;padding:.5rem .8rem;border:1.5px solid var(--ink);border-radius:10px;background:var(--card);color:var(--ink)}
+.timer-duration-input{font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;border:none;background:transparent;color:var(--ink);width:4.2ch;text-align:center;outline:none;padding:0}
 
 /* VERDICT */
 .verdict-body{padding:1.6rem}
@@ -277,22 +280,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
         <span class="caught-label">inconsistencies</span>
       </div>
       <div class="timer-row">
-        <div class="timer-ring" id="timerRing" onclick="toggleTimer()">
-          <svg width="80" height="80" viewBox="0 0 80 80">
-            <circle class="timer-bg" cx="40" cy="40" r="36"/>
-            <circle class="timer-progress" id="timerArc" cx="40" cy="40" r="36"/>
-          </svg>
-          <div class="timer-display">
-            <div class="timer-secs" id="timerDisplay">3:00</div>
-            <div class="timer-hint" id="timerHint">start</div>
-          </div>
-        </div>
-        <div class="timer-presets">
-          <button class="preset-btn" onclick="setDuration(120,this)">2 min</button>
-          <button class="preset-btn active" onclick="setDuration(180,this)">3 min</button>
-          <button class="preset-btn" onclick="setDuration(300,this)">5 min</button>
-          <button class="preset-btn" onclick="setDuration(0,this)">No timer</button>
-        </div>
+        <div id="timerMount"></div>
       </div>
     </div>
     <div class="action-row">
@@ -639,10 +627,6 @@ var currentPhase = 0;
 var maxPhase = 0;
 var currentQ = 0;
 var caughtCount = 0;
-var timerDuration = 180;
-var timerRemaining = 180;
-var timerInterval = null;
-var timerRunning = false;
 var verdictChosen = null;
 var allQuestions = [];
 
@@ -775,11 +759,7 @@ function goToPhase(n) {
     s.style.cursor = (i <= maxPhase) ? 'pointer' : 'default';
   });
   if (n === 2) {
-    stopTimer();
-    timerRemaining = timerDuration;
-    updateTimerDisplay();
-    document.getElementById('timerRing').classList.remove('warning','danger');
-    document.getElementById('timerHint').textContent = timerDuration > 0 ? 'start' : 'off';
+    if (timerState['main']) timerSelectDuration('main', timerState['main'].defaultSecs);
   }
   window.scrollTo({top: 0, behavior: 'smooth'});
 }
@@ -797,78 +777,143 @@ function resetAll() {
     s.style.cursor = i === 0 ? 'pointer' : 'default';
     s.classList.remove('done');
   });
-  stopTimer();
   buildScenarioGrid();
   goToPhase(0);
 }
 
-// Timer
-function setDuration(secs, btn) {
-  timerDuration = secs;
-  timerRemaining = secs;
-  document.querySelectorAll('.preset-btn').forEach(function(b){ b.classList.remove('active'); });
-  btn.classList.add('active');
-  stopTimer();
-  var ring = document.getElementById('timerRing');
-  ring.classList.remove('warning','danger');
-  if (secs === 0) {
-    document.getElementById('timerDisplay').textContent = '--';
-    document.getElementById('timerHint').textContent = 'off';
+// ===== Reusable timer widget (multi-instance: one button, m:ss typing, progress bar on top) =====
+var timerState = {};
+function timerFormatTime(totalSeconds){
+  var m=Math.floor(totalSeconds/60), s=totalSeconds%60;
+  return m+':'+(s<10?'0':'')+s;
+}
+function timerParseTime(str){
+  var parts=String(str).trim().split(':');
+  var m, s;
+  if(parts.length>=2){ m=parseInt(parts[0],10); s=parseInt(parts[1],10); }
+  else { m=parseInt(parts[0],10); s=0; }
+  if(isNaN(m)) m=0;
+  if(isNaN(s)||s<0||s>59) s=0;
+  var total=m*60+s;
+  if(!total || total<1) return null;
+  return Math.min(total,5999);
+}
+function timerWidgetHTML(id, defaultSecs, locked){
+  var editBits = locked ? '' :
+    '<button class="timer-edit-btn" id="timerEditBtn-'+id+'" onclick="timerEditDuration(\''+id+'\')" title="Edit duration" aria-label="Edit timer duration"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>'+
+    '<span class="timer-duration-edit" id="timerDurationEdit-'+id+'"><input type="text" inputmode="numeric" class="timer-duration-input" id="timerDurationInput-'+id+'" placeholder="'+timerFormatTime(defaultSecs)+'" onblur="timerCommitDuration(\''+id+'\')" onkeydown="if(event.key===\'Enter\'){this.blur()}else if(event.key===\'Escape\'){timerCancelEdit(\''+id+'\')}"></span>';
+  return ''+
+    '<div class="timer-section">'+
+      '<div class="timer-progress"><div class="timer-progress-fill" id="timerProgress-'+id+'"></div></div>'+
+      '<div class="timer-controls">'+
+        '<span class="timer-btn-wrap">'+
+          '<button class="timer-btn" id="timerBtn-'+id+'" onclick="timerHandleClick(\''+id+'\')"><span class="timer-btn-icon" id="timerBtnIcon-'+id+'">&#9654;</span><span id="timerBtnLabel-'+id+'"></span></button>'+
+          editBits+
+        '</span>'+
+      '</div>'+
+    '</div>';
+}
+function timerInit(id, defaultSecs, locked){
+  timerState[id] = {interval:null, seconds:defaultSecs, total:defaultSecs, running:false, paused:false, defaultSecs:defaultSecs, locked:!!locked};
+  timerUpdateBtn(id);
+}
+function timerSelectDuration(id, secs){
+  var st = timerState[id];
+  clearInterval(st.interval); st.interval=null;
+  st.running=false; st.paused=false;
+  st.total=secs; st.seconds=secs;
+  var prog = document.getElementById('timerProgress-'+id);
+  prog.style.width='0%'; prog.className='timer-progress-fill';
+  timerUpdateBtn(id);
+}
+function timerEditDuration(id){
+  var st = timerState[id];
+  if(st.locked) return;
+  clearInterval(st.interval); st.interval=null; st.running=false; st.paused=false;
+  var input=document.getElementById('timerDurationInput-'+id);
+  input.value=timerFormatTime(st.defaultSecs);
+  document.getElementById('timerBtn-'+id).style.display='none';
+  document.getElementById('timerEditBtn-'+id).style.display='none';
+  document.getElementById('timerDurationEdit-'+id).style.display='inline-flex';
+  input.focus();
+  input.select();
+}
+function timerCommitDuration(id){
+  var st = timerState[id];
+  if(st._canceling){ st._canceling=false; return; }
+  var parsed=timerParseTime(document.getElementById('timerDurationInput-'+id).value);
+  if(parsed) st.defaultSecs=parsed;
+  document.getElementById('timerDurationEdit-'+id).style.display='none';
+  document.getElementById('timerBtn-'+id).style.display='inline-flex';
+  timerSelectDuration(id, st.defaultSecs);
+}
+function timerCancelEdit(id){
+  var st = timerState[id];
+  st._canceling=true;
+  document.getElementById('timerDurationEdit-'+id).style.display='none';
+  document.getElementById('timerBtn-'+id).style.display='inline-flex';
+  timerUpdateBtn(id);
+}
+function timerHandleClick(id){
+  var st = timerState[id];
+  if(!st.running && !st.paused && st.seconds<=0 && st.total>0){ timerSelectDuration(id, st.defaultSecs); return; }
+  timerToggle(id);
+}
+function timerToggle(id){
+  var st = timerState[id];
+  if(!st.total) return;
+  if(!st.running && !st.paused){ st.running=true; timerTick(id); }
+  else if(st.running){ clearInterval(st.interval); st.interval=null; st.running=false; st.paused=true; }
+  else{ st.paused=false; st.running=true; timerTick(id); }
+  timerUpdateBtn(id);
+}
+function timerTick(id){
+  var st = timerState[id];
+  var prog=document.getElementById('timerProgress-'+id);
+  st.interval=setInterval(function(){
+    st.seconds--;
+    var pct=((st.total-st.seconds)/st.total)*100;
+    prog.style.width=pct+'%';
+    if(st.seconds<=10 && st.seconds>0){ prog.className='timer-progress-fill warn'; }
+    if(st.seconds<=0){
+      clearInterval(st.interval); st.interval=null; st.running=false;
+      prog.style.width='100%'; prog.className='timer-progress-fill warn';
+      setTimeout(function(){
+        if(!st.running && !st.paused && st.seconds<=0){ timerSelectDuration(id, st.defaultSecs); }
+      },2500);
+    }
+    timerUpdateBtn(id);
+  },1000);
+}
+function timerUpdateBtn(id){
+  var st = timerState[id];
+  var btn=document.getElementById('timerBtn-'+id);
+  var icon=document.getElementById('timerBtnIcon-'+id);
+  var label=document.getElementById('timerBtnLabel-'+id);
+  var editBtn=document.getElementById('timerEditBtn-'+id);
+  if(editBtn) editBtn.style.display = st.locked ? 'none' : 'inline-flex';
+  if(st.running){
+    icon.innerHTML='&#9208;';
+    label.innerHTML='<span class="timer-btn-time">'+timerFormatTime(st.seconds)+'</span>';
+    btn.className='timer-btn running'+(st.seconds<=10?' warn':'');
+  } else if(st.paused){
+    icon.innerHTML='&#9654;';
+    label.innerHTML='<span class="timer-btn-time">'+timerFormatTime(st.seconds)+'</span>';
+    btn.className='timer-btn paused';
+  } else if(st.seconds<=0 && st.total>0){
+    icon.innerHTML='&#8635;';
+    label.textContent='Done';
+    btn.className='timer-btn done';
   } else {
-    updateTimerDisplay();
-    document.getElementById('timerHint').textContent = 'start';
+    icon.innerHTML='&#9654;';
+    label.innerHTML='<span class="timer-btn-time">'+timerFormatTime(st.defaultSecs)+'</span>';
+    btn.className='timer-btn';
   }
 }
 
-function toggleTimer() {
-  if (timerDuration === 0) return;
-  timerRunning ? stopTimer() : startTimer();
-}
-
-function startTimer() {
-  if (timerDuration === 0) return;
-  if (timerRemaining <= 0) timerRemaining = timerDuration;
-  timerRunning = true;
-  document.getElementById('timerHint').textContent = 'pause';
-  timerInterval = setInterval(function(){
-    timerRemaining--;
-    updateTimerDisplay();
-    if (timerRemaining <= 0){ stopTimer(); timerExpired(); }
-  }, 1000);
-}
-
-function stopTimer() {
-  clearInterval(timerInterval);
-  timerRunning = false;
-  if (timerDuration > 0 && timerRemaining > 0)
-    document.getElementById('timerHint').textContent = 'start';
-}
-
-function timerExpired() {
-  document.getElementById('timerHint').textContent = 'done!';
-  var ring = document.getElementById('timerRing');
-  ring.classList.add('danger');
-  var flashes = 0;
-  var iv = setInterval(function(){
-    ring.style.opacity = ring.style.opacity==='0.4'?'1':'0.4';
-    if(++flashes>5){ clearInterval(iv); ring.style.opacity='1'; }
-  }, 200);
-}
-
-function updateTimerDisplay() {
-  if (timerDuration === 0) return;
-  var mins = Math.floor(timerRemaining / 60);
-  var secs = timerRemaining % 60;
-  document.getElementById('timerDisplay').textContent = mins + ':' + (secs < 10 ? '0' : '') + secs;
-  var ratio = timerDuration > 0 ? timerRemaining / timerDuration : 1;
-  document.getElementById('timerArc').style.strokeDashoffset = 226 * (1 - ratio);
-  var ring = document.getElementById('timerRing');
-  ring.classList.remove('warning','danger');
-  if (ratio <= 0.25) ring.classList.add('danger');
-  else if (ratio <= 0.5) ring.classList.add('warning');
-}
-
 document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('timerMount').innerHTML = timerWidgetHTML('main', 180, false);
+  timerInit('main', 180, false);
   buildScenarioGrid();
   document.querySelectorAll('.phase-step').forEach(function(s,i){
     if (i > 0) { s.style.opacity = '.4'; s.style.cursor = 'default'; }
