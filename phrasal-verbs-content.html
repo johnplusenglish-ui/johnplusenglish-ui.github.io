@@ -443,12 +443,6 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
   .pv-no-results { text-align:center; padding:3rem; color: var(--text-muted); font-style:italic; }
 
   /* Frequency legend */
-  .pv-legend {
-    display:flex; gap:1.25rem; margin-bottom:1.25rem; flex-wrap:wrap;
-    font-size:.8rem; color: var(--text-muted);
-  }
-  .pv-legend-item { display:flex; align-items:center; gap:.25rem; }
-  .pv-legend-item .pv-entry-dot { margin-left:0; }
 
   @media (max-width:800px) {
     .pv-cat-layout { grid-template-columns:1fr; }
@@ -785,7 +779,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
   @page{margin:1.5cm;size:A4}
   
   body{background:#fff !important;color:#000}
-  .topnav,nav,.page-header,.tabs,.pv-controls,.pv-freq-filters,.pv-search,.pv-search-count,#pvAlphaContent,#pvCatLayout,.print-modal-backdrop,.pv-legend,.pv-alpha-nav,.pv-cat-search-box{display:none !important}
+  .topnav,nav,.page-header,.tabs,.pv-controls,.pv-freq-filters,.pv-search,.pv-search-count,#pvAlphaContent,#pvCatLayout,.print-modal-backdrop,.pv-alpha-nav,.pv-cat-search-box{display:none !important}
   .tab-content,.tab-content.active{display:none !important}
   .page-container,.page-header{padding:0 !important;max-width:none !important}
   #printArea{display:block !important}
@@ -1259,11 +1253,6 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
   <!-- PLACEHOLDER TABS -->
   <div class="tab-content" id="tab-common-phrasal-verbs">
 
-    <div class="pv-legend">
-      <div class="pv-legend-item"><span class="pv-entry-dot t1" style="width:8px;height:8px;"></span> Common</div>
-      <div class="pv-legend-item"><span class="pv-entry-dot t2" style="width:8px;height:8px;"></span> Somewhat common</div>
-      <div class="pv-legend-item"><span class="pv-entry-dot t3" style="width:8px;height:8px;"></span> Less common</div>
-    </div>
 
     <div class="pv-controls">
       <button class="pv-view-btn on" onclick="pvSetView('alpha',this)">Alphabetical</button>
@@ -1301,11 +1290,6 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
   </div>
   <div class="tab-content" id="tab-pv-nouns">
 
-    <div class="pv-legend">
-      <div class="pv-legend-item"><span class="pv-entry-dot t1" style="width:8px;height:8px;"></span> Common</div>
-      <div class="pv-legend-item"><span class="pv-entry-dot t2" style="width:8px;height:8px;"></span> Somewhat common</div>
-      <div class="pv-legend-item"><span class="pv-entry-dot t3" style="width:8px;height:8px;"></span> Less common</div>
-    </div>
 
     <div class="pv-controls" style="justify-content:flex-end;">
       <button class="pv-print-btn" onclick="nounOpenPrint()" aria-label="Print options">
@@ -1830,6 +1814,23 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
     clearTimeout(pvSearchTimer);
     pvSearchTimer = setTimeout(pvRenderAlpha, 160);
   }
+
+  // Letter jumps land instantly. html{scroll-behavior:smooth} is right for short
+  // in-page links, but a long jump here is tens of thousands of pixels that
+  // Chrome animates over more than a second — the scroll was smooth, just far.
+  // Instant for the strip only; smooth stays in place everywhere else.
+  document.addEventListener('click', function(ev) {
+    if (!ev.target || !ev.target.closest) return;
+    var a = ev.target.closest('.pv-alpha-strip a[href^="#"]');
+    if (!a || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey || ev.button !== 0) return;
+    var target = document.getElementById(a.getAttribute('href').slice(1));
+    if (!target) return;
+    ev.preventDefault();
+    var strip = a.closest('.pv-alpha-strip');
+    var offset = strip ? strip.getBoundingClientRect().height : 0;
+    window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - offset - 6, behavior: 'instant' });
+    if (history.replaceState) history.replaceState(null, '', a.getAttribute('href'));
+  });
 
   // Click a row to reveal its example, accordion-scoped to the surrounding list.
   document.addEventListener('click', function(ev) {

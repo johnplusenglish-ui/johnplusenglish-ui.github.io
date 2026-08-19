@@ -1546,6 +1546,24 @@ function depRender(){
   depSizeLedger();
 }
 depRender();
+// Letter jumps land instantly. html{scroll-behavior:smooth} is right for short
+// in-page links, but A->W here is a 38,000px trip that Chrome animates over
+// ~1.5s — the scroll was smooth, just far. Instant for the strip only; smooth
+// stays in place everywhere else on the page.
+document.addEventListener('click',function(ev){
+  if(!ev.target||!ev.target.closest)return;
+  var a=ev.target.closest('.alpha-strip a[href^="#"]');
+  if(!a||ev.metaKey||ev.ctrlKey||ev.shiftKey||ev.altKey||ev.button!==0)return;
+  var target=document.getElementById(a.getAttribute('href').slice(1));
+  if(!target)return;
+  ev.preventDefault();
+  var strip=a.closest('.alpha-strip');
+  var offset=strip?strip.getBoundingClientRect().height:0;
+  var y=target.getBoundingClientRect().top+window.scrollY-offset-6;
+  window.scrollTo({top:y,behavior:'instant'});
+  if(history.replaceState) history.replaceState(null,'',a.getAttribute('href'));
+});
+
 // Click a row to reveal its example. Accordion-scoped to the surrounding list
 // so only one example is open at a time. Delegated, so it survives re-renders.
 document.addEventListener('click',function(ev){
