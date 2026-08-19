@@ -8,7 +8,7 @@
 <meta name="description" content="Interactive preposition exercises for English learners. Practice dependent prepositions, prepositional phrases, and more.">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-:root{--sun:#FFB347;--sky:#2176FF;--sky-light:#E8EEFF;--sea:#1DD3B0;--coral:#FF6B6B;--lavender:#9B72CF;--mint:#5DDEA0;--sand:#FFF5E6;--cream:#F7F6F3;--ink:#2D3047;--muted:#7A7D8E;--border:#E8E5DF;--card:#fff;--radius:14px}
+:root{--sun:#FFB347;--sky:#2176FF;--sky-light:#E8EEFF;--sea:#1DD3B0;--sea-light:#E4FBF7;--coral:#FF6B6B;--lavender:#9B72CF;--mint:#5DDEA0;--sand:#FFF5E6;--cream:#F7F6F3;--ink:#2D3047;--muted:#7A7D8E;--border:#E8E5DF;--card:#fff;--radius:14px}
 *{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth;overflow-y:scroll}
 body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
 
@@ -136,20 +136,32 @@ a.tab{text-decoration:none}
 .cat-entries{display:none;overflow:hidden}
 .cat-entries.open{display:block;animation:slideDown .25s ease}
 @keyframes slideDown{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
-.alpha-header{font-family:'Outfit',sans-serif;font-size:1.8rem;font-weight:700;color:var(--sea);margin:0 0 .75rem;padding-bottom:.5rem;border-bottom:2px solid var(--sea);scroll-margin-top:80px}
-.alpha-header:not(:first-child){margin-top:2rem}
-.entry{display:grid;grid-template-columns:160px 46px 1fr;gap:.75rem;padding:.75rem 1rem;border-radius:10px;transition:background .15s;align-items:baseline}
-.entry:hover{background:rgba(0,0,0,.02)}.entry:nth-child(even){background:rgba(0,0,0,.015)}.entry:nth-child(even):hover{background:rgba(0,0,0,.03)}
-.e-combo{font-weight:700;font-size:.9rem;color:var(--ink)}
-.e-type{font-family:Outfit,sans-serif;font-size:.68rem;font-weight:500;padding:.25rem .5rem;border-radius:6px;text-align:center;height:fit-content}
-.e-type.v{background:#dbeafe;color:#2563eb}.e-type.n{background:#dcfce7;color:#16a34a}.e-type.adj{background:var(--sky-light);color:var(--sky)}.e-type.phrase{background:#f3e8ff;color:#7c3aed}
-.e-right{min-width:0}
-.e-def{color:var(--muted);font-style:italic;font-size:.88rem;margin-bottom:.25rem}
-.e-ex{color:var(--ink);font-size:.9rem;font-weight:400;line-height:1.6}
-.e-ex b{color:var(--ink);font-weight:700}
-.alpha-nav{display:flex;flex-wrap:wrap;gap:.25rem;margin-bottom:1.5rem;position:sticky;top:0;background:var(--cream);padding:.75rem 0;z-index:10;border-bottom:1px solid var(--border)}
-.alpha-link{font-family:Outfit,sans-serif;font-size:.75rem;font-weight:500;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:6px;text-decoration:none;color:var(--muted);transition:all .15s;border:1px solid transparent}
-.alpha-link:hover{background:var(--card);border-color:var(--border);color:var(--ink)}.alpha-link.has{color:var(--ink);font-weight:700}
+/* ── Ledger listing ──
+   Headword and its preposition sit in two left-aligned columns sized from the
+   widest entry in the data (see depSizeLedger), so every preposition lands on
+   the same vertical line and the pattern is scannable down the page. Rows are
+   separated by hairlines, not zebra stripes — the old :nth-child(even) striping
+   miscounted because .alpha-header shares the parent and flipped the parity. */
+.alpha-header{font-family:'Outfit',sans-serif;font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--sea);margin:0;padding:1.15rem .3rem .3rem;border-bottom:1.5px solid var(--sea);scroll-margin-top:3.4rem}
+.alpha-header:first-child{padding-top:.35rem}
+.ledger{--hw:9rem;--pw:6rem}
+/* fallbacks matter: rows also render outside a .ledger wrapper, and a var()
+   with no fallback would invalidate the whole declaration and collapse the grid */
+.entry{display:grid;grid-template-columns:var(--hw,9rem) var(--pw,6rem) 1fr;gap:0 1.1rem;align-items:baseline;padding:.5rem .4rem;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s}
+.entry:hover,.entry.open{background:var(--cream)}
+.entry.two{grid-template-columns:var(--hw,11rem) 1fr}
+.e-combo{font-weight:700;font-size:.85rem;color:var(--ink);line-height:1.35}
+.e-prep{font-weight:700;font-size:.85rem;color:var(--sea);line-height:1.35}
+.e-type{font-family:Outfit,sans-serif;font-size:.56rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-left:.35rem}
+.e-def{color:var(--muted);font-size:.775rem;line-height:1.4;min-width:0;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.entry.open .e-def{-webkit-line-clamp:unset;overflow:visible}
+.e-ex{display:none;grid-column:2/-1;color:var(--ink);font-size:.735rem;font-style:italic;margin-top:.3rem;padding:.3rem .5rem;background:var(--sea-light);border-radius:0 6px 6px 0;line-height:1.45}
+.entry.two .e-ex{grid-column:1/-1}
+.entry.open .e-ex{display:block}
+.e-ex b{font-style:normal;font-weight:700;color:var(--sea)}
+.alpha-strip{position:sticky;top:0;z-index:10;display:flex;flex-wrap:wrap;gap:.15rem;padding:.5rem .25rem;margin-bottom:.6rem;background:rgba(247,246,243,.94);backdrop-filter:blur(8px);border-bottom:1.5px solid var(--border)}
+.alpha-strip a{font-family:Outfit,sans-serif;font-size:.72rem;font-weight:700;color:var(--muted);text-decoration:none;width:1.6rem;height:1.6rem;display:flex;align-items:center;justify-content:center;border-radius:6px;transition:background .12s,color .12s}
+.alpha-strip a:hover{background:var(--sea-light);color:var(--sea)}
 .no-results{text-align:center;padding:3rem;color:var(--muted);font-style:italic}
 
 
@@ -203,7 +215,15 @@ a.tab{text-decoration:none}
 
 @media(max-width:700px){
   .study-sidebar-layout{grid-template-columns:1fr}
-  .study-sidebar{max-width:none;width:100%;max-height:none;position:static}
+  .study-sidebar{max-width:none;width:100%;max-height:220px;position:static}
+}
+@media(max-width:620px){
+  /* Two columns only: headword + preposition keep their alignment stripe,
+     the definition drops to its own full-width line underneath. */
+  .entry{grid-template-columns:var(--hw) 1fr;gap:0 .8rem}
+  .entry.two{grid-template-columns:1fr}
+  .e-def{grid-column:1/-1;-webkit-line-clamp:2;margin-top:.15rem}
+  .e-ex{grid-column:1/-1}
 }
 
 /* Open Cloze Tests */
@@ -438,8 +458,7 @@ footer{text-align:center;padding:3rem 2rem;font-size:.8rem;color:var(--muted);bo
   .tabs-wrapper{padding:1.5rem 1.25rem 4rem}
   .tab{padding:.75rem 1rem;font-size:.84rem}
   .panel-card{padding:2rem 1.5rem}
-  .entry{grid-template-columns:120px 42px 1fr;gap:.5rem;padding:.5rem .5rem;font-size:.85rem}
-  .e-combo{font-size:.82rem}
+  .entry{padding:.5rem .25rem}
   .cg{grid-template-columns:1fr}.qc{padding:1.25rem}.mcg{grid-template-columns:1fr}
 }
 .reveal,.reveal-d1,.reveal-d2,.reveal-d3,.reveal-d4{opacity:1!important;transform:none!important;animation:none!important}
@@ -830,7 +849,6 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
           <button class="tf" onclick="depSetType('Adj',this)">Adjectives</button>
         </div>
         <input class="search-box" type="text" id="dep_searchBox" placeholder="Search prepositions, definitions, or examples…" oninput="depDoSearch()">
-        <div class="search-count" id="dep_searchCount"></div>
         <div id="dep_studyContent"></div>
       </div>
       <div id="dep_catView" style="display:none">
@@ -908,7 +926,6 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
     <p class="pd">Fixed phrases built around a preposition.</p>
     <div class="ex-study-view active" id="pp_study_view">
       <input class="search-box" type="text" id="pp_searchBox" placeholder="Search phrases, definitions, or examples…" oninput="ppDoSearch()">
-      <div class="search-count" id="pp_searchCount"></div>
       <div id="pp_studyContent"></div>
     </div>
     <div class="ex-practice-view" id="pp_practice_view">
@@ -1400,16 +1417,13 @@ function depShowSelectedCats(){
     return;
   }
   var html='';
-  var total=0;
   var cats=Array.from(depCatSel);
   cats.sort(function(a,b){return parseInt(a)-parseInt(b)});
   cats.forEach(function(cat){
     var name=cat.replace(/^\d+\.\s*/,'');
     var entries=dep_D[cat];
-    total+=entries.length;
-    html+='<div style="font-family:Outfit,sans-serif;font-size:1.15rem;margin:1.5rem 0 .5rem;padding-bottom:.25rem;border-bottom:2px solid var(--sky)">'+name+'</div>';
+    html+='<div class="alpha-header">'+name+'</div>';
     entries.forEach(function(e){
-      var tc=e[1].toLowerCase();
       var prepBold='<b>'+e[4]+'</b>';
       var exHtml=e[3].replace('___',prepBold);
       var phraseWords=e[0].replace(/\(.*?\)/g,'').trim().split(/\s+/);
@@ -1418,11 +1432,13 @@ function depShowSelectedCats(){
         var afterPrep=phraseWords.slice(prepIdx+1).join(' ');
         exHtml=exHtml.replace(new RegExp('(<\/b>)\\s+('+afterPrep.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')'),'$1 <b>$2</b>');
       }
-      html+='<div class="entry"><span class="e-combo">'+e[0]+'</span><span class="e-type '+tc+'">'+e[1]+'</span><div class="e-right"><div class="e-def">'+e[2]+'</div><div class="e-ex">'+exHtml+'</div></div></div>';
+      // routed through depEntryHTML so both views render an identical row
+      html+=depEntryHTML({co:e[0],ty:e[1],df:e[2],ex:exHtml,an:e[4]});
     });
   });
-  var header='<h3>'+depCatSel.size+' categor'+(depCatSel.size===1?'y':'ies')+' selected</h3><div class="study-content-count">'+total+' entries</div>';
-  document.getElementById('dep_sidebarContent').innerHTML=header+html;
+  var header='<h3>'+depCatSel.size+' categor'+(depCatSel.size===1?'y':'ies')+' selected</h3>';
+  document.getElementById('dep_sidebarContent').innerHTML=header+'<div class="ledger">'+html+'</div>';
+  depSizeLedger();
 }
 
 function depShowCat(cat){depCatSel.clear();depCatSel.add(cat);depBuildSidebar();depShowSelectedCats()}
@@ -1430,17 +1446,67 @@ function depShowCat(cat){depCatSel.clear();depCatSel.add(cat);depBuildSidebar();
 function depFilterCats(){depBuildSidebar()}
 
 function depSetType(t,btn){depStudyState.typeFilter=t;btn.parentElement.querySelectorAll('.tf').forEach(function(b){b.classList.remove('on')});btn.classList.add('on');depRender()}
-function depDoSearch(){depStudyState.search=document.getElementById('dep_searchBox').value.trim().toLowerCase();depRender()}
+// Debounced: a full render rebuilds every matching row, so firing on each
+// keystroke made typing stutter on the 1066-entry list.
+var depSearchTimer=null;
+function depDoSearch(){
+  clearTimeout(depSearchTimer);
+  depSearchTimer=setTimeout(function(){
+    depStudyState.search=document.getElementById('dep_searchBox').value.trim().toLowerCase();
+    depRender();
+  },160);
+}
 function depMatchesFilter(e){
   if(depStudyState.typeFilter!=='all'&&e.ty!==depStudyState.typeFilter)return false;
   if(depStudyState.search){var s=depStudyState.search;var co=(e.co||'').toLowerCase();var df=(e.df||'').toLowerCase();var ex=(e.ex||'').toLowerCase().replace(/<[^>]+>/g,'');if(co.indexOf(s)===-1&&df.indexOf(s)===-1&&ex.indexOf(s)===-1)return false}
   return true;
 }
+// The preposition is the final whitespace-separated token of the combo, and may
+// be a slashed pair ("abound in/with", "oblivious of/to") — keep the pair whole.
+function depSplitTerm(co,an){
+  var m=co.match(/(\S+)$/);
+  if(m&&m[1].split('/').indexOf(an)!==-1){
+    return {head:co.slice(0,m.index).replace(/\s+$/,''),prep:m[1]};
+  }
+  return {head:co,prep:an};
+}
 function depEntryHTML(e){
-  var tc=e.ty.toLowerCase();if(tc==='adj')tc='adj';if(tc==='v')tc='v';if(tc==='n')tc='n';if(tc==='phrase')tc='phrase';
-  var defT=e.df?'<div class="e-def">'+e.df+'</div>':'';
+  var s=depSplitTerm(e.co,e.an);
+  // .e-def is always emitted, even when empty, so the grid columns stay aligned
+  var defT='<div class="e-def">'+(e.df||'')+'</div>';
   var exT=e.ex?'<div class="e-ex">'+e.ex.replace('___','<b>'+e.an+'</b>')+'</div>':'';
-  return '<div class="entry"><span class="e-combo">'+e.co+'</span><span class="e-type '+tc+'">'+e.ty+'</span><div class="e-right">'+defT+exT+'</div></div>';
+  return '<div class="entry"><span class="e-combo">'+s.head+'</span>'
+    +'<span class="e-prep">'+s.prep+'<span class="e-type">'+e.ty+'</span></span>'
+    +defT+exT+'</div>';
+}
+// Measure the widest headword and preposition once, so the two columns fit the
+// real data rather than a guessed width. Cached — depAllEntries never changes.
+var depColW=null;
+function depMeasure(strings,weight,size){
+  var p=document.createElement('span');
+  p.style.cssText='position:absolute;left:-9999px;top:0;white-space:nowrap;'
+    +'font-family:Outfit,sans-serif;font-weight:'+weight+';font-size:'+size;
+  document.body.appendChild(p);
+  var m=0;
+  for(var i=0;i<strings.length;i++){p.textContent=strings[i];if(p.offsetWidth>m)m=p.offsetWidth}
+  p.parentNode.removeChild(p);
+  return m;
+}
+function depSizeLedger(){
+  if(!depColW){
+    var heads=[],preps=[];
+    depAllEntries.forEach(function(e){
+      var s=depSplitTerm(e.co,e.an);heads.push(s.head);preps.push(s.prep);
+    });
+    depColW={
+      hw:Math.ceil(depMeasure(heads,700,'.85rem'))+8,
+      pw:Math.ceil(depMeasure(preps,700,'.85rem'))+34 // + room for the type tag
+    };
+  }
+  document.querySelectorAll('#panel-dependent .ledger').forEach(function(el){
+    el.style.setProperty('--hw',depColW.hw+'px');
+    el.style.setProperty('--pw',depColW.pw+'px');
+  });
 }
 function depRender(){
   var container=document.getElementById('dep_studyContent');
@@ -1455,47 +1521,42 @@ function depRender(){
   });
   
   var sortedLetters=Object.keys(letters).sort();
-  
-  var html='<div class="search-count">'+filtered.length+' entries shown</div>';
-  html+='<div class="study-sidebar-layout"><div class="study-sidebar" id="dep_alphaSidebar">';
-  html+='<div class="dep-sb-item" onclick="depShowAll(this)" data-letter="all"><span class="dep-sb-item-name" style="font-weight:700">A\u2013Z</span></div>';
+
+  if(!filtered.length){
+    container.innerHTML='<div class="no-results">No entries match your search.</div>';
+    return;
+  }
+
+  // A slim sticky A\u2013Z strip that anchor-jumps, replacing the old 27-item
+  // vertical rail (which on mobile stacked into ~1000px of buttons above the
+  // first entry). Every letter stays rendered, so jumping keeps its context.
+  var html='<div class="ledger"><div class="alpha-strip">';
+  sortedLetters.forEach(function(l){html+='<a href="#dep-'+l+'">'+l+'</a>'});
+  html+='</div><div class="study-content">';
   sortedLetters.forEach(function(l){
-    html+='<div class="dep-sb-item" onclick="depShowLetter(this,\''+l+'\')" data-letter="'+l+'"><span class="dep-sb-item-name" style="font-family:\'Outfit\',sans-serif;font-size:1.1rem">'+l+'</span></div>';
+    html+='<div class="alpha-header" id="dep-'+l+'">'+l+'</div>';
+    letters[l].forEach(function(e){html+=depEntryHTML(e)});
   });
-  html+='</div><div class="study-content" id="dep_alphaContent"></div></div>';
-  
+  html+='</div></div>';
+
   container.innerHTML=html;
-  document.getElementById('dep_searchCount').textContent='';
   window.depLetters=letters;
   window.depFilteredEntries=filtered;
   window.depSortedLetters=sortedLetters;
-  
-  var first=document.querySelector('#dep_alphaSidebar .dep-sb-item');
-  if(first){first.classList.add('active');depShowAll(first);}
-}
-
-function depShowAll(el){
-  document.querySelectorAll('#dep_alphaSidebar .dep-sb-item').forEach(function(s){s.classList.remove('active')});
-  el.classList.add('active');
-  var html='';
-  window.depSortedLetters.forEach(function(l){
-    html+='<div class="alpha-header">'+l+'</div>';
-    window.depLetters[l].forEach(function(e){html+=depEntryHTML(e)});
-  });
-  document.getElementById('dep_alphaContent').innerHTML=html;
-}
-
-function depShowLetter(el,letter){
-  document.querySelectorAll('#dep_alphaSidebar .dep-sb-item').forEach(function(s){s.classList.remove('active')});
-  el.classList.add('active');
-  var entries=window.depLetters[letter]||[];
-  var html='<h3>'+letter+'</h3><div class="study-content-count">'+entries.length+' entries</div>';
-  entries.forEach(function(e){html+=depEntryHTML(e)});
-  document.getElementById('dep_alphaContent').innerHTML=html;
+  depSizeLedger();
 }
 depRender();
-function depExpandAll(){document.querySelectorAll('#dep_studyContent .cat-title').forEach(function(t){t.classList.add('open');t.nextElementSibling.classList.add('open')})}
-function depCollapseAll(){document.querySelectorAll('#dep_studyContent .cat-title').forEach(function(t){t.classList.remove('open');t.nextElementSibling.classList.remove('open')})}
+// Click a row to reveal its example. Accordion-scoped to the surrounding list
+// so only one example is open at a time. Delegated, so it survives re-renders.
+document.addEventListener('click',function(ev){
+  if(!ev.target||!ev.target.closest)return;
+  var row=ev.target.closest('.entry');
+  if(!row)return;
+  var wasOpen=row.classList.contains('open');
+  var scope=row.closest('.study-content')||document;
+  scope.querySelectorAll('.entry.open').forEach(function(o){o.classList.remove('open')});
+  if(!wasOpen)row.classList.add('open');
+});
 
 // Study view for Prepositional Phrases
 var ppStudyState={view:'alpha',typeFilter:'all',search:''};
@@ -1576,16 +1637,13 @@ function ppShowSelectedCats(){
     return;
   }
   var html='';
-  var total=0;
   var cats=Array.from(ppCatSel);
   cats.forEach(function(cat){
-    var entries=pp_D[cat];
-    total+=entries.length;
-    html+='<div style="font-family:Outfit,sans-serif;font-size:1.15rem;margin:1.5rem 0 .5rem;padding-bottom:.25rem;border-bottom:2px solid var(--sky)">'+cat+'</div>';
-    entries.forEach(function(e){html+=ppEntryHTML({co:e[0],ty:e[1],df:e[2],ex:e[3],an:e[4]})});
+    html+='<div class="alpha-header">'+cat+'</div>';
+    pp_D[cat].forEach(function(e){html+=ppEntryHTML({co:e[0],ty:e[1],df:e[2],ex:e[3],an:e[4]})});
   });
-  var header='<h3>'+ppCatSel.size+' preposition'+(ppCatSel.size===1?'':'s')+' selected</h3><div class="study-content-count">'+total+' entries</div>';
-  document.getElementById('pp_sidebarContent').innerHTML=header+html;
+  var header='<h3>'+ppCatSel.size+' preposition'+(ppCatSel.size===1?'':'s')+' selected</h3>';
+  document.getElementById('pp_sidebarContent').innerHTML=header+'<div class="ledger">'+html+'</div>';
 }
 
 function ppShowCat(cat){ppCatSel.clear();ppCatSel.add(cat);ppBuildSidebar();ppShowSelectedCats()}
@@ -1600,7 +1658,6 @@ function ppMatchesFilter(e){
   return true;
 }
 function ppEntryHTML(e){
-  var defT=e.df?'<div class="e-def">'+e.df+'</div>':'';
   var ppEx=e.ex||'';
   if(ppEx){
     ppEx=ppEx.replace('___',e.an);
@@ -1614,16 +1671,16 @@ function ppEntryHTML(e){
     }
   }
   var exT=ppEx?'<div class="e-ex">'+ppEx+'</div>':'';
-  return '<div class="entry" style="grid-template-columns:160px 1fr"><span class="e-combo">'+e.co+'</span><div class="e-right">'+defT+exT+'</div></div>';
+  // Prepositional phrases have no trailing particle to split out, so they use
+  // the two-column variant of the same row — same type scale, hairlines and
+  // click-to-reveal as the Dependent tab, just without the preposition column.
+  return '<div class="entry two"><span class="e-combo">'+e.co+'</span>'
+    +'<div class="e-def">'+(e.df||'')+'</div>'+exT+'</div>';
 }
 function ppRender(){
   var container=document.getElementById('pp_studyContent');
   var cats=Object.keys(pp_D);
-  var total=0;
-  cats.forEach(function(c){pp_D[c].forEach(function(e){if(ppMatchesFilter({co:e[0],ty:e[1],df:e[2],ex:e[3],an:e[4]}))total++})});
-  
-  var html='<div class="search-count">'+total+' entries shown</div>';
-  html+='<div class="study-sidebar-layout"><div class="study-sidebar" id="pp_alphaSidebar">';
+  var html='<div class="study-sidebar-layout"><div class="study-sidebar" id="pp_alphaSidebar">';
   html+='<div class="dep-sb-item" onclick="ppShowAllPreps(this)" data-letter="all"><span class="dep-sb-item-name" style="font-weight:700">All</span></div>';
   cats.forEach(function(cat){
     var filtered=[];
@@ -1634,7 +1691,6 @@ function ppRender(){
   html+='</div><div class="study-content" id="pp_alphaContent"></div></div>';
   
   container.innerHTML=html;
-  document.getElementById('pp_searchCount').textContent='';
   
   var first=document.querySelector('#pp_alphaSidebar .dep-sb-item');
   if(first){first.classList.add('active');ppShowAllPreps(first);}
@@ -1661,7 +1717,7 @@ function ppShowPrep(el,cat){
   var entries=pp_D[cat];
   var filtered=[];
   entries.forEach(function(e){if(ppMatchesFilter({co:e[0],ty:e[1],df:e[2],ex:e[3],an:e[4]}))filtered.push(e)});
-  var html='<h3>'+cat+'</h3><div class="study-content-count">'+filtered.length+' entries</div>';
+  var html='<div class="alpha-header">'+cat+'</div>';
   filtered.forEach(function(e){html+=ppEntryHTML({co:e[0],ty:e[1],df:e[2],ex:e[3],an:e[4]})});
   document.getElementById('pp_alphaContent').innerHTML=html;
 }
