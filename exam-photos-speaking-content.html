@@ -158,15 +158,18 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
 .reset-chips{font-family:'Outfit',sans-serif;font-size:.72rem;font-weight:600;color:var(--muted);background:none;border:none;cursor:pointer;padding:0;transition:color .15s}
 .reset-chips:hover{color:var(--ink)}
 
-.print-btn{display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:7px 16px;border-radius:10px;font-size:.78rem;font-weight:700;cursor:pointer;border:1.5px solid var(--border);background:var(--card);color:var(--muted);font-family:'Outfit',sans-serif;transition:all .2s}
+.card-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.print-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:10px;font-size:.78rem;font-weight:700;cursor:pointer;border:1.5px solid var(--border);background:var(--card);color:var(--muted);font-family:'Outfit',sans-serif;transition:all .2s}
 .print-btn:hover{border-color:var(--ink);color:var(--ink)}
+.png-btn.busy{opacity:.55;cursor:progress}
+.print-btn:disabled{pointer-events:none}
 .print-btn svg{flex-shrink:0}
 
 .img-slot.c1-faded{opacity:.3;transition:opacity .25s;filter:grayscale(30%)}
 .img-slot.faded{opacity:.35;transition:opacity .25s;filter:grayscale(30%)}
 
 @media print{
-  nav,.mode-bar,.acc-header .chevron,.sub-drop-header,.timer-row,.gen-timer-row,.print-btn,.phase-tabs{display:none!important}
+  nav,.mode-bar,.acc-header .chevron,.sub-drop-header,.timer-row,.gen-timer-row,.print-btn,.card-actions,.phase-tabs{display:none!important}
   .acc-card{box-shadow:none!important;border:1px solid #ddd!important;break-inside:avoid}
   .acc-body{display:block!important}
   .sub-drop-body{display:block!important}
@@ -527,7 +530,10 @@ function genTimerHTML(id) {
 }
 
 function printBtn(id) {
-  return `<button class="print-btn" onclick="printCard('${id}')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>Print</button>`;
+  return `<div class="card-actions">` +
+    `<button class="print-btn" onclick="printCard('${id}')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>Print</button>` +
+    `<button class="print-btn png-btn" id="pngBtn-${id}" onclick="downloadCardPNG('${id}')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download PNG</button>` +
+    `</div>`;
 }
 
 function timerHTML(id, secs, locked, labelText) {
@@ -799,6 +805,220 @@ function toggleC1Photo(slot, cardId) {
   } else {
     const fadedCount = row.querySelectorAll('.img-slot.c1-faded').length;
     if (fadedCount < 1) slot.classList.add('c1-faded');
+  }
+}
+
+// ── Download the task as a PNG practice sheet ──
+const PNG_META = {
+  b2:  {ink:'#16A88D', tint:'#E7F6F2', label:'B2 First · Speaking Part 2'},
+  c1:  {ink:'#2176FF', tint:'#E8EEFF', label:'C1 Advanced · Speaking Part 2'},
+  c2:  {ink:'#9B72CF', tint:'#F0E8FA', label:'C2 Proficiency · Speaking Part 2'},
+  gen: {ink:'#E09A2E', tint:'#FFF5E6', label:'Picture discussion'}
+};
+
+/* split an element's html into [{text, bold}] so <strong> survives into canvas */
+function richSegments(el) {
+  const out = [];
+  el.childNodes.forEach(n => {
+    if (n.nodeType === 3) out.push({text:n.textContent, bold:false});
+    else out.push({text:n.textContent, bold:n.tagName === 'STRONG' || n.tagName === 'B'});
+  });
+  return out;
+}
+function wrapRich(ctx, segs, maxW, fReg, fBold) {
+  const lines = []; let line = [], x = 0;
+  segs.forEach(seg => {
+    const parts = seg.text.split(/(\s+)/).filter(t => t !== '');
+    parts.forEach(w => {
+      ctx.font = seg.bold ? fBold : fReg;
+      const ww = ctx.measureText(w).width;
+      if (x + ww > maxW && /\S/.test(w) && line.length) { lines.push(line); line = []; x = 0; }
+      if (!/\S/.test(w) && x === 0) return;
+      line.push({text:w, bold:seg.bold, x:x});
+      x += ww;
+    });
+  });
+  if (line.length) lines.push(line);
+  return lines;
+}
+function wrapPlain(ctx, text, maxW) {
+  const words = text.split(' '); const lines = []; let line = '';
+  words.forEach(w => {
+    const test = line ? line + ' ' + w : w;
+    if (ctx.measureText(test).width > maxW && line) { lines.push(line); line = w; }
+    else line = test;
+  });
+  if (line) lines.push(line);
+  return lines;
+}
+function roundRectPath(ctx, x, y, w, h, r) {
+  if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(x, y, w, h, r); return; }
+  ctx.beginPath();
+  ctx.moveTo(x+r, y); ctx.arcTo(x+w, y, x+w, y+h, r); ctx.arcTo(x+w, y+h, x, y+h, r);
+  ctx.arcTo(x, y+h, x, y, r); ctx.arcTo(x, y, x+w, y, r); ctx.closePath();
+}
+/* draw an image cropped to fill the box, like object-fit:cover */
+function drawCover(ctx, img, x, y, w, h, r) {
+  const iw = img.naturalWidth, ih = img.naturalHeight;
+  const scale = Math.max(w/iw, h/ih);
+  const dw = iw*scale, dh = ih*scale;
+  ctx.save(); roundRectPath(ctx, x, y, w, h, r); ctx.clip();
+  ctx.drawImage(img, x + (w-dw)/2, y + (h-dh)/2, dw, dh);
+  ctx.restore();
+}
+
+async function downloadCardPNG(cardId) {
+  const btn = document.getElementById('pngBtn-' + cardId);
+  const card = document.getElementById(cardId);
+  if (!card) return;
+  const level = cardId.split('-')[0];
+  const meta = PNG_META[level] || PNG_META.gen;
+  const label = btn ? btn.lastChild : null;
+  if (btn) { btn.disabled = true; btn.classList.add('busy'); }
+
+  try {
+    const F = w => (sz => `${w} ${sz}px Outfit, sans-serif`);
+    try {
+      await Promise.all(['400 16px Outfit','500 16px Outfit','700 16px Outfit','800 16px Outfit']
+        .map(f => document.fonts.load(f)));
+      await document.fonts.ready;
+    } catch (e) {}
+
+    const imgs = Array.from(card.querySelectorAll('.img-row img'));
+    await Promise.all(imgs.map(im => im.complete && im.naturalWidth
+      ? Promise.resolve() : new Promise(r => { im.onload = im.onerror = r; })));
+
+    const letters = Array.from(card.querySelectorAll('.img-row .img-label')).map(e => e.textContent.trim());
+    const topic = (card.querySelector('.acc-title') || {}).textContent || '';
+    const setNo = (card.querySelector('.set-badge') || {}).textContent || '';
+    const title = topic.replace(setNo, '').trim();
+    const qEl = card.querySelector('.task-q.phase-q.active') || card.querySelector('.task-q');
+    const groups = (typeof lang !== 'undefined' && lang[level]) ? lang[level] : [];
+
+    /* ---- layout (CSS pixels, drawn at 2x) ---- */
+    const W = 900, PAD = 44, CW = W - PAD*2, S = 2;
+    const single = imgs.length === 1;
+    const cols = single ? 1 : (imgs.length === 2 ? 2 : 3);
+    const gap = 14;
+    const slotW = (CW - gap*(cols-1)) / cols;
+    /* single image keeps its native 3:2 so nothing is cropped; grids match the on-screen crop */
+    const slotH = single ? slotW * 0.667 : (level === 'c2' ? slotW : slotW * 0.75);
+    const rows = Math.ceil(imgs.length / cols);
+
+    const probe = document.createElement('canvas').getContext('2d');
+    probe.font = '500 19px Outfit, sans-serif';
+    const qLines = qEl ? wrapRich(probe, richSegments(qEl), CW, '500 19px Outfit, sans-serif', '800 19px Outfit, sans-serif') : [];
+
+    const gCols = Math.min(3, Math.max(1, groups.length));
+    const gGap = 26;
+    const gW = (CW - gGap*(gCols-1)) / gCols;
+    probe.font = '400 14px Outfit, sans-serif';
+    const gLines = groups.map(g => g.phrases.map(t => wrapPlain(probe, t, gW)));
+    const gHeights = gLines.map(list => list.reduce((a, l) => a + l.length*20 + 8, 0));
+    const langBodyH = groups.length ? Math.max(...gHeights) : 0;
+
+    let H = PAD;
+    H += 26 + 16;                               // header line
+    H += qLines.length * 29 + 20;               // question
+    H += rows*slotH + (rows-1)*gap;             // photos
+    if (groups.length) H += 26 + 24 + langBodyH; // language block
+    H += 26 + PAD;                              // footer
+
+    const cv = document.createElement('canvas');
+    cv.width = W*S; cv.height = Math.round(H)*S;
+    const ctx = cv.getContext('2d');
+    ctx.scale(S, S);
+    ctx.textBaseline = 'top';
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
+
+    let y = PAD;
+
+    /* header: level chip + set/topic, rule underneath */
+    ctx.font = '700 11px Outfit, sans-serif';
+    try { ctx.letterSpacing = '1.2px'; } catch (e) {}
+    const chipTxt = meta.label.toUpperCase();
+    const chipW = ctx.measureText(chipTxt).width + 20;
+    ctx.fillStyle = meta.tint; roundRectPath(ctx, PAD, y, chipW, 22, 6); ctx.fill();
+    ctx.fillStyle = meta.ink; ctx.fillText(chipTxt, PAD + 10, y + 6);
+    try { ctx.letterSpacing = '0px'; } catch (e) {}
+    ctx.font = '800 15px Outfit, sans-serif'; ctx.fillStyle = '#2D3047';
+    const headRight = `${setNo.trim()}  ${title}`.trim();
+    ctx.textAlign = 'right'; ctx.fillText(headRight, W - PAD, y + 4); ctx.textAlign = 'left';
+    y += 22 + 14;
+    ctx.strokeStyle = '#E8E5DF'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(PAD, y + .5); ctx.lineTo(W - PAD, y + .5); ctx.stroke();
+    y += 20;
+
+    /* question */
+    qLines.forEach(line => {
+      line.forEach(tok => {
+        ctx.font = tok.bold ? '800 19px Outfit, sans-serif' : '500 19px Outfit, sans-serif';
+        ctx.fillStyle = '#2D3047';
+        ctx.fillText(tok.text, PAD + tok.x, y);
+      });
+      y += 29;
+    });
+    y += 20;
+
+    /* photos with letter badges */
+    imgs.forEach((im, i) => {
+      const cx = PAD + (i % cols) * (slotW + gap);
+      const cy = y + Math.floor(i / cols) * (slotH + gap);
+      drawCover(ctx, im, cx, cy, slotW, slotH, 10);
+      ctx.strokeStyle = '#E8E5DF'; ctx.lineWidth = 1;
+      roundRectPath(ctx, cx + .5, cy + .5, slotW - 1, slotH - 1, 10); ctx.stroke();
+      const L = letters[i];
+      if (L) {
+        ctx.fillStyle = 'rgba(31,34,51,.62)';
+        ctx.beginPath(); ctx.arc(cx + 20, cy + 20, 12, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#fff'; ctx.font = '700 12px Outfit, sans-serif';
+        ctx.textAlign = 'center'; ctx.fillText(L, cx + 20, cy + 14); ctx.textAlign = 'left';
+      }
+    });
+    y += rows*slotH + (rows-1)*gap;
+
+    /* useful language, one column per function */
+    if (groups.length) {
+      y += 26;
+      groups.slice(0, gCols).forEach((g, gi) => {
+        const gx = PAD + gi*(gW + gGap);
+        let gy = y;
+        ctx.font = '700 10px Outfit, sans-serif';
+        try { ctx.letterSpacing = '1.1px'; } catch (e) {}
+        ctx.fillStyle = meta.ink; ctx.fillText(g.fn.toUpperCase(), gx, gy);
+        try { ctx.letterSpacing = '0px'; } catch (e) {}
+        gy += 15;
+        ctx.strokeStyle = '#E8E5DF'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(gx, gy + .5); ctx.lineTo(gx + gW, gy + .5); ctx.stroke();
+        gy += 9;
+        ctx.font = '400 14px Outfit, sans-serif'; ctx.fillStyle = '#2D3047';
+        gLines[gi].forEach(lines => {
+          lines.forEach(ln => { ctx.fillText(ln, gx, gy); gy += 20; });
+          gy += 8;
+        });
+      });
+      y += 24 + langBodyH;
+    }
+
+    /* footer */
+    ctx.strokeStyle = '#E8E5DF'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(PAD, y + .5); ctx.lineTo(W - PAD, y + .5); ctx.stroke();
+    ctx.font = '700 12px Outfit, sans-serif'; ctx.fillStyle = '#7A7D8E';
+    ctx.fillText('johnplusenglish.com', PAD, y + 10);
+
+    const slug = (setNo.trim() + '-' + title).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    const blob = await new Promise(res => cv.toBlob(res, 'image/png'));
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `${level}-${slug || 'task'}.png`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+    return cv;
+  } catch (err) {
+    console.error(err);
+    alert('Sorry, the PNG could not be created.');
+  } finally {
+    if (btn) { btn.disabled = false; btn.classList.remove('busy'); }
   }
 }
 
