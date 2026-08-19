@@ -366,25 +366,26 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
      vertical line and "up / out / off / down" become scannable down the page.
      Hairlines instead of zebra stripes: the old :nth-child(even) rule counted
      .pv-alpha-header too, so stripe parity flipped at every letter break. */
-  .pv-ledger { --hw:8rem; --pw:6rem; }
+  .pv-ledger { --hw:9rem; }
   .pv-entry {
-    display:grid; grid-template-columns:var(--hw,8rem) var(--pw,6rem) 1fr; gap:0 1.1rem;
+    display:grid; grid-template-columns:var(--hw,9rem) 1fr; gap:0 1.2rem;
     padding:.5rem .4rem; border-bottom:1px solid var(--border);
     cursor:pointer; transition:background .12s; align-items:baseline;
   }
   .pv-entry:hover, .pv-entry.open { background:var(--cream); }
-  .pv-entry-name { font-weight:700; font-size:.85rem; color: var(--text-primary); line-height:1.35; }
-  .pv-entry-part { font-weight:700; font-size:.85rem; color:var(--accent-teal); line-height:1.35; }
+  /* Verb and particle read as one phrase ("account for"), so they sit together
+     in a single column rather than being split across an aligned gap. */
+  .pv-entry-name { font-weight:700; font-size:.85rem; color: var(--text-primary); line-height:1.35; white-space:nowrap; }
   /* Neutral tier classes: the old .common was green here but amber in idioms,
      which blocked the two pages from ever sharing this stylesheet. */
-  .pv-entry-dot { width:7px; height:7px; border-radius:50%; display:inline-block; margin-left:.4rem; vertical-align:middle; }
+  .pv-entry-dot { width:5px; height:5px; border-radius:50%; display:inline-block; margin-left:.35rem; vertical-align:middle; }
   .pv-entry-dot.t1 { background:#16A34A; }
   .pv-entry-dot.t2 { background:#D97706; }
   .pv-entry-dot.t3 { background:#9CA3AF; }
   .pv-entry-def { color: var(--text-muted); font-size:.775rem; line-height:1.4; min-width:0;
     display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden; }
   .pv-entry.open .pv-entry-def { -webkit-line-clamp:unset; overflow:visible; }
-  .pv-entry-ex { display:none; grid-column:2/-1; color: var(--text-primary);
+  .pv-entry-ex { display:none; grid-column:1/-1; color: var(--text-primary);
     font-size:.735rem; font-style:italic; margin-top:.3rem; padding:.3rem .5rem;
     background:var(--sea-light); border-radius:0 6px 6px 0; line-height:1.45; }
   .pv-entry.open .pv-entry-ex { display:block; }
@@ -451,11 +452,9 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     .pv-sb-wrap { max-height:220px; position:static; }
   }
   @media (max-width:620px) {
-    /* Verb + particle keep their stripe on one line; the definition drops to
-       its own full-width line underneath rather than being squeezed. */
-    .pv-entry { grid-template-columns:var(--hw,8rem) 1fr; gap:0 .8rem; }
-    .pv-entry-def { grid-column:1/-1; -webkit-line-clamp:2; margin-top:.15rem; }
-    .pv-entry-ex { grid-column:1/-1; }
+    /* Term on its own line, definition beneath, rather than two squeezed columns. */
+    .pv-entry { grid-template-columns:1fr; }
+    .pv-entry-def { -webkit-line-clamp:2; margin-top:.15rem; }
   }
   .section-content { display: none; }
   .section-content.active { display: block; }
@@ -1760,24 +1759,16 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
     pvSizeLedger();
   }
 
-  // The particle is everything after the verb ("kick off" -> kick | off,
-  // "put up with" -> put | up with). Data is uniformly 2 or 3 tokens.
-  function pvSplitTerm(pv) {
-    var i = pv.indexOf(' ');
-    if (i === -1) return { head: pv, part: '' };
-    return { head: pv.slice(0, i), part: pv.slice(i + 1) };
-  }
   var PV_TIER = { common:'t1', somewhat:'t2', less:'t3' };
   function pvEntryHTML(e) {
-    var s = pvSplitTerm(e.pv);
-    return '<div class="pv-entry"><div class="pv-entry-name">' + s.head + '</div>'
-      + '<div class="pv-entry-part">' + s.part
+    return '<div class="pv-entry">'
+      + '<div class="pv-entry-name">' + e.pv
       + '<span class="pv-entry-dot ' + (PV_TIER[e.freq] || 't3') + '" title="' + e.freq + '"></span></div>'
       + '<div class="pv-entry-def">' + e.def + '</div>'
       + '<div class="pv-entry-ex">' + pvHighlight(e.ex, e.pv) + '</div></div>';
   }
 
-  // Measure the widest verb and particle once so the columns fit the real data.
+  // Measure the widest phrasal verb once so the term column fits the real data.
   var pvColW = null;
   function pvMeasure(strings, weight, size) {
     var p = document.createElement('span');
@@ -1791,16 +1782,13 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
   }
   function pvSizeLedger() {
     if (!pvColW) {
-      var heads = [], parts = [];
-      pvAll.forEach(function(e) { var s = pvSplitTerm(e.pv); heads.push(s.head); parts.push(s.part); });
-      pvColW = {
-        hw: Math.ceil(pvMeasure(heads, 700, '.85rem')) + 8,
-        pw: Math.ceil(pvMeasure(parts, 700, '.85rem')) + 22 // + room for the tier dot
-      };
+      // Longest phrasal verb is 16 characters, so one column fits them all with
+      // no wrapping and no special case. + room for the trailing tier dot.
+      var terms = pvAll.map(function(e) { return e.pv; });
+      pvColW = { hw: Math.ceil(pvMeasure(terms, 700, '.85rem')) + 20 };
     }
     document.querySelectorAll('.pv-ledger').forEach(function(el) {
       el.style.setProperty('--hw', pvColW.hw + 'px');
-      el.style.setProperty('--pw', pvColW.pw + 'px');
     });
   }
 
