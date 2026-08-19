@@ -161,7 +161,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
 .card-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
 .print-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:10px;font-size:.78rem;font-weight:700;cursor:pointer;border:1.5px solid var(--border);background:var(--card);color:var(--muted);font-family:'Outfit',sans-serif;transition:all .2s}
 .print-btn:hover{border-color:var(--ink);color:var(--ink)}
-.png-btn.busy{opacity:.55;cursor:progress}
+.dl-btn.busy{opacity:.55;cursor:progress}
 .print-btn:disabled{pointer-events:none}
 .print-btn svg{flex-shrink:0}
 
@@ -532,7 +532,7 @@ function genTimerHTML(id) {
 function printBtn(id) {
   return `<div class="card-actions">` +
     `<button class="print-btn" onclick="printCard('${id}')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>Print</button>` +
-    `<button class="print-btn png-btn" id="pngBtn-${id}" onclick="downloadCardPNG('${id}')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download PNG</button>` +
+    `<button class="print-btn dl-btn" id="dlBtn-${id}" onclick="downloadCardImage('${id}')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download image</button>` +
     `</div>`;
 }
 
@@ -808,8 +808,8 @@ function toggleC1Photo(slot, cardId) {
   }
 }
 
-// ── Download the task as a PNG practice sheet ──
-const PNG_META = {
+// ── Download the task as an image practice sheet ──
+const SHEET_META = {
   b2:  {ink:'#16A88D', tint:'#E7F6F2', label:'B2 First · Speaking Part 2'},
   c1:  {ink:'#2176FF', tint:'#E8EEFF', label:'C1 Advanced · Speaking Part 2'},
   c2:  {ink:'#9B72CF', tint:'#F0E8FA', label:'C2 Proficiency · Speaking Part 2'},
@@ -867,12 +867,12 @@ function drawCover(ctx, img, x, y, w, h, r) {
   ctx.restore();
 }
 
-async function downloadCardPNG(cardId) {
-  const btn = document.getElementById('pngBtn-' + cardId);
+async function downloadCardImage(cardId) {
+  const btn = document.getElementById('dlBtn-' + cardId);
   const card = document.getElementById(cardId);
   if (!card) return;
   const level = cardId.split('-')[0];
-  const meta = PNG_META[level] || PNG_META.gen;
+  const meta = SHEET_META[level] || SHEET_META.gen;
   const label = btn ? btn.lastChild : null;
   if (btn) { btn.disabled = true; btn.classList.add('busy'); }
 
@@ -1007,16 +1007,17 @@ async function downloadCardPNG(cardId) {
     ctx.fillText('johnplusenglish.com', PAD, y + 10);
 
     const slug = (setNo.trim() + '-' + title).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-    const blob = await new Promise(res => cv.toBlob(res, 'image/png'));
+    /* JPEG: the sheet is ~95% photograph, so lossless PNG costs ~5x the bytes for no visible gain */
+    const blob = await new Promise(res => cv.toBlob(res, 'image/jpeg', 0.92));
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = `${level}-${slug || 'task'}.png`;
+    a.href = url; a.download = `${level}-${slug || 'task'}.jpg`;
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 4000);
     return cv;
   } catch (err) {
     console.error(err);
-    alert('Sorry, the PNG could not be created.');
+    alert('Sorry, the image could not be created.');
   } finally {
     if (btn) { btn.disabled = false; btn.classList.remove('busy'); }
   }
