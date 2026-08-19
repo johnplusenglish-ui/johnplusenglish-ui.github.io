@@ -896,7 +896,7 @@ async function downloadCardPNG(cardId) {
     const groups = (typeof lang !== 'undefined' && lang[level]) ? lang[level] : [];
 
     /* ---- layout (CSS pixels, drawn at 2x) ---- */
-    const W = 900, PAD = 44, CW = W - PAD*2, S = 2;
+    const W = 900, PAD = 66, CW = W - PAD*2, S = 3;   /* 3x -> 2700px wide, ~325 DPI on A4 */
     const single = imgs.length === 1;
     const cols = single ? 1 : (imgs.length === 2 ? 2 : 3);
     const gap = 14;
@@ -921,7 +921,7 @@ async function downloadCardPNG(cardId) {
     H += 26 + 16;                               // header line
     H += qLines.length * 29 + 20;               // question
     H += rows*slotH + (rows-1)*gap;             // photos
-    if (groups.length) H += 26 + 24 + langBodyH; // language block
+    if (groups.length) H += 34 + 24 + langBodyH; // language block
     H += 26 + PAD;                              // footer
 
     const cv = document.createElement('canvas');
@@ -979,7 +979,7 @@ async function downloadCardPNG(cardId) {
 
     /* useful language, one column per function */
     if (groups.length) {
-      y += 26;
+      y += 34;
       groups.slice(0, gCols).forEach((g, gi) => {
         const gx = PAD + gi*(gW + gGap);
         let gy = y;
