@@ -246,6 +246,33 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
 .back-pill{display:inline-flex;align-items:center;gap:.4rem;font-family:'Outfit',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-decoration:none;background:var(--card);border:1.5px solid var(--border);border-radius:999px;padding:.5rem 1.1rem .5rem .85rem;cursor:pointer;transition:all .18s;margin-bottom:1.2rem;box-shadow:var(--shadow-sm)}
 .back-pill:hover{color:var(--sky);border-color:var(--sky);box-shadow:var(--shadow-md);transform:translateY(-1px)}
 .back-pill svg{width:13px;height:13px;flex-shrink:0}
+
+/* ── Set picker: rail of sets + open card beside it ── */
+.set-picker{display:grid;grid-template-columns:260px 1fr;gap:1.25rem;align-items:start;transition:grid-template-columns .22s ease}
+.set-rail{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);display:flex;flex-direction:column;overflow:hidden;position:sticky;top:1rem;max-height:calc(100vh - 2rem)}
+.set-rail-head{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.75rem 1rem;border-bottom:1px solid var(--border)}
+.set-rail-label{font-family:'Outfit',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.set-rail-scroll{flex:1;min-height:0;overflow-y:auto;padding:.4rem .5rem .6rem}
+.set-rail-scroll::-webkit-scrollbar{width:4px}
+.set-rail-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.set-rail-foot{padding:.55rem .9rem;border-top:1px solid var(--border);font-size:.66rem;color:var(--muted)}
+.set-row{-webkit-appearance:none;appearance:none;display:flex;align-items:center;gap:.65rem;width:100%;padding:.45rem .6rem;margin-bottom:.1rem;text-align:left;background:none;border:none;border-radius:9px;cursor:pointer;color:var(--ink);font-family:'Outfit',sans-serif;transition:background .12s ease,box-shadow .12s ease}
+.set-row:hover{background:var(--cream)}
+.set-row.on{background:var(--rowtint);box-shadow:var(--shadow-sm)}
+.set-row.on .set-row-t{color:var(--rowink)}
+.set-row-txt{display:flex;flex-direction:column;min-width:0;flex:1}
+.set-row-n{font-size:.6rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.set-row-t{font-size:.84rem;font-weight:700;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.set-thumb{width:38px;height:38px;border-radius:8px;overflow:hidden;flex-shrink:0;background:var(--cream);border:1px solid var(--border)}
+.set-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.set-pane{min-width:0}
+.set-pane > .acc-card{display:none;margin-bottom:0}
+.set-pane > .acc-card.shown{display:block}
+.set-pane > .acc-card.shown .acc-body{display:block}
+.set-pane .acc-header{cursor:default}
+.set-pane .acc-header:hover{background:transparent}
+.set-pane .chevron{display:none}
+@media(max-width:760px){.set-picker{grid-template-columns:1fr}.set-rail{position:static;max-height:none}}
 </style>
 <style>.topnav{display:none!important}</style></head>
 <body>
@@ -863,6 +890,64 @@ document.querySelectorAll('.mode-pill').forEach(pill => {
 
 // ── Init ──
 renderB2(); renderC1(); renderC2(); renderGen(); renderPhrases();
+
+// ══════════════════════════════════════════
+//  SET RAIL  (one rail of sets per exam panel, selected set opens beside it)
+// ══════════════════════════════════════════
+const RAIL_META = {
+  b2:  {sets:b2Sets,  tint:'var(--lv-b2-light)',    ink:'var(--lv-b2)',    label:'FCE Part 2 sets'},
+  c1:  {sets:c1Sets,  tint:'var(--lv-c1-light)',    ink:'var(--lv-c1)',    label:'CAE Part 2 sets'},
+  c2:  {sets:c2Sets,  tint:'var(--lavender-light)', ink:'var(--lavender)', label:'CPE Part 2 sets'},
+  gen: {sets:genSets, tint:'var(--sand)',           ink:'var(--sun)',      label:'Free describe images'}
+};
+function thumbFor(photo) {
+  return photo.replace('/picture-discussion/', '/picture-discussion/thumbs/');
+}
+function selectSet(level, i) {
+  const panel = document.getElementById('panel-' + level);
+  panel.querySelectorAll('.set-pane > .acc-card').forEach((c, n) => {
+    c.classList.toggle('shown', n === i);
+    c.classList.toggle('open', n === i);
+  });
+  panel.querySelectorAll('.set-row').forEach((r, n) => r.classList.toggle('on', n === i));
+}
+function installSetRails() {
+  Object.keys(RAIL_META).forEach(level => {
+    const meta = RAIL_META[level];
+    const panel = document.getElementById('panel-' + level);
+    const cards = Array.from(panel.children).filter(el => el.classList.contains('acc-card'));
+    const pane = document.createElement('div');
+    pane.className = 'set-pane';
+    cards.forEach(c => {
+      const head = c.querySelector('.acc-header');
+      if (head) head.removeAttribute('onclick');   // the card in the pane stays open
+      pane.appendChild(c);
+    });
+    const rail = document.createElement('aside');
+    rail.className = 'set-rail';
+    rail.style.setProperty('--rowtint', meta.tint);
+    rail.style.setProperty('--rowink', meta.ink);
+    let rows = '';
+    meta.sets.forEach((s, i) => {
+      rows += `<button class="set-row" type="button" onclick="selectSet('${level}',${i})">` +
+                `<span class="set-thumb"><img loading="lazy" alt="" src="${thumbFor(s.photos[0])}"></span>` +
+                `<span class="set-row-txt"><span class="set-row-n">Set ${i + 1}</span>` +
+                `<span class="set-row-t">${s.topic}</span></span>` +
+              `</button>`;
+    });
+    rail.innerHTML = `<div class="set-rail-head"><span class="set-rail-label">All sets</span></div>` +
+                     `<div class="set-rail-scroll">${rows}</div>` +
+                     `<div class="set-rail-foot"><b>${meta.sets.length}</b> ${meta.label}</div>`;
+    const picker = document.createElement('div');
+    picker.className = 'set-picker';
+    picker.appendChild(rail);
+    picker.appendChild(pane);
+    panel.appendChild(picker);
+    selectSet(level, 0);
+  });
+}
+installSetRails();
+
 </script>
 </body>
 </html>
