@@ -90,7 +90,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
 .lbl:first-child{margin-top:14px}
 
 /* Images */
-.img-row{display:flex;gap:12px;margin-bottom:4px}
+.img-row{display:flex;gap:12px;margin-bottom:4px;margin-top:2px}
 .img-slot{flex:1;aspect-ratio:4/3;border-radius:var(--radius-sm);overflow:hidden;position:relative;background:var(--cream);border:1.5px solid var(--border)}
 .img-slot img{width:100%;height:100%;object-fit:cover;display:block}
 .img-label{position:absolute;top:7px;left:7px;background:rgba(45,48,71,.6);color:#fff;font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:5px;backdrop-filter:blur(4px);letter-spacing:.3px}
@@ -98,10 +98,11 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
 .img-row.grid-3 .img-slot{aspect-ratio:4/3}
 .img-row.grid-5{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .img-row.grid-5 .img-slot{aspect-ratio:1}
-.img-row.single{max-width:440px}
+.img-row.single{max-width:100%}
 
 /* Task instruction */
-.task-q{font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;line-height:1.55;color:var(--ink);padding:14px 18px;border-radius:var(--radius-sm);margin-top:14px;margin-bottom:4px}
+.task-q{font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;line-height:1.55;color:var(--ink);padding:14px 18px;border-radius:var(--radius-sm);margin-top:4px;margin-bottom:12px}
+.task-q.phase-q{display:none}.task-q.phase-q.active{display:block}
 .task-q.b2{background:var(--lv-b2-light);}
 .task-q.c1{background:var(--lv-c1-light);}
 .task-q.c2{background:var(--lavender-light);}
@@ -164,6 +165,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
 .print-btn svg{flex-shrink:0}
 
 .img-slot.c1-faded{opacity:.3;transition:opacity .25s;filter:grayscale(30%)}
+.img-slot.faded{opacity:.35;transition:opacity .25s;filter:grayscale(30%)}
 
 @media print{
   nav,.mode-bar,.acc-header .chevron,.sub-drop-header,.timer-row,.gen-timer-row,.print-btn,.phase-tabs{display:none!important}
@@ -249,8 +251,15 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
 
 /* ── Set picker: rail of sets + open card beside it ── */
 .set-picker{display:grid;grid-template-columns:260px 1fr;gap:1.25rem;align-items:start;transition:grid-template-columns .22s ease}
+.set-picker.sb-collapsed{grid-template-columns:52px 1fr}
+.set-rail.collapsed .set-rail-head{border-bottom:none;justify-content:center;padding:.75rem .5rem}
+.set-rail.collapsed .set-rail-label,.set-rail.collapsed .set-rail-scroll,.set-rail.collapsed .set-rail-foot{display:none}
+.set-rail-toggle{width:26px;height:26px;border-radius:7px;border:1.5px solid var(--border);background:transparent;display:flex;align-items:center;justify-content:center;color:var(--muted);cursor:pointer;transition:all .15s;flex-shrink:0}
+.set-rail-toggle:hover{border-color:var(--accent);color:var(--accent)}
+.set-rail-toggle svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.4;transition:transform .2s ease}
+.set-rail.collapsed .set-rail-toggle svg{transform:rotate(180deg)}
 .set-rail{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);display:flex;flex-direction:column;overflow:hidden;position:sticky;top:1rem;max-height:calc(100vh - 2rem)}
-.set-rail-head{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.75rem 1rem;border-bottom:1px solid var(--border)}
+.set-rail-head{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.75rem 1rem;border-bottom:1px solid var(--border);cursor:pointer}
 .set-rail-label{font-family:'Outfit',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
 .set-rail-scroll{flex:1;min-height:0;overflow-y:auto;padding:.4rem .5rem .6rem}
 .set-rail-scroll::-webkit-scrollbar{width:4px}
@@ -272,7 +281,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
 .set-pane .acc-header{cursor:default}
 .set-pane .acc-header:hover{background:transparent}
 .set-pane .chevron{display:none}
-@media(max-width:760px){.set-picker{grid-template-columns:1fr}.set-rail{position:static;max-height:none}}
+@media(max-width:760px){.set-picker,.set-picker.sb-collapsed{grid-template-columns:1fr}.set-rail{position:static;max-height:none}}
 </style>
 <style>.topnav{display:none!important}</style></head>
 <body>
@@ -317,6 +326,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
 const U = (id, w=480) => `https://images.unsplash.com/photo-${id}?w=${w}&q=80&auto=format`;
 
 const P = (level, file) => `images/picture-discussion/${level}/${file}`;
+const LET = ['A','B','C','D','E'];
+const letterise = t => String(t).replace(/\b([1-5])\b/g, (m,n) => LET[n-1]);
 
 const b2Sets = [
   { topic:"Spending free time", photos:[P("b2","set01-photo1.jpg"),P("b2","set01-photo2.jpg")], question:"Here are two photographs showing people spending their free time. Compare the photographs, and say <strong>how relaxing each activity might be</strong>.", followUp:"Which of these ways of spending free time do you prefer?" },
@@ -413,7 +424,7 @@ const prompts = {
     {text:"Respond to the question above.",hint:'"They might be… because…" / "I\'d imagine…" / "It seems likely that…"'},
   ],
   c1: [
-    {text:"State which two you're comparing, and briefly describe each.",hint:'"I\'m going to compare photos 1 and 3. In the first one…"'},
+    {text:"State which two you're comparing, and briefly describe each.",hint:'"I\'m going to compare photos A and C. In the first one…"'},
     {text:"Compare: How are the situations similar and different?",hint:'"What strikes me is that both…" / "The main contrast is…"'},
     {text:"Answer the task question thoughtfully.",hint:'"I\'d argue that…" / "It depends on…" / "To a certain extent…"'},
   ],
@@ -509,7 +520,7 @@ function switchPbLevel(btn, level) {
 // ══════════════════════════════════════════
 
 function imgs(photos, cls, labels) {
-  return `<div class="img-row ${cls||''}">${photos.map((u,i)=>`<div class="img-slot"><span class="img-label">${labels?labels[i]:(i+1)}</span><img src="${u}" alt="Photo ${i+1}" loading="lazy"></div>`).join('')}</div>`;
+  return `<div class="img-row ${cls||''}">${photos.map((u,i)=>`<div class="img-slot">${labels?`<span class="img-label">${labels[i]}</span>`:''}<img src="${u}" alt="${labels?'Photo '+labels[i]:'Image'}" loading="lazy"></div>`).join('')}</div>`;
 }
 
 function promptsList(list, level) {
@@ -551,10 +562,9 @@ function renderB2() {
   b2Sets.forEach((s,i) => {
     const id = `b2-${i}`;
     h += `<div class="acc-card" id="${id}"><div class="acc-header" onclick="toggle('${id}')"><div class="acc-title"><span class="set-badge b2">Set ${i+1}</span>${s.topic}</div><span class="chevron">▾</span></div><div class="acc-body">`;
-    h += `<div class="lbl">Your two photos</div>`;
-    h += imgs(s.photos, '', ['Photo 1','Photo 2']);
-    h += timerHTML(id, 60, true);
     h += `<div class="task-q b2">${s.question}</div>`;
+    h += imgs(s.photos, '', ['A','B']);
+    h += timerHTML(id, 60, true);
     h += subDrop('Useful Language', 'b2', langBox('b2'));
     h += subDrop('Guided Prompts', 'b2', promptsList(prompts.b2, 'b2'));
     h += subDrop("Partner's Follow-up (30 sec)", 'b2',
@@ -572,10 +582,10 @@ function renderC1() {
   c1Sets.forEach((s,i) => {
     const id = `c1-${i}`;
     h += `<div class="acc-card" id="${id}"><div class="acc-header" onclick="toggle('${id}')"><div class="acc-title"><span class="set-badge c1">Set ${i+1}</span>${s.topic}</div><span class="chevron">▾</span></div><div class="acc-body">`;
-    h += `<div class="lbl">Choose two of these three photos - click the one you're <em>not</em> using</div>`;
-    h += `<div class="img-row grid-3" id="${id}-imgrow">${s.photos.map((u,pi)=>`<div class="img-slot" data-photo="${pi+1}" onclick="toggleC1Photo(this,'${id}')"><span class="img-label">${pi+1}</span><img src="${u}" alt="Photo ${pi+1}" loading="lazy"></div>`).join('')}</div>`;
-    h += timerHTML(id, 60, true);
     h += `<div class="task-q c1">${s.question}</div>`;
+    h += `<div class="img-row grid-3" id="${id}-imgrow">${s.photos.map((u,pi)=>`<div class="img-slot" data-photo="${pi+1}" onclick="toggleC1Photo(this,'${id}')"><span class="img-label">${LET[pi]}</span><img src="${u}" alt="Photo ${LET[pi]}" loading="lazy"></div>`).join('')}</div>`;
+    h += `<div class="lbl" style="margin-top:6px">Click the photo you're <em>not</em> using</div>`;
+    h += timerHTML(id, 60, true);
     h += subDrop('Useful Language', 'c1', langBox('c1'));
     h += subDrop('Guided Prompts', 'c1', promptsList(prompts.c1, 'c1'));
     h += subDrop("Partner's Follow-up (30 sec)", 'c1',
@@ -593,21 +603,20 @@ function renderC2() {
   c2Sets.forEach((s,i) => {
     const id = `c2-${i}`;
     h += `<div class="acc-card" id="${id}"><div class="acc-header" onclick="toggle('${id}')"><div class="acc-title"><span class="set-badge c2">Set ${i+1}</span>${s.topic}</div><span class="chevron">▾</span></div><div class="acc-body">`;
-    h += `<div class="lbl">Photo set - theme: ${s.theme}</div>`;
     // parse which photo numbers are active in phase 1
     const p1nums = s.p1Photos.split(/\s*and\s*/).map(n=>parseInt(n.trim()));
-    h += `<div class="img-row grid-5" id="${id}-imgrow">${s.photos.map((u,pi)=>`<div class="img-slot${p1nums.includes(pi+1)?' p1-active':' faded'}" data-photo="${pi+1}"><span class="img-label">${pi+1}</span><img src="${u}" alt="Photo ${pi+1}" loading="lazy"></div>`).join('')}</div>`;
     h += `<div class="phase-tabs"><button class="phase-tab active" onclick="switchPhase(this,'${id}',1)">Phase 1 - Discuss (~1 min)</button><button class="phase-tab" onclick="switchPhase(this,'${id}',2)">Phase 2 - Discuss &amp; Decide (~3 min)</button></div>`;
+    h += `<div class="task-q c2 phase-q active" id="${id}-q1">The examiner has selected photos ${letterise(s.p1Photos)}. ${letterise(s.p1Q)}</div>`;
+    h += `<div class="task-q c2 phase-q" id="${id}-q2">${letterise(s.p2Q)}</div>`;
+    h += `<div class="img-row grid-5" id="${id}-imgrow">${s.photos.map((u,pi)=>`<div class="img-slot${p1nums.includes(pi+1)?' p1-active':' faded'}" data-photo="${pi+1}"><span class="img-label">${LET[pi]}</span><img src="${u}" alt="Photo ${LET[pi]}" loading="lazy"></div>`).join('')}</div>`;
     // Phase 1
     h += `<div class="phase-block active" id="${id}-p1">`;
     h += timerHTML(id+'-p1', 60, true);
-    h += `<div class="task-q c2">The examiner has selected photos ${s.p1Photos}. ${s.p1Q}</div>`;
     h += subDrop('Guided Prompts (Phase 1)', 'c2', promptsList(prompts.c2p1, 'c2'));
     h += `</div>`;
     // Phase 2
     h += `<div class="phase-block" id="${id}-p2">`;
     h += timerHTML(id+'-p2', 180, true);
-    h += `<div class="task-q c2">${s.p2Q}</div>`;
     h += subDrop('Guided Prompts (Phase 2)', 'c2', promptsList(prompts.c2p2, 'c2'));
     h += `</div>`;
     h += subDrop('Useful Language', 'c2', langBox('c2'));
@@ -628,10 +637,9 @@ function renderGen() {
   genSets.forEach((s,i) => {
     const id = `gen-${i}`;
     h += `<div class="acc-card" id="${id}"><div class="acc-header" onclick="toggle('${id}')"><div class="acc-title"><span class="set-badge gen">Image ${i+1}</span>${s.topic}</div><span class="chevron">▾</span></div><div class="acc-body">`;
-    h += `<div class="lbl">Image</div>`;
+    h += `<div class="task-q gen">${s.prompt}</div>`;
     h += imgs(s.photos, 'single');
     h += genTimerHTML(id);
-    h += `<div class="task-q gen">${s.prompt}</div>`;
     h += subDrop('Useful Language', 'gen', langBox('gen'));
     h += subDrop('Guided Prompts', 'gen', promptsList(prompts.gen, 'gen'));
     h += printBtn(id);
@@ -653,6 +661,8 @@ function switchPhase(btn, cardId, phase) {
   btn.classList.add('active');
   card.querySelectorAll('.phase-block').forEach(b => b.classList.remove('active'));
   document.getElementById(`${cardId}-p${phase}`).classList.add('active');
+  card.querySelectorAll('.phase-q').forEach(q => q.classList.remove('active'));
+  const pq = document.getElementById(`${cardId}-q${phase}`); if (pq) pq.classList.add('active');
   // fade photos not in play for phase 1; show all for phase 2
   const imgRow = document.getElementById(`${cardId}-imgrow`);
   if (imgRow) {
@@ -935,7 +945,7 @@ function installSetRails() {
                 `<span class="set-row-t">${s.topic}</span></span>` +
               `</button>`;
     });
-    rail.innerHTML = `<div class="set-rail-head"><span class="set-rail-label">All sets</span></div>` +
+    rail.innerHTML = `<div class="set-rail-head" onclick="toggleSetRail('${level}')"><span class="set-rail-label">All sets</span><button class="set-rail-toggle" type="button" aria-label="Collapse list" onclick="event.stopPropagation();toggleSetRail('${level}')"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button></div>` +
                      `<div class="set-rail-scroll">${rows}</div>` +
                      `<div class="set-rail-foot"><b>${meta.sets.length}</b> ${meta.label}</div>`;
     const picker = document.createElement('div');
@@ -944,7 +954,16 @@ function installSetRails() {
     picker.appendChild(pane);
     panel.appendChild(picker);
     selectSet(level, 0);
+    if (railCollapsed) { rail.classList.add('collapsed'); picker.classList.add('sb-collapsed'); }
   });
+}
+let railCollapsed = false;
+try { railCollapsed = localStorage.getItem('jpe-exam-photos-rail') === '1'; } catch(e) {}
+function toggleSetRail(level) {
+  railCollapsed = !railCollapsed;
+  document.querySelectorAll('.set-rail').forEach(r => r.classList.toggle('collapsed', railCollapsed));
+  document.querySelectorAll('.set-picker').forEach(p => p.classList.toggle('sb-collapsed', railCollapsed));
+  try { localStorage.setItem('jpe-exam-photos-rail', railCollapsed ? '1' : '0'); } catch(e) {}
 }
 installSetRails();
 
