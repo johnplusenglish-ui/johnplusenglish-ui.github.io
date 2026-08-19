@@ -72,9 +72,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
    30% phrase bank on the left, everything else centred in the middle.
    Every number below is lifted from that tool so the two match. */
 .debate-card{background:var(--card);border:1.5px solid var(--border);border-radius:22px;box-shadow:0 1px 2px rgba(20,30,60,.04),0 20px 44px -28px rgba(30,50,110,.35);display:grid;grid-template-columns:30% 1fr;overflow:hidden;width:100%;max-width:1040px;margin:0 auto;aspect-ratio:5/3;container-type:inline-size}
-.debate-phrases{padding:24px 22px;background:var(--cream);border-right:1.5px solid var(--border);overflow-y:auto}
-.debate-phrases-title{font-family:Outfit,sans-serif;font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--level-color,var(--sky));margin-bottom:16px}
-.phrase-item{font-size:13.5px;line-height:1.5;padding:2px 8px;border-radius:7px;cursor:pointer;user-select:none;margin-bottom:2px;transition:opacity .3s,background .12s;display:flex;align-items:center;gap:3px}
+.debate-phrases{padding:2.14cqw 1.96cqw;background:var(--cream);border-right:1.5px solid var(--border);overflow-y:auto}
+.debate-phrases-title{font-family:Outfit,sans-serif;font-size:clamp(9px,.98cqw,11px);font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--level-color,var(--sky));margin-bottom:1.43cqw}
+.phrase-item{font-size:clamp(10px,1.205cqw,13.5px);line-height:1.5;padding:.18cqw .36cqw;border-radius:7px;cursor:pointer;user-select:none;margin-bottom:.18cqw;transition:opacity .3s,background .12s;display:flex;align-items:center;gap:3px}
 .phrase-item:hover{background:var(--card)}
 .phrase-item.blue{color:var(--level-color,var(--sky));font-weight:600;font-style:italic}
 .phrase-item.black{color:var(--ink);font-weight:600}
@@ -98,6 +98,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
   .bubble{width:148px;height:148px;font-size:13px;padding:15px}
   .bubbles{gap:16px 20px;max-width:484px}
   .debate-card{container-type:normal}
+  .debate-phrases{padding:24px 22px}
+  .debate-phrases-title{font-size:11px;margin-bottom:16px}
+  .phrase-item{font-size:13.5px;padding:2px 4px;margin-bottom:2px}
+  .add-phrase{font-size:11.5px;padding:4px 8px;margin-top:8px}
   .debate-title{font-size:22px}
   .debate-question{font-size:16px;margin:14px 0 20px}
 }
@@ -221,7 +225,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
 .pi-del{opacity:0;color:var(--muted);font-size:11px;padding:0 3px;background:none;border:none;cursor:pointer;line-height:1;transition:opacity .12s;flex-shrink:0}
 .phrase-item:hover .pi-del{opacity:.5}
 .pi-del:hover{opacity:1;color:var(--coral)}
-.add-phrase{font-size:11.5px;color:var(--muted);letter-spacing:.04em;padding:4px 8px;margin-top:8px;font-weight:600;cursor:pointer;border-radius:7px;background:none;border:none;display:block;width:100%;text-align:left;transition:all .12s}
+.add-phrase{font-size:clamp(9.5px,1.03cqw,11.5px);color:var(--muted);letter-spacing:.04em;padding:.36cqw .72cqw;margin-top:.72cqw;font-weight:600;cursor:pointer;border-radius:7px;background:none;border:none;display:block;width:100%;text-align:left;transition:all .12s}
 .add-phrase:hover{color:var(--level-color,var(--sky));background:var(--card)}
 .build-hint{font-size:.78rem;color:var(--muted);text-align:center;margin-top:.9rem;font-style:italic}
 .build-fields{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.4rem}
@@ -398,6 +402,28 @@ function flatBank(level){
   var groups = phraseBank[level] || {};
   var out = [];
   Object.keys(groups).forEach(function(k){ out = out.concat(groups[k]); });
+  return out;
+}
+
+/* Every preset debate ships exactly this many phrases, and it is what the bank
+   column holds without scrolling. The full level bank is far bigger (55 at C1),
+   so a new debate takes a round-robin slice of it: one from every group, then a
+   second from every group, and so on. That opens with a usable spread -
+   openers, opinions, agreeing, disagreeing - rather than the first group twice
+   over. */
+var SEED_PHRASES = 17;
+function seedBank(level){
+  var groups = phraseBank[level] || {};
+  var keys = Object.keys(groups);
+  var out = [], row = 0, added = true;
+  while (out.length < SEED_PHRASES && added){
+    added = false;
+    for (var i = 0; i < keys.length && out.length < SEED_PHRASES; i++){
+      var g = groups[keys[i]];
+      if (row < g.length){ out.push(g[row]); added = true; }
+    }
+    row++;
+  }
   return out;
 }
 
@@ -609,7 +635,7 @@ function blankDebate(level){
     title: 'New debate', question: 'Type the debate question here.',
     task: 'Type the task instruction here.',
     bubbles: ['option one','option two','option three'],
-    phrases: flatBank(level).slice(),
+    phrases: seedBank(level),
     vocab: [], followup: []
   };
 }
@@ -690,10 +716,10 @@ function buildSetLevel(lvl){
   if (!d){ return; }
   clearTimeout(saveTimer);
   harvest();
-  var oldDefaults = flatBank(d.level);
+  var oldDefaults = seedBank(d.level);
   var untouched = d.phrases.length === oldDefaults.length && d.phrases.every(function(p, i){ return p === oldDefaults[i]; });
   d.level = lvl;
-  if (untouched){ d.phrases = flatBank(lvl).slice(); flash('Switched to ' + lvl + ' - phrases swapped'); }
+  if (untouched){ d.phrases = seedBank(lvl); flash('Switched to ' + lvl + ' - phrases swapped'); }
   else { flash('Switched to ' + lvl + ' - your phrases kept'); }
   saveCustom();
   buildLevelToggle();
