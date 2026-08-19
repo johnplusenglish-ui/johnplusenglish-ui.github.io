@@ -1885,10 +1885,12 @@ renderPvList(); renderPvPane();
 
 
   // ── NOUN FORMS (picker) ──
-  var NOUN_GROUPS=[{name:'Spelling',keys:['one word','hyphenated']}];
+  // grouped by the particle of the source phrasal verb (back up -> backup): the pattern worth seeing
+  var nounParticle=function(e){var p=e.source.trim().split(/\s+/).pop().toLowerCase();return ['out','up','off','down','over','in','back','on','away'].indexOf(p)>-1?p:'other'};
+  var NOUN_GROUPS=[{name:'By particle',keys:['out','up','off','down','over','in','back','on','away','other']}];
   var nounCat='all', nounQ='';
   var nounShut=new Set();
-  var nounLabel=function(k){return k.charAt(0).toUpperCase()+k.slice(1)};
+  var nounLabel=function(k){return k==='other'?'Other particles':'-'+k+' nouns'};
   var NOUN_SORTED=nounData.slice().sort(function(a,b){return a.noun.localeCompare(b.noun)});
   function nounHighlight(text, noun) {
     var re = new RegExp('\\b(' + noun.replace(/[-]/g, '[-\\s]?').replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&') + ')\\b', 'gi');
@@ -1896,7 +1898,7 @@ renderPvList(); renderPvPane();
   }
   function renderNounList(){renderGroupMenu('list-pv-nouns',NOUN_GROUPS,nounShut,nounCat,'All noun forms',nounLabel,goNounCat,renderNounList)}
   function goNounCat(k){nounCat=k;nounQ='';renderNounList();renderNounPane();scrollPaneIntoView('pv-nouns')}
-  function nounScope(){return nounCat==='all'?NOUN_SORTED:NOUN_SORTED.filter(function(e){return e.spelling===nounCat})}
+  function nounScope(){return nounCat==='all'?NOUN_SORTED:NOUN_SORTED.filter(function(e){return nounParticle(e)===nounCat})}
   function nounMatch(e){
     if(nounCurrentFreq!=='all'&&e.freq!==nounCurrentFreq) return false;
     if(nounQ){var hay=(e.noun+' '+e.def+' '+e.source).toLowerCase();if(hay.indexOf(nounQ)<0) return false}
@@ -1904,20 +1906,20 @@ renderPvList(); renderPvPane();
   }
   function nounShown(){return nounScope().filter(nounMatch)}
   function nounRow(e){
-    return '<div class="lr" data-row><div class="lr-h">'+esc(e.noun)+'<span class="lr-tag '+e.spelling.replace(' ','-')+'">'+esc(e.spelling)+'</span>'+(e.also_adj?'<span class="lr-tag adj">also adj.</span>':'')+'<span class="fdot '+(PV_TIER[e.freq]||'t3')+'" title="'+PV_FREQ_LABEL[e.freq]+'"></span></div>'
+    return '<div class="lr" data-row><div class="lr-h">'+esc(e.noun)+(e.also_adj?'<span class="lr-tag adj">also adj.</span>':'')+'<span class="fdot '+(PV_TIER[e.freq]||'t3')+'" title="'+PV_FREQ_LABEL[e.freq]+'"></span></div>'
       +'<div class="lr-d">'+esc(e.def)+'</div><div class="lr-x">'+nounHighlight(esc(e.ex),e.noun)+'<span class="src">from the phrasal verb <b>'+esc(e.source)+'</b></span></div></div>';
   }
   var nounColW=null;
   function nounSizeLedger(el){
-    if(!nounColW) nounColW=Math.ceil(measureW(nounData.map(function(e){return e.noun+'  hyphenated  also adj.'}),700,'.85rem'))+10;
+    if(!nounColW) nounColW=Math.ceil(measureW(nounData.map(function(e){return e.noun+(e.also_adj?'  also adj.':'')}),700,'.85rem'))+24;
     el.style.setProperty('--tw',nounColW+'px');
   }
   var nounSearchTimer=null;
   function renderNounPane(){
     var isAll=nounCat==='all', base=nounScope();
-    document.getElementById('h-pv-nouns').textContent=isAll?'All noun forms':nounLabel(nounCat)+' nouns';
+    document.getElementById('h-pv-nouns').textContent=isAll?'All noun forms':(nounCat==='other'?'Other particles':'Nouns ending in -'+nounCat);
     var fn={}; base.forEach(function(e){fn[e.freq]=(fn[e.freq]||0)+1});
-    document.getElementById('sub-pv-nouns').textContent=base.length+' noun forms made from phrasal verbs';
+    document.getElementById('sub-pv-nouns').textContent=base.length+' noun forms made from phrasal verbs'+(isAll?'':' with '+(nounCat==='other'?'around / through / together / ahead / to / by':nounCat));
     if(nounCurrentFreq!=='all'&&!fn[nounCurrentFreq]) nounCurrentFreq='all';
     document.getElementById('body-pv-nouns').innerHTML='<div class="bar"><div class="bar-filters">'
       +'<select class="sel'+(nounCurrentFreq!=='all'?' set':'')+'" id="nounFreqSel"><option value="all">All frequencies ('+base.length+')</option>'
@@ -2587,7 +2589,7 @@ function nounDoPrint(){
     // current view = search + freq filter
     var q = (document.getElementById('nounSearchBox').value || '').toLowerCase().trim();
     entries = nounData.filter(function(e){
-      if (nounCat !== 'all' && e.spelling !== nounCat) return false;
+      if (nounCat !== 'all' && nounParticle(e) !== nounCat) return false;
       if (nounCurrentFreq !== 'all' && e.freq !== nounCurrentFreq) return false;
       if (q){
         var hay = (e.noun + ' ' + e.def + ' ' + e.ex + ' ' + e.source).toLowerCase();
