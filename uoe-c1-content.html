@@ -1340,6 +1340,8 @@ function scrollToPart(pn) {
 // ══════════════════════════════════════════
 var observer = new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting)e.target.classList.add('visible')});},{threshold:.1});
 document.querySelectorAll('.reveal').forEach(function(el){observer.observe(el);});
+// Fallback: if the observer never fires (e.g. inside the embed iframe), reveal everything
+setTimeout(function(){if(!document.querySelector('.reveal.visible')){document.querySelectorAll('.reveal').forEach(function(el){el.classList.add('visible');});}},600);
 
 buildSidebar();
 
