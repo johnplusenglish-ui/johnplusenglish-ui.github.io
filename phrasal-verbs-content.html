@@ -8,7 +8,7 @@
 <meta name="description" content="Learn how phrasal verbs work, explore common combinations, and practise with interactive exercises.">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-:root{--sun:#FFB347;--sky:#2176FF;--sky-light:#E8EEFF;--sea:#1DD3B0;--coral:#FF6B6B;--lavender:#9B72CF;--mint:#5DDEA0;--sand:#FFF5E6;--cream:#F7F6F3;--ink:#2D3047;--muted:#7A7D8E;--border:#E8E5DF;--card:#fff;--radius:14px;--sidebar-w:220px;--sidebar-collapsed:52px;--font-display:'Outfit',sans-serif;--font-body:'Outfit',sans-serif;--bg:#F7F6F3;--bg-card:#FFFFFF;--text-primary:#2D3047;--text-secondary:#7A7D8E;--text-muted:#7A7D8E;--accent-teal:#1DD3B0;--accent-coral:#FF6B6B;--accent-amber:#FFB347;--accent-violet:#9B72CF;--accent-green:#5DDEA0;--accent-blue:#2176FF;--accent-pink:#D96BA0;--accent-navy:#2D3047;--highlight-bg:#E8F2FD;--tab-active:#1DD3B0;--sidebar-active-bg:#1DD3B0;--sidebar-active-text:#FFFFFF;--shadow-sm:0 1px 3px rgba(45,48,71,0.06);--shadow-md:0 4px 12px rgba(45,48,71,0.08)}
+:root{--sun:#FFB347;--sky:#2176FF;--sky-light:#E8EEFF;--sea:#1DD3B0;--sea-light:#E4FBF7;--coral:#FF6B6B;--lavender:#9B72CF;--mint:#5DDEA0;--sand:#FFF5E6;--cream:#F7F6F3;--ink:#2D3047;--muted:#7A7D8E;--border:#E8E5DF;--card:#fff;--radius:14px;--sidebar-w:220px;--sidebar-collapsed:52px;--font-display:'Outfit',sans-serif;--font-body:'Outfit',sans-serif;--bg:#F7F6F3;--bg-card:#FFFFFF;--text-primary:#2D3047;--text-secondary:#7A7D8E;--text-muted:#7A7D8E;--accent-teal:#1DD3B0;--accent-coral:#FF6B6B;--accent-amber:#FFB347;--accent-violet:#9B72CF;--accent-green:#5DDEA0;--accent-blue:#2176FF;--accent-pink:#D96BA0;--accent-navy:#2D3047;--highlight-bg:#E8F2FD;--tab-active:#1DD3B0;--sidebar-active-bg:#1DD3B0;--sidebar-active-text:#FFFFFF;--shadow-sm:0 1px 3px rgba(45,48,71,0.06);--shadow-md:0 4px 12px rgba(45,48,71,0.08)}
 *{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth;overflow-y:scroll;overflow-x:hidden}
 body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
 
@@ -325,11 +325,26 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     display:grid; grid-template-columns:minmax(160px,max-content) 1fr; gap:1.25rem; align-items:start;
   }
   .pv-alpha-header {
-    font-family: 'Outfit',sans-serif; font-size:1.8rem; font-weight:700;
-    color: var(--accent-teal); margin:0 0 .75rem; padding-bottom:.5rem;
-    border-bottom:2px solid var(--accent-teal); scroll-margin-top:80px;
+    font-family:'Outfit',sans-serif; font-size:.62rem; font-weight:800;
+    text-transform:uppercase; letter-spacing:.1em;
+    color: var(--accent-teal); margin:0; padding:1.15rem .3rem .3rem;
+    border-bottom:1.5px solid var(--accent-teal); scroll-margin-top:3.4rem;
   }
-  .pv-alpha-header:not(:first-child) { margin-top:2rem; }
+  .pv-alpha-header:first-child { padding-top:.35rem; }
+  /* Slim sticky A–Z strip, replacing the 27-item vertical rail that stacked
+     into ~1000px of buttons above the first entry on a phone. */
+  .pv-alpha-strip {
+    position:sticky; top:0; z-index:10; display:flex; flex-wrap:wrap; gap:.15rem;
+    padding:.5rem .25rem; margin-bottom:.6rem;
+    background:rgba(247,246,243,.94); backdrop-filter:blur(8px);
+    border-bottom:1.5px solid var(--border);
+  }
+  .pv-alpha-strip a {
+    font-family:Outfit,sans-serif; font-size:.72rem; font-weight:700; color:var(--text-muted);
+    text-decoration:none; width:1.6rem; height:1.6rem; display:flex; align-items:center;
+    justify-content:center; border-radius:6px; transition:background .12s,color .12s;
+  }
+  .pv-alpha-strip a:hover { background:var(--sea-light); color:var(--accent-teal); }
   /* Sidebar (shared with cat view) */
   .pv-sb-wrap {min-width:160px;max-width:280px;
     background: var(--bg-card); border:1.5px solid var(--border); border-radius: var(--radius);
@@ -345,22 +360,35 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
   }
   .pv-sb-ctrl-btn:hover { color: var(--text-primary); border-color: var(--text-muted); }
 
+  /* ── Ledger listing ──
+     Verb and particle sit in two left-aligned columns sized from the widest
+     entry in the data (pvSizeLedger), so every particle lands on the same
+     vertical line and "up / out / off / down" become scannable down the page.
+     Hairlines instead of zebra stripes: the old :nth-child(even) rule counted
+     .pv-alpha-header too, so stripe parity flipped at every letter break. */
+  .pv-ledger { --hw:8rem; --pw:6rem; }
   .pv-entry {
-    display:grid; grid-template-columns:160px 46px 1fr; gap:.75rem;
-    padding:.75rem 1rem; border-radius:10px; transition:background .15s; align-items:baseline;
+    display:grid; grid-template-columns:var(--hw,8rem) var(--pw,6rem) 1fr; gap:0 1.1rem;
+    padding:.5rem .4rem; border-bottom:1px solid var(--border);
+    cursor:pointer; transition:background .12s; align-items:baseline;
   }
-  .pv-entry:hover { background:rgba(0,0,0,.02); }
-  .pv-entry:nth-child(even) { background:rgba(0,0,0,.015); }
-  .pv-entry:nth-child(even):hover { background:rgba(0,0,0,.03); }
-  .pv-entry-name { font-weight:700; font-size:.9rem; color: var(--text-primary); }
-  .pv-entry-dot { width:10px; height:10px; border-radius:50%; margin-top:5px; }
-  .pv-entry-dot.common { background:#16A34A; }
-  .pv-entry-dot.somewhat { background:#D97706; }
-  .pv-entry-dot.less { background:#9CA3AF; }
-  .pv-entry-right { min-width:0; }
-  .pv-entry-def { color: var(--text-muted); font-style:italic; font-size:.88rem; margin-bottom:.25rem; }
-  .pv-entry-ex { color: var(--text-primary); font-size:.9rem; font-weight:400; line-height:1.6; }
-  .pv-entry-ex b { color: var(--text-primary); font-weight:700; }
+  .pv-entry:hover, .pv-entry.open { background:var(--cream); }
+  .pv-entry-name { font-weight:700; font-size:.85rem; color: var(--text-primary); line-height:1.35; }
+  .pv-entry-part { font-weight:700; font-size:.85rem; color:var(--accent-teal); line-height:1.35; }
+  /* Neutral tier classes: the old .common was green here but amber in idioms,
+     which blocked the two pages from ever sharing this stylesheet. */
+  .pv-entry-dot { width:7px; height:7px; border-radius:50%; display:inline-block; margin-left:.4rem; vertical-align:middle; }
+  .pv-entry-dot.t1 { background:#16A34A; }
+  .pv-entry-dot.t2 { background:#D97706; }
+  .pv-entry-dot.t3 { background:#9CA3AF; }
+  .pv-entry-def { color: var(--text-muted); font-size:.775rem; line-height:1.4; min-width:0;
+    display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden; }
+  .pv-entry.open .pv-entry-def { -webkit-line-clamp:unset; overflow:visible; }
+  .pv-entry-ex { display:none; grid-column:2/-1; color: var(--text-primary);
+    font-size:.735rem; font-style:italic; margin-top:.3rem; padding:.3rem .5rem;
+    background:var(--sea-light); border-radius:0 6px 6px 0; line-height:1.45; }
+  .pv-entry.open .pv-entry-ex { display:block; }
+  .pv-entry-ex b { font-style:normal; color: var(--accent-teal); font-weight:700; }
   .pv-entry-cat { font-size:.68rem; margin-top:.5rem; display:flex; flex-wrap:wrap; gap:4px; }
   .pv-entry-cat span { cursor:pointer; transition:all .15s; padding:2px 9px; border-radius:5px; font-weight:700; text-transform:capitalize; line-height:1.4; background:#fff; border:1.5px solid var(--border); color:var(--text-muted); }
   .pv-entry-cat span:hover { transform:translateY(-1px); box-shadow:var(--shadow-sm); }
@@ -420,13 +448,20 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     font-size:.8rem; color: var(--text-muted);
   }
   .pv-legend-item { display:flex; align-items:center; gap:.25rem; }
+  .pv-legend-item .pv-entry-dot { margin-left:0; }
 
   @media (max-width:800px) {
     .pv-cat-layout { grid-template-columns:1fr; }
     .pv-cat-sidebar { max-height:200px; position:static; }
-    .pv-entry { grid-template-columns:120px 42px 1fr; gap:.5rem; font-size:.85rem; }
     .pv-alpha-layout2 { grid-template-columns:1fr; gap:.75rem; }
     .pv-sb-wrap { max-height:220px; position:static; }
+  }
+  @media (max-width:620px) {
+    /* Verb + particle keep their stripe on one line; the definition drops to
+       its own full-width line underneath rather than being squeezed. */
+    .pv-entry { grid-template-columns:var(--hw,8rem) 1fr; gap:0 .8rem; }
+    .pv-entry-def { grid-column:1/-1; -webkit-line-clamp:2; margin-top:.15rem; }
+    .pv-entry-ex { grid-column:1/-1; }
   }
   .section-content { display: none; }
   .section-content.active { display: block; }
@@ -662,6 +697,12 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
   .noun-entry:nth-child(even) { background:rgba(0,0,0,.015); }
   .noun-entry:nth-child(even):hover { background:rgba(0,0,0,.03); }
   .noun-entry-name { font-weight:700; font-size:.9rem; color: var(--text-primary); }
+  /* The Nouns listing keeps its own block-style dot; .pv-entry-dot became an
+     inline marker for the ledger rows and no longer suits this grid. */
+  .noun-entry-dot { width:10px; height:10px; border-radius:50%; margin-top:5px; }
+  .noun-entry-dot.t1 { background:#16A34A; }
+  .noun-entry-dot.t2 { background:#D97706; }
+  .noun-entry-dot.t3 { background:#9CA3AF; }
   .noun-entry-spelling {
     font-size:.68rem; font-weight:600; padding:.25rem .5rem; border-radius:6px;
     display:inline-block; margin-top:.25rem;
@@ -1219,9 +1260,9 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
   <div class="tab-content" id="tab-common-phrasal-verbs">
 
     <div class="pv-legend">
-      <div class="pv-legend-item"><span class="pv-entry-dot common" style="width:8px;height:8px;"></span> Common</div>
-      <div class="pv-legend-item"><span class="pv-entry-dot somewhat" style="width:8px;height:8px;"></span> Somewhat common</div>
-      <div class="pv-legend-item"><span class="pv-entry-dot less" style="width:8px;height:8px;"></span> Less common</div>
+      <div class="pv-legend-item"><span class="pv-entry-dot t1" style="width:8px;height:8px;"></span> Common</div>
+      <div class="pv-legend-item"><span class="pv-entry-dot t2" style="width:8px;height:8px;"></span> Somewhat common</div>
+      <div class="pv-legend-item"><span class="pv-entry-dot t3" style="width:8px;height:8px;"></span> Less common</div>
     </div>
 
     <div class="pv-controls">
@@ -1243,7 +1284,6 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
     <!-- Alpha view -->
     <div id="pvAlphaView">
       <input class="pv-search" type="text" id="pvSearchBox" placeholder="Search phrasal verbs, definitions, or examples…" oninput="pvDoSearch()">
-      <div class="pv-search-count" id="pvSearchCount"></div>
       <div id="pvAlphaContent"></div>
     </div>
 
@@ -1262,9 +1302,9 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
   <div class="tab-content" id="tab-pv-nouns">
 
     <div class="pv-legend">
-      <div class="pv-legend-item"><span class="pv-entry-dot common" style="width:8px;height:8px;"></span> Common</div>
-      <div class="pv-legend-item"><span class="pv-entry-dot somewhat" style="width:8px;height:8px;"></span> Somewhat common</div>
-      <div class="pv-legend-item"><span class="pv-entry-dot less" style="width:8px;height:8px;"></span> Less common</div>
+      <div class="pv-legend-item"><span class="pv-entry-dot t1" style="width:8px;height:8px;"></span> Common</div>
+      <div class="pv-legend-item"><span class="pv-entry-dot t2" style="width:8px;height:8px;"></span> Somewhat common</div>
+      <div class="pv-legend-item"><span class="pv-entry-dot t3" style="width:8px;height:8px;"></span> Less common</div>
     </div>
 
     <div class="pv-controls" style="justify-content:flex-end;">
@@ -1711,7 +1751,6 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
       });
     }
     filtered.sort(function(a, b) { return a.pv.localeCompare(b.pv); });
-    document.getElementById('pvSearchCount').textContent = filtered.length + ' of ' + pvAll.length + ' phrasal verbs';
     if (filtered.length === 0) {
       document.getElementById('pvAlphaContent').innerHTML = '<div class="pv-no-results">No phrasal verbs found.</div>';
       return;
@@ -1724,58 +1763,84 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
     });
     var sortedLetters = Object.keys(groups).sort();
 
-    // If current selected letter is no longer present, fall back to 'all'
-    if (pvAlphaLetter !== 'all' && !groups[pvAlphaLetter]) pvAlphaLetter = 'all';
-
-    // Build sidebar
-    var sidebarHtml = '<div class="pv-sb-wrap" id="pvAlphaSidebar">';
-    var azActive = pvAlphaLetter === 'all' ? ' active' : '';
-    sidebarHtml += '<div class="pv-sb-item' + azActive + '" onclick="pvAlphaShowAll()" data-letter="all">';
-    sidebarHtml += '<span class="pv-sb-item-name" style="font-weight:700">A\u2013Z</span>';
-    sidebarHtml += '</div>';
+    var html = '<div class="pv-ledger"><div class="pv-alpha-strip">';
+    sortedLetters.forEach(function(l) { html += '<a href="#pvLetter_' + l + '">' + l + '</a>'; });
+    html += '</div><div class="pv-cat-content" id="pvAlphaContentInner">';
     sortedLetters.forEach(function(l) {
-      var act = pvAlphaLetter === l ? ' active' : '';
-      sidebarHtml += '<div class="pv-sb-item' + act + '" onclick="pvAlphaShowLetter(\'' + l + '\')" data-letter="' + l + '">';
-      sidebarHtml += '<span class="pv-sb-item-name" style="font-family:\'Outfit\',sans-serif;font-size:1.1rem">' + l + '</span>';
-      sidebarHtml += '</div>';
+      html += '<div class="pv-alpha-header" id="pvLetter_' + l + '">' + l + '</div>';
+      groups[l].forEach(function(e) { html += pvEntryHTML(e); });
     });
-    sidebarHtml += '</div>';
+    html += '</div></div>';
 
-    // Build content area
-    var contentHtml = '<div class="pv-cat-content" id="pvAlphaContentInner">';
-    if (pvAlphaLetter === 'all') {
-      sortedLetters.forEach(function(l) {
-        contentHtml += '<div class="pv-alpha-header" id="pvLetter_' + l + '">' + l + '</div>';
-        groups[l].forEach(function(e) {
-          contentHtml += pvEntryHTML(e);
-        });
-      });
-    } else {
-      var letterEntries = groups[pvAlphaLetter] || [];
-      contentHtml += '<h3>' + pvAlphaLetter + '</h3>';
-      contentHtml += '<div class="pv-cat-content-count">' + letterEntries.length + ' phrasal verb' + (letterEntries.length !== 1 ? 's' : '') + '</div>';
-      letterEntries.forEach(function(e) {
-        contentHtml += pvEntryHTML(e);
-      });
-    }
-    contentHtml += '</div>';
-
-    document.getElementById('pvAlphaContent').innerHTML = '<div class="pv-alpha-layout2">' + sidebarHtml + contentHtml + '</div>';
+    document.getElementById('pvAlphaContent').innerHTML = html;
+    pvSizeLedger();
   }
 
+  // The particle is everything after the verb ("kick off" -> kick | off,
+  // "put up with" -> put | up with). Data is uniformly 2 or 3 tokens.
+  function pvSplitTerm(pv) {
+    var i = pv.indexOf(' ');
+    if (i === -1) return { head: pv, part: '' };
+    return { head: pv.slice(0, i), part: pv.slice(i + 1) };
+  }
+  var PV_TIER = { common:'t1', somewhat:'t2', less:'t3' };
   function pvEntryHTML(e) {
-    var h = '<div class="pv-entry"><div class="pv-entry-name">' + e.pv + '</div>';
-    h += '<div class="pv-entry-dot ' + e.freq + '" title="' + e.freq + '"></div>';
-    h += '<div class="pv-entry-right"><div class="pv-entry-def">' + e.def + '</div>';
-    h += '<div class="pv-entry-ex">' + pvHighlight(e.ex, e.pv) + '</div>';
-    h += '</div></div>';
-    return h;
+    var s = pvSplitTerm(e.pv);
+    return '<div class="pv-entry"><div class="pv-entry-name">' + s.head + '</div>'
+      + '<div class="pv-entry-part">' + s.part
+      + '<span class="pv-entry-dot ' + (PV_TIER[e.freq] || 't3') + '" title="' + e.freq + '"></span></div>'
+      + '<div class="pv-entry-def">' + e.def + '</div>'
+      + '<div class="pv-entry-ex">' + pvHighlight(e.ex, e.pv) + '</div></div>';
+  }
+
+  // Measure the widest verb and particle once so the columns fit the real data.
+  var pvColW = null;
+  function pvMeasure(strings, weight, size) {
+    var p = document.createElement('span');
+    p.style.cssText = 'position:absolute;left:-9999px;top:0;white-space:nowrap;'
+      + 'font-family:Outfit,sans-serif;font-weight:' + weight + ';font-size:' + size;
+    document.body.appendChild(p);
+    var m = 0;
+    for (var i = 0; i < strings.length; i++) { p.textContent = strings[i]; if (p.offsetWidth > m) m = p.offsetWidth; }
+    p.parentNode.removeChild(p);
+    return m;
+  }
+  function pvSizeLedger() {
+    if (!pvColW) {
+      var heads = [], parts = [];
+      pvAll.forEach(function(e) { var s = pvSplitTerm(e.pv); heads.push(s.head); parts.push(s.part); });
+      pvColW = {
+        hw: Math.ceil(pvMeasure(heads, 700, '.85rem')) + 8,
+        pw: Math.ceil(pvMeasure(parts, 700, '.85rem')) + 22 // + room for the tier dot
+      };
+    }
+    document.querySelectorAll('.pv-ledger').forEach(function(el) {
+      el.style.setProperty('--hw', pvColW.hw + 'px');
+      el.style.setProperty('--pw', pvColW.pw + 'px');
+    });
   }
 
   function pvAlphaShowAll() { pvAlphaLetter = 'all'; pvRenderAlpha(); }
   function pvAlphaShowLetter(l) { pvAlphaLetter = l; pvRenderAlpha(); }
 
-  function pvDoSearch() { pvRenderAlpha(); }
+  // Debounced: a full render rebuilds every matching row, so firing on each
+  // keystroke made typing stutter on the 780-entry list.
+  var pvSearchTimer = null;
+  function pvDoSearch() {
+    clearTimeout(pvSearchTimer);
+    pvSearchTimer = setTimeout(pvRenderAlpha, 160);
+  }
+
+  // Click a row to reveal its example, accordion-scoped to the surrounding list.
+  document.addEventListener('click', function(ev) {
+    if (!ev.target || !ev.target.closest) return;
+    var row = ev.target.closest('.pv-entry');
+    if (!row) return;
+    var wasOpen = row.classList.contains('open');
+    var scope = row.closest('.pv-cat-content') || document;
+    scope.querySelectorAll('.pv-entry.open').forEach(function(o) { o.classList.remove('open'); });
+    if (!wasOpen) row.classList.add('open');
+  });
 
   function pvRenderCatSidebar() {
     var search = (document.getElementById('pvCatSearchBox').value || '').toLowerCase().trim();
@@ -1854,19 +1919,16 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
     if (pvCurrentFreq !== 'all') allEntries = allEntries.filter(function(e) { return e.freq === pvCurrentFreq; });
     var catCount = pvSelectedCats.size;
     var html = '<h3>' + catCount + ' categor' + (catCount === 1 ? 'y' : 'ies') + ' selected</h3>';
-    html += '<div class="pv-cat-content-count">' + allEntries.length + ' phrasal verb' + (allEntries.length !== 1 ? 's' : '') + '</div>';
     if (allEntries.length === 0) {
       html += '<div class="pv-no-results">No phrasal verbs match the current filter.</div>';
     } else {
-      allEntries.forEach(function(e) {
-        html += '<div class="pv-entry"><div class="pv-entry-name">' + e.pv + '</div>';
-        html += '<div class="pv-entry-dot ' + e.freq + '" title="' + e.freq + '"></div>';
-        html += '<div class="pv-entry-right"><div class="pv-entry-def">' + e.def + '</div>';
-        html += '<div class="pv-entry-ex">' + pvHighlight(e.ex, e.pv) + '</div>';
-        html += '</div></div>';
-      });
+      // routed through pvEntryHTML so both views render an identical row
+      html += '<div class="pv-ledger">';
+      allEntries.forEach(function(e) { html += pvEntryHTML(e); });
+      html += '</div>';
     }
     document.getElementById('pvCatContent').innerHTML = html;
+    pvSizeLedger();
   }
 
   pvUpdateFreqCounts();
@@ -2178,7 +2240,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
     h += '<span class="noun-entry-spelling ' + spellingClass + '">' + e.spelling + '</span>';
     if (e.also_adj) h += '<span class="noun-entry-adj">also adj.</span>';
     h += '</div>';
-    h += '<div class="pv-entry-dot ' + e.freq + '" title="' + e.freq + '"></div>';
+    h += '<div class="noun-entry-dot ' + (PV_TIER[e.freq] || 't3') + '" title="' + e.freq + '"></div>';
     h += '<div class="noun-entry-right">';
     h += '<div class="noun-entry-def">' + e.def + '</div>';
     h += '<div class="noun-entry-ex">' + nounHighlight(e.ex, e.noun) + '</div>';
@@ -3325,6 +3387,10 @@ function mcGetStatus(idx) {
 function mcEscape(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 function mcRenderSidebar() {
+  // #mcSidebarList no longer exists — the Matching tab was rebuilt around the
+  // "Set N of 98 / New set" control. Without this guard the call below threw on
+  // every page load and aborted the rest of this script block's top-level init.
+  if (!document.getElementById('mcSidebarList')) return;
   var activeEl = document.querySelector('#mcSidebarList .cloze-sb-item.active');
   var activeIdx = activeEl ? parseInt(activeEl.dataset.idx) : -1;
   var html = '';
