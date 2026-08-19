@@ -8,7 +8,7 @@
 <meta name="description" content="The 100 phrases people actually say in Italian, Spanish, Ukrainian, Russian and French, with their real English equivalents.">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-:root{--sun:#FFB347;--sky:#2176FF;--sky-light:#E8EEFF;--sea:#1DD3B0;--coral:#FF6B6B;--lavender:#9B72CF;--mint:#5DDEA0;--sand:#FFF5E6;--cream:#F7F6F3;--ink:#2D3047;--muted:#7A7D8E;--border:#E8E5DF;--card:#fff;--radius:14px}
+:root{--sun:#FFB347;--sky:#2176FF;--sky-light:#E8EEFF;--sea:#1DD3B0;--coral:#FF6B6B;--lavender:#9B72CF;--mint:#5DDEA0;--sand:#FFF5E6;--cream:#F7F6F3;--ink:#2D3047;--muted:#7A7D8E;--border:#E8E5DF;--card:#fff;--radius:14px;--shadow-sm:0 1px 3px rgba(45,48,71,.06)}
 *{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
 body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
 body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,var(--border) 1px,transparent 1px);background-size:28px 28px;opacity:.4;pointer-events:none;z-index:0}
@@ -46,70 +46,95 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 /* ── Container ── */
 .page-container{max-width:960px;margin:0 auto;padding:0 2rem 4rem;position:relative;z-index:1}
 
-/* ── Toolbar: search + drill toggle + count ── */
-.ph-toolbar{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-bottom:1.1rem}
-.ph-btn{font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:700;padding:.6rem 1rem;border:1.5px solid var(--border);border-radius:10px;background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:.4rem;white-space:nowrap}
-.ph-btn:hover{border-color:var(--lang,var(--sea));color:var(--lang,var(--sea))}
-.ph-btn.on{background:color-mix(in srgb,var(--lang,var(--sea)) 10%,var(--card));border-color:var(--lang,var(--sea));color:var(--lang,var(--sea))}
-.ph-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
-.ph-count{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted);white-space:nowrap;margin-left:auto}
-
-/* ── Picker: category rail + phrase pane ── */
-.ph-picker{display:grid;grid-template-columns:240px 1fr;gap:1.25rem;align-items:start;transition:grid-template-columns .22s ease}
-.ph-picker.sb-collapsed{grid-template-columns:52px 1fr}
-.ph-rail{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);display:flex;flex-direction:column;position:sticky;top:1rem}
-.ph-rail-header{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.75rem 1rem;border-bottom:1px solid var(--border)}
-.ph-rail.collapsed .ph-rail-header{border-bottom:none;justify-content:center;padding:.75rem .5rem}
-.ph-rail-label{font-family:Outfit,sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ph-rail.collapsed .ph-rail-label{display:none}
-.ph-rail-toggle{width:26px;height:26px;border-radius:7px;border:1.5px solid var(--border);background:transparent;display:flex;align-items:center;justify-content:center;color:var(--muted);cursor:pointer;transition:all .15s;flex-shrink:0}
-.ph-rail-toggle:hover{border-color:var(--lang,var(--sea));color:var(--lang,var(--sea))}
-.ph-rail-toggle svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;transition:transform .2s ease}
-.ph-rail.collapsed .ph-rail-toggle svg{transform:rotate(180deg)}
-.ph-rail.collapsed .ph-rail-scroll{display:none}
-.ph-rail-scroll{flex:1;overflow-y:auto;padding:.5rem;max-height:72vh}
-.ph-rail-scroll::-webkit-scrollbar{width:4px}
-.ph-rail-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
-.ph-cat{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.55rem .7rem;border-radius:8px;cursor:pointer;transition:background .15s;margin-bottom:.15rem;border:none;background:none;width:100%;font-family:'Outfit',sans-serif;text-align:left}
-.ph-cat:hover{background:var(--cream)}
-.ph-cat-name{font-size:.84rem;font-weight:700;color:var(--ink);line-height:1.3}
-.ph-cat-n{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--muted);flex-shrink:0}
-.ph-cat.active{background:color-mix(in srgb,var(--lang,var(--sea)) 10%,var(--card))}
-.ph-cat.active .ph-cat-name{color:var(--lang,var(--sea))}
-.ph-cat.active .ph-cat-n{color:var(--lang,var(--sea))}
-
-/* ── Phrase pane ── */
-.ph-pane{min-width:0}
-.ph-pane-head{margin-bottom:.9rem}
-.ph-pane-label{font-family:Outfit,sans-serif;font-size:.65rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--lang,var(--sea));margin-bottom:.15rem}
-.ph-pane-head h2{font-family:'Outfit',sans-serif;font-size:1.35rem;font-weight:800;letter-spacing:-.01em;line-height:1.2}
-.ph-card{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:.9rem 1.1rem;margin-bottom:.65rem;animation:fadeUp .3s ease both}
-.ph-line{display:flex;align-items:baseline;gap:.55rem;flex-wrap:wrap}
-.ph-phrase{font-size:1.1rem;font-weight:800;letter-spacing:-.01em;line-height:1.35}
-.ph-tr{font-family:'JetBrains Mono',monospace;font-size:.71rem;color:var(--muted);letter-spacing:-.01em}
-.ph-lit{font-size:.81rem;color:var(--muted);font-style:italic;margin-top:.12rem}
-.ph-en{margin-top:.5rem;font-size:.97rem;font-weight:700;color:var(--lang,var(--sea));line-height:1.4}
-.ph-en.hidden-en{color:transparent;background:color-mix(in srgb,var(--ink) 7%,transparent);border-radius:6px;cursor:pointer;user-select:none}
-.ph-en.hidden-en:hover{background:color-mix(in srgb,var(--ink) 11%,transparent)}
-.ph-note{margin-top:.3rem;font-size:.84rem;color:var(--muted);line-height:1.55}
-.ph-note b{color:var(--ink);font-weight:600}
-
 /* ── Intro strip ── */
-.ph-intro{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:1rem 1.2rem;margin-bottom:1.1rem;font-size:.88rem;color:var(--muted);line-height:1.6}
+.ph-intro{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:1rem 1.2rem;margin-bottom:1.1rem;font-size:.88rem;color:var(--muted);line-height:1.6;box-shadow:var(--shadow-sm)}
 .ph-intro b{color:var(--ink);font-weight:600}
 
+/* ── Picker: collapsible grouped menu + pane (house Study-Tools shape) ── */
+.picker{--accent:var(--lang,#2176FF);--accent-light:color-mix(in srgb,var(--lang,#2176FF) 12%,#fff);display:grid;grid-template-columns:300px 1fr;gap:1.25rem;align-items:start;transition:grid-template-columns .22s ease}
+.picker.sb-collapsed{grid-template-columns:52px 1fr}
+.sb{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);display:flex;flex-direction:column;overflow:hidden;box-shadow:var(--shadow-sm);position:sticky;top:1rem;max-height:calc(100vh - 2rem)}
+.sb-head{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.75rem 1rem;border-bottom:1px solid var(--border);cursor:pointer}
+.sb.collapsed .sb-head{border-bottom:none;justify-content:center;padding:.75rem .5rem}
+.sb-label{font-size:.68rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb.collapsed .sb-label{display:none}
+.sb-toggle{width:26px;height:26px;border-radius:7px;border:1.5px solid var(--border);background:transparent;display:flex;align-items:center;justify-content:center;color:var(--muted);cursor:pointer;transition:all .15s;flex-shrink:0}
+.sb-toggle:hover{border-color:var(--accent);color:var(--accent)}
+.sb-toggle svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.4;transition:transform .2s ease}
+.sb.collapsed .sb-toggle svg{transform:rotate(180deg)}
+.sb.collapsed .sb-scroll,.sb.collapsed .sb-foot{display:none}
+.sb-scroll{flex:1;min-height:0;overflow-y:auto;padding:.4rem .5rem .75rem}
+.sb-scroll::-webkit-scrollbar{width:4px}
+.sb-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.sb-foot{padding:.55rem .9rem;border-top:1px solid var(--border);font-size:.66rem;color:var(--muted)}
+.sb-foot b{color:var(--ink);font-weight:700}
+.cat{margin-bottom:.4rem}
+.cat-toggle{-webkit-appearance:none;appearance:none;width:100%;display:flex;align-items:center;justify-content:space-between;gap:.5rem;border:none;background:transparent;cursor:pointer;font-family:inherit;font-size:.64rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--catdot);padding:.6rem .7rem;text-align:left;border-radius:8px;transition:background .15s}
+.cat-toggle:hover{background:var(--cream)}
+.cat-chev{font-size:.7rem;flex-shrink:0;color:var(--muted);transition:transform .18s}
+.cat.shut .cat-chev{transform:rotate(-90deg)}
+.cat.shut .cat-rows{display:none}
+.cat-rows{background:var(--cream);border-radius:10px;padding:.25rem;margin-top:.15rem}
+.bk{-webkit-appearance:none;appearance:none;display:flex;align-items:center;gap:.7rem;width:100%;padding:.55rem .8rem;text-align:left;background:none;border:none;border-radius:6px;box-shadow:none;cursor:pointer;color:var(--ink);font-family:inherit;font-size:.84rem;font-weight:700;line-height:1.25;transition:background .12s ease,box-shadow .12s ease,color .12s ease}
+.bk:hover{background:#fff}
+.bk.on{background:#fff;box-shadow:var(--shadow-sm)}
+.bk.on .bk-name{color:var(--catdot)}
+.bk-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bk-all{margin-bottom:.5rem}
+.bk-all:hover,.bk-all.on{background:var(--cream);box-shadow:none}
+
+.pane{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);min-width:0;overflow:hidden;box-shadow:var(--shadow-sm)}
+.pane-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.9rem 1.25rem;border-bottom:1.5px solid var(--border)}
+.pane-titles{min-width:0}
+.pane-head h2{font-size:1.25rem;font-weight:800;letter-spacing:-.025em;margin:0;line-height:1.2;font-family:'Outfit',sans-serif;color:var(--ink)}
+.pane-head p{font-size:.74rem;color:var(--muted);margin:.15rem 0 0}
+.pane-actions{display:flex;align-items:center;gap:.5rem;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
+.pane-body{padding:.5rem 1.25rem 1.25rem}
+
+.pane-print,.hide-btn{font-family:'Outfit',sans-serif;font-size:.75rem;font-weight:700;padding:.42rem .75rem;border:1.5px solid var(--border);border-radius:9px;background:var(--card);color:var(--ink);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:.45rem;white-space:nowrap}
+.pane-print svg,.hide-btn svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2}
+.pane-print:hover{border-color:var(--ink);background:var(--ink);color:var(--cream)}
+.hide-btn{color:var(--muted)}
+.hide-btn:hover{border-color:var(--lang,var(--sea));color:var(--lang,var(--sea))}
+.hide-btn.on{background:var(--accent-light);border-color:var(--lang,var(--sea));color:var(--lang,var(--sea))}
+
+/* ── Phrase rows: single-column divided list ── */
+.gh{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);padding:1rem .2rem .35rem;border-bottom:1.5px solid var(--accent);margin-bottom:.2rem;scroll-margin-top:3rem}
+.gh:first-child{padding-top:.4rem}
+.pr{padding:.75rem .25rem;border-bottom:1px solid var(--border);animation:fadeUp .3s ease both}
+.pr:last-child{border-bottom:none}
+.pr-top{display:flex;align-items:baseline;gap:.55rem;flex-wrap:wrap}
+.pr-phrase{font-size:1.06rem;font-weight:800;letter-spacing:-.01em;line-height:1.35;color:var(--ink)}
+.pr-tr{font-family:'JetBrains Mono',monospace;font-size:.71rem;color:var(--muted);letter-spacing:-.01em}
+.pr-lit{font-size:.81rem;color:var(--muted);font-style:italic;margin-top:.12rem}
+.pr-en{margin-top:.45rem;font-size:.97rem;font-weight:700;color:var(--lang,var(--sea));line-height:1.4}
+.pr-en.hidden-en{color:transparent;background:color-mix(in srgb,var(--ink) 7%,transparent);border-radius:6px;cursor:pointer;user-select:none;display:inline-block;min-width:8rem}
+.pr-en.hidden-en:hover{background:color-mix(in srgb,var(--ink) 11%,transparent)}
+.pr-note{margin-top:.3rem;font-size:.84rem;color:var(--muted);line-height:1.55}
+.pr-note b{color:var(--ink);font-weight:600}
+
+@media(max-width:820px){
+  .picker,.picker.sb-collapsed{grid-template-columns:1fr}
+  .sb{position:static;max-height:none}
+  .sb-scroll{max-height:240px}
+  .sb-toggle{display:none}
+  .sb.collapsed .sb-head{border-bottom:1px solid var(--border);justify-content:space-between;padding:.75rem 1rem;cursor:default}
+  .sb.collapsed .sb-label{display:block}
+  .sb.collapsed .sb-scroll,.sb.collapsed .sb-foot{display:block}
+  .pane-head{padding:.85rem 1rem;flex-wrap:wrap}
+  .pane-head h2{font-size:1.1rem}
+  .pane-body{padding:.5rem 1rem 1rem}
+}
 @media(max-width:640px){
-  .ph-picker{grid-template-columns:1fr}
-  .ph-rail{position:static}
-  .ph-rail-scroll{max-height:none}
   .page-header{padding:1.5rem 1.25rem 1rem}
   .tabs-wrap{padding:0 1.25rem}
   .page-container{padding:0 1.25rem 3rem}
 }
 @media print{
-  .topnav,.tabs-wrap,.ph-toolbar,.ph-rail,.back-pill,.ph-intro{display:none!important}
-  .ph-picker{display:block!important}
-  .ph-card{break-inside:avoid;border:1px solid #ddd}
+  .topnav,.tabs-wrap,.sb,.hide-btn,.pane-print,.ph-intro,.back-pill{display:none!important}
+  .picker{display:block!important}
+  .pane{border:none;box-shadow:none}
+  .pr{break-inside:avoid}
   body::before{display:none}
 }
 </style>
@@ -138,20 +163,26 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 
 <div class="page-container">
   <div class="ph-intro" id="phIntro"></div>
-  <div class="ph-toolbar">
-    <button class="ph-btn" id="phHideBtn" onclick="toggleHide()"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"></path><circle cx="12" cy="12" r="3"></circle></svg><span id="phHideLabel">Hide English</span></button>
-    <span class="ph-count" id="phCount"></span>
-  </div>
 
-  <div class="ph-picker" id="phPicker">
-    <div class="ph-rail" id="phRail">
-      <div class="ph-rail-header">
-        <span class="ph-rail-label">Categories</span>
-        <button class="ph-rail-toggle" onclick="toggleRail()" aria-label="Collapse categories"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+  <div class="picker" id="phPicker">
+    <aside class="sb" id="phSb">
+      <div class="sb-head" onclick="toggleMenu()">
+        <span class="sb-label">Categories</span>
+        <button class="sb-toggle" type="button" aria-label="Collapse categories" onclick="event.stopPropagation();toggleMenu()"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
       </div>
-      <div class="ph-rail-scroll" id="phRailList"></div>
+      <div class="sb-scroll" id="phMenu"></div>
+      <div class="sb-foot"><b id="phFoot">0</b> phrases &middot; <b id="phCatN">10</b> categories</div>
+    </aside>
+    <div class="pane">
+      <div class="pane-head">
+        <div class="pane-titles"><h2 id="phH"></h2><p id="phSub"></p></div>
+        <div class="pane-actions">
+          <button class="hide-btn" id="phHideBtn" onclick="toggleHide()"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"></path><circle cx="12" cy="12" r="3"></circle></svg><span id="phHideLabel">Hide English</span></button>
+          <button class="pane-print" onclick="printCurrent()"><svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>Print</button>
+        </div>
+      </div>
+      <div class="pane-body" id="phPane"></div>
     </div>
-    <div class="ph-pane" id="phPane"></div>
   </div>
 </div>
 
@@ -809,16 +840,25 @@ const LANGS = [
    intro:"Real spoken French, including the dropped <b>ne</b>, the verlan (<b>ouf</b>, <b>relou</b>, <b>chelou</b>) and the fillers that carry half of any conversation (<b>du coup</b>, <b>genre</b>, <b>en fait</b>)."}
 ];
 
-/* ═══════════════ STATE + RENDER ═══════════════ */
+/* ═══ STATE + RENDER ═══ */
+const GROUP_COLOR = ['#2176FF','#E76F51','#2A9D8F','#9B72CF'];
+const GROUPS = [
+  {name:'Meeting & small talk', keys:['greet','small','plans']},
+  {name:'Reacting & responding', keys:['agree','react']},
+  {name:'Moods & grumbles',      keys:['feel','effort','annoy']},
+  {name:'Fillers & slang',       keys:['soft','slang']}
+];
+const CAT_NAME = {}; CATS.forEach(function(c){ CAT_NAME[c.id] = c.name; });
+
 let curLang = LANGS[0];
-let curCat  = CATS[0].id;
+let curCat  = 'all';
 let hideEn  = false;
+let menuShut = {};   /* group name -> collapsed */
 
 const $ = function(id){ return document.getElementById(id); };
 const esc = function(s){ return String(s).replace(/&(?!(amp|lt|gt|quot|#\d+);)/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); };
 /* Notes and literals carry intentional <b>/<i>; phrases and English never do. */
 const rich = function(s){ return String(s).replace(/&(?!(amp|lt|gt|quot|#\d+);)/g,'&amp;'); };
-
 function store(k,v){ try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v); }catch(e){ return null; } }
 
 function buildTabs(){
@@ -831,66 +871,111 @@ function buildTabs(){
   });
 }
 
-function catCount(catId){
-  return (curLang.data[catId]||[]).length;
-}
+function catCount(catId){ return (curLang.data[catId]||[]).length; }
+function langTotal(){ var t=0; CATS.forEach(function(c){ t += catCount(c.id); }); return t; }
 
-function buildRail(){
-  $('phRailList').innerHTML = CATS.map(function(c){
-    var n = catCount(c.id);
-    return '<button class="ph-cat' + (c.id===curCat ? ' active' : '') + '" data-cat="' + c.id + '">' +
-             '<span class="ph-cat-name">' + c.name + '</span>' +
-             '<span class="ph-cat-n">' + n + '</span>' +
-           '</button>';
-  }).join('');
-  Array.prototype.forEach.call($('phRailList').querySelectorAll('.ph-cat'), function(b){
-    b.addEventListener('click', function(){ curCat = b.getAttribute('data-cat'); buildRail(); buildPane(); });
+/* ── Menu: All row + collapsible colour-coded groups ── */
+function renderMenu(){
+  var h = '<button class="bk bk-all' + (curCat==='all'?' on':'') + '" data-c="all" style="--catdot:var(--ink)"><span class="bk-name">All phrases</span></button>';
+  GROUPS.forEach(function(g,gi){
+    var shut = !!menuShut[g.name];
+    h += '<div class="cat' + (shut?' shut':'') + '" style="--catdot:' + GROUP_COLOR[gi%GROUP_COLOR.length] + '">'
+       +   '<button class="cat-toggle" data-g="' + esc(g.name) + '">' + esc(g.name) + '<span class="cat-chev">&#9662;</span></button>'
+       +   '<div class="cat-rows">';
+    g.keys.forEach(function(k){
+      h += '<button class="bk' + (curCat===k?' on':'') + '" data-c="' + k + '"><span class="bk-name">' + esc(CAT_NAME[k]) + '</span></button>';
+    });
+    h += '</div></div>';
   });
+  var box = $('phMenu'); var keep = box.scrollTop; box.innerHTML = h; box.scrollTop = keep;
+  box.querySelectorAll('.bk').forEach(function(b){ b.addEventListener('click', function(){ pickCat(b.getAttribute('data-c')); }); });
+  box.querySelectorAll('.cat-toggle').forEach(function(t){ t.addEventListener('click', function(){ var n=t.getAttribute('data-g'); menuShut[n]=!menuShut[n]; renderMenu(); }); });
 }
+function pickCat(c){ curCat = c; renderMenu(); renderPane(); scrollPaneIntoView(); }
 
-function card(p){
-  var tr  = p[1] ? '<span class="ph-tr">' + esc(p[1]) + '</span>' : '';
-  var lit = p[2] ? '<div class="ph-lit">lit. ' + rich(p[2]) + '</div>' : '';
-  var note= p[4] ? '<div class="ph-note">' + rich(p[4]) + '</div>' : '';
-  return '<div class="ph-card">' +
-           '<div class="ph-line"><span class="ph-phrase">' + esc(p[0]) + '</span>' + tr + '</div>' +
-           lit +
-           '<div class="ph-en' + (hideEn ? ' hidden-en' : '') + '" onclick="revealOne(this)">' + esc(p[3]) + '</div>' +
-           note +
-         '</div>';
+/* ── Pane ── */
+function phraseRow(p){
+  var tr   = p[1] ? '<span class="pr-tr">' + esc(p[1]) + '</span>' : '';
+  var lit  = p[2] ? '<div class="pr-lit">lit. ' + rich(p[2]) + '</div>' : '';
+  var note = p[4] ? '<div class="pr-note">' + rich(p[4]) + '</div>' : '';
+  return '<div class="pr">'
+       +   '<div class="pr-top"><span class="pr-phrase">' + esc(p[0]) + '</span>' + tr + '</div>'
+       +   lit
+       +   '<div class="pr-en' + (hideEn?' hidden-en':'') + '" onclick="revealOne(this)">' + esc(p[3]) + '</div>'
+       +   note
+       + '</div>';
 }
-
-function buildPane(){
-  var cat  = CATS.filter(function(c){ return c.id===curCat; })[0];
-  var list = curLang.data[curCat] || [];
-  var total = 0;
-  CATS.forEach(function(c){ total += catCount(c.id); });
-  $('phCount').textContent = total + ' phrases';
-
-  var head = '<div class="ph-pane-head">' +
-               '<div class="ph-pane-label">' + curLang.name + '</div>' +
-               '<h2>' + cat.name + '</h2>' +
-             '</div>';
-
-  $('phPane').innerHTML = head + list.map(card).join('');
+function renderPane(){
+  var total = langTotal();
+  $('phFoot').textContent = total;
+  $('phCatN').textContent = CATS.length;
+  var body = '';
+  if(curCat==='all'){
+    $('phH').textContent = 'All phrases';
+    $('phSub').textContent = curLang.name + ' · ' + total + ' phrases across ' + CATS.length + ' categories';
+    CATS.forEach(function(c){
+      var list = curLang.data[c.id] || [];
+      if(!list.length) return;
+      body += '<div class="gh">' + esc(c.name) + '</div>' + list.map(phraseRow).join('');
+    });
+  } else {
+    var list = curLang.data[curCat] || [];
+    $('phH').textContent = CAT_NAME[curCat] || '';
+    $('phSub').textContent = curLang.name + ' · ' + list.length + ' phrases';
+    body = list.map(phraseRow).join('');
+  }
+  $('phPane').innerHTML = body;
 }
-
-function revealOne(el){
-  if(el.classList.contains('hidden-en')) el.classList.remove('hidden-en');
-}
-
+function revealOne(el){ if(el.classList.contains('hidden-en')) el.classList.remove('hidden-en'); }
 function toggleHide(){
   hideEn = !hideEn;
   $('phHideBtn').classList.toggle('on', hideEn);
   $('phHideLabel').textContent = hideEn ? 'Show English' : 'Hide English';
-  buildPane();
+  renderPane();
 }
 
-function toggleRail(){
-  var rail = $('phRail'), picker = $('phPicker');
-  var collapsed = rail.classList.toggle('collapsed');
-  picker.classList.toggle('sb-collapsed', collapsed);
-  store('jpe-phrases-rail-collapsed', collapsed ? '1' : '0');
+/* ── Menu collapse (persisted; key kept for continuity) ── */
+function toggleMenu(){
+  if(window.matchMedia('(max-width:820px)').matches) return;
+  var sb=$('phSb'), pk=$('phPicker');
+  var c = sb.classList.toggle('collapsed');
+  pk.classList.toggle('sb-collapsed', c);
+  store('jpe-phrases-rail-collapsed', c ? '1' : '0');
+}
+function scrollPaneIntoView(){
+  if(!window.matchMedia('(max-width:820px)').matches) return;
+  var pane = document.querySelector('#phPicker .pane'); if(pane) pane.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+/* ── Print the current view as a clean handout ── */
+function printCurrent(){
+  var w = window.open('', '_blank'); if(!w) return;
+  var title = 'Everyday Phrases · ' + curLang.name + (curCat==='all' ? '' : ' · ' + (CAT_NAME[curCat]||''));
+  var cats = curCat==='all' ? CATS.map(function(c){ return c.id; }) : [curCat];
+  var blocks = '';
+  cats.forEach(function(cid){
+    var list = curLang.data[cid] || []; if(!list.length) return;
+    blocks += '<h2>' + esc(CAT_NAME[cid]) + '</h2>';
+    list.forEach(function(p){
+      blocks += '<div class="row"><div class="ph">' + esc(p[0]) + (p[1] ? ' <span class="tr">' + esc(p[1]) + '</span>' : '') + '</div>'
+             + (p[2] ? '<div class="lit">lit. ' + rich(p[2]) + '</div>' : '')
+             + '<div class="en">' + esc(p[3]) + '</div>'
+             + (p[4] ? '<div class="note">' + rich(p[4]) + '</div>' : '')
+             + '</div>';
+    });
+  });
+  w.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>' + esc(title) + '</title>'
+   + '<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">'
+   + '<style>*{box-sizing:border-box}body{font-family:Outfit,sans-serif;color:#2D3047;max-width:820px;margin:0 auto;padding:1.5rem 2rem;font-size:10.5pt;line-height:1.5}'
+   + '.hd{text-align:right;font-size:.7rem;color:#7A7D8E;margin-bottom:1.2rem}'
+   + 'h2{font-size:1.15rem;font-weight:800;margin:1.4rem 0 .5rem;padding-bottom:.25rem;border-bottom:1.5px solid ' + curLang.accent + ';color:' + curLang.accent + '}h2:first-of-type{margin-top:0}'
+   + '.row{padding:.5rem 0;border-bottom:1px solid #eee;break-inside:avoid}'
+   + '.ph{font-weight:800;font-size:1rem}.tr{font-weight:500;font-size:.75rem;color:#7A7D8E}'
+   + '.lit{font-style:italic;color:#7A7D8E;font-size:.82rem}.en{font-weight:700;color:' + curLang.accent + ';margin-top:.2rem}.note{color:#555;font-size:.83rem;margin-top:.15rem}.note b{color:#2D3047}'
+   + '@media print{body{padding:.75rem}h2{page-break-after:avoid}}</style></head><body>'
+   + '<div class="hd">johnplusenglish.com · ' + esc(title) + '</div>' + blocks + '</body></html>');
+  w.document.close();
+  setTimeout(function(){ w.print(); }, 400);
 }
 
 function setLang(id){
@@ -898,18 +983,16 @@ function setLang(id){
   document.documentElement.style.setProperty('--lang', curLang.accent);
   $('phIntro').innerHTML = curLang.intro;
   store('jpe-phrases-lang', curLang.id);
-  buildTabs(); buildRail(); buildPane();
+  buildTabs(); renderMenu(); renderPane();
 }
 
 (function init(){
   var savedLang = store('jpe-phrases-lang');
   var start = LANGS.filter(function(l){ return l.id===savedLang; })[0] || LANGS[0];
-
   if(store('jpe-phrases-rail-collapsed') === '1'){
-    $('phRail').classList.add('collapsed');
+    $('phSb').classList.add('collapsed');
     $('phPicker').classList.add('sb-collapsed');
   }
-
   setLang(start.id);
 })();
 </script>
