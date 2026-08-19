@@ -61,13 +61,22 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .fx-sb-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
 .fx-sb-foot{padding:.55rem .9rem;border-top:1px solid var(--border);font-size:.66rem;color:var(--muted)}
 
-.fx-grp{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);padding:.85rem .75rem .3rem}
-.bk{-webkit-appearance:none;appearance:none;display:flex;align-items:center;gap:.6rem;width:100%;padding:.5rem .75rem;text-align:left;background:none;border:none;border-radius:8px;cursor:pointer;color:var(--ink);font-family:inherit;font-size:.84rem;font-weight:700;line-height:1.3;transition:background .12s ease,color .12s ease}
-.bk:hover{background:var(--cream)}
-.bk.on{background:var(--cream)}
-.bk.on .bk-name{color:var(--accent)}
+.cat{margin-bottom:.4rem}
+.cat-toggle{-webkit-appearance:none;appearance:none;width:100%;display:flex;align-items:center;justify-content:space-between;gap:.5rem;border:none;background:transparent;cursor:pointer;font-family:inherit;font-size:.64rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--catdot);padding:.6rem .7rem;text-align:left;border-radius:8px;transition:background .15s}
+.cat-toggle:hover{background:var(--cream)}
+.cat-chev{font-size:.7rem;flex-shrink:0;color:var(--muted);transition:transform .18s}
+.cat.shut .cat-chev{transform:rotate(-90deg)}
+.cat.shut .cat-rows{display:none}
+.cat-rows{background:var(--cream);border-radius:10px;padding:.25rem;margin-top:.15rem}
+.bk{-webkit-appearance:none;appearance:none;display:flex;align-items:center;gap:.7rem;width:100%;padding:.55rem .8rem;text-align:left;background:none;border:none;border-radius:6px;box-shadow:none;cursor:pointer;color:var(--ink);font-family:inherit;font-size:.84rem;font-weight:700;line-height:1.25;transition:background .12s ease,box-shadow .12s ease,color .12s ease}
+.bk:hover{background:#fff}
+.bk.on{background:#fff;box-shadow:var(--shadow-sm)}
+.bk.on .bk-name{color:var(--catdot)}
 .bk-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bk-n{font-size:.68rem;font-weight:600;color:var(--muted);flex:none}
+/* the all-expressions row sits outside the trays, so it takes a cream fill instead of a white pill */
+.bk-all{margin-bottom:.5rem}
+.bk-all:hover,.bk-all.on{background:var(--cream);box-shadow:none}
 
 /* pane */
 .fx-pane{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);min-width:0;overflow:hidden;box-shadow:var(--shadow-sm)}
@@ -292,14 +301,19 @@ CATS.forEach(c => CAT_BY_ID[c.id] = c);
 const ALL = [];
 CATS.forEach(c => c.items.forEach(item => ALL.push(Object.assign({}, item, {catId:c.id, catLabel:c.label, catColor:c.color}))));
 
-// sidebar grouping - static labels, no accordions
+// sidebar grouping - collapsible, same shape as the Word Banks bank menu
 const SET_GROUPS = [
   {name:'Opinion & argument',   ids:['opinions','agreeing','hedging','certainty']},
   {name:'Structuring & linking',ids:['adding','explaining','cause','comparing','generalising']},
   {name:'Conversation & advice',ids:['reacting','social','advice','time']}
 ];
+const GROUP_COLOR = ['#2176FF','#E76F51','#2A9D8F'];
 
 let setId = 'all', reg = 'all', lvl = 'all', q = '';
+
+// groups start closed, bar the one holding the current set
+const shutGroups = new Set(SET_GROUPS.map(g => g.name));
+shutGroups.delete((SET_GROUPS.filter(g => g.ids.indexOf(setId) > -1)[0] || SET_GROUPS[0]).name);
 
 const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 const setEntries = id => id === 'all' ? ALL : ALL.filter(e => e.catId === id);
@@ -314,10 +328,14 @@ function shownList() {
 }
 
 function renderSetList() {
-  let h = '<button class="bk' + (setId === 'all' ? ' on' : '') + '" data-s="all">'
+  let h = '<button class="bk bk-all' + (setId === 'all' ? ' on' : '') + '" data-s="all" style="--catdot:var(--accent)">'
         + '<span class="bk-name">All expressions</span><span class="bk-n">' + ALL.length + '</span></button>';
-  SET_GROUPS.forEach(g => {
-    h += '<div class="fx-grp">' + esc(g.name) + '</div>';
+  SET_GROUPS.forEach((g, gi) => {
+    const shut = shutGroups.has(g.name);
+    h += '<div class="cat' + (shut ? ' shut' : '') + '" style="--catdot:' + GROUP_COLOR[gi % GROUP_COLOR.length] + '">'
+       + '<button class="cat-toggle" data-g="' + esc(g.name) + '">' + esc(g.name)
+       + '<span class="cat-chev">&#9662;</span></button>'
+       + '<div class="cat-rows">';
     g.ids.forEach(id => {
       const c = CAT_BY_ID[id];
       if (!c) return;
@@ -325,12 +343,18 @@ function renderSetList() {
          + '<span class="bk-name">' + esc(c.label) + '</span>'
          + '<span class="bk-n">' + c.items.length + '</span></button>';
     });
+    h += '</div></div>';
   });
   const box = document.getElementById('setList');
   const keep = box.scrollTop;          // re-rendering would otherwise snap the list back to the top
   box.innerHTML = h;
   box.scrollTop = keep;
   box.querySelectorAll('.bk').forEach(b => b.addEventListener('click', () => goSet(b.dataset.s)));
+  box.querySelectorAll('.cat-toggle').forEach(t => t.addEventListener('click', () => {
+    const n = t.dataset.g;
+    shutGroups.has(n) ? shutGroups.delete(n) : shutGroups.add(n);
+    renderSetList();
+  }));
 }
 
 function goSet(id) {
