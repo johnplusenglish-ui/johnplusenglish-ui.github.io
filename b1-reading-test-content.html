@@ -34,6 +34,13 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 
 .wrap{max-width:960px;margin:0 auto;padding:0 2rem 4rem;position:relative;z-index:1}
 
+.test-picker{display:flex;align-items:center;gap:.45rem;flex-wrap:wrap;margin:1.6rem 0 0}
+.test-picker-label{font-family:Outfit,sans-serif;font-size:.62rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-right:.25rem}
+.test-pill{font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:700;padding:.4rem .9rem;border-radius:999px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:background .16s,color .16s,border-color .16s}
+.test-pill:hover{color:var(--ink);border-color:var(--muted)}
+.test-pill.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.test-topic{font-size:.78rem;color:var(--muted);margin:.55rem 0 0}
+.test-topic strong{color:var(--ink);font-weight:700}
 .overview{display:flex;gap:.6rem;flex-wrap:wrap;margin:1.6rem 0 1.2rem;padding:.9rem 1.1rem;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);align-items:center}
 .overview-item{font-size:.78rem;color:var(--muted);display:flex;align-items:center;gap:.35rem}
 .overview-item strong{color:var(--ink);font-weight:800;font-size:.85rem}
@@ -151,17 +158,19 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 
 <div class="page-header">
   <a href="reading.html" class="back-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</a>
-  <div class="pilot-flag">Pilot - for review, not yet linked in the sidebar</div>
   <div class="topic-hero">
     <div class="topic-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
     <div>
       <h1>B1 Preliminary Reading - Parts 1 to 4</h1>
-      <div class="hero-meta"><span><strong>4</strong> parts</span><span><strong>20</strong> questions</span><span><strong>~35</strong> min</span></div>
+      <div class="hero-meta"><span><strong>5</strong> tests</span><span><strong>4</strong> parts each</span><span><strong>20</strong> questions</span><span><strong>~35</strong> min</span></div>
     </div>
   </div>
 </div>
 
 <div class="wrap">
+  <div class="test-picker" id="testPicker"><span class="test-picker-label">Test</span></div>
+  <div class="test-topic" id="testTopic"></div>
+
   <div class="overview">
     <div class="overview-item">Part 1 <strong id="ov1">-/5</strong></div>
     <div class="overview-item">Part 2 <strong id="ov2">-/5</strong></div>
@@ -195,11 +204,11 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 
   <!-- PART 2 -->
   <div class="part-section" data-part="2" id="section2">
-    <div class="exam-info"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span>You are going to read about five people looking for an evening class, and eight adverts. Decide which advert (A to H) would be most suitable for each person (1 to 5).</span></div>
+    <div class="exam-info"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span id="rub2"></span></div>
     <div class="test-card">
       <div class="test-header"><div class="test-title">Part 2 · Matching</div><div class="score-display" id="p2ScoreDisplay">Score: <span class="score-val" id="p2ScoreVal"></span></div></div>
       <div class="passage" id="p2Passage" style="padding-bottom:0">
-        <div class="passage-title">Evening Classes</div>
+        <div class="passage-title" id="p2Title"></div>
         <div class="match-texts" id="p2Texts"></div>
       </div>
       <div class="passage" id="p2Questions" style="padding-top:0"></div>
@@ -215,7 +224,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 
   <!-- PART 3 -->
   <div class="part-section" data-part="3" id="section3">
-    <div class="exam-info"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span>You are going to read a magazine article. For questions 1 to 5, choose the answer (A, B, C or D) which you think fits best according to the text.</span></div>
+    <div class="exam-info"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span id="rub3"></span></div>
     <div class="test-card">
       <div class="test-header"><div class="test-title">Part 3 · Multiple Choice</div><div class="score-display" id="p3ScoreDisplay">Score: <span class="score-val" id="p3ScoreVal"></span></div></div>
       <div class="passage" id="p3Passage"></div>
@@ -261,15 +270,22 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 
 <script>
 /* ============ DATA ============ */
-const P1 = [
+const TESTS = [
+
+{
+  topic: "Weekend work, evening classes and a street library",
+
+  P1: [
   {notice:"SALE - 50% OFF ALL WINTER COATS\nOffer ends Sunday. No returns on sale items.", stem:"What does this sign tell you?", opts:["You can return sale items within a week.","The discount will not last after this weekend.","All coats in the shop are half price."], correct:1, exp:"The sign says the offer ‘ends Sunday’ - the discount stops after the weekend. It only applies to winter coats, not everything, and sale items can't be returned at all."},
   {notice:"Hi Sam, the meeting's been moved to 3pm because Claire's train is delayed. Same room though! See you there. - Priya", stem:"What has changed about the meeting?", opts:["The time.","The room.","Who is attending."], correct:0, exp:"The message says the meeting has moved to 3pm, and specifically says ‘Same room though!’ - the room hasn't changed."},
   {notice:"Due to essential repairs, this library will be closed all day Thursday. We apologise for any inconvenience. Books may still be returned using the box outside the main entrance.", stem:"What does this notice tell you?", opts:["The library is closed permanently.","You cannot return books this week.","You can still return books while the library is closed."], correct:2, exp:"The notice says books can still be returned in the box outside, even though the library itself is closed on Thursday. The closure is for one day, not permanent."},
   {notice:"Keep refrigerated. Once opened, consume within 3 days. Do not freeze.", stem:"What does this label tell you about the product?", opts:["It should not be put in a freezer.","It must be eaten on the day you buy it.","It can be stored at room temperature."], correct:0, exp:"The label directly says ‘Do not freeze.’ It doesn't say the product must be eaten the same day (3 days once opened) or that it can be kept at room temperature (it says ‘keep refrigerated’)."},
   {notice:"Thanks for your order! Unfortunately, one item (the blue scarf) is currently out of stock. We've shipped the rest of your order and will send the scarf separately as soon as it's back in stock, at no extra delivery charge.", stem:"What does this email tell the customer?", opts:["Their whole order has been delayed.","They will need to pay again for late delivery.","Part of their order will arrive later, with no extra cost."], correct:2, exp:"Only the scarf is delayed - the rest has already shipped - and the extra delivery for the scarf is free (‘at no extra delivery charge’)."}
-];
+  ],
 
-const P2 = {
+  P2: {
+    title: "Evening Classes",
+    rubric: "You are going to read about five people looking for an evening class, and eight adverts. Decide which advert (A to H) would be most suitable for each person (1 to 5).",
   texts: [
     {letter:"A", name:"Family Pottery", body:"Saturdays, 10am. Parents and children (ages 8+) work side by side making simple pottery pieces. All materials included. No experience needed."},
     {letter:"B", name:"Advanced Spanish Conversation", body:"Tuesdays, 7pm. For confident intermediate speakers only. Focus on fluency through discussion, not grammar."},
@@ -287,9 +303,10 @@ const P2 = {
     {stem:"Priya wants to improve her public speaking for her job, and needs a course that includes some one-on-one feedback from the teacher.", correct:"D", exp:"Confident Public Speaking offers individual feedback after every session and is popular with professionals."},
     {stem:"Sofia is looking for a class she can do together with her ten-year-old daughter, ideally something creative.", correct:"A", exp:"Family Pottery is for parents and children aged 8+, and is a creative activity - unlike Watercolour Painting (G), which is adults only."}
   ]
-};
+  },
 
-const P3 = {
+  P3: {
+    rubric: "You are going to read a magazine article about a student with an unusual weekend job. For questions 1 to 5, choose the answer (A, B, C or D) which you think fits best according to the text.",
   title: "Lucia's Unusual Weekend Job",
   passage: [
     "Every Saturday morning, while most of her friends are still asleep, 19-year-old Lucia Fernandez gets on her bicycle and rides around her neighbourhood, checking on other people's houses. She is not a burglar - she has a key to every house on her list, and the owners pay her to be there.",
@@ -305,9 +322,9 @@ const P3 = {
     {stem:"What helped Lucia feel more confident doing the job?", opts:["Hiring a friend to help her.","Talking to Mrs. Petrov about her worries.","Following the same checklist at each house.","Visiting fewer houses than before."], correct:2, exp:"The text says she now has ‘a simple checklist she follows at every house, which she says has made her far more confident.’ Hiring a friend is only a future hope, not something that's happened."},
     {stem:"What is this text mainly about?", opts:["A serious problem caused by an unusual weekend job.","How a small favour turned into a regular part-time job.","Why teenagers should be paid more for helping neighbours.","The dangers of giving house keys to young people."], correct:1, exp:"The whole text traces how one small favour for a neighbour grew into a regular paid job with twelve houses - it isn't mainly about a problem, payment fairness, or danger."}
   ]
-};
+  },
 
-const P4 = {
+  P4: {
   title: "The Little Free Library on Elm Street",
   parts: [
     "On the corner of Elm Street, outside a small blue house, there is a wooden box about the size of a large bird house. Anyone who walks past can open its little door, take a book, and leave one in return - or simply take a book and bring nothing back at all.",
@@ -336,13 +353,339 @@ const P4 = {
     5:"Gap 5 follows ‘Daniel has no plans to stop’ and precedes ‘He says the time it takes is nothing compared to the pleasure...’ - H shows he's not just continuing but expanding.",
     extra:"B, D and G are not used: B and G both describe things (other boxes appearing, early neighbourhood opposition) the text never actually mentions at any point, and D's detail about painting the box yellow doesn't connect to any surrounding sentence."
   }
-};
+  }
+}
+,
+
+{
+  topic: "City beekeeping, a repair café and a Saturday out",
+  P1: [
+    {notice:"SWIMMING POOL CLOSED FOR CLEANING\nMonday 9am to 1pm. The gym, studios and changing rooms remain open as usual.", stem:"What does this notice tell members?", opts:["The whole building will be shut on Monday morning.","Only one part of the building cannot be used on Monday morning.","Nothing in the building can be used until 1pm."], correct:1, exp:"Only the pool is closed - the notice says the gym, studios and changing rooms stay open as usual."},
+    {notice:"Tom, I'm at the station but I can't see you anywhere. I've got both tickets in my bag, so don't go through the barrier without me. I'm by the coffee stand. Nadia", stem:"What does Nadia want Tom to do?", opts:["Find her before he goes to the platform.","Buy himself another ticket.","Wait for her outside the station."], correct:0, exp:"She has both tickets, so she tells him not to go through the barrier without her - he has to find her first. She is inside, by the coffee stand, not outside."},
+    {notice:"We called with your parcel at 11:20 today. It is now at Wells Newsagent, 14 Bridge Road. Please collect it within 10 days, bringing this card and photo identification.", stem:"What must the customer do?", opts:["Arrange for the parcel to be delivered again.","Pay a small charge at the newsagent.","Collect the parcel and take proof of who they are."], correct:2, exp:"The card says to collect the parcel from the newsagent with the card and photo identification. No second delivery and no charge are mentioned."},
+    {notice:"PHOTOGRAPHY WELCOME\nPlease switch your flash off. Tripods may be used in the garden only.", stem:"What are visitors told?", opts:["They may take photographs inside, but not with a flash.","They may not take photographs inside the building.","They may use a tripod anywhere in the museum."], correct:0, exp:"Photography is welcome, but the flash must be off. Tripods are limited to the garden, so not anywhere."},
+    {notice:"Dear parents, Friday's farm trip will go ahead whatever the weather, so please send your child with a waterproof coat. Packed lunches are no longer needed, as lunch will now be provided at the farm.", stem:"What has changed about the trip?", opts:["It may be cancelled if the weather is bad.","Children no longer need to bring their own food.","Children must bring a change of clothes."], correct:1, exp:"The email says packed lunches are ‘no longer needed’ because lunch will be provided. The trip goes ahead in any weather, and only a waterproof coat is asked for."}
+  ],
+  P2: {
+    title: "Saturday Activities",
+    rubric: "You are going to read about five people who want to try something new on a Saturday, and eight descriptions of local activities. Decide which activity (A to H) would be most suitable for each person (1 to 5).",
+    texts: [
+      {letter:"A", name:"River Kayaking Taster", body:"Saturdays, 10am. No experience needed and all equipment is provided. Minimum age 16. Not suitable for anyone who cannot swim."},
+      {letter:"B", name:"Bread Making Workshop", body:"Saturdays, 9am to 12pm. Take home two loaves at the end. Everything is provided; just bring a bag to carry your bread in."},
+      {letter:"C", name:"Guided Bird Walk", body:"Saturdays, 7am. Three hours of gentle walking with an expert guide. Binoculars can be borrowed free of charge."},
+      {letter:"D", name:"Repair Café", body:"Saturdays, 11am to 3pm. Bring a broken lamp, toaster or bicycle and our volunteers will show you how to mend it yourself. Free, though donations are welcome."},
+      {letter:"E", name:"Family Fossil Hunt", body:"Saturdays, 2pm, on the beach at Cove Bay. Children aged 6 and over with an adult. Strong shoes essential, as the beach is rocky."},
+      {letter:"F", name:"Evening Photography Walk", body:"Sundays, 4pm. Learn to use your camera's manual settings in low light. Bring your own camera."},
+      {letter:"G", name:"Beginners' Climbing Wall", body:"Saturdays, 1pm. Indoors, for anyone aged 12 and over, with instructors on hand. Runs whatever the weather."},
+      {letter:"H", name:"Community Garden Morning", body:"Saturdays, 10am to 1pm. Help us plant, water and weed. Tools provided, no experience needed, children welcome with an adult."}
+    ],
+    questions: [
+      {stem:"Nils wants to learn a practical skill that will save him money, and would like to bring something of his own along to work on.", correct:"D", exp:"The Repair Café is the only option where you bring your own broken object, and its whole purpose is to teach you to mend things yourself instead of paying for repairs."},
+      {stem:"Rosa is looking for something outdoors that she can do with her seven-year-old son, ideally beside the sea.", correct:"E", exp:"The Family Fossil Hunt is on a beach, and is for children aged 6 and over with an adult, so a seven-year-old can take part. The Community Garden (H) also allows children but is not by the sea."},
+      {stem:"Ben is fourteen and wants to try a new sport, but he does not want his plans ruined if it rains.", correct:"G", exp:"The Climbing Wall is indoors, ‘runs whatever the weather’ and accepts anyone aged 12 and over. Kayaking (A) is outdoors and has a minimum age of 16."},
+      {stem:"Amara likes starting her weekend early, and wants an activity where she can borrow the equipment rather than buy it.", correct:"C", exp:"The Bird Walk starts at 7am, the earliest of all the options, and binoculars can be borrowed free of charge."},
+      {stem:"Tomas only has Saturday mornings free, and wants to make something he can take home for his family.", correct:"B", exp:"The Bread Making Workshop runs from 9am to 12pm on Saturday and you take two loaves home at the end."}
+    ]
+  },
+  P3: {
+    title: "Bees Above the Traffic",
+    rubric: "You are going to read a magazine article about a young man who keeps bees in the middle of a city. For questions 1 to 5, choose the answer (A, B, C or D) which you think fits best according to the text.",
+    passage: [
+      "Six floors above one of the busiest streets in the city, on the flat roof of a former furniture factory, stand four wooden boxes that almost nobody below knows anything about. Inside them live roughly two hundred thousand bees, and they belong to Karim Aziz, who is twenty-three and works in the bookshop on the ground floor of the same building.",
+      "Karim never planned to become a beekeeper. Three years ago he read a short article about city bees while he was waiting for a bus, and afterwards he could not stop thinking about it. He spent the whole winter reading everything he could find, took a ten-week evening course at a community centre, and then spent almost all of his savings on a single hive. His family were not impressed. His mother in particular was certain that he would be stung from morning to night.",
+      "In fact, Karim is stung far less often than most people imagine: three or four times a season, he says, and almost always when he is rushing. What surprised him much more was how well the bees did in the middle of a city. People assume bees need open countryside, but city gardens, parks and balconies contain an enormous variety of flowering plants, and unlike farmland they are hardly ever sprayed with chemicals. His four hives now produce more honey than those of a friend who keeps bees twenty miles outside the city.",
+      "The honey has turned into a small business, although not yet a profitable one. Karim sells it in the bookshop downstairs, and a restaurant around the corner buys several jars a month. Every penny goes straight back into equipment, and he admits that he still spends more than he earns. This does not worry him at all. ‘The honey pays for the bees,’ he says. ‘It was never supposed to pay for me.’",
+      "What he would really like is for other people to try it. Twice a year he runs a free afternoon on the roof for anyone who is curious, lending them a protective suit and letting them stand beside an open hive. Some visitors last thirty seconds; others stay for two hours and then email him for weeks. Two of them have since started hives of their own, one on a balcony and one in a school garden, and that, Karim says, is the most useful thing he has done since he began."
+    ],
+    questions: [
+      {stem:"How did Karim first become interested in beekeeping?", opts:["A member of his family already kept bees.","He read something by chance while he was waiting for a bus.","He was offered a free course at a community centre.","He was looking for a way to earn more money."], correct:1, exp:"The text says he read a short article about city bees while waiting for a bus and could not stop thinking about it. The course came afterwards, and he actually spends more than he earns."},
+      {stem:"What does Karim say about being stung?", opts:["It happens less often than people expect.","It happens mainly in the winter months.","It is something he has learned to avoid completely.","It stopped once he had more experience."], correct:0, exp:"He says he is stung ‘far less often than most people imagine’, three or four times a season. So it has not stopped completely and it is not limited to winter."},
+      {stem:"According to the text, why do bees do well in the city?", opts:["City hives are cheaper to look after than country ones.","City honey has a stronger flavour than country honey.","City plants are rarely treated with chemicals.","City beekeepers can sell their honey more easily."], correct:2, exp:"The text says city gardens, parks and balconies are ‘hardly ever sprayed with chemicals’, unlike farmland. Cost, flavour and selling are not given as reasons."},
+      {stem:"What does Karim mean when he says ‘The honey pays for the bees’?", opts:["He hopes the bees will support him financially one day.","He spends what he earns on the bees rather than on himself.","He only sells honey in order to pay back money he borrowed.","He would keep the bees even if they produced no honey."], correct:1, exp:"Every penny ‘goes straight back into equipment’, and he adds that the honey ‘was never supposed to pay for me’ - the income is for the bees, not for him."},
+      {stem:"What does Karim regard as his biggest achievement?", opts:["Producing more honey than a friend outside the city.","Convincing his family that he had made the right choice.","Running free afternoons on the roof twice a year.","Getting other people to start keeping bees themselves."], correct:3, exp:"He describes the two visitors who now keep their own hives as ‘the most useful thing he has done since he began’. The free afternoons are how it happened, not the achievement itself."}
+    ]
+  },
+  P4: {
+    title: "The Repair Café",
+    parts: [
+      "On the first Saturday of every month, the hall behind St Anne's church fills up with broken things. People arrive carrying toasters that no longer heat, lamps that flicker, jackets with torn pockets and bicycles with chains that slip.",
+      " Around a dozen volunteers sit waiting at long tables, with tools laid out in front of them.\n\nThe volunteers are strict about one rule in particular.",
+      " Visitors who came expecting a free repair service are sometimes surprised, but almost all of them stay, and they leave knowing something they did not know when they arrived.\n\nNot everything can be saved, of course.",
+      " In those cases the volunteers explain exactly what the problem is and suggest where the object can be recycled properly.\n\nThe café started four years ago with three volunteers and a box of tools borrowed from a local school.",
+      " The busiest table by far is the one for clothes, where two retired tailors work through a queue that never seems to get any shorter.\n\nFor the organisers, though, the repairs themselves are not really the point.",
+      " That belief, they say, is far harder to pass on than any particular skill with a screwdriver."
+    ],
+    options: [
+      {letter:"A", text:"The hall is also used during the week by a children's music club."},
+      {letter:"B", text:"The idea behind it is simple: instead of throwing something away, you bring it here and mend it yourself."},
+      {letter:"C", text:"Visitors are asked to book a place online before they arrive."},
+      {letter:"D", text:"They will show you what to do and hand you the screwdriver, but they will never do the job for you."},
+      {letter:"E", text:"Each repair is timed, and the fastest one is announced at the end of the day."},
+      {letter:"F", text:"Some items are too badly damaged, and a few are simply too dangerous to open at all."},
+      {letter:"G", text:"Today the list of helpers is so long that some of them are asked to come only every second month."},
+      {letter:"H", text:"What matters more is that people go home believing broken things are worth a second look."}
+    ],
+    correct: {1:"B", 2:"D", 3:"F", 4:"G", 5:"H"},
+    exp: {
+      1:"Gap 1 comes after the description of people arriving with broken objects and before ‘Around a dozen volunteers sit waiting’ - B explains what the whole event is for, which is exactly what a reader needs at that point.",
+      2:"Gap 2 follows ‘The volunteers are strict about one rule in particular’, so the gap must state that rule. D does, and it also explains why visitors expecting a free repair service are surprised.",
+      3:"Gap 3 follows ‘Not everything can be saved’ and precedes ‘In those cases the volunteers explain exactly what the problem is’ - F names the two kinds of hopeless case that ‘those cases’ then refers back to.",
+      4:"Gap 4 contrasts the café's small beginnings (three volunteers, borrowed tools) with how it is now, and G gives that contrast directly, with far more volunteers than are needed each month.",
+      5:"Gap 5 follows ‘the repairs themselves are not really the point’ and comes before ‘That belief... is far harder to pass on’ - H supplies the belief that ‘that belief’ refers to.",
+      extra:"A, C and E are not used: the music club (A) and the online booking (C) are never mentioned anywhere in the text and fit no gap, and E contradicts the relaxed, teaching-first atmosphere the text describes throughout."
+    }
+  }
+},
+
+{
+  topic: "A village shop, holiday choices and a long-distance swimmer",
+  P1: [
+    {notice:"ROOM 204 - Please do not use the lift today. Engineers are working on it until 5pm. Stairs are at the end of each corridor.", stem:"What does this notice tell hotel guests?", opts:["The lift will not be working for the whole day.","Guests should ask an engineer for help with the stairs.","Guests can only use the lift after 5pm."], correct:2, exp:"Work on the lift finishes at 5pm, so it can be used after that. ‘Until 5pm’ does not mean the whole day."},
+    {notice:"Hi Lena, I left my blue folder on your kitchen table last night. Could you bring it to college tomorrow? If you can't, just leave it with your neighbour and I'll cycle over after lunch. Thanks! Jo", stem:"Why has Jo written to Lena?", opts:["To ask Lena to look after something for her.","To ask Lena to return something she forgot.","To tell Lena that she will visit her tomorrow."], correct:1, exp:"Jo left her folder at Lena's and wants it back. The visit is only a second option if Lena cannot bring it to college."},
+    {notice:"Meeting Room B is booked from 2pm to 4pm today for a training session. If you need a quiet space during this time, Room C on the third floor is free.", stem:"What does this message tell staff?", opts:["Staff can use a different room while Room B is busy.","There will be no quiet rooms available this afternoon.","Everyone should attend the training session in Room B."], correct:0, exp:"Room B is in use, so staff are pointed to Room C instead. Nobody is told to attend the training."},
+    {notice:"LAST TRAIN TO THE CITY CENTRE LEAVES AT 23:40.\nAfter this time, a bus replacement service runs every 30 minutes from the front of the station.", stem:"What should passengers do if they arrive at the station at midnight?", opts:["Wait for the next train in the morning.","Take a bus from outside the station.","Walk to the city centre, as no transport runs."], correct:1, exp:"After 23:40 there are no trains, but buses run every 30 minutes from the front of the station."},
+    {notice:"Thank you for contacting us about your broken headphones. As they are still under guarantee, please return them to any of our shops with your receipt and you will be given a new pair immediately. No need to post them to us.", stem:"What does the company tell the customer?", opts:["They can exchange the headphones in a shop straight away.","They should send the headphones back by post.","They will need to wait for the headphones to be repaired."], correct:0, exp:"The customer should take them to any shop with the receipt and ‘will be given a new pair immediately’. The email says there is no need to post them."}
+  ],
+  P2: {
+    title: "Holidays This Summer",
+    rubric: "You are going to read about five people who are choosing a holiday, and eight holiday descriptions. Decide which holiday (A to H) would be most suitable for each person (1 to 5).",
+    texts: [
+      {letter:"A", name:"Mountain Walking Week", body:"Seven days of guided walks in the Alps, up to 15 km a day. Good fitness required. Comfortable hotel with evening meals included."},
+      {letter:"B", name:"Island Cooking Holiday", body:"Five days on a quiet Greek island learning traditional dishes from local cooks. Small groups of eight. All meals included, airport transfers arranged."},
+      {letter:"C", name:"Canal Boat Adventure", body:"Hire a narrowboat for a week and travel at four miles an hour through the English countryside. No licence or experience needed. Sleeps up to six."},
+      {letter:"D", name:"Wildlife Camp", body:"Three nights in tents in a national park, with expert guides. Early starts to see animals at dawn. Not suitable for children under 12."},
+      {letter:"E", name:"City Break by Train", body:"Four nights in Prague, travelling by rail from London. Central hotel, breakfast included. Free time to explore at your own pace."},
+      {letter:"F", name:"Beach Club Holiday", body:"Ten days at a resort with four pools, a kids' club for ages 4 to 11, and evening entertainment. Flights included."},
+      {letter:"G", name:"Language Course in Spain", body:"Two weeks of morning Spanish lessons in Seville, staying with a local family. Afternoons free. All levels welcome."},
+      {letter:"H", name:"Cycling in Holland", body:"Six days of easy, flat cycling between towns, luggage carried ahead of you each day. Bikes provided. Hotels and breakfast included."}
+    ],
+    questions: [
+      {stem:"Hannah and Mark want an active holiday, but neither of them is very fit and they would rather not carry their bags.", correct:"H", exp:"The Holland cycling trip is ‘easy, flat’ and your luggage is carried ahead of you each day. The Mountain Walking Week (A) needs good fitness."},
+      {stem:"Farid does not like flying and wants a few days in a European city where he can decide for himself what to do each day.", correct:"E", exp:"The City Break travels by train from London and offers ‘free time to explore at your own pace’. Most other options involve flights."},
+      {stem:"The Nowak family have two children aged five and eight, and want somewhere the children will be looked after for part of the day.", correct:"F", exp:"The Beach Club has a kids' club for ages 4 to 11, so both children can go. The Wildlife Camp (D) does not accept children under 12."},
+      {stem:"Carla wants to improve her language skills and would like to live with local people rather than stay in a hotel.", correct:"G", exp:"The Language Course in Seville includes staying with a local family. The Cooking Holiday (B) is with locals but not about language."},
+      {stem:"Dev wants to get up very early and see animals in their natural surroundings, with someone knowledgeable to explain what he is looking at.", correct:"D", exp:"The Wildlife Camp has ‘early starts to see animals at dawn’ with expert guides."}
+    ]
+  },
+  P3: {
+    title: "The Shop That Would Not Close",
+    rubric: "You are going to read a magazine article about a shop in a small village. For questions 1 to 5, choose the answer (A, B, C or D) which you think fits best according to the text.",
+    passage: [
+      "When the last shop in the village of Ashworth closed three years ago, most people assumed that was the end of the matter. The nearest supermarket was eleven kilometres away, the bus ran twice a day, and the owner, who was seventy-four, had simply decided it was time to retire. For a few months the building stood empty, its windows covered in old newspaper.",
+      "Then Grace Obi, who had moved to the village only a year earlier, put a notice on the church door. She suggested that the village should buy the shop itself and run it together. At the first meeting, held in her own living room, nine people turned up. Some were excited; several said politely that the idea would never work. Grace admits she went to bed that night certain that she had made a fool of herself.",
+      "The opposite turned out to be true. Within six weeks, one hundred and forty villagers, more than half the adults in Ashworth, had each bought a share in the business for fifty pounds. The money was just enough to rent the building, repaint it, and fill the shelves for the first month. The shop reopened on a Saturday morning in March, and sold out of bread before eleven o'clock.",
+      "Today the shop is run by two part-time staff and more than thirty volunteers, who each give a few hours a week. There is a small café at the back with three tables, which has become the place where older residents meet in the mornings and parents stop after the school run. The post office counter, which the village lost years ago, has also returned. Grace says the café was never part of the original plan, but it now makes almost as much money as the shop itself.",
+      "Not everyone in Ashworth is a fan. A few people complain that prices are higher than in the supermarket, which is true, and others say that the volunteers are sometimes slow. Grace does not argue with either point. ‘We are not trying to beat the supermarket,’ she says. ‘We are trying to make sure that a village of three hundred people still has somewhere to buy milk, meet a neighbour and post a letter. Judged by that, I think we're doing all right.’"
+    ],
+    questions: [
+      {stem:"Why did the original shop close?", opts:["Too few people in the village used it.","The owner was too old to keep running it.","A new supermarket opened nearby.","The building needed expensive repairs."], correct:1, exp:"The text says the owner ‘was seventy-four and had simply decided it was time to retire’. None of the other reasons are given."},
+      {stem:"How did Grace feel after the first meeting?", opts:["Embarrassed that she had suggested the idea.","Surprised at how many people had come.","Angry that some people had not taken her seriously.","Confident that the plan would succeed."], correct:0, exp:"She went to bed ‘certain that she had made a fool of herself’ - in other words, embarrassed. The next paragraph says ‘the opposite turned out to be true’, so she was not confident."},
+      {stem:"What does the writer say about the money raised from the shares?", opts:["It was more than the village actually needed.","It came mainly from a small number of wealthy residents.","It covered the basic costs of opening, but not much more.","It took over a year to collect."], correct:2, exp:"The money was ‘just enough’ to rent the building, repaint it and fill the shelves for the first month - enough to open, with nothing spare. It was raised in six weeks by 140 people at £50 each."},
+      {stem:"What does Grace say about the café?", opts:["It was always the most important part of the plan.","It has become surprisingly successful.","It is too small for the number of customers.","It is only open in the mornings."], correct:1, exp:"The café ‘was never part of the original plan’, but now makes almost as much money as the shop - a success nobody expected."},
+      {stem:"How does Grace respond to people who criticise the shop?", opts:["She says the criticisms are unfair.","She promises that prices will come down soon.","She accepts the criticisms but explains the shop's real purpose.","She says the critics should volunteer themselves."], correct:2, exp:"She ‘does not argue with either point’, then explains that the aim is not to compete with the supermarket but to give the village a place to shop, meet and post letters."}
+    ]
+  },
+  P4: {
+    title: "Swimming Across the Channel",
+    parts: [
+      "At four o'clock on a grey September morning, Maya Lindqvist walked into the sea at Dover and began to swim towards France. Thirteen hours and forty minutes later, she walked out onto a beach near Calais, unable to feel her hands.",
+      " Only a few hundred people manage it each year, and many more try and fail.\n\nMaya, who is twenty-nine and works as a nurse, had been preparing for two years.",
+      " Most of it was done in a lake near her home, where the water stays cold well into the summer.\n\nThe rules of a Channel swim are strict.",
+      " For thirteen hours, therefore, Maya could only swim, eat from a bottle passed down on a rope, and keep going.\n\nThe hardest part, she says, was not the cold or the distance.",
+      " For almost two hours she seemed to make no progress at all, and she remembers wondering whether she would ever reach the other side.\n\nShe has no plans to do it again.",
+      " Instead, she wants to help other people prepare for their own attempts, starting with a group of six swimmers from her local club."
+    ],
+    options: [
+      {letter:"A", text:"Swimmers are allowed to rest on the boat for a maximum of ten minutes every hour."},
+      {letter:"B", text:"Swimmers may not touch the boat that follows them, and may not wear anything warmer than an ordinary swimming costume."},
+      {letter:"C", text:"She had crossed the English Channel, one of the most difficult swims in the world."},
+      {letter:"D", text:"Her training had involved swimming up to thirty kilometres a week."},
+      {letter:"E", text:"Instead, it was the moment when the tide turned against her a few kilometres from the French coast."},
+      {letter:"F", text:"The water temperature that morning was a surprisingly warm twenty degrees."},
+      {letter:"G", text:"Once, she says, is enough for anyone."},
+      {letter:"H", text:"Her parents watched the whole swim from the beach at Dover."}
+    ],
+    correct: {1:"C", 2:"D", 3:"B", 4:"E", 5:"G"},
+    exp: {
+      1:"Gap 1 comes between the description of the swim and ‘Only a few hundred people manage it each year’ - C names what ‘it’ is: the English Channel.",
+      2:"Gap 2 follows ‘had been preparing for two years’ and precedes ‘Most of it was done in a lake’ - D describes the training that ‘it’ then refers back to.",
+      3:"Gap 3 follows ‘The rules of a Channel swim are strict’ and precedes ‘For thirteen hours, therefore, Maya could only swim...’ - B states the rules that lead to that result. A contradicts the rules.",
+      4:"Gap 4 follows ‘The hardest part... was not the cold or the distance’ and precedes ‘For almost two hours she seemed to make no progress’ - E supplies what the hardest part actually was, and explains the lack of progress.",
+      5:"Gap 5 follows ‘She has no plans to do it again’ and comes before ‘Instead, she wants to help other people’ - G fits her decision not to repeat the swim.",
+      extra:"A, F and H are not used: A contradicts the rule that swimmers may not touch the boat, F contradicts the cold conditions (grey morning, cold lake training, numb hands), and H's detail about her parents is never mentioned and does not connect to any gap."
+    }
+  }
+},
+
+{
+  topic: "Learning an instrument late, choosing a museum and a street of murals",
+  P1: [
+    {notice:"Dear customer, your table for four is booked for 7:30pm on Friday. Tables are held for 15 minutes. If you are running late, please call us on the number below.", stem:"What does the restaurant want the customer to know?", opts:["They will lose the table if they arrive late without phoning.","They must call to confirm the booking before Friday.","They can arrive at any time after 7:30pm."], correct:0, exp:"Tables are only held for 15 minutes, and late customers are asked to phone. No confirmation call is required before Friday."},
+    {notice:"Sara, the printer on our floor is out of ink again. I've ordered more but it won't arrive till Thursday. Use the one in the library on the ground floor - it takes the same card. Dan", stem:"What does Dan tell Sara?", opts:["The printer will be repaired on Thursday.","She needs a different card for the library printer.","She can print somewhere else in the meantime."], correct:2, exp:"Dan points her to the library printer and says it takes the same card. The printer is not broken, it just has no ink until Thursday."},
+    {notice:"CYCLE PARKING\nBicycles left here for more than 7 days will be removed. Please use a lock. The college accepts no responsibility for theft or damage.", stem:"What does this notice tell cyclists?", opts:["Bicycles cannot be left here for longer than a week.","Bicycles must be locked, or they will be removed.","The college will pay if a bicycle is stolen."], correct:0, exp:"Bicycles left for more than 7 days are removed. Locking is advised, but the removal rule is about time, and the college accepts no responsibility for theft."},
+    {notice:"Volunteers needed for the town beach clean on Sunday 14th, 9am to 12pm. Gloves and bags provided. Under-16s welcome if accompanied by an adult. Coffee and cake for everyone afterwards!", stem:"What does this advert say about the beach clean?", opts:["Volunteers should bring their own gloves.","Young people can take part if an adult is with them.","It will last the whole day."], correct:1, exp:"Under-16s are welcome ‘if accompanied by an adult’. Gloves are provided, and the event is 9am to 12pm, not all day."},
+    {notice:"Hi Ahmed, I've finally finished the book you lent me. I'll leave it in your pigeonhole at work tomorrow, unless you'd rather I posted it to your new address? Let me know. Thanks again, it was brilliant. Ola", stem:"What does Ola want Ahmed to do?", opts:["Tell her where he would like his book returned.","Lend her another book by the same writer.","Collect the book from her new address."], correct:0, exp:"Ola offers two ways of returning the book and asks Ahmed to ‘let me know’ which he prefers."}
+  ],
+  P2: {
+    title: "Museums and Galleries",
+    rubric: "You are going to read about five people who want to visit a museum or gallery, and eight descriptions. Decide which place (A to H) would be most suitable for each person (1 to 5).",
+    texts: [
+      {letter:"A", name:"The Science Hub", body:"Hands-on exhibits you can push, pull and climb on. Popular with families. Open daily. Adults £9, children £5, under-3s free."},
+      {letter:"B", name:"Riverside Modern Art Gallery", body:"Changing exhibitions by living artists. Entry is free, with guided tours on Wednesday afternoons. Café with river views."},
+      {letter:"C", name:"City Transport Museum", body:"Old trams, buses and a working steam train that gives rides at weekends. Closed on Mondays. Free for under-12s."},
+      {letter:"D", name:"House of Music", body:"The story of the city's musicians, with headphones at every display. Live concerts every evening at 7pm; entry includes the concert. Open until 10pm."},
+      {letter:"E", name:"Marlow Castle", body:"A medieval castle with views from the tower. Ninety steps and no lift. Audio guide available in eight languages."},
+      {letter:"F", name:"The Writers' House", body:"The former home of two nineteenth-century novelists, kept exactly as they left it. Small and quiet; visits by timed ticket only, maximum twelve people at a time."},
+      {letter:"G", name:"Harbour Aquarium", body:"Sharks, rays and a touch pool where you can hold a starfish. Feeding times at 11am and 3pm. Open late on Fridays."},
+      {letter:"H", name:"Museum of the Sea", body:"Ship models, maps and stories of the port's history, in a building on three floors with a lift. Free entry every Sunday."}
+    ],
+    questions: [
+      {stem:"Kenji wants to see some art without spending any money, and would like someone to explain the works to him.", correct:"B", exp:"The Riverside Gallery is free and has guided tours on Wednesday afternoons. The Museum of the Sea (H) is free on Sundays but is not an art gallery."},
+      {stem:"Elena works until 6pm and wants to visit a museum after work that also offers something to listen to.", correct:"D", exp:"The House of Music is open until 10pm and includes a live concert at 7pm. The Aquarium (G) is open late but only on Fridays, and is not about listening."},
+      {stem:"Marta's grandfather finds stairs difficult, and is interested in boats and the history of the port.", correct:"H", exp:"The Museum of the Sea is about the port's history and has a lift. Marlow Castle (E) has views but ninety steps and no lift."},
+      {stem:"Pawel wants to take his two young sons, aged four and seven, somewhere they can touch things rather than just look.", correct:"A", exp:"The Science Hub has hands-on exhibits you can ‘push, pull and climb on’ and is popular with families. The Aquarium (G) has a touch pool, but the Hub is entirely hands-on."},
+      {stem:"Ines enjoys reading and prefers small, quiet places to large, crowded ones.", correct:"F", exp:"The Writers' House is ‘small and quiet’, limited to twelve visitors at a time, and connected to literature."}
+    ]
+  },
+  P3: {
+    title: "Never Too Late for the Cello",
+    rubric: "You are going to read a magazine article about a man who started learning a musical instrument as an adult. For questions 1 to 5, choose the answer (A, B, C or D) which you think fits best according to the text.",
+    passage: [
+      "Patrick Doyle was fifty-eight when he walked into a music shop and asked to buy a cello. The assistant, who was perhaps twenty, asked politely whether it was for his grandchild. ‘No,’ Patrick said. ‘It's for me.’ He had never read a note of music in his life.",
+      "The idea had been with him for decades. As a boy he had wanted to learn, but his school had no instruments and his parents could not afford lessons. Then came work, marriage and children, and the wish got pushed further and further back. What finally changed things was his retirement from the post office. ‘I had all this time,’ he says, ‘and I realised that if I didn't do it now, I never would.’",
+      "The first year, he admits, was terrible. His fingers hurt, the sounds he made were so bad that his wife went out to the garden whenever he practised, and at his weekly lesson he was by far the oldest student by forty years. More than once he thought about giving up. What kept him going, strangely, was a girl of nine who had the lesson before his. ‘She was better than me in every way,’ he says, ‘but she was always so pleased when she got something right. I thought, if she can enjoy being bad at it, so can I.’",
+      "Four years later, Patrick plays in a community orchestra that rehearses on Tuesday evenings. He is still not, by his own description, a good cellist. But he can read music, play in tune most of the time and get through a concert without anyone noticing his mistakes, which he says is all he ever wanted. His wife now stays indoors when he practises.",
+      "Patrick thinks too many adults believe that learning an instrument is something you can only do as a child. ‘Children learn faster,’ he says, ‘but adults know why they are doing it, and that counts for a lot.’ He has just one piece of advice for anyone over fifty who is thinking about it: buy the instrument first, and worry about whether you can play it later."
+    ],
+    questions: [
+      {stem:"Why did Patrick not learn an instrument as a child?", opts:["He was not interested in music at that time.","His family did not have the money for lessons.","His school only taught singing.","His parents wanted him to concentrate on his studies."], correct:1, exp:"The text says his school had no instruments and his parents ‘could not afford lessons’. He did want to learn, so he was interested."},
+      {stem:"What made Patrick finally decide to start?", opts:["A suggestion from his wife.","Seeing a young person play.","Having more free time after he stopped working.","Hearing an orchestra at a concert."], correct:2, exp:"‘What finally changed things was his retirement from the post office’ - he suddenly had time, and realised it was now or never."},
+      {stem:"What does Patrick say about the girl who had the lesson before him?", opts:["She helped him practise outside lessons.","Her attitude encouraged him to continue.","She was the only person younger than him at the school.","She later joined the same orchestra."], correct:1, exp:"He says she was ‘always so pleased when she got something right’ and that this made him think he could enjoy being bad at it too - her attitude kept him going."},
+      {stem:"How does Patrick describe his playing now?", opts:["Good enough for what he wanted to achieve.","Better than most people in the orchestra.","Still too poor to perform in public.","Improving very quickly."], correct:0, exp:"He says he is ‘still not a good cellist’, but he can read music, play in tune and get through a concert, ‘which he says is all he ever wanted’."},
+      {stem:"What does Patrick believe about adults learning instruments?", opts:["They learn just as quickly as children.","They should begin with something easier than the cello.","They have an advantage because they understand their reasons.","They usually give up within the first year."], correct:2, exp:"He says children learn faster, ‘but adults know why they are doing it, and that counts for a lot’."}
+    ]
+  },
+  P4: {
+    title: "The Street That Became a Gallery",
+    parts: [
+      "Ten years ago, Foundry Lane was the kind of street people walked down quickly. The factories that gave it its name had closed long before, and what remained was a row of empty brick walls covered in faded posters.",
+      " Now it is the most photographed street in the city.\n\nThe change began with a single painting.",
+      " Nobody knew who had done it, and for a while the council talked about removing it. Then a local café owner started using it as the background for photos on her menu, and visitors began asking where it was.\n\nThe council changed its mind.",
+      " Within two years, every wall on the lane had been painted, and artists were travelling from abroad to take part.\n\nThe murals do not stay the same.",
+      " This keeps the lane fresh, but it also means that a favourite picture can disappear overnight, which not everyone is happy about.\n\nThe lane has also brought a different kind of problem.",
+      " Residents say that weekends have become noisy, and that parking is now impossible. Even so, most of them admit they would not want to go back to the grey walls and the faded posters."
+    ],
+    options: [
+      {letter:"A", text:"Every spring, a few of the older ones are painted over and replaced by new work."},
+      {letter:"B", text:"One night, an enormous blue whale appeared on the side of the old bottle factory."},
+      {letter:"C", text:"Most visitors say that the whale is still their favourite."},
+      {letter:"D", text:"Instead of painting over the whale, it invited artists to cover the other walls too."},
+      {letter:"E", text:"Its forty-metre length is the same as that of a real blue whale."},
+      {letter:"F", text:"On sunny weekends, thousands of people arrive to photograph the walls."},
+      {letter:"G", text:"Few people lived there, and fewer still had any reason to visit."},
+      {letter:"H", text:"Most of the buildings were built in the nineteenth century."}
+    ],
+    correct: {1:"G", 2:"B", 3:"D", 4:"A", 5:"F"},
+    exp: {
+      1:"Gap 1 sits between the description of the empty, poster-covered street and ‘Now it is the most photographed street in the city’ - G completes the picture of the old, ignored lane so that the contrast with ‘Now’ makes sense.",
+      2:"Gap 2 follows ‘The change began with a single painting’ and precedes ‘Nobody knew who had done it’ - B introduces the whale painting that ‘it’ then refers to.",
+      3:"Gap 3 follows ‘The council changed its mind’ and precedes ‘Within two years, every wall on the lane had been painted’ - D explains the new decision that led to that result.",
+      4:"Gap 4 follows ‘The murals do not stay the same’ and precedes ‘This keeps the lane fresh, but... a favourite picture can disappear overnight’ - A explains how and when they change.",
+      5:"Gap 5 follows ‘a different kind of problem’ and precedes residents' complaints about noise and parking - F describes the crowds that cause those problems.",
+      extra:"C, E and H are not used: C and E add extra detail about the whale that no gap needs, and H's building dates do not connect to the sentences around any gap."
+    }
+  }
+},
+
+{
+  topic: "A lighthouse keeper's diary, weekend courses and community gardens",
+  P1: [
+    {notice:"CAR PARK FULL\nPlease use the overflow car park on Mill Lane, a five-minute walk away. A free shuttle bus runs every ten minutes from the entrance.", stem:"What are drivers told to do?", opts:["Wait until a space becomes free in this car park.","Park in another place nearby and walk or take a bus.","Pay extra to use the overflow car park."], correct:1, exp:"The main car park is full, so drivers should use the Mill Lane overflow and either walk or take the free shuttle. There is no charge and no mention of waiting."},
+    {notice:"Hi team, the fire alarm will be tested at 10am tomorrow. When you hear it, please carry on working as normal - there is no need to leave the building. A real alarm would ring for much longer. Facilities", stem:"What should staff do when they hear the alarm tomorrow?", opts:["Stay where they are and keep working.","Leave the building immediately.","Wait to hear how long it rings before deciding."], correct:0, exp:"Staff are told to ‘carry on working as normal’ during the test - there is no need to leave. A real alarm would ring for much longer."},
+    {notice:"Returns: items can be returned within 30 days with a receipt for a full refund. Without a receipt, we can only offer an exchange or a credit note.", stem:"What does the shop say about returns?", opts:["No items can be returned without a receipt.","All returns must be made within a week.","A refund is only possible if you have your receipt."], correct:2, exp:"A ‘full refund’ needs a receipt; without one, the shop still offers an exchange or credit note, so returns are possible - just not refunds. The period is 30 days, not a week."},
+    {notice:"Book club moved to the Blue Room this month, as the usual room is being painted. Same day and time. New members always welcome - just turn up. Thursdays, 6pm.", stem:"What has changed about the book club this month?", opts:["The day it meets.","The room it meets in.","The time it starts."], correct:1, exp:"Only the room has changed, to the Blue Room, because the usual room is being painted. The day and time are the ‘same’."},
+    {notice:"To all residents: recycling will now be collected on Wednesdays, not Fridays, from next week. Please put your green bin out by 7am. General rubbish collection is unchanged.", stem:"What do residents need to remember?", opts:["Their general rubbish will now be collected on a different day.","Recycling will be collected a day later than before.","Recycling will now be collected earlier in the week."], correct:2, exp:"Recycling moves from Friday to Wednesday, which is earlier in the week. General rubbish collection is unchanged."}
+  ],
+  P2: {
+    title: "Weekend Courses",
+    rubric: "You are going to read about five people who want to take a weekend course, and eight course descriptions. Decide which course (A to H) would be most suitable for each person (1 to 5).",
+    texts: [
+      {letter:"A", name:"Introduction to Sign Language", body:"Saturdays, 10am, six weeks. Learn everyday phrases and the alphabet. No previous knowledge needed. Small friendly group."},
+      {letter:"B", name:"Weekend Woodworking", body:"Sundays, 9am to 4pm. Make a wooden stool to take home. All tools and wood provided. Ages 18+. Some heavy lifting involved."},
+      {letter:"C", name:"Family History for Beginners", body:"Saturdays, 2pm. Learn how to research your ancestors online. Bring a laptop if you have one; a few are available to borrow."},
+      {letter:"D", name:"Outdoor Sketching", body:"Sundays, 11am, in the botanical gardens. Bring your own pencils and paper. Suitable for all levels. Cancelled if it rains."},
+      {letter:"E", name:"Beginners' Coding", body:"Saturdays, 10am to 1pm, four weeks. Build your first simple website. Laptops provided. No experience necessary."},
+      {letter:"F", name:"Weekend Choir", body:"Sundays, 3pm. Sing pop and folk songs together. No need to read music. All welcome, drop in any week."},
+      {letter:"G", name:"Cake Decorating", body:"Saturdays, 1pm. Learn to ice and decorate a celebration cake. Ingredients included; take your cake home. Aprons provided."},
+      {letter:"H", name:"Digital Photo Editing", body:"Saturdays, 4pm. Improve your photos on a computer. Bring photos on a memory stick. Basic computer skills needed."}
+    ],
+    questions: [
+      {stem:"Grace wants to learn a new skill that would help her communicate with a deaf colleague, and is free on Saturday mornings.", correct:"A", exp:"Introduction to Sign Language runs on Saturday mornings and teaches everyday phrases for communication - exactly what Grace needs for her deaf colleague."},
+      {stem:"Leo enjoys making things with his hands and wants to finish the weekend with an object he has built himself.", correct:"B", exp:"Weekend Woodworking lets you ‘make a wooden stool to take home’. Cake Decorating (G) also gives something to take home, but it is not a built object."},
+      {stem:"Priya wants to learn how to find out about her grandparents and great-grandparents.", correct:"C", exp:"Family History for Beginners teaches you ‘how to research your ancestors online’."},
+      {stem:"Sam has always wanted to sing but cannot read music, and would like a relaxed class he can join whenever he is free.", correct:"F", exp:"Weekend Choir needs no music-reading and lets you ‘drop in any week’, so Sam can come whenever he is free."},
+      {stem:"Nour wants to start learning to build websites but has no computer of her own to bring.", correct:"E", exp:"Beginners' Coding is about building your first website and provides laptops, so Nour does not need her own computer."}
+    ]
+  },
+  P3: {
+    title: "The Keeper's Diary",
+    rubric: "You are going to read a magazine article about an old diary found in a lighthouse. For questions 1 to 5, choose the answer (A, B, C or D) which you think fits best according to the text.",
+    passage: [
+      "When the old lighthouse at Craig Point was turned into a small museum last year, a builder repairing the floor found a tin box hidden beneath the boards. Inside was a diary, written between 1911 and 1913 by a keeper named Thomas Reid, who had lived alone in the lighthouse for most of those years.",
+      "The diary is not, at first sight, very exciting. Reid wrote something almost every day, but many entries are just a line or two about the weather, the state of the light, and the ships he had seen passing. He noted the temperature each morning and the direction of the wind, exactly as he was required to. For long stretches, nothing at all seems to happen.",
+      "Yet it is precisely this ordinariness that historians have found so valuable. Weather records from that part of the coast are rare, and Reid's careful daily notes have turned out to be far more useful to scientists studying the climate than any dramatic story could have been. A researcher at the city university has been comparing them with modern measurements, and says the diary is ‘worth more than its writer could ever have imagined’.",
+      "Here and there, though, the man himself appears. In the winter of 1912 he describes going three weeks without seeing another human being, and admits that he began talking to the seabirds. On calm evenings he mentions reading the same six books over and over, and once, memorably, he writes simply: ‘Lonely today. Wrote a letter I shall never send.’ These moments are rare, but they are what visitors to the museum remember.",
+      "What became of Thomas Reid is not fully known. The diary stops suddenly in the spring of 1913, with no explanation, and records show only that a different keeper took over that summer. Some believe he moved to Canada, where a Thomas Reid of about the right age appears in later documents, but nobody can be sure. His diary, at least, has found a home: it now sits in a glass case in the lighthouse where it was written, open at the page about the seabirds."
+    ],
+    questions: [
+      {stem:"Where was the diary found?", opts:["Under the floor of the lighthouse.","In a museum in the city.","In a box of the keeper's belongings.","Among old records at the university."], correct:0, exp:"A builder found a tin box ‘hidden beneath the boards’ while repairing the floor of the lighthouse."},
+      {stem:"What are most of the diary entries about?", opts:["Reid's feelings of loneliness.","Ordinary details such as the weather and passing ships.","Problems with the lighthouse equipment.","Conversations with visitors."], correct:1, exp:"Many entries are ‘just a line or two about the weather, the state of the light, and the ships he had seen passing’. The personal moments are described as rare."},
+      {stem:"Why do historians value the diary?", opts:["It tells an exciting and dramatic story.","It was written by a famous lighthouse keeper.","It records rare weather information for that coast.","It contains letters to important people."], correct:2, exp:"Weather records from that coast ‘are rare’, and Reid's daily notes have proved ‘far more useful to scientists studying the climate’ than any dramatic story."},
+      {stem:"What do visitors to the museum remember most?", opts:["The detailed temperature records.","The list of ships that passed the lighthouse.","The name of the researcher studying the diary.","The rare moments when Reid writes about himself."], correct:3, exp:"The personal moments - talking to seabirds, the unsent letter - ‘are what visitors to the museum remember’, even though they are rare."},
+      {stem:"What does the text say about what happened to Reid?", opts:["He definitely moved to Canada.","He stayed at the lighthouse until he died.","It is not known for certain.","He became a writer."], correct:2, exp:"The diary stops suddenly with no explanation, and ‘nobody can be sure’ what happened. The Canada idea is only what ‘some believe’."}
+    ]
+  },
+  P4: {
+    title: "Growing Vegetables in the City",
+    parts: [
+      "On a patch of waste ground between two blocks of flats, where nothing grew for years except weeds, there are now forty small vegetable gardens. Each one is looked after by a different family from the flats above.",
+      " The land had belonged to the city council, which had no plans for it and was happy to let the residents use it.\n\nAt first, only a handful of people were interested.",
+      " Rosa Delgado, who had grown vegetables as a child in the countryside, offered to show the others what to do.\n\nThe results in the first summer surprised everyone.",
+      " Families who had never grown anything found themselves with more tomatoes, beans and lettuces than they could eat.\n\nSharing the extra food soon became part of the routine.",
+      " A table was set up near the gate where anyone could leave vegetables they did not need and take whatever they wanted.\n\nThe gardens have changed the area in ways nobody expected.",
+      " Neighbours who had lived in the same building for years without speaking now meet every evening among the plants, and the children have somewhere to play that is not the street."
+    ],
+    options: [
+      {letter:"A", text:"The idea came from a group of residents who were tired of looking at an ugly, empty space."},
+      {letter:"B", text:"Most of them had never planted a seed in their lives and had no idea where to begin."},
+      {letter:"C", text:"The greatest change of all, though, has been to the way people treat one another."},
+      {letter:"D", text:"The soil, it turned out, was far better than anyone had expected."},
+      {letter:"E", text:"The council later decided to sell the land to a builder."},
+      {letter:"F", text:"Each family pays a small yearly fee to cover the cost of water."},
+      {letter:"G", text:"Vegetables from the city, some people believe, taste better than any others."},
+      {letter:"H", text:"Nobody liked the thought of good vegetables being thrown away."}
+    ],
+    correct: {1:"A", 2:"B", 3:"D", 4:"H", 5:"C"},
+    exp: {
+      1:"Gap 1 comes after the description of the forty gardens and before ‘The land had belonged to the city council’ - A explains where the idea came from, before the text turns to who owned the land.",
+      2:"Gap 2 follows ‘At first, only a handful of people were interested’ and precedes Rosa offering ‘to show the others what to do’ - B explains why they needed showing: they had never planted anything.",
+      3:"Gap 3 follows ‘The results in the first summer surprised everyone’ and precedes the huge crop of tomatoes and beans - D gives the reason the harvest was so good.",
+      4:"Gap 4 follows ‘Sharing the extra food soon became part of the routine’ and precedes the sharing table by the gate - H gives the reason (not wanting good food wasted) that the table then solves.",
+      5:"Gap 5 follows ‘changed the area in ways nobody expected’ and precedes neighbours meeting and children playing - C names the social change that those examples then illustrate.",
+      extra:"E, F and G are not used: E contradicts the text (the council was happy to let residents keep using the land), and F and G add details about yearly fees and taste that no gap requires."
+    }
+  }
+}
+
+];
 
 /* ============ STATE ============ */
+let TI = 0;
+let P1, P2, P3, P4;
 const state = {
-  p1: new Array(P1.length).fill(null), p1checked:false,
-  p2: new Array(P2.questions.length).fill(null), p2checked:false,
-  p3: new Array(P3.questions.length).fill(null), p3checked:false,
+  p1: [], p1checked:false,
+  p2: [], p2checked:false,
+  p3: [], p3checked:false,
   p4: {}, p4checked:false
 };
 const GAPCOUNT4 = 5;
@@ -549,8 +892,36 @@ function showPart(n){
   document.querySelectorAll('.part-section').forEach(s=>s.classList.toggle('visible', +s.dataset.part===n));
 }
 
+/* ============ TEST PICKER ============ */
+function loadTest(i){
+  TI = i;
+  const T = TESTS[i];
+  P1 = T.P1; P2 = T.P2; P3 = T.P3; P4 = T.P4;
+  document.getElementById('rub2').textContent = P2.rubric;
+  document.getElementById('rub3').textContent = P3.rubric;
+  document.getElementById('p2Title').textContent = P2.title;
+  document.getElementById('testTopic').innerHTML = '<strong>Test ' + (i+1) + '</strong> - ' + T.topic;
+  document.querySelectorAll('.test-pill').forEach((b,bi)=>b.classList.toggle('active', bi===i));
+  resetP1(); resetP2(); resetP3(); resetP4();
+  showPart(1);
+  try{ localStorage.setItem('jpe-b1-reading-test', i); }catch(e){}
+  window.scrollTo(0,0);
+}
+function buildPicker(){
+  const wrap = document.getElementById('testPicker');
+  TESTS.forEach((t,i)=>{
+    const b = document.createElement('button');
+    b.className = 'test-pill'; b.textContent = 'Test ' + (i+1);
+    b.onclick = ()=>loadTest(i);
+    wrap.appendChild(b);
+  });
+}
+
 /* ============ INIT ============ */
-renderP1(); renderP2(); renderP3(); renderP4();
+buildPicker();
+let startTest = 0;
+try{ const sv = parseInt(localStorage.getItem('jpe-b1-reading-test'),10); if(sv>=0 && sv<TESTS.length) startTest = sv; }catch(e){}
+loadTest(startTest);
 </script>
 </body>
 </html>

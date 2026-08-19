@@ -35,6 +35,13 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .wrap{max-width:960px;margin:0 auto;padding:0 2rem 4rem;position:relative;z-index:1}
 
 /* progress bar across parts */
+.test-picker{display:flex;align-items:center;gap:.45rem;flex-wrap:wrap;margin:1.6rem 0 0}
+.test-picker-label{font-family:Outfit,sans-serif;font-size:.62rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-right:.25rem}
+.test-pill{font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:700;padding:.4rem .9rem;border-radius:999px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:background .16s,color .16s,border-color .16s}
+.test-pill:hover{color:var(--ink);border-color:var(--muted)}
+.test-pill.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.test-topic{font-size:.78rem;color:var(--muted);margin:.55rem 0 0}
+.test-topic strong{color:var(--ink);font-weight:700}
 .overview{display:flex;gap:.6rem;flex-wrap:wrap;margin:1.6rem 0 1.2rem;padding:.9rem 1.1rem;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);align-items:center}
 .overview-item{font-size:.78rem;color:var(--muted);display:flex;align-items:center;gap:.35rem}
 .overview-item strong{color:var(--ink);font-weight:800;font-size:.85rem}
@@ -149,17 +156,19 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 
 <div class="page-header">
   <a href="reading.html" class="back-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</a>
-  <div class="pilot-flag">Pilot - for review, not yet linked in the sidebar</div>
   <div class="topic-hero">
     <div class="topic-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
     <div>
       <h1>B2 First Reading - Parts 5 to 7</h1>
-      <div class="hero-meta"><span><strong>3</strong> parts</span><span><strong>22</strong> questions</span><span><strong>~40</strong> min</span></div>
+      <div class="hero-meta"><span><strong>5</strong> tests</span><span><strong>3</strong> parts each</span><span><strong>22</strong> questions</span><span><strong>~40</strong> min</span></div>
     </div>
   </div>
 </div>
 
 <div class="wrap">
+  <div class="test-picker" id="testPicker"><span class="test-picker-label">Test</span></div>
+  <div class="test-topic" id="testTopic"></div>
+
   <div class="overview" id="overview">
     <div class="overview-item">Part 5 <strong id="ovP5">-/6</strong></div>
     <div class="overview-item">Part 6 <strong id="ovP6">-/6</strong></div>
@@ -175,7 +184,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 
   <!-- PART 5 -->
   <div class="part-section visible" data-part="5" id="section5">
-    <div class="exam-info"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span>You are going to read a magazine article. For questions 1 to 6, choose the answer (A, B, C or D) which you think fits best according to the text.</span></div>
+    <div class="exam-info"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span id="rub5"></span></div>
     <div class="test-card">
       <div class="test-header"><div class="test-title">Part 5 · Multiple Choice</div><div class="score-display" id="p5ScoreDisplay">Score: <span class="score-val" id="p5ScoreVal"></span></div></div>
       <div class="passage" id="p5Passage"></div>
@@ -192,7 +201,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 
   <!-- PART 6 -->
   <div class="part-section" data-part="6" id="section6">
-    <div class="exam-info"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span>You are going to read an article. Six sentences have been removed from the article. Choose from the sentences A to G the one which fits each gap (1 to 6). There is one extra sentence which you do not need to use.</span></div>
+    <div class="exam-info"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span id="rub6"></span></div>
     <div class="test-card">
       <div class="test-header"><div class="test-title">Part 6 · Gapped Text</div><div class="score-display" id="p6ScoreDisplay">Score: <span class="score-val" id="p6ScoreVal"></span></div></div>
       <div class="passage" id="p6Passage"></div>
@@ -209,7 +218,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 
   <!-- PART 7 -->
   <div class="part-section" data-part="7" id="section7">
-    <div class="exam-info"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span>You are going to read about four people's experience of working night shifts. For questions 1 to 10, choose from the people (A to D). The people may be chosen more than once.</span></div>
+    <div class="exam-info"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span id="rub7"></span></div>
     <div class="test-card">
       <div class="test-header"><div class="test-title">Part 7 · Multiple Matching</div><div class="score-display" id="p7ScoreDisplay">Score: <span class="score-val" id="p7ScoreVal"></span></div></div>
       <div class="passage" id="p7Passage" style="padding-bottom:0">
@@ -240,7 +249,12 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 
 <script>
 /* ============ DATA ============ */
-const P5 = {
+const TESTS = [
+
+{
+  topic: "Moonlight gardens, dark skies and life on the night shift",
+ P5: {
+    rubric: "You are going to read a magazine article about a garden designer. For questions 1 to 6, choose the answer (A, B, C or D) which you think fits best according to the text.",
   title: "The Night Gardener",
   passage: [
     "For most of her career, Elena Voss designed gardens exactly the way everyone else did: with colour in mind. She thought carefully about which flowers would look striking together in June, and which would still be blooming by September. Then, one August evening eight years ago, she stayed late at a client's house to finish planting a border, and something changed. “The sun went down, and the garden I'd just spent three weeks on basically disappeared,” she remembers. “All that colour I'd been so proud of just vanished into the dark. But something else appeared instead - the white flowers seemed to glow, and I could suddenly smell things I hadn't noticed all day.” That evening turned into the beginning of an entirely new career. Voss now designs what she calls ‘moonlight gardens’: outdoor spaces built specifically to be experienced after sunset, when most conventional gardens have nothing left to offer.",
@@ -257,9 +271,10 @@ const P5 = {
     {stem:"How does Voss respond to the criticism that night gardens are a ‘luxury’?", opts:["She admits they are impractical and advises against them for most clients.","She insists that night gardens can, in fact, be enjoyed at any time of year.","She points out that traditional daytime gardens are just as seasonal.","She argues that something doesn't need to be usable all year round to be worth having."], correct:3, exp:"Her swimming-pool comparison directly makes this point: “You don't have to enjoy something all year round for it to be worth having.”"},
     {stem:"What is the writer's main purpose in this text?", opts:["To explain, through one designer's experience, how a niche gardening idea has grown in popularity.","To criticise traditional garden designers for failing to keep up with new trends.","To give practical, step-by-step advice on which plants to use in a home garden.","To argue that daytime gardens are becoming less popular than night gardens in general."], correct:0, exp:"The text is a profile piece: it follows Voss's personal story and uses it to illustrate a wider trend, rather than issuing criticism, giving a how-to guide, or claiming daytime gardens are declining overall."}
   ]
-};
+  },
 
-const P6 = {
+  P6: {
+    rubric: "You are going to read an article about a town and its night sky. Six sentences have been removed. Choose from the sentences A to G the one which fits each gap (1 to 6). There is one extra sentence you do not need.",
   title: "The Return of the Dark Sky",
   parts: [
     "Twenty years ago, few people in the small English town of Moorhaven gave much thought to the sky above their heads once the sun went down. Streetlights burned all night regardless of whether anyone was walking beneath them, shop signs glowed long after closing time, and the surrounding hills faded into an orange haze that blotted out all but the very brightest stars.",
@@ -289,9 +304,11 @@ const P6 = {
     6:"Gap 6 sets up the closing line “that is no small achievement” - E's “become something of a model” is the achievement being referred to.",
     extra:"B is not used: its “however” implies a contrast with something positive stated immediately before it, but no gap position in the text is preceded by a statement that B could plausibly contrast with."
   }
-};
+  },
 
-const P7 = {
+  P7: {
+    title: "Working Nights: Four People's Stories",
+    rubric: "You are going to read about four people who work night shifts. For questions 1 to 10, choose from the people (A to D). The people may be chosen more than once.",
   texts: [
     {letter:"A", name:"Priya, 34, hospital nurse", body:"I've worked nights for almost ten years now, and people always assume I must hate it, but the truth is more complicated. The wards are genuinely calmer after midnight - no visitors, no meetings, just patients and the small team looking after them, and I find I can actually focus properly on the people in my care rather than the paperwork. What I've never managed to solve is the social side. My partner works a normal daytime job, so most weeks we see each other properly for maybe two hours a day. I've tried switching back to days twice, and both times I lasted less than a month before asking to go back."},
     {letter:"B", name:"Marcus, 41, bakery owner", body:"I start at half past two in the morning, seven days a week, because bread genuinely doesn't taste the same if it isn't fresh out of the oven by the time people arrive for breakfast. When I first took over the bakery from my father, I assumed I'd get used to the early hours within a few weeks. Fifteen years later, I still haven't, not really - I've simply learned to function on it. Even on my one day off, I'm wide awake by four and starving by six, whether there's fresh bread waiting or not. What keeps me going is walking into an empty, silent bakery each morning and having the whole place entirely to myself before anyone else is awake."},
@@ -310,13 +327,327 @@ const P7 = {
     {stem:"mentions being exhausted even during the journey home?", correct:"D", exp:"Tom: “mornings when I've driven home barely able to keep my eyes open.”"},
     {stem:"gets more done on a personal project than they would if they worked daytime hours?", correct:"C", exp:"Sofia: “I get through more writing in one shift than I used to manage in an entire week at home.”"}
   ]
-};
+  }
+}
+,
+
+{
+  topic: "A lighthouse keeper turned author, wild swimming and lost languages",
+  P5: {
+    title: "The Accidental Novelist",
+    rubric: "You are going to read a magazine article about a writer's unusual path to publication. For questions 1 to 6, choose the answer (A, B, C or D) which you think fits best according to the text.",
+    passage: [
+      "When Ruth Callan's first novel appeared in bookshops last spring, several reviewers described her as an overnight success. It is a phrase that makes her laugh. “I'd been writing for twenty-two years by the time anyone published a word of it,” she says. “If that's overnight, it was a very long night indeed.” The description is understandable, though: almost nobody in the literary world had heard of Callan before, for the simple reason that she had never sent her work to anybody. For more than two decades she had written purely for herself, filling notebook after notebook and stacking the finished ones in a cupboard she rarely opened.",
+      "Callan grew up in a family where writing was regarded as a pleasant hobby rather than a serious ambition, and for most of her adult life she treated it exactly that way. She trained as a physiotherapist, married, raised two children, and wrote in the evenings once the house was quiet. The idea of showing her stories to a stranger, let alone a publisher, filled her with a dread she found difficult to explain even to herself. “It wasn't that I thought the work was bad,” she reflects. “It was more that as long as nobody read it, it couldn't fail. The moment you send something off, you're asking to be judged, and I simply preferred not to be.”",
+      "What eventually changed her mind was not a sudden burst of confidence but a house move. When she and her husband decided to downsize, Callan was forced to confront the cupboard and its contents: eleven completed manuscripts, none of which anyone had ever seen. Her first instinct, she admits, was to throw them all away. It was her daughter, then twenty and home for the weekend, who stopped her, sat down on the floor, and began to read. By the end of the afternoon she had finished half a manuscript and was, in Callan's words, “absolutely furious that I'd never shown it to her before.”",
+      "Even then, Callan resisted. She agreed, reluctantly, to let her daughter type up one manuscript and send it to a single small publisher, on the strict condition that she herself would not be told when or whether a reply came. This unusual arrangement suited her perfectly. For three months she carried on as normal, deliberately not asking, while her daughter quietly handled a growing correspondence. The novel was accepted, then went to a second printing within weeks of publication, and Callan learned all of this more or less at once, over a single startling phone call from an editor she had never spoken to.",
+      "She is now, a little to her own surprise, working on a twelfth novel, this time with a contract and a deadline. She is honest about the fact that writing to order feels very different from writing in secret, and not always better. “There's a freedom in believing nobody will ever read it,” she says. “I've lost that, and I do miss it.” Yet she has no regrets about the change. When aspiring writers ask her advice, she gives them just one instruction, delivered with the firmness of someone who wishes she had followed it earlier: show your work to somebody, anybody, long before you think it is ready."
+    ],
+    questions: [
+      {stem:"Why does Callan find the phrase ‘overnight success’ amusing?", opts:["She does not consider her novel to be genuinely successful.","She had actually been writing for a very long time beforehand.","She believes reviewers rarely understand how publishing works.","She only started writing shortly before the novel appeared."], correct:1, exp:"She points out she had been writing for twenty-two years, joking that “it was a very long night indeed” - the humour is in the gap between the phrase and the reality."},
+      {stem:"What does Callan say was the real reason she never showed anyone her writing?", opts:["She was convinced the quality of the work was poor.","She could not find a publisher willing to consider it.","She wanted to avoid the possibility of being judged.","She had been discouraged from writing by her family."], correct:2, exp:"She explicitly says it was not that she thought the work was bad, but that “as long as nobody read it, it couldn't fail” - she preferred not to be judged."},
+      {stem:"What finally forced Callan to deal with her manuscripts?", opts:["Encouragement from a publisher who had heard about her.","Her daughter asking to read her stories.","A realisation that her writing was good enough.","A decision to move to a smaller home."], correct:3, exp:"The turning point was practical: “When she and her husband decided to downsize, Callan was forced to confront the cupboard.” The daughter's involvement came after that."},
+      {stem:"How did Callan's daughter react to reading one of the manuscripts?", opts:["She was annoyed that her mother had kept them hidden.","She thought they needed a great deal of editing.","She was surprised her mother had written so many.","She immediately contacted several publishers."], correct:0, exp:"By the end of the afternoon the daughter was “absolutely furious that I'd never shown it to her before” - annoyed that they had been hidden, not critical of the writing."},
+      {stem:"What was unusual about the way Callan's first novel was submitted?", opts:["It was sent to a large number of publishers at once.","She insisted on not being told about any response.","Her daughter rewrote large sections before sending it.","It was published without Callan's knowledge or consent."], correct:1, exp:"She agreed only “on the strict condition that she herself would not be told when or whether a reply came” - she deliberately kept herself in the dark."},
+      {stem:"What does Callan admit she has lost since becoming a published writer?", opts:["Her interest in writing fiction at all.","The support of her close family.","The sense of freedom that came from writing privately.","Her ability to meet publishers' deadlines."], correct:2, exp:"She says “There's a freedom in believing nobody will ever read it. I've lost that, and I do miss it.”"}
+    ]
+  },
+  P6: {
+    title: "Into the Cold",
+    rubric: "You are going to read an article about the rise of wild swimming. Six sentences have been removed. Choose from the sentences A to G the one which fits each gap (1 to 6). There is one extra sentence you do not need.",
+    parts: [
+      "Fifteen years ago, anyone spotted lowering themselves into a freezing river in the middle of winter would have been assumed to be in some kind of difficulty. Today, on that same stretch of water, they are more likely to be part of a cheerful group of thirty, wearing woolly hats and clutching flasks of tea.",
+      " The activity now known as wild swimming - swimming outdoors in lakes, rivers and the sea rather than in heated pools - has grown from an eccentric minority pursuit into something close to a mainstream hobby.\n\nThe reasons people give for taking it up vary enormously. Some are drawn by the physical challenge, others by a desire to spend more time outdoors, and a growing number mention the supposed health benefits of cold water.",
+      " What almost all of them describe, however, is a feeling that is harder to measure: a sense of calm and clear-headedness that can last for hours after they have dried off and gone home.\n\nScientists have become increasingly interested in exactly this effect. Studies suggest that brief immersion in cold water triggers a series of physical responses, including changes in breathing and heart rate, that may genuinely influence mood.",
+      " For now, most researchers are careful to say only that something appears to be happening, without claiming to understand it fully.\n\nEnthusiasts, unsurprisingly, tend to need no convincing. Online groups dedicated to the activity have swelled into the hundreds of thousands, and organised events can attract enormous numbers.",
+      " Newcomers, however, are repeatedly warned that the same cold water responsible for the pleasant after-effects can also be genuinely dangerous.\n\nThe risks are real and worth taking seriously. Cold water can cause the body to lose heat far faster than air at the same temperature, and even strong swimmers can find their muscles becoming useless within minutes.",
+      " Experienced swimmers therefore tend to follow a few strict rules: never swim alone, get out well before you feel truly cold, and warm up slowly rather than jumping straight into a hot shower.\n\nNone of this, though, seems likely to slow the activity's growth. For its supporters, the combination of exercise, fresh air and a powerful sense of wellbeing is simply too appealing to resist.",
+      " That, perhaps, is the real secret of its success: not the science, which remains uncertain, but the way it makes people feel."
+    ],
+    options: [
+      {letter:"A", text:"Whether these short-term changes add up to any lasting benefit, though, remains far from clear."},
+      {letter:"B", text:"One recent gathering in the north of the country drew more than two thousand swimmers to a single beach."},
+      {letter:"C", text:"Heated indoor pools, by contrast, are becoming steadily more expensive to run."},
+      {letter:"D", text:"The transformation over a single generation has been remarkable."},
+      {letter:"E", text:"In extreme cases, this loss of control can make it impossible to get back to safety."},
+      {letter:"F", text:"Most of these motivations, it should be said, apply equally to swimming in an ordinary pool."},
+      {letter:"G", text:"Ask a hundred swimmers why they do it, and you will get a hundred slightly different answers."}
+    ],
+    correct: {1:"D", 2:"G", 3:"A", 4:"B", 5:"E", 6:"F"},
+    exp: {
+      1:"Gap 1 follows the striking then-and-now contrast (a lone figure in a freezing river versus a cheerful group of thirty) and precedes the explanation of what wild swimming is - D's “transformation over a single generation has been remarkable” sums up that contrast.",
+      2:"Gap 2 sits between a list of the different reasons people give and “What almost all of them describe, however...” - G's “a hundred slightly different answers” fits the variety just described.",
+      3:"Gap 3 follows the claim that cold water triggers responses that “may genuinely influence mood” and precedes “For now, most researchers are careful to say only...” - A introduces exactly that note of caution.",
+      4:"Gap 4 follows “organised events can attract enormous numbers” and B gives a concrete example: two thousand swimmers on one beach.",
+      5:"Gap 5 follows the warning that muscles can become “useless within minutes” and E extends that idea: the loss of control can make it impossible to get back to safety, which the strict rules then address.",
+      6:"Gap 6 needs to round off the piece before the final line about how it makes people feel - F's point that the same motivations apply to pool swimming subtly returns to what makes wild swimming distinctive, leaving feeling as the real answer.",
+      extra:"C is not used: its claim about the rising cost of indoor pools is never developed anywhere in the article and fits none of the gaps, which are all about wild swimming itself rather than its alternatives."
+    }
+  },
+  P7: {
+    title: "Saving a Language: Four Volunteers",
+    rubric: "You are going to read about four people helping to preserve endangered languages. For questions 1 to 10, choose from the people (A to D). The people may be chosen more than once.",
+    texts: [
+      {letter:"A", name:"Elin, recording elderly speakers", body:"I spend most weekends driving around remote villages with a microphone, recording the last fluent speakers of a language that probably won't outlive them. It's slow, and often quite emotional work - many of the people I record are in their eighties and know perfectly well that they're among the final few. What surprised me most when I started was how little of the language had ever been written down; almost everything I'm capturing exists only in these people's memories. I trained as a sound engineer, not a linguist, and honestly I think that's an advantage: I worry about the quality of the recording, and I leave the analysis to the academics who use it afterwards."},
+      {letter:"B", name:"Marek, building a digital dictionary", body:"My job is to take the recordings and notes that people like Elin gather and turn them into something searchable that anyone can use online. I came to this from software rather than languages, and at first I badly underestimated how difficult it would be - you can't simply pour words into a database when half of them have three or four spellings and no agreed grammar. The reward, for me, is entirely practical: a teenager in the community can now look up a word on their phone in seconds, something that was impossible even five years ago. I rarely meet the speakers themselves, which is the one part of the work I regret."},
+      {letter:"C", name:"Salome, teaching children", body:"I run an after-school club where children learn songs, games and simple conversations in a language their grandparents speak but their parents mostly don't. Breaking that middle link is the whole challenge: if a language skips even one generation, it's extraordinarily hard to bring back. People sometimes assume the children find it a burden, but the opposite is true - they treat it as a kind of secret code, and they're far quicker than any adult I've taught. My worry is what happens when they grow up and there's nobody their own age to speak it with."},
+      {letter:"D", name:"Tomas, campaigning for recognition", body:"I don't teach and I can't build a website, but I can write letters, organise meetings and pester officials, and that's what I do. Without official status - road signs, a place in schools, some money - even the best recordings and dictionaries end up as museum pieces. I've learned to be patient, because progress is measured in years, not weeks, and most of my letters are simply ignored. But we recently persuaded the regional government to fund a single part-time teaching post, and small as that sounds, it took three years of steady pressure and I consider it the proudest achievement of my life so far."}
+    ],
+    questions: [
+      {stem:"came to this work from a technical background rather than a language one?", correct:"B", exp:"Marek: “I came to this from software rather than languages.” (Elin trained as a sound engineer too, but Marek's whole entry is about the technical crossover into a language project.)"},
+      {stem:"believes that not being a language specialist actually helps them in their role?", correct:"A", exp:"Elin: “I trained as a sound engineer, not a linguist, and honestly I think that's an advantage.”"},
+      {stem:"expresses regret at having little contact with the speakers themselves?", correct:"B", exp:"Marek: “I rarely meet the speakers themselves, which is the one part of the work I regret.”"},
+      {stem:"describes how quickly children pick the language up compared with adults?", correct:"C", exp:"Salome: the children “are far quicker than any adult I've taught.”"},
+      {stem:"argues that without official support, other preservation efforts may come to nothing?", correct:"D", exp:"Tomas: without official status “even the best recordings and dictionaries end up as museum pieces.”"},
+      {stem:"points out that much of the language has never existed in written form?", correct:"A", exp:"Elin: “how little of the language had ever been written down; almost everything I'm capturing exists only in these people's memories.”"},
+      {stem:"admits to having greatly misjudged how hard the task would be?", correct:"B", exp:"Marek: “at first I badly underestimated how difficult it would be.”"},
+      {stem:"identifies the loss of a single generation of speakers as the central problem?", correct:"C", exp:"Salome: “if a language skips even one generation, it's extraordinarily hard to bring back.”"},
+      {stem:"describes a recent success that required years of persistent effort?", correct:"D", exp:"Tomas: the part-time teaching post “took three years of steady pressure and I consider it the proudest achievement of my life.”"},
+      {stem:"worries about who the current learners will be able to speak to in the future?", correct:"C", exp:"Salome: “My worry is what happens when they grow up and there's nobody their own age to speak it with.”"}
+    ]
+  }
+},
+
+{
+  topic: "The comeback of the vinyl record, urban foxes and a museum of failures",
+  P5: {
+    title: "Why Vinyl Refused to Die",
+    rubric: "You are going to read a magazine article about the return of vinyl records. For questions 1 to 6, choose the answer (A, B, C or D) which you think fits best according to the text.",
+    passage: [
+      "In 2007, the vinyl record was, to all appearances, finished. Annual sales had fallen to a level that barely registered on the industry's charts, the last few pressing plants were closing, and the machines used to make records were being sold for scrap or shipped abroad. Downloads had taken over, streaming was on the horizon, and the idea that anyone under forty might want to buy music on a heavy black disc seemed faintly absurd. Yet within a decade vinyl had become the fastest-growing format in the entire music business, outselling CDs in some markets and turning a handful of surviving factories into unexpectedly valuable enterprises.",
+      "Explaining this reversal is harder than it looks. The most obvious theory - that older listeners were simply buying the music of their youth again - turns out to be largely wrong. Surveys consistently show that a striking proportion of new vinyl buyers are under thirty, many of them purchasing records by contemporary artists rather than reissues of old albums. Just as puzzling, a significant number of these buyers do not even own a record player. They are buying the object, it seems, as much as the music it contains, which raises an obvious question: what exactly is the object for?",
+      "Part of the answer lies in a reaction against the very convenience that killed vinyl in the first place. When every song ever recorded is available instantly and more or less free, the argument goes, music begins to feel weightless and disposable. A record, by contrast, demands something of its owner. It must be bought, carried home, removed from its sleeve, placed on a turntable and turned over halfway through. Each of these small inconveniences, paradoxically, seems to make the listening feel more deliberate and more valuable. Several buyers interviewed for this article used almost identical language, describing the ritual as a way of ‘actually paying attention' to an album instead of letting it wash past in the background.",
+      "The physical scale of a record matters too. A twelve-inch sleeve is large enough to be treated as a genuine piece of artwork, and many buyers display their records rather than hiding them away. Musicians and designers have responded enthusiastically, producing elaborate covers, coloured discs and special editions that would make no sense as a digital file. In this respect vinyl has quietly become something the industry had almost given up hope of selling: a physical product that people actively want to own and show to others, rather than a mere container for the sound.",
+      "None of this means the revival is guaranteed to last. Vinyl remains expensive to produce and to buy, the number of factories able to press it is still small, and much of the recent growth has come from a limited pool of enthusiasts who may not keep spending forever. Industry analysts are divided over whether the format has found a permanent, if modest, place in the market or is simply enjoying an unusually long moment of fashion. What almost everyone now agrees on, however, is that the confident predictions of vinyl's death, repeated so often twenty years ago, turned out to be badly mistaken."
+    ],
+    questions: [
+      {stem:"How does the writer describe the state of vinyl in 2007?", opts:["It was beginning to show the first signs of recovery.","It appeared to be very close to disappearing completely.","It was popular only among a small group of young people.","It was still competing successfully with downloads."], correct:1, exp:"The paragraph describes collapsing sales, closing plants and machines sold for scrap - vinyl “was, to all appearances, finished.”"},
+      {stem:"What does the writer say is wrong with the most obvious explanation for vinyl's return?", opts:["It assumes older listeners have more money to spend.","It ignores how cheap records have recently become.","Many new buyers are young and buying current music.","It fails to explain why CDs did not recover too."], correct:2, exp:"The ‘buying the music of their youth' theory is “largely wrong” because surveys show many buyers are under thirty and buy contemporary artists, not reissues."},
+      {stem:"Why does the writer find it ‘puzzling' that some people buy vinyl?", opts:["They do not own anything to play the records on.","They pay far more than they would for a download.","They rarely listen to the same record twice.","They prefer reissues to music by new artists."], correct:0, exp:"A significant number of buyers “do not even own a record player,” so they are buying the object rather than a way of hearing the music."},
+      {stem:"According to the text, why might the ‘inconveniences' of vinyl actually appeal to listeners?", opts:["They make each record last much longer.","They keep the overall cost of the hobby low.","They make the act of listening feel more deliberate.","They allow several people to listen at once."], correct:2, exp:"The effort of handling a record “seems to make the listening feel more deliberate and more valuable,” a way of ‘actually paying attention'."},
+      {stem:"What point does the writer make about the size of a record sleeve?", opts:["It makes records difficult to store neatly.","It puts some younger buyers off buying them.","It explains why records are so expensive.","It allows the cover to be enjoyed as artwork."], correct:3, exp:"A twelve-inch sleeve is “large enough to be treated as a genuine piece of artwork,” and many buyers display their records."},
+      {stem:"What is the general view of industry analysts mentioned at the end?", opts:["They disagree about whether the revival will last.","They are certain vinyl will soon disappear again.","They believe vinyl will overtake streaming entirely.","They think the growth has already come to a stop."], correct:0, exp:"Analysts “are divided over whether the format has found a permanent... place... or is simply enjoying an unusually long moment of fashion.”"}
+    ]
+  },
+  P6: {
+    title: "The Fox on the Doorstep",
+    rubric: "You are going to read an article about foxes living in cities. Six sentences have been removed. Choose from the sentences A to G the one which fits each gap (1 to 6). There is one extra sentence you do not need.",
+    parts: [
+      "It is close to midnight in a quiet suburban street, and a fox is trotting confidently down the middle of the road as though it owns the place. It pauses to investigate a rubbish bag, glances up at a lit window without much interest, and continues on its way. Scenes like this, once rare, are now a nightly occurrence in towns and cities across much of the world.",
+      " Foxes, it turns out, have adapted to human surroundings with remarkable ease.\n\nThe reasons are not difficult to understand. A city offers a fox an almost endless supply of food, from discarded takeaways to the contents of unsecured bins, as well as countless warm, sheltered places to raise young, under sheds, beneath decking, or in overgrown corners of gardens.",
+      " In return, the fox asks for nothing and, for the most part, causes little serious harm.\n\nNot everyone, however, is charmed by their new neighbours. Some residents complain about the mess left behind when bins are raided, about the sharp smell foxes leave to mark their territory, and about the unearthly screaming sound they make during the mating season.",
+      " These frightened callers are almost always reassured to learn that attacks on people are extraordinarily rare, and that a fox is far more interested in avoiding a human than in approaching one.\n\nAttempts to remove urban foxes have a long and mostly unsuccessful history. For decades, some city councils trapped and killed them in large numbers, only to find that the population bounced straight back.",
+      " Killing the foxes in one area simply left an empty territory that neighbouring foxes were quick to occupy.\n\nToday, the advice from wildlife experts is very different, and centres on a single simple principle: do not feed them.",
+      " A fox that has learned to associate people with an easy meal loses its natural caution, which is bad for the animal and unsettling for the humans it begins to pester.\n\nBeyond that, the experts suggest, the best approach is largely to leave the animals alone. Urban foxes are, after all, a sign that even a busy modern city can still make room for something genuinely wild.",
+      " For most of us, the sight of one crossing the road at night is a small, unexpected reminder of that fact."
+    ],
+    options: [
+      {letter:"A", text:"The problem, researchers eventually realised, was that removing the animals achieved nothing."},
+      {letter:"B", text:"Well-meaning people who put out food, they explain, do far more harm than good."},
+      {letter:"C", text:"A few are frightened enough to telephone the council demanding that something be done."},
+      {letter:"D", text:"Where such an environment once seemed hostile, they now find it positively welcoming."},
+      {letter:"E", text:"Foxes are most active during the hours around dawn and dusk."},
+      {letter:"F", text:"In exchange, it keeps down the numbers of rats and other pests that people like even less."},
+      {letter:"G", text:"That, at least, is how supporters of the animals prefer to see it."}
+    ],
+    correct: {1:"D", 2:"F", 3:"C", 4:"A", 5:"B", 6:"G"},
+    exp: {
+      1:"Gap 1 follows the image of a fox at home in the street and precedes “Foxes... have adapted to human surroundings with remarkable ease” - D's shift from a once-hostile environment to a welcoming one fits that idea.",
+      2:"Gap 2 lists what the city gives the fox (food, shelter) and is followed by “In return, the fox asks for nothing” - F states what the fox gives back: controlling rats and pests.",
+      3:"Gap 3 lists residents' complaints and precedes “These frightened callers are almost always reassured...” - C introduces the people who telephone the council, i.e. the callers.",
+      4:"Gap 4 follows the statement that the population “bounced straight back” and precedes “Killing the foxes... simply left an empty territory...” - A explains that removal achieved nothing, which the next sentence then details.",
+      5:"Gap 5 follows the single principle “do not feed them” and precedes “A fox that has learned to associate people with an easy meal...” - B is about well-meaning feeders doing harm.",
+      6:"Gap 6 follows the warm description of foxes as a sign of the wild in the city and precedes the closing line - G's “how supporters of the animals prefer to see it” gently attributes that rosy view before the final reflection.",
+      extra:"E is not used: the fact that foxes are most active around dawn and dusk is true but connects to none of the gaps, each of which is about people's reactions to foxes or attempts to manage them rather than the animals' daily timetable."
+    }
+  },
+  P7: {
+    title: "The Museum of Failure: Four Curators",
+    rubric: "You are going to read about four people who work at a museum dedicated to failed products. For questions 1 to 10, choose from the people (A to D). The people may be chosen more than once.",
+    texts: [
+      {letter:"A", name:"Dieter, founder", body:"I started the museum after years of collecting failed products almost as a joke - a fizzy drink that tasted of nothing, a games console nobody bought, a phone with a keyboard so small it was unusable. People assumed it would be a mocking sort of place, but that was never my intention. Every object here represents someone's genuine, expensive attempt to do something new, and most of them failed for interesting reasons rather than stupid ones. My favourite visitors are the ones who arrive expecting to laugh and leave thinking more carefully about the products they use every day."},
+      {letter:"B", name:"Yuki, acquisitions", body:"My job is to track down and obtain the exhibits, which is far harder than people imagine. Companies are understandably reluctant to hand over evidence of their most embarrassing mistakes, and I've had polite refusals from some of the biggest names in the business. I've learned to approach the engineers and designers directly rather than the marketing departments, because the people who actually built a failed product are often strangely proud of it and keen to explain what went wrong. Almost every exhibit in the building arrived because one individual decided the story deserved to be told."},
+      {letter:"C", name:"Priya, education", body:"I design the workshops we run for schools and, increasingly, for companies. The business visitors surprise people the most - firms actually pay to bring their teams here, precisely because studying other people's failures is far less painful than studying your own. What I try to get across, especially to the children, is that nearly every one of these flops taught the industry something that later fed into a success. Failure, handled properly, isn't the opposite of progress; it's part of how progress happens. That's a difficult idea to sell in a culture that treats any mistake as shameful."},
+      {letter:"D", name:"Sam, visitor experience", body:"I look after everything to do with how visitors move through the museum and what they take away from it. The single most common reaction I see is relief - people wander round realising that enormous, admired companies have made errors far worse than anything they've done at work, and you can almost watch their shoulders drop. We deliberately don't name-and-shame; the labels explain what was attempted and why it didn't work, never who should be blamed. I sometimes think we're less a museum than a rather unusual form of group therapy."}
+    ],
+    questions: [
+      {stem:"says that people expect the museum to be more mocking than it actually is?", correct:"A", exp:"Dieter: “People assumed it would be a mocking sort of place, but that was never my intention.”"},
+      {stem:"argues that failure is a necessary part of achieving success?", correct:"C", exp:"Priya: “Failure, handled properly, isn't the opposite of progress; it's part of how progress happens.”"},
+      {stem:"finds that the people who built a failed product are often willing to talk about it?", correct:"B", exp:"Yuki: engineers and designers “are often strangely proud of it and keen to explain what went wrong.”"},
+      {stem:"observes that visitors often feel reassured about their own mistakes?", correct:"D", exp:"Sam: “The single most common reaction I see is relief... you can almost watch their shoulders drop.”"},
+      {stem:"believes most of the products failed for understandable rather than foolish reasons?", correct:"A", exp:"Dieter: “most of them failed for interesting reasons rather than stupid ones.”"},
+      {stem:"explains that the exhibits are difficult to obtain from the companies involved?", correct:"B", exp:"Yuki: “Companies are understandably reluctant to hand over evidence of their most embarrassing mistakes.”"},
+      {stem:"mentions that businesses pay to learn from the museum's exhibits?", correct:"C", exp:"Priya: “firms actually pay to bring their teams here.”"},
+      {stem:"hopes visitors will think differently about the products they use daily?", correct:"A", exp:"Dieter: his favourite visitors “leave thinking more carefully about the products they use every day.”"},
+      {stem:"stresses that the museum avoids blaming particular individuals?", correct:"D", exp:"Sam: “We deliberately don't name-and-shame... never who should be blamed.”"},
+      {stem:"says that a single person is usually responsible for each exhibit being there?", correct:"B", exp:"Yuki: “Almost every exhibit... arrived because one individual decided the story deserved to be told.”"}
+    ]
+  }
+},
+
+{
+  topic: "A chef who cooks for one, the science of boredom and four map-makers",
+  P5: {
+    title: "The Restaurant With One Seat",
+    rubric: "You are going to read a magazine article about an unusual restaurant. For questions 1 to 6, choose the answer (A, B, C or D) which you think fits best according to the text.",
+    passage: [
+      "The hardest reservation to get in the city is not at a famous hotel or a celebrity chef's flagship. It is at a small room above a bicycle shop, where the chef, Aksel Berg, cooks for exactly one guest at a time. There are no other tables, no menu to choose from, and no possibility of bringing a friend. You arrive alone, you eat alone, and roughly two hours later you leave, having spoken to nobody except Berg himself, who cooks a few feet away and talks to you throughout.",
+      "The concept sounds, on paper, like a gimmick, and Berg is the first to admit that this was a reasonable fear when he opened three years ago. He had spent fifteen years working in busy, high-pressure kitchens and had grown to dislike almost everything about them: the noise, the speed, the sense that a hundred meals a night meant nobody's meal really mattered. His idea was, in a sense, a direct reaction against all of that. If cooking for a hundred strangers felt impersonal, he reasoned, then cooking for one might feel like the opposite. What he had not fully anticipated was how strange, and occasionally uncomfortable, that level of attention could be for the guest.",
+      "In the early months, Berg noticed that a surprising number of diners arrived visibly nervous. Eating alone in public already makes many people uneasy; eating alone while a professional chef watches your every mouthful and asks what you think turned out, for some, to be close to unbearable. Berg learned to read the signs quickly. With guests who clearly wanted to talk, he talked; with those who did not, he worked in a comfortable near-silence, explaining each dish only briefly. Managing this, he says, is now by far the most demanding part of the job, far more than the actual cooking, which after fifteen years he could almost do in his sleep.",
+      "Not everyone approves. Some critics have argued that the single-seat format turns a meal into a kind of performance, and that no food, however good, is improved by being watched over so intently. Berg has read these reviews and finds that he partly agrees. He accepts that his restaurant is not, and could never be, relaxing in the ordinary sense. But relaxation, he insists, was never the point. He compares a meal at his table not to a night out but to a visit to a small gallery: something you do deliberately, pay close attention to, and remember, rather than something that simply washes over you pleasantly and is forgotten by the morning.",
+      "Whatever one makes of the idea, it has undeniably worked as a business, though not in the way outsiders assume. Berg makes very little from the meals themselves; a single cover a night, even at a high price, does not go far. What has transformed his fortunes is everything that has grown up around the restaurant's reputation: a book, a series of sold-out talks, and invitations to design one-off events around the world. The tiny room above the bicycle shop, he says with some amusement, now functions less as his main source of income than as a kind of expensive advertisement for everything else he does."
+    ],
+    questions: [
+      {stem:"What is unusual about Aksel Berg's restaurant?", opts:["It serves only a single dish each evening.","It seats just one guest at any one time.","It has no fixed location in the city.","It allows guests to cook alongside the chef."], correct:1, exp:"Berg “cooks for exactly one guest at a time,” with no other tables - the single seat is the whole concept."},
+      {stem:"Why did Berg create this kind of restaurant?", opts:["He disliked the impersonal feeling of large, busy kitchens.","He wanted to charge much higher prices than other chefs.","He had been unable to find work in ordinary restaurants.","He hoped to attract famous and wealthy customers."], correct:0, exp:"He had “grown to dislike almost everything” about high-pressure kitchens, feeling that cooking for a hundred meant “nobody's meal really mattered.”"},
+      {stem:"What had Berg not expected before opening?", opts:["How difficult it would be to attract any customers.","How quickly he would grow bored of cooking.","How much the intense attention would unsettle some guests.","How expensive it would be to run such a small place."], correct:2, exp:"He “had not fully anticipated how strange, and occasionally uncomfortable, that level of attention could be for the guest.”"},
+      {stem:"According to Berg, what is now the most difficult part of his job?", opts:["Preparing the food to a high enough standard.","Keeping the cost of ingredients under control.","Attracting reviews from well-known critics.","Judging how much each guest wants to interact."], correct:3, exp:"Reading whether a guest wants to talk or eat in silence “is now by far the most demanding part of the job, far more than the actual cooking.”"},
+      {stem:"How does Berg respond to critics who dislike the format?", opts:["He accepts that the experience is not meant to be relaxing.","He argues that they have misunderstood his cooking.","He claims their reviews have damaged his business.","He promises to change the way the meals work."], correct:0, exp:"He “partly agrees,” accepting the restaurant “could never be relaxing,” but says “relaxation... was never the point,” comparing it to a gallery visit."},
+      {stem:"What does the writer say about how Berg actually makes his money?", opts:["The meals themselves are his main source of income.","He relies on money from the bicycle shop below.","Most of his earnings come from activities linked to the restaurant's fame.","He earns most from training other chefs."], correct:2, exp:"The meals earn “very little”; what transformed his fortunes is “everything that has grown up around the restaurant's reputation” - a book, talks and events."}
+    ]
+  },
+  P6: {
+    title: "In Praise of Being Bored",
+    rubric: "You are going to read an article about boredom. Six sentences have been removed. Choose from the sentences A to G the one which fits each gap (1 to 6). There is one extra sentence you do not need.",
+    parts: [
+      "For most of human history, boredom was simply an unavoidable part of life. Long journeys, quiet evenings and dull afternoons had to be endured because there was, quite literally, nothing to be done about them. Today, that has changed completely. The moment a queue forms or a train is delayed, a screen appears in almost every hand, and the empty minutes are filled instantly.",
+      " A small but growing group of psychologists, however, has begun to wonder whether we have lost something valuable in the process.\n\nTheir argument rests on a simple observation: boredom, unpleasant as it feels, is not a pointless state. It is, they suggest, the mind's way of signalling that the current situation is unrewarding and that attention should be directed elsewhere.",
+      " In other words, the discomfort of being bored may be precisely what pushes people to daydream, to plan, and to come up with new ideas.\n\nSeveral studies appear to support this. In one well-known experiment, participants asked to perform a deliberately dull task - copying numbers from a telephone directory - went on to score more highly on tests of creativity than a comparison group who had done something more engaging first.",
+      " The researchers concluded that a period of boredom had, in effect, primed the mind to think more inventively.\n\nCritics are right to point out that such experiments are limited, and that not all boredom is created equal. There is a world of difference between the mild restlessness of a quiet Sunday and the crushing boredom of a job with nothing to do.",
+      " The first may gently encourage creativity; the second is far more likely to cause genuine misery.\n\nWhat concerns the psychologists most, though, is not boredom itself but our growing inability to tolerate even a moment of it. When every empty second is immediately filled with a video or a game, they argue, the mind never gets the chance to wander at all.",
+      " Children may be particularly affected, since it is precisely in unstructured, slightly boring time that many of them learn to invent games, tell stories and entertain themselves.\n\nNone of this amounts to a call to throw away our phones. The point the researchers make is more modest, and probably more realistic.",
+      " Occasionally, they suggest, we might simply let ourselves be bored, and see what our minds do with the empty time."
+    ],
+    options: [
+      {letter:"A", text:"Boredom, in this view, is not the enemy of a good idea but often its starting point."},
+      {letter:"B", text:"The result, they warn, may be a generation that has never learned to be comfortably alone with its own thoughts."},
+      {letter:"C", text:"Filling that gap has never been easier or more tempting."},
+      {letter:"D", text:"Crucially, those who reported feeling most bored during the task were also the most creative afterwards."},
+      {letter:"E", text:"Most people, understandably, regard it as something to be avoided at all costs."},
+      {letter:"F", text:"That distinction matters a great deal."},
+      {letter:"G", text:"Boredom is also far more common in adults than in young children."}
+    ],
+    correct: {1:"C", 2:"A", 3:"D", 4:"F", 5:"B", 6:"E"},
+    exp: {
+      1:"Gap 1 follows the point that empty minutes are now “filled instantly” and precedes the psychologists' worry that “we have lost something” - C's “Filling that gap has never been easier or more tempting” bridges the two.",
+      2:"Gap 2 follows the idea that boredom signals a situation is unrewarding and precedes “In other words... pushes people to daydream... and come up with new ideas” - A restates boredom as the starting point of ideas.",
+      3:"Gap 3 follows the description of the number-copying experiment and precedes “The researchers concluded that a period of boredom had... primed the mind” - D gives the key finding: the most bored were the most creative.",
+      4:"Gap 4 follows the contrast between mild restlessness and crushing boredom and precedes “The first may gently encourage creativity; the second...” - F's “That distinction matters a great deal” points directly at that contrast.",
+      5:"Gap 5 follows the worry that “the mind never gets the chance to wander” and precedes the point about children - B warns of a generation never comfortable alone with its thoughts.",
+      6:"Gap 6 needs a sentence to sit before the final, gentle suggestion to “let ourselves be bored” - E's admission that most people regard boredom “as something to be avoided at all costs” sets up that mild challenge.",
+      extra:"G is not used: its claim that boredom is more common in adults than young children is never argued in the text, which in fact suggests children have the most to gain from unstructured, boring time."
+    }
+  },
+  P7: {
+    title: "Mapping the World: Four Cartographers",
+    rubric: "You are going to read about four people who make maps. For questions 1 to 10, choose from the people (A to D). The people may be chosen more than once.",
+    texts: [
+      {letter:"A", name:"Ingrid, mountain cartographer", body:"I map high mountain regions, mostly for climbers and rescue teams, and accuracy in my work is not a matter of neatness but of safety - a mistake of a few metres on a cliff edge could genuinely cost someone their life. I still do a great deal of my checking on foot, walking the ground myself, because the satellite images, good as they are, can't tell you whether a slope is loose rock or solid. People imagine map-making is done entirely at a computer these days, and mostly they're right, but my particular corner of it still involves a surprising amount of very cold, very tiring fieldwork."},
+      {letter:"B", name:"Ravi, historical map restorer", body:"I don't make new maps; I repair and digitise very old ones, some of them four or five hundred years old. The fascinating thing is how confidently the early map-makers drew places they had clearly never seen - coastlines that don't exist, islands in the wrong ocean, sea monsters in the blank spaces. I've learned to see those mistakes not as failures but as records of what people believed at the time. My job is to preserve them exactly, errors and all; the moment you ‘correct' an old map, you destroy the very thing that makes it valuable to a historian."},
+      {letter:"C", name:"Mei, digital street-mapper", body:"I work for a company that keeps the online maps most people use every day up to date. It's a strange, endless task - a city changes constantly, with new one-way systems, closed roads and renamed streets, and the map is out of date almost the moment we publish it. What surprises people is how much still depends on ordinary members of the public reporting errors; no company, however large, has enough staff to check every street. I sometimes think of the map less as a finished object than as something we're all quietly building together, whether users realise it or not."},
+      {letter:"D", name:"Tomasz, maps for blind users", body:"I design tactile maps - maps you read with your fingers rather than your eyes - for blind and partially sighted people. It has completely changed how I think about what a map is for. A sighted person's map tries to show everything at once, but that's useless if you're reading by touch, so I've had to learn what to leave out, which is far harder than deciding what to put in. Every raised line has to earn its place. The best compliment I ever received was from a man who told me he'd walked to a new job on his own for the first time using one of my maps."}
+    ],
+    questions: [
+      {stem:"still does a lot of their checking by physically visiting the area?", correct:"A", exp:"Ingrid: “I still do a great deal of my checking on foot, walking the ground myself.”"},
+      {stem:"describes their map as never truly finished?", correct:"C", exp:"Mei: “the map is out of date almost the moment we publish it,” something “we're all quietly building together.”"},
+      {stem:"stresses that errors in their field could put lives at risk?", correct:"A", exp:"Ingrid: “a mistake of a few metres on a cliff edge could genuinely cost someone their life.”"},
+      {stem:"values old mistakes as evidence of what people once believed?", correct:"B", exp:"Ravi: he sees the errors “not as failures but as records of what people believed at the time.”"},
+      {stem:"found that the work changed their whole idea of what a map is for?", correct:"D", exp:"Tomasz: “It has completely changed how I think about what a map is for.”"},
+      {stem:"relies partly on ordinary people to report problems?", correct:"C", exp:"Mei: “how much still depends on ordinary members of the public reporting errors.”"},
+      {stem:"acknowledges that most modern map-making happens on a computer?", correct:"A", exp:"Ingrid: “People imagine map-making is done entirely at a computer these days, and mostly they're right.”"},
+      {stem:"deliberately preserves inaccuracies rather than fixing them?", correct:"B", exp:"Ravi: “My job is to preserve them exactly, errors and all.”"},
+      {stem:"mentions a specific person who benefited greatly from their work?", correct:"D", exp:"Tomasz: the man who “walked to a new job on his own for the first time using one of my maps.”"},
+      {stem:"found that deciding what to remove was the hardest skill to learn?", correct:"D", exp:"Tomasz: “I've had to learn what to leave out, which is far harder than deciding what to put in.”"}
+    ]
+  }
+},
+
+{
+  topic: "A town that banned cars, the psychology of queues and four second-career stories",
+  P5: {
+    title: "The Town That Said No to Cars",
+    rubric: "You are going to read a magazine article about a town that removed cars from its centre. For questions 1 to 6, choose the answer (A, B, C or D) which you think fits best according to the text.",
+    passage: [
+      "When the small city of Valmont announced, a decade ago, that it intended to ban private cars from its historic centre, the reaction was almost entirely negative. Shopkeepers predicted ruin, arguing that customers would simply drive to out-of-town supermarkets instead. Residents worried about deliveries, elderly relatives and rainy days. The local newspaper ran a series of gloomy articles, and a petition against the plan gathered several thousand signatures within a fortnight. Looking back now, even the scheme's supporters admit that the opposition was not unreasonable; similar plans in other cities had, after all, sometimes ended badly.",
+      "What made Valmont's approach different, its planners insist, was the refusal to do everything at once. Rather than banning cars overnight, the city introduced the change in stages over four years, beginning with a single square and a handful of connecting streets. Crucially, each stage was presented as an experiment that could be reversed if it failed. This, according to the project's director, Lena Fischer, was the key to eventual success. ‘People will accept an experiment that they would never accept as a permanent law,' she says. ‘And once they've lived with it for six months, the experiment quietly becomes the new normal, and nobody wants to go back.'",
+      "The economic fears, which had been the loudest, proved largely unfounded, though not immediately. In the first year, several shops in the pedestrianised streets did report a fall in takings, and two closed altogether, a fact opponents seized upon. By the third year, however, the picture had reversed. Freed from traffic, the streets filled with cafés, market stalls and people who lingered rather than hurrying through, and shops that survived the difficult early period generally reported higher sales than before. The lesson, Fischer suggests, is that such changes must be judged over years rather than months, a message that is politically very hard to deliver.",
+      "Not every problem was so easily solved. The question of deliveries, dismissed by some early supporters as a minor detail, turned out to be genuinely difficult, and was only resolved by allowing goods vehicles into the centre during a narrow window early each morning. Access for disabled residents required a special permit system that took years to get right and still attracts complaints. Fischer is refreshingly honest about all this. ‘The critics weren't wrong that these things were problems,' she says. ‘They were wrong to think the problems couldn't be solved.'",
+      "Today, Valmont is visited regularly by planners from other cities hoping to copy its success, and Fischer spends much of her time warning them against the obvious mistake. ‘Everyone wants the finished result - the lovely car-free squares - without the slow, unglamorous, argumentative process that produced it,' she says. ‘They ask me how we won people over, and I have to tell them the truth, which is that we didn't win an argument. We ran an experiment for long enough that the argument stopped mattering.'"
+    ],
+    questions: [
+      {stem:"How did people in Valmont first react to the plan to ban cars?", opts:["With cautious but general approval.","With almost total opposition.","With complete indifference.","With enthusiasm from shopkeepers in particular."], correct:1, exp:"The reaction “was almost entirely negative,” with gloomy articles and a petition of several thousand signatures."},
+      {stem:"According to the planners, what made Valmont's approach unusual?", opts:["It banned all cars on a single day.","It offered free public transport instead.","It introduced the change gradually, as a series of experiments.","It copied a successful scheme from another city."], correct:2, exp:"The difference was “the refusal to do everything at once,” rolling out the change “in stages over four years,” each presented as a reversible experiment."},
+      {stem:"Why does Fischer think presenting the change as an ‘experiment' worked?", opts:["It allowed the city to save money on the project.","People will accept a trial they would reject as a permanent rule.","It meant the plan could be kept secret at first.","It forced shopkeepers to support the scheme."], correct:1, exp:"She says “People will accept an experiment that they would never accept as a permanent law,” and it quietly becomes normal."},
+      {stem:"What does the writer say about the economic effects of the scheme?", opts:["Shops in the area benefited immediately.","The predicted disaster happened exactly as feared.","Takings fell at first but generally improved later.","The effect on shops was impossible to measure."], correct:2, exp:"In year one some shops lost takings and two closed, but “by the third year... shops that survived... generally reported higher sales than before.”"},
+      {stem:"What does Fischer admit about the criticisms made of the scheme?", opts:["The critics had identified genuine problems.","The critics were motivated mainly by politics.","The problems raised were completely imaginary.","The critics later admitted they had been wrong."], correct:0, exp:"She says “The critics weren't wrong that these things were problems. They were wrong to think the problems couldn't be solved.”"},
+      {stem:"What mistake does Fischer warn visiting planners against?", opts:["Spending too much money too quickly.","Copying Valmont's design too closely.","Ignoring the needs of local shopkeepers.","Wanting the result without the slow, difficult process."], correct:3, exp:"Planners “want the finished result... without the slow, unglamorous, argumentative process that produced it.”"}
+    ]
+  },
+  P6: {
+    title: "The Art of the Queue",
+    rubric: "You are going to read an article about waiting in queues. Six sentences have been removed. Choose from the sentences A to G the one which fits each gap (1 to 6). There is one extra sentence you do not need.",
+    parts: [
+      "Nobody enjoys waiting in a queue, but the way we experience that wait is far stranger than most of us realise. Researchers who study queuing have discovered that the actual length of a wait and how long it feels are often only loosely connected. A short queue can feel endless, while a longer one can pass almost unnoticed.",
+      " Understanding why has become a serious business, particularly for the companies whose customers spend a great deal of their lives waiting.\n\nOne of the most important findings is that unoccupied time feels far longer than occupied time. A minute spent staring at a wall drags; the same minute spent reading a sign or watching a screen passes quickly.",
+      " The mirrors gave waiting passengers something to do - discreetly checking their own appearance - and the complaints, remarkably, almost disappeared.\n\nA second principle is that uncertainty makes waiting worse. A wait of unknown length is far more stressful than a longer wait whose end is clearly signalled.",
+      " This is why so many systems now tell you that you are ‘number four in the queue' or that your food will arrive ‘in about ten minutes'. The information may not shorten the wait, but it changes how the wait feels.\n\nPerhaps the most powerful factor of all, however, is fairness. People will tolerate a surprisingly long wait provided they believe the system is just.",
+      " The single-file queue that feeds several tills, now common in banks and post offices, was introduced largely for this reason: it guarantees that nobody who arrived after you will be served before you.\n\nWhat all of this suggests is that managing a queue is as much a psychological task as a practical one. Simply making people wait less is expensive and often impossible.",
+      " Changing how the waiting feels, by contrast, is frequently cheap and surprisingly effective.\n\nNone of this, of course, makes queuing enjoyable. But it does explain why some waits leave us furious while others, no shorter, barely register.",
+      " The difference, it turns out, lies far less in the clock than in the mind."
+    ],
+    options: [
+      {letter:"A", text:"By contrast, nothing angers a waiting customer more than seeing someone who arrived later being served first."},
+      {letter:"B", text:"The classic example comes from a hotel that received endless complaints about slow lifts, until someone installed mirrors beside them."},
+      {letter:"C", text:"That gap between real and perceived time is where all the interesting psychology lies."},
+      {letter:"D", text:"This helps explain the peculiar relief of finally being told exactly how long you must wait."},
+      {letter:"E", text:"Most people, after all, would rather the queue moved faster."},
+      {letter:"F", text:"The result is a wait that is technically identical but feels considerably shorter."},
+      {letter:"G", text:"Adding staff, building more tills or expanding a waiting room all cost real money."}
+    ],
+    correct: {1:"C", 2:"B", 3:"D", 4:"A", 5:"G", 6:"F"},
+    exp: {
+      1:"Gap 1 follows the observation that real and felt waiting times are “only loosely connected” and precedes the point that understanding why “has become a serious business” - C names that gap as where the psychology lies.",
+      2:"Gap 2 follows the claim that occupied time feels shorter and precedes “The mirrors gave waiting passengers something to do... the complaints almost disappeared” - B introduces the hotel and its mirrors.",
+      3:"Gap 3 follows the idea that an uncertain wait is more stressful and precedes systems telling you ‘number four in the queue' - D is about the relief of being told how long you must wait.",
+      4:"Gap 4 follows the point that people tolerate long waits if the system feels fair and precedes the single-file queue example - A gives the flip side: anger at someone later being served first.",
+      5:"Gap 5 follows “making people wait less is expensive and often impossible” and precedes “Changing how the waiting feels... is cheap” - G lists the real costs of adding staff and tills.",
+      6:"Gap 6 needs a sentence before the closing line “The difference... lies far less in the clock than in the mind” - F's technically identical wait that “feels considerably shorter” fits that contrast.",
+      extra:"E is not used: its bland point that people would rather the queue moved faster adds nothing to any gap, all of which turn on how waiting is perceived or managed rather than on the obvious wish for it to be shorter."
+    }
+  },
+  P7: {
+    title: "Starting Again: Four Second Careers",
+    rubric: "You are going to read about four people who completely changed career in mid-life. For questions 1 to 10, choose from the people (A to D). The people may be chosen more than once.",
+    texts: [
+      {letter:"A", name:"Beatriz, lawyer turned baker", body:"I practised law for eighteen years before I opened a bakery, and everyone assumed I must have hated the law. I didn't - I was good at it and it paid well. What I couldn't stand any longer was that at the end of each day I had nothing I could actually hold in my hands. Bread gives me that, every single morning. The pay cut was brutal, and I won't pretend otherwise; I earn perhaps a third of what I used to. But I've never once regretted it, and the odd skill from my old life turns out to be useful - I read a supplier's contract far more carefully than most bakers ever would."},
+      {letter:"B", name:"Ken, engineer turned nurse", body:"I spent twenty-five years designing bridges, then retrained as a nurse at fifty-two. People find that leap baffling, but to me the two jobs have more in common than you'd think: both are really about solving problems under pressure without making mistakes that hurt people. The training was genuinely humbling - being the oldest student by three decades, being examined by people half my age. What I hadn't expected was how much my previous life would help; I stay calm in a crisis in a way that took my younger colleagues years to learn, and nobody teaches you that on a course."},
+      {letter:"C", name:"Amara, teacher turned park ranger", body:"After twenty years teaching in a city school, I now spend my days outdoors managing a national park, and my old colleagues think I've retired. I certainly haven't - the work is physically exhausting in a way teaching never was. But teaching prepared me better than any ranger course could have; a large part of this job is explaining things to visitors, calming down people who are frightened or lost, and occasionally telling grown adults to stop doing something dangerous. That's essentially a classroom, just with better scenery. The one thing I miss is watching the same children grow up over the years."},
+      {letter:"D", name:"Viktor, banker turned carpenter", body:"I left a very well-paid job in finance at forty to become a carpenter, and I know exactly how that sounds - the classic mid-life crisis. Maybe it was. What I'd say is that I spent two decades moving money around a screen and never being sure I'd actually made anything at all. Now I make tables and chairs that will outlast me. My family thought I'd lost my mind, and financially it was reckless, I admit - we sold our house and moved somewhere much cheaper. But my children saw me happy for the first time they could remember, and that, I've decided, was worth more than the house."}
+    ],
+    questions: [
+      {stem:"says they wanted work that produced something physical and lasting?", correct:"A", exp:"Beatriz: “at the end of each day I had nothing I could actually hold in my hands. Bread gives me that.”"},
+      {stem:"admits the change looked like a stereotypical mid-life crisis?", correct:"D", exp:"Viktor: “I know exactly how that sounds - the classic mid-life crisis. Maybe it was.”"},
+      {stem:"believes their two careers are more similar than people assume?", correct:"B", exp:"Ken: “the two jobs have more in common than you'd think: both are really about solving problems under pressure.”"},
+      {stem:"mentions a large drop in income as a result of the change?", correct:"A", exp:"Beatriz: “The pay cut was brutal... I earn perhaps a third of what I used to.”"},
+      {stem:"found that skills from teaching transferred directly to the new job?", correct:"C", exp:"Amara: “teaching prepared me better than any ranger course could have... That's essentially a classroom.”"},
+      {stem:"says their family reacted with alarm to the decision?", correct:"D", exp:"Viktor: “My family thought I'd lost my mind.”"},
+      {stem:"describes feeling humbled by being much older than fellow trainees?", correct:"B", exp:"Ken: “being the oldest student by three decades, being examined by people half my age.”"},
+      {stem:"values a personal reward that they consider greater than money?", correct:"D", exp:"Viktor: “my children saw me happy for the first time... that... was worth more than the house.”"},
+      {stem:"points out that the new job is far more physically tiring than the old one?", correct:"C", exp:"Amara: “the work is physically exhausting in a way teaching never was.”"},
+      {stem:"found that an old professional skill still proves useful in the new role?", correct:"A", exp:"Beatriz: “I read a supplier's contract far more carefully than most bakers ever would.”"}
+    ]
+  }
+}
+
+];
 
 /* ============ STATE ============ */
+let TI = 0;
+let P5, P6, P7;
 const state = {
-  p5: new Array(P5.questions.length).fill(null), p5checked:false,
+  p5: [], p5checked:false,
   p6: {}, p6checked:false,
-  p7: new Array(P7.questions.length).fill(null), p7checked:false
+  p7: [], p7checked:false
 };
 
 /* ============ RENDER ============ */
@@ -342,7 +673,7 @@ function renderP6(){
   document.getElementById('p6Options').innerHTML = `<div class="p6-options-title">Sentence Options</div>` + P6.options.map(o=>`<div class="p6-opt-row"><b>${o.letter}</b><span>${o.text}</span></div>`).join('');
 }
 function renderP7(){
-  document.getElementById('p7Title').textContent = "Working Nights: Four People's Stories";
+  document.getElementById('p7Title').textContent = P7.title;
   document.getElementById('p7Texts').innerHTML = P7.texts.map(t=>`
     <div class="p7-text-card">
       <div class="p7-text-name"><span class="p7-text-letter">${t.letter}</span>${t.name}</div>
@@ -551,8 +882,36 @@ function showPart(n){
   document.querySelectorAll('.part-section').forEach(s=>s.classList.toggle('visible', +s.dataset.part===n));
 }
 
+/* ============ TEST PICKER ============ */
+function loadTest(i){
+  TI = i;
+  const T = TESTS[i];
+  P5 = T.P5; P6 = T.P6; P7 = T.P7;
+  document.getElementById('rub5').textContent = P5.rubric;
+  document.getElementById('rub6').textContent = P6.rubric;
+  document.getElementById('rub7').textContent = P7.rubric;
+  document.getElementById('testTopic').innerHTML = '<strong>Test ' + (i+1) + '</strong> - ' + T.topic;
+  document.querySelectorAll('.test-pill').forEach((b,bi)=>b.classList.toggle('active', bi===i));
+  resetP5(); resetP6(); resetP7();
+  showPart(5);
+  try{ localStorage.setItem('jpe-b2-reading-test', i); }catch(e){}
+  window.scrollTo(0,0);
+}
+function buildPicker(){
+  const wrap = document.getElementById('testPicker');
+  TESTS.forEach((t,i)=>{
+    const b = document.createElement('button');
+    b.className = 'test-pill'; b.textContent = 'Test ' + (i+1);
+    b.onclick = ()=>loadTest(i);
+    wrap.appendChild(b);
+  });
+}
+
 /* ============ INIT ============ */
-renderP5(); renderP6(); renderP7();
+buildPicker();
+let startTest = 0;
+try{ const sv = parseInt(localStorage.getItem('jpe-b2-reading-test'),10); if(sv>=0 && sv<TESTS.length) startTest = sv; }catch(e){}
+loadTest(startTest);
 </script>
 </body>
 </html>
