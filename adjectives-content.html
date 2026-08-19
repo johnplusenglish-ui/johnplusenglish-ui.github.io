@@ -132,43 +132,40 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .pv-search:focus{border-color:var(--lavender)}
 .pv-search-count{font-size:.78rem;color:var(--text-muted);margin-bottom:1.25rem}
 
-.adj-entry{display:grid;grid-template-columns:180px 36px 1fr;gap:.75rem;padding:.75rem 1rem;border-radius:10px;transition:background .15s;align-items:baseline}
-.adj-entry:hover{background:rgba(0,0,0,.02)}
-.adj-entry:nth-child(even){background:rgba(0,0,0,.015)}
-.adj-entry:nth-child(even):hover{background:rgba(0,0,0,.03)}
-.adj-entry-name{font-weight:700;font-size:.9rem;color:var(--text-primary)}
-.adj-type-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
-.adj-type-dot.gradable{background:#9B72CF}
-.adj-type-dot.strong{background:#FF6B6B}
-.adj-type-dot.nongrad{background:#1DD3B0}
-.adj-entry-right{min-width:0}
-.adj-entry-def{color:var(--text-muted);font-style:italic;font-size:.88rem;margin-bottom:.25rem}
-.adj-entry-ex{color:var(--text-primary);font-size:.9rem;line-height:1.6}
-.adj-entry-ex b{font-weight:700}
-.adj-entry-meta{font-size:.68rem;margin-top:.5rem;display:flex;flex-wrap:wrap;gap:4px}
-.adj-entry-meta span{padding:2px 9px;border-radius:5px;font-weight:700;line-height:1.4;background:#fff;border:1.5px solid var(--border);color:var(--text-muted)}
-.adj-entry-meta .tag-strong{border-color:#FF6B6B;color:#C54545;background:#FFF0F0}
-.adj-entry-meta .tag-grad{border-color:#9B72CF;color:#6B46A0;background:#F3EEF9}
-.adj-entry-meta .tag-nongrad{border-color:#1DD3B0;color:#0A8A76;background:#E8FBF8}
-.adj-entry-meta .tag-prep{border-color:var(--sky);color:#1a5fd4;background:#EEF3FF}
-.adj-entry-meta .tag-coll{border-color:var(--accent-amber);color:#A86618;background:#FEF9F0}
+/* ── Ledger listing ──
+   Adjectives are single words or short phrases (median 8 chars, up to 18 for
+   non-slash entries, 26 for the handful of slash pairs like
+   "confusing/confused"), so the row is one column term+dot | definition,
+   same shape as Phrasal Verbs and Idioms. --tw is sized at runtime (adjSizeList)
+   to the 90th-percentile term width, not the longest — the widest entry is far
+   above the typical one, so sizing to the max left a huge gap on most rows.
+   The tail that's still too wide gets .wide (full-width row, definition
+   beneath), same escape hatch as Idioms. Zebra striping is gone: the old
+   :nth-child(even) rule counted .adj-alpha-header too, so parity flipped at
+   every letter break. */
+.adj-entry{display:grid;grid-template-columns:var(--tw,10rem) 1fr;gap:0 1.2rem;align-items:baseline;padding:.5rem .3rem;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s}
+.adj-entry:hover,.adj-entry.open{background:var(--bg)}
+.adj-entry-name{font-weight:700;font-size:.85rem;color:var(--text-primary);line-height:1.35;white-space:nowrap}
+.adj-entry.wide{grid-template-columns:1fr}
+.adj-entry.wide .adj-entry-def{margin-top:.1rem}
+/* Neutral tier classes, shared naming with Phrasal Verbs/Idioms: t1 common,
+   t2 somewhat, t3 less. */
+.adj-entry-dot{width:5px;height:5px;border-radius:50%;display:inline-block;margin-left:.35rem;vertical-align:middle;flex-shrink:0}
+.adj-entry-dot.t1{background:#16A34A}
+.adj-entry-dot.t2{background:#D97706}
+.adj-entry-dot.t3{background:#9CA3AF}
+.adj-entry-def{color:var(--text-muted);font-size:.775rem;line-height:1.4;min-width:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.adj-entry.open .adj-entry-def{-webkit-line-clamp:unset;overflow:visible}
+.adj-entry-ex{display:none;grid-column:1/-1;color:var(--text-primary);font-size:.735rem;font-style:italic;margin-top:.28rem;padding:.28rem .45rem;background:var(--highlight-bg);border-radius:0 6px 6px 0;line-height:1.45}
+.adj-entry.open .adj-entry-ex{display:block}
+.adj-entry-ex b{font-style:normal;color:var(--lavender);font-weight:700}
 
-.adj-legend{display:flex;gap:1.25rem;margin-bottom:1.25rem;flex-wrap:wrap;font-size:.8rem;color:var(--text-muted)}
-.adj-legend-item{display:flex;align-items:center;gap:.25rem}
-
-.adj-alpha-layout{display:grid;grid-template-columns:80px 1fr;gap:1.25rem;align-items:start}
-.adj-alpha-header{font-family:'Outfit',sans-serif;font-size:1.8rem;font-weight:700;color:var(--lavender);margin:0 0 .75rem;padding-bottom:.5rem;border-bottom:2px solid var(--lavender);scroll-margin-top:80px}
-.adj-alpha-header:not(:first-child){margin-top:2rem}
-.adj-sb-wrap{width:80px;background:var(--bg-card);border:1.5px solid var(--border);border-radius:var(--radius);padding:.75rem;max-height:70vh;overflow-y:auto;position:sticky;top:80px}
-.adj-sb-wrap::-webkit-scrollbar{width:4px}
-.adj-sb-wrap::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
-.adj-sb-item{font-size:.8rem;font-weight:700;padding:.5rem 1rem;border-radius:10px;cursor:pointer;transition:all .15s;display:flex;align-items:center;color:var(--text-secondary);margin-bottom:.25rem;border:1.5px solid var(--border);background:#fff}
-.adj-sb-item:hover{transform:translateX(2px);color:var(--text-primary);border-color:var(--text-muted)}
-.adj-sb-item::before{display:none}
-.adj-sb-item.active{background:var(--lavender);color:#fff;border-color:var(--lavender);transform:translateX(2px);box-shadow:0 2px 8px rgba(45,48,71,.15)}
-.adj-sb-item-name{flex:1;line-height:1.3;min-width:0}
-.adj-sb-count{font-family:Outfit,sans-serif;font-size:.65rem;opacity:.5;padding:.25rem .5rem;border-radius:8px;flex-shrink:0;background:rgba(0,0,0,.05);color:var(--text-muted)}
-.adj-sb-item.active .adj-sb-count{background:rgba(255,255,255,.2);color:#fff;opacity:.8}
+.adj-alpha-header{font-family:'Outfit',sans-serif;font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--lavender);margin:0;padding:1.15rem .3rem .3rem;border-bottom:1.5px solid var(--lavender);scroll-margin-top:3.4rem}
+.adj-alpha-header:first-child{padding-top:.35rem}
+/* Slim sticky A–Z strip, replacing the vertical letter rail. */
+.adj-alpha-strip{position:sticky;top:0;z-index:10;display:flex;flex-wrap:wrap;gap:.15rem;padding:.5rem .25rem;margin-bottom:.6rem;background:rgba(247,246,243,.94);backdrop-filter:blur(8px);border-bottom:1.5px solid var(--border)}
+.adj-alpha-strip a{font-family:var(--font-body);font-size:.72rem;font-weight:700;color:var(--text-muted);text-decoration:none;width:1.6rem;height:1.6rem;display:flex;align-items:center;justify-content:center;border-radius:6px;transition:background .12s,color .12s}
+.adj-alpha-strip a:hover{background:var(--highlight-bg);color:var(--lavender)}
 
 .adj-cat-layout{display:grid;grid-template-columns:minmax(160px,max-content) 1fr;gap:1.25rem;min-height:400px}
 .adj-cat-sidebar{min-width:180px;max-width:260px;background:var(--bg-card);border:1.5px solid var(--border);border-radius:var(--radius);padding:.5rem;max-height:70vh;overflow-y:auto;position:sticky;top:80px}
@@ -187,14 +184,9 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .adj-cat-empty span{font-size:2rem;display:block;margin-bottom:.5rem}
 .adj-no-results{text-align:center;padding:3rem;color:var(--text-muted);font-style:italic}
 
-.pv-alpha-nav{display:flex;flex-wrap:wrap;gap:.25rem;margin-bottom:1.25rem;position:sticky;top:64px;background:var(--bg);padding:.5rem 0;z-index:10;border-bottom:1px solid var(--border)}
-.pv-alpha-link{font-size:.78rem;font-weight:600;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:6px;text-decoration:none;color:var(--text-muted);transition:all .15s;border:1px solid transparent;cursor:pointer;background:none}
-.pv-alpha-link:hover{background:var(--bg-card);border-color:var(--border);color:var(--text-primary)}
-.pv-alpha-link.has{color:var(--text-primary);font-weight:700}
-
 @media print{
   @page{margin:1.5cm;size:A4}
-  body::before,nav,.page-header,.tabs,.pv-controls,.pv-freq-filters,.pv-search,.pv-search-count,#adjMain,.pv-alpha-nav,.adj-legend{display:none!important}
+  body::before,nav,.page-header,.tabs,.pv-controls,.pv-freq-filters,.pv-search,.pv-search-count,#adjMain{display:none!important}
   .tab-content,.tab-content.active{display:none!important}
   .page-container{padding:0!important;max-width:none!important}
   #printArea{display:block!important}
@@ -205,9 +197,9 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
   .content-layout{grid-template-columns:1fr}
   .adj-cat-layout{grid-template-columns:1fr}
   .adj-cat-sidebar{max-height:200px;position:static}
-  .adj-entry{grid-template-columns:140px 28px 1fr;gap:.5rem;font-size:.85rem}
-  .adj-alpha-layout{grid-template-columns:1fr}
-  .adj-sb-wrap{max-height:220px;position:static}
+  /* Term on its own line, definition beneath, rather than two squeezed columns. */
+  .adj-entry{grid-template-columns:1fr}
+  .adj-entry-def{margin-top:.15rem}
   .prep-grid{grid-template-columns:1fr}
 }
 @media(max-width:680px){
@@ -911,12 +903,6 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 
   <!-- LIST TAB -->
   <div class="tab-content" id="tab-list">
-    <div class="adj-legend">
-      <div class="adj-legend-item"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#16A34A"></span> Common</div>
-      <div class="adj-legend-item"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#D97706"></span> Somewhat common</div>
-      <div class="adj-legend-item"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#9CA3AF"></span> Less common</div>
-      <div class="adj-legend-item"><span class="adj-type-dot gradable"></span> Gradable &nbsp;<span class="adj-type-dot strong"></span> Strong &nbsp;<span class="adj-type-dot nongrad"></span> Non-gradable</div>
-    </div>
     <div class="pv-controls">
       <button class="pv-view-btn on" onclick="adjSetView('alpha',this)">Alphabetical</button>
       <button class="pv-view-btn" onclick="adjSetView('cat',this)">By Category</button>
@@ -932,8 +918,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
       <button class="pv-ff" data-type="less" onclick="adjSetType('less',this)"><span class="fdot" style="background:#9CA3AF"></span>Less common <span class="pv-ff-count" id="count-less"></span></button>
 
     </div>
-    <input class="pv-search" id="adjSearch" placeholder="Search adjectives, definitions, or examples&#8230;" oninput="adjRender()">
-    <div class="pv-search-count" id="adjCount"></div>
+    <input class="pv-search" id="adjSearch" placeholder="Search adjectives, definitions, or examples&#8230;" oninput="adjDoSearch()">
     <div id="adjMain"></div>
   </div>
 
@@ -1964,7 +1949,7 @@ const ADJ_DATA = [
 {word:"rigorous",type:"gradable",cat:"academic",def:"Extremely thorough; precise",ex:"The methodology was incredibly rigorous.",coll:"incredibly rigorous",freq:"somewhat"},
 {word:"seminal",type:"gradable",cat:"academic",def:"Strongly influencing later developments",ex:"That was a seminal moment.",coll:"truly seminal",freq:"less"},
 {word:"groundbreaking",type:"strong",gradable:"significant",cat:"academic",def:"Innovative; pioneering",ex:"The research was absolutely groundbreaking.",coll:"absolutely groundbreaking",freq:"somewhat"},
-{word:"pioneering",type:"gradable",cat:"academic",def:"Developing new areas of knowledge",ex:"Her work was truly pioneering.",coll:"truly pioneering",freq:"less"},,
+{word:"pioneering",type:"gradable",cat:"academic",def:"Developing new areas of knowledge",ex:"Her work was truly pioneering.",coll:"truly pioneering",freq:"less"},
 
 // ── SUPPLEMENTARY: EVERYDAY ADJECTIVES ─────────────────────────────────────
 {word:"sexy",type:"gradable",cat:"appearance",def:"Sexually attractive; informal",ex:"He looked really sexy.",coll:"really sexy",freq:"common"},
@@ -2658,25 +2643,76 @@ function adjGetFiltered(){
   });
 }
 
-function adjBuildRow(a){
-  const freqColour={'common':'#16A34A','somewhat':'#D97706','less':'#9CA3AF','unset':'#CBD5E1'}[a.freq||'unset'];
-  const freqDot='<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:'+freqColour+'"></span>';
-  return '<div class="adj-entry"><div class="adj-entry-name">'+a.word+'</div><div>'+freqDot+'</div><div class="adj-entry-right"><div class="adj-entry-def">'+a.def+'</div><div class="adj-entry-ex">'+a.ex+'</div></div></div>';
+var ADJ_TIER={common:'t1',somewhat:'t2',less:'t3'};
+// Bold the headword (or, for a slash pair like "confusing/confused", whichever
+// alternative actually appears) inside its example sentence.
+function adjHighlight(ex,word){
+  var alts=word.split('/');
+  for(var i=0;i<alts.length;i++){
+    var re=new RegExp('\\b('+alts[i].replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')\\b','i');
+    if(re.test(ex)) return ex.replace(re,'<b>$1</b>');
+  }
+  return ex;
 }
+function adjBuildRow(a){
+  return '<div class="adj-entry"><div class="adj-entry-name">'+a.word
+    +'<span class="adj-entry-dot '+(ADJ_TIER[a.freq]||'t3')+'" title="'+a.freq+'"></span></div>'
+    +'<div class="adj-entry-def">'+a.def+'</div>'
+    +'<div class="adj-entry-ex">'+adjHighlight(a.ex,a.word)+'</div></div>';
+}
+
+// Size the term column to the 90th-percentile word width, not the widest —
+// a dozen slash-pair entries (e.g. "confusing/confused") are far wider than
+// a typical adjective, so sizing to the max left a huge gap on most rows.
+// The tail that's still too wide for the column gets .wide (full-width row,
+// definition beneath) instead, same escape hatch as the Idioms list.
+var adjColW=null, adjTermPx=null;
+function adjMeasureTerms(){
+  var p=document.createElement('span');
+  p.style.cssText='position:absolute;left:-9999px;top:0;white-space:nowrap;'
+    +'font-family:Outfit,sans-serif;font-weight:700;font-size:.85rem';
+  document.body.appendChild(p);
+  adjTermPx=Object.create(null);
+  var w=[];
+  ADJ_DATA.forEach(function(a){ if(!a) return; p.textContent=a.word; var x=p.offsetWidth; adjTermPx[a.word]=x; w.push(x); });
+  p.parentNode.removeChild(p);
+  w.sort(function(x,y){return x-y});
+  adjColW=w[Math.floor(w.length*0.9)]+20; // + room for the trailing tier dot
+}
+function adjSizeList(){
+  if(adjColW===null) adjMeasureTerms();
+  var main=document.getElementById('adjMain');
+  main.querySelectorAll('.adj-sheet').forEach(function(el){ el.style.setProperty('--tw',adjColW+'px'); });
+  main.querySelectorAll('.adj-entry').forEach(function(row){
+    var n=row.querySelector('.adj-entry-name');
+    if(!n) return;
+    var px=adjTermPx[n.firstChild?n.firstChild.textContent:''];
+    row.classList.toggle('wide', px!==undefined && px+20>adjColW);
+  });
+}
+// On a cold load the first measure can run before Outfit arrives, which would
+// cache a fallback-font width. Re-measure once the real face is ready.
+if(document.fonts&&document.fonts.ready) document.fonts.ready.then(function(){ adjColW=null; adjSizeList(); });
 
 function adjRender(){
   const data=adjGetFiltered();
-  const q=document.getElementById('adjSearch').value.trim();
-  document.getElementById('adjCount').textContent=q?data.length+' result'+(data.length!==1?'s':'')+' for "'+q+'"':'';
   const freqVals=['common','somewhat','less'];
   ['all','gradable','strong','nongrad','common','somewhat','less'].forEach(t=>{
     const el=document.getElementById('count-'+t);
     if(el){
-      const c=t==='all'?ADJ_DATA.length:freqVals.includes(t)?ADJ_DATA.filter(a=>a.freq===t).length:ADJ_DATA.filter(a=>a.type===t).length;
+      const c=t==='all'?ADJ_DATA.length:freqVals.includes(t)?ADJ_DATA.filter(a=>a&&a.freq===t).length:ADJ_DATA.filter(a=>a&&a.type===t).length;
       el.textContent='('+c+')';
     }
   });
   if(adjView==='alpha')renderAlpha(data);else renderCat(data);
+}
+
+// Debounced: a full render rebuilds every matching row, so firing on each
+// keystroke made typing stutter on the 1445-entry list.
+var adjSearchTimer=null;
+function adjDoSearch(){
+  clearTimeout(adjSearchTimer);
+  adjSearchTimer=setTimeout(adjRender,160);
 }
 
 function renderAlpha(data){
@@ -2685,50 +2721,20 @@ function renderAlpha(data){
   const byL={};
   data.forEach(a=>{const l=a.word[0].toUpperCase();if(!byL[l])byL[l]=[];byL[l].push(a);});
   const letters=Object.keys(byL).sort();
-  const layout=document.createElement('div');layout.className='adj-alpha-layout';
-  const sb=document.createElement('div');sb.className='adj-sb-wrap';
-  const content=document.createElement('div');content.className='adj-alpha-content';
+  letters.forEach(l=>byL[l].sort((x,y)=>x.word.toLowerCase().localeCompare(y.word.toLowerCase())));
 
-  // Only render on letter click - empty state by default
-  let activeLetter=null;
-  function showLetter(l){
-    adjActiveLetter=l;
-    document.querySelectorAll('.adj-sb-item').forEach(x=>x.classList.remove('active'));
-    sb.querySelectorAll('.adj-sb-item').forEach(x=>{if(x.dataset.l===l)x.classList.add('active');});
-    let html='<div class="adj-alpha-header">'+l+'</div>';
-    byL[l].forEach(a=>{html+=adjBuildRow(a);});
-    content.innerHTML=html;
-  }
-
+  let strip='<div class="adj-alpha-strip">';
+  letters.forEach(l=>{ strip+='<a href="#adjL-'+l+'">'+l+'</a>'; });
+  strip+='</div>';
+  let content='<div class="adj-sheet">';
   letters.forEach(l=>{
-    const item=document.createElement('div');item.className='adj-sb-item';item.dataset.l=l;
-    item.innerHTML='<span class="adj-sb-item-name">'+l+'</span>';
-    item.onclick=()=>showLetter(l);
-    sb.appendChild(item);
+    content+='<div class="adj-alpha-header" id="adjL-'+l+'">'+l+'</div>';
+    byL[l].forEach(a=>{content+=adjBuildRow(a);});
   });
+  content+='</div>';
 
-  content.innerHTML='';
-  // Add "All" pill first
-  const allItem=document.createElement('div');allItem.className='adj-sb-item';allItem.dataset.l='ALL';
-  allItem.innerHTML='<span class="adj-sb-item-name">All</span>';
-  allItem.onclick=()=>{
-    activeLetter='ALL';
-    document.querySelectorAll('.adj-sb-item').forEach(x=>x.classList.remove('active'));
-    allItem.classList.add('active');
-    let html='';
-    letters.forEach(l=>{
-      html+='<div class="adj-alpha-header">'+l+'</div>';
-      byL[l].forEach(a=>{html+=adjBuildRow(a);});
-    });
-    content.innerHTML=html;
-  };
-  sb.insertBefore(allItem,sb.firstChild);
-  layout.appendChild(sb);layout.appendChild(content);main.innerHTML='';main.appendChild(layout);
-  const restoreLetter=adjActiveLetter&&(adjActiveLetter==='ALL'||letters.includes(adjActiveLetter))?adjActiveLetter:'ALL';
-  allItem.click();
-  if(restoreLetter!=='ALL'&&letters.includes(restoreLetter)){
-    sb.querySelectorAll('.adj-sb-item').forEach(item=>{if(item.dataset.l===restoreLetter)item.click();});
-  }
+  main.innerHTML=strip+content;
+  adjSizeList();
 }
 
 function renderCat(data){
@@ -2736,6 +2742,7 @@ function renderCat(data){
   if(!data.length){main.innerHTML='<div class="adj-no-results">No adjectives found.</div>';return;}
   const byC={};
   data.forEach(a=>{const c=a.cat||'other';if(!byC[c])byC[c]=[];byC[c].push(a);});
+  Object.keys(byC).forEach(c=>byC[c].sort((x,y)=>x.word.toLowerCase().localeCompare(y.word.toLowerCase())));
   const cats=Object.keys(byC).sort();
   const layout=document.createElement('div');layout.className='adj-cat-layout';
   const sb=document.createElement('div');sb.className='adj-cat-sidebar';
@@ -2747,8 +2754,10 @@ function renderCat(data){
     item.onclick=()=>{
       adjActiveCat=cat;
       document.querySelectorAll('.adj-sb-cat').forEach(x=>x.classList.remove('active'));item.classList.add('active');
-      content.innerHTML='<h3>'+cat.replace(/-/g,' ')+'</h3><div class="adj-cat-content-count">'+byC[cat].length+' adjective'+(byC[cat].length!==1?'s':'')+'</div>';
-      byC[cat].forEach(a=>{content.innerHTML+=adjBuildRow(a);});
+      // routed through adjBuildRow so both views render an identical row
+      content.innerHTML='<h3>'+cat.replace(/-/g,' ')+'</h3><div class="adj-sheet">'
+        +byC[cat].map(adjBuildRow).join('')+'</div>';
+      adjSizeList();
     };
     sb.appendChild(item);
   });
@@ -2762,6 +2771,34 @@ function renderCat(data){
     });
   }
 }
+
+// Letter jumps land instantly. html{scroll-behavior:smooth} is right for short
+// in-page links, but a long jump here is tens of thousands of pixels that
+// Chrome animates over more than a second — the scroll was smooth, just far.
+// Instant for the strip only; smooth stays in place everywhere else.
+document.addEventListener('click',function(ev){
+  if(!ev.target||!ev.target.closest) return;
+  var a=ev.target.closest('.adj-alpha-strip a[href^="#"]');
+  if(!a||ev.metaKey||ev.ctrlKey||ev.shiftKey||ev.altKey||ev.button!==0) return;
+  var target=document.getElementById(a.getAttribute('href').slice(1));
+  if(!target) return;
+  ev.preventDefault();
+  var strip=a.closest('.adj-alpha-strip');
+  var offset=strip?strip.getBoundingClientRect().height:0;
+  window.scrollTo({top:target.getBoundingClientRect().top+window.scrollY-offset-6,behavior:'instant'});
+  if(history.replaceState) history.replaceState(null,'',a.getAttribute('href'));
+});
+
+// Click a row to reveal its example, accordion-scoped to the surrounding list.
+document.addEventListener('click',function(ev){
+  if(!ev.target||!ev.target.closest) return;
+  var row=ev.target.closest('.adj-entry');
+  if(!row) return;
+  var wasOpen=row.classList.contains('open');
+  var scope=row.closest('.adj-sheet, .adj-cat-content')||document;
+  scope.querySelectorAll('.adj-entry.open').forEach(o=>o.classList.remove('open'));
+  if(!wasOpen) row.classList.add('open');
+});
 
 function adjSetView(v,btn){adjView=v;if(v==='alpha')adjActiveCat=null;else adjActiveLetter='ALL';document.querySelectorAll('.pv-view-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');adjRender();}
 function adjSetType(t,btn){adjType=t;document.querySelectorAll('.pv-ff').forEach(b=>b.classList.remove('on'));btn.classList.add('on');adjRender();}
