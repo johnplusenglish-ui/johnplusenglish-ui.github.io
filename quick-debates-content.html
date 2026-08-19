@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,25 +5,23 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Quick Debates - johnplusenglish</title>
-<meta name="description" content="150 structured debate cards for B2-C2 & Fun English speaking practice with useful phrases.">
+<meta name="description" content="180 structured debate cards for B1 to C2 and Fun English speaking practice, plus a builder for making your own.">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{--sun:#FFB347;--sky:#2176FF;--sky-light:#E8EEFF;--sea:#1DD3B0;--coral:#FF6B6B;--lavender:#9B72CF;--mint:#5DDEA0;--sand:#FFF5E6;--cream:#F7F6F3;--ink:#2D3047;--muted:#7A7D8E;--border:#E8E5DF;--card:#fff;--radius:14px;--shadow-sm:0 1px 3px rgba(45,48,71,0.06);--shadow-md:0 4px 12px rgba(45,48,71,0.08)}
 *{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth;overflow-y:scroll}
 body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
 body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,var(--border) 1px,transparent 1px);background-size:28px 28px;opacity:.4;pointer-events:none;z-index:0}
+button{font-family:inherit}
+[contenteditable]{outline:none}
 nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,.88);backdrop-filter:blur(16px);border-bottom:1.5px solid var(--border);padding:.85rem 2rem;display:flex;align-items:center;justify-content:space-between}
 .nav-logo{font-family:'Outfit',sans-serif;font-size:1.3rem;font-weight:800;letter-spacing:-.02em;color:var(--ink);text-decoration:none}
 .nav-logo span{color:#2563EB}
 .nav-links{display:flex;gap:1.8rem}
 .nav-links a{font-size:.85rem;font-weight:600;color:var(--muted);text-decoration:none;transition:color .2s}
 .nav-links a:hover{color:var(--ink)}
-.page-header{padding:2rem 2rem 1rem;max-width:960px;margin:0 auto;position:relative;z-index:1}
-.back-link{display:inline-flex;align-items:center;gap:.4rem;font-size:.85rem;font-weight:600;color:var(--muted);text-decoration:none;margin-bottom:1.2rem;transition:color .2s}
-.back-link:hover{color:var(--ink)}
+.page-header{padding:2rem 2rem 1rem;max-width:1040px;margin:0 auto;position:relative;z-index:1}
 .section-label{font-family:Outfit,sans-serif;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--lavender);margin-bottom:.5rem;font-weight:500}
-.page-title{font-family:'Outfit',sans-serif;font-size:clamp(2rem,5vw,3rem);margin-bottom:.8rem;font-weight:900;line-height:1.1}
-.page-desc{color:var(--muted);font-size:1.05rem;max-width:600px;line-height:1.7;margin-bottom:1.5rem}
 .topic-hero{display:flex;align-items:flex-start;gap:1.25rem}
 .topic-icon{width:52px;height:52px;border-radius:12px;background:color-mix(in srgb,#2D3047 8%,#fff);color:#2D3047;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .topic-icon svg{width:24px;height:24px;stroke-width:1.8;fill:none;stroke:currentColor}
@@ -38,13 +35,15 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
 .mode-btn:not(.on):focus-visible{outline:2px solid var(--sea);outline-offset:2px}
 .mode-btn.on{outline:none;background:var(--cream);border-color:#2176FF;border-bottom:none!important;color:#2176FF;padding-top:calc(.5rem + 3px);box-shadow:0 -3px 10px rgba(45,48,71,.06);z-index:2}
 .mode-btn:nth-child(2).on{border-color:#50C878;color:#50C878}
+.mode-btn:nth-child(3).on{border-color:#9B72CF;color:#9B72CF}
 @media(max-width:600px){.mode-btn{padding:.5rem .75rem;font-size:.82rem}.mode-btn.on{padding-top:calc(.5rem + 3px)}}
 @media(prefers-reduced-motion:reduce){.mode-btn{transition:none}}
 
-.controls{max-width:960px;margin:0 auto;padding:0 2rem 1rem;position:relative;z-index:1}
-.ctrl-row{display:flex;gap:.8rem;flex-wrap:wrap;align-items:center}
-.level-toggle{display:flex;gap:0;border:1.5px solid var(--border);border-radius:10px;overflow:hidden}
-.lvl-btn{font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:600;padding:.5rem 1.1rem;background:var(--card);color:var(--muted);border:none;cursor:pointer;transition:all .15s}
+.controls{max-width:1040px;margin:0 auto;padding:0 2rem 1rem;position:relative;z-index:1}
+.ctrl-row{display:flex;gap:.7rem;flex-wrap:wrap;align-items:center}
+.level-toggle{display:flex;gap:0;border:1.5px solid var(--border);border-radius:10px;overflow-x:auto;overflow-y:hidden;max-width:100%;scrollbar-width:none}
+.level-toggle::-webkit-scrollbar{display:none}
+.lvl-btn{font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:600;padding:.5rem .85rem;white-space:nowrap;flex-shrink:0;background:var(--card);color:var(--muted);border:none;cursor:pointer;transition:all .15s}
 .lvl-btn:hover{color:var(--ink)}
 .lvl-btn.on{background:var(--ink);color:var(--cream)}
 .lvl-btn.on[data-lv="B1"]{background:#FF6B6B}
@@ -52,39 +51,64 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
 .lvl-btn.on[data-lv="C1"]{background:#2176FF}
 .lvl-btn.on[data-lv="C2"]{background:#9B72CF}
 .lvl-btn.on[data-lv="Fun"]{background:#FF9100}
-.debate-select{font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:600;padding:.45rem 2rem .45rem .8rem;border:1.5px solid var(--border);border-radius:10px;background:var(--card);color:var(--ink);cursor:pointer;outline:none;transition:border-color .2s;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237A7D8E' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .7rem center;min-width:200px;max-width:280px}
+.lvl-btn.on[data-lv="mine"]{background:#2D3047}
+.debate-select{font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:600;padding:.45rem 2rem .45rem .8rem;border:1.5px solid var(--border);border-radius:10px;background:var(--card);color:var(--ink);cursor:pointer;outline:none;transition:border-color .2s;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237A7D8E' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .7rem center;min-width:180px;max-width:260px}
+.debate-select{min-width:0}
 .debate-select:hover{border-color:var(--ink)}
 .debate-select:focus{border-color:var(--sky)}
 .ctrl-spacer{flex:1}
 .action-btn{font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:600;padding:.45rem 1rem;border:1.5px solid var(--border);border-radius:10px;background:var(--card);color:var(--ink);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:.4rem}
 .action-btn:hover{border-color:var(--ink);background:var(--cream)}
+.action-btn:disabled{opacity:.4;cursor:default}
+.action-btn:disabled:hover{border-color:var(--border);background:var(--card)}
 .action-btn svg{flex-shrink:0}
+.action-btn.solid{background:var(--ink);border-color:var(--ink);color:var(--cream)}
+.action-btn.solid:hover{opacity:.85;background:var(--ink);color:var(--cream)}
 
-.main{max-width:960px;margin:0 auto;padding:0 2rem 3rem;position:relative;z-index:1}
+.main{max-width:1040px;margin:0 auto;padding:0 2rem 3rem;position:relative;z-index:1}
 
-/* Debate card */
-.debate-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:0 2px 12px rgba(45,48,71,.04);display:grid;grid-template-columns:280px 1fr}
-.debate-phrases{padding:1.4rem;border-right:1.5px solid var(--border);background:var(--cream)}
-.debate-phrases-title{font-family:Outfit,sans-serif;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--level-color, var(--sky));margin-bottom:.8rem}
-.phrase-item{font-size:.82rem;line-height:1.7;padding:.15rem 0;cursor:pointer;transition:all .15s;user-select:none}
-.phrase-item:hover{opacity:.7}
-.phrase-item.blue{color:var(--level-color, var(--sky));font-weight:700;font-style:italic}
-.phrase-item.black{color:var(--ink);font-weight:700}
-.phrase-item.crossed{text-decoration:line-through;opacity:.35}
-.phrase-group-label{font-family:Outfit,sans-serif;font-size:.55rem;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-top:.7rem;margin-bottom:.2rem;opacity:.6}
-.phrase-group-label:first-child{margin-top:0}
-.debate-content{padding:1.8rem 2rem;display:flex;flex-direction:column;align-items:center}
-.debate-top{display:flex;justify-content:space-between;align-items:center;width:100%;margin-bottom:.8rem}
-.debate-title{font-family:'Outfit',sans-serif;font-size:1.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.02em}
-.debate-level{font-family:Outfit,sans-serif;font-size:1rem;font-weight:700;color:var(--level-color, var(--sky))}
-.debate-question{font-size:1rem;font-weight:700;text-align:center;margin-bottom:1.5rem;max-width:500px}
-.bubbles{display:flex;flex-wrap:wrap;justify-content:center;gap:1rem;margin-bottom:1.5rem}
-.bubble{width:145px;height:145px;border-radius:50%;border:1.5px solid var(--level-color, var(--sky));display:flex;align-items:center;justify-content:center;text-align:center;font-size:.82rem;font-weight:600;color:var(--ink);padding:.8rem;line-height:1.35;transition:all .25s;cursor:pointer;background:var(--card);user-select:none}
-.bubble:hover{transform:scale(1.04);box-shadow:0 4px 14px rgba(45,48,71,.08)}
-.bubble.highlighted{background:var(--level-color, var(--sky));color:#fff;border-color:var(--level-color, var(--sky));box-shadow:0 4px 14px rgba(45,48,71,.15)}
-.debate-task{font-size:.95rem;font-weight:700;font-style:italic;text-align:center;color:var(--ink)}
+/* ── Debate card ──────────────────────────────────────────────────
+   Same frame as the Debate Builder on johnplustools.com: a 5:3 card,
+   30% phrase bank on the left, everything else centred in the middle.
+   Every number below is lifted from that tool so the two match. */
+.debate-card{background:var(--card);border:1.5px solid var(--border);border-radius:22px;box-shadow:0 1px 2px rgba(20,30,60,.04),0 20px 44px -28px rgba(30,50,110,.35);display:grid;grid-template-columns:30% 1fr;overflow:hidden;width:100%;max-width:1040px;margin:0 auto;aspect-ratio:5/3;container-type:inline-size}
+.debate-phrases{padding:24px 22px;background:var(--cream);border-right:1.5px solid var(--border);overflow-y:auto}
+.debate-phrases-title{font-family:Outfit,sans-serif;font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--level-color,var(--sky));margin-bottom:16px}
+.phrase-item{font-size:13.5px;line-height:1.5;padding:2px 8px;border-radius:7px;cursor:pointer;user-select:none;margin-bottom:2px;transition:opacity .3s,background .12s;display:flex;align-items:center;gap:3px}
+.phrase-item:hover{background:var(--card)}
+.phrase-item.blue{color:var(--level-color,var(--sky));font-weight:600;font-style:italic}
+.phrase-item.black{color:var(--ink);font-weight:600}
+.phrase-item.crossed{opacity:.3;text-decoration:line-through;text-decoration-thickness:1px}
+.debate-content{padding:24px 34px;display:flex;flex-direction:column;align-items:center;justify-content:center;justify-content:safe center;min-height:0;overflow:hidden}
+.debate-top{display:flex;align-items:center;gap:12px;width:100%}
+.debate-title{font-family:'Outfit',sans-serif;font-size:26px;font-weight:800;letter-spacing:-.02em;text-transform:uppercase;flex:1;line-height:1.2;padding:1px 6px}
+.debate-level{font-family:Outfit,sans-serif;font-size:15px;font-weight:800;letter-spacing:.06em;color:var(--level-color,var(--sky));flex-shrink:0;padding-right:4px}
+.debate-question{font-size:17px;font-weight:600;text-align:center;line-height:1.45;margin:16px 0 20px;max-width:560px;padding:6px 10px}
+/* Exactly three bubbles fit per row, so 4 and 5 wrap and centre beneath. */
+.bubbles{display:flex;flex-wrap:wrap;justify-content:center;gap:1.79cqw 2.32cqw;max-width:50.9cqw;margin:0 auto}
+.bubble{width:15.36cqw;height:15.36cqw;border-radius:50%;border:1.5px solid var(--level-color,var(--sky));background:var(--card);display:flex;align-items:center;justify-content:center;text-align:center;font-size:clamp(11.5px,1.25cqw,14px);font-weight:600;color:var(--ink);padding:1.6cqw;line-height:1.35;position:relative;cursor:pointer;user-select:none;transition:transform .15s,box-shadow .2s,background .2s,color .2s,opacity .3s}
+.bubble:hover{transform:translateY(-2px);box-shadow:0 8px 20px -8px color-mix(in srgb,var(--level-color,var(--sky)) 55%,transparent)}
+.bubble.highlighted{background:var(--level-color,var(--sky));color:#fff;box-shadow:0 6px 18px -6px rgba(45,48,71,.3)}
+.debate-task{font-size:15px;font-weight:600;font-style:italic;text-align:center;max-width:540px;padding:6px 10px;margin-top:18px;color:var(--ink)}
+.debate-progress{font-family:Outfit,sans-serif;font-size:10.5px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;font-weight:700;margin-top:8px;display:flex;gap:16px}
 
-.card-nav{display:flex;justify-content:space-between;align-items:center;margin-top:1rem;gap:1rem}
+@media(max-width:1020px){
+  .debate-card{aspect-ratio:auto}
+  .debate-content{padding:24px 22px}
+  .bubble{width:148px;height:148px;font-size:13px;padding:15px}
+  .bubbles{gap:16px 20px;max-width:484px}
+  .debate-card{container-type:normal}
+  .debate-title{font-size:22px}
+  .debate-question{font-size:16px;margin:14px 0 20px}
+}
+@media(max-width:768px){
+  .debate-card{grid-template-columns:1fr;border-radius:16px}
+  .debate-phrases{border-right:none;border-bottom:1.5px solid var(--border)}
+  .bubble{width:126px;height:126px;font-size:12px;padding:12px}
+  .bubbles{gap:14px 16px;max-width:420px}
+}
+
+.card-nav{display:flex;justify-content:space-between;align-items:center;margin-top:1.2rem;gap:1rem}
 .nav-btn{font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;padding:.6rem 1.5rem;border:1.5px solid var(--border);border-radius:10px;background:var(--card);color:var(--ink);cursor:pointer;transition:all .15s}
 .nav-btn:hover{border-color:var(--sky);color:var(--sky)}
 .nav-btn:disabled{opacity:.3;cursor:default}
@@ -109,21 +133,44 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
 .timer-edit-btn:hover{color:var(--ink);background:var(--cream)}
 .timer-duration-edit{display:none;align-items:baseline;gap:.3rem;font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;padding:.5rem .8rem;border:1.5px solid var(--ink);border-radius:10px;background:var(--card);color:var(--ink)}
 .timer-duration-input{font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;border:none;background:transparent;color:var(--ink);width:4.2ch;text-align:center;outline:none;padding:0}
-@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(46,196,182,.3)}50%{box-shadow:0 0 0 6px rgba(46,196,182,0)}}
 
-/* Phrase bank */
+/* ── Topic vocabulary + follow-up: separate panels below the card ── */
+.extras{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.4rem;align-items:start}
+.extra-panel{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm)}
+.extra-toggle{width:100%;padding:.75rem 1.1rem;display:flex;align-items:center;justify-content:space-between;gap:.6rem;background:transparent;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:700;color:var(--ink);text-align:left;transition:background .12s}
+.extra-toggle:hover{background:var(--cream)}
+.extra-toggle .x-arrow{font-size:.65rem;color:var(--muted);transition:transform .2s;flex-shrink:0}
+.extra-toggle.open .x-arrow{transform:rotate(180deg)}
+.extra-body{display:none;padding:.2rem 1.1rem 1.1rem;border-top:1px solid var(--border)}
+.extra-body.show{display:block}
+.extra-sub{font-family:Outfit,sans-serif;font-size:.58rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:.9rem 0 .5rem}
+.vocab-chips{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.8rem}
+.vocab-chips li{list-style:none;font-size:.82rem;color:var(--ink);padding:.3rem .75rem;background:var(--cream);border:1px solid var(--border);border-radius:8px;line-height:1.4;font-weight:600}
+.followup-list{list-style:none;counter-reset:fq;margin-top:.5rem}
+.followup-item{padding:.55rem 0;border-bottom:1px solid rgba(232,229,223,.6);display:flex;gap:.7rem;align-items:flex-start;font-size:.9rem;line-height:1.55}
+.followup-item:last-child{border-bottom:none;padding-bottom:0}
+.followup-num{font-family:Outfit,sans-serif;font-size:.72rem;font-weight:700;color:var(--muted);min-width:18px;padding-top:.15rem;flex-shrink:0}
+.fp-row{display:flex;flex-wrap:wrap;gap:.35rem}
+.fp-item{font-size:.78rem;font-weight:600;font-style:italic;color:var(--level-color,var(--sky));background:var(--cream);border:1px solid var(--border);border-radius:8px;padding:.25rem .6rem;cursor:pointer;user-select:none;transition:opacity .2s}
+.fp-item.crossed{opacity:.3;text-decoration:line-through}
+.extra-empty{font-size:.8rem;color:var(--muted);font-style:italic;padding:.5rem 0}
+@media(max-width:768px){.extras{grid-template-columns:1fr}}
+
+/* ── Phrase bank tab ── */
 .phrase-bank{display:none}
 .phrase-bank.show{display:block}
 .debate-view{display:block}
 .debate-view.hide{display:none}
-.pb-level-toggle{display:flex;gap:0;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;width:fit-content;margin-bottom:1.5rem}
-.pb-lvl{font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:600;padding:.5rem 1.4rem;background:var(--card);color:var(--muted);border:none;cursor:pointer;transition:all .15s}
+.pb-level-toggle{display:flex;gap:0;border:1.5px solid var(--border);border-radius:10px;overflow-x:auto;overflow-y:hidden;max-width:100%;width:fit-content;margin-bottom:1.5rem;scrollbar-width:none}
+.pb-level-toggle::-webkit-scrollbar{display:none}
+.pb-lvl{font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:600;padding:.5rem 1.4rem;white-space:nowrap;flex-shrink:0;background:var(--card);color:var(--muted);border:none;cursor:pointer;transition:all .15s}
 .pb-lvl:hover{color:var(--ink)}
 .pb-lvl.on{color:#fff}
 .pb-lvl.on[data-lv="B1"]{background:#FF6B6B}
 .pb-lvl.on[data-lv="B2"]{background:#16A88D}
 .pb-lvl.on[data-lv="C1"]{background:#2176FF}
 .pb-lvl.on[data-lv="C2"]{background:#9B72CF}
+.pb-lvl.on[data-lv="Fun"]{background:#FF9100}
 .pb-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
 .pb-category{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:1.2rem 1.4rem;transition:box-shadow .2s}
 .pb-category:hover{box-shadow:0 4px 14px rgba(45,48,71,.06)}
@@ -134,68 +181,75 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
 .pb-chip:hover{border-color:var(--pb-color, var(--sky));color:var(--pb-color, var(--sky));transform:translateY(-1px);box-shadow:0 1px 3px rgba(45,48,71,.06)}
 .pb-chip.used{text-decoration:line-through;opacity:.35;transform:none;box-shadow:none;border-color:var(--border);background:var(--cream);color:var(--muted)}
 .pb-chip.used:hover{background:var(--cream);border-color:var(--border);color:var(--muted);transform:none;box-shadow:none}
+@media(max-width:768px){.pb-grid{grid-template-columns:1fr}}
 
-footer{text-align:center;padding:3rem 2rem;font-size:.8rem;color:var(--muted);border-top:1.5px solid var(--border);max-width:960px;margin:2rem auto 0;position:relative;z-index:1}
-.print-row{display:flex;justify-content:flex-end;margin-bottom:.4rem}
-.print-card-btn{background:none;border:none;font-size:1.1rem;cursor:pointer;opacity:.4;transition:opacity .15s;padding:.2rem;line-height:1}
-.print-card-btn:hover{opacity:1}
+/* ── Customise tab: build your own debate ── */
+.build-view{display:none}
+.build-view.show{display:block}
+.build-strip{display:flex;flex-wrap:wrap;gap:.45rem;align-items:center;margin-bottom:1.2rem}
+.bl-head{font-family:Outfit,sans-serif;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-right:.3rem}
+.bl-item{display:inline-flex;align-items:center;gap:.45rem;max-width:260px;padding:.32rem .55rem;border:1.5px solid var(--border);border-radius:999px;background:var(--card);cursor:pointer;font-family:'Outfit',sans-serif;font-size:.8rem;font-weight:700;color:var(--ink);transition:border-color .15s,box-shadow .15s,background .15s}
+.bl-item:hover{background:var(--cream)}
+.bl-item.on{border-color:var(--bl,var(--sky));box-shadow:0 0 0 2.5px color-mix(in srgb,var(--bl,var(--sky)) 14%,transparent)}
+.bl-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bl-lvl{font-family:Outfit,sans-serif;font-size:.56rem;font-weight:800;letter-spacing:.08em;color:#fff;background:var(--bl,var(--muted));border-radius:5px;padding:.1rem .4rem;flex-shrink:0}
+.bl-del{font-size:.75rem;color:var(--muted);opacity:.35;padding:0 .1rem;flex-shrink:0;transition:opacity .12s,color .12s}
+.bl-item:hover .bl-del{opacity:.6}
+.bl-del:hover{opacity:1;color:var(--coral)}
+.bl-empty{font-size:.78rem;color:var(--muted);font-style:italic}
+.build-status{font-family:Outfit,sans-serif;font-size:.62rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.build-empty{background:var(--card);border:1.5px dashed var(--border);border-radius:var(--radius);padding:3.5rem 2rem;text-align:center;color:var(--muted)}
+.build-empty h3{font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:800;color:var(--ink);margin-bottom:.4rem}
+.build-empty p{font-size:.88rem;max-width:380px;margin:0 auto}
 
-@media(max-width:768px){.debate-card{grid-template-columns:1fr}.debate-phrases{border-right:none;border-bottom:1.5px solid var(--border)}.bubble{width:120px;height:120px;font-size:.75rem}.pb-grid{grid-template-columns:1fr}}
-@media(max-width:640px){nav{padding:.75rem 1.2rem}.nav-links{gap:1rem}.page-header{padding:1.6rem 1.2rem .8rem}.controls{padding:0 1.2rem .5rem}.main{padding:0 1.2rem 2rem}.debate-content{padding:1.2rem}.bubble{width:100px;height:100px;font-size:.72rem}}
-@media print{nav,.page-header,.controls,.card-nav,.timer-section,.mode-toggle,.print-row,.print-card-btn,.action-btn,.teacher-feedback,footer{display:none}.main{padding:0;margin:0}.debate-card{box-shadow:none;border:1px solid #ccc}.phrase-item.crossed{text-decoration:none;opacity:1}.bubble.highlighted{background:#ddd;color:#000;border-color:#999}.vocab-list,.followup-list{display:block!important}.vocab-toggle .v-arrow,.followup-toggle .f-arrow{display:none}.phrase-bank.show{display:block}.phrase-bank.show .pb-level-toggle,.phrase-bank.show .action-btn{display:none}.pb-grid{gap:.6rem}.pb-category{break-inside:avoid;box-shadow:none;border:1px solid #ccc}}
+/* Edit affordances live only on the builder's copy of the card. */
+.debate-card.edit .bubble{cursor:default}
+.debate-card.edit .bubble:hover{transform:none;box-shadow:none}
+.debate-card.edit [contenteditable]{cursor:text;border-radius:8px;transition:background .12s,box-shadow .12s}
+.debate-card.edit [contenteditable]:hover{background:var(--cream)}
+.debate-card.edit [contenteditable]:focus{background:var(--card);box-shadow:0 0 0 1.5px var(--level-color,var(--sky))}
+.debate-card.edit .phrase-item{cursor:default}
+.debate-card.edit .bubble>span{width:100%;padding:4px 6px;border-radius:8px}
+.bubble .rm{position:absolute;top:9px;right:11px;font-size:12px;line-height:1;color:var(--muted);opacity:0;padding:3px 6px;border-radius:999px;background:var(--card);border:none;cursor:pointer;transition:opacity .12s}
+.bubble:hover .rm{opacity:.55}
+.bubble .rm:hover{opacity:1;color:var(--coral)}
+.add-bubble{width:15.36cqw;height:15.36cqw;border-radius:50%;border:1.5px dashed var(--border);background:none;color:var(--muted);font-size:clamp(11px,1.16cqw,13px);font-weight:600;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:.6;transition:all .15s}
+.add-bubble:hover{border-color:var(--level-color,var(--sky));color:var(--level-color,var(--sky));opacity:1;background:var(--cream)}
+@media(max-width:1020px){.add-bubble{width:148px;height:148px;font-size:13px}}
+@media(max-width:768px){.add-bubble{width:126px;height:126px;font-size:12px}}
+.pi-txt{flex:1;padding:0 2px}
+.pi-del{opacity:0;color:var(--muted);font-size:11px;padding:0 3px;background:none;border:none;cursor:pointer;line-height:1;transition:opacity .12s;flex-shrink:0}
+.phrase-item:hover .pi-del{opacity:.5}
+.pi-del:hover{opacity:1;color:var(--coral)}
+.add-phrase{font-size:11.5px;color:var(--muted);letter-spacing:.04em;padding:4px 8px;margin-top:8px;font-weight:600;cursor:pointer;border-radius:7px;background:none;border:none;display:block;width:100%;text-align:left;transition:all .12s}
+.add-phrase:hover{color:var(--level-color,var(--sky));background:var(--card)}
+.build-hint{font-size:.78rem;color:var(--muted);text-align:center;margin-top:.9rem;font-style:italic}
+.build-fields{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.4rem}
+.field-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:1rem 1.1rem;box-shadow:var(--shadow-sm)}
+.field-label{font-family:Outfit,sans-serif;font-size:.6rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:.15rem}
+.field-hint{font-size:.74rem;color:var(--muted);margin-bottom:.6rem}
+.field-area{width:100%;min-height:132px;font-family:'Outfit',sans-serif;font-size:.86rem;line-height:1.6;color:var(--ink);background:var(--cream);border:1.5px solid var(--border);border-radius:10px;padding:.6rem .75rem;resize:vertical;outline:none;transition:border-color .15s}
+.field-area:focus{border-color:var(--level-color,var(--sky));background:var(--card)}
+@media(max-width:768px){.build-fields{grid-template-columns:1fr}}
 
-/* Vocab panel - inline inside debate content */
-.vocab-section{border-top:1px solid var(--border);margin-top:1.2rem;width:100%}
-.vocab-toggle{width:100%;padding:.7rem 0;display:flex;align-items:center;justify-content:space-between;background:transparent;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:700;color:var(--ink);transition:opacity .15s}
-.vocab-toggle:hover{opacity:.7}
-.vocab-toggle .v-arrow{transition:transform .2s;font-size:.7rem}
-.vocab-toggle.open .v-arrow{transform:rotate(180deg)}
-.vocab-list{display:none;padding:0 0 .5rem}
-.vocab-list.show{display:block}
-.vocab-list ul{list-style:none;display:flex;flex-wrap:wrap;gap:.4rem}
-.vocab-list li{font-size:.84rem;color:var(--ink);padding:.35rem .8rem;background:var(--cream);border:1px solid var(--border);border-radius:8px;line-height:1.4;font-weight:600}
+footer{text-align:center;padding:3rem 2rem;font-size:.8rem;color:var(--muted);border-top:1.5px solid var(--border);max-width:1040px;margin:2rem auto 0;position:relative;z-index:1}
 
-/* Follow-up discussion */
-.followup-section{border-top:1px solid var(--border);margin-top:.8rem;width:100%}
-.followup-toggle{width:100%;padding:.7rem 0;display:flex;align-items:center;justify-content:space-between;background:transparent;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:700;color:var(--ink);transition:opacity .15s}
-.followup-toggle:hover{opacity:.7}
-.followup-toggle .f-arrow{transition:transform .2s;font-size:.7rem}
-.followup-toggle.open .f-arrow{transform:rotate(180deg)}
-.followup-list{display:none;padding:0 0 .5rem}
-.followup-list.show{display:block}
-.followup-list ol{list-style:none;counter-reset:fq;padding:0}
-.followup-item{counter-increment:fq;padding:.55rem 0;border-bottom:1px solid rgba(232,229,223,.5);display:flex;gap:.7rem;align-items:flex-start;font-size:.92rem;line-height:1.55}
-.followup-item:last-child{border-bottom:none;padding-bottom:0}
-.followup-num{font-family:Outfit,sans-serif;font-size:.72rem;font-weight:700;color:var(--muted);min-width:18px;padding-top:.15rem;flex-shrink:0}
-
-/* Follow-up phrases - positioned in left column aligned with follow-up section */
-.debate-card{position:relative;overflow:visible}
-.followup-phrases{display:none;position:absolute;left:0;width:280px;padding:1rem 1.4rem;background:var(--cream);border-right:1.5px solid var(--border);z-index:3}
-.followup-phrases.show{display:block}
-.followup-phrases-title{font-family:Outfit,sans-serif;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:.6rem}
-.fp-item{font-size:.82rem;line-height:1.7;padding:.15rem 0;cursor:pointer;transition:all .15s;user-select:none}
-.fp-item:hover{opacity:.7}
-.fp-item:nth-child(odd){color:var(--level-color, var(--sky));font-weight:700;font-style:italic}
-.fp-item:nth-child(even){color:var(--ink);font-weight:700}
-.fp-item.crossed{text-decoration:line-through;opacity:.35}
-.teacher-feedback{max-width:960px;margin:1.5rem auto 0;padding:0 2rem;position:relative;z-index:1}
-.tf-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem}
-.tf-label{font-family:Outfit,sans-serif;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--lavender);font-weight:500}
-.tf-clear{font-family:'Outfit',sans-serif;font-size:.75rem;font-weight:600;color:var(--muted);background:none;border:1.5px solid var(--border);border-radius:6px;padding:.3rem .8rem;cursor:pointer;transition:all .2s}
-.tf-clear:hover{border-color:var(--coral);color:var(--coral)}
-.tf-grid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
-.tf-item{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:1rem 1.2rem}
-.tf-criterion{font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;margin-bottom:.3rem}
-.tf-desc{font-size:.75rem;color:var(--muted);margin-bottom:.5rem;line-height:1.4}
-.tf-scale{display:flex;gap:.3rem}
-.tf-dot{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:var(--muted);cursor:pointer;transition:all .2s}
-.tf-dot:hover,.tf-dot.selected{background:var(--sea);border-color:var(--sea);color:#fff}
-@media(max-width:768px){.tf-grid{grid-template-columns:1fr}}
-@media(max-width:640px){.teacher-feedback{padding:0 1.2rem}}
-@media print{.teacher-feedback{display:none}}
+@media(max-width:640px){nav{padding:.75rem 1.2rem}.nav-links{gap:1rem}.page-header{padding:1.6rem 1.2rem .8rem}.controls{padding:0 1.2rem .5rem}.main{padding:0 1.2rem 2rem}}
+@media print{
+  nav,.topnav,.page-header,.controls,.card-nav,.timer-section,.mode-toggle,.action-btn,.build-strip,.build-fields,.build-status,footer{display:none}
+  .main{padding:0;margin:0;max-width:none}
+  .debate-card{box-shadow:none;border:1px solid #ccc;aspect-ratio:auto;max-width:none}
+  .phrase-item.crossed{text-decoration:none;opacity:1}
+  .bubble.highlighted{background:#ddd;color:#000;border-color:#999}
+  .bubble .rm,.add-bubble,.add-phrase,.pi-del{display:none!important}
+  .extra-body{display:block!important}
+  .extra-toggle .x-arrow{display:none}
+  .phrase-bank.show{display:block}
+  .phrase-bank.show .pb-level-toggle{display:none}
+  .pb-grid{gap:.6rem}
+  .pb-category{break-inside:avoid;box-shadow:none;border:1px solid #ccc}
+}
 .topnav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(247,246,243,.88);backdrop-filter:blur(16px);border-bottom:1.5px solid #E8E5DF;padding:0 2rem;display:flex;align-items:center;justify-content:space-between}
-.nav-logo{font-family:'Outfit',sans-serif;font-size:1.3rem;font-weight:800;letter-spacing:-.02em;color:#2D3047;text-decoration:none}
-.nav-logo span{color:#2563EB}
 .topnav-links{display:flex;gap:1.2rem;align-items:center}
 .topnav-links a{font-size:.8rem;font-weight:600;color:#7A7D8E;text-decoration:none;transition:color .2s}
 .topnav-links a:hover{color:#2176FF}
@@ -228,31 +282,41 @@ footer{text-align:center;padding:3rem 2rem;font-size:.8rem;color:var(--muted);bo
 <div class="mode-toggle" role="tablist">
 <button class="mode-btn on" role="tab" onclick="setMode('debates',this)">Debates</button>
 <button class="mode-btn" role="tab" onclick="setMode('phrases',this)">Phrase Bank</button>
+<button class="mode-btn" role="tab" onclick="setMode('build',this)">Customise</button>
 </div>
 
 <div class="debate-view" id="debateView">
 <div class="ctrl-row">
-<div class="level-toggle">
-<button class="lvl-btn on" data-lv="all" onclick="setLevel('all',this)">All (150)</button>
-<button class="lvl-btn" data-lv="B1" onclick="setLevel('B1',this)">B1 (30)</button>
-<button class="lvl-btn" data-lv="B2" onclick="setLevel('B2',this)">B2 (30)</button>
-<button class="lvl-btn" data-lv="C1" onclick="setLevel('C1',this)">C1 (30)</button>
-<button class="lvl-btn" data-lv="C2" onclick="setLevel('C2',this)">C2 (30)</button>
-<button class="lvl-btn" data-lv="Fun" onclick="setLevel('Fun',this)">Fun (30)</button>
-</div>
+<div class="level-toggle" id="levelToggle"></div>
 <select class="debate-select" id="debateSelect" onchange="selectDebate(this.value)"><option value="">Browse by topic...</option></select>
 <div class="ctrl-spacer"></div>
 <div style="display:flex;gap:.8rem;flex-shrink:0">
-<button class="action-btn" id="downloadPngBtn" onclick="downloadDebatePng()" title="Download as PNG"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
-<button class="action-btn" onclick="window.print()" title="Print"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></button>
+<button class="action-btn" id="downloadPngBtn" onclick="downloadCardPng('debateCard')" title="Download as PNG"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+<button class="action-btn" onclick="window.print()" title="Print"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8" rx="1"/></svg></button>
+</div>
+</div>
+</div>
+
+<div class="build-view" id="buildControls">
+<div class="ctrl-row">
+<button class="action-btn solid" onclick="buildNew()">+ New debate</button>
+<select class="debate-select" id="presetSelect" onchange="buildFromPreset(this.value)"><option value="">Start from a preset...</option></select>
+<select class="debate-select" id="buildLevel" style="min-width:120px" onchange="buildSetLevel(this.value)"><option value="B1">Level B1</option><option value="B2">Level B2</option><option value="C1">Level C1</option><option value="C2">Level C2</option><option value="Fun">Level Fun</option></select>
+<span class="build-status" id="buildStatus"></span>
+<div class="ctrl-spacer"></div>
+<div style="display:flex;gap:.8rem;flex-shrink:0">
+<button class="action-btn" id="buildPngBtn" onclick="downloadCardPng('buildCard')" title="Download as PNG"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+<button class="action-btn" onclick="window.print()" title="Print"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8" rx="1"/></svg></button>
 </div>
 </div>
 </div>
 </div>
 
 <div class="main">
+
 <div class="debate-view" id="debateMain">
 <div class="debate-card" id="debateCard"></div>
+<div class="extras" id="debateExtras"></div>
 
 <div class="card-nav">
 <button class="nav-btn" id="prevBtn" onclick="go(-1)">&larr; Previous</button>
@@ -267,7 +331,7 @@ footer{text-align:center;padding:3rem 2rem;font-size:.8rem;color:var(--muted);bo
 <span class="timer-btn-icon" id="timerBtnIcon">&#9654;</span>
 <span id="timerBtnLabel">3 min</span>
 </button>
-<button class="timer-edit-btn" id="timerEditBtn" onclick="editDuration()" title="Edit duration" aria-label="Edit timer duration"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+<button class="timer-edit-btn" id="timerEditBtn" onclick="editDuration()" title="Edit duration" aria-label="Edit timer duration"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
 <span class="timer-duration-edit" id="timerDurationEdit">
 <input type="text" inputmode="numeric" class="timer-duration-input" id="timerDurationInput" placeholder="3:00" onblur="commitDuration()" onkeydown="if(event.key==='Enter'){this.blur()}else if(event.key==='Escape'){cancelEditDuration()}">
 </span>
@@ -283,24 +347,18 @@ footer{text-align:center;padding:3rem 2rem;font-size:.8rem;color:var(--muted);bo
 <button class="pb-lvl" data-lv="B2" onclick="setPBLevel('B2',this)">B2</button>
 <button class="pb-lvl" data-lv="C1" onclick="setPBLevel('C1',this)">C1</button>
 <button class="pb-lvl" data-lv="C2" onclick="setPBLevel('C2',this)">C2</button>
+<button class="pb-lvl" data-lv="Fun" onclick="setPBLevel('Fun',this)">Fun</button>
 </div>
-<button class="action-btn" onclick="window.print()" title="Print phrase bank"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></button>
+<button class="action-btn" onclick="window.print()" title="Print phrase bank"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8" rx="1"/></svg></button>
 </div>
 <div class="pb-grid" id="pbGrid"></div>
 </div>
+
+<div class="build-view" id="buildMain">
+<div class="build-strip" id="buildList"></div>
+<div class="build-stage" id="buildStage"></div>
 </div>
 
-<div class="teacher-feedback">
-<div class="tf-header">
-<div class="tf-label">Teacher Feedback</div>
-<button class="tf-clear" onclick="tfClear()">Clear all</button>
-</div>
-<div class="tf-grid">
-<div class="tf-item"><div class="tf-criterion">Grammar &amp; Vocabulary</div><div class="tf-desc">Used a range of grammatical structures and vocabulary accurately and appropriately</div><div class="tf-scale"><div class="tf-dot" onclick="tfRate(this)">1</div><div class="tf-dot" onclick="tfRate(this)">2</div><div class="tf-dot" onclick="tfRate(this)">3</div><div class="tf-dot" onclick="tfRate(this)">4</div><div class="tf-dot" onclick="tfRate(this)">5</div></div></div>
-<div class="tf-item"><div class="tf-criterion">Pronunciation</div><div class="tf-desc">Clear individual sounds, appropriate word and sentence stress, and natural intonation</div><div class="tf-scale"><div class="tf-dot" onclick="tfRate(this)">1</div><div class="tf-dot" onclick="tfRate(this)">2</div><div class="tf-dot" onclick="tfRate(this)">3</div><div class="tf-dot" onclick="tfRate(this)">4</div><div class="tf-dot" onclick="tfRate(this)">5</div></div></div>
-<div class="tf-item"><div class="tf-criterion">Discourse Management</div><div class="tf-desc">Organised ideas coherently with appropriate cohesive devices and relevant contributions</div><div class="tf-scale"><div class="tf-dot" onclick="tfRate(this)">1</div><div class="tf-dot" onclick="tfRate(this)">2</div><div class="tf-dot" onclick="tfRate(this)">3</div><div class="tf-dot" onclick="tfRate(this)">4</div><div class="tf-dot" onclick="tfRate(this)">5</div></div></div>
-<div class="tf-item"><div class="tf-criterion">Interactive Communication</div><div class="tf-desc">Initiated and responded appropriately, maintained and developed the interaction</div><div class="tf-scale"><div class="tf-dot" onclick="tfRate(this)">1</div><div class="tf-dot" onclick="tfRate(this)">2</div><div class="tf-dot" onclick="tfRate(this)">3</div><div class="tf-dot" onclick="tfRate(this)">4</div><div class="tf-dot" onclick="tfRate(this)">5</div></div></div>
-</div>
 </div>
 
 <footer>&copy; 2026 johnplusenglish. All rights reserved.</footer>
@@ -311,341 +369,522 @@ var phraseBank = {"B1": {"Starting the discussion": ["Can I start?", "I think...
 var debateVocab = {"Happiness": ["happy", "sad", "smile", "enjoy", "relax", "laugh", "feel good", "grateful", "pleased", "cheerful"], "A Good Teacher": ["patient", "explain", "strict", "helpful", "fair", "lesson", "homework", "classroom", "encourage", "understand"], "Favourite Food": ["delicious", "tasty", "healthy", "junk food", "homemade", "recipe", "ingredients", "meal", "snack", "dessert"], "Weekend Plans": ["lie in", "go out", "hang out", "lazy", "busy", "relax", "plan", "meet up", "chill", "free time"], "Pets": ["feed", "walk", "loyal", "playful", "cage", "vet", "pet shop", "look after", "fur", "bark"], "Learning": ["study", "revise", "practise", "improve", "make mistakes", "understand", "remember", "forget", "concentrate", "try"], "Morning or Night": ["alarm", "wake up", "energy", "routine", "tired", "productive", "early bird", "night owl", "sunrise", "midnight"], "The Best Age": ["childhood", "teenager", "adult", "retire", "grow up", "responsible", "independent", "freedom", "experience", "carefree"], "Staying Fit": ["exercise", "gym", "healthy", "active", "lazy", "tired", "strong", "flexible", "sweat", "warm up"], "Dream Holiday": ["beach", "mountains", "sightseeing", "relax", "adventure", "hotel", "flight", "luggage", "sunbathe", "explore"], "Home": ["bedroom", "kitchen", "living room", "garden", "balcony", "rent", "move", "comfortable", "tidy", "messy"], "Best Job": ["salary", "boss", "colleague", "office", "shift", "deadline", "experience", "apply", "interview", "contract"], "Phones": ["screen", "app", "notification", "charge", "message", "call", "download", "selfie", "addicted", "battery"], "Good Manners": ["polite", "rude", "respect", "queue", "interrupt", "apologise", "excuse me", "behaviour", "proper", "gesture"], "Best Season": ["spring", "summer", "autumn", "winter", "temperature", "sunny", "rainy", "snowy", "warm", "cold"], "City or Village": ["noisy", "quiet", "crowded", "peaceful", "convenient", "boring", "lively", "nature", "traffic", "neighbour"], "Good Friend": ["trust", "loyal", "fun", "support", "honest", "share", "laugh", "help", "close", "depend on"], "Best Transport": ["cheap", "fast", "comfortable", "safe", "green", "convenient", "crowded", "delay", "ticket", "journey"], "Screen Time": ["limit", "break", "digital", "online", "offline", "distraction", "focus", "habit", "rule", "balance"], "Clothes": ["fashion", "comfortable", "brand", "size", "style", "bargain", "expensive", "cheap", "trendy", "fit"], "Talent": ["gifted", "practise", "skill", "creative", "natural", "learn", "improve", "perform", "stage", "audience"], "Rules": ["fair", "strict", "break", "follow", "punishment", "reward", "behave", "obey", "allow", "forbidden"], "Birthday": ["celebrate", "candles", "cake", "present", "surprise", "guest", "invitation", "party", "wish", "blow out"], "Sleep": ["tired", "dream", "nightmare", "alarm", "pillow", "blanket", "nap", "snore", "rest", "deep sleep"], "Money": ["save", "spend", "earn", "waste", "budget", "afford", "expensive", "cheap", "cash", "card"], "Weather": ["forecast", "sunny", "rainy", "cloudy", "windy", "temperature", "degree", "umbrella", "coat", "season"], "Healthy Eating": ["vitamin", "protein", "sugar", "fat", "diet", "fresh", "organic", "portion", "balanced", "vegetable"], "Being Polite": ["please", "thank you", "sorry", "excuse me", "manners", "respect", "considerate", "patient", "kind", "rude"], "Free Time": ["hobby", "relax", "bored", "enjoy", "pastime", "chill", "hang out", "activity", "interest", "fun"], "The Future": ["predict", "change", "technology", "invention", "improve", "develop", "modern", "robot", "digital", "progress"], "Free Time": ["leisure time", "pastime", "unwind", "recharge", "kill time", "a hobby", "quality time", "work-life balance", "spare time", "take up (a hobby)"], "Dream Job": ["career path", "job satisfaction", "promotion", "commute", "perks and benefits", "rewarding", "demanding", "hands-on", "fulfilling", "a dead-end job"], "City vs Countryside": ["pace of life", "cost of living", "rush hour", "community spirit", "urban sprawl", "remote area", "public transport", "pollution", "a suburb", "settle down"], "Learning English": ["pick up (a language)", "fluency", "mother tongue", "immersion", "get the hang of", "vocabulary", "make progress", "brush up on", "grammar", "a native speaker"], "Social Media": ["go viral", "a follower", "an influencer", "scroll through", "online presence", "cyberbullying", "a feed", "share / repost", "addictive", "screen time"], "Healthy Living": ["a balanced diet", "sedentary lifestyle", "well-being", "burn out", "keep fit", "mental health", "junk food", "get in shape", "a check-up", "sleep-deprived"], "Travel": ["a getaway", "off the beaten track", "sightseeing", "backpacking", "culture shock", "a bucket list", "broaden your horizons", "a layover", "travel light", "a tourist trap"], "Money": ["a budget", "savings", "disposable income", "get into debt", "live within your means", "a bargain", "cost of living", "financially stable", "a mortgage", "splash out"], "Friendship": ["a close bond", "loyalty", "drift apart", "keep in touch", "fall out (with)", "have someone's back", "trustworthy", "acquaintance", "make up (after an argument)", "a shoulder to cry on"], "Technology": ["a device", "artificial intelligence", "digital literacy", "a glitch", "upgrade", "cutting-edge", "user-friendly", "data privacy", "a gadget", "go offline"], "Education": ["curriculum", "student loan", "vocational training", "drop out", "lifelong learning", "a scholarship", "rote learning", "critical thinking", "a graduate", "extracurricular"], "Food Choices": ["organic", "processed food", "plant-based", "calorie intake", "a food allergy", "sustainable", "home-cooked", "a portion", "nutritious", "comfort food"], "Home": ["a mortgage", "do up (a house)", "cosy", "a flatmate", "settle in", "neighbourhood", "move in / out", "spacious", "a landlord / tenant", "a sense of belonging"], "The Environment": ["carbon footprint", "renewable energy", "single-use plastic", "eco-friendly", "recycle", "greenhouse gases", "biodiversity", "climate change", "go green", "sustainability"], "Success": ["achieve a goal", "ambition", "determination", "a milestone", "setback", "perseverance", "live up to expectations", "self-made", "sacrifice", "recognition"], "Language Learning": ["bilingual", "mother tongue", "fluency", "proficiency", "code-switching", "language barrier", "pick up naturally", "linguistic competence", "immersive experience", "culturally aware"], "The Future of Work": ["remote working", "automation", "gig economy", "upskilling", "work-life integration", "redundancy", "freelance", "a start-up", "employability", "corporate ladder"], "Sources of Stress": ["burnout", "overwhelmed", "anxiety", "coping mechanism", "work pressure", "a trigger", "chronic stress", "mindfulness", "emotional exhaustion", "a support network"], "Healthy Habits": ["holistic", "preventative", "well-being", "a detox", "self-care", "resilience", "screen fatigue", "nutritional awareness", "therapeutic", "a routine"], "Decision Making": ["weigh up", "gut feeling", "rational", "impulsive", "a dilemma", "consequences", "cognitive bias", "peer pressure", "a trade-off", "deliberate"], "Travel Experiences": ["transformative", "cultural immersion", "a perspective shift", "off the grid", "wanderlust", "a rite of passage", "soul-searching", "hospitality", "a turning point", "eye-opening"], "Work-Life Balance": ["juggle", "overworked", "a boundary", "burnout", "flexible working", "downtime", "prioritise", "a 9-to-5", "sabbatical", "job satisfaction"], "Social Media's Impact": ["algorithm", "echo chamber", "misinformation", "influencer culture", "digital footprint", "clickbait", "cancel culture", "a platform", "curated content", "screen addiction"], "What Makes Relationships Last": ["compromise", "commitment", "mutual respect", "compatibility", "emotional intelligence", "take for granted", "a deal-breaker", "unconditional", "grow apart", "open communication"], "Life Satisfaction": ["fulfilment", "contentment", "gratitude", "a sense of purpose", "material wealth", "intrinsic motivation", "quality of life", "self-actualisation", "a trade-off", "well-rounded"], "Education Priorities": ["curriculum reform", "standardised testing", "soft skills", "digital literacy", "critical thinking", "inclusive education", "student-centred", "vocational", "rote learning", "lifelong learning"], "Gender Equality": ["glass ceiling", "gender pay gap", "unconscious bias", "parental leave", "empowerment", "representation", "stereotypes", "quota", "work-life balance", "equal opportunities"], "Mental Health Barriers": ["stigma", "therapy", "a waiting list", "accessibility", "emotional literacy", "a support system", "counselling", "a coping strategy", "well-being", "vulnerability"], "Future of Cities": ["urbanisation", "gentrification", "smart city", "infrastructure", "green space", "congestion", "housing crisis", "sustainability", "community hub", "public transport"], "Beauty Standards": ["body image", "unrealistic expectations", "self-esteem", "photoshopped", "representation", "beauty industry", "body positivity", "airbrushed", "insecurity", "societal pressure"], "Shopping Habits": ["impulse purchase", "brand loyalty", "ethical consumption", "disposable income", "planned obsolescence", "consumer culture", "value for money", "fast fashion", "greenwashing", "a conscious consumer"], "Parenting Styles": ["authoritarian", "permissive", "helicopter parenting", "attachment theory", "emotional intelligence", "boundaries", "unconditional love", "overprotective", "role model", "resilience"], "Exploration": ["frontier", "uncharted territory", "breakthrough", "the unknown", "cutting-edge research", "invest in", "ground-breaking", "allocate resources", "the long-term payoff", "a paradigm shift"], "Global Challenges": ["systemic", "inequality", "geopolitical", "humanitarian crisis", "sustainable development", "an existential threat", "multilateral", "accountability", "a tipping point", "unprecedented"], "The Housing Crisis": ["affordable housing", "social housing", "speculative investment", "gentrification", "rent control", "a housing bubble", "homelessness", "urban planning", "a property ladder", "supply and demand"], "Healthcare Priorities": ["preventative care", "universal healthcare", "waiting times", "underfunded", "a mental health crisis", "public health", "an ageing population", "medical research", "frontline workers", "holistic care"], "Criminal Justice": ["rehabilitation", "recidivism", "deterrent", "restorative justice", "incarceration", "systemic inequality", "reform", "reoffending rates", "community service", "the root cause"], "Climate Action": ["net zero", "fossil fuels", "carbon capture", "deforestation", "renewable infrastructure", "the Paris Agreement", "greenwashing", "emissions", "a tipping point", "climate adaptation"], "AI & Technology Risks": ["algorithmic bias", "surveillance state", "autonomous weapons", "deepfake", "data sovereignty", "ethical AI", "existential risk", "digital divide", "job displacement", "regulation"], "Threats to Democracy": ["disinformation", "voter suppression", "political polarisation", "lobbying", "a free press", "authoritarian tendencies", "checks and balances", "civic engagement", "populism", "erosion of trust"], "Winners of Globalisation": ["outsourcing", "free trade", "exploitation", "a supply chain", "economic disparity", "protectionism", "a developing economy", "multinational", "a race to the bottom", "cultural homogenisation"], "The Value of Art": ["provocative", "cultural heritage", "censorship", "artistic freedom", "patronage", "accessible", "a masterpiece", "aesthetic", "thought-provoking", "a cultural institution"], "Ethics of Wealth": ["philanthropy", "wealth redistribution", "tax avoidance", "a social safety net", "income inequality", "corporate responsibility", "trickle-down economics", "a wealth gap", "moral obligation", "inherited wealth"], "The Media": ["editorial independence", "a media mogul", "press freedom", "investigative journalism", "a paywall", "propaganda", "accountability", "a reliable source", "media literacy", "a conflict of interest"], "Cultural Preservation": ["intangible heritage", "assimilation", "indigenous", "a dying language", "cultural appropriation", "oral tradition", "UNESCO", "national identity", "globalisation", "a living tradition"], "Pets & Animals": ["a rescue animal", "low-maintenance", "a companion", "house-trained", "a breed", "veterinary care", "allergies", "unconditional love", "an aquarium", "adopt"], "Gifts": ["thoughtful", "a voucher", "gift-wrap", "sentimental value", "a token of appreciation", "the thought that counts", "an occasion", "personalised", "a wish list", "regift"], "TV & Streaming": ["binge-watch", "a box set", "a plot twist", "a cliffhanger", "a spin-off", "a genre", "subtitles", "a spoiler", "a streaming platform", "on-demand"], "Cooking": ["a recipe", "from scratch", "meal prep", "ingredients", "a portion", "seasoning", "a balanced diet", "home-cooked", "leftovers", "a food processor"], "Neighbours": ["a boundary", "a noise complaint", "considerate", "a terraced house", "communal areas", "a fence", "next door", "privacy", "a dispute", "a community"], "Influencer Culture": ["a brand deal", "sponsored content", "authenticity", "a following", "engagement", "curated", "monetise", "a niche", "parasocial relationship", "credibility"], "Sleep": ["insomnia", "circadian rhythm", "melatonin", "sleep hygiene", "a power nap", "sleep-deprived", "REM sleep", "a lie-in", "restless", "oversleep"], "Trust in Society": ["accountability", "transparency", "institutional trust", "corruption", "a whistleblower", "civic duty", "credibility", "social contract", "scepticism", "integrity"], "Creativity": ["innovation", "think outside the box", "brainstorm", "an artistic outlet", "originality", "trial and error", "imagination", "a creative block", "improvise", "a muse"], "Addiction in Modern Life": ["dopamine", "compulsive behaviour", "withdrawal", "instant gratification", "a coping mechanism", "dependency", "moderation", "detox", "impulse control", "a trigger"], "Freedom of Speech": ["censorship", "hate speech", "a platform", "defamation", "provocative", "a slippery slope", "political correctness", "a double standard", "civil liberties", "accountability"], "The Death of Expertise": ["credibility", "peer-reviewed", "misinformation", "anti-intellectualism", "a conspiracy theory", "an echo chamber", "evidence-based", "populism", "a pundit", "informed consent"], "The Attention Economy": ["dopamine loop", "doomscrolling", "a notification", "cognitive overload", "deep work", "a distraction", "engagement metrics", "monetise attention", "digital minimalism", "screen fatigue"], "Meritocracy": ["privilege", "a level playing field", "social mobility", "nepotism", "a glass ceiling", "bootstraps", "systemic barriers", "inherited advantage", "equal opportunity", "self-made"], "Surveillance Society": ["Big Brother", "data mining", "encryption", "a civil liberty", "facial recognition", "opt in / opt out", "metadata", "a privacy policy", "whistleblower", "authoritarian"], "Sport": ["a tournament", "a referee", "a league", "competitive", "a draw", "a spectator", "a champion", "a penalty", "sportsmanship", "a comeback"], "Music": ["a genre", "a melody", "lyrics", "a gig", "a playlist", "catchy", "acoustic", "a band", "a rhythm", "off-key"], "Morning Routines": ["an alarm", "a lie-in", "a habit", "productive", "a routine", "snooze", "energised", "skip breakfast", "a morning person", "a night owl"], "Holidays": ["a resort", "all-inclusive", "sightseeing", "a souvenir", "book in advance", "off-season", "jet lag", "a getaway", "a road trip", "unwind"], "Shopping": ["a bargain", "a receipt", "a refund", "browse", "a queue", "a deal", "in stock", "out of stock", "a loyalty card", "window shopping"], "Weekends": ["a lie-in", "catch up on", "chill out", "a day trip", "quality time", "errands", "recharge", "spontaneous", "a lazy Sunday", "make the most of"], "Learning Styles": ["visual", "auditory", "hands-on", "a technique", "absorb information", "take notes", "a tutorial", "self-taught", "concentration", "revision"], "Transport": ["congestion", "a fare", "rush hour", "a commute", "eco-friendly", "a timetable", "a delay", "a season ticket", "car-sharing", "a cycle lane"], "Manners": ["etiquette", "courteous", "rude", "interrupt", "punctual", "a gesture", "respectful", "inconsiderate", "excuse me", "apologise"], "Childhood": ["upbringing", "a playground", "imagination", "carefree", "a role model", "grow up", "spoilt", "sheltered", "nurture", "a milestone"], "Nostalgia": ["rose-tinted glasses", "sentimentality", "a throwback", "wistful", "romanticise", "longing", "bittersweet", "a golden age", "reminisce", "a comfort blanket"], "Risk-Taking": ["a leap of faith", "calculated risk", "the comfort zone", "a gamble", "high-stakes", "averse", "bold", "reckless", "pay off", "venture"], "Digital Detox": ["withdrawal", "unplug", "screen time", "notification fatigue", "mindful use", "FOMO", "analogue", "intentional", "cold turkey", "reconnect"], "Ageing": ["life expectancy", "a milestone birthday", "ageism", "gracefully", "a pension", "dementia", "a care home", "retirement", "vitality", "dignity"], "Public Speaking": ["stage fright", "body language", "articulate", "engage an audience", "a keynote", "charisma", "stumble over words", "rehearse", "eye contact", "persuasive"], "Empathy": ["compassion", "put yourself in someone's shoes", "emotional intelligence", "detached", "indifferent", "perspective-taking", "validate", "vulnerable", "cold", "warm-hearted"], "Commuting": ["a packed train", "rush hour", "road rage", "a season ticket", "telecommute", "dead time", "congestion charge", "car-pool", "a crush", "standing room only"], "Apologies": ["sincere", "make amends", "take responsibility", "defensive", "grudge", "forgive", "hollow", "remorse", "a peace offering", "clear the air"], "Competition": ["rivalry", "a level playing field", "cutthroat", "drive", "a sore loser", "outperform", "collaborative", "a league", "stakes", "fierce"], "Silence": ["awkward", "meditative", "deafening silence", "contemplative", "fill the gap", "small talk", "introspective", "eerie", "golden", "a pause"], "Cancel Culture": ["accountability", "mob mentality", "due process", "public shaming", "redemption", "context collapse", "virtue signalling", "a witch hunt", "proportionality", "nuance"], "The Gig Economy": ["precarious employment", "zero-hours contract", "platform capitalism", "flexibility trap", "labour rights", "self-employment", "benefit entitlement", "exploitation", "hustle", "side gig"], "Loneliness Epidemic": ["social isolation", "epidemic", "atomised society", "parasocial relationship", "community erosion", "hyper-connection", "meaningful connection", "superficial", "a safety net", "alienation"], "Ethical Consumption": ["greenwashing", "conscious consumer", "supply chain", "carbon footprint", "fair trade", "boycott", "virtue signalling", "sustainable", "fast fashion", "complicit"], "Nationalism vs Globalism": ["sovereignty", "protectionism", "integration", "cultural assimilation", "multilateralism", "populism", "isolationism", "cosmopolitan", "a border", "self-determination"], "Higher Education": ["tuition fees", "student debt", "a credential", "vocational", "autodidact", "alma mater", "a dropout", "ROI (return on investment)", "grade inflation", "academic rigour"], "Social Mobility": ["the poverty trap", "social capital", "a postcode lottery", "intergenerational", "upward mobility", "structural inequality", "a scholarship", "bootstraps", "meritocratic", "a glass floor"], "Truth in the Digital Age": ["post-truth", "fact-checking", "disinformation", "a narrative", "media literacy", "deepfake", "verification", "cognitive bias", "a reliable source", "propaganda"], "Work and Identity": ["define yourself", "a vocation", "workaholism", "burnout", "a calling", "self-worth", "purposeful", "a job title", "retire", "reinvent yourself"], "Intergenerational Conflict": ["a generation gap", "scapegoat", "a stereotype", "generational wealth", "Boomer/Millennial/Gen Z", "blame game", "shared struggle", "economic inequality", "divide and conquer", "common ground"], "Superpower Showdown": ["telekinesis", "invincible", "a sidekick", "a cape", "a nemesis", "a supervillain", "X-ray vision", "identity", "a weakness", "harness"], "Deserted Island": ["survival", "resourceful", "stranded", "a shelter", "a signal fire", "rations", "castaway", "a coconut", "rescue", "marooned"], "The Worst Flatmate": ["inconsiderate", "a ground rule", "passive-aggressive", "a chore rota", "a deposit", "split the bill", "a house meeting", "a nightmare", "boundaries", "move out"], "Time Machine": ["era", "a century", "medieval", "futuristic", "a paradox", "witness", "observe", "blend in", "the past", "the future"], "Animals as Colleagues": ["loyal", "productive", "distracting", "low-maintenance", "a team player", "territorial", "trainable", "a mascot", "obedient", "unpredictable"], "Breakfast for Dinner": ["brunch", "a fry-up", "comfort food", "unconventional", "a guilty pleasure", "carbs", "a feast", "a portion", "savoury", "sweet"], "Fictional Dinner Party": ["a character", "charismatic", "witty", "entertaining", "a conversation starter", "an icebreaker", "fictional", "imaginary", "iconic", "legendary"], "The Worst Invention": ["counterproductive", "a nuisance", "overrated", "unnecessary", "annoying", "outdated", "a disruption", "regrettable", "a nightmare", "obsolete"], "Rename a Country": ["misleading", "ironic", "literal", "a nickname", "geography", "a stereotype", "confusing", "hilarious", "appropriate", "rebrand"], "Useless Skills": ["pointless", "impressive", "a party trick", "niche", "obscure", "random", "hilarious", "oddly satisfying", "underrated", "quirky"], "Zombie Apocalypse": ["survival instinct", "barricade", "stockpile", "weapons", "a hideout", "an alliance", "undead", "a horde", "supplies", "fortify"], "School Subjects": ["pointless", "outdated", "the curriculum", "compulsory", "irrelevant", "replace", "practical", "engage", "a waste of time", "reform"], "Food Crimes": ["unacceptable", "controversial", "a combination", "disgusting", "offensive", "sacrilege", "a debate", "a crime against food", "divisive", "polarising"], "Celebrity Swap": ["glamorous", "lifestyle", "a mansion", "fame", "fortune", "paparazzi", "luxury", "the spotlight", "behind the scenes", "envy"], "Annoying Sounds": ["irritating", "unbearable", "cringe", "grating", "ear-splitting", "repetitive", "drive you mad", "a trigger", "intolerable", "maddening"], "Pet Peeves": ["infuriating", "inconsiderate", "a habit", "annoying", "irrational", "overreact", "tolerate", "wind someone up", "trivial", "get on your nerves"], "Secret Talents": ["impressive", "self-taught", "a hidden skill", "gifted", "natural", "wow factor", "jaw-dropping", "pick up", "effortless", "a knack"], "Alien Encounter": ["humanity", "represent", "first impression", "a species", "civilisation", "curiosity", "a phenomenon", "a wonder", "communicate", "universal"], "Dream House": ["luxury", "essential", "a feature", "an extension", "a renovation", "state-of-the-art", "spacious", "custom-built", "over the top", "extravagant"], "Swap One Sense": ["deprived", "heightened", "compensate", "rely on", "take for granted", "overwhelming", "adapt", "a disability", "sensory", "perception"], "Unpopular Opinions": ["controversial", "divisive", "brave", "ridiculous", "overrated", "underrated", "hot take", "polarising", "defend", "outrageous"], "Bad Advice": ["misleading", "clich\u00e9", "well-meaning", "naive", "unrealistic", "toxic positivity", "a platitude", "harmful", "generic", "superficial"], "Embarrassing Moments": ["cringe", "mortifying", "recover", "play it cool", "laugh it off", "die inside", "awkward", "humiliating", "blush", "pretend it didn't happen"], "Future Inventions": ["a breakthrough", "revolutionary", "life-changing", "sci-fi", "futuristic", "a prototype", "game-changing", "a patent", "innovative", "far-fetched"], "Conspiracy Corner": ["far-fetched", "a theory", "evidence", "plausible", "absurd", "a hoax", "debunk", "suspicious", "cover-up", "tin-foil hat"], "Worst Jobs": ["unbearable", "degrading", "underpaid", "thankless", "soul-destroying", "mind-numbing", "a nightmare", "hazardous", "monotonous", "demoralising"], "One Rule for the World": ["enforce", "universal", "a law", "mandatory", "optional", "revolutionary", "practical", "utopian", "absurd", "implement"], "Movie Logic": ["unrealistic", "a clich\u00e9", "predictable", "a trope", "suspension of disbelief", "lazy writing", "overused", "formulaic", "ridiculous", "eye-rolling"], "Last Meal": ["indulgent", "a feast", "a delicacy", "mouth-watering", "comfort food", "a course", "exquisite", "savoury", "decadent", "divine"], "Rewrite History": ["a turning point", "a ripple effect", "consequences", "alter", "a timeline", "pivotal", "a butterfly effect", "irreversible", "reshape", "rewrite"], "Weather": ["forecast", "heatwave", "drizzle", "overcast", "mild", "chilly", "humid", "seasons", "climate", "temperature"], "Sleeping Habits": ["insomnia", "nap", "alarm", "oversleep", "restless", "deep sleep", "snore", "a lie-in", "drowsy", "bedtime routine"], "Role Models": ["admire", "inspire", "look up to", "set an example", "influence", "achievements", "humble", "dedicated", "determined", "a mentor"], "Stress Relief": ["unwind", "cope with", "overwhelmed", "take a break", "deep breathing", "meditation", "tension", "a distraction", "recharge", "peace of mind"], "First Impressions": ["approachable", "eye contact", "body language", "vibe", "handshake", "standoffish", "charisma", "judge", "perception", "appearance"], "Teamwork": ["collaborate", "delegate", "a deadline", "brainstorm", "contribute", "conflict", "compromise", "a shared goal", "strengths", "feedback"], "Daily Routines": ["habit", "productive", "consistency", "discipline", "mindful", "autopilot", "flexible", "ritual", "structure", "a morning person"], "Languages": ["bilingual", "fluent", "pronunciation", "grammar", "immersion", "pick up", "native speaker", "practice", "vocabulary", "accent"], "The Power of Habit": ["ingrained", "compulsive", "incremental", "transformative", "autopilot", "deliberate", "willpower", "cue-routine-reward", "self-discipline", "a trigger"], "Remote Work": ["hybrid model", "presenteeism", "digital nomad", "Zoom fatigue", "asynchronous", "accountability", "blurred boundaries", "co-working", "productivity metrics", "isolation"], "Food & Identity": ["comfort food", "culinary heritage", "foodie culture", "dietary choices", "ethical eating", "food shaming", "cultural appropriation", "nostalgia", "ritual", "provenance"], "Courage": ["vulnerability", "conviction", "moral courage", "whistleblowing", "resilience", "bravado", "integrity", "stand your ground", "backbone", "fearless"], "Time Management": ["prioritise", "procrastinate", "a to-do list", "delegate", "time-poor", "multitask", "deep work", "a bottleneck", "efficiency", "burnout"], "Generational Differences": ["baby boomer", "millennial", "Gen Z", "generation gap", "digital native", "entitled", "work ethic", "values", "stereotype", "bridge the gap"], "The Role of Luck": ["serendipity", "privilege", "a head start", "right place right time", "meritocracy", "opportunity", "a silver spoon", "self-made", "circumstance", "fate"], "City Design": ["pedestrian zone", "gentrification", "infrastructure", "liveable", "congestion", "urban sprawl", "mixed-use", "sustainable", "accessibility", "a community hub"], "Online Privacy": ["data breach", "encryption", "cookies", "surveillance", "consent", "opt out", "metadata", "digital footprint", "targeted ads", "cybersecurity"], "Forgiveness": ["resentment", "grudge", "reconciliation", "closure", "accountability", "remorse", "let go", "betrayal", "healing", "unconditional"], "The Paradox of Choice": ["decision fatigue", "opportunity cost", "satisficer vs maximiser", "analysis paralysis", "regret aversion", "cognitive overload", "default option", "paradox", "autonomy", "overwhelm"], "Post-Truth Politics": ["disinformation", "fact-checking", "media literacy", "soundbite", "spin", "populism", "narrative", "propaganda", "civic engagement", "accountability"], "The Value of Boredom": ["understimulation", "daydreaming", "creative incubation", "mindfulness", "tolerance", "introspection", "restlessness", "cognitive space", "flow state", "idle"], "Language & Power": ["discourse", "euphemism", "framing", "loaded language", "linguistic imperialism", "jargon", "code-switching", "rhetoric", "gatekeeping", "marginalize"], "Moral Luck": ["culpability", "intention vs outcome", "accountability", "negligence", "circumstantial", "determinism", "agency", "moral judgement", "consequence", "a grey area"], "Digital Immortality": ["posthumous", "data legacy", "AI avatar", "digital estate", "grief tech", "consent", "memorialisation", "virtual presence", "ethical AI", "exploitation"], "The Limits of Empathy": ["compassion fatigue", "selective empathy", "emotional labour", "desensitisation", "systemic thinking", "burnout", "moral imagination", "tribal", "overwhelm", "perspective-taking"], "Degrowth": ["GDP", "steady-state", "consumerism", "sustainability", "circular economy", "prosperity without growth", "decoupling", "resource depletion", "sufficiency", "ecological footprint"], "The Right to Disconnect": ["always-on culture", "digital boundaries", "labour rights", "presenteeism", "work-life integration", "burnout", "legislation", "flexibility", "employer obligation", "wellbeing"], "Collective Memory": ["historiography", "monument", "commemoration", "erasure", "revisionism", "oral history", "public narrative", "heritage", "selective memory", "cultural amnesia"]};
 var debateFollowup = {"Happiness": ["What makes you happy?", "Can money make you happy?", "Is happiness the same for everyone?"], "A Good Teacher": ["Who was your favourite teacher?", "Do you think teaching is easy?", "What's the worst thing a teacher can do?"], "Favourite Food": ["Do you like cooking?", "What food do you eat every day?", "Would you try something new?"], "Weekend Plans": ["Do you prefer busy or relaxed weekends?", "What did you do last weekend?", "Is the weekend long enough?"], "Pets": ["Do you have a pet?", "What pet would you like?", "Are pets good for children?"], "Learning": ["How do you learn best?", "What's hard to learn?", "Do you like studying?"], "Morning or Night": ["What time do you wake up?", "Do you like mornings?", "Are you more productive at night?"], "The Best Age": ["What age would you like to be again?", "Is getting older good or bad?", "What's the best thing about your age?"], "Staying Fit": ["Do you do exercise?", "Is it important to be fit?", "What sport do you like?"], "Dream Holiday": ["Where would you go?", "Do you prefer beach or city?", "Who would you travel with?"], "Home": ["Do you like your home?", "What would you change?", "Is location important?"], "Best Job": ["What's your dream job?", "Is money the most important thing?", "Would you work from home?"], "Phones": ["How often do you use your phone?", "Could you live without it?", "What app do you use most?"], "Good Manners": ["Are manners different in different countries?", "Do young people have good manners?", "What's the rudest thing someone can do?"], "Best Season": ["What do you do in summer?", "Do you like cold weather?", "Does the weather change your mood?"], "City or Village": ["Where do you live?", "Would you move?", "What's good about your town?"], "Good Friend": ["How many close friends do you have?", "Can you make friends online?", "Do friends change as you get older?"], "Best Transport": ["How do you get to work/school?", "Do you like driving?", "Should public transport be free?"], "Screen Time": ["How much screen time do you have?", "Is it bad for you?", "Do you check your phone before bed?"], "Clothes": ["Do you care about fashion?", "Do you shop online?", "How often do you buy clothes?"], "Talent": ["What are you good at?", "Can you learn a talent?", "What talent do you want?"], "Rules": ["Are rules important?", "What rule would you change?", "Do you always follow rules?"], "Birthday": ["How do you celebrate?", "Do you like surprises?", "What's the best birthday present?"], "Sleep": ["How many hours do you sleep?", "Do you sleep well?", "Do you take naps?"], "Money": ["Do you save money?", "What do you spend money on?", "Is money important?"], "Weather": ["What's the weather like today?", "Does weather affect you?", "What weather do you hate?"], "Healthy Eating": ["Do you eat healthy food?", "Do you cook at home?", "What's your favourite meal?"], "Being Polite": ["Are you always polite?", "When is it hard to be polite?", "Is being polite important?"], "Free Time": ["Do you have enough free time?", "What do you do when you're bored?", "Do you like being alone?"], "The Future": ["What will be different in 20 years?", "Are you optimistic about the future?", "What technology do you want?"], "Free Time": ["Do you think people waste too much free time on their phones?", "How would your life change if you had an extra day off each week?", "Is doing nothing a good way to spend free time?", "Do you think hobbies should be productive or just fun?", "How has the way people spend free time changed in the last 20 years?"], "Dream Job": ["Would you take a pay cut for a job you loved?", "Is it realistic to expect to enjoy your job every day?", "How important is the opinion of friends and family when choosing a career?", "Do you think people change their idea of a dream job as they get older?", "Is job security more important now than it was for your parents' generation?"], "City vs Countryside": ["Would you ever move somewhere completely different from where you grew up?", "Do you think remote work will make more people move to the countryside?", "What would you miss most if you moved from a city to a village?", "Is it selfish to want to live somewhere quiet while others struggle in crowded cities?", "Do you think small towns are friendlier than big cities?"], "Learning English": ["What's the most frustrating thing about learning a language?", "Do you think you'll ever stop learning English?", "Is it possible to learn a language well without visiting the country?", "How has technology changed the way we learn languages?", "Do you think speaking English gives people an unfair advantage?"], "Social Media": ["Could you live without social media for a month?", "Do you think social media has made people more or less honest?", "Should parents monitor their children's social media?", "Has social media changed what it means to be famous?", "Do you present a different version of yourself online?"], "Healthy Living": ["Do you think people are healthier or unhealthier than 50 years ago?", "Is it the government's job to keep people healthy?", "Why do people find it so hard to change unhealthy habits?", "Is mental health taken as seriously as physical health where you live?", "Would you rather live a short exciting life or a long boring one?"], "Travel": ["Is it better to travel to many places or return to the same place?", "Has a trip ever changed the way you think about something?", "Do you think budget airlines have made travel too easy?", "Is it possible to travel responsibly in today's world?", "What's more valuable \u2014 travelling alone or with other people?"], "Money": ["At what point does someone have 'enough' money?", "Do you think your generation handles money differently from your parents'?", "Should financial education be compulsory in schools?", "Is it OK to borrow money from friends?", "Does having more money actually make everyday life easier?"], "Friendship": ["Can a friendship survive a serious disagreement?", "Is it normal to have fewer friends as you get older?", "Do you think men and women approach friendship differently?", "Can you be close friends with a work colleague?", "How do you know when a friendship has run its course?"], "Technology": ["Are we too dependent on technology?", "What technology could you not live without?", "Do you think children should learn to code at school?", "Has technology made people lazier or more efficient?", "What's one piece of technology you wish hadn't been invented?"], "Education": ["Should homework be abolished?", "Do you think the education you received prepared you for real life?", "Is competition in schools healthy or harmful?", "Should all education be free?", "What would you change about the way you were taught?"], "Food Choices": ["Do you think people overthink what they eat?", "Should fast food carry health warnings like cigarettes?", "Is cooking a skill everyone should learn?", "How much does advertising influence what you eat?", "Would you eat lab-grown meat?"], "Home": ["Is owning a home still an important life goal?", "How much does your home affect your happiness?", "Would you rather have a big house in a boring area or a small flat in an exciting city?", "Do you think people spend too much money on their homes?", "What makes a good neighbour?"], "The Environment": ["Do you feel personally responsible for climate change?", "Should people who pollute more pay more?", "Is it hypocritical to care about the environment but still fly?", "Do you think your daily choices actually make a difference?", "Will the next generation judge us for how we treated the planet?"], "Success": ["Can you be successful without being ambitious?", "Do you think luck plays a bigger role than hard work?", "Is it possible to be successful and have a balanced life?", "How does social media change what people see as success?", "At what age do people usually feel successful?"], "Language Learning": ["Does learning a language change the way you think?", "Is there a point where you can say you've 'mastered' a language?", "Should companies pay for employees to learn languages?", "Is English killing smaller languages?", "How does your personality change when you speak another language?"], "The Future of Work": ["Will the idea of a 'career for life' disappear completely?", "Should companies be forced to offer remote work options?", "How do you stay motivated in a job that doesn't inspire you?", "Is the gig economy liberating or exploitative?", "What skills will be most valuable in ten years?"], "Sources of Stress": ["Is some stress actually good for us?", "Do you think older generations were less stressed, or just less open about it?", "Should mental health days be a legal right?", "How has always being connected changed our stress levels?", "What's the most underrated way to manage stress?"], "Healthy Habits": ["Is the wellness industry helping people or just making money?", "Do you think routine is essential for good health?", "Has the obsession with self-care gone too far?", "Why do we know what's healthy but still don't do it?", "Is therapy something everyone should try at least once?"], "Decision Making": ["Do you trust your gut or overthink everything?", "Have you ever made a decision you were sure about that turned out badly?", "Should big life decisions be made with your heart or your head?", "How much do other people's opinions influence your choices?", "Is regret useful or just a waste of energy?"], "Travel Experiences": ["Can travel be genuinely transformative, or is that a romanticised idea?", "Is there a difference between being a tourist and being a traveller?", "Should gap years be encouraged or are they a waste of time?", "How has Instagram changed the way we travel?", "Do you travel to escape your life or to find something new?"], "Work-Life Balance": ["Is perfect work-life balance a myth?", "Should employers be responsible for their staff's wellbeing?", "How do you switch off from work at the end of the day?", "Is ambition compatible with a relaxed lifestyle?", "Would you work fewer hours for less money?"], "Social Media's Impact": ["Should social media platforms be regulated like traditional media?", "Is it possible to use social media without it affecting your self-esteem?", "Has cancel culture made people more afraid to speak honestly?", "Do algorithms radicalise people?", "Would society be better off without social media?"], "What Makes Relationships Last": ["Is it possible to love someone and still grow apart?", "How important is it to share the same interests as your partner?", "Does living together before marriage make relationships stronger?", "Can a relationship survive infidelity?", "Is compromise a strength or a sign of settling?"], "Life Satisfaction": ["Do you think happiness is a choice?", "Is contentment the same as settling for less?", "How much does comparison with others affect your satisfaction?", "Can money buy happiness, or just comfort?", "What would you sacrifice for a more meaningful life?"], "Education Priorities": ["Are exams the best way to measure learning?", "Should schools teach children how to manage their emotions?", "Is the traditional university model still relevant?", "How should education prepare students for jobs that don't exist yet?", "Should creativity be valued as much as academic achievement?"], "Gender Equality": ["Has feminism achieved its goals, or is there still work to do?", "Should gender quotas be used in politics and business?", "How do gender roles affect men negatively?", "Is the pay gap a myth or a reality?", "Can true equality exist while cultural expectations remain different?"], "Mental Health Barriers": ["Why is there still a stigma around therapy?", "Should schools have mental health professionals on staff?", "Is social media making mental health worse for young people?", "How can workplaces better support employees' mental health?", "Should mental health be treated with the same urgency as physical health emergencies?"], "Future of Cities": ["Are megacities sustainable in the long term?", "Should car-free city centres become the norm?", "How can cities become more inclusive for all income levels?", "Is gentrification progress or displacement?", "What would your ideal city look like?"], "Beauty Standards": ["Are beauty standards becoming more diverse or just differently narrow?", "Should cosmetic procedures be regulated more strictly?", "How does the beauty industry profit from insecurity?", "Do men face as much pressure about appearance as women?", "Has body positivity become commercialised?"], "Shopping Habits": ["Is ethical consumption possible under capitalism?", "How has the shift to online shopping changed communities?", "Should companies be legally required to disclose their supply chains?", "Is planned obsolescence a form of fraud?", "Can consumer boycotts genuinely change corporate behaviour?"], "Parenting Styles": ["Is it possible to raise children without imposing your own values?", "How much of a child's success is down to parenting versus circumstance?", "Should parents be their children's friends or authority figures?", "Is helicopter parenting a response to a genuinely more dangerous world?", "At what point does parental involvement become interference?"], "Exploration": ["Is space exploration a vanity project while Earth's problems remain unsolved?", "Should scientific research be driven by curiosity or practical application?", "Who should own discoveries made in international waters or outer space?", "Is genetic research an ethical minefield or humanity's greatest hope?", "How should we decide what to explore when resources are limited?"], "Global Challenges": ["Is climate change an existential threat or a manageable risk?", "Can poverty be eliminated, or is it an inherent feature of capitalism?", "Is AI more likely to save humanity or endanger it?", "Should wealthy nations accept more responsibility for global crises?", "Are international institutions like the UN still fit for purpose?"], "The Housing Crisis": ["Is housing a human right or a market commodity?", "Should foreign investors be banned from buying residential property?", "Is the dream of home ownership realistic for younger generations?", "How has Airbnb changed the housing landscape in your city?", "Should governments build more or regulate more?"], "Healthcare Priorities": ["Should healthcare be entirely free, even if it means higher taxes?", "Is preventative care genuinely more cost-effective than treatment?", "How should societies handle the ethical dilemmas of limited medical resources?", "Is the pharmaceutical industry driven by profit or by purpose?", "Should people who make unhealthy lifestyle choices pay more for healthcare?"], "Criminal Justice": ["Does prison actually work?", "Should the focus of justice be on the victim, the criminal, or society?", "Is poverty an excuse for crime or an explanation?", "How should society reintegrate people who have served time?", "Is the death penalty ever justifiable?"], "Climate Action": ["Is individual action meaningful when systemic change is what's needed?", "Should fossil fuel companies be held legally accountable for climate damage?", "Is nuclear energy a necessary part of the solution?", "Can capitalism and sustainability coexist?", "What should happen to countries that don't meet their climate targets?"], "AI & Technology Risks": ["Should AI development be paused until regulation catches up?", "Who is responsible when an AI makes a harmful decision?", "Is the convenience of AI worth the loss of privacy?", "Will AI create more jobs than it destroys?", "Should AI-generated content be labelled as such by law?"], "Threats to Democracy": ["Is democracy the best system of government, or just the least bad?", "Can democracy survive in a post-truth world?", "Should voting be compulsory?", "How can democratic institutions rebuild public trust?", "Is populism a symptom of democratic failure or democratic expression?"], "Winners of Globalisation": ["Has globalisation reduced or increased inequality?", "Should countries prioritise local production over cheap imports?", "Is cultural globalisation enriching or eroding national identities?", "Can deglobalisation work, or is it too late?", "Who pays the real price for cheap goods in wealthy nations?"], "The Value of Art": ["Should governments fund art that most people don't understand?", "Is art that doesn't provoke still valuable?", "Can AI create art, or only imitate it?", "Should art be accessible to everyone, or is exclusivity part of its value?", "Has the market ruined art by turning it into an investment?"], "Ethics of Wealth": ["Is philanthropy a genuine solution or a way for the rich to avoid systemic change?", "Should inheritance be taxed more heavily?", "At what point does wealth accumulation become morally questionable?", "Is trickle-down economics a proven theory or a convenient myth?", "Can billionaires exist in a just society?"], "The Media": ["Is truly objective journalism possible?", "Should news be free, or does that devalue it?", "How should democracies protect press freedom without enabling misinformation?", "Has the decline of local news damaged communities?", "Should social media platforms be treated as publishers?"], "Cultural Preservation": ["Is it possible to preserve a culture without freezing it in time?", "Should minority languages be artificially sustained?", "Who has the right to define what counts as cultural heritage?", "Is cultural appropriation always harmful, or can it be a form of appreciation?", "How should societies balance tradition with progress?"], "Pets & Animals": ["Should people adopt pets rather than buy from breeders?", "Is it fair to keep animals in a flat?", "Do pets improve mental health?", "Should there be a test before someone can own a pet?", "Are some animals too exotic to be pets?"], "Gifts": ["Is it the thought that counts, or does the gift itself matter?", "Should adults stop exchanging gifts at Christmas?", "Is giving money as a gift lazy or practical?", "Have you ever received a gift you secretly hated?", "Is gift-giving becoming too commercialised?"], "TV & Streaming": ["Has binge-watching changed how we enjoy stories?", "Are there too many streaming platforms now?", "Should children's screen time be strictly limited?", "Is reality TV harmful or harmless entertainment?", "Will cinema survive the streaming revolution?"], "Cooking": ["Should cooking be taught in every school?", "Is home cooking becoming a lost art?", "Do men and women share cooking equally in your culture?", "Is it possible to eat well without cooking?", "Has social media made cooking more about looks than taste?"], "Neighbours": ["Should you always introduce yourself to new neighbours?", "How would you handle a noisy neighbour?", "Is community spirit dying in modern cities?", "Should neighbours help each other or keep their distance?", "Have you ever had a neighbour dispute?"], "Influencer Culture": ["Would you trust a product recommended by an influencer?", "Should influencers be regulated like advertisers?", "Is being an influencer a real job?", "How do influencers affect young people's self-image?", "Will influencer culture last, or is it a trend?"], "Sleep": ["Should companies allow naps during the workday?", "Is staying up late a sign of poor discipline or creativity?", "How has technology changed our sleep habits?", "Should schools start later to match teenagers' sleep patterns?", "Is 'I'll sleep when I'm dead' a dangerous attitude?"], "Trust in Society": ["How can governments rebuild trust after a scandal?", "Do you trust the media in your country?", "Is trust earned or given by default?", "Has social media made society more or less trusting?", "What happens to a society when trust collapses?"], "Creativity": ["Are creative people born or made?", "Does the education system kill creativity?", "Can AI be genuinely creative?", "Is creativity more important than technical skill?", "What's the most creative solution to a problem you've ever seen?"], "Addiction in Modern Life": ["Are we all addicted to our phones?", "Should social media apps carry health warnings?", "Is willpower enough to overcome addiction?", "Has society normalised unhealthy habits?", "Where's the line between a habit and an addiction?"], "Freedom of Speech": ["Should social media platforms censor content?", "Is there a difference between free speech and hate speech?", "Can comedy ever go too far?", "Should universities be spaces for all opinions, even extreme ones?", "Is political correctness protecting people or silencing debate?"], "The Death of Expertise": ["Should everyone's opinion carry equal weight?", "Why do people distrust vaccines despite scientific consensus?", "Has the internet made us smarter or more confused?", "Should experts communicate differently to rebuild trust?", "Is 'do your own research' empowering or dangerous?"], "The Attention Economy": ["Do you feel your attention is being stolen?", "Should tech companies be held responsible for addictive design?", "Can you be productive in a world of constant distraction?", "Is deep reading a dying skill?", "Would you pay for an ad-free, algorithm-free internet?"], "Meritocracy": ["Do you believe the 'American Dream' is still possible?", "Is inherited wealth fair?", "How much of your success is down to luck versus effort?", "Should there be a maximum income?", "Can equality of opportunity ever truly exist?"], "Surveillance Society": ["Would you accept total surveillance if it eliminated crime?", "Should employees be monitored while working from home?", "Is the 'I have nothing to hide' argument valid?", "How much personal data should companies be allowed to collect?", "Are smart speakers always listening?"], "Weather": ["Do you check the weather forecast every day?", "How does weather affect your plans?", "Which season suits your personality best?"], "Sleeping Habits": ["Are you a morning person or a night owl?", "What keeps you awake at night?", "Do you think napping is underrated?"], "Role Models": ["Did you have a role model growing up?", "Can celebrities be good role models?", "Is it dangerous to put people on a pedestal?"], "Stress Relief": ["What's the first thing you do when you feel stressed?", "Do you think stress can ever be positive?", "Is modern life more stressful than before?"], "First Impressions": ["Have you ever been wrong about a first impression?", "How long does it take to truly know someone?", "Do clothes really make the person?"], "Teamwork": ["What's the worst team experience you've had?", "Can introverts be good team leaders?", "Is teamwork always better than working alone?"], "Daily Routines": ["Is your routine different on weekends?", "Which habit has been hardest to build?", "Do routines make life boring or productive?"], "Languages": ["What's the hardest part of learning a new language?", "Should English remain the global lingua franca?", "Can you learn a language just from apps?"], "The Power of Habit": ["Which habit took you the longest to build?", "Can you break a habit by replacing it?", "Are we slaves to our habits?"], "Remote Work": ["Do you work better at home or in an office?", "Is hybrid working the ideal compromise?", "Will offices become obsolete?"], "Food & Identity": ["Is there a dish that defines your family?", "Can food be political?", "Does what you eat say something about who you are?"], "Courage": ["When was the last time you did something brave?", "Is courage innate or learned?", "Can you be brave and still feel afraid?"], "Time Management": ["What's your biggest time waster?", "Do you use any time management techniques?", "Is being busy the same as being productive?"], "Generational Differences": ["Do you feel more connected to your generation or your parents'?", "Is generational labelling helpful or harmful?", "What can different generations learn from each other?"], "The Role of Luck": ["Do you consider yourself lucky?", "Is there such a thing as making your own luck?", "How much does where you're born determine your future?"], "City Design": ["What would you change about the city you live in?", "Are cars the enemy of good urban design?", "Should cities be designed for people or for efficiency?"], "Online Privacy": ["Have you ever been affected by a data breach?", "Do you read privacy policies?", "Is convenience worth sacrificing privacy?"], "Forgiveness": ["Is there something you've never been able to forgive?", "Can you forgive without forgetting?", "Is forgiveness for the forgiver or the forgiven?"], "The Paradox of Choice": ["Do you find it hard to choose in restaurants?", "Has online shopping made choosing harder?", "Is a 'good enough' choice better than a perfect one?"], "Post-Truth Politics": ["How do you decide what news to trust?", "Is social media making us less informed?", "Can democracy function without shared facts?"], "The Value of Boredom": ["When were you last truly bored?", "Do you reach for your phone when you have nothing to do?", "Can boredom lead to creativity?"], "Language & Power": ["Has political correctness gone too far?", "Does speaking English give you an advantage?", "Can language be a tool of oppression?"], "Moral Luck": ["Should we punish people differently based on outcomes?", "Is intent more important than result?", "How do you judge someone who fails while trying to help?"], "Digital Immortality": ["Would you want an AI version of yourself after death?", "Who should control your online presence after you die?", "Is digital grieving healthy?"], "The Limits of Empathy": ["Can you have too much empathy?", "Is empathy biased?", "Should we focus more on systems than feelings?"], "Degrowth": ["Can we have prosperity without economic growth?", "Is consumerism the root of environmental damage?", "Would you accept a lower standard of living for the planet?"], "The Right to Disconnect": ["Do you check work emails after hours?", "Should bosses be able to contact you on weekends?", "Is the right to disconnect realistic in a global economy?"], "Collective Memory": ["Who decides what gets taught in history class?", "Should statues of controversial figures be removed?", "Is social media changing how we remember events?"], "Superpower Showdown": ["Would you use your superpower for good or for yourself?", "Which superpower would be the worst to have?", "If everyone had superpowers, would anyone be special?"], "Deserted Island": ["How long could you survive alone?", "What would you miss most about modern life?", "Would you enjoy the solitude or go crazy?"], "The Worst Flatmate": ["Have you ever had a terrible flatmate?", "What's the one thing you can't tolerate in a flatmate?", "Is living alone better than sharing?"], "Time Machine": ["Would you change anything if you went back?", "Is it better to visit the past or the future?", "What period in history would be the most dangerous?"], "Animals as Colleagues": ["Would animals make the office more productive?", "Which animal would be the worst boss?", "Should pets be allowed in offices?"], "Breakfast for Dinner": ["What's the best breakfast food?", "Is brunch just an excuse for a late breakfast?", "Do food rules even make sense?"], "Fictional Dinner Party": ["Which fictional character would be the worst dinner guest?", "Would heroes or villains be more entertaining?", "Could Sherlock Holmes and Homer Simpson get along?"], "The Worst Invention": ["Is there an invention you wish had never been created?", "Are some inventions only bad because of how we use them?", "What everyday invention do we take for granted?"], "Rename a Country": ["Which country has the coolest name?", "Should countries be allowed to rebrand?", "Do place names shape how we think about them?"], "Useless Skills": ["What's your most useless skill?", "Are useless skills actually good conversation starters?", "Would you rather have one amazing skill or ten random ones?"], "Zombie Apocalypse": ["Would you survive a zombie apocalypse?", "Who would be the worst person to be stuck with?", "Are zombie films preparing us for anything real?"], "School Subjects": ["What subject would you add to the curriculum?", "Is school preparing people for real life?", "What was the most useful thing you learned at school?"], "Food Crimes": ["Is there a food combination you love that others hate?", "Who decides what counts as a food crime?", "Are food traditions worth defending?"], "Celebrity Swap": ["Which celebrity's life looks the most stressful?", "Would fame be worth the loss of privacy?", "Is the celebrity lifestyle as glamorous as it seems?"], "Annoying Sounds": ["Are you sensitive to sounds?", "Why do some sounds bother us more than others?", "Should there be quiet zones in more public places?"], "Pet Peeves": ["Is your biggest pet peeve rational or irrational?", "Do pet peeves say something about your personality?", "Can you train yourself to stop being annoyed?"], "Secret Talents": ["What talent would make you the most popular at a party?", "Is it better to be a specialist or a jack of all trades?", "What skill would change your daily life the most?"], "Alien Encounter": ["Would you be excited or terrified to meet an alien?", "What would aliens think of social media?", "Should we be trying to contact alien life?"], "Dream House": ["Is your dream house realistic or fantasy?", "Does where you live affect your happiness?", "Would you rather have a huge house or the perfect location?"], "Swap One Sense": ["Which sense do you use the most without realising?", "Could you adapt to losing a sense?", "Do you think losing a sense would sharpen the others?"], "Unpopular Opinions": ["What's the most controversial thing you believe?", "Why are unpopular opinions so fun to debate?", "Is it OK to hold an opinion most people disagree with?"], "Bad Advice": ["What's the worst advice you've ever followed?", "Is well-meaning advice always helpful?", "Do people actually want advice or just validation?"], "Embarrassing Moments": ["How do you handle embarrassing situations?", "Do embarrassing moments make good stories later?", "Is it possible to live without ever being embarrassed?"], "Future Inventions": ["Which invention would you invest in?", "Are we too dependent on technology already?", "What problem does the world most need solved?"], "Conspiracy Corner": ["Why do people enjoy conspiracy theories?", "Is there a conspiracy theory that turned out to be true?", "Are conspiracy theories harmless fun or dangerous?"], "Worst Jobs": ["What makes a job unbearable?", "Is any job beneath anyone?", "Would more money make a terrible job acceptable?"], "One Rule for the World": ["Would your rule be enforceable?", "Could one simple rule really change the world?", "What rule would you break if someone else made it?"], "Movie Logic": ["Which movie clich\u00e9 do you secretly enjoy?", "Do movies shape our expectations of real life?", "What would a realistic movie actually look like?"], "Last Meal": ["Does your last meal choice say something about you?", "Is comfort food always the best choice?", "Would you cook it yourself or have a chef?"], "Rewrite History": ["Could changing one event fix everything?", "Is it dangerous to romanticise the past?", "If you changed history, would you still exist?"]};
 var followupPhrases = {"B1": ["I think...", "Maybe, but...", "I agree because...", "I don't agree because...", "What about you?"], "B2": ["Personally, I think ...", "I'm not entirely sure, but ...", "I see what you mean, but ...", "That might be true, however ...", "I'd have to disagree there."], "C1": ["I'd be inclined to say ...", "It's hard to say for certain, but ...", "I take your point, though I'd argue ...", "That's debatable \u2014 you could also say ...", "I'd challenge that assumption."], "C2": ["My instinct would be to say ...", "I wouldn't go so far as to claim ...", "With respect, I think that oversimplifies it.", "That's one way of looking at it, but ...", "I'd fundamentally question that premise."], "Fun": ["Personally, I think ...", "I'm not so sure about that ...", "That's fair, but ...", "OK but imagine this ...", "I'd have to disagree there."]};
+
+/* ── State ─────────────────────────────────────────────────────── */
+var LEVELS = ['B1','B2','C1','C2','Fun'];
+var levelColors = {'B1':'#FF6B6B','B2':'#16A88D','C1':'#2176FF','C2':'#9B72CF','Fun':'#FF9100'};
+var CUSTOM_KEY = 'jpe_quick_debates_custom_v1';
+
+var mode = 'debates';
+var currentFilter = 'all';
 var filtered = debates.slice();
 var idx = 0;
-var currentFilter = 'all';
 var pbLevel = 'B1';
-var colors = ['#2176FF','#1DD3B0','#FF6B6B','#9B72CF','#FFB347','#5DDEA0','#2176FF','#1DD3B0','#FF6B6B','#9B72CF','#FFB347'];
 
-function setMode(mode, btn) {
-  document.querySelectorAll('.mode-btn').forEach(function(b){b.classList.remove('on')});
-  btn.classList.add('on');
-  document.getElementById('debateView').className = mode === 'debates' ? 'debate-view' : 'debate-view hide';
-  document.getElementById('debateMain').className = mode === 'debates' ? 'debate-view' : 'debate-view hide';
-  document.getElementById('phraseBank').className = mode === 'phrases' ? 'phrase-bank show' : 'phrase-bank';
-  document.querySelector('.teacher-feedback').style.display = mode === 'phrases' ? 'none' : '';
-  if (mode === 'phrases') renderPB();
+function levelColor(lv){ return levelColors[lv] || '#2176FF'; }
+function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+/* ── Custom debates (localStorage) ─────────────────────────────── */
+function loadCustom(){
+  try { var raw = localStorage.getItem(CUSTOM_KEY); var a = raw ? JSON.parse(raw) : []; return Array.isArray(a) ? a : []; }
+  catch(e){ return []; }
+}
+function saveCustom(){
+  try { localStorage.setItem(CUSTOM_KEY, JSON.stringify(custom)); } catch(e){}
+}
+var custom = loadCustom();
+
+function flatBank(level){
+  var groups = phraseBank[level] || {};
+  var out = [];
+  Object.keys(groups).forEach(function(k){ out = out.concat(groups[k]); });
+  return out;
 }
 
-function setLevel(lvl, btn) {
-  document.querySelectorAll('.lvl-btn').forEach(function(b){b.classList.remove('on')});
-  btn.classList.add('on');
+/* ── Tabs ──────────────────────────────────────────────────────── */
+function setMode(m, btn){
+  mode = m;
+  document.querySelectorAll('.mode-btn').forEach(function(b){ b.classList.remove('on'); });
+  if (btn) btn.classList.add('on');
+  document.getElementById('debateView').className = m === 'debates' ? 'debate-view' : 'debate-view hide';
+  document.getElementById('debateMain').className = m === 'debates' ? 'debate-view' : 'debate-view hide';
+  document.getElementById('phraseBank').className = m === 'phrases' ? 'phrase-bank show' : 'phrase-bank';
+  document.getElementById('buildControls').className = m === 'build' ? 'build-view show' : 'build-view';
+  document.getElementById('buildMain').className = m === 'build' ? 'build-view show' : 'build-view';
+  if (m === 'phrases') renderPB();
+  if (m === 'build') renderBuild();
+}
+
+/* ── Level filter ──────────────────────────────────────────────── */
+function buildLevelToggle(){
+  var counts = {};
+  debates.forEach(function(d){ counts[d.level] = (counts[d.level]||0) + 1; });
+  var h = '<button class="lvl-btn' + (currentFilter==='all'?' on':'') + '" data-lv="all" onclick="setLevel(\'all\',this)">All (' + debates.length + ')</button>';
+  LEVELS.forEach(function(lv){
+    if (!counts[lv]) return;
+    h += '<button class="lvl-btn' + (currentFilter===lv?' on':'') + '" data-lv="' + lv + '" onclick="setLevel(\'' + lv + '\',this)">' + lv + ' (' + counts[lv] + ')</button>';
+  });
+  h += '<button class="lvl-btn' + (currentFilter==='mine'?' on':'') + '" data-lv="mine" onclick="setLevel(\'mine\',this)">Mine (' + custom.length + ')</button>';
+  document.getElementById('levelToggle').innerHTML = h;
+}
+
+function setLevel(lvl, btn){
+  document.querySelectorAll('.lvl-btn').forEach(function(b){ b.classList.remove('on'); });
+  if (btn) btn.classList.add('on');
   currentFilter = lvl;
   if (lvl === 'all') filtered = debates.slice();
-  else filtered = debates.filter(function(d){return d.level === lvl});
-  idx = 0; function populateDropdown() {
-  var sel = document.getElementById('debateSelect');
-  sel.innerHTML = '<option value="">Browse by topic...</option>';
-  filtered.forEach(function(d, i) {
-    var opt = document.createElement('option');
-    opt.value = i;
-    opt.textContent = d.title + ' (' + d.level + ')';
-    sel.appendChild(opt);
-  });
-}
-
-function selectDebate(val) {
-  if (val === '') return;
-  idx = parseInt(val);
+  else if (lvl === 'mine') filtered = custom.slice();
+  else filtered = debates.filter(function(d){ return d.level === lvl; });
+  idx = 0;
+  populateDropdown();
   render();
 }
 
-// Update render to sync dropdown
-var _origRender = render;
-render = function() {
-  _origRender();
+function populateDropdown(){
   var sel = document.getElementById('debateSelect');
-  if (sel) sel.value = idx;
-};
-
-// Rebuild dropdown when filter changes
-var _origSetLevel = setLevel;
-setLevel = function(lvl, btn) {
-  _origSetLevel(lvl, btn);
-  populateDropdown();
-};
-
-var _origShuffle = shuffleDebates;
-shuffleDebates = function() {
-  _origShuffle();
-  populateDropdown();
-};
-
-var _origReset = resetDebates;
-resetDebates = function() {
-  _origReset();
-  populateDropdown();
-};
-
-populateDropdown();
-render();
-}
-function shuffleDebates() { for (var i = filtered.length-1; i > 0; i--) {var j = Math.floor(Math.random()*(i+1)); var t = filtered[i]; filtered[i] = filtered[j]; filtered[j] = t;} idx = 0; function populateDropdown() {
-  var sel = document.getElementById('debateSelect');
-  sel.innerHTML = '<option value="">Browse by topic...</option>';
-  filtered.forEach(function(d, i) {
-    var opt = document.createElement('option');
-    opt.value = i;
-    opt.textContent = d.title + ' (' + d.level + ')';
-    sel.appendChild(opt);
+  var h = '<option value="">Browse by topic...</option>';
+  filtered.forEach(function(d, i){
+    h += '<option value="' + i + '">' + esc(d.title) + ' (' + esc(d.level) + ')</option>';
   });
+  sel.innerHTML = h;
+  sel.value = filtered.length ? String(idx) : '';
 }
 
-function selectDebate(val) {
+function selectDebate(val){
   if (val === '') return;
-  idx = parseInt(val);
+  idx = parseInt(val, 10);
   render();
 }
 
-// Update render to sync dropdown
-var _origRender = render;
-render = function() {
-  _origRender();
-  var sel = document.getElementById('debateSelect');
-  if (sel) sel.value = idx;
-};
-
-// Rebuild dropdown when filter changes
-var _origSetLevel = setLevel;
-setLevel = function(lvl, btn) {
-  _origSetLevel(lvl, btn);
-  populateDropdown();
-};
-
-var _origShuffle = shuffleDebates;
-shuffleDebates = function() {
-  _origShuffle();
-  populateDropdown();
-};
-
-var _origReset = resetDebates;
-resetDebates = function() {
-  _origReset();
-  populateDropdown();
-};
-
-populateDropdown();
-render(); }
-function resetDebates() { var b = document.querySelector('.lvl-btn.on'); var lvl = b ? b.textContent.split(' ')[0] : 'All'; if (lvl === 'All') filtered = debates.slice(); else filtered = debates.filter(function(d){return d.level === lvl}); idx = 0; function populateDropdown() {
-  var sel = document.getElementById('debateSelect');
-  sel.innerHTML = '<option value="">Browse by topic...</option>';
-  filtered.forEach(function(d, i) {
-    var opt = document.createElement('option');
-    opt.value = i;
-    opt.textContent = d.title + ' (' + d.level + ')';
-    sel.appendChild(opt);
-  });
-}
-
-function selectDebate(val) {
-  if (val === '') return;
-  idx = parseInt(val);
+function go(dir){
+  if (!filtered.length) return;
+  idx += dir;
+  if (idx < 0) idx = 0;
+  if (idx >= filtered.length) idx = filtered.length - 1;
   render();
 }
 
-// Update render to sync dropdown
-var _origRender = render;
-render = function() {
-  _origRender();
-  var sel = document.getElementById('debateSelect');
-  if (sel) sel.value = idx;
-};
-
-// Rebuild dropdown when filter changes
-var _origSetLevel = setLevel;
-setLevel = function(lvl, btn) {
-  _origSetLevel(lvl, btn);
-  populateDropdown();
-};
-
-var _origShuffle = shuffleDebates;
-shuffleDebates = function() {
-  _origShuffle();
-  populateDropdown();
-};
-
-var _origReset = resetDebates;
-resetDebates = function() {
-  _origReset();
-  populateDropdown();
-};
-
-populateDropdown();
-render(); }
-function randomDebate() { idx = Math.floor(Math.random() * filtered.length); function populateDropdown() {
-  var sel = document.getElementById('debateSelect');
-  sel.innerHTML = '<option value="">Browse by topic...</option>';
-  filtered.forEach(function(d, i) {
-    var opt = document.createElement('option');
-    opt.value = i;
-    opt.textContent = d.title + ' (' + d.level + ')';
-    sel.appendChild(opt);
+/* ── The debate card ───────────────────────────────────────────── */
+function cardHtml(d){
+  var h = '<div class="debate-phrases"><div class="debate-phrases-title">Useful phrases (' + esc(d.level) + ')</div>';
+  (d.phrases || []).forEach(function(p, i){
+    h += '<div class="phrase-item ' + (i % 2 === 0 ? 'blue' : 'black') + '" onclick="togglePhrase(this)">' + esc(p) + '</div>';
   });
-}
-
-function selectDebate(val) {
-  if (val === '') return;
-  idx = parseInt(val);
-  render();
-}
-
-// Update render to sync dropdown
-var _origRender = render;
-render = function() {
-  _origRender();
-  var sel = document.getElementById('debateSelect');
-  if (sel) sel.value = idx;
-};
-
-// Rebuild dropdown when filter changes
-var _origSetLevel = setLevel;
-setLevel = function(lvl, btn) {
-  _origSetLevel(lvl, btn);
-  populateDropdown();
-};
-
-var _origShuffle = shuffleDebates;
-shuffleDebates = function() {
-  _origShuffle();
-  populateDropdown();
-};
-
-var _origReset = resetDebates;
-resetDebates = function() {
-  _origReset();
-  populateDropdown();
-};
-
-populateDropdown();
-render(); }
-function go(dir) { idx += dir; if (idx < 0) idx = 0; if (idx >= filtered.length) idx = filtered.length - 1; function populateDropdown() {
-  var sel = document.getElementById('debateSelect');
-  sel.innerHTML = '<option value="">Browse by topic...</option>';
-  filtered.forEach(function(d, i) {
-    var opt = document.createElement('option');
-    opt.value = i;
-    opt.textContent = d.title + ' (' + d.level + ')';
-    sel.appendChild(opt);
-  });
-}
-
-function selectDebate(val) {
-  if (val === '') return;
-  idx = parseInt(val);
-  render();
-}
-
-// Update render to sync dropdown
-var _origRender = render;
-render = function() {
-  _origRender();
-  var sel = document.getElementById('debateSelect');
-  if (sel) sel.value = idx;
-};
-
-// Rebuild dropdown when filter changes
-var _origSetLevel = setLevel;
-setLevel = function(lvl, btn) {
-  _origSetLevel(lvl, btn);
-  populateDropdown();
-};
-
-var _origShuffle = shuffleDebates;
-shuffleDebates = function() {
-  _origShuffle();
-  populateDropdown();
-};
-
-var _origReset = resetDebates;
-resetDebates = function() {
-  _origReset();
-  populateDropdown();
-};
-
-populateDropdown();
-render(); }
-function toggleFollowup(btn) {
-  btn.classList.toggle("open");
-  var list = btn.nextElementSibling;
-  if (list) list.classList.toggle("show");
-  var fp = document.getElementById("followupPhrases");
-  if (!fp) return;
-  if (btn.classList.contains("open")) {
-    // Position the phrases to align with the followup section
-    var section = btn.closest(".followup-section");
-    var card = document.getElementById("debateCard");
-    if (section && card) {
-      var sectionTop = section.getBoundingClientRect().top - card.getBoundingClientRect().top;
-      fp.style.top = (sectionTop + 40) + "px";
-    }
-    var lvl = btn.dataset.level;
-    var fpList = followupPhrases[lvl] || [];
-    var ph = '<div class="followup-phrases-title">Discussion phrases</div>';
-    fpList.forEach(function(p) { ph += '<div class="fp-item" onclick="togglePhrase(this)">' + p + '</div>'; });
-    fp.innerHTML = ph;
-    fp.classList.add("show");
-  } else {
-    fp.classList.remove("show");
-    fp.innerHTML = "";
-  }
-}
-function toggleVocab(btn) {
-  btn.classList.toggle('open');
-  var list = btn.nextElementSibling;
-  if (list) list.classList.toggle('show');
-}
-function togglePhrase(el) { el.classList.toggle('crossed'); }
-function toggleBubble(el) { el.classList.toggle('highlighted'); }
-
-function render() {
-  var d = filtered[idx];
-  var lvlClass = d.level === 'C2' ? 'debate-level c2' : d.level === 'C1' ? 'debate-level c1' : d.level === 'Fun' ? 'debate-level fun' : d.level === 'B1' ? 'debate-level b1' : 'debate-level b2';
-  var h = '<div class="debate-phrases"><div class="debate-phrases-title">Useful phrases (' + d.level + ')</div>';
-  d.phrases.forEach(function(p, i) {
-    var cls = i % 2 === 0 ? 'phrase-item blue' : 'phrase-item black';
-    h += '<div class="' + cls + '" onclick="togglePhrase(this)">' + p + '</div>';
-  });
-  
   h += '</div><div class="debate-content">';
-  h += '<div class="debate-top"><span class="debate-title">' + d.title + '</span><span class="' + lvlClass + '">' + d.level + '</span></div>';
-  h += '<div class="debate-question">' + d.question + '</div><div class="bubbles">';
-  d.bubbles.forEach(function(b) { h += '<div class="bubble" onclick="toggleBubble(this)">' + b + '</div>'; });
-  h += '</div><div class="debate-task">' + d.task + '</div>';
-  // Vocab section
-  var vList = debateVocab[d.title] || [];
-  h += '<div class="vocab-section"><button class="vocab-toggle" onclick="toggleVocab(this)">Topic vocabulary <span class="v-arrow">&#9660;</span></button>';
-  h += '<div class="vocab-list"><ul>';
-  vList.forEach(function(v) { h += '<li>' + v + '</li>'; });
-  h += '</ul></div></div>';
-  // Follow-up discussion (below vocab)
-  var fList = debateFollowup[d.title] || [];
-  h += '<div class="followup-section"><button class="followup-toggle" data-level="' + d.level + '" onclick="toggleFollowup(this)">Follow-up discussion <span class="f-arrow">&#9660;</span></button>';
-  h += '<div class="followup-list"><ol>';
-  fList.forEach(function(q, i) { h += '<li class="followup-item"><span class="followup-num">' + (i+1) + '</span><span>' + q + '</span></li>'; });
-  h += '</ol></div></div>';
+  h += '<div class="debate-top"><span class="debate-title">' + esc(d.title) + '</span><span class="debate-level">' + esc(d.level) + '</span></div>';
+  h += '<div class="debate-question">' + esc(d.question) + '</div>';
+  h += '<div class="bubbles">';
+  (d.bubbles || []).forEach(function(b){ h += '<div class="bubble" onclick="toggleBubble(this)">' + esc(b) + '</div>'; });
   h += '</div>';
-  document.getElementById('debateCard').innerHTML = h;
-  // Set level colour on card (neutral grey when browsing "All"; the level's own colour when filtered to it)
-  var levelColors = {'B1':'#FF6B6B','B2':'#16A88D','C1':'#2176FF','C2':'#9B72CF','Fun':'#FF9100'};
-  var cardColor = currentFilter === 'all' ? '#7A7D8E' : (levelColors[d.level] || '#2176FF');
-  document.getElementById('debateCard').style.setProperty('--level-color', cardColor);
-  // Add floating followup phrases container
-  var fpDiv = document.createElement('div');
-  fpDiv.id = 'followupPhrases';
-  fpDiv.className = 'followup-phrases';
-  document.getElementById('debateCard').appendChild(fpDiv);
-  document.getElementById('counter').textContent = (idx+1) + ' / ' + filtered.length;
+  h += '<div class="debate-task">' + esc(d.task) + '</div>';
+  h += '<div class="debate-progress" id="cardProgress"></div>';
+  h += '</div>';
+  return h;
+}
+
+function togglePhrase(el){ el.classList.toggle('crossed'); updateProgress(); }
+function toggleBubble(el){ el.classList.toggle('highlighted'); updateProgress(); }
+
+function updateProgress(){
+  var card = document.getElementById('debateCard');
+  var out = document.getElementById('cardProgress');
+  if (!card || !out) return;
+  var bubbles = card.querySelectorAll('.bubble');
+  var phrases = card.querySelectorAll('.phrase-item');
+  var hi = card.querySelectorAll('.bubble.highlighted').length;
+  var used = card.querySelectorAll('.phrase-item.crossed').length;
+  out.innerHTML = '<span>' + hi + ' / ' + bubbles.length + ' prompts covered</span><span>' + used + ' / ' + phrases.length + ' phrases used</span>';
+}
+
+function render(){
+  var card = document.getElementById('debateCard');
+  var extras = document.getElementById('debateExtras');
+  var d = filtered[idx];
+  if (!d){
+    card.style.display = 'none';
+    extras.innerHTML = '<div class="build-empty" style="grid-column:1/-1"><h3>Nothing here yet</h3><p>You have not saved any debates of your own. Open the <b>Customise</b> tab to build one.</p></div>';
+    document.getElementById('counter').textContent = '0 / 0';
+    document.getElementById('prevBtn').disabled = true;
+    document.getElementById('nextBtn').disabled = true;
+    return;
+  }
+  card.style.display = '';
+  card.className = 'debate-card';
+  card.style.setProperty('--level-color', levelColor(d.level));
+  card.innerHTML = cardHtml(d);
+  updateProgress();
+  renderExtras(d);
+  document.getElementById('counter').textContent = (idx + 1) + ' / ' + filtered.length;
   document.getElementById('prevBtn').disabled = idx === 0;
   document.getElementById('nextBtn').disabled = idx >= filtered.length - 1;
+  var sel = document.getElementById('debateSelect');
+  if (sel) sel.value = String(idx);
 }
 
-function downloadDebatePng() {
-  var btn = document.getElementById('downloadPngBtn');
+/* ── Topic vocabulary + follow-up, below the card ──────────────── */
+function renderExtras(d){
+  var vList = d.vocab || debateVocab[d.title] || [];
+  var fList = d.followup || debateFollowup[d.title] || [];
+  var fpList = followupPhrases[d.level] || [];
+  var h = '';
+
+  h += '<div class="extra-panel" style="--level-color:' + levelColor(d.level) + '">';
+  h += '<button class="extra-toggle" onclick="toggleExtra(this)">Topic vocabulary <span class="x-arrow">&#9660;</span></button>';
+  h += '<div class="extra-body">';
+  if (vList.length){
+    h += '<ul class="vocab-chips">';
+    vList.forEach(function(v){ h += '<li>' + esc(v) + '</li>'; });
+    h += '</ul>';
+  } else {
+    h += '<div class="extra-empty">No topic vocabulary for this debate yet.</div>';
+  }
+  h += '</div></div>';
+
+  h += '<div class="extra-panel" style="--level-color:' + levelColor(d.level) + '">';
+  h += '<button class="extra-toggle" onclick="toggleExtra(this)">Follow-up discussion <span class="x-arrow">&#9660;</span></button>';
+  h += '<div class="extra-body">';
+  if (fList.length){
+    h += '<ol class="followup-list">';
+    fList.forEach(function(q, i){ h += '<li class="followup-item"><span class="followup-num">' + (i+1) + '</span><span>' + esc(q) + '</span></li>'; });
+    h += '</ol>';
+  } else {
+    h += '<div class="extra-empty">No follow-up questions for this debate yet.</div>';
+  }
+  if (fpList.length){
+    h += '<div class="extra-sub">Discussion phrases</div><div class="fp-row">';
+    fpList.forEach(function(p){ h += '<span class="fp-item" onclick="this.classList.toggle(\'crossed\')">' + esc(p) + '</span>'; });
+    h += '</div>';
+  }
+  h += '</div></div>';
+
+  document.getElementById('debateExtras').innerHTML = h;
+}
+
+function toggleExtra(btn){
+  btn.classList.toggle('open');
+  var body = btn.nextElementSibling;
+  if (body) body.classList.toggle('show');
+}
+
+/* ── Phrase bank tab ───────────────────────────────────────────── */
+function setPBLevel(lvl, btn){
+  pbLevel = lvl;
+  document.querySelectorAll('.pb-lvl').forEach(function(b){ b.classList.remove('on'); });
+  btn.classList.add('on');
+  renderPB();
+}
+
+function renderPB(){
+  var data = phraseBank[pbLevel] || {};
+  var col = levelColor(pbLevel);
+  var grid = document.getElementById('pbGrid');
+  grid.style.setProperty('--pb-color', col);
+  var h = '';
+  Object.keys(data).forEach(function(cat){
+    h += '<div class="pb-category">';
+    h += '<div class="pb-cat-title"><span class="dot" style="background:' + col + '"></span>' + esc(cat) + '</div>';
+    h += '<div class="pb-chips">';
+    data[cat].forEach(function(p){ h += '<span class="pb-chip" onclick="this.classList.toggle(\'used\')">' + esc(p) + '</span>'; });
+    h += '</div></div>';
+  });
+  grid.innerHTML = h;
+}
+
+/* ── Customise tab ─────────────────────────────────────────────────
+   The card here is the same markup as the one above, with the text
+   made editable and a delete control on each prompt and phrase. What
+   you see is what prints, so there is no second layout to keep in
+   sync. Edits are harvested out of the DOM and autosaved; the model is
+   never written back into the fields while you are typing, which would
+   move the caret. */
+var MAX_BUBBLES = 5;
+var buildId = null;
+var saveTimer = null;
+
+function newId(){ return 'c' + Date.now().toString(36) + Math.floor(Math.random()*1e4).toString(36); }
+
+function blankDebate(level){
+  return {
+    id: newId(), custom: true, level: level,
+    title: 'New debate', question: 'Type the debate question here.',
+    task: 'Type the task instruction here.',
+    bubbles: ['option one','option two','option three'],
+    phrases: flatBank(level).slice(),
+    vocab: [], followup: []
+  };
+}
+
+function currentBuild(){
+  for (var i = 0; i < custom.length; i++) if (custom[i].id === buildId) return custom[i];
+  return null;
+}
+
+function buildNew(){
+  stash();
+  var lvl = document.getElementById('buildLevel').value || 'B1';
+  var d = blankDebate(lvl);
+  custom.unshift(d);
+  buildId = d.id;
+  saveCustom();
+  buildLevelToggle();
+  renderBuild();
+  flash('New debate');
+}
+
+function buildFromPreset(val){
+  var sel = document.getElementById('presetSelect');
+  if (val === '') return;
+  stash();
+  var src = debates[parseInt(val, 10)];
+  sel.value = '';
+  if (!src) return;
+  var d = {
+    id: newId(), custom: true, level: src.level,
+    title: src.title, question: src.question, task: src.task,
+    bubbles: (src.bubbles || []).slice(),
+    phrases: (src.phrases || []).slice(),
+    vocab: (debateVocab[src.title] || []).slice(),
+    followup: (debateFollowup[src.title] || []).slice()
+  };
+  custom.unshift(d);
+  buildId = d.id;
+  saveCustom();
+  buildLevelToggle();
+  renderBuild();
+  flash('Copied "' + src.title + '"');
+}
+
+/* Flush whatever is on screen before the card is swapped out from under
+   it - the debounced autosave may still be pending. */
+function stash(){
+  clearTimeout(saveTimer);
+  harvest();
+  saveCustom();
+}
+
+function buildOpen(id){
+  stash();
+  buildId = id;
+  renderBuild();
+}
+
+function buildDelete(id, ev){
+  if (ev) ev.stopPropagation();
+  var d = null;
+  for (var i = 0; i < custom.length; i++) if (custom[i].id === id) d = custom[i];
+  if (!d) return;
+  if (!window.confirm('Delete "' + d.title + '"? This cannot be undone.')) return;
+  custom = custom.filter(function(x){ return x.id !== id; });
+  if (buildId === id) buildId = custom.length ? custom[0].id : null;
+  saveCustom();
+  buildLevelToggle();
+  if (currentFilter === 'mine'){ setLevel('mine', document.querySelector('.lvl-btn[data-lv="mine"]')); }
+  renderBuild();
+  flash('Deleted');
+}
+
+/* Level change swaps the phrase bank only when the phrases are still
+   the level's untouched defaults, so a teacher's own wording survives. */
+function buildSetLevel(lvl){
+  var d = currentBuild();
+  if (!d){ return; }
+  clearTimeout(saveTimer);
+  harvest();
+  var oldDefaults = flatBank(d.level);
+  var untouched = d.phrases.length === oldDefaults.length && d.phrases.every(function(p, i){ return p === oldDefaults[i]; });
+  d.level = lvl;
+  if (untouched){ d.phrases = flatBank(lvl).slice(); flash('Switched to ' + lvl + ' - phrases swapped'); }
+  else { flash('Switched to ' + lvl + ' - your phrases kept'); }
+  saveCustom();
+  buildLevelToggle();
+  renderBuild();
+}
+
+function renderBuild(){
+  var list = document.getElementById('buildList');
+  var stage = document.getElementById('buildStage');
+
+  var lh = '<span class="bl-head">Your debates</span>';
+  if (!custom.length){
+    lh += '<span class="bl-empty">nothing saved yet</span>';
+  } else {
+    custom.forEach(function(d){
+      lh += '<button class="bl-item' + (d.id === buildId ? ' on' : '') + '" style="--bl:' + levelColor(d.level) + '" onclick="buildOpen(\'' + d.id + '\')">';
+      lh += '<span class="bl-lvl">' + esc(d.level) + '</span>';
+      lh += '<span class="bl-name">' + esc(d.title) + '</span>';
+      lh += '<span class="bl-del" onclick="buildDelete(\'' + d.id + '\',event)" title="Delete">&#10005;</span>';
+      lh += '</button>';
+    });
+  }
+  list.innerHTML = lh;
+
+  var d = currentBuild();
+  if (!d){
+    stage.innerHTML = '<div class="build-empty"><h3>Build your own debate</h3><p>Start from scratch with <b>+ New debate</b>, or copy one of the ' + debates.length + ' presets and rewrite it. Everything you save stays in this browser and shows up under <b>Mine</b> on the Debates tab.</p></div>';
+    document.getElementById('buildPngBtn').disabled = true;
+    return;
+  }
+  document.getElementById('buildPngBtn').disabled = false;
+  document.getElementById('buildLevel').value = d.level;
+
+  var h = '<div class="debate-card edit" id="buildCard" style="--level-color:' + levelColor(d.level) + '">';
+  h += '<div class="debate-phrases"><div class="debate-phrases-title">Useful phrases (' + esc(d.level) + ')</div>';
+  d.phrases.forEach(function(p, i){
+    h += '<div class="phrase-item ' + (i % 2 === 0 ? 'blue' : 'black') + '">';
+    h += '<span class="pi-txt" contenteditable="true" data-phrase="' + i + '" oninput="markDirty()">' + esc(p) + '</span>';
+    h += '<button class="pi-del" onclick="removePhrase(' + i + ')" title="Remove">&#10005;</button>';
+    h += '</div>';
+  });
+  h += '<button class="add-phrase" onclick="addPhrase()">+ add a phrase</button>';
+  h += '</div>';
+
+  h += '<div class="debate-content">';
+  h += '<div class="debate-top"><span class="debate-title" contenteditable="true" data-field="title" oninput="markDirty()">' + esc(d.title) + '</span><span class="debate-level">' + esc(d.level) + '</span></div>';
+  h += '<div class="debate-question" contenteditable="true" data-field="question" oninput="markDirty()">' + esc(d.question) + '</div>';
+  h += '<div class="bubbles">';
+  d.bubbles.forEach(function(b, i){
+    h += '<div class="bubble"><span contenteditable="true" data-bubble="' + i + '" oninput="markDirty()">' + esc(b) + '</span>';
+    h += '<button class="rm" onclick="removeBubble(' + i + ')" title="Remove prompt">&#10005;</button></div>';
+  });
+  if (d.bubbles.length < MAX_BUBBLES) h += '<button class="add-bubble" onclick="addBubble()">+ prompt</button>';
+  h += '</div>';
+  h += '<div class="debate-task" contenteditable="true" data-field="task" oninput="markDirty()">' + esc(d.task) + '</div>';
+  h += '</div></div>';
+
+  h += '<div class="build-hint">Click any text on the card to rewrite it. Hover a prompt or a phrase for its remove button. Five prompts is the maximum.</div>';
+
+  h += '<div class="build-fields">';
+  h += '<div class="field-card"><div class="field-label">Topic vocabulary</div><div class="field-hint">One word or phrase per line. Shows under the card.</div>';
+  h += '<textarea class="field-area" id="fieldVocab" oninput="markDirty()" placeholder="happy&#10;grateful&#10;cheerful">' + esc((d.vocab || []).join('\n')) + '</textarea></div>';
+  h += '<div class="field-card"><div class="field-label">Follow-up discussion</div><div class="field-hint">One question per line. Shows under the card.</div>';
+  h += '<textarea class="field-area" id="fieldFollowup" oninput="markDirty()" placeholder="What makes you happy?&#10;Can money buy happiness?">' + esc((d.followup || []).join('\n')) + '</textarea></div>';
+  h += '</div>';
+
+  stage.innerHTML = h;
+}
+
+/* Read every editable field back into the model. Never write the model
+   into the DOM from here - the DOM is the source of truth while the
+   card is open. */
+function harvest(){
+  var d = currentBuild();
+  var card = document.getElementById('buildCard');
+  if (!d || !card) return;
+  var t = card.querySelector('[data-field="title"]');
+  var q = card.querySelector('[data-field="question"]');
+  var k = card.querySelector('[data-field="task"]');
+  if (t) d.title = t.textContent.trim() || 'Untitled';
+  if (q) d.question = q.textContent.trim();
+  if (k) d.task = k.textContent.trim();
+  d.bubbles = Array.prototype.map.call(card.querySelectorAll('[data-bubble]'), function(el){ return el.textContent.trim(); });
+  d.phrases = Array.prototype.map.call(card.querySelectorAll('[data-phrase]'), function(el){ return el.textContent.trim(); });
+  var v = document.getElementById('fieldVocab');
+  var f = document.getElementById('fieldFollowup');
+  if (v) d.vocab = v.value.split('\n').map(function(s){ return s.trim(); }).filter(Boolean);
+  if (f) d.followup = f.value.split('\n').map(function(s){ return s.trim(); }).filter(Boolean);
+}
+
+function markDirty(){
+  flash('Saving...');
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(function(){
+    harvest();
+    saveCustom();
+    syncListTitle();
+    buildLevelToggle();
+    flash('Saved');
+  }, 400);
+}
+
+function syncListTitle(){
+  var d = currentBuild();
+  if (!d) return;
+  var item = document.querySelector('.bl-item.on .bl-name');
+  if (item) item.textContent = d.title;
+}
+
+function flash(msg){
+  var el = document.getElementById('buildStatus');
+  if (el) el.textContent = msg;
+}
+
+function addBubble(){
+  var d = currentBuild();
+  if (!d || d.bubbles.length >= MAX_BUBBLES) return;
+  clearTimeout(saveTimer);
+  harvest();
+  d.bubbles.push('new prompt');
+  saveCustom();
+  renderBuild();
+  focusLast('[data-bubble]');
+}
+
+function removeBubble(i){
+  var d = currentBuild();
+  if (!d) return;
+  clearTimeout(saveTimer);
+  harvest();
+  d.bubbles.splice(i, 1);
+  saveCustom();
+  renderBuild();
+}
+
+function addPhrase(){
+  var d = currentBuild();
+  if (!d) return;
+  clearTimeout(saveTimer);
+  harvest();
+  d.phrases.push('new phrase');
+  saveCustom();
+  renderBuild();
+  focusLast('[data-phrase]');
+}
+
+function removePhrase(i){
+  var d = currentBuild();
+  if (!d) return;
+  clearTimeout(saveTimer);
+  harvest();
+  d.phrases.splice(i, 1);
+  saveCustom();
+  renderBuild();
+}
+
+/* New prompts and phrases open focused with the placeholder selected,
+   so you can type straight over it. */
+function focusLast(sel){
+  var all = document.querySelectorAll('#buildCard ' + sel);
+  var el = all[all.length - 1];
+  if (!el) return;
+  el.focus();
+  var r = document.createRange();
+  r.selectNodeContents(el);
+  var s = window.getSelection();
+  s.removeAllRanges();
+  s.addRange(r);
+}
+
+function populatePresets(){
+  var sel = document.getElementById('presetSelect');
+  var h = '<option value="">Start from a preset...</option>';
+  LEVELS.forEach(function(lv){
+    var any = debates.some(function(d){ return d.level === lv; });
+    if (!any) return;
+    h += '<optgroup label="' + lv + '">';
+    debates.forEach(function(d, i){ if (d.level === lv) h += '<option value="' + i + '">' + esc(d.title) + '</option>'; });
+    h += '</optgroup>';
+  });
+  sel.innerHTML = h;
+}
+
+/* ── PNG export ────────────────────────────────────────────────── */
+function downloadCardPng(cardId){
+  var btn = mode === 'build' ? document.getElementById('buildPngBtn') : document.getElementById('downloadPngBtn');
   var origHtml = btn.innerHTML;
   btn.disabled = true;
   btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>';
 
-  if (typeof html2canvas === 'undefined') {
+  if (typeof html2canvas === 'undefined'){
     var s = document.createElement('script');
     s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
     s.onload = function(){ doCapture(); };
@@ -655,232 +894,168 @@ function downloadDebatePng() {
     doCapture();
   }
 
-  function doCapture() {
-    var card = document.getElementById('debateCard');
-    var vocab = card.querySelector('.vocab-section');
-    var followup = card.querySelector('.followup-section');
-    var followupPhrasesEl = document.getElementById('followupPhrases');
-    var origGrid = card.style.gridTemplateColumns;
+  function doCapture(){
+    var card = document.getElementById(cardId);
+    if (!card){ restore(); return; }
+    // Always capture the wide two-column frame, whatever the viewport is
+    // doing, and drop the editing chrome so the export is the clean card.
     var origWidth = card.style.width;
-    var origVocabDisplay = vocab ? vocab.style.display : '';
-    var origFollowupDisplay = followup ? followup.style.display : '';
-    var origFpDisplay = followupPhrasesEl ? followupPhrasesEl.style.display : '';
+    var origGrid = card.style.gridTemplateColumns;
+    var origRatio = card.style.aspectRatio;
+    var chrome = card.querySelectorAll('.rm,.add-bubble,.add-phrase,.pi-del');
+    card.style.width = '1040px';
+    card.style.gridTemplateColumns = '30% 1fr';
+    card.style.aspectRatio = '5/3';
+    chrome.forEach(function(el){ el.style.display = 'none'; });
 
-    // Always render the wide (desktop) two-column layout and drop vocab/follow-up, regardless of current viewport/toggle state.
-    // The card itself must be widened too - the grid override alone is powerless while a narrow mobile viewport still caps the container.
-    card.style.width = '896px';
-    card.style.gridTemplateColumns = '280px 1fr';
-    if (vocab) vocab.style.display = 'none';
-    if (followup) followup.style.display = 'none';
-    if (followupPhrasesEl) followupPhrasesEl.style.display = 'none';
-
-    function restoreCardState() {
+    function restoreCard(){
       card.style.width = origWidth;
       card.style.gridTemplateColumns = origGrid;
-      if (vocab) vocab.style.display = origVocabDisplay;
-      if (followup) followup.style.display = origFollowupDisplay;
-      if (followupPhrasesEl) followupPhrasesEl.style.display = origFpDisplay;
+      card.style.aspectRatio = origRatio;
+      chrome.forEach(function(el){ el.style.display = ''; });
     }
 
-    html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function(canvas) {
-      restoreCardState();
-      var d = filtered[idx];
+    html2canvas(card, {scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false}).then(function(canvas){
+      restoreCard();
+      var d = cardId === 'buildCard' ? currentBuild() : filtered[idx];
       var link = document.createElement('a');
       link.download = (d && d.title ? d.title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') : 'debate') + '.png';
       link.href = canvas.toDataURL('image/png');
       link.click();
       restore();
-    }).catch(function(){ restoreCardState(); restore(); });
+    }).catch(function(){ restoreCard(); restore(); });
   }
-  function restore() {
+  function restore(){
     btn.innerHTML = origHtml;
     btn.disabled = false;
   }
 }
 
-function setPBLevel(lvl, btn) {
-  pbLevel = lvl;
-  document.querySelectorAll('.pb-lvl').forEach(function(b){b.classList.remove('on')});
-  btn.classList.add('on');
-  renderPB();
-}
-
-function renderPB() {
-  var data = phraseBank[pbLevel];
-  var cats = Object.keys(data);
-  var levelColors = {'B1':'#FF6B6B','B2':'#16A88D','C1':'#2176FF','C2':'#9B72CF'};
-  var col = levelColors[pbLevel] || '#2176FF';
-  document.getElementById('pbGrid').style.setProperty('--pb-color', col);
-  var h = '';
-  cats.forEach(function(cat, ci) {
-    h += '<div class="pb-category">';
-    h += '<div class="pb-cat-title"><span class="dot" style="background:' + col + '"></span>' + cat + '</div>';
-    h += '<div class="pb-chips">';
-    data[cat].forEach(function(p) { h += '<span class="pb-chip" onclick="this.classList.toggle(\'used\')">' + p + '</span>'; });
-    h += '</div></div>';
-  });
-  document.getElementById('pbGrid').innerHTML = h;
-}
-
-// Timer -- one button: idle shows the duration as m:ss + edit pencil (type any m:ss, e.g. 1:30), click
-// starts; click again pauses/resumes; when it finishes, click resets back to idle. Progress bar sits
-// above the button. Colour is a state signal, not decoration: neutral when idle, green while running,
-// orange while paused, coral in the last 10s / when done.
+/* ── Timer ─────────────────────────────────────────────────────────
+   One button: idle shows the duration as m:ss + edit pencil (type any
+   m:ss, e.g. 1:30), click starts; click again pauses/resumes; when it
+   finishes, click resets back to idle. Colour is a state signal, not
+   decoration: neutral when idle, green while running, orange while
+   paused, coral in the last 10s / when done. */
 var timerInterval = null, timerSeconds = 0, timerTotal = 0, timerRunning = false, timerPaused = false;
 var timerDefaultSeconds = 180, cancelingDurationEdit = false;
 
 function formatTime(totalSeconds){
-  var m=Math.floor(totalSeconds/60), s=totalSeconds%60;
-  return m+':'+(s<10?'0':'')+s;
+  var m = Math.floor(totalSeconds/60), s = totalSeconds%60;
+  return m + ':' + (s<10?'0':'') + s;
 }
 function parseTime(str){
-  var parts=String(str).trim().split(':');
+  var parts = String(str).trim().split(':');
   var m, s;
-  if(parts.length>=2){ m=parseInt(parts[0],10); s=parseInt(parts[1],10); }
-  else { m=parseInt(parts[0],10); s=0; }
-  if(isNaN(m)) m=0;
-  if(isNaN(s)||s<0||s>59) s=0;
-  var total=m*60+s;
-  if(!total || total<1) return null;
-  return Math.min(total,5999);
+  if (parts.length >= 2){ m = parseInt(parts[0],10); s = parseInt(parts[1],10); }
+  else { m = parseInt(parts[0],10); s = 0; }
+  if (isNaN(m)) m = 0;
+  if (isNaN(s) || s < 0 || s > 59) s = 0;
+  var total = m*60 + s;
+  if (!total || total < 1) return null;
+  return Math.min(total, 5999);
 }
 function selectDuration(secs){
-  clearInterval(timerInterval); timerInterval=null;
-  timerRunning=false; timerPaused=false;
-  timerTotal=secs; timerSeconds=secs;
-  document.getElementById('timerProgress').style.width='0%';
-  document.getElementById('timerProgress').className='timer-progress-fill';
+  clearInterval(timerInterval); timerInterval = null;
+  timerRunning = false; timerPaused = false;
+  timerTotal = secs; timerSeconds = secs;
+  document.getElementById('timerProgress').style.width = '0%';
+  document.getElementById('timerProgress').className = 'timer-progress-fill';
   updateTimerBtn();
 }
 function editDuration(){
-  clearInterval(timerInterval); timerInterval=null; timerRunning=false; timerPaused=false;
-  var input=document.getElementById('timerDurationInput');
-  input.value=formatTime(timerDefaultSeconds);
-  document.getElementById('timerBtn').style.display='none';
-  document.getElementById('timerEditBtn').style.display='none';
-  document.getElementById('timerDurationEdit').style.display='inline-flex';
+  clearInterval(timerInterval); timerInterval = null; timerRunning = false; timerPaused = false;
+  var input = document.getElementById('timerDurationInput');
+  input.value = formatTime(timerDefaultSeconds);
+  document.getElementById('timerBtn').style.display = 'none';
+  document.getElementById('timerEditBtn').style.display = 'none';
+  document.getElementById('timerDurationEdit').style.display = 'inline-flex';
   input.focus();
   input.select();
 }
 function commitDuration(){
-  if(cancelingDurationEdit){ cancelingDurationEdit=false; return; }
-  var parsed=parseTime(document.getElementById('timerDurationInput').value);
-  if(parsed) timerDefaultSeconds=parsed;
-  document.getElementById('timerDurationEdit').style.display='none';
-  document.getElementById('timerBtn').style.display='inline-flex';
+  if (cancelingDurationEdit){ cancelingDurationEdit = false; return; }
+  var parsed = parseTime(document.getElementById('timerDurationInput').value);
+  if (parsed) timerDefaultSeconds = parsed;
+  document.getElementById('timerDurationEdit').style.display = 'none';
+  document.getElementById('timerBtn').style.display = 'inline-flex';
   selectDuration(timerDefaultSeconds);
 }
 function cancelEditDuration(){
-  cancelingDurationEdit=true;
-  document.getElementById('timerDurationEdit').style.display='none';
-  document.getElementById('timerBtn').style.display='inline-flex';
+  cancelingDurationEdit = true;
+  document.getElementById('timerDurationEdit').style.display = 'none';
+  document.getElementById('timerBtn').style.display = 'inline-flex';
   updateTimerBtn();
 }
 function handleTimerClick(){
-  if(!timerRunning && !timerPaused && timerSeconds<=0 && timerTotal>0){ selectDuration(timerDefaultSeconds); return; }
+  if (!timerRunning && !timerPaused && timerSeconds <= 0 && timerTotal > 0){ selectDuration(timerDefaultSeconds); return; }
   toggleTimer();
 }
 function toggleTimer(){
-  if(!timerTotal) return;
-  if(!timerRunning&&!timerPaused){ timerRunning=true; runTimerTick(); }
-  else if(timerRunning){ clearInterval(timerInterval); timerInterval=null; timerRunning=false; timerPaused=true; }
-  else{ timerPaused=false; timerRunning=true; runTimerTick(); }
+  if (!timerTotal) return;
+  if (!timerRunning && !timerPaused){ timerRunning = true; runTimerTick(); }
+  else if (timerRunning){ clearInterval(timerInterval); timerInterval = null; timerRunning = false; timerPaused = true; }
+  else { timerPaused = false; timerRunning = true; runTimerTick(); }
   updateTimerBtn();
 }
 function runTimerTick(){
-  var prog=document.getElementById('timerProgress');
-  timerInterval=setInterval(function(){
+  var prog = document.getElementById('timerProgress');
+  timerInterval = setInterval(function(){
     timerSeconds--;
-    var pct=((timerTotal-timerSeconds)/timerTotal)*100;
-    prog.style.width=pct+'%';
-    if(timerSeconds<=10&&timerSeconds>0){ prog.className='timer-progress-fill warn'; }
-    if(timerSeconds<=0){
-      clearInterval(timerInterval); timerInterval=null; timerRunning=false;
-      prog.style.width='100%'; prog.className='timer-progress-fill warn';
+    var pct = ((timerTotal - timerSeconds)/timerTotal)*100;
+    prog.style.width = pct + '%';
+    if (timerSeconds <= 10 && timerSeconds > 0){ prog.className = 'timer-progress-fill warn'; }
+    if (timerSeconds <= 0){
+      clearInterval(timerInterval); timerInterval = null; timerRunning = false;
+      prog.style.width = '100%'; prog.className = 'timer-progress-fill warn';
       setTimeout(function(){
-        if(!timerRunning && !timerPaused && timerSeconds<=0){ selectDuration(timerDefaultSeconds); }
-      },2500);
+        if (!timerRunning && !timerPaused && timerSeconds <= 0){ selectDuration(timerDefaultSeconds); }
+      }, 2500);
     }
     updateTimerBtn();
-  },1000);
+  }, 1000);
 }
 function updateTimerBtn(){
-  var btn=document.getElementById('timerBtn');
-  var icon=document.getElementById('timerBtnIcon');
-  var label=document.getElementById('timerBtnLabel');
-  var editBtn=document.getElementById('timerEditBtn');
-  editBtn.style.display='inline-flex';
-  if(timerRunning){
-    icon.innerHTML='&#9208;';
-    label.innerHTML='<span class="timer-btn-time">'+formatTime(timerSeconds)+'</span>';
-    btn.className='timer-btn running'+(timerSeconds<=10?' warn':'');
-  } else if(timerPaused){
-    icon.innerHTML='&#9654;';
-    label.innerHTML='<span class="timer-btn-time">'+formatTime(timerSeconds)+'</span>';
-    btn.className='timer-btn paused';
-  } else if(timerSeconds<=0 && timerTotal>0){
-    icon.innerHTML='&#8635;';
-    label.textContent='Done';
-    btn.className='timer-btn done';
+  var btn = document.getElementById('timerBtn');
+  var icon = document.getElementById('timerBtnIcon');
+  var label = document.getElementById('timerBtnLabel');
+  var editBtn = document.getElementById('timerEditBtn');
+  editBtn.style.display = 'inline-flex';
+  if (timerRunning){
+    icon.innerHTML = '&#9208;';
+    label.innerHTML = '<span class="timer-btn-time">' + formatTime(timerSeconds) + '</span>';
+    btn.className = 'timer-btn running' + (timerSeconds <= 10 ? ' warn' : '');
+  } else if (timerPaused){
+    icon.innerHTML = '&#9654;';
+    label.innerHTML = '<span class="timer-btn-time">' + formatTime(timerSeconds) + '</span>';
+    btn.className = 'timer-btn paused';
+  } else if (timerSeconds <= 0 && timerTotal > 0){
+    icon.innerHTML = '&#8635;';
+    label.textContent = 'Done';
+    btn.className = 'timer-btn done';
   } else {
-    icon.innerHTML='&#9654;';
-    label.innerHTML='<span class="timer-btn-time">'+formatTime(timerDefaultSeconds)+'</span>';
-    btn.className='timer-btn';
+    icon.innerHTML = '&#9654;';
+    label.innerHTML = '<span class="timer-btn-time">' + formatTime(timerDefaultSeconds) + '</span>';
+    btn.className = 'timer-btn';
   }
 }
 
-document.addEventListener('keydown', function(e) { if (e.key === 'ArrowLeft') go(-1); if (e.key === 'ArrowRight') go(1); });
-function populateDropdown() {
-  var sel = document.getElementById('debateSelect');
-  sel.innerHTML = '<option value="">Browse by topic...</option>';
-  filtered.forEach(function(d, i) {
-    var opt = document.createElement('option');
-    opt.value = i;
-    opt.textContent = d.title + ' (' + d.level + ')';
-    sel.appendChild(opt);
-  });
-}
+/* Arrow keys page through debates, but never while a field is focused. */
+document.addEventListener('keydown', function(e){
+  if (mode !== 'debates') return;
+  var t = e.target;
+  if (t && (t.isContentEditable || /^(input|textarea|select)$/i.test(t.tagName))) return;
+  if (e.key === 'ArrowLeft') go(-1);
+  if (e.key === 'ArrowRight') go(1);
+});
 
-function selectDebate(val) {
-  if (val === '') return;
-  idx = parseInt(val);
-  render();
-}
-
-// Update render to sync dropdown
-var _origRender = render;
-render = function() {
-  _origRender();
-  var sel = document.getElementById('debateSelect');
-  if (sel) sel.value = idx;
-};
-
-// Rebuild dropdown when filter changes
-var _origSetLevel = setLevel;
-setLevel = function(lvl, btn) {
-  _origSetLevel(lvl, btn);
-  populateDropdown();
-};
-
-var _origShuffle = shuffleDebates;
-shuffleDebates = function() {
-  _origShuffle();
-  populateDropdown();
-};
-
-var _origReset = resetDebates;
-resetDebates = function() {
-  _origReset();
-  populateDropdown();
-};
-
+/* ── Boot ──────────────────────────────────────────────────────── */
+buildLevelToggle();
 populateDropdown();
+populatePresets();
 render();
 selectDuration(timerDefaultSeconds);
-
-function tfRate(dot){var s=dot.parentElement.children;var v=parseInt(dot.textContent);for(var i=0;i<s.length;i++){if(i<v)s[i].classList.add('selected');else s[i].classList.remove('selected');}}
-function tfClear(){document.querySelectorAll('.tf-dot.selected').forEach(function(d){d.classList.remove('selected');});}
+buildId = custom.length ? custom[0].id : null;
 </script>
-</div>
 </body>
 </html>
