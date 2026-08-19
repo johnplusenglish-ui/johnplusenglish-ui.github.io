@@ -34,6 +34,13 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 
 .wrap{max-width:960px;margin:0 auto;padding:0 2rem 4rem;position:relative;z-index:1}
 
+.test-picker{display:flex;align-items:center;gap:.45rem;flex-wrap:wrap;margin:1.6rem 0 0}
+.test-picker-label{font-family:Outfit,sans-serif;font-size:.62rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-right:.25rem}
+.test-pill{font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:700;padding:.4rem .9rem;border-radius:999px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:background .16s,color .16s,border-color .16s}
+.test-pill:hover{color:var(--ink);border-color:var(--muted)}
+.test-pill.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.test-topic{font-size:.78rem;color:var(--muted);margin:.55rem 0 0}
+.test-topic strong{color:var(--ink);font-weight:700}
 .overview{display:flex;gap:.6rem;flex-wrap:wrap;margin:1.6rem 0 1.2rem;padding:.9rem 1.1rem;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);align-items:center}
 .overview-item{font-size:.78rem;color:var(--muted);display:flex;align-items:center;gap:.35rem}
 .overview-item strong{color:var(--ink);font-weight:800;font-size:.85rem}
@@ -142,17 +149,19 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 
 <div class="page-header">
   <a href="reading.html" class="back-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</a>
-  <div class="pilot-flag">Pilot - for review, not yet linked in the sidebar</div>
   <div class="topic-hero">
     <div class="topic-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
     <div>
       <h1>C1 Advanced Reading - Parts 5 to 8</h1>
-      <div class="hero-meta"><span><strong>4</strong> parts</span><span><strong>26</strong> questions</span><span><strong>~45</strong> min</span></div>
+      <div class="hero-meta"><span><strong>5</strong> tests</span><span><strong>4</strong> parts each</span><span><strong>26</strong> questions</span><span><strong>~45</strong> min</span></div>
     </div>
   </div>
 </div>
 
 <div class="wrap">
+  <div class="test-picker" id="testPicker"><span class="test-picker-label">Test</span></div>
+  <div class="test-topic" id="testTopic"></div>
+
   <div class="overview">
     <div class="overview-item">Part 5 <strong id="ov5">-/6</strong></div>
     <div class="overview-item">Part 6 <strong id="ov6">-/4</strong></div>
@@ -170,7 +179,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 
   <!-- PART 5 -->
   <div class="part-section visible" data-part="5" id="section5">
-    <div class="exam-info"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span>You are going to read an article. For questions 1 to 6, choose the answer (A, B, C or D) which you think fits best according to the text.</span></div>
+    <div class="exam-info"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span id="rub5"></span></div>
     <div class="test-card">
       <div class="test-header"><div class="test-title">Part 5 · Multiple Choice</div><div class="score-display" id="p5ScoreDisplay">Score: <span class="score-val" id="p5ScoreVal"></span></div></div>
       <div class="passage" id="p5Passage"></div>
@@ -187,7 +196,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 
   <!-- PART 6 -->
   <div class="part-section" data-part="6" id="section6">
-    <div class="exam-info"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span>You are going to read four reviews of a restaurant. For questions 1 to 4, choose from the reviewers (A to D). The reviewers may be chosen more than once.</span></div>
+    <div class="exam-info"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span id="rub6"></span></div>
     <div class="test-card">
       <div class="test-header"><div class="test-title">Part 6 · Cross-text Matching</div><div class="score-display" id="p6ScoreDisplay">Score: <span class="score-val" id="p6ScoreVal"></span></div></div>
       <div class="passage" id="p6PassageIntro" style="padding-bottom:0">
@@ -207,7 +216,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 
   <!-- PART 7 -->
   <div class="part-section" data-part="7" id="section7">
-    <div class="exam-info"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span>You are going to read an article from which six paragraphs have been removed. Choose from the paragraphs A to G the one which fits each gap (1 to 6). There is one extra paragraph which you do not need to use.</span></div>
+    <div class="exam-info"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span id="rub7"></span></div>
     <div class="test-card">
       <div class="test-header"><div class="test-title">Part 7 · Gapped Text</div><div class="score-display" id="p7ScoreDisplay">Score: <span class="score-val" id="p7ScoreVal"></span></div></div>
       <div class="passage" id="p7Passage"></div>
@@ -224,7 +233,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 
   <!-- PART 8 -->
   <div class="part-section" data-part="8" id="section8">
-    <div class="exam-info"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span>You are going to read about four professionals describing a mistake early in their career. For questions 1 to 10, choose from the people (A to D). The people may be chosen more than once.</span></div>
+    <div class="exam-info"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span id="rub8"></span></div>
     <div class="test-card">
       <div class="test-header"><div class="test-title">Part 8 · Multiple Matching</div><div class="score-display" id="p8ScoreDisplay">Score: <span class="score-val" id="p8ScoreVal"></span></div></div>
       <div class="passage" id="p8PassageIntro" style="padding-bottom:0">
@@ -256,7 +265,12 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 
 <script>
 /* ============ DATA ============ */
-const P5 = {
+const TESTS = [
+
+{
+  topic: "Memory athletes, a restaurant's reviews, early ideas and career mistakes",
+ P5: {
+    rubric: "You are going to read a magazine article about competitive memory. For questions 1 to 6, choose the answer (A, B, C or D) which you think fits best according to the text.",
   title: "The Art of Remembering Everything",
   passage: [
     "Somewhere in a conference hotel outside Reading, a room of forty competitors sits in near-total silence, headphones clamped over their ears, staring at nothing in particular. To an outsider, it might look like an unusually intense exam, or perhaps a meditation retreat gone slightly wrong. In fact, this is the semi-final of a national memory championship, and the forty people in the room are about to attempt to memorise the order of a shuffled deck of cards in under five minutes.",
@@ -273,9 +287,11 @@ const P5 = {
     {stem:"What does the quoted competitor's comment (“Everyone loves the trick... two years it actually takes to get good”) mainly suggest?", opts:["Most people give up once the initial excitement of the technique wears off.","The technique itself becomes less effective after the first month.","Competitors resent how easy the technique is to learn.","Two years is an unusually long time compared to other skills."], correct:0, exp:"The quote contrasts short-lived initial enthusiasm (“for the first month”) with the small number who commit to the “two years it actually takes.”"},
     {stem:"What is the writer's main point about the relationship between memory-sport ability and general intelligence?", opts:["Research confirms that memory athletes are generally more intelligent than average.","Competitors avoid discussing the topic since it embarrasses them.","Evidence suggests the skill comes from practice rather than any special natural ability.","Intelligence testing has never been carried out on competitive memory athletes."], correct:2, exp:"The text says studies and competitor testimony “suggest the opposite” of the intelligence myth: the skill is “almost entirely the product of specific, deliberate practice.”"}
   ]
-};
+  },
 
-const P6 = {
+  P6: {
+    qword: "reviewer",
+    rubric: "You are going to read four reviews of a new restaurant. For questions 1 to 4, choose from the reviewers (A to D). The reviewers may be chosen more than once.",
   title: "Four Reviews of Marlowe's",
   texts: [
     {letter:"A", name:"Reviewer A", body:"Marlowe's has clearly spent its opening budget on atmosphere rather than substance. The dim lighting and reclaimed-wood tables are undeniably handsome, and the staff strike exactly the right note between attentive and unobtrusive. Unfortunately, none of that compensates for a menu that reads far more ambitiously than it eats: my duck arrived competently cooked but entirely unseasoned. Portions, too, are stingy for the prices charged. I wanted to love this place. I simply couldn't."},
@@ -289,9 +305,10 @@ const P6 = {
     {stem:"differs from the other three reviewers by suggesting that a restaurant's attractive design might be deliberately distracting from weaker food?", correct:"C", exp:"Only C makes this specific accusation (“a restaurant this pleased with its own lighting design usually has something to hide”) - A, B and D all comment on the room without linking it to suspicion about the food."},
     {stem:"differs from the other reviewers by complaining about a practical, not merely aesthetic, problem with the dining room itself?", correct:"B", exp:"Only B raises a practical complaint about the room (tables too close together, poor lighting for reading the menu) - A, C and D all discuss the room only in terms of its look, not its usability."}
   ]
-};
+  },
 
-const P7 = {
+  P7: {
+    rubric: "You are going to read an article from which six paragraphs have been removed. Choose from the paragraphs A to G the one which fits each gap (1 to 6). There is one extra paragraph you do not need.",
   title: "Too Early, Not Wrong: The Idea That Arrived Ahead of Its Time",
   parts: [
     "In 1878, an engineer named Werner von Siemens grew mildly obsessed with an idea few of his contemporaries thought worth taking seriously: a machine that would let ordinary people speak to each other across long distances without wires. He was not, in any meaningful sense, wrong about the possibility. He was simply several decades early, working with materials and a supporting infrastructure that made his particular version of the idea impractical, however sound its underlying principle.",
@@ -321,9 +338,11 @@ const P7 = {
     6:"Gap 6 follows “hindsight is... unavailable to the person actually living through the premature attempt” and precedes “It does, however, suggest a more modest, practical question” - C extends the point about the impossibility of telling early-but-sound apart from simply-wrong in the moment.",
     extra:"B is not used: its claim about Babbage's personality contradicts the surrounding paragraphs, which attribute the failure entirely to manufacturing precision, not personality."
   }
-};
+  },
 
-const P8 = {
+  P8: {
+    qword: "person",
+    rubric: "You are going to read four professionals describing a mistake early in their career. For questions 1 to 10, choose from the people (A to D). The people may be chosen more than once.",
   title: "Career Mistakes: Four Professionals Reflect",
   texts: [
     {letter:"A", name:"Rahel, restaurant chef", body:"In my first head chef role, I redesigned the entire menu in my first month, before I understood who our regular customers were or what had actually been keeping them coming back for years. Covers dropped by a third. What stings is that I never asked a single long-standing member of staff what our customers valued about the old menu before I threw it out. These days, whenever I join a new kitchen, the first month is entirely for listening, not changing anything at all."},
@@ -343,14 +362,401 @@ const P8 = {
     {stem:"suggests that the most capable people in their field behave in a way they hadn't expected?", correct:"B", exp:"Tomás was surprised that the engineers he respected most asked more questions, not fewer."},
     {stem:"says that dealing with the practical consequences of the mistake was less difficult than confronting what it revealed about themselves?", correct:"D", exp:"Marcus: “the uncomfortable part wasn't managing the fallout... it was realising [what it revealed about him].”"}
   ]
-};
+  }
+}
+,
+
+{
+  topic: "The science of birdsong, four novel-openings, the map that misled a nation, and life as a translator",
+  P5: {
+    title: "Why Birds Sing Before Dawn",
+    rubric: "You are going to read a magazine article about the dawn chorus. For questions 1 to 6, choose the answer (A, B, C or D) which you think fits best according to the text.",
+    passage: [
+      "Anyone who has been woken, against their will, by the wall of sound that birds produce in the hour before sunrise will have wondered, at least briefly, what on earth the birds imagine they are achieving. The phenomenon, known as the dawn chorus, is one of the most familiar sounds in nature and, until surprisingly recently, one of the least understood. That so ordinary an event should have resisted explanation for so long says a good deal about how easy it is to overlook the questions hiding inside everyday experience.",
+      "The most obvious explanation, and the one most people reach for, is that birds sing in the morning simply because they have just woken up and are, in some loose sense, cheerful. This is almost certainly wrong. Birdsong is metabolically expensive and, more importantly, dangerous: a singing bird advertises its exact location to every predator in the area. Natural selection does not tend to preserve behaviours that are both costly and risky unless they deliver some substantial compensating benefit. The real puzzle, then, is not why birds sing, but why they concentrate so much of their singing into the one part of the day when, on the face of it, the costs seem highest.",
+      "One long-standing theory concerns the quality of the air itself. Sound travels further and more clearly in the cool, still conditions typical of early morning, before the day's heat generates the turbulence that scatters and distorts it. A song produced at dawn may therefore reach as much as twenty times the area it would cover at midday, for the same expenditure of energy. On this account, birds sing early for the same reason a person might make an important phone call from a quiet room rather than a crowded street: not because the message is different, but because it stands a far better chance of being heard.",
+      "Attractive as this explanation is, it cannot be the whole story, since it fails to explain why the light level, specifically, matters so much. Careful observation has established that many species begin singing at a remarkably consistent light intensity, one too dim for foraging to be efficient but evidently bright enough for something. This has led to a second, complementary theory: that the pre-dawn period is essentially dead time. It is too dark to hunt for insects productively, yet the bird is awake and has energy to spare. Singing, in effect, makes use of an hour that would otherwise be wasted, and does so at precisely the moment when the acoustic conditions happen to be ideal.",
+      "What makes the dawn chorus genuinely interesting to researchers, however, is that the singing appears to carry real information, and that rivals and mates are demonstrably listening. A male who sings loudly and elaborately at first light is, among other things, signalling that he has survived the night in good enough condition to afford such extravagance. Weaker or sicker birds cannot match the performance, and the audience adjusts its behaviour accordingly. Far from being the meaningless racket it appears to the sleep-deprived human below, the dawn chorus turns out to be a densely competitive exchange, conducted in a medium we can hear but not, without considerable effort, decode.",
+      "None of this, it should be said, entirely rules out the possibility that the birds are also, in some sense we will never be able to confirm, simply glad to see the morning. Science can establish what a behaviour is for without ruling out that it might, additionally, feel like something to the animal performing it. But if the dawn chorus teaches us anything, it is to be suspicious of the explanations that come most readily to hand. The cheerful-birds theory was satisfying precisely because it required no further thought, which is, more often than not, the surest sign that an explanation deserves a second look."
+    ],
+    questions: [
+      {stem:"What point does the writer make in the first paragraph about the dawn chorus?", opts:["It is far less common than most people assume.","A very familiar event went unexplained for a long time.","It has become quieter in recent decades.","Scientists have always found it easy to explain."], correct:1, exp:"The writer notes the dawn chorus is “one of the most familiar sounds in nature and... one of the least understood,” using it to show how everyday questions get overlooked."},
+      {stem:"Why does the writer reject the idea that birds sing simply because they are cheerful?", opts:["Birds do not actually sing more in the morning than at other times.","Cheerfulness cannot be measured in birds at all.","Predators are not attracted by birdsong.","Singing is costly and dangerous, so it must bring a real benefit."], correct:3, exp:"Because song is “metabolically expensive” and advertises the bird's location to predators, natural selection would not preserve it “unless [it delivered] some substantial compensating benefit.”"},
+      {stem:"According to the ‘quality of air' theory, why do birds sing at dawn?", opts:["The cool, still air lets their song travel much further.","Their voices are naturally stronger in the morning.","Fewer other birds are singing at that time.","The cold forces them to move and make noise."], correct:0, exp:"Sound “travels further and more clearly in the cool, still conditions” of early morning, so a dawn song can reach up to twenty times the area for the same energy."},
+      {stem:"What does the writer say is a weakness of the ‘quality of air' theory?", opts:["It has never been tested by observation.","It cannot explain why light level matters so much.","It applies only to a few rare species.","It ignores the energy cost of singing."], correct:1, exp:"The theory “cannot be the whole story, since it fails to explain why the light level, specifically, matters so much.”"},
+      {stem:"What does the ‘dead time' theory propose?", opts:["Birds sing at dawn because they cannot sleep.","Singing replaces hunting, which is impossible in the dark.","Birds use an hour too dark for hunting but full of spare energy.","Dawn is the only time birds are safe from predators."], correct:2, exp:"The pre-dawn hour is “too dark to hunt for insects productively, yet the bird is awake and has energy to spare,” so singing uses time that “would otherwise be wasted.”"},
+      {stem:"What is the writer's main conclusion in the final paragraph?", opts:["We should distrust explanations that feel too easy.","The cheerful-birds theory has turned out to be correct after all.","Birds definitely do not experience any emotion.","The dawn chorus will never be understood scientifically."], correct:0, exp:"The writer warns us “to be suspicious of the explanations that come most readily to hand,” since an explanation that “required no further thought” is often the one that “deserves a second look.”"}
+    ]
+  },
+  P6: {
+    qword: "reviewer",
+    title: "Four Reviews of a Debut Novel",
+    rubric: "You are going to read four reviews of the same debut novel. For questions 1 to 4, choose from the reviewers (A to D). The reviewers may be chosen more than once.",
+    texts: [
+      {letter:"A", name:"Reviewer A", body:"There is no denying the sheer ambition of Halloran's first novel, which spans four generations and three continents in barely three hundred pages. The trouble is that ambition, here, comes at the cost of depth: characters appear, are hurried through a defining crisis, and vanish before we have learned to care about them. The prose, sentence by sentence, is frequently beautiful, and I suspect Halloran will write something remarkable one day. This, for all its evident talent, is not yet that book."},
+      {letter:"B", name:"Reviewer B", body:"Much has been made of the novel's structure, which leaps between decades without warning, and I gather some readers have found it bewildering. I did not; if anything, the jumps are the most controlled thing about the book, each one landing exactly where it should. What let me down was the writing at the level of the individual sentence, which too often reaches for a striking image and grasps only a cliché. A tighter editor would have served this genuinely clever book far better than it has been served."},
+      {letter:"C", name:"Reviewer C", body:"Halloran has been praised, rightly, for tackling difficult material without flinching, and the central section, set during the famine, is as powerful as anything I have read this year. Yet I finished the book unconvinced by its architecture. The constant movement back and forth in time, presented by the publisher as bold, struck me instead as a way of disguising the fact that the story does not, in the end, quite hold together. The sentences are polished; the whole is less than their sum."},
+      {letter:"D", name:"Reviewer D", body:"It has become fashionable to complain that debut novelists attempt too much, and no doubt Halloran's canvas is enormous. For once, though, the ambition is fully earned. The book moves confidently across generations, and the much-discussed time-shifts are not a gimmick but the very engine of its meaning, forcing us to see each generation in the light of the last. If the writing occasionally strains for effect, that is a small price for a first novel this alive to history."}
+    ],
+    questions: [
+      {stem:"expresses a more positive overall verdict on the novel than the other three?", correct:"D", exp:"Only D judges the book a success (“the ambition is fully earned”); A, B and C each conclude that it fails in some important respect."},
+      {stem:"shares Reviewer C's low opinion of the novel's structure?", correct:"A", exp:"A criticises the structure for sacrificing depth (characters “vanish before we have learned to care”), agreeing with C that the architecture fails - whereas B and D both defend the structure as controlled or meaningful."},
+      {stem:"holds a view of the book's sentence-level writing that differs from the other three?", correct:"B", exp:"B alone criticises the individual sentences (“reaches for a striking image and grasps only a cliché”); A, C and D all praise the prose (‘beautiful', ‘polished', earned) even where they fault other elements."},
+      {stem:"like Reviewer D, regards the novel's time-shifting structure as a genuine strength?", correct:"B", exp:"B calls the jumps “the most controlled thing about the book,” aligning with D's view that they are “the very engine of its meaning” - while A and C both see the structure as a weakness."}
+    ]
+  },
+  P7: {
+    rubric: "You are going to read an article from which six paragraphs have been removed. Choose from the paragraphs A to G the one which fits each gap (1 to 6). There is one extra paragraph you do not need.",
+    title: "The Line on the Map",
+    parts: [
+      "For the better part of a century, one of the most confidently drawn features on maps of the West African interior was a range of mountains that did not exist. The Kong Mountains, as they were labelled, stretched for hundreds of miles, neatly dividing the northern deserts from the fertile lands to the south. They appeared on the most respected maps produced anywhere in the world, were reproduced by cartographer after cartographer, and shaped the plans of governments and trading companies alike. There was only one difficulty, which took a remarkably long time to surface: nobody had ever seen them.",
+      " The mountains made their first appearance in 1798, in a map drawn by a celebrated cartographer of the day. He was working, as mapmakers of his era routinely did, from second-hand accounts, and one traveller had mentioned high ground somewhere in the general region. From this thin and ambiguous evidence, a modest note about hills grew, over successive editions, into a continuous and imposing range.",
+      " This process of repetition is what makes the Kong Mountains genuinely instructive. Rather than being questioned, the range was copied, and each act of copying lent it further authority. A feature that appeared on one map might be doubted; a feature that appeared on twenty, drawn by respected hands, acquired the weight of established fact.",
+      " The consequences were not merely academic. Trading companies planned routes on the assumption that the mountains formed a natural barrier, and explorers set out expecting to cross them. At least one expedition's failure was attributed, after the event, to the supposed difficulty of a mountain range that its members had, in reality, walked straight across without noticing anything of the kind.",
+      " The correction, when it finally came, was undramatic. In the 1880s, a French officer travelled through precisely the region the mountains were supposed to occupy and reported, with some puzzlement, an expanse of gently undulating grassland. His account was at first met with resistance, for the range was by now too familiar to be surrendered lightly.",
+      " Yet the deeper lesson of the Kong Mountains has little to do with the specific failings of early cartography, which improved beyond recognition within a generation. It concerns instead the way an unverified claim, once it enters a trusted body of knowledge, can become almost impossible to dislodge, not because anyone defends it, but because everyone assumes someone else already has.",
+      " It is tempting to feel superior to the mapmakers who so faithfully copied one another's mistake. That temptation is worth resisting. The mechanisms that produced the Kong Mountains, an unverified source, an authoritative repetition, and a collective failure to check, are not confined to the eighteenth century, and the modern world, awash in information copied endlessly from source to source, offers them more opportunity than ever."
+    ],
+    options: [
+      {letter:"A", text:"How such a thing came to be drawn in the first place is easily explained, and rather less interesting than what followed."},
+      {letter:"B", text:"Even then, the range did not vanish overnight; it lingered on maps for a further two decades, quietly shrinking with each new edition until it finally disappeared altogether, unmourned and largely unremarked."},
+      {letter:"C", text:"Modern surveying equipment, by contrast, can now fix the height of a hillside to within a few centimetres from orbit, leaving little room for the imagination to invent anything at all."},
+      {letter:"D", text:"Once fixed on paper, in other words, the mountains had begun to influence the very decisions of the people best placed to discover that they were not there."},
+      {letter:"E", text:"By the middle of the nineteenth century, they were an unquestioned fact of geography, taught in schools and printed in the finest atlases money could buy."},
+      {letter:"F", text:"That, ultimately, is why the story still deserves to be told, and why it should be read as a warning rather than a curiosity."},
+      {letter:"G", text:"The result was a striking illustration of how an error, given enough repetition, can harden into something almost indistinguishable from truth."}
+    ],
+    correct: {1:"A", 2:"G", 3:"E", 4:"D", 5:"B", 6:"F"},
+    exp: {
+      1:"Gap 1 follows the revelation that ‘nobody had ever seen them' and precedes the account of the range's first appearance in 1798 - A promises to explain ‘how such a thing came to be drawn' and points forward to ‘what followed.'",
+      2:"Gap 2 follows the origin story (a note growing into a range) and precedes ‘This process of repetition is what makes the Kong Mountains instructive' - G names that process, which the next sentence then refers to as ‘This process of repetition.'",
+      3:"Gap 3 follows ‘acquired the weight of established fact' and precedes the paragraph on real-world consequences - E marks the endpoint of that process: by mid-century the range was ‘an unquestioned fact... taught in schools.'",
+      4:"Gap 4 follows the account of traders and explorers relying on the range and precedes ‘The correction, when it finally came' - D interprets those consequences (‘in other words, the mountains had begun to influence the very decisions...').",
+      5:"Gap 5 follows the French officer's report meeting resistance and precedes ‘Yet the deeper lesson' - B describes the slow disappearance that followed the correction.",
+      6:"Gap 6 follows the deeper lesson about unverified claims and precedes the closing warning against feeling superior - F states that this is ‘why the story still deserves to be told... a warning rather than a curiosity.'",
+      extra:"C is not used: its point about modern surveying fixing heights from orbit is a technological aside that fits none of the gaps, which all concern how the false range spread, shaped events, and was finally corrected."
+    }
+  },
+  P8: {
+    qword: "translator",
+    title: "The Translator's Craft: Four Voices",
+    rubric: "You are going to read comments by four literary translators. For questions 1 to 10, choose from the translators (A to D). The translators may be chosen more than once.",
+    texts: [
+      {letter:"A", name:"Translator A", body:"People assume the hardest thing to translate is poetry, but for me it's humour, and specifically jokes that depend on the sound of words rather than their meaning. You simply cannot carry a pun across a language boundary; you can only decide what the pun was doing in the original and then build a completely new one, in the target language, that does the same job. Purists call this rewriting rather than translating. I call it the only honest option. The alternative, a footnote explaining why something was funny, is an admission of defeat."},
+      {letter:"B", name:"Translator B", body:"I translate contemporary crime fiction, which people tend to look down on, and I've made my peace with that. What they don't realise is how demanding the deadlines are: a bestseller has to appear in a dozen languages almost simultaneously, so I'm often translating a book at the same speed the author wrote it, with none of the years of reflection they enjoyed. I've learned to trust my first instinct, because I frequently don't have time for a second. Oddly, I think the work is better for it; over-thinking a sentence can drain the life out of it."},
+      {letter:"C", name:"Translator C", body:"The question I'm asked most often is whether I could ever translate my own writing, and the answer is a firm no. I've published two novels in my own language, and the thought of rendering them into English myself appals me; I'd be forever tempted to improve them, to fix what I now see as flaws, and that isn't a translator's job. A translator's loyalty is to the book as it exists, not to the book its author wishes they had written. With someone else's work, that loyalty comes naturally. With my own, it would be impossible."},
+      {letter:"D", name:"Translator D", body:"I spent fifteen years translating a single medieval poem, on and off, and I'm still not sure I've finished. What that long acquaintance taught me is that there is no such thing as a definitive translation; there is only the best translation for a particular readership at a particular moment. Language shifts under your feet. The version I'd have produced at thirty embarrasses me now, not because it was wrong, but because it was answering questions readers no longer ask. Every generation, I've come to believe, needs the great works translated afresh."}
+    ],
+    questions: [
+      {stem:"argues that a good translation sometimes requires creating something entirely new rather than reproducing the original?", correct:"A", exp:"A says a pun cannot be carried across; you must “build a completely new one... that does the same job.”"},
+      {stem:"works under unusually severe time pressure?", correct:"B", exp:"B: bestsellers appear in many languages “almost simultaneously,” so the work is done at great speed."},
+      {stem:"explains why they would refuse to translate a particular kind of text?", correct:"C", exp:"C would not translate their own novels, fearing the temptation “to improve them.”"},
+      {stem:"believes no single translation of a work can be final?", correct:"D", exp:"D: “there is no such thing as a definitive translation; there is only the best translation for a particular readership at a particular moment.”"},
+      {stem:"claims that working quickly can actually improve the result?", correct:"B", exp:"B: “over-thinking a sentence can drain the life out of it,” and the work “is better for” trusting first instincts."},
+      {stem:"describes a type of material that most people wrongly assume is the most difficult?", correct:"A", exp:"A: “People assume the hardest thing to translate is poetry, but for me it's humour.”"},
+      {stem:"says a translator must be faithful to the book as it is, not as its author might now wish it to be?", correct:"C", exp:"C: “A translator's loyalty is to the book as it exists, not to the book its author wishes they had written.”"},
+      {stem:"is aware that the genre they work in is not highly regarded?", correct:"B", exp:"B translates crime fiction, “which people tend to look down on, and I've made my peace with that.”"},
+      {stem:"regards an earlier version of their own work with some embarrassment?", correct:"D", exp:"D: “The version I'd have produced at thirty embarrasses me now.”"},
+      {stem:"regards explaining a joke to the reader as a failure?", correct:"A", exp:"A: a footnote explaining the humour “is an admission of defeat.”"}
+    ]
+  }
+},
+
+{
+  topic: "The economics of free museums, four essays on ambition, the standardised railway clock, and volunteer lifeboat crews",
+  P5: {
+    title: "The Price of Free",
+    rubric: "You are going to read an article about museums that charge no entry fee. For questions 1 to 6, choose the answer (A, B, C or D) which you think fits best according to the text.",
+    passage: [
+      "The idea that a great museum should be free to enter has, in some countries, acquired almost the status of a moral principle. To charge for admission, the argument runs, is to put a price on knowledge and to exclude precisely those people who would benefit most. It is a powerful and appealing case, and one I broadly accept. What is rarely acknowledged, however, is that ‘free' museums are nothing of the kind. The cost has simply been moved somewhere less visible, and where it lands turns out to matter a great deal.",
+      "The most straightforward model is public funding: the museum charges nobody at the door because the state pays for it out of general taxation. This has the obvious merit of removing the barrier of price entirely. It also, less obviously, makes the institution dependent on political decisions it cannot control. A museum funded by the government is a museum whose budget can be cut by the government, and history suggests that cultural spending is among the first things to be reduced when public finances tighten. Free entry, in other words, can purchase accessibility at the cost of security.",
+      "An increasingly common alternative is to keep entry free while extracting money from visitors in other ways: through a shop they must walk through on the way out, a café charging generously for coffee, and a steady stream of ticketed special exhibitions layered on top of the free permanent collection. Museums that have gone furthest down this road can end up in a slightly awkward position, publicly committed to free access while depending financially on persuading those same free visitors to spend. The permanent collection becomes, in effect, the loss-leader that draws people in.",
+      "Then there is private philanthropy, the model most associated with the great collections of the United States. Here, free or cheap entry is underwritten by wealthy donors, whose generosity is genuine but rarely without conditions. A donor may reasonably expect a gallery to bear their name, or take a close interest in what is displayed within it. Curators at such institutions describe a constant, delicate negotiation between the demands of scholarship and the preferences of the people paying the bills, a negotiation that visitors, wandering the free galleries, never see and would probably be surprised to learn was taking place.",
+      "None of this is an argument against free museums, which remain, on balance, a civilised and worthwhile thing for a society to provide. It is an argument against the comfortable assumption that ‘free' means ‘without cost.' Every model of funding shapes the institution in ways that reach right down to what ends up on the walls. The visitor who pays nothing at the door has not escaped the transaction; they have merely been spared the knowledge of how, and by whom, it was settled. That ignorance is a kind of luxury, and like most luxuries, somebody, somewhere, is paying for it."
+    ],
+    questions: [
+      {stem:"What is the writer's main point in the first paragraph?", opts:["Free museums are morally superior to those that charge.","Museums described as ‘free' still have costs, just hidden ones.","Charging for museums always excludes the poorest visitors.","Most people wrongly believe museums should charge for entry."], correct:1, exp:"The writer accepts the case for free entry but insists ‘free museums are nothing of the kind' - the cost has simply been ‘moved somewhere less visible.'"},
+      {stem:"What disadvantage does the writer identify with public funding of museums?", opts:["It leaves the museum vulnerable to political spending cuts.","It makes tickets more expensive over time.","It discourages people from visiting regularly.","It prevents museums from holding special exhibitions."], correct:0, exp:"A state-funded museum's ‘budget can be cut by the government,' and cultural spending is ‘among the first things to be reduced' in hard times."},
+      {stem:"What ‘awkward position' does the writer describe in the third paragraph?", opts:["Charging high prices for a poor-quality permanent collection.","Having to close the permanent collection to fund exhibitions.","Being committed to free access while relying on visitors to spend.","Refusing donations that come with conditions attached."], correct:2, exp:"Such museums are ‘publicly committed to free access while depending financially on persuading those same free visitors to spend' in shops, cafés and on special exhibitions."},
+      {stem:"According to the writer, what characterises the philanthropy model?", opts:["Donors give money with no expectations whatsoever.","Entry is more expensive than under other models.","Curators have complete freedom over what is displayed.","A hidden negotiation between scholarship and donors' wishes."], correct:3, exp:"Curators describe ‘a constant, delicate negotiation between the demands of scholarship and the preferences of the people paying the bills,' invisible to visitors."},
+      {stem:"What does the writer mean by calling the visitor's ignorance ‘a kind of luxury'?", opts:["Only wealthy visitors can afford to ignore the issue.","Not having to think about how the museum is funded is itself a comfort.","The museum deliberately keeps its funding secret.","Free entry is a luxury that societies cannot really afford."], correct:1, exp:"The visitor ‘has merely been spared the knowledge of how... it was settled' - being spared that awareness is the luxury, and ‘somebody, somewhere, is paying for it.'"},
+      {stem:"What is the writer's overall attitude to free museums?", opts:["They are worthwhile, but their hidden costs should be recognised.","They should be replaced by a system of modest charges.","They are the only fair way to run a museum.","They inevitably lead to lower standards of scholarship."], correct:0, exp:"The piece is ‘not an argument against free museums,' which remain ‘worthwhile,' but against the assumption that ‘free' means ‘without cost.'"}
+    ]
+  },
+  P6: {
+    qword: "writer",
+    title: "Four Views on Ambition",
+    rubric: "You are going to read four short essays about ambition. For questions 1 to 4, choose from the writers (A to D). The writers may be chosen more than once.",
+    texts: [
+      {letter:"A", name:"Writer A", body:"We are encouraged, from an early age, to be ambitious, as though the word named a single, obviously good thing. It does not. The ambition to master a craft, to do something as well as it can possibly be done, is among the finest of human impulses. The ambition merely to rise, to be seen to have risen, to overtake others, is among the emptiest, and the two are constantly confused. A society that cannot tell them apart will reward the wrong people and wonder, later, why its most admired figures so often turn out to be hollow."},
+      {letter:"B", name:"Writer B", body:"Much fashionable advice now treats ambition as faintly embarrassing, a relic of a more grasping age, and urges us instead to seek balance and contentment. I distrust this profoundly. Contentment is a fine thing to arrive at, but a poor thing to aim for, and much of what is most valuable in the world, difficult art, hard-won knowledge, genuine reform, was made by people who were emphatically not content and had no wish to be. To counsel the young out of ambition is to ask them to want less from their lives than they are capable of achieving."},
+      {letter:"C", name:"Writer C", body:"The problem with ambition is not the wanting; it is the timing. Almost everyone I know who is unhappy in middle age set their ambitions in their twenties, achieved most of them, and never thought to revise them. They are climbing, still, a ladder they chose before they knew themselves, and the view from the top, now that they near it, means nothing to them. The truly fortunate are not those who lack ambition, but those who periodically dare to ask whether they still want what they once wanted."},
+      {letter:"D", name:"Writer D", body:"There is a comfortable modern idea that we should each ‘follow our passion,' and that ambition, properly understood, is simply the pursuit of what we already love. I think this gets things backwards. In my experience, passion far more often follows achievement than precedes it: we come to love the things we have worked hard at and become good at, not the other way around. The advice to wait for passion before committing effort has, I suspect, kept a great many people idle while they waited for a feeling that only effort could have produced."}
+    ],
+    questions: [
+      {stem:"argues that ambition is not one thing but two very different things?", correct:"A", exp:"A distinguishes the ambition ‘to master a craft' from the ambition ‘merely to rise,' warning that the two are ‘constantly confused.'"},
+      {stem:"like Writer B, defends ambition against those who would discourage it?", correct:"D", exp:"D rejects the ‘follow your passion' advice that keeps people ‘idle,' defending effort and achievement, in line with B's defence of ambition against calls for mere contentment."},
+      {stem:"is mainly concerned with when and whether ambitions should be reconsidered, rather than with ambition itself?", correct:"C", exp:"C's point is about ‘timing' and the failure to ‘revise' ambitions set too early - the fortunate are those who ‘ask whether they still want what they once wanted.'"},
+      {stem:"challenges a piece of popular modern advice about how ambition relates to feeling?", correct:"D", exp:"D disputes the ‘follow your passion' idea, arguing ‘passion far more often follows achievement than precedes it.' (B distrusts advice too, but B targets advice urging contentment, not the passion-and-effort relationship.)"}
+    ]
+  },
+  P7: {
+    title: "Setting the Nation's Clocks",
+    rubric: "You are going to read an article from which six paragraphs have been removed. Choose from the paragraphs A to G the one which fits each gap (1 to 6). There is one extra paragraph you do not need.",
+    parts: [
+      "For most of human history, the question ‘what time is it?' had a purely local answer. Noon was the moment the sun stood highest in a particular sky, and since the sun reaches its peak a few minutes later in the west than in the east, every town kept time slightly differently from its neighbours. A traveller crossing the country adjusted their watch, if they bothered at all, by a minute here and two minutes there. For centuries this caused nobody any serious inconvenience.",
+      " The railways changed that, and changed it suddenly. A network of fast trains running to a printed timetable simply cannot function if every station along the line measures noon by its own local sun. A train that leaves one town at what that town calls ten o'clock and arrives at another that keeps time four minutes behind creates a small but real confusion that multiplies dangerously across a busy network.",
+      " Their solution was as bold as it was practical. Rather than wait for anyone to agree on a national standard, they simply imposed one of their own, running every station and every timetable on the time kept at a single observatory, regardless of local custom. A clock in a town two hundred miles to the west might now disagree with the sun overhead by a quarter of an hour, and the railways did not care in the slightest.",
+      " Not everyone accepted the change quietly. In several towns, the local authorities kept the old time on public clocks out of principle, so that for a while a town might display two different times at once: ‘railway time' at the station and ‘God's time,' as some indignantly called it, on the church tower a few streets away. Disputes over which was the ‘real' time occasionally reached the courts.",
+      " Yet the outcome was never really in doubt. The convenience of a single shared time was simply too great, and the number of people whose lives were governed by the railway timetable grew every year. Town by town, the old local times were quietly abandoned, until the version imposed by the railway companies had become, in practice, the time of the entire country.",
+      " What is striking, looking back, is how completely the older way of thinking has vanished. We now regard the time as something external and absolute, handed down from some central authority and merely displayed by our clocks, rather than as a local observation of where the sun happens to be. The idea that noon might legitimately mean different things in different towns strikes us as faintly absurd.",
+      " That, in the end, is the quiet achievement of standard time. It solved a genuine problem of coordination so thoroughly that we have forgotten there was ever a problem, or a choice, at all, and now experience as a plain fact of nature something that was, not so very long ago, a decision made by a handful of railway companies for reasons of their own."
+    ],
+    options: [
+      {letter:"A", text:"We have, without ever quite noticing the shift, come to treat a practical convenience as though it were a fixed law of nature."},
+      {letter:"B", text:"Before the railways, in short, there was simply no reason for distant places to agree on the time, and so they did not."},
+      {letter:"C", text:"Passengers, meanwhile, were expected to keep pace as best they could, consulting the large clocks the companies now installed prominently at every station entrance."},
+      {letter:"D", text:"Faced with this, the railway companies did not petition governments or convene committees; they acted, in the direct manner of businesses with timetables to keep and money to lose."},
+      {letter:"E", text:"Ships at sea, of course, faced an entirely different set of problems, which would not be solved until the introduction of accurate marine chronometers."},
+      {letter:"F", text:"Resistance of this kind, however, could only ever delay the inevitable, not prevent it."},
+      {letter:"G", text:"This transformation in how ordinary people understood time was, in its way, more remarkable than the practical change that produced it."}
+    ],
+    correct: {1:"B", 2:"D", 3:"C", 4:"F", 5:"G", 6:"A"},
+    exp: {
+      1:"Gap 1 follows the description of purely local time causing ‘nobody any serious inconvenience' and precedes ‘The railways changed that' - B sums up that before the railways there was ‘no reason for distant places to agree on the time.'",
+      2:"Gap 2 follows the problem the railways created (trains and mismatched local noons) and precedes ‘The companies' solution was as bold as it was practical' - D describes how the companies ‘acted... in the direct manner of businesses,' which the next sentence calls their solution.",
+      3:"Gap 3 follows the imposition of a single observatory time and precedes the public backlash - C describes passengers keeping pace using the prominent station clocks, a natural bridge before opposition is introduced.",
+      4:"Gap 4 follows the account of towns keeping ‘God's time' in protest and precedes ‘Yet the outcome was never really in doubt' - F states that such resistance ‘could only ever delay the inevitable.'",
+      5:"Gap 5 follows the practical triumph of standard time and precedes the paragraph on how our very idea of time changed - G introduces that deeper ‘transformation in how ordinary people understood time.'",
+      6:"Gap 6 follows ‘noon might mean different things... strikes us as faintly absurd' and precedes ‘That, in the end, is the quiet achievement of standard time' - A states that we now ‘treat a practical convenience as though it were a fixed law of nature,' which ‘That' then refers back to.",
+      extra:"E is not used: the problems of ships at sea and marine chronometers belong to a different story of timekeeping altogether and connect to none of the gaps, which all concern land-based local time and the railways."
+    }
+  },
+  P8: {
+    qword: "crew member",
+    title: "The Volunteer Lifeboat: Four Crew Members",
+    rubric: "You are going to read comments by four members of a volunteer lifeboat crew. For questions 1 to 10, choose from the crew members (A to D). The crew members may be chosen more than once.",
+    texts: [
+      {letter:"A", name:"Crew member A", body:"I've been on the crew for twenty years, and the thing outsiders never grasp is how ordinary most of it is: endless training, maintenance, fundraising, the pager going off for something that turns out to be a false alarm. The dramatic rescues people imagine are a tiny fraction of it. I don't say that to complain, only because the myth does us a disservice. Volunteers who join expecting constant excitement don't last; the ones who stay are the ones who take a quiet satisfaction in a boat kept perfectly ready for a call that may not come for weeks."},
+      {letter:"B", name:"Crew member B", body:"My father was on this same crew, and his father before him, so in one sense I never really chose it. What I did not expect was how much the training would change me elsewhere in my life. Learning to stay calm and think clearly when everything is going wrong at sea turns out to be extraordinarily useful on land too. I run a business now, and colleagues comment on how unflustered I am in a crisis. They have no idea that I learned it in a small boat in a gale, and I rarely tell them."},
+      {letter:"C", name:"Crew member C", body:"People often ask whether I'm frightened, and the honest answer is that fear isn't really the issue once you're launched; you're far too busy. The fear, for me, comes afterwards, sometimes days afterwards, when I think about what might have happened. What I find hardest, though, isn't the danger. It's the calls we don't reach in time, the ones where we're recovering rather than rescuing. You never get used to those, and anyone who tells you they have is either lying or shouldn't be on the crew."},
+      {letter:"D", name:"Crew member D", body:"I joined late, in my forties, after moving to the coast, and I was worried I'd be treated as an outsider. The opposite happened; the crew took me in completely, and I've never felt anything like that sense of belonging. What strikes me most is how little any of the usual things matter here, what you do for a living, how much money you have, where you went to school. On the boat, the only question that has ever mattered is whether the person next to you will do their job when it counts. It's the most honest relationship I've ever known."}
+    ],
+    questions: [
+      {stem:"believes that a popular image of the work is misleading?", correct:"A", exp:"A says ‘the myth does us a disservice' - most of the work is ordinary training and maintenance, not dramatic rescues."},
+      {stem:"says that fear affects them mainly after an event rather than during it?", correct:"C", exp:"C: ‘the fear, for me, comes afterwards... when I think about what might have happened.'"},
+      {stem:"mentions a family tradition of serving on the crew?", correct:"B", exp:"B: ‘My father was on this same crew, and his father before him.'"},
+      {stem:"suggests that those who join for the wrong reasons tend not to stay?", correct:"A", exp:"A: ‘Volunteers who join expecting constant excitement don't last.'"},
+      {stem:"values the way the crew ignores conventional social distinctions?", correct:"D", exp:"D: ‘how little any of the usual things matter here, what you do for a living, how much money you have.'"},
+      {stem:"identifies the unsuccessful rescues as the most difficult part of the job?", correct:"C", exp:"C: ‘the calls we don't reach in time... You never get used to those.'"},
+      {stem:"deliberately keeps quiet about the origin of a personal quality?", correct:"B", exp:"B's colleagues admire his composure but ‘have no idea' he learned it at sea, and ‘I rarely tell them.'"},
+      {stem:"has found that skills learned in the role are useful in their everyday work?", correct:"B", exp:"B: staying calm in a crisis ‘turns out to be extraordinarily useful on land too,' now in running a business."},
+      {stem:"is sceptical of anyone who claims to have become used to a particular hardship?", correct:"C", exp:"C: anyone who says they've got used to the failed rescues ‘is either lying or shouldn't be on the crew.'"},
+      {stem:"had doubts about being accepted that proved unfounded?", correct:"D", exp:"D worried about being ‘treated as an outsider,' but ‘the opposite happened.'"}
+    ]
+  }
+},
+
+{
+  topic: "Why we forget names, four takes on remote work, the invention of the index, and museum conservators",
+  P5: {
+    title: "The Name on the Tip of the Tongue",
+    rubric: "You are going to read an article about why we forget people's names. For questions 1 to 6, choose the answer (A, B, C or D) which you think fits best according to the text.",
+    passage: [
+      "It is one of the most reliably embarrassing experiences in social life. You meet someone you know perfectly well, recognise their face instantly, recall where you met them and what they do for a living, and find that the single most important piece of information, their name, has simply vanished. The peculiar thing is not that we forget names, but that we forget them so much more readily than everything else we know about a person. A face, an occupation, a shared history: all reliably present. The name alone goes missing.",
+      "For a long time this was assumed to reflect some quirk of importance, as if the brain judged names to be less worth remembering than other facts. The truth, researchers now believe, is almost the opposite, and considerably more interesting. Names are hard to remember not because they matter less, but because, from the brain's point of view, they mean nothing at all. Nearly everything else we learn about a person connects to a web of existing knowledge. Learning that someone is a baker calls up everything we already know about bread, ovens and early mornings. A name, by contrast, is arbitrary. Knowing that a man is called Baker tells you, in itself, precisely nothing about him.",
+      "This is neatly demonstrated by a well-known experiment. Researchers showed people photographs of strangers, each accompanied by two pieces of invented information: an occupation and a surname, sometimes identical. A picture might be labelled ‘Baker' as a name, or ‘baker' as a job. When later asked to recall the labels, participants remembered the occupation far more often than the identical word used as a name. The word itself was the same; what differed was whether it connected to anything. As a job, ‘baker' opened a door into a whole storehouse of associations. As a name, it stood alone, connected to nothing, and slipped away.",
+      "Understanding this suggests why the usual advice for remembering names actually works. The common trick of repeating a person's name immediately (‘Nice to meet you, Sofia') helps a little, but the more powerful techniques all involve manufacturing the very connections that names naturally lack. Picturing Sofia on a sofa, or linking her to another Sofia you already know, gives the arbitrary sound something to attach to. The methods can feel absurd, but they are not arbitrary themselves; they are a direct response to the specific reason names are difficult, supplying by deliberate effort the associations that occupations come by for free.",
+      "There is a consoling lesson in all this for anyone who has ever felt that forgetting a name signals indifference or early mental decline. It signals neither. The forgetting is a predictable consequence of how memory is built, and it afflicts the attentive and the careless alike. If anything, the person agonising over a forgotten name is demonstrating how much they care, since the very reason the lapse stings is that everything else about the person, everything that genuinely reflects who they are, has been remembered perfectly well. The name, in the end, is the one piece of information about a person that has nothing to do with them at all."
+    ],
+    questions: [
+      {stem:"What does the writer find most ‘peculiar' about forgetting names?", opts:["That we forget them far more easily than other information about a person.","That we forget the faces of people we have just met.","That we remember names but forget occupations.","That the problem gets worse as people grow older."], correct:0, exp:"The writer says the strange thing ‘is not that we forget names, but that we forget them so much more readily than everything else' - face, job and history all remain."},
+      {stem:"According to current research, why are names hard to remember?", opts:["The brain judges them to be relatively unimportant.","They carry no meaning and connect to nothing we already know.","They are usually longer than other pieces of information.","People do not pay attention when introductions are made."], correct:1, exp:"Names are hard ‘not because they matter less, but because... they mean nothing at all' - unlike a job, a name ‘tells you... precisely nothing about him.'"},
+      {stem:"What did the experiment with photographs demonstrate?", opts:["People remember faces better than any words.","Short words are easier to recall than long ones.","The same word is remembered better as a job than as a name.","People invent occupations more easily than names."], correct:2, exp:"Participants remembered ‘baker' the occupation far more often than the identical ‘Baker' as a name, because as a job it ‘connected to' a store of associations."},
+      {stem:"Why, according to the writer, do memory tricks for names work?", opts:["They force the person to repeat the name many times.","They make the person concentrate harder at the introduction.","They replace the real name with an easier one.","They supply the connections that names naturally lack."], correct:3, exp:"The powerful techniques ‘involve manufacturing the very connections that names naturally lack,' giving the arbitrary sound ‘something to attach to.'"},
+      {stem:"What reassurance does the writer offer in the final paragraph?", opts:["Forgetting a name is not a sign of indifference or decline.","Forgetting names can be completely cured with practice.","Only careless people tend to forget names.","Names are actually the easiest thing to remember."], correct:0, exp:"Forgetting a name ‘signals neither' indifference nor decline; it ‘afflicts the attentive and the careless alike' and is just how memory works."},
+      {stem:"What does the writer suggest is, in a sense, reassuring about the fact that it is the name we forget?", opts:["Names are the least useful thing to know about a person.","The person is unlikely to notice the lapse.","Everything that truly reflects the person has been remembered.","Names can always be looked up later."], correct:2, exp:"The lapse stings precisely because ‘everything else about the person... that genuinely reflects who they are, has been remembered perfectly well.'"}
+    ]
+  },
+  P6: {
+    qword: "manager",
+    title: "Four Managers on Remote Work",
+    rubric: "You are going to read four managers' views on remote working. For questions 1 to 4, choose from the managers (A to D). The managers may be chosen more than once.",
+    texts: [
+      {letter:"A", name:"Manager A", body:"The debate about remote work has become absurdly polarised, as if the only choices were a silent office of the miserable or a productive utopia in pyjamas. My experience, running a team of thirty, is that neither extreme is true and that the honest answer is ‘it depends entirely on the task.' Deep, solitary work, writing, analysis, coding, is almost always better done at home, away from interruption. Genuinely creative collaboration, the kind where one half-formed idea sparks another, remains stubbornly harder over a screen. The mistake is looking for a single policy to cover both."},
+      {letter:"B", name:"Manager B", body:"I'll be blunt: the productivity data from our fully remote period was excellent, better than the office ever produced, and I have no patience for managers who want people back at their desks out of nostalgia or a need to watch them. What I will concede is that we paid a hidden price that took two years to show up. The junior staff who joined during that period never absorbed the thousand unspoken things you only learn by being near more experienced colleagues. Our output was fine. Our pipeline of future talent quietly suffered."},
+      {letter:"C", name:"Manager C", body:"People frame this as a question about productivity, and I think that misses the point entirely. Even if I could prove that remote work produced identical output, which I probably can, I would still worry about what happens to a company's culture when nobody ever shares a room. Culture isn't built in scheduled video calls; it's built in the overheard joke, the unplanned corridor conversation, the sense of a shared endeavour you can physically feel. You can run a business without that for a while. I'm less sure you can build one."},
+      {letter:"D", name:"Manager D", body:"The obsession with whether people are in the office strikes me as a distraction from the real issue, which is trust. A manager who trusts their team doesn't much care where they sit; a manager who doesn't will be miserable whatever the arrangement, hovering over remote workers with surveillance software or over office workers in person. We spent months designing the perfect hybrid policy and eventually realised the policy was never the point. Fix the trust, and the location question mostly answers itself. Fail to, and no policy on earth will save you."}
+    ],
+    questions: [
+      {stem:"argues that the right amount of remote work depends on the type of task involved?", correct:"A", exp:"A: ‘it depends entirely on the task' - solitary work suits home, creative collaboration suits being together."},
+      {stem:"like Manager C, is more concerned with something other than productivity?", correct:"B", exp:"B concedes that although ‘our output was fine,' remote work damaged the development of junior staff - a non-productivity concern, aligning with C's focus on culture over output."},
+      {stem:"believes the whole office-versus-home debate distracts from a more fundamental issue?", correct:"D", exp:"D calls the office question ‘a distraction from the real issue, which is trust.'"},
+      {stem:"suggests that the harm done by remote work only became apparent after a considerable delay?", correct:"B", exp:"B: ‘we paid a hidden price that took two years to show up' - the weakened talent pipeline emerged slowly."}
+    ]
+  },
+  P7: {
+    title: "The Machine for Finding Things",
+    rubric: "You are going to read an article from which six paragraphs have been removed. Choose from the paragraphs A to G the one which fits each gap (1 to 6). There is one extra paragraph you do not need.",
+    parts: [
+      "Turn to the back of almost any serious non-fiction book and you will find, in small type, a list that most readers never consciously think about: the index. It seems too obvious to have been invented, as natural and inevitable a part of a book as its pages. Yet for most of the history of writing, the index did not exist, and its eventual appearance represented a genuine and far from obvious leap in how knowledge could be used.",
+      " The reason is that an index answers a question that, for much of history, it made little sense to ask. In a world of scrolls, there was no practical way to point a reader to a specific location; a scroll has no pages to number, and unrolling one to a precise spot is slow and clumsy. The very format of the text made the idea of ‘looking something up' close to meaningless.",
+      " The arrival of the bound book, with its separate, turnable, and crucially numberable pages, changed the underlying possibilities completely. Now, for the first time, a specific passage had a fixed and citable address. A reader could be told that a particular subject was discussed ‘on page 214' and could turn straight to it. The page number, which we take entirely for granted, was the essential precondition for everything that followed.",
+      " Even then, the index was not an obvious next step, and its early history is bound up with the medieval universities and the friars who preached in them. A preacher needed to find, quickly, every passage in a vast body of religious writing that bore on a particular theme. Reading each work from the beginning every time was impossibly slow, and out of this very practical need the first true subject indexes were painstakingly compiled.",
+      " These early indexes were astonishing feats of labour, assembled by hand over years by teams of scholars, and they were treated as valuable objects in their own right, sometimes circulating separately from the works they indexed. To build one was to impose a wholly new kind of order on a text, an order based not on the sequence the author had chosen but on what a future reader might one day want to find.",
+      " That shift, from the author's order to the reader's needs, is the quiet revolution the index represents. A book without an index can only be read in the order it was written. A book with one can be entered at any point, interrogated, consulted, argued with, used as a tool rather than merely absorbed as a narrative. The index turned the book from something you experienced into something you could operate.",
+      " It is a strange thought that so humble a device, relegated to the back pages and rarely noticed, should have been one of the machines that made modern scholarship possible. But the ability to find a specific fact, quickly, among thousands, without reading everything around it, is so fundamental to how we now use written knowledge that its absence is almost impossible to imagine. We inherited it, like so much else, from people who had to invent it first."
+    ],
+    options: [
+      {letter:"A", text:"To appreciate why, it helps to remember that for centuries the standard form of a written work was not the book at all, but the scroll."},
+      {letter:"B", text:"Modern software, of course, can now generate such a list automatically in a fraction of a second."},
+      {letter:"C", text:"It was this practical requirement, rather than any abstract love of order, that drove the earliest experiments."},
+      {letter:"D", text:"With that single innovation, the technical obstacle that had made an index impossible simply disappeared."},
+      {letter:"E", text:"What they created, in effect, was a second way into the book, running at right angles to the first."},
+      {letter:"F", text:"This capacity for rearrangement had consequences that went well beyond mere convenience."},
+      {letter:"G", text:"Compiling one demanded that every occurrence of every significant idea be located, judged, and recorded under a consistent heading."}
+    ],
+    correct: {1:"A", 2:"D", 3:"C", 4:"G", 5:"E", 6:"F"},
+    exp: {
+      1:"Gap 1 follows the claim that the index ‘represented a genuine and far from obvious leap' and precedes ‘The reason is that an index answers a question...' - A explains why, pointing to the scroll as the older standard form.",
+      2:"Gap 2 follows the explanation of why scrolls made ‘looking something up' meaningless and precedes ‘The arrival of the bound book... changed the underlying possibilities' - D marks the disappearance of ‘the technical obstacle that had made an index impossible.'",
+      3:"Gap 3 follows the medieval preacher's ‘very practical need' for finding passages and precedes the description of the early indexes as feats of labour - C confirms it was ‘this practical requirement... that drove the earliest experiments.'",
+      4:"Gap 4 follows the note that indexes imposed a new order based on ‘what a future reader might want to find' and precedes ‘That shift, from the author's order to the reader's needs' - G describes the exacting compilation work that produced that new order.",
+      5:"Gap 5 must complete the point about a reader-based order before ‘That shift... is the quiet revolution' - E's ‘a second way into the book, running at right angles to the first' captures precisely that new access.",
+      6:"Gap 6 follows the claim that the index let a book be ‘operated' rather than merely read and precedes the closing reflection - F's ‘capacity for rearrangement had consequences... beyond mere convenience' bridges to the final paragraph.",
+      extra:"B is not used: its remark that modern software can generate an index automatically is an anachronistic aside that fits none of the gaps, all of which trace the historical invention of the index by hand."
+    }
+  },
+  P8: {
+    qword: "conservator",
+    title: "Restoring the Past: Four Conservators",
+    rubric: "You are going to read comments by four museum conservators. For questions 1 to 10, choose from the conservators (A to D). The conservators may be chosen more than once.",
+    texts: [
+      {letter:"A", name:"Conservator A", body:"The public imagines conservation as making old things look new again, and that's almost the reverse of what we do. Our guiding rule is minimum intervention: we try to stabilise an object and halt its decay while changing it as little as we possibly can. A painting with visible damage may be left with that damage visible, if repairing it would mean painting over the artist's own work. It takes people a while to understand that a clumsy, over-eager restoration can destroy more history than centuries of gentle neglect."},
+      {letter:"B", name:"Conservator B", body:"Everything we do now has to be reversible; that principle is drummed into you from the first day of training. Any material we add to an object, any adhesive or filler, must be removable by a future conservator without harming the original, because we assume our successors will know things we don't and may want to undo our work. Earlier generations weren't so careful, and I spend a great deal of my time undoing well-meaning repairs from decades ago that used materials we now know cause terrible damage over time."},
+      {letter:"C", name:"Conservator C", body:"What surprises people most is how much of the job is science rather than art. Before I touch anything, I'll have analysed its chemistry, photographed it under ultraviolet and infrared light, and often taken microscopic samples. The romantic image of the conservator with a fine brush and a steady hand is real enough, but it comes at the very end of a long, unglamorous process of investigation. I sometimes think of myself as a detective first and a craftsperson second. You cannot treat what you do not understand."},
+      {letter:"D", name:"Conservator D", body:"The hardest decisions in this job are never technical; they're ethical. Whose intentions do you serve? An object may have been altered many times over its life, and ‘restoring' it always means choosing one moment in its history to privilege over all the others. Do you return a much-repaired chair to how it looked when it was made, erasing three hundred years of a family's repairs, or do you preserve those repairs as part of its story? There's rarely a clearly correct answer, and I've learned to be suspicious of any colleague who thinks there is."}
+    ],
+    questions: [
+      {stem:"stresses the principle of changing an object as little as possible?", correct:"A", exp:"A: ‘Our guiding rule is minimum intervention... changing it as little as we possibly can.'"},
+      {stem:"regards the most difficult choices in the work as moral rather than practical?", correct:"D", exp:"D: ‘The hardest decisions in this job are never technical; they're ethical.'"},
+      {stem:"insists that any work done should be capable of being undone later?", correct:"B", exp:"B: ‘Everything we do now has to be reversible... removable by a future conservator without harming the original.'"},
+      {stem:"points out that a popular idea of the profession is close to the opposite of the truth?", correct:"A", exp:"A: the public imagines making things ‘look new again, and that's almost the reverse of what we do.'"},
+      {stem:"emphasises the large amount of scientific investigation involved before any treatment?", correct:"C", exp:"C: analysis, UV and infrared photography, microscopic samples all come ‘before I touch anything.'"},
+      {stem:"points out that restoring an object means privileging one period of its history?", correct:"D", exp:"D: ‘restoring it always means choosing one moment in its history to privilege over all the others.'"},
+      {stem:"spends significant time correcting the mistakes of earlier practitioners?", correct:"B", exp:"B: ‘I spend a great deal of my time undoing well-meaning repairs from decades ago.'"},
+      {stem:"is wary of colleagues who are too confident they have the right answer?", correct:"D", exp:"D: ‘I've learned to be suspicious of any colleague who thinks there is [a clearly correct answer].'"},
+      {stem:"compares their role to that of an investigator?", correct:"C", exp:"C: ‘I sometimes think of myself as a detective first and a craftsperson second.'"},
+      {stem:"suggests that leaving an object alone can be safer than treating it badly?", correct:"A", exp:"A: ‘a clumsy, over-eager restoration can destroy more history than centuries of gentle neglect.'"}
+    ]
+  }
+},
+
+{
+  topic: "The myth of the lone genius, four food critics, the standardisation of the shipping container, and long-haul pilots",
+  P5: {
+    title: "The Myth of the Lone Genius",
+    rubric: "You are going to read an article about how great ideas are produced. For questions 1 to 6, choose the answer (A, B, C or D) which you think fits best according to the text.",
+    passage: [
+      "There is a story we like to tell about invention, and it goes something like this. A solitary genius, working alone and largely misunderstood, is struck by a flash of insight that changes the world. The apple falls; the bath overflows; the lone figure cries out and runs into the street. It is a wonderful story, endlessly repeated, and it is almost entirely false. The trouble is that we are extremely reluctant to give it up, and the reasons for that reluctance are more revealing than the myth itself.",
+      "The historical record, examined closely, tells a very different tale. The great majority of important discoveries turn out, on inspection, to have been made more or less simultaneously by several people working independently. The telephone, the theory of evolution by natural selection, the calculus, the light bulb: in each case, two or more people arrived at essentially the same idea at essentially the same time, often without any knowledge of one another. This pattern is so common that historians of science have a name for it: the phenomenon of ‘multiple discovery.'",
+      "The reason for this is not mysterious once you stop thinking of ideas as bolts from the blue. An invention becomes possible only when the necessary preconditions are in place: the enabling technologies, the accumulated knowledge, the unanswered question that a whole field has begun to circle. When those conditions ripen, the idea does not wait for a single exceptional mind; it becomes, in a sense, available to anyone standing in the right place, and is typically seized by several such people at once. The individual who gets the credit is often simply the one who published first, or shouted loudest, or had the better lawyer.",
+      "This does not mean that individuals do not matter, and here the debunkers sometimes overreach. Two people may arrive at the same broad idea, yet the specific form one of them gives it, the elegance, the crucial refinement, the sheer determination to see it through against resistance, can make all the difference to whether it changes anything. What the evidence rules out is not the importance of the individual, but the far grander claim that the idea would never have existed at all without one particular person. The genius, on this more modest view, shapes and accelerates something that was, in some form, coming anyway.",
+      "Why, then, do we cling so tightly to the lone-genius myth in the face of all this? Part of the answer is that a story needs a hero, and ‘the conditions were ripe' makes for poor drama. But there is something less flattering at work too. The myth of the solitary genius quietly excuses the rest of us. If world-changing ideas are the property of rare, almost superhuman individuals, then the ordinary person is off the hook, freed from any expectation of contributing. The truth, that discovery is a collective, cumulative, and deeply ordinary human activity into which many hands feed, is at once more encouraging and more demanding. It suggests that the difference between those who contribute and those who do not is far smaller, and far more a matter of effort and circumstance, than the comfortable myth allows."
+    ],
+    questions: [
+      {stem:"What does the writer say about the traditional story of invention?", opts:["It is broadly accurate but oversimplified.","It is almost entirely false, yet we are reluctant to abandon it.","It applies only to discoveries made before modern times.","It was invented recently by historians of science."], correct:1, exp:"The lone-genius story ‘is almost entirely false,' yet ‘we are extremely reluctant to give it up.'"},
+      {stem:"What is the phenomenon of ‘multiple discovery'?", opts:["Several people independently reaching the same idea at the same time.","The same person making several discoveries in one field.","One discovery leading directly to several others.","A discovery being confirmed by later researchers."], correct:0, exp:"Many key discoveries ‘have been made more or less simultaneously by several people working independently.'"},
+      {stem:"According to the writer, why does multiple discovery happen?", opts:["Because scientists frequently copy one another's work.","Because the human mind naturally works in the same way everywhere.","Because an idea becomes available once its preconditions are in place.","Because governments fund the same research in many places."], correct:2, exp:"An invention becomes possible ‘only when the necessary preconditions are in place,' after which it is ‘available to anyone standing in the right place.'"},
+      {stem:"What does the writer concede about the role of the individual?", opts:["Individuals make no real difference to the outcome.","Only one person is ever truly responsible for a discovery.","Individuals matter only if they publish first.","The specific form an individual gives an idea can matter greatly."], correct:3, exp:"The writer warns that debunkers ‘overreach': the ‘specific form,' ‘crucial refinement' and ‘determination' an individual brings ‘can make all the difference.'"},
+      {stem:"What ‘grander claim' does the writer say the evidence rules out?", opts:["That an idea would never have existed without one particular person.","That individuals contribute anything at all to discovery.","That preconditions matter more than people.","That discoveries are ever made simultaneously."], correct:0, exp:"What is ruled out is ‘the far grander claim that the idea would never have existed at all without one particular person.'"},
+      {stem:"What ‘less flattering' reason does the writer give for our attachment to the myth?", opts:["It makes scientists seem more important than they are.","It helps sell popular books about science.","It excuses ordinary people from any expectation of contributing.","It flatters the countries where discoveries were made."], correct:2, exp:"The myth ‘quietly excuses the rest of us': if ideas belong to rare geniuses, ‘the ordinary person is off the hook.'"}
+    ]
+  },
+  P6: {
+    qword: "critic",
+    title: "Four Critics on a New Restaurant",
+    rubric: "You are going to read four food critics writing about the same new restaurant. For questions 1 to 4, choose from the critics (A to D). The critics may be chosen more than once.",
+    texts: [
+      {letter:"A", name:"Critic A", body:"The kitchen at Meridian is plainly gifted, and on a good night the food approaches brilliance. The problem is consistency: across three visits, one meal was among the best I've eaten all year and another was a series of small, careless errors, an over-reduced sauce, a cold plate, a forgotten garnish. A restaurant charging these prices cannot afford an off night, and I had one. Talent is not in question here. Reliability, at least for now, very much is."},
+      {letter:"B", name:"Critic B", body:"Every critic seems obliged to mention Meridian's prices, so let me be the one to say they are entirely justified. Yes, it is expensive; so is everything done this well. What nobody else seems willing to admit is that the much-praised head chef is not, in fact, doing anything especially original, the menu is a confident assembly of ideas borrowed from elsewhere. That would bother me more if the execution were not flawless. I'd rather eat a borrowed dish cooked perfectly than an original one cooked with ego."},
+      {letter:"C", name:"Critic C", body:"I wanted to dislike Meridian, if only to escape the tide of praise, and I couldn't. Everything worked, on the night I went: the timing, the service, the genuinely surprising flavours. It is fashionable to complain that restaurants like this are all style and no substance, and I arrived ready to make exactly that complaint. I left having eaten some of the most inventive food of my year, at a price that, while high, seemed fair for what arrived on the plate. I have no useful criticism to offer, which is rare enough to be worth admitting."},
+      {letter:"D", name:"Critic D", body:"Meridian has been greeted with a chorus of adoration that I find genuinely baffling. The cooking is competent, occasionally more, but the originality everyone keeps praising escaped me entirely; I could name three other restaurants serving near-identical dishes for half the money. What Meridian has, and what its rivals lack, is a very good publicist. Strip away the hype and you are left with a pleasant, wildly overpriced meal, and a dining room full of people afraid to admit they can't see what all the fuss is about."}
+    ],
+    questions: [
+      {stem:"gives the most consistently positive verdict on the restaurant?", correct:"C", exp:"Only C found ‘everything worked' with ‘no useful criticism to offer'; A cites inconsistency, B denies the food's originality, and D is largely negative."},
+      {stem:"shares Critic B's view that the food is not genuinely original?", correct:"D", exp:"D says ‘the originality everyone keeps praising escaped me entirely,' agreeing with B that the dishes are borrowed - though B forgives it and D does not."},
+      {stem:"differs from the other three by complaining that the restaurant is not worth the money?", correct:"D", exp:"Only D calls it ‘wildly overpriced'; A, B and C all consider the prices justified or fair for the quality."},
+      {stem:"raises a concern about the restaurant that none of the other three mentions?", correct:"A", exp:"Only A raises inconsistency between visits (‘one meal... the best I've eaten all year and another a series of careless errors') - the others each judge it on a single, uniform impression."}
+    ]
+  },
+  P7: {
+    title: "The Box That Built the Modern World",
+    rubric: "You are going to read an article from which six paragraphs have been removed. Choose from the paragraphs A to G the one which fits each gap (1 to 6). There is one extra paragraph you do not need.",
+    parts: [
+      "It is a plain steel box, corrugated, rectangular, and about as interesting to look at as a filing cabinet. There are tens of millions of them in the world, stacked in ports, riding on ships and lorries, occasionally repurposed as offices or homes. The shipping container is so unremarkable that it is easy to miss the scale of what it did. Yet a serious case can be made that this dull object reshaped the global economy more profoundly than almost any technology of the twentieth century.",
+      " Before it, loading a ship was a scene of astonishing, expensive chaos. Goods arrived at the docks in a thousand different shapes, sacks, barrels, crates, loose bundles, and each had to be manhandled aboard and packed by hand into the awkward spaces of a ship's hold. An army of dockworkers might spend days loading a single vessel, and the cost of all that labour made shipping goods over long distances ruinously expensive.",
+      " The insight behind the container was almost embarrassingly simple: put the goods in a standard box before they ever reach the port, and handle the box rather than its contents. A crane can lift a sealed container from a lorry and set it directly onto a ship in seconds, with no need to touch what is inside. What had taken days could now take hours, and the cost of loading collapsed to a tiny fraction of its former level.",
+      " The idea, however, was the easy part. The container could only deliver its promise if a box loaded onto a lorry in one country could be lifted onto a ship, unloaded onto a train, and carried to its destination anywhere in the world, and that required every one of those systems to agree on a single set of dimensions and fittings.",
+      " Reaching that agreement took years of difficult negotiation between rival companies, national bodies and competing designs, none of whom had much immediate interest in surrendering their own standard to a competitor's. That this was eventually achieved at all is, in retrospect, as impressive as the original idea, and considerably less celebrated.",
+      " Once the standard was in place, the effects rippled outward in ways nobody had fully predicted. Because shipping had become so cheap, it now made economic sense to manufacture goods on the far side of the planet and send them across oceans to be sold, something that would have been unthinkable when loading costs were high.",
+      " None of this was the plan. The container was conceived as a way to load ships more cheaply, not as an instrument for remaking the map of world manufacturing. That it became the second is a reminder that the most transformative technologies are often not the cleverest, but the ones that quietly remove a cost so basic that nobody had thought to question it."
+    ],
+    options: [
+      {letter:"A", text:"The whole global supply chain, with factories in one hemisphere serving shops in another, rests on this single, unglamorous fact."},
+      {letter:"B", text:"To understand why, you have to picture the world of shipping as it was before this box existed."},
+      {letter:"C", text:"A container, after all, is useful only if it fits the ship, the crane, the lorry and the train alike."},
+      {letter:"D", text:"Newer vessels can now carry more than twenty thousand of them on a single voyage."},
+      {letter:"E", text:"The solution, when someone finally arrived at it, seems obvious only with the benefit of hindsight."},
+      {letter:"F", text:"In this respect, the container's real triumph was not one of engineering at all, but of persuasion and compromise."},
+      {letter:"G", text:"Entire industries, in other words, quietly rearranged themselves around the low cost of moving a box from one continent to another."}
+    ],
+    correct: {1:"B", 2:"E", 3:"C", 4:"F", 5:"G", 6:"A"},
+    exp: {
+      1:"Gap 1 follows the claim that the container ‘reshaped the global economy' and precedes ‘Before it, loading a ship was a scene of... chaos' - B invites us to ‘picture the world of shipping as it was before this box existed.'",
+      2:"Gap 2 follows the description of the old, chaotic, expensive loading and precedes ‘The insight behind the container was almost embarrassingly simple' - E notes that ‘the solution... seems obvious only with the benefit of hindsight.'",
+      3:"Gap 3 follows the point that the idea was ‘the easy part' and precedes the need for every system to share dimensions - C states that ‘a container... is useful only if it fits the ship, the crane, the lorry and the train alike.'",
+      4:"Gap 4 follows the account of years of standard-setting negotiation and precedes ‘Once the standard was in place' - F concludes that the real triumph ‘was not one of engineering at all, but of persuasion and compromise.'",
+      5:"Gap 5 follows the point that cheap shipping made distant manufacturing sensible and precedes ‘None of this was the plan' - G says ‘entire industries... quietly rearranged themselves around the low cost of moving a box.'",
+      6:"Gap 6 is best filled by A: it follows the rearrangement of world manufacturing and reinforces that ‘the whole global supply chain... rests on this single, unglamorous fact,' before the closing reflection. (Placed at the end of the economic-effects thread.)",
+      extra:"D is not used: its statistic about newer vessels carrying twenty thousand containers is a stray detail that fits none of the gaps, which trace the container's origins, its need for a shared standard, and its economic consequences."
+    }
+  },
+  P8: {
+    qword: "pilot",
+    title: "Life at Altitude: Four Long-Haul Pilots",
+    rubric: "You are going to read comments by four long-haul airline pilots. For questions 1 to 10, choose from the pilots (A to D). The pilots may be chosen more than once.",
+    texts: [
+      {letter:"A", name:"Pilot A", body:"People are often unsettled to learn how much of a modern flight is automated, as though that made the pilot redundant. It's the opposite. The automation handles the routine flawlessly, which frees us to do the thing computers still can't: exercise judgement when something unexpected happens. My real job isn't flying the aircraft minute to minute; it's monitoring, thinking ahead, and being ready to take over instantly on the rare occasions it matters. The hardest skill to teach a young pilot isn't how to fly. It's how to stay alert through hours in which, if all goes well, nothing whatever happens."},
+      {letter:"B", name:"Pilot B", body:"The part of the job that wears you down isn't the flying; it's the body clock. I might have breakfast in one time zone, land in another eight hours out of step, and be expected to sleep when my body is convinced it's the middle of the afternoon. After twenty years, I still haven't truly adjusted, and I've stopped expecting to. What helps is ruthless discipline about rest, blackout blinds, no screens, a fixed routine wherever I am in the world. The pilots who struggle are the ones who try to live like tourists on their layovers. I gave that up long ago."},
+      {letter:"C", name:"Pilot C", body:"What outsiders rarely appreciate is how much of safety comes down to communication rather than skill. Modern training spends less time on stick-and-rudder ability than on how a crew talks to one another, specifically, on making sure a junior officer feels able to challenge a senior captain who is making a mistake. Some of the worst accidents in aviation history happened because someone saw a problem and didn't feel able to speak up. We have worked hard to build cockpits where rank never silences a valid concern, and I'd argue it has saved more lives than any piece of technology."},
+      {letter:"D", name:"Pilot D", body:"I came to this late, after a first career in medicine, and the thing that most surprised me was how similar the two worlds are underneath. Both are obsessed, rightly, with learning from failure, with checklists, with the idea that any competent professional can have a catastrophic lapse and that systems, not heroics, are what keep people safe. In medicine, when I trained, admitting an error still felt like a confession. In aviation, reporting your own mistakes is treated as a service to everyone. I only wish the hospital I left had thought the same way."}
+    ],
+    questions: [
+      {stem:"argues that automation has made the pilot's judgement more important, not less?", correct:"A", exp:"A: automation frees pilots ‘to do the thing computers still can't: exercise judgement when something unexpected happens.'"},
+      {stem:"believes that good communication has done more for safety than technology?", correct:"C", exp:"C: cockpits where ‘rank never silences a valid concern' have ‘saved more lives than any piece of technology.'"},
+      {stem:"says that disrupted sleep is the most difficult aspect of the job?", correct:"B", exp:"B: ‘The part of the job that wears you down isn't the flying; it's the body clock.'"},
+      {stem:"says the hardest thing to teach is maintaining concentration when nothing is happening?", correct:"A", exp:"A: the hardest skill is ‘how to stay alert through hours in which... nothing whatever happens.'"},
+      {stem:"was struck by the similarities between their new profession and a previous one?", correct:"D", exp:"D: coming from medicine, ‘the thing that most surprised me was how similar the two worlds are underneath.'"},
+      {stem:"mentions that past disasters resulted from someone failing to speak up?", correct:"C", exp:"C: ‘some of the worst accidents... happened because someone saw a problem and didn't feel able to speak up.'"},
+      {stem:"describes their main role as watching and anticipating rather than constant hands-on control?", correct:"A", exp:"A: ‘My real job... is monitoring, thinking ahead, and being ready to take over instantly.'"},
+      {stem:"has adopted a strict personal routine to cope with a challenge?", correct:"B", exp:"B relies on ‘ruthless discipline about rest, blackout blinds, no screens, a fixed routine.'"},
+      {stem:"criticises people who fail to prioritise rest during stopovers?", correct:"B", exp:"B: ‘The pilots who struggle are the ones who try to live like tourists on their layovers.'"},
+      {stem:"contrasts attitudes to admitting mistakes in two different fields?", correct:"D", exp:"D: in medicine ‘admitting an error still felt like a confession,' but in aviation reporting mistakes ‘is treated as a service to everyone.'"}
+    ]
+  }
+}
+
+];
 
 /* ============ STATE ============ */
+let TI = 0;
+let P5, P6, P7, P8;
 const state = {
-  p5: new Array(P5.questions.length).fill(null), p5checked:false,
-  p6: new Array(P6.questions.length).fill(null), p6checked:false,
+  p5: [], p5checked:false,
+  p6: [], p6checked:false,
   p7: {}, p7checked:false,
-  p8: new Array(P8.questions.length).fill(null), p8checked:false
+  p8: [], p8checked:false
 };
 const GAPCOUNT7 = 6;
 
@@ -372,7 +778,7 @@ function renderMatch(prefix, data, sectionSel){
     </div>`).join('');
   document.getElementById(prefix+'Questions').innerHTML = data.questions.map((q,qi)=>`
     <div class="match-q" data-qi="${qi}">
-      <div class="match-stem"><span class="mcq-num" style="flex-shrink:0">${qi+1}</span><span>Which reviewer/person ${q.stem}</span></div>
+      <div class="match-stem"><span class="mcq-num" style="flex-shrink:0">${qi+1}</span><span>Which ${data.qword||'person'} ${q.stem}</span></div>
       <div class="match-pills">${data.texts.map(t=>`<button class="match-pill" data-letter="${t.letter}" onclick="pickMatch('${prefix}',${qi},'${t.letter}')">${t.letter}</button>`).join('')}</div>
     </div>`).join('');
 }
@@ -550,8 +956,37 @@ function showPart(n){
   document.querySelectorAll('.part-section').forEach(s=>s.classList.toggle('visible', +s.dataset.part===n));
 }
 
+/* ============ TEST PICKER ============ */
+function loadTest(i){
+  TI = i;
+  const T = TESTS[i];
+  P5 = T.P5; P6 = T.P6; P7 = T.P7; P8 = T.P8;
+  document.getElementById('rub5').textContent = P5.rubric;
+  document.getElementById('rub6').textContent = P6.rubric;
+  document.getElementById('rub7').textContent = P7.rubric;
+  document.getElementById('rub8').textContent = P8.rubric;
+  document.getElementById('testTopic').innerHTML = '<strong>Test ' + (i+1) + '</strong> - ' + T.topic;
+  document.querySelectorAll('.test-pill').forEach((b,bi)=>b.classList.toggle('active', bi===i));
+  resetP5(); resetP6(); resetP7(); resetP8();
+  showPart(5);
+  try{ localStorage.setItem('jpe-c1-reading-test', i); }catch(e){}
+  window.scrollTo(0,0);
+}
+function buildPicker(){
+  const wrap = document.getElementById('testPicker');
+  TESTS.forEach((t,i)=>{
+    const b = document.createElement('button');
+    b.className = 'test-pill'; b.textContent = 'Test ' + (i+1);
+    b.onclick = ()=>loadTest(i);
+    wrap.appendChild(b);
+  });
+}
+
 /* ============ INIT ============ */
-renderP5(); renderMatch('p6',P6); renderP7(); renderMatch('p8',P8);
+buildPicker();
+let startTest = 0;
+try{ const sv = parseInt(localStorage.getItem('jpe-c1-reading-test'),10); if(sv>=0 && sv<TESTS.length) startTest = sv; }catch(e){}
+loadTest(startTest);
 </script>
 </body>
 </html>
