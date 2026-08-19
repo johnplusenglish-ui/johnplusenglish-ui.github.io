@@ -120,8 +120,11 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
 .pv-sheet{display:block}
 .pv-entry{display:grid;grid-template-columns:var(--tw,12rem) 1fr;gap:0 1.2rem;align-items:baseline;padding:.5rem .3rem;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s}
 .pv-entry:hover,.pv-entry.open{background:var(--cream)}
-.pv-entry-name{font-weight:700;font-size:.85rem;color:var(--text-primary);line-height:1.35}
+.pv-entry-name{font-weight:700;font-size:.85rem;color:var(--text-primary);line-height:1.35;white-space:nowrap}
 .pv-entry-name .nw{white-space:nowrap}
+/* Too long for the term column: take the full width, definition drops beneath. */
+.pv-entry.wide{grid-template-columns:1fr}
+.pv-entry.wide .pv-entry-def{margin-top:.1rem}
 /* Neutral tier classes: .common was amber here but green in phrasal verbs,
    which blocked the two pages from ever sharing this stylesheet. */
 .pv-entry-dot{width:5px;height:5px;border-radius:50%;display:inline-block;margin-left:.35rem;vertical-align:middle;flex-shrink:0}
@@ -263,8 +266,11 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
   .pv-cat-sidebar{max-height:200px;position:static}
 }
 @media(max-width:620px){
-  /* Term and definition stack rather than being squeezed into two columns. */
+  /* Term and definition stack rather than being squeezed into two columns.
+     Wrapping comes back on here: the longest idiom is wider than a phone
+     screen, so nowrap would force the page to scroll sideways. */
   .pv-entry{grid-template-columns:1fr}
+  .pv-entry-name{white-space:normal}
   .pv-entry-def{margin-top:.15rem}
 }
 @media(max-width:480px){
@@ -1288,20 +1294,35 @@ function idRenderAlpha(items){
 // Size the term column to the 90th-percentile idiom width, not the widest.
 // The longest idiom measures ~316px but the median is ~113px, so sizing to the
 // maximum pushed definitions far to the right on most rows. Cached.
-var idTermW = null;
+var idTermW = null, idTermPx = null;
+function idMeasureTerms(){
+  var p = document.createElement('span');
+  p.style.cssText = 'position:absolute;left:-9999px;top:0;white-space:nowrap;'
+    + 'font-family:Outfit,sans-serif;font-weight:700;font-size:.85rem';
+  document.body.appendChild(p);
+  idTermPx = Object.create(null);
+  var w = [];
+  DATA.forEach(function(it){ p.textContent = it.i; var x = p.offsetWidth; idTermPx[it.i] = x; w.push(x); });
+  p.parentNode.removeChild(p);
+  w.sort(function(a,b){ return a - b; });
+  idTermW = w[Math.floor(w.length * 0.9)] + 12;
+}
+// ~11px covers the trailing frequency dot and its margin
+var ID_DOT_PX = 11;
 function idSizeList(){
-  if (idTermW === null) {
-    var p = document.createElement('span');
-    p.style.cssText = 'position:absolute;left:-9999px;top:0;white-space:nowrap;'
-      + 'font-family:Outfit,sans-serif;font-weight:700;font-size:.85rem';
-    document.body.appendChild(p);
-    var w = DATA.map(function(it){ p.textContent = it.i; return p.offsetWidth; });
-    p.parentNode.removeChild(p);
-    w.sort(function(a,b){ return a - b; });
-    idTermW = w[Math.floor(w.length * 0.9)] + 12;
-  }
+  if (idTermW === null) idMeasureTerms();
   document.querySelectorAll('.pv-sheet').forEach(function(el){
     el.style.setProperty('--tw', idTermW + 'px');
+  });
+  // Terms never wrap. The ~10% too long for the column get their own full-width
+  // line with the definition beneath, instead of either wrapping to two lines
+  // or forcing a wider column that would push every definition to the right.
+  // Uses the cached measurements, so this reads no layout.
+  document.querySelectorAll('.pv-entry').forEach(function(row){
+    var n = row.querySelector('.pv-entry-name');
+    if (!n) return;
+    var px = idTermPx[n.textContent.trim()];
+    row.classList.toggle('wide', px !== undefined && px + ID_DOT_PX > idTermW);
   });
 }
 // On a cold load the first measure can run before Outfit arrives, which would
