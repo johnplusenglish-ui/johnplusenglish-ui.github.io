@@ -137,10 +137,13 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
    non-slash entries, 26 for the handful of slash pairs like
    "confusing/confused"), so the row is one column term+dot | definition,
    same shape as Phrasal Verbs and Idioms. --tw is sized at runtime (adjSizeList)
-   to the 90th-percentile term width, not the longest — the widest entry is far
-   above the typical one, so sizing to the max left a huge gap on most rows.
-   The tail that's still too wide gets .wide (full-width row, definition
-   beneath), same escape hatch as Idioms. Zebra striping is gone: the old
+   to the 99th-percentile term width, not the longest — sizing to the true max
+   would widen the column for one outlier. p99 rather than Idioms' p90: these
+   are mostly short, uniform single words, so a wide row breaking that rhythm
+   every ~10 rows reads as a fault, not a rare exception. The handful still
+   too wide (mainly the 12 slash pairs like "confusing/confused") get .wide
+   (full-width row, definition beneath), same escape hatch as Idioms. Zebra
+   striping is gone: the old
    :nth-child(even) rule counted .adj-alpha-header too, so parity flipped at
    every letter break. */
 .adj-entry{display:grid;grid-template-columns:var(--tw,10rem) 1fr;gap:0 1.2rem;align-items:baseline;padding:.5rem .3rem;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s}
@@ -2677,7 +2680,12 @@ function adjMeasureTerms(){
   ADJ_DATA.forEach(function(a){ if(!a) return; p.textContent=a.word; var x=p.offsetWidth; adjTermPx[a.word]=x; w.push(x); });
   p.parentNode.removeChild(p);
   w.sort(function(x,y){return x-y});
-  adjColW=w[Math.floor(w.length*0.9)]+20; // + room for the trailing tier dot
+  // p99, not p90: adjectives are mostly short single words with a tight,
+  // uniform rhythm, so a wide row breaking that pattern every ~10 rows read
+  // as a fault rather than a rare exception (unlike the longer, more varied
+  // Idioms list, where p90 was the right call). p99 costs ~28px more gap on
+  // a typical row but drops wide rows from 9.7% to under 1%.
+  adjColW=w[Math.floor(w.length*0.99)]+20; // + room for the trailing tier dot
 }
 function adjSizeList(){
   if(adjColW===null) adjMeasureTerms();
