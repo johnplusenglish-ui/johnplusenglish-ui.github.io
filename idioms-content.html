@@ -112,11 +112,12 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
    Idioms are whole phrases with no particle to split out, so unlike the
    Prepositions and Phrasal Verbs ledgers there is no third column to align.
    Term and definition sit side by side in one column, matching those pages.
-   --tw is set at runtime (idSizeList) to the 90th-percentile term width rather
+   --tw is set at runtime (idSizeList) to the 95th-percentile term width rather
    than the longest: the widest idiom is 316px but the median is only 113px, so
-   sizing to the maximum left a huge gap on most rows. The top ~10% wrap to a
-   second line instead. Zebra striping is gone — .pv-alpha-header shares the
-   parent, so :nth-child(even) flipped parity at every letter break. */
+   sizing to the maximum left a huge gap on most rows. The ~5% still too wide
+   get .wide (full-width row, definition beneath) rather than wrapping onto a
+   second line. Zebra striping is gone — .pv-alpha-header shares the parent,
+   so :nth-child(even) flipped parity at every letter break. */
 .pv-sheet{display:block}
 .pv-entry{display:grid;grid-template-columns:var(--tw,12rem) 1fr;gap:0 1.2rem;align-items:baseline;padding:.5rem .3rem;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s}
 .pv-entry:hover,.pv-entry.open{background:var(--cream)}
@@ -1305,7 +1306,11 @@ function idMeasureTerms(){
   DATA.forEach(function(it){ p.textContent = it.i; var x = p.offsetWidth; idTermPx[it.i] = x; w.push(x); });
   p.parentNode.removeChild(p);
   w.sort(function(a,b){ return a - b; });
-  idTermW = w[Math.floor(w.length * 0.9)] + 12;
+  // p95, not p90: idioms are naturally variable-length phrases (unlike the
+  // tight, uniform single words on the Adjectives list, where p90 read as a
+  // broken pattern), so the occasional wide row is closer to expected. Still,
+  // p95 nearly halves how often it happens (8.9% -> 4.9%) for only 22px more.
+  idTermW = w[Math.floor(w.length * 0.95)] + 12;
 }
 // ~11px covers the trailing frequency dot and its margin
 var ID_DOT_PX = 11;
