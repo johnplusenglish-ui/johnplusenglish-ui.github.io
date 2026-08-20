@@ -116,6 +116,19 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
 .fade-enter{animation:fadeIn .32s ease both}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
+/* stage transitions + result reveal */
+.panel{position:relative}
+.stage-break{position:absolute;inset:0;z-index:5;background:var(--card);border-radius:var(--radius);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.7rem;text-align:center;padding:1rem;animation:fadeIn .3s ease both}
+.stage-break .lvl-pill{font-size:1rem;padding:.35rem .95rem}
+.sb-text{font-weight:600;font-size:1.02rem;max-width:30ch}
+.sb-text b{color:var(--sky)}
+.res-greet{font-size:1.12rem;font-weight:700;margin-bottom:.7rem}
+.res-john{font-size:.88rem;font-style:italic;color:var(--muted);max-width:46ch;margin:.7rem auto 0}
+.res-john b{font-style:normal;font-weight:700;color:var(--ink)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.seq{animation:fadeUp .45s ease both}
+@media(prefers-reduced-motion:reduce){.seq,.stage-break{animation:none}}
+
 /* result */
 .res-top{text-align:center;padding-bottom:.4rem}
 .badge{width:104px;height:104px;margin:.3rem auto 1rem;border-radius:22px;display:grid;place-items:center;color:#fff;font-weight:800;font-size:2.4rem;letter-spacing:-.02em;box-shadow:0 10px 26px -10px var(--lvl,#2176FF);background:var(--lvl,#2176FF);animation:pop .5s cubic-bezier(.34,1.56,.64,1) both}
@@ -238,16 +251,22 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     <div class="qbar"><i id="bar"></i></div>
     <p class="stem" id="stem" aria-live="polite"></p>
     <div class="opts" id="opts"></div>
+    <div class="stage-break" id="stageBreak" hidden>
+      <span class="lvl-pill" id="sbPill">B2</span>
+      <p class="sb-text" id="sbText"></p>
+    </div>
   </section>
 
   <!-- RESULT -->
   <section id="result" class="panel" hidden>
     <div class="res-top">
+      <div class="res-greet" id="resGreet"></div>
       <div class="badge" id="badge">B2</div>
       <div class="res-label">Your estimated level</div>
       <div class="res-name" id="resName">Upper-Intermediate</div>
       <p class="res-desc" id="resDesc"></p>
       <p class="res-desc" id="resFocus" style="font-size:.82rem"></p>
+      <p class="res-john" id="resJohn"></p>
       <div class="res-score" id="resScore"></div>
     </div>
 
@@ -532,6 +551,15 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
   var FAIL_CORE  = {A1:5, A2:5, B1:5, B2:5, C1:5, C2:7};
   var PASS_TOTAL = {A1:10, A2:10, B1:10, B2:10, C1:12, C2:14};
   var PASS_PCT   = {A1:.625, A2:.625, B1:.625, B2:.625, C1:.75, C2:.875};
+  var JOHN = {
+    A1:"Everyone starts somewhere. Come along and we&rsquo;ll get you talking from day one.",
+    A2:"You&rsquo;ve got the basics. Now we make them automatic.",
+    B1:"Solid foundations. Time to turn knowledge into real conversation.",
+    B2:"This is where fluency starts to feel real. Keep pushing.",
+    C1:"Genuinely impressive. From here it&rsquo;s precision and sounding natural.",
+    C2:"Outstanding. At this level it&rsquo;s all nuance, and that&rsquo;s the fun part."
+  };
+  var GREET = {A1:"Great start", A2:"Great start", B1:"Well done", B2:"Nice work", C1:"Impressive stuff", C2:"Outstanding"};
 
   var LV = {
     A1:{name:"Beginner", color:"#8B5CF6", desc:"You can understand and use very basic everyday phrases and introduce yourself.",
@@ -637,22 +665,66 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
       st.items = shuffle(RESERVE_POOL[b].slice()).slice(0,4);
       st.idx = 0;
       st.ans = new Array(st.items.length).fill(null);
-      render(); return;
+      stageBreak(b, "Close call. A few more <b>"+b+"</b> questions to be sure.", render); return;
     }
     var total = st.coreC + c;
     st.per[b] = {c:total, t:CORE+RES};
     if(total >= PASS_TOTAL[b]) passBand(); else failBand();
   }
+  function stageBreak(band, msg, cb){
+    var sb = el("stageBreak");
+    el("sbPill").textContent = band;
+    el("sbPill").style.background = (LV[band] || {}).color || "#2176FF";
+    el("sbText").innerHTML = msg;
+    sb.hidden = false; lock = true;
+    setTimeout(function(){ sb.hidden = true; lock = false; cb(); }, 1400);
+  }
+  function celebrate(){
+    try{
+      if(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      var host = document.querySelector(".res-top");
+      var cv = document.createElement("canvas");
+      if(!host || !cv.getContext) return;
+      cv.width = 600; cv.height = 300;
+      cv.style.cssText = "position:absolute;left:50%;top:-14px;transform:translateX(-50%);width:300px;height:150px;pointer-events:none";
+      host.style.position = "relative";
+      host.appendChild(cv);
+      var ctx = cv.getContext("2d");
+      var cols = ["#8B5CF6","#6366F1","#0EA5E9","#2176FF","#10b981","#059669"];
+      var ps = [];
+      for(var i = 0; i < 36; i++){
+        var a = Math.random()*Math.PI*2, sp = 2 + Math.random()*4;
+        ps.push({x:300, y:170, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp - 3.2, r:2.5 + Math.random()*3, c:cols[i % 6]});
+      }
+      var t0 = performance.now();
+      (function frame(now){
+        var t = (now - t0) / 1300;
+        ctx.clearRect(0, 0, 600, 300);
+        if(t >= 1){ if(cv.parentNode) cv.parentNode.removeChild(cv); return; }
+        ps.forEach(function(p){
+          p.x += p.vx; p.y += p.vy; p.vy += 0.12;
+          ctx.globalAlpha = Math.max(0, 1 - t);
+          ctx.fillStyle = p.c;
+          ctx.fillRect(p.x - p.r, p.y - p.r, p.r*2, p.r*1.2);
+        });
+        requestAnimationFrame(frame);
+      })(t0);
+    }catch(e){}
+  }
   function passBand(){
     st.passed[ORDER[st.band]] = true;
     if(st.band===ORDER.length-1 || st.failed[ORDER[st.band+1]]){ finish(st.band); return; }
-    st.band++; startStage();
+    st.band++;
+    var nb = ORDER[st.band];
+    stageBreak(nb, "Strong answers. Stepping up to <b>"+nb+"</b>.", startStage);
   }
   function failBand(){
     st.failed[ORDER[st.band]] = true;
     if(st.band===0){ finish(0); return; }
     if(st.passed[ORDER[st.band-1]]){ finish(st.band-1); return; }
-    st.band--; startStage();
+    st.band--;
+    var nb = ORDER[st.band];
+    stageBreak(nb, "Let&rsquo;s try some <b>"+nb+"</b> questions and find your fit.", startStage);
   }
 
   function submitResult(level, levelName, spectrumPct){
@@ -694,9 +766,25 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     el("badge").textContent = level;
     document.querySelector(".badge").style.setProperty("--lvl", meta.color);
     el("resName").textContent = meta.name;
+    var fn = (student.name || "").trim().split(/\s+/)[0] || "there";
+    el("resGreet").textContent = (GREET[level] || "Well done") + ", " + fn + "!";
+    el("resJohn").innerHTML = "&ldquo;" + JOHN[level] + "&rdquo;&nbsp; <b>John</b>";
     el("resDesc").textContent = meta.desc;
     el("resFocus").textContent = meta.focus;
-    el("resScore").textContent = "You answered "+st.correct+" of "+st.before+" correctly across "+Object.keys(st.per).length+" level checks.";
+    var setScore = function(n){
+      el("resScore").textContent = "You answered "+n+" of "+st.before+" correctly across "+Object.keys(st.per).length+" level checks.";
+    };
+    var reduced = true;
+    try{ reduced = !window.performance || (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches); }catch(e){}
+    if(reduced){ setScore(st.correct); }
+    else {
+      var sc0 = performance.now(), scTarget = st.correct;
+      (function tick(now){
+        var p = Math.min(1, (now - sc0) / 700);
+        setScore(Math.round(scTarget * p));
+        if(p < 1) requestAnimationFrame(tick);
+      })(sc0);
+    }
 
     // position within the band: base on margin above the pass mark,
     // nudged up by any correct answers in the band above
@@ -766,6 +854,13 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
 
     quiz.hidden = true; intro.hidden = true; result.hidden = false;
     result.classList.add("fade-enter");
+    try{
+      for(var ki = 0; ki < result.children.length; ki++){
+        result.children[ki].style.animationDelay = (ki * 90) + "ms";
+        result.children[ki].classList.add("seq");
+      }
+    }catch(e){}
+    celebrate();
     bar.style.width = "100%";
     window.scrollTo({top:0, behavior:"smooth"});
   }
@@ -921,6 +1016,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
 
   document.addEventListener("keydown", function(e){
     if(quiz.hidden || !st) return;
+    if(!el("stageBreak").hidden) return;
     var n = st.items[st.idx].o.length;
     if(e.key.length===1){
       var kk = e.key.toLowerCase();
@@ -930,6 +1026,11 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     if(e.key==="Backspace" || e.key==="ArrowLeft"){ e.preventDefault(); goBack(); }
   });
   backBtn.addEventListener("click", goBack);
+  try{
+    el("gateName").addEventListener("keydown", function(e){ if(e.key === "Enter"){ e.preventDefault(); el("gateEmail").focus(); } });
+    el("gateEmail").addEventListener("keydown", function(e){ if(e.key === "Enter"){ e.preventDefault(); el("startBtn").click(); } });
+    if(!PREVIEW_LEVEL) el("gateName").focus();
+  }catch(e){}
   document.addEventListener("mousemove", function(){ opts.classList.remove("nohover"); }, {passive:true});
 
   function validEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
@@ -983,6 +1084,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
   el("retakeBtn").addEventListener("click", function(){
     result.hidden = true; quiz.hidden = true; intro.hidden = false; bar.style.width = "0%";
     el("review").hidden = true; el("revTitle").hidden = true;
+    el("stageBreak").hidden = true;
     el("noteText").value = ""; el("noteText").disabled = false;
     el("noteBtn").disabled = false; el("noteStatus").textContent = "";
     window.scrollTo({top:0, behavior:"smooth"});
