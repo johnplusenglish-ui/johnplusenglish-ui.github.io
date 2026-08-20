@@ -536,6 +536,14 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
 
   // ---- Adaptive state: start at B1, walk up/down to find the boundary ----
   var st=null, lock=false, lastCard=null;
+  // John's preview mode: open /#preview (or #preview-c1 etc.) to see the finished
+  // result screen with sample data. Nothing is logged or saved in preview.
+  var PREVIEW_LEVEL = (function(){
+    try{
+      var m = (window.location.hash || "").match(/^#preview(?:-(a1|a2|b1|b2|c1|c2))?$/i);
+      return m ? (m[1] ? m[1].toUpperCase() : "B2") : null;
+    }catch(e){ return null; }
+  })();
   function reset(){ st={band:2, passed:{}, failed:{}, per:{}, before:0, correct:0, items:null, idx:0, ans:null, history:[]}; lock=false; }
 
   function startStage(){
@@ -583,6 +591,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
   function goBack(){ if(st.idx>0){ st.idx--; render(); } }
 
   function logHit(key){
+    if(PREVIEW_LEVEL) return;
     try{ fetch("https://abacus.jasoncameron.dev/hit/johnplusenglish/"+key, {mode:"cors", keepalive:true}).catch(function(){}); }
     catch(e){}
   }
@@ -622,6 +631,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
   }
 
   function submitResult(level, levelName, spectrumPct){
+    if(PREVIEW_LEVEL) return;
     if(SUPABASE_URL.indexOf("REPLACE") === 0 || SUPABASE_ANON_KEY.indexOf("REPLACE") === 0) return;
     var breakdown = {};
     Object.keys(st.per).forEach(function(l){ breakdown[l] = st.per[l]; });
@@ -653,7 +663,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
 
   function finish(placedIdx){
     var level = ORDER[placedIdx], meta = LV[level];
-    try{ localStorage.setItem("jpe-level", JSON.stringify({level:level, at:Date.now()})); }catch(e){}
+    if(!PREVIEW_LEVEL){ try{ localStorage.setItem("jpe-level", JSON.stringify({level:level, at:Date.now()})); }catch(e){} }
     logHit("lt-place-"+level.toLowerCase());
 
     el("badge").textContent = level;
@@ -836,6 +846,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
   });
 
   el("noteBtn").addEventListener("click", function(){
+    if(PREVIEW_LEVEL){ el("noteStatus").textContent = "Preview mode: nothing is sent."; return; }
     var txt = el("noteText").value.trim();
     if(!txt){ el("noteStatus").textContent = "Write something first."; return; }
     var btn = el("noteBtn");
@@ -918,6 +929,32 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     student.name = name; student.email = email;
     reset(); intro.hidden = true; result.hidden = true; quiz.hidden = false; startStage();
   });
+  if(PREVIEW_LEVEL){
+    (function(){
+      var L = PREVIEW_LEVEL, idx = ORDER.indexOf(L);
+      student = { name: "Sample Student", email: "preview@example.com" };
+      reset();
+      st.per = {}; st.passed = {}; st.failed = {};
+      if(idx >= 2){
+        for(var k = 2; k <= idx; k++){ st.per[ORDER[k]] = {c:8, t:10}; st.passed[ORDER[k]] = true; }
+        if(idx < ORDER.length - 1){ st.per[ORDER[idx+1]] = {c:5, t:10}; st.failed[ORDER[idx+1]] = true; }
+      } else {
+        st.per.B1 = {c:3, t:10}; st.failed.B1 = true;
+        if(idx === 1){ st.per.A2 = {c:8, t:10}; st.passed.A2 = true; }
+        else { st.per.A2 = {c:3, t:10}; st.failed.A2 = true; st.per.A1 = {c:8, t:10}; st.passed.A1 = true; }
+      }
+      var c = 0, t = 0;
+      Object.keys(st.per).forEach(function(b){ c += st.per[b].c; t += st.per[b].t; });
+      st.correct = c; st.before = t;
+      st.history = POOL[L].gv.slice(0, 5).map(function(it, i){
+        var ok = i < 4;
+        return {b: L, item: it, u: ok ? it.a : (it.a + 1) % 4, ok: ok};
+      });
+      intro.hidden = true; quiz.hidden = true;
+      finish(idx);
+    })();
+  }
+
   el("retakeBtn").addEventListener("click", function(){
     result.hidden = true; quiz.hidden = true; intro.hidden = false; bar.style.width = "0%";
     el("review").hidden = true; el("revTitle").hidden = true;
