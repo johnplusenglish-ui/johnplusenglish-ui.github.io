@@ -94,11 +94,20 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
 .gap{display:inline-block;min-width:52px;border-bottom:2.5px solid var(--sky);vertical-align:baseline;margin:0 3px}
 .opts{display:flex;flex-direction:column;gap:.6rem}
 .opt{appearance:none;text-align:left;font-family:'Outfit',sans-serif;cursor:pointer;width:100%;background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:.8rem 1rem;font-size:.95rem;font-weight:500;color:var(--ink);display:flex;align-items:center;gap:.8rem;transition:all .15s}
-.opt:hover{border-color:var(--sky);background:var(--sky-light)}
 .opt:active{transform:scale(.99)}
 .opt .key{flex:0 0 auto;width:26px;height:26px;border-radius:8px;background:var(--cream);border:1px solid var(--border);display:grid;place-items:center;font-size:.72rem;font-weight:700;color:var(--muted);transition:all .15s}
-.opt:hover .key,.opt.chosen .key{background:var(--sky);border-color:var(--sky);color:#fff}
 .opt.chosen{border-color:var(--sky);background:var(--sky-light)}
+.opt.chosen .key{background:var(--sky);border-color:var(--sky);color:#fff}
+/* Hover styling only on real pointer devices. On touch (incl. Telegram's in-app
+   browser) :hover sticks after a tap and would make the next question look answered. */
+@media (hover:hover) and (pointer:fine){
+  .opt:hover:not(.chosen){border-color:var(--sky);background:var(--sky-light)}
+  .opt:hover:not(.chosen) .key{background:var(--sky);border-color:var(--sky);color:#fff}
+  /* Suppress hover until the mouse actually moves, so a cursor left resting over
+     one row does not pre-highlight that row on the next question. */
+  .opts.nohover .opt:hover:not(.chosen){border-color:var(--border);background:var(--card)}
+  .opts.nohover .opt:hover:not(.chosen) .key{background:var(--cream);border-color:var(--border);color:var(--muted)}
+}
 
 .fade-enter{animation:fadeIn .32s ease both}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
@@ -500,6 +509,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     backBtn.hidden = (st.idx===0);
     stem.innerHTML = q.s.replace("___", '<span class="gap">&nbsp;</span>');
     opts.innerHTML = "";
+    opts.classList.add("nohover");
     q.o.forEach(function(text, i){
       var b = document.createElement("button");
       b.className = "opt" + (st.ans[st.idx]===i ? " chosen" : "");
@@ -710,6 +720,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     if(e.key==="Backspace" || e.key==="ArrowLeft"){ e.preventDefault(); goBack(); }
   });
   backBtn.addEventListener("click", goBack);
+  document.addEventListener("mousemove", function(){ opts.classList.remove("nohover"); }, {passive:true});
 
   function validEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
   ["gateName","gateEmail"].forEach(function(id){
