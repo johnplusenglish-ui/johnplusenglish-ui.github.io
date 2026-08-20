@@ -126,6 +126,16 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
 .res-john-photo{width:72px;height:72px;border-radius:50%;object-fit:cover;display:block;margin:1.4rem auto .2rem;background:#111;box-shadow:0 4px 14px -6px rgba(0,0,0,.4)}
 .res-john{font-size:.88rem;font-style:italic;color:var(--muted);max-width:46ch;margin:.5rem auto 0}
 .res-john b{font-style:normal;font-weight:700;color:var(--ink)}
+.john-audio-btn{
+  display:inline-flex;align-items:center;gap:.4rem;margin-top:.6rem;
+  background:var(--sky-light);color:var(--sky);border:none;border-radius:999px;
+  padding:.4rem .9rem;font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:600;
+  cursor:pointer;transition:background .15s;
+}
+.john-audio-btn:hover{background:#DCE6FF}
+.john-audio-btn svg{width:12px;height:12px;flex-shrink:0}
+.john-audio-btn.playing svg{animation:audioPulse 1s ease-in-out infinite}
+@keyframes audioPulse{0%,100%{opacity:1}50%{opacity:.45}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .seq{animation:fadeUp .45s ease both}
 @media(prefers-reduced-motion:reduce){.seq,.stage-break{animation:none}}
@@ -269,6 +279,11 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
       <p class="res-desc" id="resFocus" style="font-size:.82rem"></p>
       <img class="res-john-photo" src="images/john-circle.jpg" alt="John, johnplusenglish" width="72" height="72" loading="lazy">
       <p class="res-john" id="resJohn"></p>
+      <button class="john-audio-btn" id="johnAudioBtn" type="button" hidden>
+        <svg id="johnAudioIcon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        <span id="johnAudioLabel">Hear it from John</span>
+      </button>
+      <audio id="johnAudio" preload="none"></audio>
       <div class="res-score" id="resScore"></div>
     </div>
 
@@ -760,6 +775,28 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     }catch(e){}
   }
 
+  var JOHN_AUDIO = {A1:"audio/john-a1.webm", A2:"audio/john-a2.webm", B1:"audio/john-b1.webm",
+                     B2:"audio/john-b2.webm", C1:"audio/john-c1.webm", C2:"audio/john-c2.webm"};
+  (function(){
+    var btn = el("johnAudioBtn"), audio = el("johnAudio"), icon = el("johnAudioIcon"), label = el("johnAudioLabel");
+    if(!btn || !audio) return;
+    var PLAY = '<path d="M8 5v14l11-7z"/>', PAUSE = '<path d="M6 5h4v14H6zm8 0h4v14h-4z"/>';
+    btn.addEventListener("click", function(){
+      if(audio.paused){ audio.play().catch(function(){}); } else { audio.pause(); }
+    });
+    audio.addEventListener("play", function(){ btn.classList.add("playing"); icon.innerHTML = PAUSE; label.textContent = "Playing…"; });
+    function reset(){ btn.classList.remove("playing"); icon.innerHTML = PLAY; label.textContent = "Hear it from John"; }
+    audio.addEventListener("pause", reset);
+    audio.addEventListener("ended", reset);
+  })();
+  function setupJohnAudio(level){
+    var btn = el("johnAudioBtn"), audio = el("johnAudio");
+    if(!btn || !audio) return;
+    audio.pause(); audio.currentTime = 0;
+    var src = JOHN_AUDIO[level];
+    if(src){ audio.src = src; btn.hidden = false; } else { btn.hidden = true; }
+  }
+
   function finish(placedIdx){
     var level = ORDER[placedIdx], meta = LV[level];
     if(!PREVIEW_LEVEL){ try{ localStorage.setItem("jpe-level", JSON.stringify({level:level, at:Date.now()})); }catch(e){} }
@@ -771,6 +808,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     var fn = (student.name || "").trim().split(/\s+/)[0] || "there";
     el("resGreet").textContent = (GREET[level] || "Well done") + ", " + fn + "!";
     el("resJohn").innerHTML = "&ldquo;" + JOHN[level] + "&rdquo;&nbsp; <b>John</b>";
+    setupJohnAudio(level);
     el("resDesc").textContent = meta.desc;
     el("resFocus").textContent = meta.focus;
     var setScore = function(n){
@@ -1096,6 +1134,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     el("stageBreak").hidden = true;
     el("noteText").value = ""; el("noteText").disabled = false;
     el("noteBtn").disabled = false; el("noteStatus").textContent = "";
+    el("johnAudio").pause();
     if(PREVIEW_LEVEL){
       // A retake from the preview screen is a real attempt: record it like any other.
       PREVIEW_LEVEL = null;
