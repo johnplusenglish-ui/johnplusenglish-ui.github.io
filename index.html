@@ -181,7 +181,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     <div class="topic-icon"><svg viewBox="0 0 24 24"><path d="M12 3 2 8l10 5 10-5-10-5z"/><path d="M6 10.5v4.5c0 1.5 3 3 6 3s6-1.5 6-3v-4.5"/><path d="M22 8v6"/></svg></div>
     <div>
       <h1>Level Test</h1>
-      <p class="hero-sub">Find your level from A1 to C2. The test adapts to your answers, so most people finish in six to twelve minutes.</p>
+      <p class="hero-sub">Find your level from A1 to C2. The test adapts to your answers, so most people finish in eight to fifteen minutes.</p>
     </div>
   </div>
 </div>
@@ -520,13 +520,13 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
   };
 
   var ORDER = ["A1","A2","B1","B2","C1","C2"];
-  var CORE = 10, RES = 4, MAXQ = 56;
-  // Per-band standards: the top gets harder. C2 demands 9/10 outright,
-  // or 8/10 plus a flawless confirmation round (12/14).
-  var PASS_CORE  = {A1:7, A2:7, B1:7, B2:7, C1:8, C2:9};
-  var FAIL_CORE  = {A1:3, A2:3, B1:3, B2:3, C1:4, C2:5};
-  var PASS_TOTAL = {A1:9, A2:9, B1:9, B2:9, C1:10, C2:12};
-  var PASS_PCT   = {A1:.64, A2:.64, B1:.64, B2:.64, C1:.71, C2:.85};
+  var CORE = 12, RES = 4, MAXQ = 60;
+  // Launch standards: 12-item checks (9 grammar/vocab + 3 reading).
+  // C2 demands 11/12 outright, or 10/12 plus a flawless confirmation round (14/16).
+  var PASS_CORE  = {A1:9, A2:9, B1:9, B2:9, C1:10, C2:11};
+  var FAIL_CORE  = {A1:5, A2:5, B1:5, B2:5, C1:5, C2:7};
+  var PASS_TOTAL = {A1:10, A2:10, B1:10, B2:10, C1:12, C2:14};
+  var PASS_PCT   = {A1:.625, A2:.625, B1:.625, B2:.625, C1:.75, C2:.875};
 
   var LV = {
     A1:{name:"Beginner", color:"#8B5CF6", desc:"You can understand and use very basic everyday phrases and introduce yourself.",
@@ -569,8 +569,8 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
   function startStage(){
     st.phase = "core";
     var pool = POOL[ORDER[st.band]];
-    var gv = shuffle(pool.gv.slice()).slice(0,8);
-    var rc = shuffle(pool.rc.slice()).slice(0,2);
+    var gv = shuffle(pool.gv.slice()).slice(0,9);
+    var rc = shuffle(pool.rc.slice()).slice(0,3);
     st.items = shuffle(gv.concat(rc));
     st.idx = 0;
     st.ans = new Array(st.items.length).fill(null);
@@ -956,12 +956,12 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
       reset();
       st.per = {}; st.passed = {}; st.failed = {};
       if(idx >= 2){
-        for(var k = 2; k <= idx; k++){ st.per[ORDER[k]] = {c:8, t:10}; st.passed[ORDER[k]] = true; }
-        if(idx < ORDER.length - 1){ st.per[ORDER[idx+1]] = {c:5, t:10}; st.failed[ORDER[idx+1]] = true; }
+        for(var k = 2; k <= idx; k++){ st.per[ORDER[k]] = {c:10, t:12}; st.passed[ORDER[k]] = true; }
+        if(idx < ORDER.length - 1){ st.per[ORDER[idx+1]] = {c:6, t:12}; st.failed[ORDER[idx+1]] = true; }
       } else {
-        st.per.B1 = {c:3, t:10}; st.failed.B1 = true;
-        if(idx === 1){ st.per.A2 = {c:8, t:10}; st.passed.A2 = true; }
-        else { st.per.A2 = {c:3, t:10}; st.failed.A2 = true; st.per.A1 = {c:8, t:10}; st.passed.A1 = true; }
+        st.per.B1 = {c:4, t:12}; st.failed.B1 = true;
+        if(idx === 1){ st.per.A2 = {c:10, t:12}; st.passed.A2 = true; }
+        else { st.per.A2 = {c:4, t:12}; st.failed.A2 = true; st.per.A1 = {c:10, t:12}; st.passed.A1 = true; }
       }
       var c = 0, t = 0;
       Object.keys(st.per).forEach(function(b){ c += st.per[b].c; t += st.per[b].t; });
