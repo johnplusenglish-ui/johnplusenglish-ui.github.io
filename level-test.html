@@ -157,6 +157,12 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
 .rc-ctx{display:block;font-weight:400;font-size:.86em;color:var(--muted);background:var(--cream);border:1px solid var(--border);border-radius:10px;padding:.7rem .9rem;margin-bottom:.9rem;line-height:1.5}
 
 .res-actions{display:flex;justify-content:center;gap:.6rem;flex-wrap:wrap;margin-top:1.6rem}
+.note-box textarea{width:100%;font-family:'Outfit',sans-serif;font-size:.92rem;border:1.5px solid var(--border);border-radius:12px;padding:.7rem .9rem;resize:vertical;min-height:74px;background:var(--card);color:var(--ink)}
+.note-box textarea:focus{outline:none;border-color:var(--sky)}
+.note-box textarea[disabled]{opacity:.6}
+.note-row{display:flex;gap:.7rem;align-items:center;margin-top:.55rem}
+.note-status{font-size:.8rem;color:var(--muted)}
+
 [hidden]{display:none!important}
 :focus-visible{outline:2.5px solid var(--sky);outline-offset:2px}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
@@ -248,6 +254,27 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
 
     <div class="section-t">Where to go next</div>
     <div class="routes" id="routes"></div>
+
+    <div class="section-t">Keep learning with John</div>
+    <div class="routes">
+      <a class="route" href="https://www.instagram.com/johnplusenglish/" target="_blank" rel="noopener">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></span>
+        <span class="tx"><b>Instagram</b><span>Daily posts and vocab</span></span>
+      </a>
+      <a class="route" href="https://t.me/johnplusenglishchannel" target="_blank" rel="noopener">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></span>
+        <span class="tx"><b>Telegram channel</b><span>Lessons and updates</span></span>
+      </a>
+    </div>
+
+    <div class="section-t">Leave John a note</div>
+    <div class="note-box">
+      <textarea id="noteText" maxlength="300" placeholder="Something short and sweet..."></textarea>
+      <div class="note-row">
+        <button class="btn btn-reset" id="noteBtn"><svg viewBox="0 0 24 24"><path d="M22 2 11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>Send note</button>
+        <span class="note-status" id="noteStatus"></span>
+      </div>
+    </div>
 
     <div class="section-t" id="revTitle" hidden>Review your answers</div>
     <div class="rev" id="review" hidden></div>
@@ -808,6 +835,38 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     });
   });
 
+  el("noteBtn").addEventListener("click", function(){
+    var txt = el("noteText").value.trim();
+    if(!txt){ el("noteStatus").textContent = "Write something first."; return; }
+    var btn = el("noteBtn");
+    btn.disabled = true; el("noteStatus").textContent = "Sending...";
+    fetch(SUPABASE_URL + "/rest/v1/level_test_notes", {
+      method: "POST", mode: "cors", keepalive: true,
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": SUPABASE_ANON_KEY,
+        "Authorization": "Bearer " + SUPABASE_ANON_KEY,
+        "Prefer": "return=minimal"
+      },
+      body: JSON.stringify({
+        full_name: student.name, email: student.email,
+        level: (lastCard ? lastCard.level : null),
+        note: txt.slice(0, 500)
+      })
+    }).then(function(r){
+      if(r.ok){
+        el("noteText").disabled = true;
+        el("noteStatus").textContent = "Sent. Thank you!";
+      } else {
+        btn.disabled = false;
+        el("noteStatus").textContent = "Could not send just now.";
+      }
+    }).catch(function(){
+      btn.disabled = false;
+      el("noteStatus").textContent = "Could not send just now.";
+    });
+  });
+
   // copy result
   el("copyBtn").addEventListener("click", function(){
     var txt = "My English level: "+el("badge").textContent+" ("+el("resName").textContent+") · johnplusenglish.com";
@@ -862,6 +921,8 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
   el("retakeBtn").addEventListener("click", function(){
     result.hidden = true; quiz.hidden = true; intro.hidden = false; bar.style.width = "0%";
     el("review").hidden = true; el("revTitle").hidden = true;
+    el("noteText").value = ""; el("noteText").disabled = false;
+    el("noteBtn").disabled = false; el("noteStatus").textContent = "";
     window.scrollTo({top:0, behavior:"smooth"});
   });
 })();
