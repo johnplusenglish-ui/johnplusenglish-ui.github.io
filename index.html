@@ -253,6 +253,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     <div class="rev" id="review" hidden></div>
 
     <div class="res-actions">
+      <button class="btn btn-reset" id="pngBtn"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg>Download image</button>
       <button class="btn btn-reset" id="revBtn"><svg viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>Review answers</button>
       <button class="btn btn-reset" id="copyBtn"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Copy my result</button>
       <button class="btn btn-reset" id="retakeBtn"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>Take it again</button>
@@ -504,7 +505,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
   var qNow=el("qNow"), qStage=el("qStage"), backBtn=el("backBtn");
 
   // ---- Adaptive state: start at B1, walk up/down to find the boundary ----
-  var st=null, lock=false;
+  var st=null, lock=false, lastCard=null;
   function reset(){ st={band:2, passed:{}, failed:{}, per:{}, before:0, correct:0, items:null, idx:0, ans:null, history:[]}; lock=false; }
 
   function startStage(){
@@ -648,6 +649,8 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     var qual = frac < 0.33 ? "low" : (frac < 0.66 ? "solid" : "high");
     var pos = ((placedIdx + frac) / ORDER.length) * 100;
     submitResult(level, meta.name, pos);
+    lastCard = {level:level, levelName:meta.name, color:meta.color, qual:qual, pos:pos,
+                correct:st.correct, total:st.before, name:student.name};
 
     var marker = el("marker"), mLabel = el("markerLabel");
     marker.style.borderColor = meta.color;
@@ -708,6 +711,98 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     r.hidden = !show; t.hidden = !show;
     this.childNodes[this.childNodes.length-1].textContent = show ? "Hide review" : "Review answers";
     if(show) t.scrollIntoView({behavior:"smooth", block:"start"});
+  });
+
+
+  // ---- downloadable result card (canvas -> PNG) ----
+  function roundRectPath(x,a,b,w,h,r){
+    x.beginPath(); x.moveTo(a+r,b);
+    x.arcTo(a+w,b,a+w,b+h,r); x.arcTo(a+w,b+h,a,b+h,r);
+    x.arcTo(a,b+h,a,b,r); x.arcTo(a,b,a+w,b,r); x.closePath();
+  }
+  function drawCap(x,cx,cy,s,w,color){
+    function P(px,py){ return [cx+(px-12)*s, cy+(py-10)*s]; }
+    x.strokeStyle=color; x.fillStyle=color; x.lineWidth=w; x.lineCap="round"; x.lineJoin="round";
+    var d=[P(12,3),P(2,8),P(12,13),P(22,8)];
+    x.beginPath(); x.moveTo(d[0][0],d[0][1]);
+    for(var i=1;i<4;i++) x.lineTo(d[i][0],d[i][1]);
+    x.closePath(); x.stroke();
+    var a=P(6,10.5), b=P(6,15), c=P(12,18.2), e=P(18,15), f=P(18,10.5);
+    x.beginPath(); x.moveTo(a[0],a[1]); x.lineTo(b[0],b[1]);
+    x.quadraticCurveTo(c[0],c[1],e[0],e[1]); x.lineTo(f[0],f[1]); x.stroke();
+    var t1=P(22,8), t2=P(22,14);
+    x.beginPath(); x.moveTo(t1[0],t1[1]); x.lineTo(t2[0],t2[1]); x.stroke();
+    x.beginPath(); x.arc(t2[0],t2[1],w*0.9,0,7); x.fill();
+  }
+  function buildResultCard(){
+    if(!lastCard) return Promise.resolve(null);
+    return document.fonts.ready.then(function(){
+      return Promise.all([
+        document.fonts.load("800 58px Outfit"), document.fonts.load("900 100px Outfit"),
+        document.fonts.load("900 62px Outfit"), document.fonts.load("700 46px Outfit"),
+        document.fonts.load("700 26px Outfit"), document.fonts.load("500 34px Outfit"),
+        document.fonts.load("400 27px Outfit"), document.fonts.load("700 31px Outfit")
+      ]);
+    }).then(function(){
+      var W=1080, H=1350, cv=document.createElement("canvas");
+      cv.width=W; cv.height=H;
+      var x=cv.getContext("2d");
+      var INK="#2D3047", MUT="#7A7D8E", CREAM="#F7F6F3", BORDER="#E8E5DF", SKY="#2176FF";
+      x.fillStyle=CREAM; x.fillRect(0,0,W,H);
+      roundRectPath(x,60,60,W-120,H-120,44);
+      x.fillStyle="#fff"; x.fill(); x.strokeStyle=BORDER; x.lineWidth=3; x.stroke();
+      x.textBaseline="middle";
+      drawCap(x,W/2,200,6.5,14,SKY);
+      x.font="800 58px Outfit";
+      var seg=[["john",INK],["plus",SKY],["english",INK]];
+      var widths=seg.map(function(p){ return x.measureText(p[0]).width; });
+      var sx=W/2-(widths[0]+widths[1]+widths[2])/2;
+      x.textAlign="left";
+      seg.forEach(function(p,i){ x.fillStyle=p[1]; x.fillText(p[0],sx,330); sx+=widths[i]; });
+      x.textAlign="center";
+      x.fillStyle=MUT; x.font="700 26px Outfit";
+      x.fillText("L E V E L   T E S T   R E S U L T", W/2, 420);
+      x.fillStyle=INK; x.font="700 46px Outfit";
+      x.fillText(lastCard.name, W/2, 488);
+      roundRectPath(x,W/2-110,545,220,220,48);
+      x.fillStyle=lastCard.color; x.fill();
+      x.fillStyle="#fff"; x.font="900 100px Outfit";
+      x.fillText(lastCard.level, W/2, 660);
+      x.fillStyle=INK; x.font="900 62px Outfit";
+      x.fillText(lastCard.levelName, W/2, 855);
+      x.fillStyle=MUT; x.font="500 34px Outfit";
+      x.fillText(lastCard.qual+" "+lastCard.level+"  ·  "+lastCard.correct+" of "+lastCard.total+" correct", W/2, 918);
+      var bx=180, bw=W-360, by=1010, bh=16;
+      var g=x.createLinearGradient(bx,0,bx+bw,0);
+      ["#8B5CF6","#6366F1","#0EA5E9","#2176FF","#10b981","#059669"].forEach(function(c2,i){ g.addColorStop(i/5,c2); });
+      roundRectPath(x,bx,by,bw,bh,8); x.fillStyle=g; x.fill();
+      var mx=bx+bw*Math.min(100,Math.max(0,lastCard.pos))/100;
+      x.beginPath(); x.arc(mx,by+bh/2,17,0,7);
+      x.fillStyle="#fff"; x.fill(); x.lineWidth=6; x.strokeStyle=lastCard.color; x.stroke();
+      x.font="700 26px Outfit";
+      ["A1","A2","B1","B2","C1","C2"].forEach(function(l,i){
+        x.fillStyle=(l===lastCard.level)?INK:MUT;
+        x.fillText(l, bx+bw*(i+0.5)/6, by+62);
+      });
+      x.fillStyle=MUT; x.font="400 27px Outfit";
+      x.fillText(new Date().toLocaleDateString(undefined,{day:"numeric",month:"long",year:"numeric"}), W/2, 1145);
+      x.fillStyle=SKY; x.font="700 31px Outfit";
+      x.fillText("Find your level at johnplusenglish.com", W/2, 1205);
+      return cv;
+    });
+  }
+  el("pngBtn").addEventListener("click", function(){
+    buildResultCard().then(function(cv){
+      if(!cv) return;
+      cv.toBlob(function(blob){
+        if(!blob) return;
+        var a=document.createElement("a");
+        a.href=URL.createObjectURL(blob);
+        a.download="johnplusenglish-level-"+(lastCard?lastCard.level:"result")+".png";
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+      }, "image/png");
+    });
   });
 
   // copy result
