@@ -775,8 +775,14 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     }catch(e){}
   }
 
-  var JOHN_AUDIO = {A1:"audio/john-a1.webm", A2:"audio/john-a2.webm", B1:"audio/john-b1.webm",
-                     B2:"audio/john-b2.webm", C1:"audio/john-c1.webm", C2:"audio/john-c2.webm"};
+  var JOHN_AUDIO = {
+    A1:{webm:"audio/john-a1.webm", wav:"audio/john-a1.wav"},
+    A2:{webm:"audio/john-a2.webm", wav:"audio/john-a2.wav"},
+    B1:{webm:"audio/john-b1.webm", wav:"audio/john-b1.wav"},
+    B2:{webm:"audio/john-b2.webm", wav:"audio/john-b2.wav"},
+    C1:{webm:"audio/john-c1.webm", wav:"audio/john-c1.wav"},
+    C2:{webm:"audio/john-c2.webm", wav:"audio/john-c2.wav"}
+  };
   (function(){
     var btn = el("johnAudioBtn"), audio = el("johnAudio"), icon = el("johnAudioIcon"), label = el("johnAudioLabel");
     if(!btn || !audio) return;
@@ -793,8 +799,18 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     var btn = el("johnAudioBtn"), audio = el("johnAudio");
     if(!btn || !audio) return;
     audio.pause(); audio.currentTime = 0;
-    var src = JOHN_AUDIO[level];
-    if(src){ audio.src = src; btn.hidden = false; } else { btn.hidden = true; }
+    var srcs = JOHN_AUDIO[level];
+    if(srcs){
+      // Safari/iOS never supports the webm container, so offer a wav fallback -
+      // the browser picks whichever source it can actually play.
+      audio.removeAttribute("src");
+      audio.innerHTML = '<source src="'+srcs.webm+'" type="audio/webm">' +
+                         '<source src="'+srcs.wav+'" type="audio/wav">';
+      audio.load();
+      btn.hidden = false;
+    } else {
+      btn.hidden = true;
+    }
   }
 
   function finish(placedIdx){
