@@ -371,9 +371,9 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     ] },
     C1:{ gv:[
       {id:"c1-g1", s:"If she had studied medicine, she ___ a doctor now.", o:["would be","would have been","will be","is"], a:0, w:"Mixed conditional: past condition, present result."},
-      {id:"c1-g2", s:"Not only ___ late, but he also forgot the tickets.", o:["he was","he is","was he","did he"], a:2, w:"Not only at the start forces inversion: was he."},
+      {id:"c1-g2", s:"The negotiations were fraught ___ difficulty from the outset.", o:["by","in","with","of"], a:2, w:"Fraught with difficulty is the fixed collocation."},
       {id:"c1-g3", s:"___ the bad weather, the festival was a huge success.", o:["Although","However","Because","Despite"], a:3, w:"Despite is followed by a noun phrase."},
-      {id:"c1-g4", s:"___ harder he tried, the worse it seemed to get.", o:["More","The","As","So"], a:1, w:"The + comparative, the + comparative."},
+      {id:"c1-g4", s:"It was only a ___ remark, but she took it to heart.", o:["runaway","throwaway","castaway","giveaway"], a:1, w:"A throwaway remark is a casual comment not meant seriously."},
       {id:"c1-g5", s:"___ in 1965, the theatre is now a protected building.", o:["Building","To build","Built","Build"], a:2, w:"A past participle clause: Built in 1965, ..."},
       {id:"c1-g6", s:"I&rsquo;d rather you ___ smoke in the house.", o:["didn&rsquo;t","don&rsquo;t","not","won&rsquo;t"], a:0, w:"Would rather you + past form."},
       {id:"c1-g7", s:"The university is planning to ___ out a major survey.", o:["take","carry","bring","hold"], a:1, w:"The collocation is carry out a survey."},
@@ -389,14 +389,14 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
       {id:"c1-r4", s:"<span class=\"rc-ctx\">Rather than addressing the criticism directly, the spokesperson offered a carefully worded statement that conceded nothing while appearing conciliatory.</span>What does the writer suggest about the statement?", o:["It directly addressed every criticism","It was an honest apology","It ignored the criticism entirely","It appeared conciliatory but avoided real concessions"], a:3, w:"It appeared conciliatory but actually conceded nothing."}
     ] },
     C2:{ gv:[
-      {id:"c2-g1", s:"Rarely ___ such a gifted young musician.", o:["I have seen","I saw","have I seen","did I saw"], a:2, w:"Rarely at the start forces inversion: have I seen."},
+      {id:"c2-g1", s:"The committee gave his proposal short ___.", o:["thrift","shift","shrift","drift"], a:2, w:"To give something short shrift means to dismiss it with little attention."},
       {id:"c2-g2", s:"The board insisted that the report ___ submitted by Friday.", o:["is","was","will be","be"], a:3, w:"Insist that takes the subjunctive: be submitted."},
       {id:"c2-g3", s:"Had I known the truth, I ___ very differently.", o:["would act","would have acted","had acted","will act"], a:1, w:"Inverted third conditional: Had I known ... would have acted."},
       {id:"c2-g4", s:"The new findings ___ serious doubt on the whole theory.", o:["cast","throw","put","make"], a:0, w:"The collocation is cast doubt on."},
       {id:"c2-g5", s:"___ be any problems, contact the office immediately.", o:["If there","There should","Were there","Should there"], a:3, w:"Should there be = if there should be."},
-      {id:"c2-g6", s:"Little ___ that his life was about to change forever.", o:["he knew","did he know","he knows","knew he"], a:1, w:"Little at the start forces inversion: did he know."},
+      {id:"c2-g6", s:"He was notoriously ___ with praise, rarely commending even excellent work.", o:["scarce","sparing","frugal","spare"], a:1, w:"Sparing with praise means giving very little of it."},
       {id:"c2-g7", s:"She remained utterly ___ to criticism, never once reacting.", o:["impervious","imperious","impertinent","imperative"], a:0, w:"Impervious to means unaffected by."},
-      {id:"c2-g8", s:"The whole affair was quietly swept under the ___.", o:["blanket","curtain","carpet","cupboard"], a:2, w:"Sweep under the carpet means hide a problem."},
+      {id:"c2-g8", s:"The difference between the two versions is so slight as to be all but ___.", o:["imperceptive","insensible","imperceptible","impervious"], a:2, w:"Imperceptible means too slight to notice; imperceptive describes a person who fails to notice."},
       {id:"c2-g9", s:"___ any objections, the plan will proceed as scheduled.", o:["Barring","Except","Besides","Without"], a:0, w:"Barring means unless there are."},
       {id:"c2-g10", s:"The negotiations, ___ delicate, ultimately proved successful.", o:["despite","while","although being","even"], a:1, w:"While here introduces a concessive aside."},
       {id:"c2-g11", s:"His speech was littered ___ clich&eacute;s and half truths.", o:["by","of","with","in"], a:2, w:"Littered with is the fixed collocation."},
@@ -461,7 +461,13 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
   };
 
   var ORDER = ["A1","A2","B1","B2","C1","C2"];
-  var CORE = 10, RES = 4, TOTAL_PASS = 9, MAXQ = 56;
+  var CORE = 10, RES = 4, MAXQ = 56;
+  // Per-band standards: the top gets harder. C2 demands 9/10 outright,
+  // or 8/10 plus a flawless confirmation round (12/14).
+  var PASS_CORE  = {A1:7, A2:7, B1:7, B2:7, C1:8, C2:9};
+  var FAIL_CORE  = {A1:3, A2:3, B1:3, B2:3, C1:4, C2:5};
+  var PASS_TOTAL = {A1:9, A2:9, B1:9, B2:9, C1:10, C2:12};
+  var PASS_PCT   = {A1:.64, A2:.64, B1:.64, B2:.64, C1:.71, C2:.85};
 
   var LV = {
     A1:{name:"Beginner", color:"#8B5CF6", desc:"You can understand and use very basic everyday phrases and introduce yourself.",
@@ -551,8 +557,9 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     }
     st.correct += c; st.before += st.items.length;
     if(st.phase === "core"){
-      if(c >= 7){ st.per[b] = {c:c, t:CORE}; passBand(); return; }
-      if(c <= 3){ st.per[b] = {c:c, t:CORE}; failBand(); return; }
+      if(c >= PASS_CORE[b]){ st.per[b] = {c:c, t:CORE}; passBand(); return; }
+      // fail outright if below the floor, or if even a perfect reserve could not reach the bar
+      if(c <= FAIL_CORE[b] || c + RES < PASS_TOTAL[b]){ st.per[b] = {c:c, t:CORE}; failBand(); return; }
       st.coreC = c; st.phase = "reserve";
       st.items = shuffle(RESERVE_POOL[b].slice()).slice(0,4);
       st.idx = 0;
@@ -561,7 +568,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     }
     var total = st.coreC + c;
     st.per[b] = {c:total, t:CORE+RES};
-    if(total >= TOTAL_PASS) passBand(); else failBand();
+    if(total >= PASS_TOTAL[b]) passBand(); else failBand();
   }
   function passBand(){
     st.passed[ORDER[st.band]] = true;
@@ -620,7 +627,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     // position within the band: base on margin above the pass mark,
     // nudged up by any correct answers in the band above
     var per = st.per[level] || {c:0, t:8};
-    var pct = per.c/per.t, passPct = 0.625;
+    var pct = per.c/per.t, passPct = PASS_PCT[level];
     var frac;
     if(!st.passed[level]){
       frac = Math.min(0.3, pct*0.5);
