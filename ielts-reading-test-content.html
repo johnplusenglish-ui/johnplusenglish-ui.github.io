@@ -216,6 +216,8 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .score-summary-item .ss-label{font-family:Outfit,sans-serif;font-size:.6rem;font-weight:500;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
 .score-summary-item .ss-val{font-family:Outfit,sans-serif;font-size:1.05rem;font-weight:700;color:var(--accent)}
 .score-summary-total{font-family:Outfit,sans-serif;font-size:.85rem;font-weight:700;color:var(--ink);padding-top:10px;border-top:1.5px solid var(--border)}
+.score-band{font-family:Outfit,sans-serif;font-size:1.6rem;font-weight:800;color:var(--accent);margin-top:10px}
+.score-band-note{font-size:.72rem;color:var(--muted);margin-top:6px;max-width:420px;margin-left:auto;margin-right:auto;line-height:1.4}
 
 @media(max-width:640px){.wrap{padding:0 1.2rem 3rem}.page-header{padding:1.6rem 1.2rem 1rem}.match-q,.c3-row{align-items:flex-start}.mcq-opts{margin-left:0}.overview{gap:.5rem 1rem}.overview-total{margin-left:0;width:100%;text-align:center}.head-row{flex-wrap:wrap}.head-row-label{width:100%}}
 </style>
@@ -415,6 +417,8 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
       <div class="score-summary-item"><div class="ss-label">Passage 3</div><div class="ss-val" id="ss3">0/14</div></div>
     </div>
     <div class="score-summary-total" id="ssTotal">Total: 0/40</div>
+    <div class="score-band" id="ssBand"></div>
+    <div class="score-band-note">Approximate band, based on the commonly published Academic Reading raw-score conversion. The official conversion varies slightly between test versions.</div>
   </div>
 </div>
 
@@ -515,7 +519,7 @@ P3: {
     {n:28, stem:"The writer believes Hardin was wrong to be concerned about the overuse of shared resources.", correct:"NO", exp:"Paragraph G: “unmanaged, poorly designed systems for sharing a resource genuinely can collapse under overuse, exactly as he described.”"},
     {n:29, stem:"According to the writer, Ostrom proved that privatisation is never an effective way to manage shared resources.", correct:"NOT GIVEN", exp:"The writer says privatisation is not the only option, never that it never works at all."},
     {n:30, stem:"The writer implies that Ostrom's conclusions were based on real-world observation rather than theoretical argument alone.", correct:"YES", exp:"Paragraph D contrasts Ostrom's fieldwork directly with Hardin's “hypothetical pasture.”"},
-    {n:31, stem:"The writer suggests that all of the shared-resource systems Ostrom studied were successfully self-governed.", correct:"NO", exp:"Paragraph F implies some systems failed: those “missing several of these features... were considerably more likely to fail.”"},
+    {n:31, stem:"The writer suggests that all of the shared-resource systems Ostrom studied were successfully self-governed.", correct:"NO", exp:"Paragraph E says only “a significant number” of these systems remained sustainable, not all of them; Paragraph F confirms this, noting that systems missing key features “were considerably more likely to fail.”"},
     {n:32, stem:"The writer states that Ostrom was the first person ever to win the Nobel Memorial Prize in Economic Sciences for research on shared resources.", correct:"NOT GIVEN", exp:"The passage only says she was the first WOMAN to win the prize, not the first person on this topic overall."},
     {n:33, stem:"The writer believes Ostrom's design principles could apply to resource systems beyond the specific cases she studied.", correct:"NOT GIVEN", exp:"The passage describes the principles as patterns found across her case studies, but never claims they apply more broadly."}
   ],
@@ -809,6 +813,16 @@ function scoreOf(prefix){
   if(!el || !el.textContent) return 0;
   return parseInt(el.textContent.split('/')[0], 10) || 0;
 }
+const READING_BAND_TABLE = [
+  {min:39, band:9}, {min:37, band:8.5}, {min:35, band:8}, {min:33, band:7.5},
+  {min:30, band:7}, {min:27, band:6.5}, {min:23, band:6}, {min:19, band:5.5},
+  {min:15, band:5}, {min:13, band:4.5}, {min:10, band:4}, {min:8, band:3.5},
+  {min:6, band:3}, {min:4, band:2.5}
+];
+function bandForScore(score){
+  for(const row of READING_BAND_TABLE){ if(score>=row.min) return row.band; }
+  return 2;
+}
 function updateOverall(){
   const p1 = scoreOf('p1a') + scoreOf('p1b');
   const p2 = scoreOf('p2a') + scoreOf('p2b') + scoreOf('p2c');
@@ -818,6 +832,7 @@ function updateOverall(){
   document.getElementById('ss2').textContent = `${p2}/13`;
   document.getElementById('ss3').textContent = `${p3}/14`;
   document.getElementById('ssTotal').textContent = `Total: ${total}/40`;
+  document.getElementById('ssBand').textContent = `Band ${bandForScore(total)}`;
   const allDone = checkedFlag('p1a') && checkedFlag('p1b') && checkedFlag('p2a') && checkedFlag('p2b') && checkedFlag('p2c') && checkedFlag('p3a') && checkedFlag('p3b') && checkedFlag('p3c');
   document.getElementById('overallSummary').classList.toggle('visible', allDone);
 }
