@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Everyday Italian for My Baby</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFE9F2; --bg2:#FFD3E6;
+  --pink:#F2568C; --pink-deep:#D93E73;
+  --white:#FFFFFF;
+  --ink:#3A1F2B; --muted:#B6849C;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  font-family:'Outfit',sans-serif;
+  background:linear-gradient(160deg, var(--bg), var(--bg2));
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden;
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;
+}
+
+.wrap{
+  width:100%; max-width:420px; height:100%; max-height:900px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:32px; gap:28px;
+}
+
+.eyebrow{
+  font-size:.78rem; font-weight:600; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--pink-deep); opacity:.75; text-align:center; line-height:1.5;
+}
+
+.stage{
+  width:100%; aspect-ratio:3/4; max-height:60vh;
+  perspective:1400px; cursor:pointer;
+}
+.card{
+  position:relative; width:100%; height:100%;
+  transform-style:preserve-3d;
+  transition:transform .5s cubic-bezier(.4,.2,.2,1);
+}
+.card.flipped{ transform:rotateY(180deg); }
+.face{
+  position:absolute; inset:0;
+  border-radius:28px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:14px; padding:36px;
+  backface-visibility:hidden;
+  box-shadow:0 18px 40px -14px rgba(217,62,115,.35);
+  text-align:center;
+}
+.face.front{
+  background:var(--white);
+}
+.face.back{
+  background:linear-gradient(155deg, var(--pink), var(--pink-deep));
+  color:var(--white);
+  transform:rotateY(180deg);
+}
+
+.word-en{ font-size:2.3rem; font-weight:800; letter-spacing:-.01em; line-height:1.15; }
+.word-it{ font-size:2.5rem; font-weight:800; letter-spacing:-.01em; line-height:1.15; }
+.pron{
+  font-size:1.15rem; font-weight:500; opacity:.9;
+  font-style:italic;
+}
+.face.front .hint-icon{ color:var(--muted); }
+.hint-icon{ width:26px; height:26px; opacity:.55; margin-top:6px; }
+
+.tap-hint{
+  font-size:.85rem; font-weight:500; color:var(--pink-deep); opacity:.7;
+  transition:opacity .2s;
+}
+
+.progress{
+  display:flex; align-items:center; gap:10px;
+}
+.progress-text{
+  font-size:.8rem; font-weight:600; color:var(--muted);
+  font-variant-numeric:tabular-nums;
+}
+.progress-track{
+  width:120px; height:5px; border-radius:99px; background:rgba(217,62,115,.15);
+  overflow:hidden;
+}
+.progress-fill{
+  height:100%; background:var(--pink); border-radius:99px;
+  transition:width .3s ease;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .card{ transition:none; }
+}
+</style>
+</head>
+<body>
+
+  <div class="wrap">
+    <div class="eyebrow">Everyday Italian for My Baby</div>
+
+    <div class="stage" id="stage">
+      <div class="card" id="card">
+        <div class="face front">
+          <div class="word-en" id="wordEn"></div>
+          <svg class="hint-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+        </div>
+        <div class="face back">
+          <div class="word-it" id="wordIt"></div>
+          <div class="pron" id="pron"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tap-hint" id="tapHint">Tap to reveal</div>
+
+    <div class="progress">
+      <span class="progress-text" id="progressText">1 / 21</span>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+  </div>
+
+<script>
+var PHRASES = [
+  {en:"Hi", it:"Ciao", pron:"chow"},
+  {en:"Good morning", it:"Buongiorno", pron:"bwon-jor-no"},
+  {en:"Good evening", it:"Buonasera", pron:"bwo-na-say-ra"},
+  {en:"Good night", it:"Buonanotte", pron:"bwo-na-not-teh"},
+  {en:"Goodbye", it:"Arrivederci", pron:"ah-ree-veh-dair-chee"},
+  {en:"See you later", it:"Ci vediamo", pron:"chee veh-dee-ah-mo"},
+  {en:"Please", it:"Per favore", pron:"pair fah-vor-eh"},
+  {en:"Thank you", it:"Grazie", pron:"graht-see-eh"},
+  {en:"You're welcome", it:"Prego", pron:"preh-go"},
+  {en:"Excuse me / Sorry", it:"Scusa", pron:"skoo-za"},
+  {en:"How are you?", it:"Come stai?", pron:"koh-meh sty"},
+  {en:"I'm fine, thanks", it:"Sto bene, grazie", pron:"stoh beh-neh, graht-see-eh"},
+  {en:"What's your name?", it:"Come ti chiami?", pron:"koh-meh tee kee-ah-mee"},
+  {en:"My name is...", it:"Mi chiamo...", pron:"mee kee-ah-mo"},
+  {en:"Nice to meet you", it:"Piacere", pron:"pee-ah-chair-eh"},
+  {en:"I don't understand", it:"Non capisco", pron:"non kah-pees-koh"},
+  {en:"Do you speak English?", it:"Parli inglese?", pron:"par-lee een-gleh-zeh"},
+  {en:"How much is it?", it:"Quanto costa?", pron:"kwan-toh kos-tah"},
+  {en:"Where is the bathroom?", it:"Dov'è il bagno?", pron:"doh-veh eel bahn-yoh"},
+  {en:"I would like...", it:"Vorrei...", pron:"vor-ray"},
+  {en:"Cheers!", it:"Salute!", pron:"sah-loo-teh"}
+];
+
+function shuffle(a){
+  a = a.slice();
+  for(var i=a.length-1;i>0;i--){
+    var j = Math.floor(Math.random()*(i+1));
+    var t = a[i]; a[i]=a[j]; a[j]=t;
+  }
+  return a;
+}
+
+var deck = shuffle(PHRASES);
+var idx = 0, flipped = false;
+
+var cardEl = document.getElementById("card");
+var stageEl = document.getElementById("stage");
+var wordEn = document.getElementById("wordEn");
+var wordIt = document.getElementById("wordIt");
+var pron = document.getElementById("pron");
+var tapHint = document.getElementById("tapHint");
+var progressText = document.getElementById("progressText");
+var progressFill = document.getElementById("progressFill");
+
+function render(){
+  var p = deck[idx];
+  wordEn.textContent = p.en;
+  wordIt.textContent = p.it;
+  pron.textContent = p.pron;
+  cardEl.classList.toggle("flipped", flipped);
+  tapHint.textContent = flipped ? "Tap for next" : "Tap to reveal";
+  progressText.textContent = (idx + 1) + " / " + deck.length;
+  progressFill.style.width = ((idx + 1) / deck.length * 100) + "%";
+}
+
+stageEl.addEventListener("click", function(){
+  if(!flipped){
+    flipped = true;
+    render();
+    return;
+  }
+  idx++;
+  if(idx >= deck.length){
+    deck = shuffle(PHRASES);
+    idx = 0;
+  }
+  flipped = false;
+  render();
+});
+
+render();
+</script>
+</body>
+</html>
