@@ -36,7 +36,7 @@ body{
 .wrap{
   width:100%; max-width:420px; height:100%; max-height:900px;
   display:flex; flex-direction:column; align-items:center; justify-content:center;
-  padding:32px; gap:28px;
+  padding:32px; gap:22px;
 }
 
 .eyebrow{
@@ -44,10 +44,15 @@ body{
   color:var(--pink-deep); opacity:.75; text-align:center; line-height:1.5;
 }
 
+.set-label{
+  font-size:.92rem; font-weight:700; color:var(--pink-deep); text-align:center;
+  margin-top:-12px;
+}
+
 .rose{ font-size:2.6rem; line-height:1; margin-bottom:-10px; }
 
 .stage{
-  width:100%; aspect-ratio:3/4; max-height:56vh;
+  width:100%; aspect-ratio:3/4; max-height:52vh;
   perspective:1400px; cursor:pointer;
 }
 .card{
@@ -57,7 +62,6 @@ body{
 }
 .card.flipped{ transform:rotateY(180deg); }
 .card.slide-out-left{ opacity:0; translate:-36px 0; transition:opacity .16s ease, translate .16s ease; }
-.card.slide-out-right{ opacity:0; translate:36px 0; transition:opacity .16s ease, translate .16s ease; }
 .card.slide-in{ translate:0 0; }
 .face{
   position:absolute; inset:0;
@@ -95,15 +99,35 @@ body{
   width:100%; display:flex; align-items:center; justify-content:center; gap:20px;
 }
 .nav-btn{
+  position:relative;
   width:52px; height:52px; border-radius:50%; flex-shrink:0;
   background:var(--white); border:none; cursor:pointer;
   display:flex; align-items:center; justify-content:center;
   box-shadow:0 6px 16px -6px rgba(217,62,115,.35);
-  transition:transform .12s ease, box-shadow .12s ease;
+  transition:transform .12s ease, box-shadow .12s ease, background .2s ease;
   color:var(--pink-deep);
 }
 .nav-btn:active{ transform:scale(.9); }
 .nav-btn svg{ width:24px; height:24px; }
+
+.next-btn.locked{
+  background:rgba(255,255,255,.6); box-shadow:none; cursor:not-allowed;
+}
+.next-btn.locked:active{ transform:none; }
+.next-btn .arrow-icon{ position:relative; }
+.next-btn.locked .arrow-icon{ display:none; }
+.next-btn .gate-ring{
+  position:absolute; inset:0; width:100%; height:100%; transform:rotate(-90deg);
+  display:none;
+}
+.next-btn.locked .gate-ring{ display:block; }
+.gate-ring-bg{ fill:none; stroke:rgba(217,62,115,.18); stroke-width:3; }
+.gate-ring-fg{ fill:none; stroke:var(--pink-deep); stroke-width:3; stroke-linecap:round; transition:stroke-dashoffset .25s ease; }
+.next-btn .gate-count{
+  position:relative; font-size:.72rem; font-weight:700; color:var(--pink-deep);
+  display:none;
+}
+.next-btn.locked .gate-count{ display:block; }
 
 .progress{
   display:flex; align-items:center; gap:10px;
@@ -124,9 +148,33 @@ body{
 .completions{
   display:flex; align-items:center; gap:6px;
   font-size:.78rem; font-weight:600; color:var(--muted);
-  margin-top:-14px;
+  margin-top:-6px;
 }
 .completions svg{ width:15px; height:15px; color:var(--pink); flex-shrink:0; }
+
+.set-list{
+  width:100%; display:flex; flex-direction:column; gap:14px;
+}
+.set-card{
+  width:100%; background:var(--white); border-radius:22px; padding:20px 22px;
+  box-shadow:0 12px 30px -14px rgba(217,62,115,.3);
+  display:flex; align-items:center; justify-content:space-between; gap:16px;
+  cursor:pointer; transition:transform .12s ease, opacity .2s ease;
+}
+.set-card:active{ transform:scale(.97); }
+.set-card.locked{ cursor:not-allowed; opacity:.55; }
+.set-card-title{ font-weight:800; font-size:1.05rem; }
+.set-card-sub{ font-size:.8rem; color:var(--muted); margin-top:3px; }
+.set-card-icon{
+  width:42px; height:42px; border-radius:50%; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(155deg, var(--pink), var(--pink-deep));
+  color:var(--white);
+}
+.set-card.locked .set-card-icon{
+  background:rgba(182,132,156,.25); color:var(--muted);
+}
+.set-card-icon svg{ width:20px; height:20px; }
 
 .celebrate-canvas{
   position:fixed; inset:0; width:100%; height:100%;
@@ -140,9 +188,20 @@ body{
 </head>
 <body>
 
-  <div class="wrap">
+  <div class="wrap screen" id="homeScreen">
     <div class="rose">🌹</div>
     <div class="eyebrow">Everyday Italian for My Baby</div>
+    <div class="set-list" id="setList"></div>
+    <div class="completions" id="homeCompletions">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+      <span id="homeCompletionsText">0 total completions</span>
+    </div>
+  </div>
+
+  <div class="wrap screen" id="cardScreen" style="display:none">
+    <div class="rose">🌹</div>
+    <div class="eyebrow">Everyday Italian for My Baby</div>
+    <div class="set-label" id="setLabel"></div>
 
     <div class="stage" id="stage">
       <div class="card" id="card">
@@ -158,12 +217,14 @@ body{
     </div>
 
     <div class="nav-row">
-      <button class="nav-btn" id="prevBtn" aria-label="Previous card">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-      </button>
       <div class="tap-hint" id="tapHint">Tap the card to flip</div>
-      <button class="nav-btn" id="nextBtn" aria-label="Next card">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      <button class="nav-btn next-btn locked" id="nextBtn" aria-label="Next card" disabled>
+        <svg class="gate-ring" viewBox="0 0 52 52">
+          <circle class="gate-ring-bg" cx="26" cy="26" r="22"></circle>
+          <circle class="gate-ring-fg" id="gateRingFg" cx="26" cy="26" r="22"></circle>
+        </svg>
+        <span class="gate-count" id="gateCount">0</span>
+        <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
       </button>
     </div>
 
@@ -181,29 +242,87 @@ body{
   <canvas class="celebrate-canvas" id="celebrateCanvas"></canvas>
 
 <script>
-var PHRASES = [
-  {en:"Hi", it:"Ciao", pron:"chow"},
-  {en:"Good morning", it:"Buongiorno", pron:"bwon-jor-no"},
-  {en:"Good evening", it:"Buonasera", pron:"bwo-na-say-ra"},
-  {en:"Good night", it:"Buonanotte", pron:"bwo-na-not-teh"},
-  {en:"Goodbye", it:"Arrivederci", pron:"ah-ree-veh-dair-chee"},
-  {en:"See you later", it:"Ci vediamo", pron:"chee veh-dee-ah-mo"},
-  {en:"Please", it:"Per favore", pron:"pair fah-vor-eh"},
-  {en:"Thank you", it:"Grazie", pron:"graht-see-eh"},
-  {en:"You're welcome", it:"Prego", pron:"preh-go"},
-  {en:"Excuse me / Sorry", it:"Scusa", pron:"skoo-za"},
-  {en:"How are you?", it:"Come stai?", pron:"koh-meh sty"},
-  {en:"I'm fine, thanks", it:"Sto bene, grazie", pron:"stoh beh-neh, graht-see-eh"},
-  {en:"What's your name?", it:"Come ti chiami?", pron:"koh-meh tee kee-ah-mee"},
-  {en:"My name is...", it:"Mi chiamo...", pron:"mee kee-ah-mo"},
-  {en:"Nice to meet you", it:"Piacere", pron:"pee-ah-chair-eh"},
-  {en:"I don't understand", it:"Non capisco", pron:"non kah-pees-koh"},
-  {en:"Do you speak English?", it:"Parli inglese?", pron:"par-lee een-gleh-zeh"},
-  {en:"How much is it?", it:"Quanto costa?", pron:"kwan-toh kos-tah"},
-  {en:"Where is the bathroom?", it:"Dov'è il bagno?", pron:"doh-veh eel bahn-yoh"},
-  {en:"I would like...", it:"Vorrei...", pron:"vor-ray"},
-  {en:"Cheers!", it:"Salute!", pron:"sah-loo-teh"}
+var SETS = [
+  {
+    key:"set1", label:"Set 1: Everyday Basics",
+    phrases:[
+      {en:"Hi", it:"Ciao", pron:"chow"},
+      {en:"Good morning", it:"Buongiorno", pron:"bwon-jor-no"},
+      {en:"Good evening", it:"Buonasera", pron:"bwo-na-say-ra"},
+      {en:"Good night", it:"Buonanotte", pron:"bwo-na-not-teh"},
+      {en:"Goodbye", it:"Arrivederci", pron:"ah-ree-veh-dair-chee"},
+      {en:"See you later", it:"Ci vediamo", pron:"chee veh-dee-ah-mo"},
+      {en:"Please", it:"Per favore", pron:"pair fah-vor-eh"},
+      {en:"Thank you", it:"Grazie", pron:"graht-see-eh"},
+      {en:"You're welcome", it:"Prego", pron:"preh-go"},
+      {en:"Excuse me / Sorry", it:"Scusa", pron:"skoo-za"},
+      {en:"How are you?", it:"Come stai?", pron:"koh-meh sty"},
+      {en:"I'm fine, thanks", it:"Sto bene, grazie", pron:"stoh beh-neh, graht-see-eh"},
+      {en:"What's your name?", it:"Come ti chiami?", pron:"koh-meh tee kee-ah-mee"},
+      {en:"My name is...", it:"Mi chiamo...", pron:"mee kee-ah-mo"},
+      {en:"Nice to meet you", it:"Piacere", pron:"pee-ah-chair-eh"},
+      {en:"I don't understand", it:"Non capisco", pron:"non kah-pees-koh"},
+      {en:"Do you speak English?", it:"Parli inglese?", pron:"par-lee een-gleh-zeh"},
+      {en:"How much is it?", it:"Quanto costa?", pron:"kwan-toh kos-tah"},
+      {en:"Where is the bathroom?", it:"Dov'è il bagno?", pron:"doh-veh eel bahn-yoh"},
+      {en:"I would like...", it:"Vorrei...", pron:"vor-ray"},
+      {en:"Cheers!", it:"Salute!", pron:"sah-loo-teh"}
+    ]
+  },
+  {
+    key:"set2", label:"Set 2: Settling In",
+    phrases:[
+      {en:"I'm looking for an apartment to rent", it:"Sto cercando un appartamento in affitto", pron:"stoh chair-kan-doh oon ah-par-ta-men-toh een af-fee-toh"},
+      {en:"How much is the rent?", it:"Quant'è l'affitto?", pron:"kwan-teh laf-fee-toh"},
+      {en:"Is it furnished?", it:"È arredato?", pron:"eh ar-reh-dah-toh"},
+      {en:"I need to open a bank account", it:"Devo aprire un conto in banca", pron:"deh-voh ah-pree-reh oon kon-toh een ban-ka"},
+      {en:"Where is the post office?", it:"Dov'è la posta?", pron:"doh-veh lah pos-tah"},
+      {en:"I need a SIM card", it:"Ho bisogno di una SIM", pron:"oh bee-zon-yoh dee oo-nah seem"},
+      {en:"Is there wifi?", it:"C'è il wifi?", pron:"cheh eel wee-fee"},
+      {en:"What's the wifi password?", it:"Qual è la password del wifi?", pron:"kwal eh lah pass-word del wee-fee"},
+      {en:"Can you help me, please?", it:"Mi può aiutare, per favore?", pron:"mee pwoh ah-yoo-tah-reh pair fah-vor-eh"},
+      {en:"I need a doctor", it:"Ho bisogno di un medico", pron:"oh bee-zon-yoh dee oon meh-dee-koh"},
+      {en:"Where is the nearest pharmacy?", it:"Dov'è la farmacia più vicina?", pron:"doh-veh lah far-mah-chee-ah pyoo vee-chee-nah"},
+      {en:"What time does it open?", it:"A che ora apre?", pron:"ah keh oh-rah ah-preh"},
+      {en:"What time does it close?", it:"A che ora chiude?", pron:"ah keh oh-rah kyoo-deh"},
+      {en:"Can I pay by card?", it:"Posso pagare con la carta?", pron:"pos-soh pah-gah-reh kon lah kar-tah"},
+      {en:"The bill, please", it:"Il conto, per favore", pron:"eel kon-toh pair fah-vor-eh"},
+      {en:"Is this seat free?", it:"È libero questo posto?", pron:"eh lee-beh-roh kwes-toh pos-toh"},
+      {en:"Where is the train station?", it:"Dov'è la stazione?", pron:"doh-veh lah stat-see-oh-neh"},
+      {en:"A ticket to..., please", it:"Un biglietto per..., per favore", pron:"oon beel-yet-toh pair pair fah-vor-eh"},
+      {en:"I'm lost", it:"Mi sono perso/persa", pron:"mee soh-noh pair-soh / pair-sah"},
+      {en:"Can you write it down?", it:"Puoi scriverlo?", pron:"pwoy skree-vair-loh"},
+      {en:"Slowly, please", it:"Più lentamente, per favore", pron:"pyoo len-tah-men-teh pair fah-vor-eh"}
+    ]
+  },
+  {
+    key:"set3", label:"Set 3: Daily Life & Belonging",
+    phrases:[
+      {en:"I just moved here", it:"Mi sono appena trasferito/a qui", pron:"mee soh-noh ap-pen-nah trahs-feh-ree-toh/ah kwee"},
+      {en:"I'm still learning Italian", it:"Sto ancora imparando l'italiano", pron:"stoh an-koh-rah eem-pah-ran-doh lee-tal-yah-noh"},
+      {en:"Can you speak more slowly?", it:"Puoi parlare più lentamente?", pron:"pwoy par-lah-reh pyoo len-tah-men-teh"},
+      {en:"I have an appointment", it:"Ho un appuntamento", pron:"oh oon ap-poon-tah-men-toh"},
+      {en:"I'd like to make an appointment", it:"Vorrei prendere un appuntamento", pron:"vor-ray pren-deh-reh oon ap-poon-tah-men-toh"},
+      {en:"I don't feel well", it:"Non mi sento bene", pron:"non mee sen-toh beh-neh"},
+      {en:"It hurts here", it:"Mi fa male qui", pron:"mee fah mah-leh kwee"},
+      {en:"I'm allergic to...", it:"Sono allergico/a a...", pron:"soh-noh al-lair-jee-koh/kah ah"},
+      {en:"Where can I find work?", it:"Dove posso trovare lavoro?", pron:"doh-veh pos-soh troh-vah-reh lah-voh-roh"},
+      {en:"I work as a...", it:"Lavoro come...", pron:"lah-voh-roh koh-meh"},
+      {en:"What do you do for work?", it:"Che lavoro fai?", pron:"keh lah-voh-roh fye"},
+      {en:"Nice to see you again", it:"Piacere di rivederti", pron:"pyah-cheh-reh dee ree-veh-dair-tee"},
+      {en:"Would you like to grab a coffee?", it:"Ti va di prendere un caffè?", pron:"tee vah dee pren-deh-reh oon kaf-feh"},
+      {en:"I'm free this weekend", it:"Sono libero/a questo weekend", pron:"soh-noh lee-beh-roh/rah kwes-toh week-end"},
+      {en:"Let's meet at eight", it:"Ci vediamo alle otto", pron:"chee veh-dee-ah-moh al-leh ot-toh"},
+      {en:"Where do you live?", it:"Dove abiti?", pron:"doh-veh ah-bee-tee"},
+      {en:"I live near...", it:"Abito vicino a...", pron:"ah-bee-toh vee-chee-noh ah"},
+      {en:"Can you recommend a good restaurant?", it:"Puoi consigliarmi un buon ristorante?", pron:"pwoy kon-see-lyar-mee oon bwon rees-toh-ran-teh"},
+      {en:"What do I owe you?", it:"Quanto ti devo?", pron:"kwan-toh tee deh-voh"},
+      {en:"Thanks for your help", it:"Grazie per il tuo aiuto", pron:"graht-see-eh pair eel twoh ah-yoo-toh"},
+      {en:"I really like it here", it:"Mi piace molto qui", pron:"mee pyah-cheh mol-toh kwee"}
+    ]
+  }
 ];
+var FLIPS_REQUIRED = 10;
 
 function shuffle(a){
   a = a.slice();
@@ -214,8 +333,32 @@ function shuffle(a){
   return a;
 }
 
-var deck = shuffle(PHRASES);
-var idx = 0, flipped = false, animating = false;
+// ---- Per-set completion counts (persisted), with migration from the old single-deck key ----
+var COMPLETIONS_PREFIX = "italianFlashcardsCompletions_";
+var LEGACY_KEY = "italianFlashcardsCompletions";
+var completions = {};
+SETS.forEach(function(s){
+  var stored = localStorage.getItem(COMPLETIONS_PREFIX + s.key);
+  if(stored === null && s.key === "set1"){
+    stored = localStorage.getItem(LEGACY_KEY);
+  }
+  completions[s.key] = parseInt(stored || "0", 10) || 0;
+});
+function saveCompletion(key){
+  localStorage.setItem(COMPLETIONS_PREFIX + key, String(completions[key]));
+}
+function totalCompletions(){
+  return SETS.reduce(function(sum, s){ return sum + completions[s.key]; }, 0);
+}
+
+var LOCK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>';
+var ARROW_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>';
+
+var homeScreen = document.getElementById("homeScreen");
+var cardScreen = document.getElementById("cardScreen");
+var setListEl = document.getElementById("setList");
+var homeCompletionsText = document.getElementById("homeCompletionsText");
+var setLabel = document.getElementById("setLabel");
 
 var cardEl = document.getElementById("card");
 var stageEl = document.getElementById("stage");
@@ -224,8 +367,57 @@ var wordIt = document.getElementById("wordIt");
 var pron = document.getElementById("pron");
 var progressText = document.getElementById("progressText");
 var progressFill = document.getElementById("progressFill");
-var prevBtn = document.getElementById("prevBtn");
 var nextBtn = document.getElementById("nextBtn");
+var gateRingFg = document.getElementById("gateRingFg");
+var gateCount = document.getElementById("gateCount");
+var completionsText = document.getElementById("completionsText");
+
+var GATE_CIRCUMFERENCE = 2 * Math.PI * 22;
+gateRingFg.style.strokeDasharray = String(GATE_CIRCUMFERENCE);
+
+var currentSet = null, deck = [], idx = 0, flipped = false, flipCount = 0, animating = false;
+
+function renderHome(){
+  var html = "";
+  SETS.forEach(function(s, i){
+    var locked = i > 0 && completions[SETS[i - 1].key] < 21;
+    var sub = locked ? ("Complete " + SETS[i - 1].label + " to unlock") : (completions[s.key] + " / 21 completions");
+    html += '<div class="set-card' + (locked ? ' locked' : '') + '" data-index="' + i + '">' +
+      '<div><div class="set-card-title">' + s.label + '</div><div class="set-card-sub">' + sub + '</div></div>' +
+      '<div class="set-card-icon">' + (locked ? LOCK_SVG : ARROW_SVG) + '</div>' +
+    '</div>';
+  });
+  setListEl.innerHTML = html;
+  Array.prototype.forEach.call(setListEl.querySelectorAll(".set-card"), function(el){
+    el.addEventListener("click", function(){
+      var i = parseInt(el.getAttribute("data-index"), 10);
+      if(i > 0 && completions[SETS[i - 1].key] < 21) return;
+      startSet(i);
+    });
+  });
+  homeCompletionsText.textContent = totalCompletions() + (totalCompletions() === 1 ? " total completion" : " total completions");
+}
+
+function showHome(){
+  renderHome();
+  cardScreen.style.display = "none";
+  homeScreen.style.display = "flex";
+}
+
+function showCard(){
+  homeScreen.style.display = "none";
+  cardScreen.style.display = "flex";
+}
+
+function startSet(i){
+  currentSet = SETS[i];
+  deck = shuffle(currentSet.phrases);
+  idx = 0;
+  setLabel.textContent = currentSet.label;
+  completionsText.textContent = "Completed " + completions[currentSet.key] + (completions[currentSet.key] === 1 ? " time" : " times");
+  showCard();
+  fill();
+}
 
 function fill(){
   var p = deck[idx];
@@ -234,56 +426,71 @@ function fill(){
   pron.textContent = p.pron;
   progressText.textContent = (idx + 1) + " / " + deck.length;
   progressFill.style.width = ((idx + 1) / deck.length * 100) + "%";
+  resetGate();
 }
 
-// Tap the card: flip it in place, as many times as you like. Never advances.
+function resetGate(){
+  flipCount = 0;
+  updateGate();
+}
+
+function updateGate(){
+  var pct = Math.min(flipCount / FLIPS_REQUIRED, 1);
+  gateRingFg.style.strokeDashoffset = String(GATE_CIRCUMFERENCE * (1 - pct));
+  gateCount.textContent = flipCount;
+  var unlocked = flipCount >= FLIPS_REQUIRED;
+  nextBtn.classList.toggle("locked", !unlocked);
+  nextBtn.disabled = !unlocked;
+}
+
+// Tap the card: flip it in place, as many times as needed. Never advances.
+// Each tap counts toward the per-card flip gate (capped, doesn't reduce on flip-back).
 function toggleFlip(){
   if(animating) return;
   flipped = !flipped;
   cardEl.classList.toggle("flipped", flipped);
+  if(flipCount < FLIPS_REQUIRED){
+    flipCount++;
+    updateGate();
+  }
 }
 
-// Arrows / swipe: move to a new card, always landing face-up (English side).
-function go(direction){
-  if(animating) return;
-  var isCompleting = (direction > 0 && idx === deck.length - 1);
+// Forward only: move to the next card, or finish the set on card 21.
+function next(){
+  if(animating || flipCount < FLIPS_REQUIRED) return;
+  var isCompleting = idx === deck.length - 1;
   animating = true;
   flipped = false;
   cardEl.classList.remove("flipped");
-  cardEl.classList.add(direction > 0 ? "slide-out-left" : "slide-out-right");
+  cardEl.classList.add("slide-out-left");
   setTimeout(function(){
-    idx += direction;
-    if(idx >= deck.length){ deck = shuffle(PHRASES); idx = 0; }
-    if(idx < 0){ idx = deck.length - 1; }
+    if(isCompleting){
+      cardEl.classList.remove("slide-out-left");
+      animating = false;
+      completions[currentSet.key]++;
+      saveCompletion(currentSet.key);
+      showHome();
+      celebrate();
+      return;
+    }
+    idx++;
     fill();
-    cardEl.classList.remove("slide-out-left", "slide-out-right");
+    cardEl.classList.remove("slide-out-left");
     cardEl.getBoundingClientRect(); // force reflow so the next transition runs
     cardEl.classList.add("slide-in");
     setTimeout(function(){
       cardEl.classList.remove("slide-in");
       animating = false;
     }, 280);
-    if(isCompleting) celebrate();
   }, 160);
 }
 
-// ---- Completion counter (persists across visits) + falling rose/confetti celebration ----
-var COMPLETIONS_KEY = "italianFlashcardsCompletions";
-var completions = parseInt(localStorage.getItem(COMPLETIONS_KEY) || "0", 10) || 0;
-var completionsText = document.getElementById("completionsText");
-function renderCompletions(){
-  completionsText.textContent = "Completed " + completions + (completions === 1 ? " time" : " times");
-}
-renderCompletions();
-
+// ---- Falling rose/confetti celebration, fires on each full pass through a set ----
 var celebrateCanvas = document.getElementById("celebrateCanvas");
 var celebrateCtx = celebrateCanvas.getContext("2d");
 var reducedMotion = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
 
 function celebrate(){
-  completions++;
-  localStorage.setItem(COMPLETIONS_KEY, String(completions));
-  renderCompletions();
   if(reducedMotion || !celebrateCtx) return;
 
   var W = celebrateCanvas.width = window.innerWidth;
@@ -340,10 +547,9 @@ function celebrate(){
 }
 
 stageEl.addEventListener("click", toggleFlip);
-nextBtn.addEventListener("click", function(){ go(1); });
-prevBtn.addEventListener("click", function(){ go(-1); });
+nextBtn.addEventListener("click", next);
 
-// Swipe left/right on the card to navigate too - a small tap still just flips it.
+// Swipe left on the card to advance too (only when unlocked) - a small tap still just flips it.
 var touchStartX = null, touchStartY = null;
 stageEl.addEventListener("touchstart", function(e){
   touchStartX = e.touches[0].clientX;
@@ -354,18 +560,17 @@ stageEl.addEventListener("touchend", function(e){
   var dx = e.changedTouches[0].clientX - touchStartX;
   var dy = e.changedTouches[0].clientY - touchStartY;
   touchStartX = null;
-  if(Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)){
-    go(dx < 0 ? 1 : -1);
+  if(dx < -50 && Math.abs(dx) > Math.abs(dy)){
+    next();
   }
 }, {passive:true});
 
 document.addEventListener("keydown", function(e){
-  if(e.key === "ArrowRight") go(1);
-  else if(e.key === "ArrowLeft") go(-1);
+  if(e.key === "ArrowRight") next();
   else if(e.key === " "){ e.preventDefault(); toggleFlip(); }
 });
 
-fill();
+showHome();
 </script>
 </body>
 </html>
