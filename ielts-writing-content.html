@@ -206,11 +206,6 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
 .answer-icon{font-size:.75rem;transition:transform .2s;color:var(--muted)}
 .answer-toggle.expanded .answer-icon{transform:rotate(180deg)}
 
-.answer-view-toggle{order:2;display:flex;gap:0;border:1.5px solid var(--border);border-top:none;background:var(--card);padding:.6rem .9rem 0;margin:0}
-.av-btn{font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:700;padding:.4rem .95rem;background:none;color:var(--muted);border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .15s}
-.av-btn:hover{color:var(--ink)}
-.av-btn.active{color:var(--ielts,#FF9100);border-bottom-color:var(--ielts,#FF9100)}
-
 /* Answer Body */
 .answer-body{display:none;padding:1rem;background:var(--card);border:1.5px solid var(--border);border-top:none;font-size:.85rem;line-height:1.7;color:var(--ink);order:3;border-radius:0 0 10px 10px}
 .answer-body.expanded{display:block}
@@ -235,6 +230,11 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
 .image-slot.filled{border:1.5px solid var(--border);padding:.6rem}
 .image-slot.filled img{display:block}
 .image-slot.filled .image-slot-text{display:none}
+.image-gen-box:has(.image-slot.filled){padding:0;border:none;background:none;margin-bottom:1rem}
+.image-gen-box:has(.image-slot.filled) .image-gen-label,
+.image-gen-box:has(.image-slot.filled) .image-gen-prompt,
+.image-gen-box:has(.image-slot.filled) .image-gen-copy{display:none}
+.image-gen-box:has(.image-slot.filled) .image-slot.filled{margin-top:0}
 
 /* Table Styles */
 .data-table{width:100%;border-collapse:collapse;margin-bottom:1rem;background:var(--card);border:1px solid var(--border);border-radius:6px;overflow:hidden}
@@ -381,28 +381,6 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
 .error-tag.lr{background:#fff3e0;color:#FF9100}
 .error-tag.gr{background:#fff3e0;color:#FFA733}
 
-/* ── Annotated answer ───────────────────────────────── */
-.answer-view-toggle{display:flex;gap:0;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;width:fit-content;margin-bottom:.8rem}
-.annotated-body{display:none;padding:1rem;background:var(--card);border:1.5px solid var(--border);border-top:none;font-size:.85rem;line-height:1.9;color:var(--ink);order:4;border-radius:0 0 10px 10px}
-.annotated-body p{margin-bottom:.9rem}
-.annotated-body p:last-child{margin-bottom:0}
-.annotated-body.visible{display:block}
-.ann{position:relative;border-radius:4px;padding:1px 4px;margin:0 1px;cursor:help;box-decoration-break:clone;-webkit-box-decoration-break:clone}
-.ann-overview{background:rgba(255,179,71,.16)}
-.ann-key-feature{background:rgba(74,144,217,.12)}
-.ann-comparison{background:rgba(46,196,182,.12)}
-.ann-data{background:rgba(155,114,207,.1)}
-.ann-hedging{background:rgba(93,222,160,.15)}
-.ann-position{background:rgba(255,179,71,.16)}
-.ann-argument{background:rgba(74,144,217,.12)}
-.ann-example{background:rgba(46,196,182,.12)}
-.ann-concession{background:rgba(255,107,107,.12)}
-.ann-conclusion{background:rgba(155,114,207,.1)}
-.ann::after{content:attr(data-label);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;font-family:Outfit,sans-serif;font-size:.58rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;padding:3px 8px;border-radius:5px;pointer-events:none;opacity:0;transition:opacity .15s;z-index:10}
-.ann:hover::after{opacity:1}
-.ann-legend{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:.8rem}
-.ann-legend-item{display:flex;align-items:center;gap:.35rem;font-family:Outfit,sans-serif;font-size:.58rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
-.ann-legend-dot{width:10px;height:4px;border-radius:2px;flex-shrink:0}
 </style>
 <style>nav{display:none!important}</style></head>
 <body>
@@ -1029,22 +1007,6 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
                 <p>The bar chart compares the percentage of people using the internet across four age groups in the UK in 2005, 2012, and 2019. Overall, internet usage increased significantly in all age groups over the period, though a clear generational divide persisted throughout.</p>
                 <p>In 2005, the youngest group (16 to 24) led with 80% usage, while the 25 to 44 and 45 to 64 groups stood at 70% and 45% respectively. The most striking figure was the 65+ group, where only 15% used the internet. By 2012, all groups had risen substantially. The two youngest cohorts approached near-universal adoption at 97% and 92%, while the 45 to 64 group jumped to 78%. The over-65s more than doubled to 42%, yet remained well behind the other groups.</p>
                 <p>By 2019, the gap had narrowed considerably but had not disappeared. The 16 to 24 and 25 to 44 groups reached 99% and 98%, making internet use effectively universal among working-age adults. The 45 to 64 group climbed to 93%. The most dramatic transformation, however, was among the over-65s, who rose from just 15% in 2005 to 72% in 2019 - an increase of 57 percentage points - yet this group still recorded the lowest rate of usage by a significant margin.</p>
-              </div>
-              <div class="answer-view-toggle">
-                <button class="av-btn active" onclick="switchAnswerView(this,'plain')">Plain</button>
-                <button class="av-btn" onclick="switchAnswerView(this,'annotated')">Annotated</button>
-              </div>
-              <div class="annotated-body" id="ann-t1-1">
-                <div class="ann-legend">
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sun)"></span>Overview</span>
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sky)"></span>Key feature</span>
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sea)"></span>Comparison</span>
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--lavender)"></span>Data / figure</span>
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--mint)"></span>Hedging</span>
-                </div>
-                <p><span class="ann ann-overview" data-label="Overview">The bar chart compares the percentage of people using the internet across four age groups in the UK in 2005, 2012, and 2019.</span> <span class="ann ann-overview" data-label="Overview - main trend">Overall, internet usage increased significantly in all age groups over the period, though a clear generational divide persisted throughout.</span></p>
-                <p>In 2005, <span class="ann ann-key-feature" data-label="Key feature - leader">the youngest group (16 to 24) led with <span class="ann ann-data" data-label="Precise figure">80% usage</span></span>, while <span class="ann ann-comparison" data-label="Comparison">the 25 to 44 and 45 to 64 groups stood at <span class="ann ann-data" data-label="Precise figure">70% and 45%</span> respectively</span>. <span class="ann ann-key-feature" data-label="Key feature - most notable">The most striking figure was the 65+ group, where <span class="ann ann-data" data-label="Precise figure">only 15%</span> used the internet.</span> By 2012, all groups had risen substantially. <span class="ann ann-comparison" data-label="Comparison - grouping similar data">The two youngest cohorts approached near-universal adoption at <span class="ann ann-data" data-label="Precise figures">97% and 92%</span>, while the 45 to 64 group jumped to <span class="ann ann-data" data-label="Precise figure">78%</span>.</span> <span class="ann ann-key-feature" data-label="Key feature - most dramatic change">The over-65s more than doubled to <span class="ann ann-data" data-label="Precise figure">42%</span></span>, yet <span class="ann ann-comparison" data-label="Comparison - maintaining contrast">remained well behind the other groups</span>.</p>
-                <p>By 2019, <span class="ann ann-comparison" data-label="Comparison - narrowing gap">the gap had narrowed considerably but had not disappeared.</span> <span class="ann ann-key-feature" data-label="Key feature - near-universal">The 16 to 24 and 25 to 44 groups reached <span class="ann ann-data" data-label="Precise figures">99% and 98%</span>, making internet use effectively universal among working-age adults.</span> The 45 to 64 group climbed to <span class="ann ann-data" data-label="Precise figure">93%</span>. <span class="ann ann-key-feature" data-label="Key feature - most dramatic overall change">The most dramatic transformation, however, was among the over-65s, who rose from <span class="ann ann-data" data-label="Precise figure">just 15% in 2005 to 72% in 2019</span> - <span class="ann ann-data" data-label="Calculated change">an increase of 57 percentage points</span></span> - yet <span class="ann ann-comparison" data-label="Comparison - still lowest">this group still recorded the lowest rate of usage by a significant margin</span>.</p>
               </div>
             </div>
           </div>
@@ -2049,22 +2011,6 @@ Landscape orientation, 4:3 aspect ratio, no watermarks, no extra decorative text
                 <p>Further changes took place along the High Street, which grew from a handful of small shops into a larger retail area, with a new shopping mall added by 2025. The most significant change, however, occurred in the south of the town, where open fields that existed in 2005 had been entirely built over by 2025, giving way to a housing estate and a new primary school.</p>
                 <p>Throughout this period, two features remained constant: the train station in the north-west and the river running through the centre of the town, both of which anchored the surrounding development.</p>
               </div>
-              <div class="answer-view-toggle">
-                <button class="av-btn active" onclick="switchAnswerView(this,'plain')">Plain</button>
-                <button class="av-btn" onclick="switchAnswerView(this,'annotated')">Annotated</button>
-              </div>
-              <div class="annotated-body" id="ann-t1map-1">
-                <div class="ann-legend">
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sun)"></span>Overview</span>
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sky)"></span>Key change</span>
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sea)"></span>Location</span>
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--lavender)"></span>Detail</span>
-                </div>
-                <p><span class="ann ann-overview" data-label="Overview">The two maps illustrate how the town of Millbrook changed between 2005 and 2025.</span> <span class="ann ann-overview" data-label="Overview - main trend">Overall, the riverside area shifted from an industrial and functional use to a leisure and residential one, while the open fields to the south were developed into new housing.</span></p>
-                <p><span class="ann ann-comparison" data-label="Location">In 2005, the riverbank</span> <span class="ann ann-data" data-label="Detail">was occupied by a working harbour and three large warehouses</span>, with <span class="ann ann-data" data-label="Detail">a car park situated just to the south</span>. <span class="ann ann-key-feature" data-label="Key change">By 2025, the harbour had been converted into a marina for leisure boats, and the warehouses had been repurposed: one became an arts centre, while the other two were turned into apartments.</span> <span class="ann ann-key-feature" data-label="Key change">The car park was also removed and replaced with a riverside park.</span></p>
-                <p><span class="ann ann-comparison" data-label="Location">Further changes took place along the High Street</span>, <span class="ann ann-key-feature" data-label="Key change">which grew from a handful of small shops into a larger retail area, with a new shopping mall added by 2025</span>. <span class="ann ann-key-feature" data-label="Most significant change">The most significant change, however, occurred in the south of the town, where open fields that existed in 2005 had been entirely built over by 2025, giving way to a housing estate and a new primary school.</span></p>
-                <p><span class="ann ann-comparison" data-label="Noting what stayed the same">Throughout this period, two features remained constant: the train station in the north-west and the river running through the centre of the town, both of which anchored the surrounding development.</span></p>
-              </div>
             </div>
           </div>
 
@@ -2109,7 +2055,7 @@ Landscape orientation, 4:3 aspect ratio, no watermarks, no extra decorative text
                 <div class="guide-steps">
                   <div class="guide-step"><span class="guide-label">Overview</span> One sentence: a small village grew into a much larger, more developed town over the 40-year period.</div>
                   <div class="guide-step"><span class="guide-label">Body 1</span> Housing growth and the farm/woodland becoming an industrial estate and retail park.</div>
-                  <div class="guide-step"><span class="guide-label">Body 2</span> New infrastructure: the bypass, bridge, health centre and school &mdash; and what stayed the same (the church).</div>
+                  <div class="guide-step"><span class="guide-label">Body 2</span> New infrastructure: the bypass, health centre and school &mdash; and what stayed the same (the church).</div>
                   <div class="guide-step"><span class="guide-label">Tip</span> With this many changes, group them by theme (housing / commerce / infrastructure) rather than describing the map feature by feature &mdash; it's far easier to organise and to follow.</div>
                 </div>
               </div>
@@ -2120,24 +2066,8 @@ Landscape orientation, 4:3 aspect ratio, no watermarks, no extra decorative text
               <div class="answer-body" id="plain-t1map-2">
                 <p>The two maps show how the village of Ashford was transformed into a much larger settlement between 1980 and 2020. Overall, the area saw substantial residential and commercial growth, along with major new infrastructure, while a small number of original features remained untouched.</p>
                 <p>The most obvious change is the scale of housing: in 1980, only a handful of houses stood along the main road, whereas by 2020 these had multiplied into a dense residential grid covering most of the map. This growth was matched by a shift in land use to the east and west. The farm that had occupied the eastern side of the village in 1980 was replaced by an industrial estate, and roughly half of the woodland to the west was cleared to make way for a retail park.</p>
-                <p>New infrastructure was also added to support this larger population. A bypass now curves around the northern edge of the settlement, connecting to the main road, and the stream, which had only a footbridge in 1980, is now crossed by a proper road bridge. A health centre and a secondary school were also built near the centre of the town, facilities that did not exist in 1980.</p>
+                <p>New infrastructure was also added to support this larger population. A bypass now curves around the northern edge of the settlement, linking into the north-south road that already ran through the village in 1980. A health centre and a school were also built near the centre of the village, facilities that did not exist in 1980.</p>
                 <p>Despite these extensive changes, the church remained in its original position throughout the period, serving as the one fixed landmark in an otherwise transformed landscape.</p>
-              </div>
-              <div class="answer-view-toggle">
-                <button class="av-btn active" onclick="switchAnswerView(this,'plain')">Plain</button>
-                <button class="av-btn" onclick="switchAnswerView(this,'annotated')">Annotated</button>
-              </div>
-              <div class="annotated-body" id="ann-t1map-2">
-                <div class="ann-legend">
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sun)"></span>Overview</span>
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sky)"></span>Key change</span>
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sea)"></span>Location</span>
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--lavender)"></span>Detail</span>
-                </div>
-                <p><span class="ann ann-overview" data-label="Overview">The two maps show how the village of Ashford was transformed into a much larger settlement between 1980 and 2020.</span> <span class="ann ann-overview" data-label="Overview - main trend">Overall, the area saw substantial residential and commercial growth, along with major new infrastructure, while a small number of original features remained untouched.</span></p>
-                <p><span class="ann ann-key-feature" data-label="Key change">The most obvious change is the scale of housing: in 1980, only a handful of houses stood along the main road, whereas by 2020 these had multiplied into a dense residential grid covering most of the map.</span> <span class="ann ann-comparison" data-label="Location">This growth was matched by a shift in land use to the east and west.</span> <span class="ann ann-data" data-label="Detail">The farm that had occupied the eastern side of the village in 1980 was replaced by an industrial estate, and roughly half of the woodland to the west was cleared to make way for a retail park.</span></p>
-                <p><span class="ann ann-key-feature" data-label="Key change">New infrastructure was also added to support this larger population.</span> <span class="ann ann-data" data-label="Detail">A bypass now curves around the northern edge of the settlement, connecting to the main road, and the stream, which had only a footbridge in 1980, is now crossed by a proper road bridge.</span> <span class="ann ann-data" data-label="Detail">A health centre and a secondary school were also built near the centre of the town, facilities that did not exist in 1980.</span></p>
-                <p><span class="ann ann-comparison" data-label="Noting what stayed the same">Despite these extensive changes, the church remained in its original position throughout the period, serving as the one fixed landmark in an otherwise transformed landscape.</span></p>
               </div>
             </div>
           </div>
@@ -2197,22 +2127,6 @@ Landscape orientation, 4:3 aspect ratio, no watermarks, no extra decorative text
                 <p>The changes are entirely additive. The detached outdoor court will be removed and replaced by a considerably larger leisure pool, distinguished from the original pool by its irregular, curved shape. Attached to the eastern side of the main building, a new sports hall and two dance studios will be added. Along the southern edge of the building, three further facilities will be introduced: a crèche, a juice bar, and a second changing room.</p>
                 <p>In summary, while the heart of the leisure centre remains untouched, its surrounding facilities will be considerably expanded, transforming it from a basic sports facility into a much more comprehensive leisure destination.</p>
               </div>
-              <div class="answer-view-toggle">
-                <button class="av-btn active" onclick="switchAnswerView(this,'plain')">Plain</button>
-                <button class="av-btn" onclick="switchAnswerView(this,'annotated')">Annotated</button>
-              </div>
-              <div class="annotated-body" id="ann-t1map-3">
-                <div class="ann-legend">
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sun)"></span>Overview</span>
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sky)"></span>Key change</span>
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sea)"></span>Location</span>
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--lavender)"></span>Detail</span>
-                </div>
-                <p><span class="ann ann-overview" data-label="Overview">The plans show the current layout of Bayview Leisure Centre and how it will be redeveloped in the future.</span> <span class="ann ann-overview" data-label="Overview - main trend">Overall, the redevelopment retains all of the centre's existing facilities and adds a substantial number of new ones, considerably expanding the range of activities on offer.</span></p>
-                <p><span class="ann ann-data" data-label="Detail">At present, the centre consists of a gym, a changing room, a 25-metre pool, a seating area and a reception, all housed within a single rectangular building, with one separate outdoor court situated to the west.</span> <span class="ann ann-key-feature" data-label="Key change">In the future plans, every one of these core facilities remains exactly as it is, in the same position and of the same size, indicating that the basic structure of the centre will not be disrupted by the redevelopment.</span></p>
-                <p><span class="ann ann-overview" data-label="Transition">The changes are entirely additive.</span> <span class="ann ann-key-feature" data-label="Key change">The detached outdoor court will be removed and replaced by a considerably larger leisure pool, distinguished from the original pool by its irregular, curved shape.</span> <span class="ann ann-comparison" data-label="Location">Attached to the eastern side of the main building, a new sports hall and two dance studios will be added.</span> <span class="ann ann-comparison" data-label="Location">Along the southern edge of the building, three further facilities will be introduced: a crèche, a juice bar, and a second changing room.</span></p>
-                <p><span class="ann ann-overview" data-label="Closing overview">In summary, while the heart of the leisure centre remains untouched, its surrounding facilities will be considerably expanded, transforming it from a basic sports facility into a much more comprehensive leisure destination.</span></p>
-              </div>
             </div>
           </div>
 
@@ -2257,8 +2171,8 @@ Landscape orientation, 4:3 aspect ratio, no watermarks, no extra decorative text
                 <div class="guide-steps">
                   <div class="guide-step"><span class="guide-label">Overview</span> One sentence: the park gained several new leisure facilities and a more developed path network, while its main natural feature, the pond, was left untouched.</div>
                   <div class="guide-step"><span class="guide-label">Body 1</span> New facilities near the entrance: car park and playground, plus the bandstand and café further in.</div>
-                  <div class="guide-step"><span class="guide-label">Body 2</span> The path network expanding, the flower garden being added, and the trade-off of losing two trees to make room for the playground &mdash; then what stayed the same (the pond, most of the trees, the entrance).</div>
-                  <div class="guide-step"><span class="guide-label">Tip</span> A small negative detail like "two trees were removed" makes an answer more convincing than only listing additions &mdash; real redevelopments involve trade-offs, and noting one shows careful reading of the map.</div>
+                  <div class="guide-step"><span class="guide-label">Body 2</span> The path network expanding into a loop, the flower garden being added, and the trade-off of losing half the trees to make room for the car park and playground &mdash; then what stayed the same (the pond and its position, the entrance).</div>
+                  <div class="guide-step"><span class="guide-label">Tip</span> A small negative detail like "half the trees were removed" makes an answer more convincing than only listing additions &mdash; real redevelopments involve trade-offs, and noting one shows careful reading of the map.</div>
                 </div>
               </div>
               <div class="answer-toggle" onclick="toggleAnswer(this)">
@@ -2267,25 +2181,9 @@ Landscape orientation, 4:3 aspect ratio, no watermarks, no extra decorative text
               </div>
               <div class="answer-body" id="plain-t1map-4">
                 <p>The two maps illustrate how Fairview Park was redeveloped, gaining a range of new facilities while retaining its central pond. Overall, the redevelopment concentrated new leisure amenities around the existing path, while a small number of features, most notably the pond, were left unchanged.</p>
-                <p>Before redevelopment, the park consisted largely of open grass, with a single path leading from the entrance to a pond at its centre, along with a scattering of six trees and two benches. After redevelopment, several new facilities were added close to the entrance: a car park to accommodate visitors arriving by vehicle, and a playground immediately beside it. Further into the park, a bandstand was constructed on the far side of the pond, along with a small café and a flower garden.</p>
-                <p>To connect these new facilities, two additional paths were built branching off the original route, creating a small network rather than a single line. This expansion came at a small cost: two of the original six trees were removed to make space for the playground, although the remaining four were left in place. The number of benches also increased, from two to five, distributed along the new paths. Throughout the redevelopment, however, the pond itself remained exactly as it was, in both size and position.</p>
+                <p>Before redevelopment, the park consisted largely of open grass, with a single path leading from the entrance to a pond at its centre, along with a scattering of six trees and just one bench. After redevelopment, several new facilities were added close to the entrance: a car park to accommodate visitors arriving by vehicle, and a playground immediately beside it. Further into the park, a bandstand was constructed on the far side of the pond, along with a small café and a flower garden.</p>
+                <p>To connect these new facilities, the original single path was extended into a loop that now circles almost the entire pond, with an additional branch leading off to the playground. This expansion came at a cost to the park's greenery: half of the original six trees were removed, mainly to make space for the car park and playground, leaving only three standing, one pair in one corner and a single tree in another. The number of benches, by contrast, increased substantially, from just one to five, distributed at intervals around the new loop path. Throughout the redevelopment, however, the pond itself remained exactly as it was, in both size and position.</p>
                 <p>In summary, while Fairview Park was considerably expanded with new leisure facilities and a wider path network, its central pond, along with most of its original trees, was carefully preserved.</p>
-              </div>
-              <div class="answer-view-toggle">
-                <button class="av-btn active" onclick="switchAnswerView(this,'plain')">Plain</button>
-                <button class="av-btn" onclick="switchAnswerView(this,'annotated')">Annotated</button>
-              </div>
-              <div class="annotated-body" id="ann-t1map-4">
-                <div class="ann-legend">
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sun)"></span>Overview</span>
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sky)"></span>Key change</span>
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sea)"></span>Location</span>
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--lavender)"></span>Detail</span>
-                </div>
-                <p><span class="ann ann-overview" data-label="Overview">The two maps illustrate how Fairview Park was redeveloped, gaining a range of new facilities while retaining its central pond.</span> <span class="ann ann-overview" data-label="Overview - main trend">Overall, the redevelopment concentrated new leisure amenities around the existing path, while a small number of features, most notably the pond, were left unchanged.</span></p>
-                <p><span class="ann ann-data" data-label="Detail">Before redevelopment, the park consisted largely of open grass, with a single path leading from the entrance to a pond at its centre, along with a scattering of six trees and two benches.</span> <span class="ann ann-key-feature" data-label="Key change">After redevelopment, several new facilities were added close to the entrance: a car park to accommodate visitors arriving by vehicle, and a playground immediately beside it.</span> <span class="ann ann-key-feature" data-label="Key change">Further into the park, a bandstand was constructed on the far side of the pond, along with a small café and a flower garden.</span></p>
-                <p><span class="ann ann-comparison" data-label="Sequencing/location">To connect these new facilities, two additional paths were built branching off the original route, creating a small network rather than a single line.</span> <span class="ann ann-key-feature" data-label="Trade-off detail">This expansion came at a small cost: two of the original six trees were removed to make space for the playground, although the remaining four were left in place.</span> <span class="ann ann-data" data-label="Detail">The number of benches also increased, from two to five, distributed along the new paths.</span> <span class="ann ann-comparison" data-label="Noting what stayed the same">Throughout the redevelopment, however, the pond itself remained exactly as it was, in both size and position.</span></p>
-                <p><span class="ann ann-overview" data-label="Closing overview">In summary, while Fairview Park was considerably expanded with new leisure facilities and a wider path network, its central pond, along with most of its original trees, was carefully preserved.</span></p>
               </div>
             </div>
           </div>
@@ -2331,7 +2229,7 @@ Landscape orientation, 4:3 aspect ratio, no watermarks, no extra decorative text
                 <div class="guide-header">How to answer this</div>
                 <div class="guide-steps">
                   <div class="guide-step"><span class="guide-label">Overview</span> One sentence: an undeveloped island gained a full set of tourist facilities, while its natural beach area was preserved and formalised.</div>
-                  <div class="guide-step"><span class="guide-label">Body 1</span> The accommodation, reception and restaurant cluster, plus the pier and boats &mdash; the visitor-facing facilities.</div>
+                  <div class="guide-step"><span class="guide-label">Body 1</span> The accommodation, reception and restaurant cluster &mdash; the main visitor-facing facilities.</div>
                   <div class="guide-step"><span class="guide-label">Body 2</span> The two route types (footpath vs. vehicle track) and the new swimming area, then what stayed the same or was thinned rather than removed (the beach, some of the palm trees).</div>
                   <div class="guide-step"><span class="guide-label">Tip</span> Island/resort maps like this almost always distinguish a footpath from a vehicle track &mdash; naming both correctly, and explaining why two route types exist (pedestrians vs. deliveries/vehicles), reads as more precise than just saying "paths were added".</div>
                 </div>
@@ -2342,25 +2240,9 @@ Landscape orientation, 4:3 aspect ratio, no watermarks, no extra decorative text
               </div>
               <div class="answer-body" id="plain-t1map-5">
                 <p>The two maps illustrate how Coral Island was transformed from an undeveloped island into a small tourist resort. Overall, a full range of visitor facilities was constructed inland from the beach, while the beach itself, along with much of the island's natural vegetation, was largely preserved.</p>
-                <p>Before development, the island consisted of nothing more than an area of beach along one stretch of coastline and a scattering of palm trees, with no buildings or paths of any kind. After development, a cluster of visitor facilities was built a short distance from the beach: a reception building, a restaurant, and a group of six accommodation huts. A pier was also constructed extending out from the coastline, providing a mooring point for small boats.</p>
-                <p>To connect these new facilities, two distinct types of route were added: a footpath linking the beach, reception, accommodation and restaurant for pedestrians, and a separate vehicle track running from the opposite side of the island to the reception, presumably for deliveries. Just offshore from the beach, a designated swimming area was also marked out. Despite this substantial development, the beach itself remained untouched, and roughly half of the original palm trees were left standing among the new buildings.</p>
+                <p>Before development, the island consisted of nothing more than an area of beach along one stretch of coastline and a scattering of palm trees, with no buildings or paths of any kind. After development, a cluster of visitor facilities was built a short distance from the beach: a reception building, a restaurant, and a small group of accommodation huts.</p>
+                <p>To connect these new facilities, two distinct types of route were added: a dotted footpath linking the beach and swimming area to reception, the accommodation huts and the restaurant for pedestrians, and a separate dashed vehicle track looping from the swimming area down along the coast and back to reception, presumably for deliveries. Just offshore from the beach, a designated swimming area was also marked out. Despite this substantial development, the beach itself remained untouched, and many of the island's palm trees were left standing among the new buildings.</p>
                 <p>In summary, Coral Island's transformation added a complete set of tourist infrastructure to what had been an entirely natural island, without significantly disturbing its beach or its greenery.</p>
-              </div>
-              <div class="answer-view-toggle">
-                <button class="av-btn active" onclick="switchAnswerView(this,'plain')">Plain</button>
-                <button class="av-btn" onclick="switchAnswerView(this,'annotated')">Annotated</button>
-              </div>
-              <div class="annotated-body" id="ann-t1map-5">
-                <div class="ann-legend">
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sun)"></span>Overview</span>
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sky)"></span>Key change</span>
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sea)"></span>Location</span>
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--lavender)"></span>Detail</span>
-                </div>
-                <p><span class="ann ann-overview" data-label="Overview">The two maps illustrate how Coral Island was transformed from an undeveloped island into a small tourist resort.</span> <span class="ann ann-overview" data-label="Overview - main trend">Overall, a full range of visitor facilities was constructed inland from the beach, while the beach itself, along with much of the island's natural vegetation, was largely preserved.</span></p>
-                <p><span class="ann ann-data" data-label="Detail">Before development, the island consisted of nothing more than an area of beach along one stretch of coastline and a scattering of palm trees, with no buildings or paths of any kind.</span> <span class="ann ann-key-feature" data-label="Key change">After development, a cluster of visitor facilities was built a short distance from the beach: a reception building, a restaurant, and a group of six accommodation huts.</span> <span class="ann ann-key-feature" data-label="Key change">A pier was also constructed extending out from the coastline, providing a mooring point for small boats.</span></p>
-                <p><span class="ann ann-comparison" data-label="Location/detail">To connect these new facilities, two distinct types of route were added: a footpath linking the beach, reception, accommodation and restaurant for pedestrians, and a separate vehicle track running from the opposite side of the island to the reception, presumably for deliveries.</span> <span class="ann ann-key-feature" data-label="Key change">Just offshore from the beach, a designated swimming area was also marked out.</span> <span class="ann ann-comparison" data-label="Noting what stayed the same">Despite this substantial development, the beach itself remained untouched, and roughly half of the original palm trees were left standing among the new buildings.</span></p>
-                <p><span class="ann ann-overview" data-label="Closing overview">In summary, Coral Island's transformation added a complete set of tourist infrastructure to what had been an entirely natural island, without significantly disturbing its beach or its greenery.</span></p>
               </div>
             </div>
           </div>
@@ -2434,22 +2316,6 @@ Landscape orientation, 4:3 aspect ratio, no watermarks, no extra decorative text
                 <p>Once sufficient moisture has accumulated within these clouds, it falls back to the Earth's surface as precipitation, in the form of rain, most of which lands on the higher ground of the mountains. This water is then collected as surface runoff, forming rivers that flow down the mountainside, across the land, and ultimately back into the ocean, at which point the cycle begins again.</p>
                 <p>Overall, the process demonstrates a closed, self-sustaining loop in which the same water is continuously recycled between the ocean, the atmosphere, and the land.</p>
               </div>
-              <div class="answer-view-toggle">
-                <button class="av-btn active" onclick="switchAnswerView(this,'plain')">Plain</button>
-                <button class="av-btn" onclick="switchAnswerView(this,'annotated')">Annotated</button>
-              </div>
-              <div class="annotated-body" id="ann-t1process-1">
-                <div class="ann-legend">
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sun)"></span>Overview</span>
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sky)"></span>Stage</span>
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sea)"></span>Sequencing</span>
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--lavender)"></span>Detail</span>
-                </div>
-                <p><span class="ann ann-overview" data-label="Overview">The diagram illustrates the water cycle, a continuous natural process with no fixed starting or ending point.</span> <span class="ann ann-overview" data-label="Chosen starting point">For the purposes of this description, the cycle can be seen as beginning with evaporation from the ocean.</span></p>
-                <p><span class="ann ann-key-feature" data-label="Stage 1">Heated by the sun, water on the surface of the ocean evaporates and rises into the atmosphere as water vapour.</span> <span class="ann ann-comparison" data-label="Sequencing">As this vapour rises and cools over the surrounding mountains,</span> <span class="ann ann-key-feature" data-label="Stage 2">it undergoes condensation, forming clouds.</span></p>
-                <p><span class="ann ann-comparison" data-label="Sequencing">Once sufficient moisture has accumulated within these clouds,</span> <span class="ann ann-key-feature" data-label="Stage 3">it falls back to the Earth's surface as precipitation, in the form of rain, most of which lands on the higher ground of the mountains.</span> <span class="ann ann-key-feature" data-label="Stage 4">This water is then collected as surface runoff, forming rivers that flow down the mountainside, across the land, and ultimately back into the ocean,</span> <span class="ann ann-comparison" data-label="Sequencing - closing the loop">at which point the cycle begins again.</span></p>
-                <p><span class="ann ann-overview" data-label="Closing overview">Overall, the process demonstrates a closed, self-sustaining loop in which the same water is continuously recycled between the ocean, the atmosphere, and the land.</span></p>
-              </div>
             </div>
           </div>
 
@@ -2504,25 +2370,9 @@ Landscape orientation, 4:3 aspect ratio, no watermarks, no extra decorative text
               </div>
               <div class="answer-body" id="plain-t1process-2">
                 <p>The diagram illustrates the process by which used plastic bottles are recycled into new plastic products. Overall, the process consists of five distinct stages, beginning with the collection of used bottles and ending with the manufacture of a new product.</p>
-                <p>The process begins when used bottles are collected, typically from public recycling bins. These bottles are then transported to a sorting facility, where they are separated by colour and plastic type on a conveyor belt system. Following this, the sorted bottles are washed to remove any remaining contents or labels, before being shredded into small plastic flakes.</p>
+                <p>The process begins when used bottles are collected, typically from public recycling bins. These bottles are then transported to a sorting facility, where they are separated into different batches on a conveyor belt system. Following this, the sorted bottles are washed and shredded into small plastic flakes in a single combined stage.</p>
                 <p>At the next stage, these flakes are heated and melted down, after which the molten plastic is formed into small pellets. Finally, these pellets are used as the raw material to manufacture entirely new plastic products, such as new bottles, completing the process.</p>
                 <p>In summary, the recycling of a plastic bottle is a five-stage industrial process that transforms used plastic waste back into a usable raw material for new manufacturing.</p>
-              </div>
-              <div class="answer-view-toggle">
-                <button class="av-btn active" onclick="switchAnswerView(this,'plain')">Plain</button>
-                <button class="av-btn" onclick="switchAnswerView(this,'annotated')">Annotated</button>
-              </div>
-              <div class="annotated-body" id="ann-t1process-2">
-                <div class="ann-legend">
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sun)"></span>Overview</span>
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sky)"></span>Stage</span>
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sea)"></span>Sequencing</span>
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--lavender)"></span>Detail</span>
-                </div>
-                <p><span class="ann ann-overview" data-label="Overview">The diagram illustrates the process by which used plastic bottles are recycled into new plastic products.</span> <span class="ann ann-overview" data-label="Overview - stage count">Overall, the process consists of five distinct stages, beginning with the collection of used bottles and ending with the manufacture of a new product.</span></p>
-                <p><span class="ann ann-comparison" data-label="Sequencing">The process begins when</span> <span class="ann ann-key-feature" data-label="Stage 1">used bottles are collected, typically from public recycling bins.</span> <span class="ann ann-comparison" data-label="Sequencing">These bottles are then transported to</span> <span class="ann ann-key-feature" data-label="Stage 2">a sorting facility, where they are separated by colour and plastic type on a conveyor belt system.</span> <span class="ann ann-comparison" data-label="Sequencing">Following this,</span> <span class="ann ann-key-feature" data-label="Stage 3">the sorted bottles are washed to remove any remaining contents or labels, before being shredded into small plastic flakes.</span></p>
-                <p><span class="ann ann-comparison" data-label="Sequencing">At the next stage,</span> <span class="ann ann-key-feature" data-label="Stage 4">these flakes are heated and melted down, after which the molten plastic is formed into small pellets.</span> <span class="ann ann-comparison" data-label="Sequencing">Finally,</span> <span class="ann ann-key-feature" data-label="Stage 5">these pellets are used as the raw material to manufacture entirely new plastic products, such as new bottles, completing the process.</span></p>
-                <p><span class="ann ann-overview" data-label="Closing overview">In summary, the recycling of a plastic bottle is a five-stage industrial process that transforms used plastic waste back into a usable raw material for new manufacturing.</span></p>
               </div>
             </div>
           </div>
@@ -2578,22 +2428,6 @@ Landscape orientation, 4:3 aspect ratio, no watermarks, no extra decorative text
                 <p>The process begins with the collection of raw materials, namely sand, soda ash and limestone, which are combined in a mixing drum. This mixture is then transferred to a furnace, where it is heated to approximately 1,500 degrees Celsius until it melts into molten glass. The molten glass is subsequently poured into a two-part mould, giving it the initial shape of a bottle.</p>
                 <p>Once moulded, the bottle passes through an annealing oven, where it is gradually cooled to relieve internal stress in the glass. Following this, each bottle undergoes a quality inspection to check for defects. Finally, bottles that pass inspection are packaged and loaded onto a delivery truck, completing the manufacturing process.</p>
                 <p>In summary, the manufacture of a glass bottle involves transforming raw minerals into molten glass, shaping it, and then carefully cooling, checking and dispatching the finished product.</p>
-              </div>
-              <div class="answer-view-toggle">
-                <button class="av-btn active" onclick="switchAnswerView(this,'plain')">Plain</button>
-                <button class="av-btn" onclick="switchAnswerView(this,'annotated')">Annotated</button>
-              </div>
-              <div class="annotated-body" id="ann-t1process-3">
-                <div class="ann-legend">
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sun)"></span>Overview</span>
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sky)"></span>Stage</span>
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sea)"></span>Sequencing</span>
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--lavender)"></span>Detail</span>
-                </div>
-                <p><span class="ann ann-overview" data-label="Overview">The diagram illustrates the process by which glass bottles are manufactured, from raw material to finished product.</span> <span class="ann ann-overview" data-label="Overview - stage count / structure">Overall, the process consists of seven stages, and can be divided into an initial shaping phase and a subsequent finishing phase.</span></p>
-                <p><span class="ann ann-comparison" data-label="Sequencing">The process begins with</span> <span class="ann ann-key-feature" data-label="Stage 1">the collection of raw materials, namely sand, soda ash and limestone, which are combined in a mixing drum.</span> <span class="ann ann-comparison" data-label="Sequencing">This mixture is then transferred to</span> <span class="ann ann-key-feature" data-label="Stage 2-3">a furnace, where it is heated to approximately 1,500 degrees Celsius until it melts into molten glass.</span> <span class="ann ann-comparison" data-label="Sequencing">The molten glass is subsequently poured into</span> <span class="ann ann-key-feature" data-label="Stage 4">a two-part mould, giving it the initial shape of a bottle.</span></p>
-                <p><span class="ann ann-comparison" data-label="Sequencing">Once moulded,</span> <span class="ann ann-key-feature" data-label="Stage 5">the bottle passes through an annealing oven, where it is gradually cooled to relieve internal stress in the glass.</span> <span class="ann ann-comparison" data-label="Sequencing">Following this,</span> <span class="ann ann-key-feature" data-label="Stage 6">each bottle undergoes a quality inspection to check for defects.</span> <span class="ann ann-comparison" data-label="Sequencing">Finally,</span> <span class="ann ann-key-feature" data-label="Stage 7">bottles that pass inspection are packaged and loaded onto a delivery truck, completing the manufacturing process.</span></p>
-                <p><span class="ann ann-overview" data-label="Closing overview">In summary, the manufacture of a glass bottle involves transforming raw minerals into molten glass, shaping it, and then carefully cooling, checking and dispatching the finished product.</span></p>
               </div>
             </div>
           </div>
@@ -2656,22 +2490,6 @@ Landscape orientation, 4:3 aspect ratio, no watermarks, no extra decorative text
                 <p>Once dried, the beans undergo hulling, a process that removes the dried outer husk to reveal the green coffee bean underneath. These green beans are then loaded into a rotating drum roaster, where they are roasted at a high temperature until they turn brown and develop their characteristic flavour. In the final stage, the roasted beans are packaged into sacks, ready to be distributed and sold.</p>
                 <p>In summary, raw coffee cherries pass through seven clearly defined stages on their way to becoming packaged roasted coffee, with the sole exception of the pulping byproduct, which is removed from the main process entirely and repurposed as fertiliser.</p>
               </div>
-              <div class="answer-view-toggle">
-                <button class="av-btn active" onclick="switchAnswerView(this,'plain')">Plain</button>
-                <button class="av-btn" onclick="switchAnswerView(this,'annotated')">Annotated</button>
-              </div>
-              <div class="annotated-body" id="ann-t1process-4">
-                <div class="ann-legend">
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sun)"></span>Overview</span>
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sky)"></span>Stage</span>
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sea)"></span>Sequencing</span>
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--lavender)"></span>Detail</span>
-                </div>
-                <p><span class="ann ann-overview" data-label="Overview">The diagram illustrates the process by which coffee beans are produced, beginning with the harvesting of ripe coffee cherries and ending with the packaging of roasted beans for export.</span> <span class="ann ann-overview" data-label="Overview - not purely linear">Overall, the process consists of seven main sequential stages, although it is not entirely linear, since one stage also generates a waste byproduct that is diverted away for a separate use.</span></p>
-                <p><span class="ann ann-comparison" data-label="Sequencing">The process begins when</span> <span class="ann ann-key-feature" data-label="Stage 1">ripe coffee cherries are harvested by hand from coffee plants.</span> <span class="ann ann-comparison" data-label="Sequencing">These cherries are then</span> <span class="ann ann-key-feature" data-label="Stage 2">fed into a pulping machine, which strips away the outer skin and pulp.</span> <span class="ann ann-comparison" data-label="Branch point">At this point, the process branches: while the pulped beans continue on to the next stage,</span> <span class="ann ann-key-feature" data-label="Byproduct branch">the discarded skin and pulp are instead set aside as waste and subsequently used as fertiliser, rather than being processed any further.</span> <span class="ann ann-comparison" data-label="Sequencing - rejoining main line">Meanwhile,</span> <span class="ann ann-key-feature" data-label="Stage 3">the beans themselves are placed in fermentation tanks, where they are left to soak so that any residue still clinging to them can be broken down.</span> <span class="ann ann-comparison" data-label="Sequencing">Following this,</span> <span class="ann ann-key-feature" data-label="Stage 4">the beans are spread out on raised drying beds and left in the sun until their moisture content has been sufficiently reduced.</span></p>
-                <p><span class="ann ann-comparison" data-label="Sequencing">Once dried,</span> <span class="ann ann-key-feature" data-label="Stage 5">the beans undergo hulling, a process that removes the dried outer husk to reveal the green coffee bean underneath.</span> <span class="ann ann-key-feature" data-label="Stage 6">These green beans are then loaded into a rotating drum roaster, where they are roasted at a high temperature until they turn brown and develop their characteristic flavour.</span> <span class="ann ann-comparison" data-label="Sequencing - final stage">In the final stage,</span> <span class="ann ann-key-feature" data-label="Stage 7">the roasted beans are packaged into sacks, ready to be distributed and sold.</span></p>
-                <p><span class="ann ann-overview" data-label="Closing overview">In summary, raw coffee cherries pass through seven clearly defined stages on their way to becoming packaged roasted coffee, with the sole exception of the pulping byproduct, which is removed from the main process entirely and repurposed as fertiliser.</span></p>
-              </div>
             </div>
           </div>
 
@@ -2724,22 +2542,6 @@ Landscape orientation, 4:3 aspect ratio, no watermarks, no extra decorative text
                 <p>During the day, sunlight is captured by the solar panel and converted into electricity. This electricity serves two simultaneous purposes: it powers the water pump directly, and any surplus is used to charge a battery for later use. The pump, powered in this way, draws water from a reservoir and sends it through irrigation pipes to the crop field.</p>
                 <p>At night, the solar panel no longer generates any electricity, since there is no sunlight to capture. Instead, the system draws on the electricity previously stored in the battery to continue powering the same pump. This pump performs exactly the same function as during the day, drawing water from the same reservoir and delivering it through the same irrigation pipes to the crop field, ensuring that irrigation continues uninterrupted around the clock.</p>
                 <p>In summary, while the crop field is irrigated continuously both day and night, the source of power switches from direct solar generation in daylight to stored battery power after dark.</p>
-              </div>
-              <div class="answer-view-toggle">
-                <button class="av-btn active" onclick="switchAnswerView(this,'plain')">Plain</button>
-                <button class="av-btn" onclick="switchAnswerView(this,'annotated')">Annotated</button>
-              </div>
-              <div class="annotated-body" id="ann-t1process-5">
-                <div class="ann-legend">
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sun)"></span>Overview</span>
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sky)"></span>Stage</span>
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sea)"></span>Sequencing</span>
-                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--lavender)"></span>Detail</span>
-                </div>
-                <p><span class="ann ann-overview" data-label="Overview">The diagram illustrates how a solar-powered irrigation system operates, showing two distinct modes depending on the time of day.</span> <span class="ann ann-overview" data-label="Overview - structure">Overall, the system relies on solar energy during daylight hours, either using it directly or storing it, and switches to this stored energy once darkness falls.</span></p>
-                <p><span class="ann ann-comparison" data-label="Sequencing - mode 1">During the day,</span> <span class="ann ann-key-feature" data-label="Stage: generation">sunlight is captured by the solar panel and converted into electricity.</span> <span class="ann ann-key-feature" data-label="Stage: dual use">This electricity serves two simultaneous purposes: it powers the water pump directly, and any surplus is used to charge a battery for later use.</span> <span class="ann ann-data" data-label="Detail">The pump, powered in this way, draws water from a reservoir and sends it through irrigation pipes to the crop field.</span></p>
-                <p><span class="ann ann-comparison" data-label="Sequencing - mode 2">At night,</span> <span class="ann ann-key-feature" data-label="Stage: no generation">the solar panel no longer generates any electricity, since there is no sunlight to capture.</span> <span class="ann ann-key-feature" data-label="Stage: battery takes over">Instead, the system draws on the electricity previously stored in the battery to continue powering the same pump.</span> <span class="ann ann-comparison" data-label="Comparison to mode 1">This pump performs exactly the same function as during the day, drawing water from the same reservoir and delivering it through the same irrigation pipes to the crop field, ensuring that irrigation continues uninterrupted around the clock.</span></p>
-                <p><span class="ann ann-overview" data-label="Closing overview">In summary, while the crop field is irrigated continuously both day and night, the source of power switches from direct solar generation in daylight to stored battery power after dark.</span></p>
               </div>
             </div>
           </div>
@@ -2812,23 +2614,6 @@ Landscape orientation, 4:3 aspect ratio, no watermarks, no extra decorative text
           <p>Rather than eliminating tuition fees entirely, governments should implement targeted financial aid, scholarships for talented students from disadvantaged backgrounds, and flexible repayment systems linked to graduate earnings. This approach ensures that financial hardship does not preclude access to education whilst maintaining institutional quality and fiscal responsibility. Additionally, strengthening vocational pathways reduces pressure on universities and promotes a diverse range of educational outcomes.</p>
           <p>In conclusion, whilst university affordability demands urgent attention, free education represents an oversimplified solution. Balanced approaches that combine merit-based scholarships, income-contingent loans, and quality vocational alternatives better serve both educational excellence and societal equity.</p>
         </div>
-        <div class="answer-view-toggle">
-        <button class="av-btn active" onclick="switchAnswerView(this,'plain')">Plain</button>
-        <button class="av-btn" onclick="switchAnswerView(this,'annotated')">Annotated</button>
-      </div>
-      <div class="annotated-body" id="ann-t2-1">
-        <div class="ann-legend">
-          <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sun)"></span>Position</span>
-          <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sky)"></span>Argument</span>
-          <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sea)"></span>Example / Evidence</span>
-          <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--coral)"></span>Concession</span>
-          <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--lavender)"></span>Conclusion</span>
-        </div>
-        <p><span class="ann ann-position" data-label="Intro - topic context">University education represents a transformative investment in individual futures and national development.</span> <span class="ann ann-concession" data-label="Concession - acknowledging the other side">While I acknowledge the substantial financial burden that tuition fees impose on students,</span> <span class="ann ann-position" data-label="Clear position stated">I firmly believe that making university education entirely free would be neither fiscally sustainable nor equitable for all members of society.</span></p>
-        <p><span class="ann ann-argument" data-label="Argument 1 - taxpayer burden">Implementing free university education would necessitate substantial government expenditure, ultimately placing the financial burden on taxpayers who may not directly benefit from higher education.</span> <span class="ann ann-example" data-label="Supporting detail">Many individuals pursue vocational or technical training, which are equally valuable to society yet would subsidise university attendance for others.</span> <span class="ann ann-argument" data-label="Argument 2 - quality risk">Furthermore, free tuition does not guarantee educational quality; without financial accountability mechanisms, institutions may lack sufficient incentive to maintain rigorous standards and relevance to contemporary labour market demands.</span> <span class="ann ann-example" data-label="Evidence">Countries with free or heavily subsidised education systems often struggle with overcrowded facilities and limited resources per student.</span></p>
-        <p><span class="ann ann-argument" data-label="Counter-proposal - alternative solution">Rather than eliminating tuition fees entirely, governments should implement targeted financial aid, scholarships for talented students from disadvantaged backgrounds, and flexible repayment systems linked to graduate earnings.</span> <span class="ann ann-example" data-label="Justification of alternative">This approach ensures that financial hardship does not preclude access to education whilst maintaining institutional quality and fiscal responsibility.</span> <span class="ann ann-argument" data-label="Additional argument">Additionally, strengthening vocational pathways reduces pressure on universities and promotes a diverse range of educational outcomes.</span></p>
-        <p><span class="ann ann-conclusion" data-label="Conclusion - restates position">In conclusion, whilst university affordability demands urgent attention, free education represents an oversimplified solution.</span> <span class="ann ann-conclusion" data-label="Conclusion - summarises key point">Balanced approaches that combine merit-based scholarships, income-contingent loans, and quality vocational alternatives better serve both educational excellence and societal equity.</span></p>
-      </div>
       </div>
     </div>
     <div class="sample-item">
@@ -5713,24 +5498,6 @@ function switchErrors(panelId, btn) {
   try{ localStorage.setItem('jpe-ielts-writing-errors', panelId); }catch(e){}
 }
 
-// ── Annotated answer toggle ───────────────────────────────────
-function switchAnswerView(btn, view) {
-  const wrapper = btn.closest('.sample-content');
-  if (!wrapper) return;
-  const toggleBtns = btn.parentElement.querySelectorAll('.av-btn');
-  toggleBtns.forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  const plainEl = wrapper.querySelector('.answer-body');
-  const annEl   = wrapper.querySelector('.annotated-body');
-  if (!plainEl || !annEl) return;
-  if (view === 'plain') {
-    plainEl.style.display = 'block';
-    annEl.classList.remove('visible');
-  } else {
-    plainEl.style.display = 'none';
-    annEl.classList.add('visible');
-  }
-}
 
 /* ============ GUIDE ============ */
 const GUIDE_W = [
