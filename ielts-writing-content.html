@@ -223,6 +223,16 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
 .chart-wrapper{position:relative;height:300px;width:100%}
 .chart-wrapper canvas{max-height:300px}
 
+/* AI image-generation prompt + upload slot (map/process diagram tasks) */
+.image-gen-box{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:.9rem 1rem;margin-bottom:1rem}
+.image-gen-label{font-family:Outfit,sans-serif;font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.6rem;display:flex;align-items:center;gap:.4rem}
+.image-gen-prompt{font-family:'JetBrains Mono',monospace;font-size:.76rem;line-height:1.65;color:var(--ink);background:var(--cream);border-radius:8px;padding:.85rem .95rem;white-space:pre-wrap}
+.image-gen-copy{margin-top:.6rem;font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:700;padding:.45rem .9rem;border-radius:999px;border:1.5px solid var(--border);background:var(--card);color:var(--ink);cursor:pointer;transition:all .15s}
+.image-gen-copy:hover{border-color:var(--ielts,#FF9100);color:var(--ielts,#FF9100)}
+.image-gen-copy.copied{border-color:var(--sea);color:var(--sea)}
+.image-slot{margin-top:.8rem;border:1.5px dashed var(--border);border-radius:8px;padding:2rem 1rem;text-align:center;color:var(--muted);font-size:.82rem;line-height:1.6}
+.image-slot img{display:none;width:100%;border-radius:8px}
+
 /* Table Styles */
 .data-table{width:100%;border-collapse:collapse;margin-bottom:1rem;background:var(--card);border:1px solid var(--border);border-radius:6px;overflow:hidden}
 .data-table thead{background:var(--sand)}
@@ -924,7 +934,7 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
       <button class="task-nav-item active" onclick="switchTaskCard(this,0)">
         <span class="task-nav-dot"></span>
         <span class="task-nav-text"><span class="task-nav-label">Task 1</span><span class="task-nav-title">Report</span></span>
-        <span class="task-nav-count">22</span>
+        <span class="task-nav-count">26</span>
         <span class="task-nav-chev">&#9662;</span>
       </button>
       <div class="task-nav-submenu">
@@ -965,7 +975,7 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:.8rem">
-        <span class="pill-group-badge">22 tasks</span>
+        <span class="pill-group-badge">26 tasks</span>
       </div>
       <button class="print-btn" onclick="showPrintModal(this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Print</button>
     </div>
@@ -1970,10 +1980,6 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
 
       <!-- MAP CATEGORY -->
       <div class="category-section" id="map-section" data-category="map">
-        <div style="text-align:center;padding:3rem 1rem;color:var(--muted)">
-          
-          <div style="font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:700;color:var(--ink);margin-bottom:.3rem">Map Tasks Coming Soon</div>
-          <div style="font-size:.85rem">Practice tasks with before & after maps are being prepared.</div>
         <div class="phrase-bank" id="pb-map">
   <div class="phrase-bank-header" onclick="this.parentElement.classList.toggle('open')">
     <span class="phrase-bank-title t1">Phrase Bank</span>
@@ -1984,15 +1990,139 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
     <div class="pb-phrases"><div class="pb-phrase-group active"><div class="pb-item"><span class="pb-phrase">The maps illustrate how <em>[place]</em> changed between <em>[year]</em> and <em>[year]</em>.</span></div><div class="pb-item"><span class="pb-phrase">The two maps show the development of <em>[area]</em> over a <em>[X]</em>-year period.</span></div><div class="pb-item"><span class="pb-phrase">Overall, the area underwent significant development, with…</span></div></div><div class="pb-phrase-group"><div class="pb-item"><span class="pb-phrase">The <em>[feature]</em> that previously occupied the north/south was replaced by <em>[new feature]</em>.</span></div><div class="pb-item"><span class="pb-phrase">A new <em>[road/building/facility]</em> was constructed to the <em>[direction]</em> of…</span></div><div class="pb-item"><span class="pb-phrase">The <em>[feature]</em> remained unchanged throughout the period.</span></div><div class="pb-item"><span class="pb-phrase">By <em>[year]</em>, the area had been…</span></div><div class="pb-item"><span class="pb-phrase">What had been <em>[feature]</em> was converted into <em>[new use]</em>.</span></div></div><div class="pb-phrase-group"><div class="pb-item"><span class="pb-phrase">In the north/south/east/west of the map,…</span></div><div class="pb-item"><span class="pb-phrase">adjacent to / to the north of / opposite…</span></div><div class="pb-item"><span class="pb-phrase">Along the <em>[road/river/boundary]</em>,…</span></div></div></div>
   </div>
 </div>
+        <div class="samples-list">
+          <!-- Map 1: Millbrook riverside town -->
+          <div class="sample-item">
+            <div class="sample-header" onclick="toggleSample(this)">
+              <span class="sample-num">1</span>
+              <span class="sample-text">The two maps below show the town of Millbrook in 2005 and the same town in 2025.</span>
+              <span class="sample-icon">▼</span>
+            </div>
+            <div class="sample-content">
+              <div class="sample-desc">Summarise the information by selecting and reporting the main features, and make comparisons where relevant. Write at least 150 words.</div>
+              <div class="image-gen-box">
+                <div class="image-gen-label">🎨 AI image prompt &mdash; paste into ChatGPT / DALL&middot;E, then send the result back here to insert</div>
+                <div class="image-gen-prompt" id="prompt-map-1">Flat 2D vector infographic in the style of a clean modern textbook diagram. No photorealism, no gradients, no drop shadows &mdash; thin clean outlines only. Colour palette strictly limited to: #2176FF (blue, for water), #5DDEA0 (mint green, for parks/fields), #FFB347 (amber, for buildings), #9B72CF (purple, for one accent building), #2D3047 (dark navy, for roads, outlines and text labels), on a plain #F7F6F3 off-white background. All text labels in a clean modern sans-serif font, large and clearly legible.
+
+Two side-by-side town maps viewed from directly above (bird's-eye plan view), separated by a thin vertical divider line. Label the left map "2005" and the right map "2025" in bold text above each. Both maps share the same basic layout: a river running vertically through the middle, a small train station icon in the north-west corner labelled "Station", and open land filling the southern third of the map.
+
+LEFT MAP (2005): along the riverbank, draw a small harbour with 2-3 simple boat icons and three rectangular buildings labelled "Warehouses"; directly south of the warehouses, a rectangular area labelled "Car Park"; a street running east from the harbour labelled "High Street" lined with a few small shop-shaped buildings; the southern third of the map is plain green open fields with no buildings.
+
+RIGHT MAP (2025): the harbour now shows small sailing-boat icons and is labelled "Marina"; the three former warehouse buildings are relabelled &mdash; one as "Arts Centre", two as "Apartments"; the former car park area is now green space labelled "Riverside Park"; "High Street" now has more shop buildings plus one large building labelled "Shopping Mall"; the southern fields now show a grid of small identical house icons labelled "Housing Estate" and one larger building labelled "Primary School".
+
+Add a small compass rose (N/S/E/W) in the top-right corner of each map, and a simple map key/legend along the bottom explaining the colours. Landscape orientation, 4:3 aspect ratio, no watermarks or extra text.</div>
+                <button class="image-gen-copy" onclick="copyImagePrompt(this,'prompt-map-1')">Copy prompt</button>
+                <div class="image-slot" id="slot-map-1">
+                  <img alt="Map of Millbrook in 2005 and 2025">
+                  <span class="image-slot-text">Image not yet added &mdash; generate it from the prompt above, then send it back to have it inserted here.</span>
+                </div>
+              </div>
+              <div class="answer-guide">
+                <div class="guide-header">How to answer this</div>
+                <div class="guide-steps">
+                  <div class="guide-step"><span class="guide-label">Overview</span> One sentence naming the two biggest changes overall (e.g. the harbour becoming leisure/residential use, the fields being built on) &mdash; do not list every detail here.</div>
+                  <div class="guide-step"><span class="guide-label">Body 1</span> Describe the changes to the riverside area: harbour &rarr; marina, warehouses &rarr; arts centre/apartments, car park &rarr; park.</div>
+                  <div class="guide-step"><span class="guide-label">Body 2</span> Describe the changes to the High Street and the southern fields: more shops + shopping mall, fields &rarr; housing estate + school.</div>
+                  <div class="guide-step"><span class="guide-label">Unchanged</span> Note what stayed the same (the station, the river itself) &mdash; examiners reward this, it shows you read both maps carefully.</div>
+                </div>
+              </div>
+              <div class="answer-toggle" onclick="toggleAnswer(this)">
+                <span class="answer-toggle-text">Show Model Answer</span>
+                <span class="answer-icon">▼</span>
+              </div>
+              <div class="answer-body" id="plain-t1map-1">
+                <p>The two maps illustrate how the town of Millbrook changed between 2005 and 2025. Overall, the riverside area shifted from an industrial and functional use to a leisure and residential one, while the open fields to the south were developed into new housing.</p>
+                <p>In 2005, the riverbank was occupied by a working harbour and three large warehouses, with a car park situated just to the south. By 2025, the harbour had been converted into a marina for leisure boats, and the warehouses had been repurposed: one became an arts centre, while the other two were turned into apartments. The car park was also removed and replaced with a riverside park.</p>
+                <p>Further changes took place along the High Street, which grew from a handful of small shops into a larger retail area, with a new shopping mall added by 2025. The most significant change, however, occurred in the south of the town, where open fields that existed in 2005 had been entirely built over by 2025, giving way to a housing estate and a new primary school.</p>
+                <p>Throughout this period, two features remained constant: the train station in the north-west and the river running through the centre of the town, both of which anchored the surrounding development.</p>
+              </div>
+              <div class="answer-view-toggle">
+                <button class="av-btn active" onclick="switchAnswerView(this,'plain')">Plain</button>
+                <button class="av-btn" onclick="switchAnswerView(this,'annotated')">Annotated</button>
+              </div>
+              <div class="annotated-body" id="ann-t1map-1">
+                <div class="ann-legend">
+                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sun)"></span>Overview</span>
+                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sky)"></span>Key change</span>
+                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sea)"></span>Location</span>
+                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--lavender)"></span>Detail</span>
+                </div>
+                <p><span class="ann ann-overview" data-label="Overview">The two maps illustrate how the town of Millbrook changed between 2005 and 2025.</span> <span class="ann ann-overview" data-label="Overview - main trend">Overall, the riverside area shifted from an industrial and functional use to a leisure and residential one, while the open fields to the south were developed into new housing.</span></p>
+                <p><span class="ann ann-comparison" data-label="Location">In 2005, the riverbank</span> <span class="ann ann-data" data-label="Detail">was occupied by a working harbour and three large warehouses</span>, with <span class="ann ann-data" data-label="Detail">a car park situated just to the south</span>. <span class="ann ann-key-feature" data-label="Key change">By 2025, the harbour had been converted into a marina for leisure boats, and the warehouses had been repurposed: one became an arts centre, while the other two were turned into apartments.</span> <span class="ann ann-key-feature" data-label="Key change">The car park was also removed and replaced with a riverside park.</span></p>
+                <p><span class="ann ann-comparison" data-label="Location">Further changes took place along the High Street</span>, <span class="ann ann-key-feature" data-label="Key change">which grew from a handful of small shops into a larger retail area, with a new shopping mall added by 2025</span>. <span class="ann ann-key-feature" data-label="Most significant change">The most significant change, however, occurred in the south of the town, where open fields that existed in 2005 had been entirely built over by 2025, giving way to a housing estate and a new primary school.</span></p>
+                <p><span class="ann ann-comparison" data-label="Noting what stayed the same">Throughout this period, two features remained constant: the train station in the north-west and the river running through the centre of the town, both of which anchored the surrounding development.</span></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Map 2: Ashford village to town -->
+          <div class="sample-item">
+            <div class="sample-header" onclick="toggleSample(this)">
+              <span class="sample-num">2</span>
+              <span class="sample-text">The maps below show the village of Ashford in 1980 and the same area in 2020.</span>
+              <span class="sample-icon">▼</span>
+            </div>
+            <div class="sample-content">
+              <div class="sample-desc">Summarise the information by selecting and reporting the main features, and make comparisons where relevant. Write at least 150 words.</div>
+              <div class="image-gen-box">
+                <div class="image-gen-label">🎨 AI image prompt &mdash; paste into ChatGPT / DALL&middot;E, then send the result back here to insert</div>
+                <div class="image-gen-prompt" id="prompt-map-2">Flat 2D vector infographic, clean modern textbook-diagram style. No photorealism, no gradients, no drop shadows &mdash; thin clean outlines only. Colour palette strictly limited to: #2176FF (blue, for the stream), #5DDEA0 (mint green, for woodland/farmland), #FFB347 (amber, for houses/buildings), #9B72CF (purple, for one accent building), #FF6B6B (coral, for the new bypass road only), #2D3047 (dark navy, for other roads, outlines and text labels), on a plain #F7F6F3 off-white background. All text labels in a clean sans-serif font, large and legible.
+
+Two side-by-side maps viewed from directly above (bird's-eye plan view), separated by a thin vertical divider. Label the left map "1980" and the right map "2020" in bold text above each. Both maps share a stream running north to south roughly through the middle.
+
+LEFT MAP (1980): a small church building near the centre; a single row of about six small houses along one main road running east-west through the middle of the map; a farm (one large barn icon plus a labelled field pattern) to the east labelled "Farm"; a patch of trees labelled "Woodland" to the west; the stream crossed by one small foot-bridge icon; otherwise open green land.
+
+RIGHT MAP (2020): the church still present in the same spot; the original houses still there but now surrounded by a full grid of many more houses filling most of the map, labelled "Housing"; the farm to the east replaced by several large rectangular warehouse-shaped buildings labelled "Industrial Estate"; about half the woodland to the west cleared, with the cleared portion now a large building labelled "Retail Park" (remaining trees still shown); the stream now crossed by a proper road bridge; a new curved road labelled "Bypass" running around the entire north edge of the map connecting to the main road; one new building near the centre labelled "Health Centre" and one labelled "Secondary School".
+
+Add a small compass rose (N/S/E/W) in the top-right corner of each map, and a simple map key/legend along the bottom. Landscape orientation, 4:3 aspect ratio, no watermarks or extra text.</div>
+                <button class="image-gen-copy" onclick="copyImagePrompt(this,'prompt-map-2')">Copy prompt</button>
+                <div class="image-slot" id="slot-map-2">
+                  <img alt="Map of Ashford in 1980 and 2020">
+                  <span class="image-slot-text">Image not yet added &mdash; generate it from the prompt above, then send it back to have it inserted here.</span>
+                </div>
+              </div>
+              <div class="answer-guide">
+                <div class="guide-header">How to answer this</div>
+                <div class="guide-steps">
+                  <div class="guide-step"><span class="guide-label">Overview</span> One sentence: a small village grew into a much larger, more developed town over the 40-year period.</div>
+                  <div class="guide-step"><span class="guide-label">Body 1</span> Housing growth and the farm/woodland becoming an industrial estate and retail park.</div>
+                  <div class="guide-step"><span class="guide-label">Body 2</span> New infrastructure: the bypass, bridge, health centre and school &mdash; and what stayed the same (the church).</div>
+                  <div class="guide-step"><span class="guide-label">Tip</span> With this many changes, group them by theme (housing / commerce / infrastructure) rather than describing the map feature by feature &mdash; it's far easier to organise and to follow.</div>
+                </div>
+              </div>
+              <div class="answer-toggle" onclick="toggleAnswer(this)">
+                <span class="answer-toggle-text">Show Model Answer</span>
+                <span class="answer-icon">▼</span>
+              </div>
+              <div class="answer-body" id="plain-t1map-2">
+                <p>The two maps show how the village of Ashford was transformed into a much larger settlement between 1980 and 2020. Overall, the area saw substantial residential and commercial growth, along with major new infrastructure, while a small number of original features remained untouched.</p>
+                <p>The most obvious change is the scale of housing: in 1980, only a handful of houses stood along the main road, whereas by 2020 these had multiplied into a dense residential grid covering most of the map. This growth was matched by a shift in land use to the east and west. The farm that had occupied the eastern side of the village in 1980 was replaced by an industrial estate, and roughly half of the woodland to the west was cleared to make way for a retail park.</p>
+                <p>New infrastructure was also added to support this larger population. A bypass now curves around the northern edge of the settlement, connecting to the main road, and the stream, which had only a footbridge in 1980, is now crossed by a proper road bridge. A health centre and a secondary school were also built near the centre of the town, facilities that did not exist in 1980.</p>
+                <p>Despite these extensive changes, the church remained in its original position throughout the period, serving as the one fixed landmark in an otherwise transformed landscape.</p>
+              </div>
+              <div class="answer-view-toggle">
+                <button class="av-btn active" onclick="switchAnswerView(this,'plain')">Plain</button>
+                <button class="av-btn" onclick="switchAnswerView(this,'annotated')">Annotated</button>
+              </div>
+              <div class="annotated-body" id="ann-t1map-2">
+                <div class="ann-legend">
+                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sun)"></span>Overview</span>
+                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sky)"></span>Key change</span>
+                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sea)"></span>Location</span>
+                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--lavender)"></span>Detail</span>
+                </div>
+                <p><span class="ann ann-overview" data-label="Overview">The two maps show how the village of Ashford was transformed into a much larger settlement between 1980 and 2020.</span> <span class="ann ann-overview" data-label="Overview - main trend">Overall, the area saw substantial residential and commercial growth, along with major new infrastructure, while a small number of original features remained untouched.</span></p>
+                <p><span class="ann ann-key-feature" data-label="Key change">The most obvious change is the scale of housing: in 1980, only a handful of houses stood along the main road, whereas by 2020 these had multiplied into a dense residential grid covering most of the map.</span> <span class="ann ann-comparison" data-label="Location">This growth was matched by a shift in land use to the east and west.</span> <span class="ann ann-data" data-label="Detail">The farm that had occupied the eastern side of the village in 1980 was replaced by an industrial estate, and roughly half of the woodland to the west was cleared to make way for a retail park.</span></p>
+                <p><span class="ann ann-key-feature" data-label="Key change">New infrastructure was also added to support this larger population.</span> <span class="ann ann-data" data-label="Detail">A bypass now curves around the northern edge of the settlement, connecting to the main road, and the stream, which had only a footbridge in 1980, is now crossed by a proper road bridge.</span> <span class="ann ann-data" data-label="Detail">A health centre and a secondary school were also built near the centre of the town, facilities that did not exist in 1980.</span></p>
+                <p><span class="ann ann-comparison" data-label="Noting what stayed the same">Despite these extensive changes, the church remained in its original position throughout the period, serving as the one fixed landmark in an otherwise transformed landscape.</span></p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- PROCESS DIAGRAM CATEGORY -->
       <div class="category-section" id="process-section" data-category="process">
-        <div style="text-align:center;padding:3rem 1rem;color:var(--muted)">
-          
-          <div style="font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:700;color:var(--ink);margin-bottom:.3rem">Process Diagram Tasks Coming Soon</div>
-          <div style="font-size:.85rem">Practice tasks with flow diagrams and life cycles are being prepared.</div>
         <div class="phrase-bank" id="pb-process">
   <div class="phrase-bank-header" onclick="this.parentElement.classList.toggle('open')">
     <span class="phrase-bank-title t1">Phrase Bank</span>
@@ -2003,6 +2133,133 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
     <div class="pb-phrases"><div class="pb-phrase-group active"><div class="pb-item"><span class="pb-phrase">The diagram illustrates the process by which <em>[subject]</em> is produced/made.</span></div><div class="pb-item"><span class="pb-phrase">The flowchart shows the stages involved in <em>[process]</em>.</span></div><div class="pb-item"><span class="pb-phrase">Overall, the process consists of <em>[X]</em> main stages, beginning with… and ending with…</span></div></div><div class="pb-phrase-group"><div class="pb-item"><span class="pb-phrase">First / Initially,…</span></div><div class="pb-item"><span class="pb-phrase">Following this,…</span></div><div class="pb-item"><span class="pb-phrase">Once this has been completed,…</span></div><div class="pb-item"><span class="pb-phrase">At the next stage,…</span></div><div class="pb-item"><span class="pb-phrase">Finally / At the last stage,…</span></div><div class="pb-item"><span class="pb-phrase">The <em>[material/product]</em> is subsequently…</span></div></div><div class="pb-phrase-group"><div class="pb-item"><span class="pb-phrase">The raw material is collected / extracted / heated / mixed / filtered.</span></div><div class="pb-item"><span class="pb-phrase">It is then passed through / transferred to / combined with…</span></div><div class="pb-item"><span class="pb-phrase">The finished product is stored / packaged / distributed.</span></div></div></div>
   </div>
 </div>
+        <div class="samples-list">
+          <!-- Process 1: Water cycle -->
+          <div class="sample-item">
+            <div class="sample-header" onclick="toggleSample(this)">
+              <span class="sample-num">1</span>
+              <span class="sample-text">The diagram below shows the water cycle, the continuous movement of water on, above, and below the surface of the Earth.</span>
+              <span class="sample-icon">▼</span>
+            </div>
+            <div class="sample-content">
+              <div class="sample-desc">Summarise the information by selecting and reporting the main features, and make comparisons where relevant. Write at least 150 words.</div>
+              <div class="image-gen-box">
+                <div class="image-gen-label">🎨 AI image prompt &mdash; paste into ChatGPT / DALL&middot;E, then send the result back here to insert</div>
+                <div class="image-gen-prompt" id="prompt-process-1">Flat 2D vector infographic, clean modern textbook-diagram style. No photorealism, no gradients, no drop shadows &mdash; thin clean outlines and simple flat icon shapes only. Colour palette strictly limited to: #2176FF (blue, for water/ocean/rivers), #5DDEA0 (mint green, for land/mountains), #FFB347 (amber, for the sun), #9B72CF (purple, for clouds outline accent), #2D3047 (dark navy, for outlines, arrows and text labels), on a plain #F7F6F3 off-white background. All text labels in a clean sans-serif font, large and legible.
+
+A circular/cyclical process diagram showing the water cycle, landscape orientation. Layout: a wide blue ocean along the bottom, mountains (mint green triangles) on the left side rising up from the ocean, flat land on the right side. Draw four labelled stages connected by bold curved arrows forming a continuous loop:
+(1) "EVAPORATION" &mdash; a sun icon (amber circle with rays) above the ocean, with several thin upward wavy arrows rising from the ocean surface toward the sky.
+(2) "CONDENSATION" &mdash; two or three simple fluffy cloud shapes in the sky above the mountains, with a short arrow leading in from the evaporation arrows.
+(3) "PRECIPITATION" &mdash; downward arrows (rain lines) falling from the clouds onto the mountains.
+(4) "COLLECTION / SURFACE RUNOFF" &mdash; a thin blue line/arrow running down the mountainside labelled "River", flowing across the flat land and back into the ocean, closing the loop.
+Number each stage 1 to 4 in a small circle badge next to its label. Landscape orientation, 4:3 aspect ratio, no watermarks or extra text.</div>
+                <button class="image-gen-copy" onclick="copyImagePrompt(this,'prompt-process-1')">Copy prompt</button>
+                <div class="image-slot" id="slot-process-1">
+                  <img alt="Diagram of the water cycle">
+                  <span class="image-slot-text">Image not yet added &mdash; generate it from the prompt above, then send it back to have it inserted here.</span>
+                </div>
+              </div>
+              <div class="answer-guide">
+                <div class="guide-header">How to answer this</div>
+                <div class="guide-steps">
+                  <div class="guide-step"><span class="guide-label">Overview</span> One sentence: the water cycle is a continuous, cyclical process with no true start or end &mdash; say so explicitly, then pick a natural starting point (usually evaporation) to describe it from.</div>
+                  <div class="guide-step"><span class="guide-label">Body 1</span> The first half of the cycle: evaporation, then condensation into clouds.</div>
+                  <div class="guide-step"><span class="guide-label">Body 2</span> The second half: precipitation, then collection/runoff back to the ocean, completing the loop.</div>
+                  <div class="guide-step"><span class="guide-label">Tip</span> Natural-process diagrams like this need heavy use of the passive voice ("water is evaporated", "clouds are formed") since there's no human "doer" &mdash; this is different from Task 2, where you avoid over-using the passive.</div>
+                </div>
+              </div>
+              <div class="answer-toggle" onclick="toggleAnswer(this)">
+                <span class="answer-toggle-text">Show Model Answer</span>
+                <span class="answer-icon">▼</span>
+              </div>
+              <div class="answer-body" id="plain-t1process-1">
+                <p>The diagram illustrates the water cycle, a continuous natural process with no fixed starting or ending point. For the purposes of this description, the cycle can be seen as beginning with evaporation from the ocean.</p>
+                <p>Heated by the sun, water on the surface of the ocean evaporates and rises into the atmosphere as water vapour. As this vapour rises and cools over the surrounding mountains, it undergoes condensation, forming clouds.</p>
+                <p>Once sufficient moisture has accumulated within these clouds, it falls back to the Earth's surface as precipitation, in the form of rain, most of which lands on the higher ground of the mountains. This water is then collected as surface runoff, forming rivers that flow down the mountainside, across the land, and ultimately back into the ocean, at which point the cycle begins again.</p>
+                <p>Overall, the process demonstrates a closed, self-sustaining loop in which the same water is continuously recycled between the ocean, the atmosphere, and the land.</p>
+              </div>
+              <div class="answer-view-toggle">
+                <button class="av-btn active" onclick="switchAnswerView(this,'plain')">Plain</button>
+                <button class="av-btn" onclick="switchAnswerView(this,'annotated')">Annotated</button>
+              </div>
+              <div class="annotated-body" id="ann-t1process-1">
+                <div class="ann-legend">
+                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sun)"></span>Overview</span>
+                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sky)"></span>Stage</span>
+                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sea)"></span>Sequencing</span>
+                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--lavender)"></span>Detail</span>
+                </div>
+                <p><span class="ann ann-overview" data-label="Overview">The diagram illustrates the water cycle, a continuous natural process with no fixed starting or ending point.</span> <span class="ann ann-overview" data-label="Chosen starting point">For the purposes of this description, the cycle can be seen as beginning with evaporation from the ocean.</span></p>
+                <p><span class="ann ann-key-feature" data-label="Stage 1">Heated by the sun, water on the surface of the ocean evaporates and rises into the atmosphere as water vapour.</span> <span class="ann ann-comparison" data-label="Sequencing">As this vapour rises and cools over the surrounding mountains,</span> <span class="ann ann-key-feature" data-label="Stage 2">it undergoes condensation, forming clouds.</span></p>
+                <p><span class="ann ann-comparison" data-label="Sequencing">Once sufficient moisture has accumulated within these clouds,</span> <span class="ann ann-key-feature" data-label="Stage 3">it falls back to the Earth's surface as precipitation, in the form of rain, most of which lands on the higher ground of the mountains.</span> <span class="ann ann-key-feature" data-label="Stage 4">This water is then collected as surface runoff, forming rivers that flow down the mountainside, across the land, and ultimately back into the ocean,</span> <span class="ann ann-comparison" data-label="Sequencing - closing the loop">at which point the cycle begins again.</span></p>
+                <p><span class="ann ann-overview" data-label="Closing overview">Overall, the process demonstrates a closed, self-sustaining loop in which the same water is continuously recycled between the ocean, the atmosphere, and the land.</span></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Process 2: Plastic bottle recycling -->
+          <div class="sample-item">
+            <div class="sample-header" onclick="toggleSample(this)">
+              <span class="sample-num">2</span>
+              <span class="sample-text">The diagram below shows the process by which plastic bottles are recycled.</span>
+              <span class="sample-icon">▼</span>
+            </div>
+            <div class="sample-content">
+              <div class="sample-desc">Summarise the information by selecting and reporting the main features, and make comparisons where relevant. Write at least 150 words.</div>
+              <div class="image-gen-box">
+                <div class="image-gen-label">🎨 AI image prompt &mdash; paste into ChatGPT / DALL&middot;E, then send the result back here to insert</div>
+                <div class="image-gen-prompt" id="prompt-process-2">Flat 2D vector infographic, clean modern textbook-diagram style. No photorealism, no gradients, no drop shadows &mdash; thin clean outlines and simple flat icon shapes only. Colour palette strictly limited to: #2176FF (blue, for the bottle icons), #1DD3B0 (teal, for machinery/conveyor outlines), #FFB347 (amber, for the melting/heat stage), #9B72CF (purple, for the final product stage), #2D3047 (dark navy, for outlines, arrows and text labels), on a plain #F7F6F3 off-white background. All text labels in a clean sans-serif font, large and legible.
+
+A linear left-to-right process diagram with five equally-spaced stages connected by bold arrows pointing right, landscape orientation. Number each stage 1 to 5 in a small circle badge above its icon:
+(1) "COLLECTION" &mdash; a recycling bin icon overflowing with simple blue plastic-bottle icons.
+(2) "SORTING" &mdash; a short conveyor-belt icon (teal outline) with bottles of two different colours being separated into two bins alongside it.
+(3) "WASHING & SHREDDING" &mdash; a simple machine icon (teal outline, rectangular body with a funnel top) with small angular plastic-flake shapes coming out of the bottom, plus a small water-droplet icon.
+(4) "MELTING & PELLETISING" &mdash; a machine icon shaded amber with small dot-shaped "pellet" icons coming out of a nozzle at the bottom.
+(5) "NEW PRODUCT" &mdash; three or four purple-outlined new plastic bottle icons, clean and upright, on a small shelf or pallet shape.
+Landscape orientation, 4:3 aspect ratio, no watermarks or extra text.</div>
+                <button class="image-gen-copy" onclick="copyImagePrompt(this,'prompt-process-2')">Copy prompt</button>
+                <div class="image-slot" id="slot-process-2">
+                  <img alt="Diagram of the plastic bottle recycling process">
+                  <span class="image-slot-text">Image not yet added &mdash; generate it from the prompt above, then send it back to have it inserted here.</span>
+                </div>
+              </div>
+              <div class="answer-guide">
+                <div class="guide-header">How to answer this</div>
+                <div class="guide-steps">
+                  <div class="guide-step"><span class="guide-label">Overview</span> One sentence: unlike the water cycle, this is a linear, human-made industrial process with a clear start (collection) and end (new product) &mdash; say so explicitly.</div>
+                  <div class="guide-step"><span class="guide-label">Body 1</span> The first half: collection, sorting, and washing/shredding into flakes.</div>
+                  <div class="guide-step"><span class="guide-label">Body 2</span> The second half: melting into pellets, then manufacturing into new bottles.</div>
+                  <div class="guide-step"><span class="guide-label">Tip</span> With exactly 5 stages and no branching, this is one of the more straightforward process diagrams &mdash; the challenge is varying your sequencing language (First / Following this / At the next stage / Finally) rather than repeating "then" five times.</div>
+                </div>
+              </div>
+              <div class="answer-toggle" onclick="toggleAnswer(this)">
+                <span class="answer-toggle-text">Show Model Answer</span>
+                <span class="answer-icon">▼</span>
+              </div>
+              <div class="answer-body" id="plain-t1process-2">
+                <p>The diagram illustrates the process by which used plastic bottles are recycled into new plastic products. Overall, the process consists of five distinct stages, beginning with the collection of used bottles and ending with the manufacture of a new product.</p>
+                <p>The process begins when used bottles are collected, typically from public recycling bins. These bottles are then transported to a sorting facility, where they are separated by colour and plastic type on a conveyor belt system. Following this, the sorted bottles are washed to remove any remaining contents or labels, before being shredded into small plastic flakes.</p>
+                <p>At the next stage, these flakes are heated and melted down, after which the molten plastic is formed into small pellets. Finally, these pellets are used as the raw material to manufacture entirely new plastic products, such as new bottles, completing the process.</p>
+                <p>In summary, the recycling of a plastic bottle is a five-stage industrial process that transforms used plastic waste back into a usable raw material for new manufacturing.</p>
+              </div>
+              <div class="answer-view-toggle">
+                <button class="av-btn active" onclick="switchAnswerView(this,'plain')">Plain</button>
+                <button class="av-btn" onclick="switchAnswerView(this,'annotated')">Annotated</button>
+              </div>
+              <div class="annotated-body" id="ann-t1process-2">
+                <div class="ann-legend">
+                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sun)"></span>Overview</span>
+                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sky)"></span>Stage</span>
+                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--sea)"></span>Sequencing</span>
+                  <span class="ann-legend-item"><span class="ann-legend-dot" style="background:var(--lavender)"></span>Detail</span>
+                </div>
+                <p><span class="ann ann-overview" data-label="Overview">The diagram illustrates the process by which used plastic bottles are recycled into new plastic products.</span> <span class="ann ann-overview" data-label="Overview - stage count">Overall, the process consists of five distinct stages, beginning with the collection of used bottles and ending with the manufacture of a new product.</span></p>
+                <p><span class="ann ann-comparison" data-label="Sequencing">The process begins when</span> <span class="ann ann-key-feature" data-label="Stage 1">used bottles are collected, typically from public recycling bins.</span> <span class="ann ann-comparison" data-label="Sequencing">These bottles are then transported to</span> <span class="ann ann-key-feature" data-label="Stage 2">a sorting facility, where they are separated by colour and plastic type on a conveyor belt system.</span> <span class="ann ann-comparison" data-label="Sequencing">Following this,</span> <span class="ann ann-key-feature" data-label="Stage 3">the sorted bottles are washed to remove any remaining contents or labels, before being shredded into small plastic flakes.</span></p>
+                <p><span class="ann ann-comparison" data-label="Sequencing">At the next stage,</span> <span class="ann ann-key-feature" data-label="Stage 4">these flakes are heated and melted down, after which the molten plastic is formed into small pellets.</span> <span class="ann ann-comparison" data-label="Sequencing">Finally,</span> <span class="ann ann-key-feature" data-label="Stage 5">these pellets are used as the raw material to manufacture entirely new plastic products, such as new bottles, completing the process.</span></p>
+                <p><span class="ann ann-overview" data-label="Closing overview">In summary, the recycling of a plastic bottle is a five-stage industrial process that transforms used plastic waste back into a usable raw material for new manufacturing.</span></p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -4382,6 +4639,18 @@ function toggleCategory(pill, category) {
   if (selectedSection) {
     selectedSection.classList.add('active');
   }
+}
+
+// Copy an AI image-generation prompt to the clipboard
+function copyImagePrompt(btn, promptId) {
+  const el = document.getElementById(promptId);
+  if (!el) return;
+  navigator.clipboard.writeText(el.textContent.trim()).then(() => {
+    const original = btn.textContent;
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = original; btn.classList.remove('copied'); }, 1800);
+  });
 }
 
 // Toggle sample item expansion
