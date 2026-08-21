@@ -3,6 +3,43 @@
 Static site, GitHub Pages (`CNAME` → johnplusenglish.com), deployed straight from `main` on push —
 **every push to `main` goes live immediately**, no staging.
 
+## Freshness check — do this first, every session
+
+This file was last synced against commit `6e927ce` (2026-08-21). Run
+`git log --oneline 6e927ce..HEAD | wc -l` — if it's a large number (this repo moves fast, ~2-3
+commits/hour is normal across concurrent sessions; treat 40+ as "a lot"), skim
+`git log --oneline 6e927ce..HEAD` for anything structural (new page pattern, new gating/redirect
+logic, sidebar/tools.html changes, a new shared component) before starting your task, and update
+this section (new SHA + whatever changed) if you find something. Don't do a deep audit — a skim of
+commit *messages* is usually enough to tell if something here is now wrong or missing. This keeps
+the file's cost proportional to how much has actually changed, not to calendar time — no scheduled
+job does this automatically, because an unattended agent periodically writing to a live,
+concurrency-sensitive repo is a worse risk than an occasionally-slightly-stale doc.
+
+## Active-work coordination (read before any multi-file edit)
+
+Before starting a task that touches many files (sidebar-wide changes, a cross-page pattern rollout,
+anything like the past incidents below), check `.claude/active-work.md` in this repo (gitignored,
+local to this Mac, shared across concurrent sessions since they all use this same working
+directory). If another session has an entry there, treat it like a dirty `git status` — don't step
+on it, ask before proceeding if it looks like it'll touch the same files. Add your own one-line
+entry (timestamp, what you're touching, session identifier) before starting, remove it when you
+commit/push or abandon the task. This is best-effort, not a real lock — it doesn't replace `git
+status --short` before staging.
+
+## Current site state (volatile — check this is still true)
+
+As of commit `6e927ce`, the site is gated: `lock.js` (included on every page) redirects to
+`lock.html` unless `sessionStorage['jpe-unlocked-v1'] === '1'`, EXCEPT `level-test.html` which is
+the free, public entry point (linked directly from the lock screen as the primary CTA). This is a
+deliberate temporary state (soft-launching Level Test alone) — don't assume the rest of the site is
+meant to stay hidden forever, and don't remove the lock without asking. To test other pages
+locally/live, set that sessionStorage key first.
+
+`ielts-writing-content.html` has a "Study Resources" tab pattern (recently added/iterated) for
+grouping study-tool links inside a content page rather than the sidebar — check that file as the
+reference if asked to add something similar elsewhere, rather than inventing a new pattern.
+
 ## Read this first: shared, concurrent repo
 
 This working tree is used by multiple Claude Code sessions at once (routinely 5-9 concurrent
@@ -35,26 +72,32 @@ Two page shapes, both must be understood before editing anything nav-related:
    (pattern 1). What's left in `tools.html` is just `location.replace('X.html')` hash redirects for
    backward compatibility — don't add new content here, treat it as a redirect shim.
 
-**The sidebar is NOT a shared component.** It's byte-identical HTML/CSS pasted into every one of the
-52 sidebar-bearing files (`grep -l "cat-group" *.html` to get the current exact list — it changes).
-Any sitewide sidebar change (new category, new tool row, recolor, layout tweak) means:
-```
-grep -l "<exact anchor string you're changing>" *.html   # get the file list first
-```
-then a scripted find-and-replace across all of them (verify the anchor string occurs exactly once
-per file before touching it — a file that's drifted from the others needs a manual look, not a
-blind sed), then a syntax check on any touched `<script>` blocks, then a local
-`python3 -m http.server` + browser check before committing. This is inherently a many-file
-operation — don't try to avoid it by editing one file and assuming the rest match; they don't
-always. See `.claude/memory` (Claude's own persistent notes, if you have access to it) for the exact
-history of this component if something looks broken — it's been reworked many times.
+**The sidebar IS a shared component (since 2026-08-21, commit `f9ba4a1`)** — do not paste it back
+into individual files. The 51 sidebar-bearing wrapper pages (all except the legacy `tools.html`
+shim) each load three shared assets instead of embedding the sidebar directly:
+- `/assets/shell.css` — sitewide chrome CSS (topnav, sidebar, accordion, collapse behaviour)
+- `/assets/shell.js` — `JPE_TITLES` map + all nav/collapse/soft-navigation JS
+- `/assets/sidebar-nav.html` — the actual category/tool-link markup, injected via a synchronous
+  `document.write(XHR(...))` at the exact spot the old inline `<nav id="sidebar">` used to sit
+  (keeps it render-blocking so there's no flash of an empty sidebar)
+
+To change a category or tool row: edit `/assets/sidebar-nav.html` once — it applies to every page
+immediately, no multi-file sed needed. To change sidebar styling: edit `/assets/shell.css`. To
+change nav/collapse behaviour: edit `/assets/shell.js`. `index.html` and `exam-photos-speaking.html`
+each have one small extra inline `<script>` alongside the shared tag for page-specific behaviour
+(home hash-routing; a query-string forward) — don't confuse that with the shared block. Always
+verify via local `python3 -m http.server` + browser click-through before shipping (soft-nav,
+active-state highlight, collapse toggle) since this is now a single point of failure for every page.
 
 ## What NOT to read/grep during exploration
 
 - `images/`, `audio/`, `pdfs/` — binary assets, never source. Don't open or grep these directories.
-- `.git/` — 392MB of history (vs. ~56MB working tree), mostly pre-compression image/audio blobs.
-  Irrelevant to almost every task; don't `git log -p` or full-history operations unless specifically
-  asked to investigate history.
+- `.git/` — ~151MB (history was rewritten/pruned 2026-08-21 to drop dead pre-compression
+  image/audio blobs; a full mirror backup of the pre-rewrite history exists at
+  `~/Documents/johnplusenglish-ui.github.io-BACKUP-20260821-102440` if anything's ever needed from
+  before that). Irrelevant to almost every task; don't `git log -p` or full-history operations
+  unless specifically asked to investigate history. Don't repeat a history rewrite without checking
+  for other active sessions first (`ListAgents`) — it requires a force-push.
 - Any single `-content.html` file is usually 150–560KB of self-contained app code. If a task only
   concerns one tool/page, you only need that one file (plus its wrapper if the nav changes too) —
   you don't need to read sibling `-content.html` files to understand it, they're independent apps
@@ -76,6 +119,6 @@ history of this component if something looks broken — it's been reworked many 
 1. Local preview: `python3 -m http.server` + browser check (Browser pane / `preview_start`), not
    just "the code looks right."
 2. `git status --short` → stage only your own files by name → commit → push.
-3. For anything touching many files (sidebar, shared header), spot-check at least one file that
-   *wasn't* part of the automated find-and-replace to make sure it didn't need the same fix and
-   wasn't missed.
+3. For anything that still legitimately touches many files (not the sidebar anymore — see
+   Architecture above), spot-check at least one file that *wasn't* part of the automated
+   find-and-replace to make sure it didn't need the same fix and wasn't missed.
