@@ -452,6 +452,7 @@ function toggleLevel(lv, btn) {
   activeLevels[lv] = !activeLevels[lv];
   if (!activeLevels.b2 && !activeLevels.c1) { activeLevels[lv] = true; return; }
   btn.classList.toggle('active', activeLevels[lv]);
+  try{ localStorage.setItem('jpe-taboo-levels', JSON.stringify(activeLevels)); }catch(e){}
   rebuildDeck();
 }
 
@@ -459,6 +460,7 @@ function setTopic(t, btn) {
   activeTopic = t;
   document.querySelectorAll('.filter-pill.topic').forEach(function(b){ b.classList.remove('active'); });
   btn.classList.add('active');
+  try{ localStorage.setItem('jpe-taboo-topic', activeTopic); }catch(e){}
   rebuildDeck();
 }
 
@@ -677,6 +679,26 @@ function timerUpdateBtn(id){
 
 // Init
 document.getElementById('timerMount').innerHTML = timerWidgetHTML('main', 60, false);
+(function restoreTabooState(){
+  try{
+    var savedLevels = localStorage.getItem('jpe-taboo-levels');
+    if (savedLevels) {
+      var parsed = JSON.parse(savedLevels);
+      if (parsed && (parsed.b2 || parsed.c1)) {
+        activeLevels = parsed;
+        var b2Btn = document.querySelector('.filter-pill.level-b2');
+        var c1Btn = document.querySelector('.filter-pill.level-c1');
+        if (b2Btn) b2Btn.classList.toggle('active', !!activeLevels.b2);
+        if (c1Btn) c1Btn.classList.toggle('active', !!activeLevels.c1);
+      }
+    }
+  }catch(e){}
+  try{
+    var savedTopic = localStorage.getItem('jpe-taboo-topic');
+    if (savedTopic) activeTopic = savedTopic;
+  }catch(e){}
+})();
+
 timerInit('main', 60, false);
 buildTopicFilters();
 rebuildDeck();

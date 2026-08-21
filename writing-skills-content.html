@@ -2926,32 +2926,72 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 
 <script>
 // ── Tab switching ──
+function selectMainTab(tab, scroll) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  tab.classList.add('active');
+  document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+  if (scroll) window.scrollTo({ top: 0, behavior: 'smooth' });
+  try { localStorage.setItem('jpe-writing-skills-tab', tab.dataset.tab); } catch (e) {}
+}
+
 document.querySelectorAll('.tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-    tab.classList.add('active');
-    document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
+  tab.addEventListener('click', () => selectMainTab(tab, true));
 });
 
 // ── Sub-tab switching (scoped to closest subtabs container) ──
-document.querySelectorAll('.subtab').forEach(s => {
-  s.addEventListener('click', () => {
-    const wrap = s.closest('.subtabs');
-    const panel = s.closest('.tab-panel');
-    if (!wrap || !panel) return;
-    wrap.querySelectorAll('.subtab').forEach(x => x.classList.remove('active'));
-    s.classList.add('active');
-    // Find all subtab-panels that belong to this subtabs group
-    const keys = Array.from(wrap.querySelectorAll('.subtab')).map(x => x.dataset.subtab);
-    keys.forEach(k => {
-      const el = document.getElementById('subpanel-' + k);
-      if (el) el.classList.toggle('active', k === s.dataset.subtab);
-    });
+function selectSubTab(s) {
+  const wrap = s.closest('.subtabs');
+  const panel = s.closest('.tab-panel');
+  if (!wrap || !panel) return;
+  wrap.querySelectorAll('.subtab').forEach(x => x.classList.remove('active'));
+  s.classList.add('active');
+  // Find all subtab-panels that belong to this subtabs group
+  const keys = Array.from(wrap.querySelectorAll('.subtab')).map(x => x.dataset.subtab);
+  keys.forEach(k => {
+    const el = document.getElementById('subpanel-' + k);
+    if (el) el.classList.toggle('active', k === s.dataset.subtab);
   });
+  try { localStorage.setItem('jpe-writing-skills-subtab-' + panel.id, s.dataset.subtab); } catch (e) {}
+}
+
+document.querySelectorAll('.subtab').forEach(s => {
+  s.addEventListener('click', () => selectSubTab(s));
 });
+
+// ── Restore saved tab / sub-tab / level selections before first paint ──
+(function restoreWritingSkillsState() {
+  try {
+    const savedTab = localStorage.getItem('jpe-writing-skills-tab');
+    if (savedTab) {
+      const tabBtn = document.querySelector('.tab[data-tab="' + savedTab + '"]');
+      if (tabBtn) selectMainTab(tabBtn, false);
+    }
+  } catch (e) {}
+
+  try {
+    document.querySelectorAll('.subtabs').forEach(wrap => {
+      const panel = wrap.closest('.tab-panel');
+      if (!panel) return;
+      const savedSub = localStorage.getItem('jpe-writing-skills-subtab-' + panel.id);
+      if (!savedSub) return;
+      const subBtn = wrap.querySelector('.subtab[data-subtab="' + savedSub + '"]');
+      if (subBtn) selectSubTab(subBtn);
+    });
+  } catch (e) {}
+
+  try {
+    document.querySelectorAll('.level-btn').forEach(btn => {
+      const m = (btn.getAttribute('onclick') || '').match(/switchLevel\(this,\s*'([^']+)'/);
+      if (!m) return;
+      const uid = m[1];
+      const savedLevel = localStorage.getItem('jpe-writing-skills-level-' + uid);
+      if (savedLevel && btn.getAttribute('onclick').indexOf("'" + savedLevel + "'") !== -1) {
+        switchLevel(btn, uid, savedLevel);
+      }
+    });
+  } catch (e) {}
+})();
 
 // ── Print modal ──
 const PRINT_OPTIONS = {
@@ -3115,6 +3155,7 @@ function switchLevel(btn, uid, level) {
   card.querySelectorAll('.level-panel').forEach(p => {
     p.classList.toggle('active', p.id === uid + '-' + level);
   });
+  try { localStorage.setItem('jpe-writing-skills-level-' + uid, level); } catch (e) {}
 }
 
 // Wire up print buttons to open modal

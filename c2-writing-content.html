@@ -2350,40 +2350,59 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 // ── Tab switching ──
 const tabs = document.querySelectorAll('.tab');
 const panels = document.querySelectorAll('.tab-panel');
+function switchMainTab(key) {
+  tabs.forEach(x => x.classList.toggle('active', x.dataset.tab === key));
+  panels.forEach(p => p.classList.toggle('active', p.id === 'panel-' + key));
+  try{ localStorage.setItem('jpe-c2-writing-tab', key); }catch(e){}
+}
 tabs.forEach(t => {
   t.addEventListener('click', () => {
-    tabs.forEach(x => x.classList.remove('active'));
-    panels.forEach(p => p.classList.remove('active'));
-    t.classList.add('active');
-    document.getElementById('panel-' + t.dataset.tab).classList.add('active');
+    switchMainTab(t.dataset.tab);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 });
+try{
+  const savedMainTab = localStorage.getItem('jpe-c2-writing-tab');
+  if (savedMainTab && document.getElementById('panel-' + savedMainTab)) switchMainTab(savedMainTab);
+}catch(e){}
 
 // ── Assessed examples sub-tab switching ──
+function switchAexTab(key) {
+  document.querySelectorAll('.aex-tab').forEach(x => x.classList.toggle('active', x.dataset.aex === key));
+  document.querySelectorAll('.aex-panel').forEach(p => p.classList.toggle('active', p.id === 'aex-' + key));
+  try{ localStorage.setItem('jpe-c2-writing-aex', key); }catch(e){}
+}
 document.querySelectorAll('.aex-tab').forEach(t => {
-  t.addEventListener('click', () => {
-    const key = t.dataset.aex;
-    document.querySelectorAll('.aex-tab').forEach(x => x.classList.toggle('active', x.dataset.aex === key));
-    document.querySelectorAll('.aex-panel').forEach(p => p.classList.toggle('active', p.id === 'aex-' + key));
-  });
+  t.addEventListener('click', () => switchAexTab(t.dataset.aex));
 });
+try{
+  const savedAex = localStorage.getItem('jpe-c2-writing-aex');
+  if (savedAex && document.getElementById('aex-' + savedAex)) switchAexTab(savedAex);
+}catch(e){}
 
 // ── Band sub-tab switching (Weak / Solid / Strong inside each task) ──
-document.querySelectorAll('.band-tab').forEach(t => {
-  t.addEventListener('click', () => {
-    const task = t.dataset.task;
-    const band = t.dataset.band;
-    // Toggle the tab buttons within this task only
-    document.querySelectorAll(`.band-tab[data-task="${task}"]`).forEach(x => {
-      x.classList.toggle('active', x.dataset.band === band);
-    });
-    // Toggle the panels within this task only
-    document.querySelectorAll(`#aex-${task} .band-panel`).forEach(p => {
-      p.classList.toggle('active', p.id === `band-${task}-${band}`);
-    });
+function switchBandTab(task, band) {
+  // Toggle the tab buttons within this task only
+  document.querySelectorAll(`.band-tab[data-task="${task}"]`).forEach(x => {
+    x.classList.toggle('active', x.dataset.band === band);
   });
+  // Toggle the panels within this task only
+  document.querySelectorAll(`#aex-${task} .band-panel`).forEach(p => {
+    p.classList.toggle('active', p.id === `band-${task}-${band}`);
+  });
+  try{ localStorage.setItem('jpe-c2-writing-band-' + task, band); }catch(e){}
+}
+document.querySelectorAll('.band-tab').forEach(t => {
+  t.addEventListener('click', () => switchBandTab(t.dataset.task, t.dataset.band));
 });
+try{
+  const bandTasks = new Set();
+  document.querySelectorAll('.band-tab').forEach(t => bandTasks.add(t.dataset.task));
+  bandTasks.forEach(task => {
+    const savedBand = localStorage.getItem('jpe-c2-writing-band-' + task);
+    if (savedBand && document.getElementById(`band-${task}-${savedBand}`)) switchBandTab(task, savedBand);
+  });
+}catch(e){}
 
 // ── Smart print ──
 document.querySelectorAll('.action-btn[data-print]').forEach(btn => {
@@ -2401,10 +2420,15 @@ document.querySelectorAll('.action-btn[data-print]').forEach(btn => {
 function switchSubtab(key) {
   document.querySelectorAll('.subtab').forEach(s => s.classList.toggle('active', s.dataset.subtab === key));
   document.querySelectorAll('.subtab-panel').forEach(p => p.classList.toggle('active', p.id === 'subpanel-' + key));
+  try{ localStorage.setItem('jpe-c2-writing-subtab', key); }catch(e){}
 }
 document.querySelectorAll('.subtab').forEach(s => {
   s.addEventListener('click', () => switchSubtab(s.dataset.subtab));
 });
+try{
+  const savedSubtab = localStorage.getItem('jpe-c2-writing-subtab');
+  if (savedSubtab && document.getElementById('subpanel-' + savedSubtab)) switchSubtab(savedSubtab);
+}catch(e){}
 
 // ── Clickable cards that jump to a tab ──
 document.querySelectorAll('.card-clickable[data-jump]').forEach(c => {
@@ -2631,6 +2655,7 @@ function loadPrompt(task, idx) {
   document.querySelectorAll('[data-prompt-idx]').forEach(b => {
     b.classList.toggle('active', Number(b.dataset.promptIdx) === currentPromptIdx);
   });
+  try{ localStorage.setItem('jpe-c2-writing-prompt', JSON.stringify({ task: currentTask, idx: currentPromptIdx })); }catch(e){}
 }
 
 document.querySelectorAll('[data-prompt]').forEach(b => {
@@ -2655,7 +2680,16 @@ function updateWordCount() {
 }
 textarea.addEventListener('input', updateWordCount);
 
-loadPrompt('essay', 0);
+(function(){
+  let initTask = 'essay', initIdx = 0;
+  try{
+    const saved = JSON.parse(localStorage.getItem('jpe-c2-writing-prompt'));
+    if (saved && PROMPTS[saved.task] && PROMPTS[saved.task][saved.idx]) {
+      initTask = saved.task; initIdx = saved.idx;
+    }
+  }catch(e){}
+  loadPrompt(initTask, initIdx);
+})();
 
 // ── Timer ──
 let timerInterval = null;
@@ -2701,14 +2735,18 @@ document.getElementById('clear-btn').addEventListener('click', () => {
 });
 
 // ── Phrase Bank task toggle ──
+function switchPbTask(key) {
+  document.querySelectorAll('.pb-task-btn').forEach(b => b.classList.toggle('active', b.dataset.pbtask === key));
+  document.querySelectorAll('.pb-task-panel').forEach(p => p.classList.toggle('active', p.id === 'pb-' + key));
+  try{ localStorage.setItem('jpe-c2-writing-pbtask', key); }catch(e){}
+}
 document.querySelectorAll('.pb-task-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.pb-task-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.pb-task-panel').forEach(p => p.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('pb-' + btn.dataset.pbtask).classList.add('active');
-  });
+  btn.addEventListener('click', () => switchPbTask(btn.dataset.pbtask));
 });
+try{
+  const savedPbTask = localStorage.getItem('jpe-c2-writing-pbtask');
+  if (savedPbTask && document.getElementById('pb-' + savedPbTask)) switchPbTask(savedPbTask);
+}catch(e){}
 </script>
 
 </body>

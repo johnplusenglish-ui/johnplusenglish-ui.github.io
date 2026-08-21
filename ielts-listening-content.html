@@ -207,6 +207,7 @@ function switchType(type) {
     document.querySelector('[data-type="' + t + '"]').classList.toggle('active', t === type);
     document.getElementById(t + '-content').classList.toggle('active', t === type);
   });
+  try{ localStorage.setItem('jpe-ielts-listening-type', type); }catch(e){}
 }
 
 const GUIDE = [
@@ -310,6 +311,7 @@ function toggleGuideSidebar(el){ el.closest(".guide-shell").classList.toggle("sb
 function showGuideTopic(i){
   const g = GUIDE[i];
   document.querySelectorAll('.guide-nav-item').forEach((b,bi)=>b.classList.toggle('active', bi===i));
+  try{ localStorage.setItem('jpe-ielts-listening-guide-topic', i); }catch(e){}
   document.getElementById('guidePaneTitle').textContent = g.title;
   document.getElementById('guidePaneDesc').innerHTML = g.desc;
   let html = '';
@@ -333,9 +335,18 @@ function showGuideTopic(i){
 function buildGuide(){
   document.getElementById('guideNav').innerHTML = GUIDE.map((g,i)=>
     `<button class="guide-nav-item" onclick="showGuideTopic(${i})"><span class="guide-nav-dot"></span><span>${g.label}</span></button>`).join('');
-  showGuideTopic(0);
+  let initialTopic = 0;
+  try{
+    const savedTopic = parseInt(localStorage.getItem('jpe-ielts-listening-guide-topic'), 10);
+    if(!isNaN(savedTopic) && savedTopic >= 0 && savedTopic < GUIDE.length) initialTopic = savedTopic;
+  }catch(e){}
+  showGuideTopic(initialTopic);
 }
 buildGuide();
+try{
+  const savedType = localStorage.getItem('jpe-ielts-listening-type');
+  if(savedType && ['guide','tests','resources'].indexOf(savedType) !== -1) switchType(savedType);
+}catch(e){}
 </script>
 
 </body>

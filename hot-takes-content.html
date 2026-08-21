@@ -347,6 +347,7 @@ function toggleLevel(lv, btn) {
   if (activeLevels[lv] && !activeLevels[other]) return;
   activeLevels[lv] = !activeLevels[lv];
   btn.classList.toggle('active', activeLevels[lv]);
+  try{ localStorage.setItem('jpe-hot-takes-levels', JSON.stringify(activeLevels)); }catch(e){}
   rebuildDeck();
 }
 
@@ -354,6 +355,7 @@ function setTopic(t, btn) {
   activeTopic = t;
   document.querySelectorAll('.filter-pill.topic').forEach(function(b){ b.classList.remove('active'); });
   btn.classList.add('active');
+  try{ localStorage.setItem('jpe-hot-takes-topic', t); }catch(e){}
   rebuildDeck();
 }
 
@@ -591,6 +593,22 @@ function timerUpdateBtn(id){
 document.addEventListener('DOMContentLoaded', function(){
   document.getElementById('timerMount').innerHTML = timerWidgetHTML('main', 60, false);
   timerInit('main', 60, false);
+
+  try{
+    var savedLevels = JSON.parse(localStorage.getItem('jpe-hot-takes-levels'));
+    if (savedLevels && (savedLevels.b2 || savedLevels.c1)) {
+      activeLevels = savedLevels;
+      var b2Btn = document.querySelector('.filter-pill.level-b2');
+      var c1Btn = document.querySelector('.filter-pill.level-c1');
+      if (b2Btn) b2Btn.classList.toggle('active', !!activeLevels.b2);
+      if (c1Btn) c1Btn.classList.toggle('active', !!activeLevels.c1);
+    }
+    var savedTopic = localStorage.getItem('jpe-hot-takes-topic');
+    if (savedTopic && TOPICS.indexOf(savedTopic) !== -1) {
+      activeTopic = savedTopic;
+    }
+  }catch(e){}
+
   buildTopicFilters();
   rebuildDeck();
 });

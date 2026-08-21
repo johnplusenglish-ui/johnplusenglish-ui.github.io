@@ -5074,7 +5074,8 @@ Landscape orientation, 4:3 aspect ratio, no watermarks, no extra decorative text
 <script>
 // Switch between Task 1 / Task 2 via the side-nav
 function switchTaskCard(btn, index) {
-  const groups = btn.closest('.content-area').querySelectorAll(':scope > .pill-group');
+  const contentArea = btn.closest('.content-area');
+  const groups = contentArea.querySelectorAll(':scope > .pill-group');
   groups.forEach((g, i) => {
     g.classList.toggle('task-hidden', i !== index);
     const content = g.querySelector('.pill-group-content');
@@ -5084,6 +5085,7 @@ function switchTaskCard(btn, index) {
   sidebar.querySelectorAll('.task-nav-item').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   btn.closest('.task-nav-group').classList.toggle('open');
+  try{ localStorage.setItem('jpe-ielts-writing-taskcard-' + contentArea.id, index); }catch(e){}
 }
 
 // Click a chart/essay-type sub-item in the sidebar: switch to its task card and jump straight to that category
@@ -5119,6 +5121,17 @@ function toggleCategory(pill, category) {
   if (selectedSection) {
     selectedSection.classList.add('active');
   }
+
+  // Persist, scoped to this content-area + task index so Task 1 and Task 2 don't clobber each other
+  try{
+    const contentArea = pill.closest('.content-area');
+    const pillGroup = pill.closest('.pill-group');
+    if (contentArea && pillGroup) {
+      const groups = Array.from(contentArea.querySelectorAll(':scope > .pill-group'));
+      const taskIdx = groups.indexOf(pillGroup);
+      localStorage.setItem('jpe-ielts-writing-category-' + contentArea.id + '-' + taskIdx, category);
+    }
+  }catch(e){}
 }
 
 // Copy an AI image-generation prompt to the clipboard
@@ -5166,6 +5179,7 @@ function switchType(type) {
     document.querySelector('[data-type="' + t + '"]').classList.toggle('active', t === type);
     document.getElementById(t + '-content').classList.toggle('active', t === type);
   });
+  try{ localStorage.setItem('jpe-ielts-writing-type', type); }catch(e){}
 }
 
 // Chart instances storage
@@ -5496,6 +5510,7 @@ function pbCat(btn, bankId) {
   container.querySelectorAll('.pb-phrase-group').forEach((g, i) => {
     g.classList.toggle('active', i === idx);
   });
+  try{ localStorage.setItem('jpe-ielts-writing-pbcat-' + (container.id || bankId), idx); }catch(e){}
 }
 
 
@@ -5654,6 +5669,7 @@ function switchChecklist(panelId, btn) {
   document.querySelectorAll('.checklist-panel').forEach(p => p.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById(panelId).classList.add('active');
+  try{ localStorage.setItem('jpe-ielts-writing-checklist', panelId); }catch(e){}
 }
 
 function toggleCheck(item, panelId) {
@@ -5689,6 +5705,7 @@ function switchErrors(panelId, btn) {
   document.querySelectorAll('.errors-panel').forEach(p => p.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById(panelId).classList.add('active');
+  try{ localStorage.setItem('jpe-ielts-writing-errors', panelId); }catch(e){}
 }
 
 // ── Annotated answer toggle ───────────────────────────────────
@@ -6022,6 +6039,7 @@ function showGuideTopicW(i){
   document.querySelectorAll('#guideNavW .task-nav-item').forEach((b,bi)=>b.classList.toggle('active', bi===i));
   document.getElementById('guideDynamicPill').classList.remove('task-hidden');
   document.querySelectorAll('#guide-content .pill-group[id^="guideStatic"]').forEach(p=>p.classList.add('task-hidden'));
+  try{ localStorage.setItem('jpe-ielts-writing-guide', JSON.stringify({ kind: 'topic', idx: i })); }catch(e){}
   document.getElementById('guideLabelW').textContent = g.label;
   document.getElementById('guideTitleW').textContent = g.title;
   let html = '';
@@ -6068,6 +6086,7 @@ function showGuideStatic(key, btn){
   document.getElementById('guideDynamicPill').classList.add('task-hidden');
   const target = GUIDE_STATIC_W.find(s=>s.key===key).panelId;
   document.querySelectorAll('#guide-content .pill-group[id^="guideStatic"]').forEach(p=>p.classList.toggle('task-hidden', p.id !== target));
+  try{ localStorage.setItem('jpe-ielts-writing-guide', JSON.stringify({ kind: 'static', key: key })); }catch(e){}
 }
 function buildGuideW(){
   const dynamicBtns = GUIDE_W.map((g,i)=>
@@ -6080,6 +6099,73 @@ function buildGuideW(){
   showGuideTopicW(0);
 }
 buildGuideW();
+
+// ── Restore saved navigation/selection state ──
+try{
+  const savedType = localStorage.getItem('jpe-ielts-writing-type');
+  if (savedType && document.getElementById(savedType + '-content')) switchType(savedType);
+}catch(e){}
+
+['academic-content', 'general-content'].forEach(function(areaId){
+  const contentArea = document.getElementById(areaId);
+  if (!contentArea) return;
+  try{
+    const savedTaskIdx = localStorage.getItem('jpe-ielts-writing-taskcard-' + areaId);
+    if (savedTaskIdx !== null) {
+      const sidebar = contentArea.querySelector('.task-sidebar');
+      const btn = sidebar && sidebar.querySelectorAll('.task-nav-item')[Number(savedTaskIdx)];
+      if (btn) switchTaskCard(btn, Number(savedTaskIdx));
+    }
+  }catch(e){}
+  try{
+    const groups = Array.from(contentArea.querySelectorAll(':scope > .pill-group'));
+    groups.forEach(function(group, idx){
+      const savedCat = localStorage.getItem('jpe-ielts-writing-category-' + areaId + '-' + idx);
+      if (savedCat) {
+        const pill = group.querySelector('.tip-pill[data-cat="' + savedCat + '"]');
+        if (pill) toggleCategory(pill, savedCat);
+      }
+    });
+  }catch(e){}
+});
+
+try{
+  document.querySelectorAll('.phrase-bank[id]').forEach(function(container){
+    const savedIdx = localStorage.getItem('jpe-ielts-writing-pbcat-' + container.id);
+    if (savedIdx !== null) {
+      const btn = container.querySelectorAll('.pb-cat')[Number(savedIdx)];
+      if (btn) pbCat(btn, container.id.replace('pb-', ''));
+    }
+  });
+}catch(e){}
+
+try{
+  const savedChecklist = localStorage.getItem('jpe-ielts-writing-checklist');
+  if (savedChecklist) {
+    const btn = document.querySelector('.checklist-tab[onclick*="' + savedChecklist + '"]');
+    if (btn && document.getElementById(savedChecklist)) switchChecklist(savedChecklist, btn);
+  }
+}catch(e){}
+
+try{
+  const savedErrors = localStorage.getItem('jpe-ielts-writing-errors');
+  if (savedErrors) {
+    const btn = document.querySelector('.errors-tab[onclick*="' + savedErrors + '"]');
+    if (btn && document.getElementById(savedErrors)) switchErrors(savedErrors, btn);
+  }
+}catch(e){}
+
+try{
+  const savedGuide = JSON.parse(localStorage.getItem('jpe-ielts-writing-guide'));
+  if (savedGuide) {
+    if (savedGuide.kind === 'topic' && GUIDE_W[savedGuide.idx]) {
+      showGuideTopicW(savedGuide.idx);
+    } else if (savedGuide.kind === 'static' && GUIDE_STATIC_W.find(s => s.key === savedGuide.key)) {
+      const btn = document.querySelector('#guideNavW .task-nav-item[onclick*="' + savedGuide.key + '"]');
+      if (btn) showGuideStatic(savedGuide.key, btn);
+    }
+  }
+}catch(e){}
 </script>
 
 <!-- Print Modal -->

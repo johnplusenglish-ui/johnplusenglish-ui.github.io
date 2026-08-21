@@ -1488,6 +1488,7 @@ function setFilter(topic) {
   activeFilter = topic;
   buildFilterChips();
   buildScenarioList();
+  try{ localStorage.setItem('jpe-chat-activity-filter', topic); }catch(e){}
 }
 
 function buildScenarioList() {
@@ -1590,6 +1591,7 @@ function loadScenario(id) {
   currentId = id;
   var sc = SCENARIOS.find(function(s){ return s.id===id; });
   if (!sc) return;
+  try{ localStorage.setItem('jpe-chat-activity-scenario', id); }catch(e){}
   document.querySelectorAll('.scenario-card').forEach(function(c){
     c.classList.toggle('active', c.id==='sc-card-'+id);
   });
@@ -1723,9 +1725,20 @@ document.addEventListener('DOMContentLoaded', function() {
 function escHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function escAttr(s){ return s.replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
+try{
+  var savedFilter = localStorage.getItem('jpe-chat-activity-filter');
+  if (savedFilter) activeFilter = savedFilter;
+}catch(e){}
 buildFilterChips();
 buildScenarioList();
-loadScenario(0);
+var initialScenarioId = 0;
+try{
+  var savedScenario = localStorage.getItem('jpe-chat-activity-scenario');
+  if (savedScenario !== null && SCENARIOS.some(function(s){ return s.id === parseInt(savedScenario,10); })) {
+    initialScenarioId = parseInt(savedScenario,10);
+  }
+}catch(e){}
+loadScenario(initialScenarioId);
 
 function exportPng() {
   var btn = document.getElementById('exportPngBtn');

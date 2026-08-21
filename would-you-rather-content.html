@@ -412,10 +412,16 @@ var timerInterval=null, timerSeconds=0, timerTotal=0, timerRunning=false, timerP
 var qfInterval=null, qfRunning=false, qfPaused=false, qfTime=30, qfRemaining=0, qfIdx=0;
 
 function init(){
+  var savedLevel='all', savedCat='all', savedMode='card';
+  try{ savedLevel = localStorage.getItem('jpe-would-you-rather-level') || 'all'; }catch(e){}
+  try{ savedCat = localStorage.getItem('jpe-would-you-rather-cat') || 'all'; }catch(e){}
+  try{ savedMode = localStorage.getItem('jpe-would-you-rather-mode') || 'card'; }catch(e){}
+
   var levels=['all','B2','C1','C2'];
+  if(levels.indexOf(savedLevel)===-1) savedLevel='all';
   var h='';
   levels.forEach(function(l){
-    h+='<span class="pill'+(l==='all'?' on':'')+'" data-v="'+l+'" onclick="setLevel(this)">'+(l==='all'?'All':l)+'</span>';
+    h+='<span class="pill'+(l===savedLevel?' on':'')+'" data-v="'+l+'" onclick="setLevel(this)">'+(l==='all'?'All':l)+'</span>';
   });
   document.getElementById('levelPills').innerHTML=h;
 
@@ -427,12 +433,17 @@ function init(){
     o.textContent=c.charAt(0).toUpperCase()+c.slice(1);
     sel.appendChild(o);
   });
+  if(savedCat!=='all'&&cats.indexOf(savedCat)!==-1) sel.value=savedCat;
+
   applyFilters();
+
+  if(savedMode==='grid') setMode('grid');
 }
 
 function setLevel(el){
   document.querySelectorAll('#levelPills .pill').forEach(function(p){p.classList.remove('on');});
   el.classList.add('on');applyFilters();
+  try{ localStorage.setItem('jpe-would-you-rather-level', el.dataset.v); }catch(e){}
 }
 
 function setSetup(open){
@@ -463,6 +474,7 @@ function applyFilters(){
   updateSummary();
   renderCard();
   if(mode==='grid')renderGrid();
+  try{ localStorage.setItem('jpe-would-you-rather-cat', cat); }catch(e){}
 }
 
 function renderCard(){
@@ -528,6 +540,7 @@ function setMode(m){
     document.querySelectorAll('.mode-btn')[1].classList.add('on');
     renderGrid();
   }
+  try{ localStorage.setItem('jpe-would-you-rather-mode', m); }catch(e){}
 }
 
 function renderGrid(){

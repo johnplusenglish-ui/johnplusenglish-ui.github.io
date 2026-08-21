@@ -462,6 +462,7 @@ function setTheme(t, btn) {
   document.querySelectorAll('.theme-badge').forEach(function(b){ b.classList.remove('active'); });
   btn.classList.add('active');
   hideStarter();
+  try{ localStorage.setItem('jpe-story-dice-theme', t); }catch(e){}
 }
 
 // Starter
@@ -625,6 +626,13 @@ function timerUpdateBtn(id){
     btn.className='timer-btn';
   }
 }
+
+(function(){
+  try{
+    var saved = localStorage.getItem('jpe-story-dice-theme');
+    if (saved && THEMES.indexOf(saved) !== -1) activeTheme = saved;
+  }catch(e){}
+})();
 
 buildThemeRow();
 document.getElementById('timerMount').innerHTML = timerWidgetHTML('main', 90, false);

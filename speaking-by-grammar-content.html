@@ -449,6 +449,7 @@ function setMode(mode){
   var target=document.getElementById('view-'+mode);
   if(target){target.style.display='block';setTimeout(function(){target.classList.add('visible');},10);}
   if(mode==='browse')renderBrowse();
+  try{ localStorage.setItem('jpe-speaking-by-grammar-mode', mode); }catch(e){}
 }
 
 function setGrammar(g,btn){
@@ -457,6 +458,7 @@ function setGrammar(g,btn){
   btn.classList.add('active');
   if(currentMode==='browse')renderBrowse();
   if(currentMode==='practice'){buildPromptList();pracIdx=-1;}
+  try{ localStorage.setItem('jpe-speaking-by-grammar-grammar', g); }catch(e){}
 }
 
 function getFiltered(){
@@ -611,7 +613,18 @@ function printCard(btn){
 
 // Init
 (function(cb){if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',cb);}else{cb();}})(function(){
-  renderBrowse();
+  var savedGrammar=null, savedMode=null;
+  try{ savedGrammar=localStorage.getItem('jpe-speaking-by-grammar-grammar'); }catch(e){}
+  try{ savedMode=localStorage.getItem('jpe-speaking-by-grammar-mode'); }catch(e){}
+  if(savedGrammar){
+    var pill=document.querySelector('.grammar-pill[data-g="'+savedGrammar.replace(/"/g,'\\"')+'"]');
+    if(pill)setGrammar(savedGrammar,pill);
+  }
+  if(savedMode && ['browse','challenge','auction'].indexOf(savedMode)!==-1 && savedMode!=='browse'){
+    setMode(savedMode);
+  }else{
+    renderBrowse();
+  }
   var observer=new IntersectionObserver(function(entries){entries.forEach(function(entry){if(entry.isIntersecting)entry.target.classList.add('visible');});},{threshold:.1});
   document.querySelectorAll('.reveal').forEach(function(el){observer.observe(el);});
 // Fallback: if the observer never fires (e.g. inside the embed iframe), reveal everything

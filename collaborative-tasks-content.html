@@ -865,10 +865,18 @@ var filtered=[], currentIdx=0, currentView='single', groupSize=2, timerInterval=
 var studentNames = ['Student A','Student B','Student C','Student D'];
 
 function init(){
+  var savedLevel='all', savedType='all', savedGroup=2, savedView='single';
+  try{
+    savedLevel=localStorage.getItem('jpe-collab-level')||'all';
+    savedType=localStorage.getItem('jpe-collab-type')||'all';
+    savedGroup=parseInt(localStorage.getItem('jpe-collab-group'),10)||2;
+    savedView=localStorage.getItem('jpe-collab-view')||'single';
+  }catch(e){}
+
   var levels=['all','B1','B2','C1','C2'];
   var h='';
   levels.forEach(function(l){
-    h+='<span class="pill'+(l==='all'?' on':'')+'" data-v="'+l+'" onclick="setLevel(this)">'+(l==='all'?'All':l)+'</span>';
+    h+='<span class="pill'+(l===savedLevel?' on':'')+'" data-v="'+l+'" onclick="setLevel(this)">'+(l==='all'?'All':l)+'</span>';
   });
   document.getElementById('levelPills').innerHTML=h;
 
@@ -880,7 +888,15 @@ function init(){
     o.textContent=tp.replace(/-/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase();});
     sel.appendChild(o);
   });
+  if(types.indexOf(savedType)!==-1||savedType==='all') sel.value=savedType;
+
+  groupSize=savedGroup;
+  document.querySelectorAll('.group-pill').forEach(function(p){
+    p.classList.toggle('on', parseInt(p.dataset.g,10)===savedGroup);
+  });
+
   applyFilters();
+  setView(savedView);
 }
 
 function setLevel(el){
@@ -891,6 +907,7 @@ function setGroup(n,el){
   groupSize=n;
   document.querySelectorAll('.group-pill').forEach(function(p){p.classList.remove('on');});
   el.classList.add('on'); renderCurrent(); updateSummary();
+  try{ localStorage.setItem('jpe-collab-group', n); }catch(e){}
 }
 
 function setSetup(open){
@@ -918,6 +935,7 @@ function applyFilters(){
     return true;
   });
   currentIdx=0;
+  try{ localStorage.setItem('jpe-collab-level', lv); localStorage.setItem('jpe-collab-type', tp); }catch(e){}
   document.getElementById('statsBar').textContent=filtered.length+' task'+(filtered.length!==1?'s':'')+' found';
   updateSummary();
   renderCurrent(); renderGrid();
@@ -1045,6 +1063,7 @@ function setView(v){
     document.getElementById('gridView').classList.add('active');
     document.querySelectorAll('.view-btn')[1].classList.add('on');
   }
+  try{ localStorage.setItem('jpe-collab-view', v); }catch(e){}
 }
 
 function shuffleTasks(){
