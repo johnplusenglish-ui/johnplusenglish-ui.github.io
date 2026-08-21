@@ -86,6 +86,14 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
 .task-nav-label{font-size:.6rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600;display:block;margin-bottom:.1rem}
 .task-nav-title{display:block;font-size:.84rem;font-weight:700;color:var(--ink);line-height:1.25}
 .task-nav-count{font-family:Outfit,sans-serif;font-size:.62rem;color:var(--muted);font-weight:600;flex-shrink:0}
+.task-nav-group{margin-bottom:.4rem}
+.task-nav-chev{font-size:.6rem;color:var(--muted);transition:transform .2s ease;flex-shrink:0;margin-left:.2rem}
+.task-nav-group.open .task-nav-chev{transform:rotate(180deg)}
+.task-nav-submenu{display:none;flex-direction:column;gap:2px;padding:.3rem .3rem .3rem .5rem;margin-top:.2rem;background:var(--cream);border-radius:10px}
+.task-nav-group.open .task-nav-submenu{display:flex}
+.task-nav-subitem{display:flex;align-items:center;padding:.42rem .6rem;border-radius:8px;cursor:pointer;font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:600;color:var(--muted);border:none;background:none;text-align:left;width:100%;transition:all .15s}
+.task-nav-subitem:hover{color:var(--ink);background:var(--card)}
+.task-nav-subitem.active{color:var(--task-accent,var(--sky));background:var(--card);font-weight:700;box-shadow:0 1px 3px rgba(45,48,71,.06)}
 .pill-group.task-hidden{display:none}
 
 /* Pill Group Container */
@@ -906,16 +914,37 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
     <div class="wb-sb-head" onclick="toggleWbSidebar(this)"><span>Tasks</span><div class="sb-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div></div>
     <div class="wb-sb-scroll task-sidebar">
 
-    <button class="task-nav-item active" style="--task-accent:#FF9100" onclick="switchTaskCard(this,0)">
-      <span class="task-nav-dot"></span>
-      <span class="task-nav-text"><span class="task-nav-label">Task 1</span><span class="task-nav-title">Report</span></span>
-      <span class="task-nav-count">22</span>
-    </button>
-    <button class="task-nav-item" style="--task-accent:#FF9100" onclick="switchTaskCard(this,1)">
-      <span class="task-nav-dot"></span>
-      <span class="task-nav-text"><span class="task-nav-label">Task 2</span><span class="task-nav-title">Essay</span></span>
-      <span class="task-nav-count">25</span>
-    </button>
+    <div class="task-nav-group open" style="--task-accent:#FF9100">
+      <button class="task-nav-item active" onclick="switchTaskCard(this,0)">
+        <span class="task-nav-dot"></span>
+        <span class="task-nav-text"><span class="task-nav-label">Task 1</span><span class="task-nav-title">Report</span></span>
+        <span class="task-nav-count">22</span>
+        <span class="task-nav-chev">&#9662;</span>
+      </button>
+      <div class="task-nav-submenu">
+        <button class="task-nav-subitem active" onclick="selectWritingCategory('academic-content',0,this,'bar')">Bar chart</button>
+        <button class="task-nav-subitem" onclick="selectWritingCategory('academic-content',0,this,'line')">Line graph</button>
+        <button class="task-nav-subitem" onclick="selectWritingCategory('academic-content',0,this,'pie')">Pie chart</button>
+        <button class="task-nav-subitem" onclick="selectWritingCategory('academic-content',0,this,'table')">Table</button>
+        <button class="task-nav-subitem" onclick="selectWritingCategory('academic-content',0,this,'map')">Map</button>
+        <button class="task-nav-subitem" onclick="selectWritingCategory('academic-content',0,this,'process')">Process diagram</button>
+      </div>
+    </div>
+    <div class="task-nav-group" style="--task-accent:#FF9100">
+      <button class="task-nav-item" onclick="switchTaskCard(this,1)">
+        <span class="task-nav-dot"></span>
+        <span class="task-nav-text"><span class="task-nav-label">Task 2</span><span class="task-nav-title">Essay</span></span>
+        <span class="task-nav-count">25</span>
+        <span class="task-nav-chev">&#9662;</span>
+      </button>
+      <div class="task-nav-submenu">
+        <button class="task-nav-subitem active" onclick="selectWritingCategory('academic-content',1,this,'opinion')">Opinion</button>
+        <button class="task-nav-subitem" onclick="selectWritingCategory('academic-content',1,this,'discussion')">Discussion</button>
+        <button class="task-nav-subitem" onclick="selectWritingCategory('academic-content',1,this,'problem')">Problem / Solution</button>
+        <button class="task-nav-subitem" onclick="selectWritingCategory('academic-content',1,this,'advantages')">Advantages / Disadvantages</button>
+        <button class="task-nav-subitem" onclick="selectWritingCategory('academic-content',1,this,'twopart')">Two-Part Question</button>
+      </div>
+    </div>
     </div>
   </div>
 
@@ -937,12 +966,12 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
     <div class="pill-group-content expanded">
       <div class="guide-line"><strong>Describe and compare data</strong> presented in charts, graphs, diagrams, or maps. Minimum 150 words in 20 minutes.</div>
       <div class="tips-pills">
-        <span class="tip-pill active" onclick="toggleCategory(this, 'bar')"><svg viewBox="0 0 24 24"><rect x="3" y="12" width="4" height="9" rx="1"/><rect x="10" y="7" width="4" height="14" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg>Bar chart</span>
-        <span class="tip-pill" onclick="toggleCategory(this, 'line')"><svg viewBox="0 0 24 24"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="17 7 21 7 21 11"/></svg>Line graph</span>
-        <span class="tip-pill" onclick="toggleCategory(this, 'pie')"><svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-9-9"/><path d="M21 12h-9V3a9 9 0 0 1 9 9z"/></svg>Pie chart</span>
-        <span class="tip-pill" onclick="toggleCategory(this, 'table')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/></svg>Table</span>
-        <span class="tip-pill" onclick="toggleCategory(this, 'map')"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>Map</span>
-        <span class="tip-pill" onclick="toggleCategory(this, 'process')"><svg viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>Process diagram</span>
+        <span class="tip-pill active" data-cat="bar" onclick="toggleCategory(this, 'bar')"><svg viewBox="0 0 24 24"><rect x="3" y="12" width="4" height="9" rx="1"/><rect x="10" y="7" width="4" height="14" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg>Bar chart</span>
+        <span class="tip-pill" data-cat="line" onclick="toggleCategory(this, 'line')"><svg viewBox="0 0 24 24"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="17 7 21 7 21 11"/></svg>Line graph</span>
+        <span class="tip-pill" data-cat="pie" onclick="toggleCategory(this, 'pie')"><svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-9-9"/><path d="M21 12h-9V3a9 9 0 0 1 9 9z"/></svg>Pie chart</span>
+        <span class="tip-pill" data-cat="table" onclick="toggleCategory(this, 'table')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/></svg>Table</span>
+        <span class="tip-pill" data-cat="map" onclick="toggleCategory(this, 'map')"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>Map</span>
+        <span class="tip-pill" data-cat="process" onclick="toggleCategory(this, 'process')"><svg viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>Process diagram</span>
       </div>
 
       <!-- BAR CHART CATEGORY -->
@@ -1992,11 +2021,11 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
     <div class="pill-group-content">
       <div class="guide-line"><strong>Write an essay</strong> in response to a point of view, argument, or problem. Minimum 250 words in 40 minutes.</div>
       <div class="tips-pills">
-        <span class="tip-pill active" onclick="toggleCategory(this, 'opinion')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Opinion</span>
-        <span class="tip-pill" onclick="toggleCategory(this, 'discussion')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/><polyline points="8 8 12 12 8 16"/><polyline points="16 8 12 12 16 16"/></svg>Discussion</span>
-        <span class="tip-pill" onclick="toggleCategory(this, 'problem')"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Problem / Solution</span>
-        <span class="tip-pill" onclick="toggleCategory(this, 'advantages')"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Advantages / Disadvantages</span>
-        <span class="tip-pill" onclick="toggleCategory(this, 'twopart')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Two-Part Question</span>
+        <span class="tip-pill active" data-cat="opinion" onclick="toggleCategory(this, 'opinion')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Opinion</span>
+        <span class="tip-pill" data-cat="discussion" onclick="toggleCategory(this, 'discussion')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/><polyline points="8 8 12 12 8 16"/><polyline points="16 8 12 12 16 16"/></svg>Discussion</span>
+        <span class="tip-pill" data-cat="problem" onclick="toggleCategory(this, 'problem')"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Problem / Solution</span>
+        <span class="tip-pill" data-cat="advantages" onclick="toggleCategory(this, 'advantages')"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Advantages / Disadvantages</span>
+        <span class="tip-pill" data-cat="twopart" onclick="toggleCategory(this, 'twopart')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Two-Part Question</span>
       </div>
 <div class="category-section active" id="opinion-section" data-category="opinion">
   <div class="phrase-bank" id="pb-essay">
@@ -2827,16 +2856,34 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
     <div class="wb-sb-head" onclick="toggleWbSidebar(this)"><span>Tasks</span><div class="sb-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div></div>
     <div class="wb-sb-scroll task-sidebar">
 
-    <button class="task-nav-item active" style="--task-accent:#FF9100" onclick="switchTaskCard(this,0)">
-      <span class="task-nav-dot"></span>
-      <span class="task-nav-text"><span class="task-nav-label">Task 1</span><span class="task-nav-title">Letter</span></span>
-      <span class="task-nav-count">15</span>
-    </button>
-    <button class="task-nav-item" style="--task-accent:#FF9100" onclick="switchTaskCard(this,1)">
-      <span class="task-nav-dot"></span>
-      <span class="task-nav-text"><span class="task-nav-label">Task 2</span><span class="task-nav-title">Essay</span></span>
-      <span class="task-nav-count">25</span>
-    </button>
+    <div class="task-nav-group open" style="--task-accent:#FF9100">
+      <button class="task-nav-item active" onclick="switchTaskCard(this,0)">
+        <span class="task-nav-dot"></span>
+        <span class="task-nav-text"><span class="task-nav-label">Task 1</span><span class="task-nav-title">Letter</span></span>
+        <span class="task-nav-count">15</span>
+        <span class="task-nav-chev">&#9662;</span>
+      </button>
+      <div class="task-nav-submenu">
+        <button class="task-nav-subitem active" onclick="selectWritingCategory('general-content',0,this,'letter-formal')">Formal</button>
+        <button class="task-nav-subitem" onclick="selectWritingCategory('general-content',0,this,'letter-semiformal')">Semi-formal</button>
+        <button class="task-nav-subitem" onclick="selectWritingCategory('general-content',0,this,'letter-informal')">Informal</button>
+      </div>
+    </div>
+    <div class="task-nav-group" style="--task-accent:#FF9100">
+      <button class="task-nav-item" onclick="switchTaskCard(this,1)">
+        <span class="task-nav-dot"></span>
+        <span class="task-nav-text"><span class="task-nav-label">Task 2</span><span class="task-nav-title">Essay</span></span>
+        <span class="task-nav-count">25</span>
+        <span class="task-nav-chev">&#9662;</span>
+      </button>
+      <div class="task-nav-submenu">
+        <button class="task-nav-subitem active" onclick="selectWritingCategory('general-content',1,this,'gt-opinion')">Opinion</button>
+        <button class="task-nav-subitem" onclick="selectWritingCategory('general-content',1,this,'gt-discussion')">Discussion</button>
+        <button class="task-nav-subitem" onclick="selectWritingCategory('general-content',1,this,'gt-problem')">Problem / Solution</button>
+        <button class="task-nav-subitem" onclick="selectWritingCategory('general-content',1,this,'gt-advantages')">Advantages / Disadvantages</button>
+        <button class="task-nav-subitem" onclick="selectWritingCategory('general-content',1,this,'gt-twopart')">Two-Part Question</button>
+      </div>
+    </div>
     </div>
   </div>
 
@@ -2858,9 +2905,9 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
     <div class="pill-group-content expanded">
       <div class="guide-line"><strong>Write a letter</strong> (formal, semi-formal, or informal) based on a given scenario. Minimum 150 words in 20 minutes.</div>
       <div class="tips-pills">
-        <span class="tip-pill active" onclick="toggleCategory(this, 'letter-formal')"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a4 4 0 0 0-8 0v2"/></svg>Formal</span>
-        <span class="tip-pill" onclick="toggleCategory(this, 'letter-semiformal')"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Semi-formal</span>
-        <span class="tip-pill" onclick="toggleCategory(this, 'letter-informal')"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>Informal</span>
+        <span class="tip-pill active" data-cat="letter-formal" onclick="toggleCategory(this, 'letter-formal')"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a4 4 0 0 0-8 0v2"/></svg>Formal</span>
+        <span class="tip-pill" data-cat="letter-semiformal" onclick="toggleCategory(this, 'letter-semiformal')"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Semi-formal</span>
+        <span class="tip-pill" data-cat="letter-informal" onclick="toggleCategory(this, 'letter-informal')"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>Informal</span>
       </div>
 <div class="category-section active" id="letter-formal-section" data-category="letter-formal">
   <div class="phrase-bank" id="pb-letter-formal">
@@ -3407,11 +3454,11 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
     <div class="pill-group-content">
       <div class="guide-line"><strong>Write an essay</strong> on everyday topics or personal experiences. Minimum 250 words in 40 minutes.</div>
       <div class="tips-pills">
-        <span class="tip-pill active" onclick="toggleCategory(this, 'gt-opinion')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Opinion</span>
-        <span class="tip-pill" onclick="toggleCategory(this, 'gt-discussion')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/><polyline points="8 8 12 12 8 16"/><polyline points="16 8 12 12 16 16"/></svg>Discussion</span>
-        <span class="tip-pill" onclick="toggleCategory(this, 'gt-problem')"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Problem / Solution</span>
-        <span class="tip-pill" onclick="toggleCategory(this, 'gt-advantages')"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Advantages / Disadvantages</span>
-        <span class="tip-pill" onclick="toggleCategory(this, 'gt-twopart')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Two-Part Question</span>
+        <span class="tip-pill active" data-cat="gt-opinion" onclick="toggleCategory(this, 'gt-opinion')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Opinion</span>
+        <span class="tip-pill" data-cat="gt-discussion" onclick="toggleCategory(this, 'gt-discussion')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/><polyline points="8 8 12 12 8 16"/><polyline points="16 8 12 12 16 16"/></svg>Discussion</span>
+        <span class="tip-pill" data-cat="gt-problem" onclick="toggleCategory(this, 'gt-problem')"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Problem / Solution</span>
+        <span class="tip-pill" data-cat="gt-advantages" onclick="toggleCategory(this, 'gt-advantages')"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Advantages / Disadvantages</span>
+        <span class="tip-pill" data-cat="gt-twopart" onclick="toggleCategory(this, 'gt-twopart')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Two-Part Question</span>
       </div>
 <div class="category-section active" id="gt-opinion-section" data-category="gt-opinion">
   <div class="phrase-bank" id="pb-essay">
@@ -4290,8 +4337,21 @@ function switchTaskCard(btn, index) {
     const content = g.querySelector('.pill-group-content');
     if (content) content.classList.toggle('expanded', i === index);
   });
-  btn.parentElement.querySelectorAll('.task-nav-item').forEach(b => b.classList.remove('active'));
+  const sidebar = btn.closest('.task-sidebar');
+  sidebar.querySelectorAll('.task-nav-item').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
+  sidebar.querySelectorAll('.task-nav-group').forEach((g, i) => g.classList.toggle('open', i === index));
+}
+
+// Click a chart/essay-type sub-item in the sidebar: switch to its task card and jump straight to that category
+function selectWritingCategory(contentAreaId, taskIndex, subBtn, category) {
+  const group = subBtn.closest('.task-nav-group');
+  const taskBtn = group.querySelector('.task-nav-item');
+  switchTaskCard(taskBtn, taskIndex);
+  group.querySelectorAll('.task-nav-subitem').forEach(b => b.classList.remove('active'));
+  subBtn.classList.add('active');
+  const pill = document.querySelector('#' + contentAreaId + ' .tip-pill[data-cat="' + category + '"]');
+  if (pill) toggleCategory(pill, category);
 }
 
 // Toggle category section (Task 1 report types)
