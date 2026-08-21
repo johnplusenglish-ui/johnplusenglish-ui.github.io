@@ -329,6 +329,7 @@ document.querySelectorAll('.tab').forEach(function(tab){
     document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
     tab.classList.add('active');
     currentLevel = tab.dataset.tab;
+    try{ localStorage.setItem('jpe-grammar-guides-level', currentLevel); }catch(e){}
     render();
   });
 });
@@ -349,6 +350,16 @@ document.getElementById('grammarSearch').addEventListener('input', function(){
     render();
   }, 200);
 });
+
+// Restore saved level before initial render
+try{
+  var savedGGLevel = localStorage.getItem('jpe-grammar-guides-level');
+  if(savedGGLevel && document.querySelector('[data-tab="'+savedGGLevel+'"]')){
+    currentLevel = savedGGLevel;
+    document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+    document.querySelector('[data-tab="'+savedGGLevel+'"]').classList.add('active');
+  }
+}catch(e){}
 
 // Initial render
 render();

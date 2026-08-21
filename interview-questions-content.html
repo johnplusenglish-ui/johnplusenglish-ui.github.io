@@ -448,6 +448,7 @@ document.getElementById('filter-bar-cat').style.display=(mode==='browse'||mode==
 if(mode==='practice'){document.getElementById('view-practice').style.display='block';setTimeout(()=>document.getElementById('view-practice').classList.add('visible'),10);resetTimer();practiceIndex=-1;}
 else if(mode==='roleplay'){document.getElementById('view-roleplay').style.display='block';setTimeout(()=>document.getElementById('view-roleplay').classList.add('visible'),10);loadScenario();}
 if(mode==='browse')renderQuestions();
+try{ localStorage.setItem('jpe-interview-questions-mode', mode); }catch(e){}
 }
 
 function toggleFilter(el,filterType,value){
@@ -456,6 +457,7 @@ el.classList.add('active');
 if(filterType==='cat')activeCat=value;
 if(currentMode==='browse')renderQuestions();
 practiceIndex=-1;
+if(filterType==='cat'){try{ localStorage.setItem('jpe-interview-questions-cat', value); }catch(e){}}
 }
 
 function onProfessionChange(){
@@ -674,7 +676,18 @@ function shuffleScenario(){const sel=document.getElementById('scenario-select');
 function rateFeedback(dot){const siblings=dot.parentElement.children;const val=parseInt(dot.textContent);for(let i=0;i<siblings.length;i++)siblings[i].classList.toggle('selected',i<val);}
 
 (function(cb){if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',cb);}else{cb();}})(function(){
+try{
+  var savedCat = localStorage.getItem('jpe-interview-questions-cat');
+  if(savedCat){
+    var catBtn = document.querySelector('.filter-pill[data-filter="cat"][data-value="'+savedCat+'"]');
+    if(catBtn){ document.querySelectorAll('.filter-pill[data-filter="cat"]').forEach(function(p){p.classList.remove('active');}); catBtn.classList.add('active'); activeCat = savedCat; }
+  }
+}catch(e){}
 renderQuestions();
+try{
+  var savedMode = localStorage.getItem('jpe-interview-questions-mode');
+  if(savedMode && document.getElementById('mode-'+savedMode)){ setMode(savedMode); }
+}catch(e){}
 var observer=new IntersectionObserver(function(entries){entries.forEach(function(entry){if(entry.isIntersecting)entry.target.classList.add('visible');});},{threshold:.1});
 document.querySelectorAll('.reveal').forEach(function(el){observer.observe(el);});
 // Fallback: if the observer never fires (e.g. inside the embed iframe), reveal everything

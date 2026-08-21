@@ -1130,10 +1130,16 @@ function getActivePhrases(){return playerCount===2?phrases:playerCount===3?phras
 function setPlayers(n,btn){
   playerCount=n;
   document.querySelectorAll('.player-btn').forEach(function(b){b.classList.remove('on')});
-  btn.classList.add('on');
+  if(!btn){
+    btn = Array.prototype.find.call(document.querySelectorAll('.player-btn'), function(b){
+      return b.getAttribute('onclick') && b.getAttribute('onclick').indexOf('setPlayers('+n+',') === 0;
+    });
+  }
+  if(btn) btn.classList.add('on');
   // Rebuild controls for new dataset
   buildControls();
   applyFilters();
+  try{ localStorage.setItem('jpe-role-play-cards-players', n); }catch(e){}
 }
 
 function setSetup(open){
@@ -1398,8 +1404,11 @@ function timerUpdateBtn(id){
   }
 }
 
-buildControls();
-applyFilters();
+try{
+  var savedPlayers = parseInt(localStorage.getItem('jpe-role-play-cards-players'), 10);
+  if (savedPlayers === 2 || savedPlayers === 3 || savedPlayers === 4) { setPlayers(savedPlayers); }
+  else { buildControls(); applyFilters(); }
+}catch(e){ buildControls(); applyFilters(); }
 document.getElementById('timerMount').innerHTML = timerWidgetHTML('main', 180, false);
 timerInit('main', 180, false);
 </script>

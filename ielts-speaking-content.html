@@ -1505,9 +1505,19 @@ function toggleWbSidebar(btn){ btn.closest(".tests-shell").classList.toggle("sb-
 function switchMainTab(tab, btn) {
   document.querySelectorAll('.main-tab').forEach(function(b) { b.classList.remove('on'); });
   document.querySelectorAll('.main-tab-panel').forEach(function(p) { p.classList.remove('active'); });
-  btn.classList.add('on');
+  if (!btn) {
+    btn = Array.prototype.find.call(document.querySelectorAll('.main-tab'), function(b) {
+      return b.getAttribute('onclick') && b.getAttribute('onclick').indexOf("'" + tab + "'") !== -1;
+    });
+  }
+  if (btn) btn.classList.add('on');
   document.getElementById('tab-' + tab).classList.add('active');
+  try{ localStorage.setItem('jpe-ielts-speaking-main-tab', tab); }catch(e){}
 }
+try{
+  var savedMainTabS = localStorage.getItem('jpe-ielts-speaking-main-tab');
+  if (savedMainTabS && document.getElementById('tab-' + savedMainTabS)) { switchMainTab(savedMainTabS); }
+}catch(e){}
 
 /* ============ GUIDE ============ */
 const GUIDE_S = [

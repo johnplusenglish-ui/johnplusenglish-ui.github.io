@@ -522,13 +522,19 @@ function toggleLevel(lv, btn) {
   activeLevels[lv] = would;
   btn.classList.toggle('active', activeLevels[lv]);
   rebuildDeck();
+  try{ localStorage.setItem('jpe-odd-one-out-levels', JSON.stringify(activeLevels)); }catch(e){}
 }
 
 function setTopic(t, btn) {
   activeTopic = t;
   document.querySelectorAll('.filter-pill.topic').forEach(function(b){ b.classList.remove('active'); });
-  btn.classList.add('active');
+  if (btn) btn.classList.add('active');
+  else {
+    var match = document.querySelector('.filter-pill.topic[onclick*="\''+t+'\'"]');
+    if (match) match.classList.add('active');
+  }
   rebuildDeck();
+  try{ localStorage.setItem('jpe-odd-one-out-topic', t); }catch(e){}
 }
 
 function getFiltered() {
@@ -801,6 +807,20 @@ function timerUpdateBtn(id){
   }
 }
 
+try{
+  var savedLevels = localStorage.getItem('jpe-odd-one-out-levels');
+  if (savedLevels) {
+    var parsedLevels = JSON.parse(savedLevels);
+    if (parsedLevels && (parsedLevels.b2 || parsedLevels.c1)) {
+      activeLevels = parsedLevels;
+      var b2Btn = document.querySelector('.level-b2'), c1Btn = document.querySelector('.level-c1');
+      if (b2Btn) b2Btn.classList.toggle('active', !!activeLevels.b2);
+      if (c1Btn) c1Btn.classList.toggle('active', !!activeLevels.c1);
+    }
+  }
+  var savedTopic = localStorage.getItem('jpe-odd-one-out-topic');
+  if (savedTopic && TOPICS.indexOf(savedTopic) !== -1) { activeTopic = savedTopic; }
+}catch(e){}
 buildTopicFilters();
 document.getElementById('timerMount').innerHTML = timerWidgetHTML('main', 30, false);
 timerInit('main', 30, false);
