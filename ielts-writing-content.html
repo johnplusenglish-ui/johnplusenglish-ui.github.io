@@ -96,6 +96,28 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
 
 .pg-icon{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-right:.2rem}
 
+/* Guide tab */
+.struct-facts{display:flex;gap:.6rem;margin-bottom:1.1rem;flex-wrap:wrap}
+.struct-fact{flex:1;min-width:90px;background:var(--accent-light,var(--sand));border-radius:10px;padding:.7rem .5rem;text-align:center}
+.struct-fact-n{font-family:Outfit,sans-serif;font-size:1.5rem;font-weight:800;color:var(--ielts,#FF9100);line-height:1.1}
+.struct-fact-l{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-top:.15rem}
+.guide-quicknav{display:flex;flex-wrap:wrap;gap:.5rem;margin:1.1rem 0 0}
+.guide-quicknav button{font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:700;padding:.45rem .85rem;border-radius:999px;border:1.5px solid var(--border);background:var(--card);color:var(--ink);cursor:pointer;transition:all .15s}
+.guide-quicknav button:hover{border-color:var(--ielts,#FF9100);color:var(--ielts,#FF9100);background:rgba(255,145,0,.08)}
+.guide-section{margin-top:1.6rem;padding-top:1.4rem;border-top:1.5px solid var(--border);scroll-margin-top:24px}
+.guide-section:first-of-type{margin-top:0;padding-top:0;border-top:none}
+.guide-section-title{font-size:1.02rem;font-weight:800;color:var(--ink);margin-bottom:.3rem}
+.guide-section-desc{font-size:.85rem;color:var(--muted);margin-bottom:.9rem;line-height:1.5}
+.guide-tip-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.7rem}
+.guide-tip{display:flex;gap:.7rem;font-size:.88rem;line-height:1.55;color:var(--ink)}
+.guide-tip-num{width:22px;height:22px;border-radius:7px;background:rgba(255,145,0,.14);color:var(--ielts,#FF9100);font-size:.72rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.guide-example{margin-top:1.1rem;padding-top:1rem;border-top:1.5px solid var(--border)}
+.guide-example-label{font-family:Outfit,sans-serif;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ielts,#FF9100);font-weight:700;margin-bottom:.5rem}
+.guide-example-body{font-size:.85rem;line-height:1.6;color:var(--ink);background:var(--sand);border-radius:10px;padding:.8rem .95rem}
+.guide-chart{margin:1rem 0;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1rem;max-width:100%;overflow:hidden}
+.guide-chart-wrap{position:relative;height:220px;width:100%}
+.guide-chart-wrap canvas{max-height:220px}
+
 .pill-group-header-left{display:flex;align-items:center;gap:1rem;flex:1}
 .pill-group-label{font-family:Outfit,sans-serif;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);font-weight:500}
 .pill-group-title{font-family:'Outfit',sans-serif;font-size:1.3rem;font-weight:700;color:var(--ink)}
@@ -366,6 +388,7 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
 <!-- Tabs -->
 <div class="tabs-wrap">
   <div class="tabs" role="tablist">
+    <button class="tab" data-type="guide" onclick="switchType('guide')" style="--tab-accent:#FF9100">Guide</button>
     <button class="tab active" data-type="academic" onclick="switchType('academic')" style="--tab-accent:#FF9100">Academic</button>
     <button class="tab" data-type="general" onclick="switchType('general')" style="--tab-accent:#FF9100">General Training</button>
     <button class="tab" data-type="resources" onclick="switchType('resources')" style="--tab-accent:#FF9100">Study Resources</button>
@@ -373,6 +396,27 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
 </div>
 
 <div class="wrap">
+<!-- Guide -->
+<div class="content-area" id="guide-content">
+  <div class="wb-sb">
+    <div class="wb-sb-head" onclick="toggleWbSidebar(this)"><span>Guide Topics</span><div class="sb-chev">&#8249;</div></div>
+    <div class="wb-sb-scroll task-sidebar" id="guideNavW"></div>
+    <div class="wb-sb-foot">Tips for every writing task on this page</div>
+  </div>
+  <div class="pill-group">
+    <div class="pill-group-header">
+      <div class="pill-group-header-left">
+        <div class="pg-icon" id="guidePgIconW" style="background:rgba(255,145,0,.14);color:var(--ielts,#FF9100)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+        <div>
+          <div class="pill-group-label" id="guideLabelW"></div>
+          <div class="pill-group-title" id="guideTitleW"></div>
+        </div>
+      </div>
+    </div>
+    <div class="pill-group-content expanded" id="guideBodyW"></div>
+  </div>
+</div>
+
 <!-- Main Content -->
 <div class="content-area active" id="academic-content">
 
@@ -382,12 +426,12 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
 
     <button class="task-nav-item active" style="--task-accent:#FF9100" onclick="switchTaskCard(this,0)">
       <span class="task-nav-dot"></span>
-      <span class="task-nav-text"><span class="task-nav-label">Task 1</span><span class="task-nav-title">Report Writing</span></span>
+      <span class="task-nav-text"><span class="task-nav-label">Task 1</span><span class="task-nav-title">Report</span></span>
       <span class="task-nav-count">22</span>
     </button>
     <button class="task-nav-item" style="--task-accent:#FF9100" onclick="switchTaskCard(this,1)">
       <span class="task-nav-dot"></span>
-      <span class="task-nav-text"><span class="task-nav-label">Task 2</span><span class="task-nav-title">Essay Writing</span></span>
+      <span class="task-nav-text"><span class="task-nav-label">Task 2</span><span class="task-nav-title">Essay</span></span>
       <span class="task-nav-count">25</span>
     </button>
     </div>
@@ -400,7 +444,7 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
         <div class="pg-icon" style="background:rgba(255,145,0,.14);color:var(--ielts,#FF9100)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg></div>
         <div>
           <div class="pill-group-label">Task 1</div>
-          <div class="pill-group-title">Report Writing</div>
+          <div class="pill-group-title">Report</div>
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:.8rem">
@@ -1455,7 +1499,7 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
         <div class="pg-icon" style="background:rgba(255,145,0,.14);color:var(--ielts,#FF9100)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
         <div>
           <div class="pill-group-label">Task 2</div>
-          <div class="pill-group-title">Essay Writing</div>
+          <div class="pill-group-title">Essay</div>
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:.8rem">
@@ -2303,12 +2347,12 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
 
     <button class="task-nav-item active" style="--task-accent:#FF9100" onclick="switchTaskCard(this,0)">
       <span class="task-nav-dot"></span>
-      <span class="task-nav-text"><span class="task-nav-label">Task 1</span><span class="task-nav-title">Letter Writing</span></span>
+      <span class="task-nav-text"><span class="task-nav-label">Task 1</span><span class="task-nav-title">Letter</span></span>
       <span class="task-nav-count">15</span>
     </button>
     <button class="task-nav-item" style="--task-accent:#FF9100" onclick="switchTaskCard(this,1)">
       <span class="task-nav-dot"></span>
-      <span class="task-nav-text"><span class="task-nav-label">Task 2</span><span class="task-nav-title">Essay Writing</span></span>
+      <span class="task-nav-text"><span class="task-nav-label">Task 2</span><span class="task-nav-title">Essay</span></span>
       <span class="task-nav-count">25</span>
     </button>
     </div>
@@ -2321,7 +2365,7 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
         <div class="pg-icon" style="background:rgba(255,145,0,.14);color:var(--ielts,#FF9100)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
         <div>
           <div class="pill-group-label">Task 1</div>
-          <div class="pill-group-title">Letter Writing</div>
+          <div class="pill-group-title">Letter</div>
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:.8rem">
@@ -2870,7 +2914,7 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
         <div class="pg-icon" style="background:rgba(255,145,0,.14);color:var(--ielts,#FF9100)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
         <div>
           <div class="pill-group-label">Task 2</div>
-          <div class="pill-group-title">Essay Writing</div>
+          <div class="pill-group-title">Essay</div>
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:.8rem">
@@ -4239,7 +4283,7 @@ function toggleBandRow(header) {
 // Switch between Academic and General Training
 function toggleWbSidebar(el){ el.closest(".content-area").classList.toggle("sb-collapsed"); }
 function switchType(type) {
-  ['academic', 'general', 'resources'].forEach(t => {
+  ['guide', 'academic', 'general', 'resources'].forEach(t => {
     document.querySelector('[data-type="' + t + '"]').classList.toggle('active', t === type);
     document.getElementById(t + '-content').classList.toggle('active', t === type);
   });
@@ -4787,7 +4831,358 @@ function switchAnswerView(btn, view) {
   }
 }
 
+/* ============ GUIDE ============ */
+const GUIDE_W = [
+  {
+    kind: "tips",
+    label: "How This Test Works",
+    title: "How This Test Works",
+    desc: "Two tasks, one hour. Let's make sure you know exactly what each one wants from you before we go any further.",
+    facts: [
+      {n:"60", l:"minutes"},
+      {n:"2", l:"tasks"},
+      {n:"250+", l:"min words"}
+    ],
+    tips: [
+      "Task 1 asks you to describe something, a chart, a table, a set of maps, or, on General Training, a letter. Task 2 asks for a full essay. No opinions in Task 1's data tasks, plenty of opinion expected in Task 2.",
+      "Task 2 is worth twice as much as Task 1 in your final Writing score, so if time gets tight, protect Task 2 first.",
+      "Task 1 needs at least 150 words, Task 2 needs at least 250. Go under either limit and you lose marks automatically, however good the writing is.",
+      "Give yourself roughly 20 minutes for Task 1 and 40 for Task 2. That split isn't arbitrary, it matches how the marks are weighted.",
+      "Use the guides in this menu to walk through Task 1 and Task 2 one piece at a time, exactly how I'd talk you through it in a lesson."
+    ]
+  },
+  {
+    kind: "passage",
+    label: "Task 1: Reports",
+    title: "Task 1: Reports",
+    intro: "Academic Task 1 asks you to describe visual data, a chart, a table, a map, or a process, in your own words. No opinions here, just a clear, accurate description. Let's go through each type in turn.",
+    sections: [
+      {
+        anchor: "structure",
+        label: "Structure & Approach",
+        title: "Structure & Approach",
+        desc: "Every report follows the same shape, whatever the chart type.",
+        tips: [
+          "Start with one sentence that paraphrases the task. Don't copy the question wording, just say the same thing in your own words.",
+          "Follow it straight away with an overview, the one or two big-picture trends or key differences, before you get lost in individual numbers.",
+          "Save the fine detail for your body paragraphs. Group similar data together rather than working through the chart point by point.",
+          "This is description, not opinion. Leave your own views, your explanations for why something happened, and your predictions at the door.",
+          "Aim for 170 to 200 words. Under 150 costs you marks automatically, but padding past 200 just eats time you need for Task 2."
+        ]
+      },
+      {
+        anchor: "bar",
+        label: "Bar Charts",
+        title: "Bar Charts",
+        desc: "Comparing categories side by side, this is where bar charts do their best work.",
+        tips: [
+          "Look for the two or three biggest contrasts first, the highest, the lowest, the biggest gap. That's usually your overview.",
+          "Group bars that behave similarly rather than describing every single one in order. If three groups all rose steadily, say that once.",
+          "Watch your verbs: rose, climbed, and increased do different jobs to remained stable or fell. Match the word to what's actually happening.",
+          "Use exact figures, but don't drown the reader in them. One precise number per claim is usually enough.",
+          "If there's a clear pattern across time, as in the chart below, your overview should mention the trend, not just the categories."
+        ],
+        chart: {canvasId:"guideChartBarW", config:{
+          type: "bar",
+          data: {
+            labels: ["2005","2012","2019"],
+            datasets: [
+              {label:"16 to 24", data:[80,97,99], backgroundColor:"#2176FF", borderRadius:4},
+              {label:"25 to 44", data:[70,92,98], backgroundColor:"#1DD3B0", borderRadius:4},
+              {label:"45 to 64", data:[45,78,93], backgroundColor:"#FFB347", borderRadius:4},
+              {label:"65+", data:[15,42,72], backgroundColor:"#FF6B6B", borderRadius:4}
+            ]
+          },
+          options: {
+            responsive:true, maintainAspectRatio:false,
+            plugins:{legend:{position:"bottom", labels:{font:{size:11}, padding:12}}},
+            scales:{y:{beginAtZero:true, max:100, title:{display:true, text:"Percentage (%)"}}}
+          }
+        }}
+      },
+      {
+        anchor: "line",
+        label: "Line Graphs",
+        title: "Line Graphs",
+        desc: "Line graphs are about movement and trend, up, down, or holding steady, over time.",
+        tips: [
+          "Your overview should describe the overall direction, not the exact numbers. Save those for the body.",
+          "Learn the trend vocabulary properly: rose sharply, climbed steadily, fluctuated, plateaued, dipped. Each one tells a different story.",
+          "If there's a sudden change, a spike, a sharp drop, name it and give the approximate figure. That's often the most markable feature.",
+          "Don't describe every single data point in order. Group the steady periods together and single out only the moments that actually stand out.",
+          "One line or several, the same rule holds: compare the lines to each other, don't just describe them one after another."
+        ],
+        chart: {canvasId:"guideChartLineW", config:{
+          type: "line",
+          data: {
+            labels: ["1995","1997","1999","2001","2003","2005","2007","2009"],
+            datasets: [{
+              label:"Car Sales (millions)",
+              data:[8.0,8.2,8.5,8.8,9.2,9.5,10.5,7.8],
+              borderColor:"#2176FF", backgroundColor:"rgba(74,144,217,.1)",
+              borderWidth:3, fill:true, tension:.3,
+              pointBackgroundColor:"#2176FF", pointRadius:4, pointHoverRadius:6
+            }]
+          },
+          options: {
+            responsive:true, maintainAspectRatio:false,
+            plugins:{legend:{position:"bottom", labels:{font:{size:11}, padding:12}}},
+            scales:{y:{beginAtZero:false, title:{display:true, text:"Sales (Millions)"}}}
+          }
+        }}
+      },
+      {
+        anchor: "pie",
+        label: "Pie Charts",
+        title: "Pie Charts",
+        desc: "Pie charts are about proportion, how the whole splits into its parts.",
+        tips: [
+          "Your overview should name the largest and smallest segments straight away. That's the first thing anyone looks for in a pie chart.",
+          "Group small segments together where it makes sense, “the remaining categories together accounted for...”, rather than listing every sliver.",
+          "Percentages are the natural language here: accounted for, made up, represented. Lean on them.",
+          "With two pie charts side by side, you're comparing proportions between them, don't just describe each one separately.",
+          "Round sensibly. “Approximately 40%” reads better than an oddly precise figure the chart doesn't actually support."
+        ],
+        chart: {canvasId:"guideChartPieW", config:{
+          type: "pie",
+          data: {
+            labels: ["Services","Manufacturing","Construction","Agriculture","Public Admin"],
+            datasets: [{
+              data:[40,18,12,15,15],
+              backgroundColor:["#2176FF","#1DD3B0","#FFB347","#FF6B6B","#9B72CF"],
+              borderColor:"#fff", borderWidth:2
+            }]
+          },
+          options: {
+            responsive:true, maintainAspectRatio:false,
+            plugins:{legend:{position:"bottom", labels:{font:{size:11}, padding:12}}}
+          }
+        }}
+      },
+      {
+        anchor: "table",
+        label: "Tables",
+        title: "Tables",
+        desc: "A table hides its own structure, so you decide what the story is.",
+        tips: [
+          "Scan the whole table before you write a word. Decide which rows or columns matter most, a table gives you no hints.",
+          "Your overview is where you show you've found the pattern the table is hiding. Don't just repeat the headings.",
+          "Group data logically, by category, by time period, by size, rather than reading the table top to bottom like a list.",
+          "Tables often have more numbers than a chart. Resist the urge to include all of them, pick the ones that support your point.",
+          "The comparison language is the same as bar charts: highest, lowest, roughly equal, more than double. Use it freely."
+        ]
+      },
+      {
+        anchor: "map",
+        label: "Maps",
+        title: "Maps",
+        desc: "Two maps, one place, two points in time. You're describing change, not features.",
+        tips: [
+          "Your overview names the biggest changes between the two maps, new buildings, disappeared features, roads that arrived. Don't describe the map like a tour guide.",
+          "Use spatial language properly: to the north of, adjacent to, in the centre of. Precision here reads as control.",
+          "Focus on what changed. A feature that stayed exactly the same is only worth a mention if it's a notable contrast to everything around it.",
+          "Passive voice earns its keep here: “a new car park was built”, “the school was demolished”. It keeps the focus on the change, not on who did it.",
+          "Organise by area, north, south, centre, or by theme, housing, transport, green space, whichever makes the change easiest to follow."
+        ]
+      },
+      {
+        anchor: "process",
+        label: "Process Diagrams",
+        title: "Process Diagrams",
+        desc: "A cycle or a sequence of steps, and your job is to explain how it works.",
+        tips: [
+          "Your overview says how many stages there are and whether the process is linear or cyclical, does it end, or loop back to the start?",
+          "Sequencing words carry the whole answer here: first, next, following this, once X has happened, finally. Use a good range, not just “then” every time.",
+          "Passive voice is usually the right choice, since a process description isn't about who's doing it: “the material is heated”, not “someone heats the material”.",
+          "Keep strictly to the order shown. Don't reorganise the process to group similar steps, unlike a chart, sequence is the whole point here.",
+          "If it's a cycle, say so clearly in the overview and again at the end, so the reader knows it loops rather than assuming it stops."
+        ]
+      }
+    ]
+  },
+  {
+    kind: "passage",
+    label: "Task 1: Letters (GT)",
+    title: "Task 1: Letters",
+    intro: "General Training swaps the report for a letter. Same time, same word count, different skill: hitting the right tone for who you're writing to.",
+    sections: [
+      {
+        anchor: "formal",
+        label: "Formal",
+        title: "Formal",
+        desc: "Writing to someone you don't know, in a professional or official capacity.",
+        tips: [
+          "Open with “Dear Sir or Madam” if you don't have a name, or “Dear Mr/Ms [Surname]” if you do. Never a first name in a formal letter.",
+          "State your reason for writing in the first sentence or two. Don't build up to it.",
+          "Keep the tone impersonal and polite throughout: “I would be grateful if...”, “I am writing to inform you that...”. No contractions, no casual phrasing.",
+          "Cover every bullet point in the task, in the order they're given, usually one clear paragraph each.",
+          "Sign off with “Yours faithfully” if you opened with “Dear Sir or Madam”, or “Yours sincerely” if you used a name. Getting this pairing wrong is a very common, very avoidable error."
+        ]
+      },
+      {
+        anchor: "semiformal",
+        label: "Semi-formal",
+        title: "Semi-formal",
+        desc: "Someone you have a professional relationship with, but know a little, a manager, a neighbour, a landlord.",
+        tips: [
+          "Open with “Dear [First name]” or “Dear Mr/Ms [Surname]”, whichever fits how well you actually know them.",
+          "The tone sits between formal and friendly: polite, but you can be a little warmer than a stranger-facing letter.",
+          "A short, natural opening line before you get to the point is fine here, unlike a fully formal letter.",
+          "Still cover every bullet point clearly, just let the language relax slightly, contractions are acceptable in moderation.",
+          "Sign off with “Best wishes” or “Kind regards”. Save “Yours sincerely” for a fully formal letter."
+        ]
+      },
+      {
+        anchor: "informal",
+        label: "Informal",
+        title: "Informal",
+        desc: "A friend or family member. This is the one register where you can actually sound like yourself.",
+        tips: [
+          "Open with “Dear [First name]” or even just the name on its own, and feel free to start with something personal before you get to the reason for writing.",
+          "Contractions, casual phrasing, even the odd exclamation mark, all fair game here. A stiff, formal-sounding informal letter loses marks for register, not gains them.",
+          "Still hit every bullet point, an informal tone doesn't mean an informal structure. The task requirements don't relax just because the tone does.",
+          "Sign off with something like “Lots of love”, “Speak soon”, or “See you then”, matching how you'd actually end a message to this person.",
+          "Getting the register right matters as much as getting the content right. Markers are checking whether you can adjust your English to the relationship, not just whether you can write correctly."
+        ]
+      }
+    ]
+  },
+  {
+    kind: "passage",
+    label: "Task 2: Essays",
+    title: "Task 2: Essays",
+    intro: "The big one, worth twice as much as Task 1. Five essay types show up again and again, let's take them one at a time.",
+    sections: [
+      {
+        anchor: "opinion",
+        label: "Opinion",
+        title: "Opinion (Agree / Disagree)",
+        desc: "You're asked whether you agree or disagree, and the whole essay defends one clear position.",
+        tips: [
+          "Decide your position before you start writing, and keep it the same all the way through. A wandering position is one of the most common ways to lose marks here.",
+          "State your opinion clearly in the introduction. Don't make the reader guess where you stand until the conclusion.",
+          "Each body paragraph should back up your position with one clear reason, developed with an explanation and an example, not just a list of points.",
+          "You can acknowledge the other side briefly, but don't let it take over a paragraph, this essay is about defending your view, not weighing both equally.",
+          "Restate your position in the conclusion, in different words from the introduction. Don't introduce a new argument this late."
+        ]
+      },
+      {
+        anchor: "discussion",
+        label: "Discussion",
+        title: "Discussion (Discuss Both Views)",
+        desc: "You're given two views and asked to discuss both, usually plus your own opinion.",
+        tips: [
+          "Give each view its own paragraph, with roughly equal space and equal seriousness, even if you personally lean one way.",
+          "Check the exact wording of the task. “Discuss both views and give your own opinion” needs all three parts, missing your own opinion loses marks even if the rest is strong.",
+          "Explain each view properly, don't just state it in one line and move on. Give a reason and an example for each side.",
+          "Your own opinion, when asked for, usually belongs in its own short paragraph or clearly in the conclusion, not scattered through both body paragraphs.",
+          "Keep the two views clearly separated. Mixing them together in one paragraph makes the structure hard to follow and hard to mark."
+        ]
+      },
+      {
+        anchor: "problem",
+        label: "Problem / Solution",
+        title: "Problem / Solution",
+        desc: "A problem is described, and you're asked to explain its causes, or problems, and suggest solutions.",
+        tips: [
+          "Read the task carefully: some ask for causes and solutions, others for problems and solutions. They're not the same thing, and answering the wrong pair loses marks.",
+          "One paragraph per half usually works well, problems or causes in one, solutions in the other, rather than mixing them together.",
+          "Match your solutions to the actual problems you raised. A solution that doesn't connect to anything you mentioned looks like it belongs to a different essay.",
+          "Be specific. “The government should do something about it” says nothing, name the actual policy, programme, or change you mean.",
+          "The conclusion is a good place to say which solution matters most, or which is most realistic. That's an easy way to show genuine thought, not just a list."
+        ]
+      },
+      {
+        anchor: "advantages",
+        label: "Advantages / Disadvantages",
+        title: "Advantages / Disadvantages",
+        desc: "You're asked to weigh the advantages and disadvantages of something, sometimes with your own opinion, sometimes without.",
+        tips: [
+          "Check whether the task asks for your opinion too. “Discuss the advantages and disadvantages” doesn't need one, “do the advantages outweigh the disadvantages” absolutely does.",
+          "One paragraph for advantages, one for disadvantages, is the clearest structure. Don't alternate between them within a paragraph.",
+          "Rank your points. Lead each paragraph with the strongest advantage or disadvantage, not whichever came to mind first.",
+          "If asked whether advantages outweigh disadvantages, make that judgement clearly, in the introduction and again in the conclusion, don't leave the reader to work it out.",
+          "Avoid a flat, mechanical list. “Firstly... secondly... thirdly...” for every single point reads as thin, vary how you introduce each idea."
+        ]
+      },
+      {
+        anchor: "twopart",
+        label: "Two-Part Question",
+        title: "Two-Part Question",
+        desc: "Two separate questions on the same topic, and both need a real answer, not just a passing mention.",
+        tips: [
+          "Identify both questions precisely before you plan anything. Missing or under-answering one half is the single biggest risk with this essay type.",
+          "Give each question its own body paragraph. Trying to answer both at once in one paragraph usually makes both answers weaker.",
+          "The two questions are often related but distinct, answer the actual question asked, not the one you assumed was coming.",
+          "Your introduction should signal that two questions are coming, a brief paraphrase of both, so the structure is clear from the start.",
+          "In the conclusion, summarise your answer to both questions, not just the second one you happened to write about last."
+        ]
+      }
+    ]
+  },
+  {
+    kind: "tips",
+    label: "Strategy & Time",
+    title: "Strategy & Time Management",
+    desc: "60 minutes, two tasks. Here's how I'd tell you to spend it.",
+    tips: [
+      "Give Task 1 about 20 minutes and Task 2 about 40. That split matches the marks, Task 2 is worth twice as much.",
+      "Spend the first two or three minutes of each task planning, not writing. A messy plan costs you far less time than a messy essay.",
+      "Write Task 2 first if you're someone who reliably runs out of time, it's worth more, so protect it before Task 1 eats your clock.",
+      "Leave a couple of minutes at the end to check word count, paragraphing, and any glaring errors, not to rewrite whole sentences.",
+      "If you're behind on time, finish the essay you're on rather than starting a new paragraph you won't complete. An unfinished paragraph reads worse than a slightly short one."
+    ]
+  }
+];
+let guideChartInstancesW = {};
+function renderGuideTipsW(tips){
+  return '<ol class="guide-tip-list">' + tips.map((t,ti)=>`<li class="guide-tip"><span class="guide-tip-num">${ti+1}</span><span>${t}</span></li>`).join('') + '</ol>';
+}
+function showGuideTopicW(i){
+  const g = GUIDE_W[i];
+  document.querySelectorAll('#guideNavW .task-nav-item').forEach((b,bi)=>b.classList.toggle('active', bi===i));
+  document.getElementById('guideLabelW').textContent = g.label;
+  document.getElementById('guideTitleW').textContent = g.title;
+  let html = '';
+  if(g.facts){
+    html += '<div class="struct-facts">' + g.facts.map(f=>`<div class="struct-fact"><div class="struct-fact-n">${f.n}</div><div class="struct-fact-l">${f.l}</div></div>`).join('') + '</div>';
+  }
+  if(g.kind === 'passage'){
+    if(g.intro) html += `<div class="guide-section-desc">${g.intro}</div>`;
+    html += '<div class="guide-quicknav">' + g.sections.map(s=>`<button onclick="document.getElementById('wganchor-${s.anchor}').scrollIntoView({behavior:'smooth',block:'start'})">${s.label} &darr;</button>`).join('') + '</div>';
+    html += g.sections.map(s => `
+      <div class="guide-section" id="wganchor-${s.anchor}">
+        <div class="guide-section-title">${s.title}</div>
+        <div class="guide-section-desc">${s.desc}</div>
+        ${s.chart ? `<div class="guide-chart"><div class="guide-chart-wrap"><canvas id="${s.chart.canvasId}"></canvas></div></div>` : ''}
+        ${renderGuideTipsW(s.tips)}
+        ${s.example ? `<div class="guide-example"><div class="guide-example-label">Worked example</div><div class="guide-example-body">${s.example}</div></div>` : ''}
+      </div>`).join('');
+  } else {
+    if(g.desc) html += `<div class="guide-section-desc">${g.desc}</div>`;
+    html += renderGuideTipsW(g.tips);
+    if(g.example) html += `<div class="guide-example"><div class="guide-example-label">Worked example</div><div class="guide-example-body">${g.example}</div></div>`;
+  }
+  document.getElementById('guideBodyW').innerHTML = html;
 
+  Object.values(guideChartInstancesW).forEach(c => { if(c && c.destroy) c.destroy(); });
+  guideChartInstancesW = {};
+  if(g.kind === 'passage'){
+    g.sections.forEach(s => {
+      if(s.chart){
+        const el = document.getElementById(s.chart.canvasId);
+        if(el) guideChartInstancesW[s.chart.canvasId] = new Chart(el.getContext('2d'), s.chart.config);
+      }
+    });
+  }
+}
+function buildGuideW(){
+  document.getElementById('guideNavW').innerHTML = GUIDE_W.map((g,i)=>
+    `<button class="task-nav-item${i===0?' active':''}" style="--task-accent:#FF9100" onclick="showGuideTopicW(${i})"><span class="task-nav-dot"></span><span class="task-nav-text"><span class="task-nav-title">${g.label}</span></span></button>`
+  ).join('');
+  showGuideTopicW(0);
+}
+buildGuideW();
 </script>
 
 <!-- Print Modal -->
