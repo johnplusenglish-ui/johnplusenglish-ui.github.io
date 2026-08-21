@@ -100,6 +100,12 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .guide-example{margin-top:1.1rem;padding-top:1rem;border-top:1.5px solid var(--border)}
 .guide-example-label{font-family:Outfit,sans-serif;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:.5rem}
 .guide-example-body{font-size:.85rem;line-height:1.6;color:var(--ink);background:var(--cream);border-radius:var(--radius-sm);padding:.8rem .95rem}
+.guide-quicknav{display:flex;flex-wrap:wrap;gap:.5rem;margin:1.1rem 0 0}
+.guide-quicknav button{font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:700;padding:.45rem .85rem;border-radius:999px;border:1.5px solid var(--border);background:var(--card);color:var(--ink);cursor:pointer;transition:all .15s}
+.guide-quicknav button:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
+.guide-section{margin-top:1.6rem;padding-top:1.4rem;border-top:1.5px solid var(--border);scroll-margin-top:24px}
+.guide-section-title{font-size:1.02rem;font-weight:800;color:var(--ink);margin-bottom:.3rem}
+.guide-section-desc{font-size:.85rem;color:var(--muted);margin-bottom:.9rem;line-height:1.5}
 .struct-facts{display:flex;gap:.6rem;margin-bottom:1.1rem;flex-wrap:wrap}
 .struct-fact{flex:1;min-width:90px;background:var(--accent-light);border-radius:var(--radius-sm);padding:.7rem .5rem;text-align:center}
 .struct-fact-n{font-family:Outfit,sans-serif;font-size:1.5rem;font-weight:800;color:var(--accent);line-height:1.1}
@@ -917,9 +923,10 @@ document.addEventListener('click', function(e){
 /* ============ GUIDE ============ */
 const GUIDE = [
   {
+    kind: "structure",
     label: "Exam Structure",
     title: "Exam Structure",
-    desc: "What the test looks like before you dive into strategy for each question type.",
+    desc: "What the test looks like before you walk through each passage in detail.",
     facts: [
       {n:"60", l:"minutes"},
       {n:"3", l:"passages"},
@@ -946,10 +953,11 @@ const GUIDE = [
       "Every question is worth one mark, regardless of task type or difficulty. There's no negative marking, so never leave a question blank.",
       "Question numbering runs continuously from 1 to 40 across all three passages, not restarting at each passage.",
       "You answer directly on the question paper/screen - there's no separate transfer stage like in Listening, so manage time carefully within each passage.",
-      "Each passage in this test mixes 2-3 different task types, exactly as in the real exam - use the Passage tabs above to jump straight to a passage once you know its layout."
+      "Use the Passage 1 / 2 / 3 guides in this menu to walk through exactly what's tested and how to approach it, one passage at a time, in the same order as the real exam."
     ]
   },
   {
+    kind: "tips",
     label: "Strategy & Time",
     title: "Strategy & Time Management",
     desc: "How to use your 60 minutes across all 3 passages.",
@@ -962,87 +970,172 @@ const GUIDE = [
     ]
   },
   {
-    label: "True/False/Not Given",
-    title: "True/False/Not Given & Yes/No/Not Given",
-    desc: "TRUE/FALSE/NOT GIVEN tests facts stated in the passage. YES/NO/NOT GIVEN tests the writer's opinions or claims. The reading strategy is identical.",
-    tips: [
-      "NOT GIVEN means the information isn't in the passage at all - not that it's implied, and not that you're unsure. Don't confuse “not mentioned” with “false”.",
-      "FALSE/NO means the passage directly contradicts the statement - it must say the opposite, not just something different.",
-      "Watch for absolute words in the statement (all, always, never, only, every). These often turn a true-sounding fact into FALSE if the passage is less absolute.",
-      "Underline the exact sentence that supports your answer before choosing. If you can't point to one, it's probably NOT GIVEN.",
-      "Questions follow the order of the passage - once you've found Q3's evidence, Q4's evidence will appear later in the text, not earlier."
-    ],
-    example: "In this test's Passage 1, statement 2 claims scientists agree dogs were domesticated “approximately 15,000 years ago”. The passage actually gives a disputed range (15,000 to 40,000 years) with no agreement - so it's FALSE, not NOT GIVEN, because the passage does address the timing directly."
-  },
-  {
-    label: "Matching Headings",
-    title: "Matching Headings",
-    desc: "Choosing a heading from a list to summarise each paragraph.",
-    tips: [
-      "Read the full list of headings first, then read each paragraph and identify its main idea - don't try to match word-for-word.",
-      "There are always more headings than paragraphs. Expect 2-3 headings you'll never use.",
-      "Look for the paragraph's overall purpose, not just repeated keywords - two headings can mention the same word but describe different functions.",
-      "Be suspicious of a heading that only matches ONE detail from a paragraph rather than its main idea - this is a very common wrong answer.",
-      "Once a heading is used, it normally can't be reused - cross options off your list as you go so you don't pick the same one twice."
-    ],
-    example: "In this test's Passage 1, paragraph C is about wolves taming themselves by scavenging near camps - heading ii (“A theory of accidental, not deliberate, taming”) matches its purpose, not just a repeated word like “wolves”, which also appears in several other paragraphs."
-  },
-  {
-    label: "Multiple Choice",
-    title: "Multiple Choice",
-    desc: "Choosing the one correct option from 4 (A-D).",
-    tips: [
-      "Read the question stem carefully before looking at the options - decide what you're looking for first.",
-      "Options are often close paraphrases of the passage, and one or two are deliberately close-but-wrong. Eliminate any option that's only partly true.",
-      "Be careful with options that copy exact words from the passage - these can be traps that twist the actual meaning.",
-      "Find the exact part of the passage the question relates to (questions follow passage order) before comparing all four options against it.",
-      "If two options both seem possible, re-read the surrounding sentence closely - the correct answer will match precisely, not approximately."
+    kind: "passage",
+    label: "Passage 1",
+    title: "Passage 1",
+    qrange: "Q1-13", diff: "easy", diffLabel: "Easiest",
+    intro: "The easiest of the three passages. It mixes two task types: True/False/Not Given first, then Matching Headings. Jump straight to either below, or read both in order.",
+    sections: [
+      {
+        anchor: "tfng",
+        label: "True/False/Not Given",
+        title: "True/False/Not Given (Q1-6)",
+        desc: "Tests facts stated in the passage - does each statement agree, disagree, or is it simply not covered?",
+        tips: [
+          "NOT GIVEN means the information isn't in the passage at all - not that it's implied, and not that you're unsure. Don't confuse “not mentioned” with “false”.",
+          "FALSE means the passage directly contradicts the statement - it must say the opposite, not just something different.",
+          "Watch for absolute words in the statement (all, always, never, only, every). These often turn a true-sounding fact into FALSE if the passage is less absolute.",
+          "Underline the exact sentence that supports your answer before choosing. If you can't point to one, it's probably NOT GIVEN.",
+          "Questions follow the order of the passage - once you've found Q3's evidence, Q4's evidence will appear later in the text, not earlier."
+        ],
+        example: "In this test, statement 2 claims scientists agree dogs were domesticated “approximately 15,000 years ago”. The passage actually gives a disputed range (15,000 to 40,000 years) with no agreement - so it's FALSE, not NOT GIVEN, because the passage does address the timing directly."
+      },
+      {
+        anchor: "headings",
+        label: "Matching Headings",
+        title: "Matching Headings (Q7-13)",
+        desc: "Choosing a heading from a list to summarise each paragraph.",
+        tips: [
+          "Read the full list of headings first, then read each paragraph and identify its main idea - don't try to match word-for-word.",
+          "There are always more headings than paragraphs. Expect 2-3 headings you'll never use.",
+          "Look for the paragraph's overall purpose, not just repeated keywords - two headings can mention the same word but describe different functions.",
+          "Be suspicious of a heading that only matches ONE detail from a paragraph rather than its main idea - this is a very common wrong answer.",
+          "Once a heading is used, it normally can't be reused - cross options off your list as you go so you don't pick the same one twice."
+        ],
+        example: "In this test, paragraph C is about wolves taming themselves by scavenging near camps - heading ii (“A theory of accidental, not deliberate, taming”) matches its purpose, not just a repeated word like “wolves”, which also appears in several other paragraphs."
+      }
     ]
   },
   {
-    label: "Matching Information",
-    title: "Matching Information",
-    desc: "Which paragraph contains a specific piece of information (not just which paragraph is on that general topic).",
-    tips: [
-      "This task asks which paragraph contains specific information - not which paragraph is broadly about that topic.",
-      "The information is usually reworded significantly (synonyms, paraphrase). Scan for meaning, not exact words from the question.",
-      "Check the instructions for whether a paragraph letter can be used more than once, and whether every paragraph is needed.",
-      "Work through the paragraphs in order once, noting briefly what each contains, then match questions against your notes - often faster than re-searching for each question.",
-      "Unlike most IELTS Reading tasks, these questions are NOT in passage order - expect to jump around the text."
+    kind: "passage",
+    label: "Passage 2",
+    title: "Passage 2",
+    qrange: "Q14-26", diff: "med", diffLabel: "Medium",
+    intro: "The medium-difficulty passage. Three task types in a row: Multiple Choice, then Matching Information, then Summary Completion.",
+    sections: [
+      {
+        anchor: "mc",
+        label: "Multiple Choice",
+        title: "Multiple Choice (Q14-18)",
+        desc: "Choosing the one correct option from 4 (A-D).",
+        tips: [
+          "Read the question stem carefully before looking at the options - decide what you're looking for first.",
+          "Options are often close paraphrases of the passage, and one or two are deliberately close-but-wrong. Eliminate any option that's only partly true.",
+          "Be careful with options that copy exact words from the passage - these can be traps that twist the actual meaning.",
+          "Find the exact part of the passage the question relates to (questions follow passage order) before comparing all four options against it.",
+          "If two options both seem possible, re-read the surrounding sentence closely - the correct answer will match precisely, not approximately."
+        ]
+      },
+      {
+        anchor: "matchinfo",
+        label: "Matching Information",
+        title: "Matching Information (Q19-22)",
+        desc: "Which paragraph contains a specific piece of information (not just which paragraph is on that general topic).",
+        tips: [
+          "This task asks which paragraph contains specific information - not which paragraph is broadly about that topic.",
+          "The information is usually reworded significantly (synonyms, paraphrase). Scan for meaning, not exact words from the question.",
+          "Check the instructions for whether a paragraph letter can be used more than once, and whether every paragraph is needed.",
+          "Work through the paragraphs in order once, noting briefly what each contains, then match questions against your notes - often faster than re-searching for each question.",
+          "Unlike most IELTS Reading tasks, these questions are NOT in passage order - expect to jump around the text."
+        ]
+      },
+      {
+        anchor: "summary",
+        label: "Summary Completion",
+        title: "Summary Completion (Q23-26)",
+        desc: "Filling gaps in a short summary using words from the passage.",
+        tips: [
+          "Always check the word limit (“NO MORE THAN THREE WORDS”). Going over it loses the mark even if the answer is otherwise correct.",
+          "Read the whole summary first to understand the overall context before filling in any gaps.",
+          "Your answer must fit the sentence grammatically - if the gap needs a noun, an adjective from the passage won't work even if it's the “right” word.",
+          "For Academic Reading, the words you need come directly from the passage - copy the exact wording used in the text rather than paraphrasing it yourself.",
+          "Spelling counts. A correct answer spelled wrong is marked wrong, so double-check any tricky words."
+        ]
+      }
     ]
   },
   {
-    label: "Matching Sentence Endings",
-    title: "Matching Sentence Endings",
-    desc: "Completing a sentence beginning with the correct ending from a list.",
-    tips: [
-      "Read all the sentence beginnings AND all the endings before choosing - some endings are grammatically odd matches even if the content looks right.",
-      "There are always more endings than beginnings. Don't assume every ending gets used.",
-      "Check grammar as well as meaning - the correct ending must complete the sentence naturally, not just state something true from the passage.",
-      "Find each sentence beginning's topic in the passage first, then look nearby for the matching detail - endings usually correspond to one specific part of the text.",
-      "Watch for endings that are true according to the passage but don't logically complete THAT specific beginning - a very common trap."
-    ]
-  },
-  {
-    label: "Summary & Notes",
-    title: "Summary & Note Completion",
-    desc: "Filling gaps in a summary or notes using words from the passage.",
-    tips: [
-      "Always check the word limit (“NO MORE THAN THREE WORDS”, “ONE WORD ONLY”). Going over it loses the mark even if the answer is otherwise correct.",
-      "Read the whole summary or notes first to understand the overall context before filling in any gaps.",
-      "Your answer must fit the sentence grammatically - if the gap needs a noun, an adjective from the passage won't work even if it's the “right” word.",
-      "For Academic Reading, the words you need come directly from the passage - copy the exact wording used in the text rather than paraphrasing it yourself.",
-      "Spelling counts. A correct answer spelled wrong is marked wrong, so double-check any tricky words."
+    kind: "passage",
+    label: "Passage 3",
+    title: "Passage 3",
+    qrange: "Q27-40", diff: "hard", diffLabel: "Hardest",
+    intro: "The hardest passage, testing the writer's views rather than plain facts. Three task types: Yes/No/Not Given, Matching Sentence Endings, then Note Completion.",
+    sections: [
+      {
+        anchor: "ynng",
+        label: "Yes/No/Not Given",
+        title: "Yes/No/Not Given (Q27-33)",
+        desc: "Tests the writer's opinions or claims, not plain facts - the same mechanic as True/False/Not Given in Passage 1, just applied to what the writer thinks rather than what happened.",
+        tips: [
+          "NOT GIVEN means the passage never states the writer's view on this - not that you disagree, and not that it's unclear.",
+          "NO means the writer's view directly contradicts the statement - it must be the opposite, not just a different opinion.",
+          "Look for the writer's own language (suggests, argues, believes, questions) to find where their opinion is actually expressed, not just where the topic is mentioned.",
+          "Don't use your own opinion or general knowledge - judge every statement only against what the writer says in this passage.",
+          "Questions follow the order of the passage, same as Passage 1's True/False/Not Given task."
+        ]
+      },
+      {
+        anchor: "endings",
+        label: "Matching Sentence Endings",
+        title: "Matching Sentence Endings (Q34-37)",
+        desc: "Completing a sentence beginning with the correct ending from a list.",
+        tips: [
+          "Read all the sentence beginnings AND all the endings before choosing - some endings are grammatically odd matches even if the content looks right.",
+          "There are always more endings than beginnings. Don't assume every ending gets used.",
+          "Check grammar as well as meaning - the correct ending must complete the sentence naturally, not just state something true from the passage.",
+          "Find each sentence beginning's topic in the passage first, then look nearby for the matching detail - endings usually correspond to one specific part of the text.",
+          "Watch for endings that are true according to the passage but don't logically complete THAT specific beginning - a very common trap."
+        ]
+      },
+      {
+        anchor: "notes",
+        label: "Note Completion",
+        title: "Note Completion (Q38-40)",
+        desc: "Filling gaps in short notes using words from the passage - the same mechanic as Passage 2's Summary Completion.",
+        tips: [
+          "Always check the word limit (“ONE WORD ONLY” here - stricter than Passage 2's summary task).",
+          "Notes are often shorter and more fragmented than a summary - read the surrounding bullet points for context, not just the sentence with the gap.",
+          "Your answer must fit the note grammatically, exactly as with summary completion.",
+          "The word comes directly from the passage - copy it exactly rather than paraphrasing.",
+          "Spelling counts here too. Double-check tricky words before moving on."
+        ]
+      }
     ]
   }
 ];
 function toggleGuideSidebar(el){ el.closest(".guide-shell").classList.toggle("sb-collapsed"); }
+function renderGuideTips(tips){
+  return '<ol class="guide-tip-list">' + tips.map((t,ti)=>`<li class="guide-tip"><span class="guide-tip-num">${ti+1}</span><span>${t}</span></li>`).join('') + '</ol>';
+}
 function showGuideTopic(i){
   const g = GUIDE[i];
   document.querySelectorAll('.guide-nav-item').forEach((b,bi)=>b.classList.toggle('active', bi===i));
   document.getElementById('guidePaneTitle').textContent = g.title;
-  document.getElementById('guidePaneDesc').textContent = g.desc;
   let html = '';
+
+  if(g.kind === 'passage'){
+    const passageNum = g.label.replace(/\D/g,'');
+    document.getElementById('guidePaneDesc').textContent = g.intro;
+    html += `<div class="struct-list"><div class="struct-row">
+      <div class="struct-badge">${passageNum}</div>
+      <div class="struct-info">
+        <div class="struct-info-top"><strong>${g.label}</strong><span class="struct-qrange">${g.qrange}</span><span class="struct-diff ${g.diff}">${g.diffLabel}</span></div>
+        <div class="struct-tasks">${g.sections.map(s=>`<span class="struct-task">${s.label}</span>`).join('')}</div>
+      </div>
+    </div></div>`;
+    html += '<div class="guide-quicknav">' + g.sections.map(s=>`<button onclick="document.getElementById('ganchor-${s.anchor}').scrollIntoView({behavior:'smooth',block:'start'})">${s.label} &darr;</button>`).join('') + '</div>';
+    html += g.sections.map(s => `
+      <div class="guide-section" id="ganchor-${s.anchor}">
+        <div class="guide-section-title">${s.title}</div>
+        <div class="guide-section-desc">${s.desc}</div>
+        ${renderGuideTips(s.tips)}
+        ${s.example ? `<div class="guide-example"><div class="guide-example-label">Worked example</div><div class="guide-example-body">${s.example}</div></div>` : ''}
+      </div>`).join('');
+    document.getElementById('guidePaneBody').innerHTML = html;
+    return;
+  }
+
+  document.getElementById('guidePaneDesc').textContent = g.desc;
   if(g.facts){
     html += '<div class="struct-facts">' + g.facts.map(f=>`<div class="struct-fact"><div class="struct-fact-n">${f.n}</div><div class="struct-fact-l">${f.l}</div></div>`).join('') + '</div>';
   }
@@ -1056,7 +1149,7 @@ function showGuideTopic(i){
         </div>
       </div>`).join('') + '</div>';
   }
-  html += '<ol class="guide-tip-list">' + g.tips.map((t,ti)=>`<li class="guide-tip"><span class="guide-tip-num">${ti+1}</span><span>${t}</span></li>`).join('') + '</ol>';
+  html += renderGuideTips(g.tips);
   if(g.example){
     html += `<div class="guide-example"><div class="guide-example-label">Worked example</div><div class="guide-example-body">${g.example}</div></div>`;
   }
