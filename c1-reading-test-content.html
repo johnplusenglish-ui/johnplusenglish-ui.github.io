@@ -8,6 +8,21 @@
 <title>C1 Advanced Reading (Parts 5 to 8) · johnplusenglish</title>
 <meta name="description" content="Practice test for Cambridge C1 Advanced Reading: Part 5 multiple choice, Part 6 cross-text multiple matching, Part 7 gapped text, Part 8 multiple matching.">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>
+(function(){
+  var FONTS = {
+    outfit: "'Outfit',sans-serif",
+    georgia: "Georgia,'Times New Roman',serif",
+    verdana: "Verdana,Geneva,sans-serif",
+    atkinson: "'Atkinson Hyperlegible',sans-serif",
+    lexend: "'Lexend',sans-serif"
+  };
+  var saved = 'outfit';
+  try { saved = localStorage.getItem('jpe-reading-font') || 'outfit'; } catch(e) {}
+  document.documentElement.style.setProperty('--reading-font', FONTS[saved] || FONTS.outfit);
+})();
+</script>
 <style>
 :root{--sky:#2176FF;--sky-light:#E8EEFF;--sun:#FFB347;--cream:#F7F6F3;--ink:#2D3047;--muted:#7A7D8E;--border:#E8E5DF;--card:#fff;--radius:14px;--radius-sm:10px;--shadow-sm:0 1px 3px rgba(45,48,71,.06);--shadow-md:0 4px 14px rgba(45,48,71,.08);--accent:#1E293B;--accent-light:#E2E8F0;--correct:#34C759;--wrong:#FF3B30}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -34,6 +49,17 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .pilot-flag{display:inline-flex;align-items:center;gap:.4rem;font-family:Outfit,sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#B87A1A;background:#FFF4E0;border:1.5px solid #FFE0A3;padding:.3rem .8rem;border-radius:999px;margin-bottom:1rem}
 
 .wrap{max-width:960px;margin:0 auto;padding:0 2rem 4rem;position:relative;z-index:1}
+.font-switch{position:relative;display:flex;justify-content:flex-end;margin:0 0 .8rem}
+.font-switch-btn{display:inline-flex;align-items:center;gap:.4rem;font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:700;padding:.4rem .9rem;border:1.5px solid var(--border);border-radius:20px;background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s}
+.font-switch-btn:hover{border-color:var(--accent);color:var(--ink)}
+.font-switch-menu{position:absolute;top:calc(100% + 6px);right:0;background:var(--card);border:1.5px solid var(--border);border-radius:12px;box-shadow:var(--shadow-md);padding:.4rem;display:none;flex-direction:column;gap:.1rem;min-width:210px;z-index:20}
+.font-switch-menu.open{display:flex}
+.font-opt{font-size:.87rem;text-align:left;padding:.55rem .65rem;border:none;border-radius:8px;background:transparent;color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:.6rem;font-family:'Outfit',sans-serif}
+.font-opt:hover{background:var(--cream)}
+.font-opt.active{background:var(--accent-light);color:var(--accent);font-weight:700}
+.font-opt-check{opacity:0;font-size:.8rem}
+.font-opt.active .font-opt-check{opacity:1}
+.font-opt-label{font-family:var(--opt-font,inherit);font-size:.95rem}
 
 .test-picker{display:flex;align-items:center;gap:.45rem;flex-wrap:wrap;margin:1.6rem 0 0}
 .test-picker-label{font-family:Outfit,sans-serif;font-size:.62rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-right:.25rem}
@@ -64,7 +90,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .score-display{font-family:Outfit,sans-serif;font-size:.82rem;font-weight:500;color:var(--muted);display:none;align-items:center;gap:6px}
 .score-display.visible{display:flex}
 .score-display .score-val{color:var(--accent);font-weight:800}
-.passage{padding:20px 4px 6px;font-size:.95rem;line-height:1.95}
+.passage{padding:20px 4px 6px;font-size:.95rem;line-height:1.95;font-family:var(--reading-font,inherit)}
 .passage p{margin-bottom:1rem}
 .passage-title{font-weight:800;text-align:center;font-size:1.05rem;margin-bottom:14px}
 
@@ -168,6 +194,17 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
     <div class="overview-item">Part 7 <strong id="ov7">-/6</strong></div>
     <div class="overview-item">Part 8 <strong id="ov8">-/10</strong></div>
     <div class="overview-total" id="ovTotal">Total: -/26</div>
+  </div>
+
+  <div class="font-switch" id="fontSwitch">
+    <button class="font-switch-btn" onclick="toggleFontMenu()" aria-haspopup="true" aria-expanded="false">Aa &nbsp;Reading font</button>
+    <div class="font-switch-menu" id="fontMenu">
+      <button class="font-opt" data-font="outfit" onclick="setReadingFont('outfit')"><span class="font-opt-label" style="--opt-font:'Outfit',sans-serif">Default</span><span class="font-opt-check">&#10003;</span></button>
+      <button class="font-opt" data-font="georgia" onclick="setReadingFont('georgia')"><span class="font-opt-label" style="--opt-font:Georgia,serif">Georgia</span><span class="font-opt-check">&#10003;</span></button>
+      <button class="font-opt" data-font="verdana" onclick="setReadingFont('verdana')"><span class="font-opt-label" style="--opt-font:Verdana,sans-serif">Verdana</span><span class="font-opt-check">&#10003;</span></button>
+      <button class="font-opt" data-font="atkinson" onclick="setReadingFont('atkinson')"><span class="font-opt-label" style="--opt-font:'Atkinson Hyperlegible',sans-serif">Atkinson Hyperlegible</span><span class="font-opt-check">&#10003;</span></button>
+      <button class="font-opt" data-font="lexend" onclick="setReadingFont('lexend')"><span class="font-opt-label" style="--opt-font:'Lexend',sans-serif">Lexend</span><span class="font-opt-check">&#10003;</span></button>
+    </div>
   </div>
 
   <div class="part-filter">
@@ -955,6 +992,32 @@ function showPart(n){
   document.querySelectorAll('.part-filter-pill').forEach(p=>p.classList.toggle('active', +p.dataset.part===n));
   document.querySelectorAll('.part-section').forEach(s=>s.classList.toggle('visible', +s.dataset.part===n));
 }
+
+var READING_FONTS = {
+  outfit: "'Outfit',sans-serif",
+  georgia: "Georgia,'Times New Roman',serif",
+  verdana: "Verdana,Geneva,sans-serif",
+  atkinson: "'Atkinson Hyperlegible',sans-serif",
+  lexend: "'Lexend',sans-serif"
+};
+function setReadingFont(key){
+  if (!READING_FONTS[key]) key = 'outfit';
+  document.documentElement.style.setProperty('--reading-font', READING_FONTS[key]);
+  document.querySelectorAll('.font-opt').forEach(function(b){ b.classList.toggle('active', b.dataset.font===key); });
+  try { localStorage.setItem('jpe-reading-font', key); } catch(e) {}
+}
+function toggleFontMenu(){
+  document.getElementById('fontMenu').classList.toggle('open');
+}
+document.addEventListener('click', function(e){
+  var sw = document.getElementById('fontSwitch');
+  if (sw && !sw.contains(e.target)) document.getElementById('fontMenu').classList.remove('open');
+});
+(function(){
+  var saved = 'outfit';
+  try { saved = localStorage.getItem('jpe-reading-font') || 'outfit'; } catch(e) {}
+  setReadingFont(saved);
+})();
 
 /* ============ TEST PICKER ============ */
 function loadTest(i){
