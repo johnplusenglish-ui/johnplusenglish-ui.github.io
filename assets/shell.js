@@ -26,6 +26,7 @@ var JPE_TITLES = {
   "hot-takes.html": "Hot Takes - johnplusenglish",
   "idioms.html": "Idioms - johnplusenglish",
   "ielts-reading-test.html": "IELTS Academic Reading · johnplusenglish",
+  "ielts-listening.html": "IELTS Listening · johnplusenglish",
   "ielts-reading.html": "IELTS Reading · johnplusenglish",
   "ielts-speaking.html": "IELTS Speaking - johnplusenglish",
   "ielts-writing.html": "IELTS Writing - johnplusenglish",
