@@ -5073,7 +5073,7 @@ Landscape orientation, 4:3 aspect ratio, no watermarks, no extra decorative text
 
 <script>
 // Switch between Task 1 / Task 2 via the side-nav
-function switchTaskCard(btn, index) {
+function switchTaskCard(btn, index, forceOpen) {
   const contentArea = btn.closest('.content-area');
   const groups = contentArea.querySelectorAll(':scope > .pill-group');
   groups.forEach((g, i) => {
@@ -5084,7 +5084,9 @@ function switchTaskCard(btn, index) {
   const sidebar = btn.closest('.task-sidebar');
   sidebar.querySelectorAll('.task-nav-item').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  btn.closest('.task-nav-group').classList.toggle('open');
+  const targetGroup = btn.closest('.task-nav-group');
+  if (forceOpen) targetGroup.classList.add('open');
+  else targetGroup.classList.toggle('open');
   try{ localStorage.setItem('jpe-ielts-writing-taskcard-' + contentArea.id, index); }catch(e){}
 }
 
@@ -5092,7 +5094,7 @@ function switchTaskCard(btn, index) {
 function selectWritingCategory(contentAreaId, taskIndex, subBtn, category) {
   const group = subBtn.closest('.task-nav-group');
   const taskBtn = group.querySelector('.task-nav-item');
-  switchTaskCard(taskBtn, taskIndex);
+  switchTaskCard(taskBtn, taskIndex, true);
   group.querySelectorAll('.task-nav-subitem').forEach(b => b.classList.remove('active'));
   subBtn.classList.add('active');
   const pill = document.querySelector('#' + contentAreaId + ' .tip-pill[data-cat="' + category + '"]');
@@ -6114,7 +6116,7 @@ try{
     if (savedTaskIdx !== null) {
       const sidebar = contentArea.querySelector('.task-sidebar');
       const btn = sidebar && sidebar.querySelectorAll('.task-nav-item')[Number(savedTaskIdx)];
-      if (btn) switchTaskCard(btn, Number(savedTaskIdx));
+      if (btn) switchTaskCard(btn, Number(savedTaskIdx), true);
     }
   }catch(e){}
   try{
