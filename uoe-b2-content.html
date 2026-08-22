@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 
-:root{--sun:#FFB347;--sky:#2176FF;--sky-light:#E8EEFF;--sea:#1DD3B0;--coral:#FF6B6B;--lavender:#9B72CF;--mint:#5DDEA0;--sand:#FFF5E6;--cream:#F7F6F3;--ink:#2D3047;--muted:#7A7D8E;--border:#E8E5DF;--card:#fff;--radius:14px;--radius-sm:10px;--shadow-sm:0 1px 3px rgba(45,48,71,.06);--shadow-md:0 4px 14px rgba(45,48,71,.08);--accent:#2EC4B6;--accent-light:#2EC4B626;--correct:#34C759;--wrong:#FF3B30}
+:root{--sun:#FFB347;--sky:#2176FF;--sky-light:#E8EEFF;--sea:#1DD3B0;--coral:#FF6B6B;--lavender:#9B72CF;--mint:#5DDEA0;--sand:#FFF5E6;--cream:#F7F6F3;--ink:#2D3047;--muted:#7A7D8E;--border:#E8E5DF;--card:#fff;--radius:14px;--radius-sm:10px;--shadow-sm:0 1px 3px rgba(45,48,71,.06);--shadow-md:0 4px 14px rgba(45,48,71,.08);--accent:#16A88D;--accent-light:#E1F5F1;--correct:#34C759;--wrong:#FF3B30}
 *{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
 body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,var(--border) 1px,transparent 1px);background-size:28px 28px;opacity:.4;pointer-events:none;z-index:0}
@@ -404,6 +404,78 @@ footer{text-align:center;padding:2.5rem 2rem;font-size:.8rem;color:var(--muted);
 .tip-item{display:flex;align-items:baseline;gap:6px;font-size:.84rem;color:var(--ink);line-height:1.5;padding:3px 0}
 .tip-icon{flex-shrink:0;font-size:.75rem}
 #p4Items{padding:0 24px}
+
+/* top-level tabs (Guide / Tests) */
+.tabs-wrap{max-width:960px;margin:0 auto;padding:0 2rem;position:relative;z-index:1}
+.tabs{display:flex;gap:4px;row-gap:4px;border-bottom:none;position:relative;margin-bottom:1.5rem;align-items:flex-end;flex-wrap:wrap;padding-top:8px}
+.tabs::before{content:'';position:absolute;left:0;right:0;bottom:0;height:1.5px;background:var(--border)}
+.tab{position:relative;font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;padding:.5rem 1.25rem;color:var(--muted);cursor:pointer;white-space:nowrap;background:color-mix(in srgb,var(--ink) 4%,transparent);border:1.5px solid var(--border);border-radius:12px 12px 0 0;transition:background .18s,color .18s,box-shadow .18s,border-color .18s}
+.tab:not(.active):hover{background:color-mix(in srgb,var(--ink) 8%,transparent);color:var(--ink)}
+.tab:not(.active):focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tab.active{outline:none}
+.tab.active{background:var(--cream);border-color:var(--tab-accent,var(--accent));border-bottom:none!important;color:var(--tab-accent,var(--accent));padding-top:calc(.5rem + 3px);box-shadow:0 -3px 10px rgba(45,48,71,.06);z-index:2}
+.content-area{display:none}
+.content-area.active{display:block}
+
+/* Guide tab (sidebar + pane) */
+.guide-shell{display:grid;grid-template-columns:250px 1fr;gap:1.2rem;align-items:start}
+.wb-sb{background:var(--card);border:1.5px solid var(--border);border-radius:14px;box-shadow:var(--shadow-sm);overflow:hidden;display:flex;flex-direction:column;position:sticky;top:80px;max-height:calc(100vh - 100px)}
+.wb-sb-head{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.75rem 1rem;border-bottom:1px solid var(--border);cursor:pointer;user-select:none}
+.wb-sb-head>span{font-size:.66rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.wb-sb-head .sb-chev{width:26px;height:26px;border:1.5px solid var(--border);border-radius:7px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:1rem;line-height:1;flex-shrink:0;transition:transform .2s}
+.wb-sb-head .sb-chev svg{width:13px;height:13px}
+.wb-sb-head:hover .sb-chev{color:var(--ink);border-color:var(--muted)}
+.wb-sb-scroll{flex:1;min-height:0;overflow-y:auto;padding:.4rem}
+.wb-sb-foot{padding:.55rem .9rem;border-top:1px solid var(--border);font-size:.66rem;color:var(--muted)}
+.wb-sb-foot b{color:var(--ink)}
+.guide-shell.sb-collapsed{grid-template-columns:48px 1fr}
+.guide-shell.sb-collapsed .wb-sb-scroll,.guide-shell.sb-collapsed .wb-sb-foot,.guide-shell.sb-collapsed .wb-sb-head>span{display:none}
+.guide-shell.sb-collapsed .wb-sb-head{justify-content:center;padding:.7rem .4rem}
+.guide-shell.sb-collapsed .sb-chev{transform:rotate(180deg)}
+.guide-nav-item{display:flex;align-items:center;gap:.6rem;padding:.65rem .75rem;border-radius:10px;cursor:pointer;font-family:'Outfit',sans-serif;color:var(--muted);border:1.5px solid transparent;background:none;transition:all .15s;text-align:left;width:100%;font-size:.84rem;font-weight:700;line-height:1.3}
+.guide-nav-item:hover{color:var(--ink);background:var(--cream)}
+.guide-nav-item.active{color:var(--ink);border-color:var(--accent);background:var(--accent-light)}
+.guide-nav-dot{width:6px;height:6px;border-radius:50%;background:var(--border);flex-shrink:0}
+.guide-nav-item.active .guide-nav-dot{background:var(--accent)}
+.guide-nav-group-label{font-family:Outfit,sans-serif;font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:.7rem .75rem .3rem}
+.guide-nav-group-label:first-child{padding-top:.2rem}
+.wb-pane{background:var(--card);border:1.5px solid var(--border);border-radius:14px;box-shadow:var(--shadow-sm);overflow:hidden;min-width:0}
+.wb-pane-head{padding:1rem 1.25rem .8rem;border-bottom:1.5px solid var(--border)}
+.wb-pane-head h2{margin:0;font-size:1.2rem;font-weight:800;letter-spacing:-.01em}
+.wb-pane-head p{margin:.35rem 0 0;font-size:.85rem;color:var(--muted);line-height:1.5}
+.wb-pane-body{padding:1.1rem 1.25rem 1.4rem}
+.guide-tip-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.7rem}
+.guide-tip{display:flex;gap:.7rem;font-size:.88rem;line-height:1.55;color:var(--ink)}
+.guide-tip-num{width:22px;height:22px;border-radius:7px;background:var(--accent-light);color:var(--accent);font-size:.72rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.guide-tip b{font-weight:700}
+.guide-example{margin-top:1.1rem;padding-top:1rem;border-top:1.5px solid var(--border)}
+.guide-example-label{font-family:Outfit,sans-serif;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:.5rem}
+.guide-example-body{font-size:.85rem;line-height:1.6;color:var(--ink);background:var(--cream);border-radius:var(--radius-sm);padding:.8rem .95rem}
+.guide-quicknav{display:flex;flex-wrap:wrap;gap:.5rem;margin:1.1rem 0 0}
+.guide-quicknav button{font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:700;padding:.45rem .85rem;border-radius:999px;border:1.5px solid var(--border);background:var(--card);color:var(--ink);cursor:pointer;transition:all .15s}
+.guide-quicknav button:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
+.guide-section{margin-top:1.6rem;padding-top:1.4rem;border-top:1.5px solid var(--border);scroll-margin-top:24px}
+.guide-section-title{font-size:1.02rem;font-weight:800;color:var(--ink);margin-bottom:.3rem}
+.guide-section-desc{font-size:.85rem;color:var(--muted);margin-bottom:.9rem;line-height:1.5}
+.struct-facts{display:flex;gap:.6rem;margin-bottom:1.1rem;flex-wrap:wrap}
+.struct-fact{flex:1;min-width:90px;background:var(--accent-light);border-radius:var(--radius-sm);padding:.7rem .5rem;text-align:center}
+.struct-fact-n{font-family:Outfit,sans-serif;font-size:1.5rem;font-weight:800;color:var(--accent);line-height:1.1}
+.struct-fact-l{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-top:.15rem}
+.struct-list{display:flex;flex-direction:column;gap:.6rem;margin-bottom:1.3rem}
+.struct-row{display:flex;gap:.9rem;padding:.85rem .95rem;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius-sm);align-items:flex-start;box-shadow:var(--shadow-sm)}
+.struct-badge{width:32px;height:32px;border-radius:9px;background:var(--accent);color:#fff;font-family:Outfit,sans-serif;font-weight:800;font-size:.9rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.struct-info{flex:1;min-width:0}
+.struct-info-top{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.35rem}
+.struct-info-top strong{font-size:.85rem}
+.struct-qrange{font-size:.7rem;color:var(--muted);font-weight:600}
+.struct-diff{font-family:Outfit,sans-serif;font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:.15rem .5rem;border-radius:999px}
+.struct-diff.easy{background:rgba(52,199,89,.14);color:#1a7a34}
+.struct-diff.med{background:rgba(255,179,71,.2);color:#a5690a}
+.struct-diff.hard{background:rgba(255,59,48,.12);color:#c0392b}
+.struct-tasks{display:flex;flex-wrap:wrap;gap:.35rem}
+.struct-task{font-size:.72rem;background:var(--card);border:1px solid var(--border);border-radius:7px;padding:.25rem .55rem;color:var(--ink)}
+.struct-task b{color:var(--accent);font-weight:800;margin-left:.2rem}
+@media(max-width:820px){.guide-shell{grid-template-columns:1fr}.wb-sb{position:static;max-height:none}}
 </style>
 <style>nav{display:none!important}</style></head>
 <body>
@@ -414,7 +486,34 @@ footer{text-align:center;padding:2.5rem 2rem;font-size:.8rem;color:var(--muted);
 <div class="page-header reveal">  <h1 class="page-title">Use of English</h1>
   <div class="level-badge">🟢 B2 First</div>
 </div>
+
+<div class="tabs-wrap">
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-type="guide" onclick="switchType('guide')" style="--tab-accent:#16A88D">Guide</button>
+    <button class="tab" data-type="tests" onclick="switchType('tests')" style="--tab-accent:#16A88D">Tests</button>
+  </div>
+</div>
+
 <div class="parts-section reveal">
+
+<div class="content-area active" id="guide-content">
+<div class="guide-shell" id="guideShell">
+  <div class="wb-sb">
+    <div class="wb-sb-head" onclick="toggleGuideSidebar(this)"><span>Guide topics</span><div class="sb-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div></div>
+    <div class="wb-sb-scroll" id="guideNav"></div>
+    <div class="wb-sb-foot">Tips for every task type in Parts 1-4</div>
+  </div>
+  <div class="wb-pane">
+    <div class="wb-pane-head">
+      <h2 id="guidePaneTitle"></h2>
+      <p id="guidePaneDesc"></p>
+    </div>
+    <div class="wb-pane-body" id="guidePaneBody"></div>
+  </div>
+</div>
+</div>
+
+<div class="content-area" id="tests-content">
   <div class="uoe-layout" id="uoeLayout">
     <!-- Sidebar -->
     <div class="uoe-sidebar" id="uoeSidebarWrap">
@@ -548,6 +647,7 @@ footer{text-align:center;padding:2.5rem 2rem;font-size:.8rem;color:var(--muted);
       </div><!-- /uoeContentArea -->
     </div><!-- /uoe-content -->
   </div><!-- /uoe-layout -->
+</div><!-- /tests-content -->
 </div><!-- /parts-section -->
 <footer>&copy; 2026 johnplusenglish. All rights reserved.</footer>
 <!-- Print modal -->
@@ -1341,6 +1441,284 @@ document.querySelectorAll('.reveal').forEach(function(el){observer.observe(el);}
 setTimeout(function(){if(!document.querySelector('.reveal.visible')){document.querySelectorAll('.reveal').forEach(function(el){el.classList.add('visible');});}},600);
 
 buildSidebar();
+
+/* ============ TABS (Guide / Tests) ============ */
+function switchType(type){
+  ['guide','tests'].forEach(t=>{
+    document.querySelector('[data-type="'+t+'"]').classList.toggle('active', t===type);
+    document.getElementById(t+'-content').classList.toggle('active', t===type);
+  });
+}
+function toggleGuideSidebar(el){ el.closest('.guide-shell').classList.toggle('sb-collapsed'); }
+
+/* ============ GUIDE ============ */
+const GUIDE = [
+  {
+    kind: "structure",
+    label: "Exam Structure",
+    title: "Use of English, Parts 1-4",
+    desc: "Parts 1-4 are the Use of English half of the Reading and Use of English paper (Parts 5-7 are Reading, covered on a separate page). Together the whole paper is 75 minutes; a common rule of thumb is to budget around 35 of those minutes for Parts 1-4.",
+    facts: [
+      {n:"4", l:"UoE parts"},
+      {n:"30", l:"questions"},
+      {n:"~35", l:"suggested minutes"}
+    ],
+    breakdown: [
+      {n:1, label:"Part 1", qrange:"Q1-8", diff:"med", diffLabel:"Medium", tasks:[{name:"Multiple Choice Cloze",count:"8"}]},
+      {n:2, label:"Part 2", qrange:"Q9-16", diff:"hard", diffLabel:"Hardest", tasks:[{name:"Open Cloze",count:"8"}]},
+      {n:3, label:"Part 3", qrange:"Q17-24", diff:"med", diffLabel:"Medium", tasks:[{name:"Word Formation",count:"8"}]},
+      {n:4, label:"Part 4", qrange:"Q25-30", diff:"hard", diffLabel:"Hardest", tasks:[{name:"Key Word Transformation",count:"6"}]}
+    ],
+    tips: [
+      "Parts 1 and 3 are mostly about vocabulary (precise word choice, word families), while Parts 2 and 4 are mostly about grammar (structure, fixed patterns) - if one type feels weaker, you'll usually feel it most in the matching pair.",
+      "Every question is worth one mark, no matter how hard it feels, and there's no penalty for a wrong guess, so never leave a gap empty.",
+      "Spelling counts. A perfectly logical answer with a spelling mistake is marked wrong, so leave a minute at the end just to re-check spelling on Parts 2, 3 and 4."
+    ]
+  },
+  {
+    kind: "tips",
+    label: "Strategy & Time",
+    title: "Strategy & Time Management",
+    desc: "Around 35 minutes for 30 questions across four very different tasks. Here's how I'd split it.",
+    tips: [
+      "Give Part 1 about 8 minutes, Part 2 about 9 minutes (it's the slowest, since there are no options to choose from), Part 3 about 8 minutes, and Part 4 about 10 minutes (each transformation needs real thinking time).",
+      "Read the whole text first in Parts 1, 2 and 3 before filling any gaps - the meaning of the whole sentence, sometimes the whole paragraph, often decides the answer, not just the words right next to the gap.",
+      "In Part 4, don't force your first idea onto the answer line. Say the transformed sentence in your head first, and check it still means exactly the same as the original before you write anything.",
+      "If a gap has you stuck, take your best guess and move on - a guess costs nothing, but the minutes you lose defending it could cost you an easier question later on."
+    ]
+  },
+  {
+    kind: "passage",
+    label: "Part 1",
+    title: "Part 1 · Multiple Choice Cloze",
+    qrange: "Q1-8", diff: "med", diffLabel: "Medium",
+    intro: "One short text with 8 gaps, each with four options (A, B, C, D) that are usually close in meaning - the skill here is precision, not comprehension. You're rarely choosing between a right word and a wrong word; you're choosing between four words that could almost all fit, except one fits best.",
+    sections: [
+      {
+        anchor: "collocation",
+        label: "Collocation & fixed phrases",
+        title: "Collocation & Fixed Phrases",
+        desc: "Many gaps test which word habitually goes with the words around it, not which word means roughly the right thing.",
+        tips: [
+          "Read past the gap before choosing - English collocations are often fixed in one direction (e.g. a verb that combines with a following preposition), so the answer is frequently confirmed by a word later in the sentence.",
+          "When two options seem equally logical in meaning, the answer is almost always the one that forms a genuine, natural collocation with a nearby word - the 'almost-right' options usually pair naturally with a different word instead.",
+          "Learn collocations as whole chunks when you revise (attract attention, take place, make an effort), rather than single words - this task is built entirely around testing those chunks."
+        ],
+        example: "In one text, the gap 'has recently ___ a lot of attention' takes 'attracted', not 'gathered', 'gained' or 'pulled' - because 'attract attention' is the one genuine fixed collocation among four options that all seem plausible in isolation."
+      },
+      {
+        anchor: "phrasal",
+        label: "Phrasal verbs & prepositions",
+        title: "Phrasal Verbs & Dependent Prepositions",
+        desc: "Some gaps test the one preposition that a particular verb, adjective or noun always takes.",
+        tips: [
+          "If the sentence structure looks like 'verb/adjective + ___ + noun', check first whether this is testing a dependent preposition rather than vocabulary meaning.",
+          "The four options are often all real prepositions that make grammatical sense - only one is the one this specific word actually takes, so this is about memorised pairings, not logic.",
+          "Keep a running list of verb+preposition and adjective+preposition pairs as you meet them (responsible for, capable of, insist on) - this task rewards recognition speed over reasoning."
+        ]
+      },
+      {
+        anchor: "semantic",
+        label: "Precise meaning & degree",
+        title: "Precise Meaning & Degree",
+        desc: "A few gaps test the fine shade of meaning between near-synonyms - words that all mean roughly the same thing, but not quite.",
+        tips: [
+          "Look for a small difference in intensity, formality, or exact sense between the four options - one may be too strong, too weak, or slightly the wrong shade of meaning for this context.",
+          "Consider whether the word needs to describe a permanent quality or a temporary state, a small amount or a large one - these small distinctions are exactly what this question type is built to test.",
+          "If you genuinely can't separate two options by meaning, go back and check collocation and grammar first - a 'meaning' gap that resists analysis is very often actually a collocation gap in disguise."
+        ]
+      }
+    ]
+  },
+  {
+    kind: "passage",
+    label: "Part 2",
+    title: "Part 2 · Open Cloze",
+    qrange: "Q9-16", diff: "hard", diffLabel: "Hardest",
+    intro: "One text with 8 gaps, but no options this time - you have to supply the word yourself, from memory. This part is almost entirely grammar rather than vocabulary: articles, prepositions, pronouns, conjunctions, and auxiliary or modal verbs.",
+    sections: [
+      {
+        anchor: "grammarwords",
+        label: "Grammar words, not content words",
+        title: "Grammar Words, Not Content Words",
+        desc: "Open Cloze gaps are almost never nouns, main verbs or adjectives - they're the small structural words that hold a sentence together.",
+        tips: [
+          "Before guessing a word, ask what part of speech is missing grammatically (article, preposition, relative pronoun, conjunction, auxiliary) - narrowing the category first makes the actual word much easier to find.",
+          "If your instinct is a noun, verb or adjective, stop - that's very rarely the answer here. This task is built around function words, not meaning-carrying ones.",
+          "Common answers include: a/an/the, of/in/at/on, which/who/that, although/despite/however, and forms of be/have/do used as auxiliaries."
+        ]
+      },
+      {
+        anchor: "wholesentence",
+        label: "Reading beyond the gap",
+        title: "Reading Beyond the Gap",
+        desc: "Because there are no options to eliminate from, you need the whole sentence - sometimes the whole paragraph - to be sure of the answer.",
+        tips: [
+          "Read the full sentence (and often the sentence before it) before deciding - open cloze answers are frequently confirmed by something later in the sentence, not just the words immediately next to the gap.",
+          "If a gap could take more than one grammatically-correct word, that's a sign you haven't found the specific clue this sentence contains yet - keep reading for confirmation.",
+          "Only one word goes in each gap. Contractions like 'don't' count as one word, but never write two separate words even if your answer feels incomplete on its own."
+        ],
+        example: "A gap like 'we managed to communicate without any ___' needs a noun a few words later or earlier for confirmation of tense and logic, but the actual missing word itself ('difficulty') is a content word replaced during transformation-style gaps in other parts - in true Open Cloze gaps, expect small words like 'in', 'which' or 'been' instead."
+      },
+      {
+        anchor: "spelling2",
+        label: "Spelling & exact form",
+        title: "Spelling & Exact Form",
+        desc: "Because you're producing the word from memory rather than picking from a list, small spelling slips are the most common way to lose marks here.",
+        tips: [
+          "Double check short, easily-confused words at the end: its/it's, their/there, whose/who's - autopilot mistakes cost marks even when your grammar understanding was correct.",
+          "If the gap needs a contraction, write it exactly as it would appear naturally (isn't, don't) - spelling it as two words or leaving out the apostrophe is marked wrong.",
+          "When you're unsure between two grammatically similar words (e.g. 'which' vs 'that'), pick the one that matches the exact clause type (non-defining vs defining relative clause) rather than guessing at random."
+        ]
+      }
+    ]
+  },
+  {
+    kind: "passage",
+    label: "Part 3",
+    title: "Part 3 · Word Formation",
+    qrange: "Q17-24", diff: "med", diffLabel: "Medium",
+    intro: "One text with 8 gaps. At the end of each gapped line, you're given a 'stem' word in capitals, and you have to change its form (noun, verb, adjective, adverb, or add a prefix/suffix) so it fits grammatically and logically into the gap.",
+    sections: [
+      {
+        anchor: "partofspeech",
+        label: "Identify the part of speech needed",
+        title: "Identify the Part of Speech Needed",
+        desc: "Before touching the stem word, work out what kind of word the gap grammatically needs.",
+        tips: [
+          "Look at the words immediately around the gap: an article or possessive just before usually means a noun is needed; 'to be' or an adverb ending nearby often signals an adjective is needed.",
+          "Decide singular or plural, and whether a noun needs to be countable or uncountable, before you commit to a specific ending.",
+          "Once you know the required part of speech, only then think about which suffix or prefix turns the stem word into that form (e.g. -ment, -tion, -ful, -less, -ly)."
+        ],
+        example: "Given the stem 'KNOW' in a gap needing a noun ('very little ___ of how to cook'), the answer is 'knowledge', not 'known' or 'knowing' - the surrounding grammar (little + noun) rules those out even before you think about meaning."
+      },
+      {
+        anchor: "negative",
+        label: "Negative prefixes",
+        title: "Negative Prefixes",
+        desc: "Roughly half of Word Formation texts include at least one gap needing a negative form - the meaning of the sentence, not just the grammar, tells you this.",
+        tips: [
+          "Watch for negative meaning signalled by words like 'not', 'lack of', 'rarely', or a generally critical tone in the sentence - that's your cue a prefix like un-, in-, im-, dis- or il- is needed, not just the base adjective.",
+          "There's no single rule for which negative prefix goes with which word, so learn common pairs as you meet them (unhealthy, impossible, disagree, illegal, irregular) rather than guessing the pattern.",
+          "Don't automatically add 'un-' to everything - check the exact word first, since many words take a different negative prefix entirely."
+        ]
+      },
+      {
+        anchor: "spellingchange",
+        label: "Spelling changes on the stem",
+        title: "Spelling Changes on the Stem",
+        desc: "Turning a stem word into the needed form very often changes its spelling beyond just adding an ending.",
+        tips: [
+          "Watch for a final 'y' changing to 'i' before an ending (beauty → beautiful is an exception; happy → happiness follows the rule), a doubled consonant, or a dropped final 'e' before an ending starting with a vowel.",
+          "Some transformations aren't obvious add-a-suffix jobs at all - e.g. 'FINANCE' becoming 'financial' changes more than the ending. Say the full sentence aloud if you're unsure a form actually exists in English.",
+          "After writing your answer, re-read the whole sentence to check it sounds natural - a technically-possible word form can still be the wrong choice if a more common alternative exists."
+        ]
+      }
+    ]
+  },
+  {
+    kind: "passage",
+    label: "Part 4",
+    title: "Part 4 · Key Word Transformation",
+    qrange: "Q25-30", diff: "hard", diffLabel: "Hardest",
+    intro: "Usually six separate sentences (this practice site sometimes uses a slightly shorter set). For each one, you rewrite a sentence to mean the same thing, using a given 'key word' that cannot be changed, filling a gap with between two and five words.",
+    sections: [
+      {
+        anchor: "keepmeaning",
+        label: "Keep the exact same meaning",
+        title: "Keep the Exact Same Meaning",
+        desc: "The single biggest reason for losing marks here is a technically-grammatical answer that has quietly changed the meaning of the original sentence.",
+        tips: [
+          "Before writing anything, say the original sentence's meaning to yourself in plain words - then check your finished answer still means exactly that, not something close to it.",
+          "Watch especially for changes in time reference (present vs past), certainty (must vs might), and who is doing the action (active vs passive) - these are the most common ways meaning quietly shifts.",
+          "If your answer technically uses the key word correctly but the sentence now means something slightly different, it's marked wrong even though every individual word is correct."
+        ]
+      },
+      {
+        anchor: "keyword",
+        label: "The key word cannot change form",
+        title: "The Key Word Cannot Change Form",
+        desc: "Whatever word you're given, it must appear in your answer completely unchanged - same tense, same form, same spelling.",
+        tips: [
+          "If the key word is a verb, you usually have to build the tense and structure around other words (auxiliaries, prepositions), since the key word itself must stay exactly as given.",
+          "Many key words point to one specific fixed structure you're expected to know (e.g. a noun that's typically followed by a particular preposition, or a verb that only works in a passive or reported-speech pattern) - recognising the structure is often more useful than translating meaning word for word.",
+          "Count your words afterwards. Contractions count as one word (don't = 1), and going outside the stated word limit (usually two to five words) loses the mark even if the sentence is otherwise perfect."
+        ],
+        example: "Original: 'I've never seen such a messy room.' Key word: EVER → 'This is the messiest room I've ever seen.' The key word 'ever' stays exactly as given, and the meaning (an extreme, unmatched level of messiness) is fully preserved even though the sentence structure changes completely."
+      },
+      {
+        anchor: "structures",
+        label: "Learn structures, not just vocabulary",
+        title: "Learn Structures, Not Just Vocabulary",
+        desc: "This task rewards recognising a fixed grammatical pattern behind the key word, more than knowing what the key word simply means.",
+        tips: [
+          "Build a personal list of key words you meet and the one fixed structure each one usually triggers (e.g. a key word that regularly appears in conditional sentences, reported speech, or comparative structures).",
+          "If you can't immediately see the structure, try rewording the original sentence in your own words first - sometimes the key word's structure only becomes obvious once you've paraphrased the idea yourself.",
+          "Leave a transformation you're unsure about and come back to it - the six sentences are independent, and a fresh look after finishing the others often reveals the structure you were missing."
+        ]
+      }
+    ]
+  }
+];
+
+function renderGuideTips(tips){
+  return '<ol class="guide-tip-list">' + tips.map((t,ti)=>`<li class="guide-tip"><span class="guide-tip-num">${ti+1}</span><span>${t}</span></li>`).join('') + '</ol>';
+}
+function showGuideTopic(i){
+  const g = GUIDE[i];
+  document.getElementById('guide-content').querySelectorAll('.guide-nav-item').forEach((b,bi)=>b.classList.toggle('active', bi===i));
+  document.getElementById('guidePaneTitle').textContent = g.title;
+  let html = '';
+
+  if(g.kind === 'passage'){
+    const partNum = g.label.replace(/\D/g,'');
+    document.getElementById('guidePaneDesc').textContent = g.intro;
+    html += `<div class="struct-list"><div class="struct-row">
+      <div class="struct-badge">${partNum}</div>
+      <div class="struct-info">
+        <div class="struct-info-top"><strong>${g.label}</strong><span class="struct-qrange">${g.qrange}</span><span class="struct-diff ${g.diff}">${g.diffLabel}</span></div>
+        <div class="struct-tasks">${g.sections.map(s=>`<span class="struct-task">${s.label}</span>`).join('')}</div>
+      </div>
+    </div></div>`;
+    html += '<div class="guide-quicknav">' + g.sections.map(s=>`<button onclick="document.getElementById('ganchor-${s.anchor}').scrollIntoView({behavior:'smooth',block:'start'})">${s.label} &darr;</button>`).join('') + '</div>';
+    html += g.sections.map(s => `
+      <div class="guide-section" id="ganchor-${s.anchor}">
+        <div class="guide-section-title">${s.title}</div>
+        <div class="guide-section-desc">${s.desc}</div>
+        ${renderGuideTips(s.tips)}
+        ${s.example ? `<div class="guide-example"><div class="guide-example-label">Worked example</div><div class="guide-example-body">${s.example}</div></div>` : ''}
+      </div>`).join('');
+    document.getElementById('guidePaneBody').innerHTML = html;
+    return;
+  }
+
+  document.getElementById('guidePaneDesc').textContent = g.desc;
+  if(g.facts){
+    html += '<div class="struct-facts">' + g.facts.map(f=>`<div class="struct-fact"><div class="struct-fact-n">${f.n}</div><div class="struct-fact-l">${f.l}</div></div>`).join('') + '</div>';
+  }
+  if(g.breakdown){
+    html += '<div class="struct-list">' + g.breakdown.map(p=>`
+      <div class="struct-row">
+        <div class="struct-badge">${p.n}</div>
+        <div class="struct-info">
+          <div class="struct-info-top"><strong>${p.label || ('Part ' + p.n)}</strong><span class="struct-qrange">${p.qrange}</span><span class="struct-diff ${p.diff}">${p.diffLabel}</span></div>
+          <div class="struct-tasks">${p.tasks.map(t=>`<span class="struct-task">${t.name} <b>${t.count}</b></span>`).join('')}</div>
+        </div>
+      </div>`).join('') + '</div>';
+  }
+  html += renderGuideTips(g.tips);
+  if(g.example){
+    html += `<div class="guide-example"><div class="guide-example-label">Worked example</div><div class="guide-example-body">${g.example}</div></div>`;
+  }
+  document.getElementById('guidePaneBody').innerHTML = html;
+}
+function buildGuide(){
+  document.getElementById('guideNav').innerHTML = GUIDE.map((g,i) =>
+    `<button class="guide-nav-item" onclick="showGuideTopic(${i})"><span class="guide-nav-dot"></span><span>${g.label}</span></button>`
+  ).join('');
+  showGuideTopic(0);
+}
+buildGuide();
 
 </script>
 </body>
