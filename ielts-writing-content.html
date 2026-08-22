@@ -82,6 +82,11 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
 .task-nav-item.active{color:var(--ink);border-color:var(--task-accent,var(--sky));background:color-mix(in srgb,var(--task-accent,var(--sky)) 7%,var(--card));box-shadow:0 1px 3px rgba(45,48,71,.06)}
 .task-nav-dot{width:8px;height:8px;border-radius:50%;background:var(--border);flex-shrink:0;transition:background .15s}
 .task-nav-item.active .task-nav-dot{background:var(--task-accent,var(--sky))}
+.guide-nav-item{display:flex;align-items:center;gap:.6rem;padding:.65rem .75rem;border-radius:10px;cursor:pointer;font-family:'Outfit',sans-serif;color:var(--muted);border:1.5px solid transparent;background:none;transition:all .15s;text-align:left;width:100%;font-size:.84rem;font-weight:700;line-height:1.3}
+.guide-nav-item:hover{color:var(--ink);background:var(--cream)}
+.guide-nav-item.active{color:var(--ink);border-color:var(--ielts,#FF9100);background:rgba(255,145,0,.1)}
+.guide-nav-dot{width:8px;height:8px;border-radius:50%;background:var(--border);flex-shrink:0}
+.guide-nav-item.active .guide-nav-dot{background:var(--ielts,#FF9100)}
 .task-nav-text{flex:1;min-width:0;line-height:1.3}
 .task-nav-label{font-size:.6rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600;display:block;margin-bottom:.1rem}
 .task-nav-title{display:block;font-size:.84rem;font-weight:700;color:var(--ink);line-height:1.25}
@@ -5987,7 +5992,7 @@ function renderGuideTipsW(tips){
 }
 function showGuideTopicW(i){
   const g = GUIDE_W[i];
-  document.querySelectorAll('#guideNavW .task-nav-item').forEach((b,bi)=>b.classList.toggle('active', bi===i));
+  document.querySelectorAll('#guideNavW .guide-nav-item').forEach((b,bi)=>b.classList.toggle('active', bi===i));
   document.getElementById('guideDynamicPill').classList.remove('task-hidden');
   document.querySelectorAll('#guide-content .pill-group[id^="guideStatic"]').forEach(p=>p.classList.add('task-hidden'));
   try{ localStorage.setItem('jpe-ielts-writing-guide', JSON.stringify({ kind: 'topic', idx: i })); }catch(e){}
@@ -6032,7 +6037,7 @@ const GUIDE_STATIC_W = [
   {key:'band', panelId:'guideStaticBand', label:'IELTS Band Descriptors'}
 ];
 function showGuideStatic(key, btn){
-  document.querySelectorAll('#guideNavW .task-nav-item').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#guideNavW .guide-nav-item').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('guideDynamicPill').classList.add('task-hidden');
   const target = GUIDE_STATIC_W.find(s=>s.key===key).panelId;
@@ -6041,10 +6046,10 @@ function showGuideStatic(key, btn){
 }
 function buildGuideW(){
   const dynamicBtns = GUIDE_W.map((g,i)=>
-    `<button class="task-nav-item${i===0?' active':''}" style="--task-accent:#FF9100" onclick="showGuideTopicW(${i})"><span class="task-nav-dot"></span><span class="task-nav-text"><span class="task-nav-title">${g.label}</span></span></button>`
+    `<button class="guide-nav-item${i===0?' active':''}" onclick="showGuideTopicW(${i})"><span class="guide-nav-dot"></span><span>${g.label}</span></button>`
   ).join('');
   const staticBtns = GUIDE_STATIC_W.map(s=>
-    `<button class="task-nav-item" style="--task-accent:#FF9100" onclick="showGuideStatic('${s.key}',this)"><span class="task-nav-dot"></span><span class="task-nav-text"><span class="task-nav-title">${s.label}</span></span></button>`
+    `<button class="guide-nav-item" onclick="showGuideStatic('${s.key}',this)"><span class="guide-nav-dot"></span><span>${s.label}</span></button>`
   ).join('');
   document.getElementById('guideNavW').innerHTML = dynamicBtns + staticBtns;
   showGuideTopicW(0);
