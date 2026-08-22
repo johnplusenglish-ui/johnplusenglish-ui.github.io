@@ -22,6 +22,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,252,247,
 .back-link{display:block;font-size:.85rem;font-weight:600;color:var(--muted);text-decoration:none;margin-bottom:.6rem;transition:color .2s}
 .back-link:hover{color:var(--accent)}
 .level-badge{display:inline-flex;margin-top:.4rem;align-items:center;gap:.4rem;font-family:Outfit,sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);background:var(--accent-light);padding:.3rem .9rem;border-radius:6px;margin-bottom:1rem}
+.topic-hero{display:flex;align-items:flex-start;gap:1.2rem}
+.topic-icon{width:52px;height:52px;border-radius:12px;background:color-mix(in srgb, #2D3047 8%, #fff);color:#2D3047;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.topic-icon svg{width:24px;height:24px;stroke-width:1.8;fill:none;stroke:currentColor}
 .page-title{font-family:'Outfit',sans-serif;font-size:clamp(2rem,5vw,2.8rem);margin-bottom:.6rem;font-weight:900;letter-spacing:-.03em;line-height:1.05}
 .page-desc{color:var(--muted);font-size:1rem;line-height:1.7;white-space:nowrap}
 .parts-section{max-width:960px;margin:0 auto;padding:0 2rem 4rem;position:relative;z-index:1}
@@ -111,7 +114,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,252,247,
 .gap-option{padding:5px 10px;border-radius:6px;font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:500;color:var(--ink);cursor:pointer;transition:all .12s;display:flex;align-items:center;gap:6px;white-space:nowrap}
 .gap-option:hover{background:rgba(29,211,176,.08)}
 .gap-option.selected{background:var(--accent-light);color:var(--accent);font-weight:700}
-.gap-option.eliminated{color:var(--border);text-decoration:line-through;pointer-events:none;opacity:.45}
+.gap-option.eliminated{color:var(--border);text-decoration:line-through;opacity:.45}
+.gap-option.eliminated:hover{background:rgba(122,125,142,.1);opacity:.7}
 .gap-divider{height:1px;background:var(--border);margin:3px 4px}
 .gap-ruleout{padding:5px 10px;border-radius:7px;font-family:Outfit,sans-serif;font-size:.7rem;font-weight:600;color:var(--coral);cursor:pointer;transition:all .12s;display:flex;align-items:center;gap:6px;letter-spacing:.3px;white-space:nowrap}
 .gap-ruleout:hover{background:rgba(255,107,107,.08)}
@@ -481,8 +485,14 @@ footer{text-align:center;padding:2.5rem 2rem;font-size:.8rem;color:var(--muted);
   <a href="index.html" class="nav-logo">john<span>plus</span>english</a>
   <div class="nav-links"><a href="index.html">Home</a><a href="index.html#about">About</a><a href="index.html#contact">Contact</a></div>
 </nav>
-<div class="page-header reveal">  <h1 class="page-title">Use of English</h1>
-  <div class="level-badge">🟢 B2 First</div>
+<div class="page-header reveal">
+  <div class="topic-hero">
+    <div class="topic-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2Z"/><path d="M9 13h2"/><path d="M15 13h.01"/><path d="M9 17h6"/></svg></div>
+    <div>
+      <h1 class="page-title">Use of English</h1>
+      <div class="level-badge">🟢 B2 First</div>
+    </div>
+  </div>
 </div>
 
 <div class="tabs-wrap">
@@ -822,8 +832,16 @@ function p1ToggleDrop(n) {
 }
 function p1Pick(n, idx) {
   if(p1Checked) return;
-  const s = p1State[n]; if(s.eliminated.includes(idx)) return;
+  const s = p1State[n];
   const g = TESTS[currentTest].gaps[n-1];
+  if(s.eliminated.includes(idx)){
+    s.eliminated = s.eliminated.filter(i=>i!==idx);
+    document.getElementById('p1opt-'+n+'-'+idx).classList.remove('eliminated');
+    const btn = document.getElementById('p1ro-'+n);
+    const rem=[]; for(let i=0;i<g.options.length;i++){if(i!==g.correct&&!s.eliminated.includes(i))rem.push(i);}
+    if(btn) btn.classList.toggle('used', rem.length<=1);
+    return;
+  }
   if(s.selected===idx){ s.selected=null; document.getElementById('p1text-'+n).textContent='Choose'; document.getElementById('p1trigger-'+n).classList.remove('answered'); document.getElementById('p1opt-'+n+'-'+idx).classList.remove('selected'); }
   else { s.selected=idx; const _o=g.options[idx],_sp=_o.indexOf(' '),_let=_sp>-1?_o.slice(0,_sp):_o,_word=_sp>-1?_o.slice(_sp):'';document.getElementById('p1text-'+n).innerHTML='<span class="gap-letter">'+_let+'</span>'+_word; document.getElementById('p1trigger-'+n).classList.add('answered'); g.options.forEach((_,i)=>{document.getElementById('p1opt-'+n+'-'+i).classList.toggle('selected',i===idx);}); document.getElementById('p1panel-'+n).classList.remove('open'); document.getElementById('p1trigger-'+n).classList.remove('open'); }
   p1UpdateProgress(); p1UpdateCheck();
