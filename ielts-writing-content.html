@@ -10,7 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-:root{--sun:#FFB347;--sky:#2176FF;--sky-light:#E8EEFF;--sea:#1DD3B0;--sea-light:#E4F8F6;--coral:#FF6B6B;--coral-light:#FFE8E8;--lavender:#9B72CF;--lavender-light:#F0E8FA;--mint:#5DDEA0;--sand:#FFF5E6;--cream:#F7F6F3;--ink:#2D3047;--muted:#7A7D8E;--border:#E8E5DF;--card:#fff;--radius:14px;--radius-sm:10px;--shadow-sm:0 1px 3px rgba(45,48,71,.06);--shadow-md:0 4px 14px rgba(45,48,71,.08)}
+:root{--ielts:#FF9100;--ielts-light:#FFF0E0;--sun:#FFB347;--sky:#2176FF;--sky-light:#E8EEFF;--sea:#1DD3B0;--sea-light:#E4F8F6;--coral:#FF6B6B;--coral-light:#FFE8E8;--lavender:#9B72CF;--lavender-light:#F0E8FA;--mint:#5DDEA0;--sand:#FFF5E6;--cream:#F7F6F3;--ink:#2D3047;--muted:#7A7D8E;--border:#E8E5DF;--card:#fff;--radius:14px;--radius-sm:10px;--shadow-sm:0 1px 3px rgba(45,48,71,.06);--shadow-md:0 4px 14px rgba(45,48,71,.08)}
 
 *{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth;overflow-x:hidden;overflow-y:scroll}
 body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-y:auto}
@@ -90,6 +90,11 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
 .content-area.sb-collapsed .wb-sb-scroll,.content-area.sb-collapsed .wb-sb-foot,.content-area.sb-collapsed .wb-sb-head>span{display:none}
 .content-area.sb-collapsed .wb-sb-head{justify-content:center;padding:.7rem .4rem}
 .content-area.sb-collapsed .sb-chev{transform:rotate(180deg)}
+.wb-pane{background:var(--card);border:1.5px solid var(--border);border-radius:14px;box-shadow:var(--shadow-sm);overflow:hidden;min-width:0}
+.wb-pane-head{padding:1rem 1.25rem .8rem;border-bottom:1.5px solid var(--border)}
+.wb-pane-head h2{margin:0;font-size:1.2rem;font-weight:800;letter-spacing:-.01em}
+.wb-pane-head p{margin:.35rem 0 0;font-size:.85rem;color:var(--muted);line-height:1.5}
+.wb-pane-body{padding:1.1rem 1.25rem 1.4rem}
 .task-nav-item{display:flex;align-items:center;gap:.6rem;padding:.65rem .75rem;border-radius:10px;cursor:pointer;font-family:'Outfit',sans-serif;color:var(--muted);border:1.5px solid var(--border);background:var(--card);transition:all .15s;text-align:left;width:100%}
 .task-nav-item:hover{color:var(--ink);border-color:var(--task-accent,var(--sky))}
 .task-nav-item.active{color:var(--ink);border-color:var(--task-accent,var(--sky));background:color-mix(in srgb,var(--task-accent,var(--sky)) 7%,var(--card));box-shadow:0 1px 3px rgba(45,48,71,.06)}
@@ -97,7 +102,7 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
 .task-nav-item.active .task-nav-dot{background:var(--task-accent,var(--sky))}
 .guide-nav-item{display:flex;align-items:center;gap:.6rem;padding:.65rem .75rem;border-radius:10px;cursor:pointer;font-family:'Outfit',sans-serif;color:var(--muted);border:1.5px solid transparent;background:none;transition:all .15s;text-align:left;width:100%;font-size:.84rem;font-weight:700;line-height:1.3}
 .guide-nav-item:hover{color:var(--ink);background:var(--cream)}
-.guide-nav-item.active{color:var(--ink);border-color:var(--ielts,#FF9100);background:#FFF0E0}
+.guide-nav-item.active{color:var(--ink);border-color:var(--ielts,#FF9100);background:var(--ielts-light,#FFF0E0)}
 .guide-nav-dot{width:8px;height:8px;border-radius:50%;background:var(--border);flex-shrink:0}
 .guide-nav-item.active .guide-nav-dot{background:var(--ielts,#FF9100)}
 .task-nav-text{flex:1;min-width:0;line-height:1.3}
@@ -112,7 +117,7 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
 .task-nav-subitem{display:flex;align-items:center;padding:.42rem .6rem;border-radius:8px;cursor:pointer;font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:600;color:var(--muted);border:none;background:none;text-align:left;width:100%;transition:all .15s}
 .task-nav-subitem:hover{color:var(--ink);background:var(--card)}
 .task-nav-subitem.active{color:var(--task-accent,var(--sky));background:var(--card);font-weight:700;box-shadow:0 1px 3px rgba(45,48,71,.06)}
-.pill-group.task-hidden{display:none}
+.pill-group.task-hidden,.wb-pane.task-hidden{display:none}
 
 /* Pill Group Container */
 .pill-group{margin-bottom:1.5rem}
@@ -277,7 +282,7 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
 
 /* Content Area */
 .content-area{display:none}
-.content-area.active{display:grid;grid-template-columns:250px 1fr;gap:1.25rem;align-items:start}
+.content-area.active{display:grid;grid-template-columns:250px 1fr;gap:1.2rem;align-items:start}
 #resources-content.active{display:block}
 .band-desc{color:var(--muted);font-size:.9rem;margin-bottom:1.2rem}
 
@@ -351,6 +356,7 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
   .pill-group-content{padding:.8rem .9rem}
   .pill-group-title{font-size:1.1rem}
   .content-area.active{grid-template-columns:1fr;gap:.6rem}
+  .wb-sb{position:static;max-height:none}
   .task-sidebar{position:static;flex-direction:row;flex-wrap:wrap}
   .task-nav-item{width:auto;flex:1;min-width:140px}
   .descriptors-grid{grid-template-columns:1fr}
@@ -443,31 +449,20 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
     <div class="wb-sb-scroll" id="guideNavW"></div>
     <div class="wb-sb-foot">Tips for every writing task on this page</div>
   </div>
-  <div class="pill-group" id="guideDynamicPill">
-    <div class="pill-group-header">
-      <div class="pill-group-header-left">
-        <div class="pg-icon" id="guidePgIconW" style="background:rgba(255,145,0,.14);color:var(--ielts,#FF9100)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
-        <div>
-          <div class="pill-group-label" id="guideLabelW"></div>
-          <div class="pill-group-title" id="guideTitleW"></div>
-        </div>
-      </div>
+  <div class="wb-pane" id="guideDynamicPill">
+    <div class="wb-pane-head">
+      <h2 id="guideTitleW"></h2>
+      <p id="guideDescW"></p>
     </div>
-    <div class="pill-group-content expanded" id="guideBodyW"></div>
+    <div class="wb-pane-body" id="guideBodyW"></div>
   </div>
 
   <!-- Self-Assessment Checklist -->
-  <div class="pill-group task-hidden" id="guideStaticChecklist">
-    <div class="pill-group-header">
-      <div class="pill-group-header-left">
-        <div class="pg-icon" style="background:rgba(255,145,0,.14);color:var(--ielts,#FF9100)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
-        <div>
-          <div class="pill-group-label">Practice</div>
-          <div class="pill-group-title">Self-Assessment Checklist</div>
-        </div>
-      </div>
+  <div class="wb-pane task-hidden" id="guideStaticChecklist">
+    <div class="wb-pane-head">
+      <h2>Self-Assessment Checklist</h2>
     </div>
-    <div class="pill-group-content expanded">
+    <div class="wb-pane-body">
         <p class="band-desc">After writing, tick each item you are confident you have met.</p>
     <div class="checklist-tabs">
       <button class="checklist-tab active" onclick="switchChecklist('cl-t1',this)">Task 1 - Report</button>
@@ -595,17 +590,11 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
   </div>
 
   <!-- Common Mistakes -->
-  <div class="pill-group task-hidden" id="guideStaticMistakes">
-    <div class="pill-group-header">
-      <div class="pill-group-header-left">
-        <div class="pg-icon" style="background:rgba(255,145,0,.14);color:#B35900"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
-        <div>
-          <div class="pill-group-label">Practice</div>
-          <div class="pill-group-title">Common Mistakes</div>
-        </div>
-      </div>
+  <div class="wb-pane task-hidden" id="guideStaticMistakes">
+    <div class="wb-pane-head">
+      <h2>Common Mistakes</h2>
     </div>
-    <div class="pill-group-content expanded">
+    <div class="wb-pane-body">
     <div class="errors-tabs">
       <button class="errors-tab active" onclick="switchErrors('err-t1',this)">Task 1 - Report</button>
       <button class="errors-tab" onclick="switchErrors('err-t2',this)">Task 2 - Essay</button>
@@ -646,17 +635,11 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
   </div>
 
   <!-- IELTS Band Descriptors -->
-  <div class="pill-group task-hidden" id="guideStaticBand">
-    <div class="pill-group-header">
-      <div class="pill-group-header-left">
-        <div class="pg-icon" style="background:rgba(255,145,0,.14);color:var(--ielts,#FF9100)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.5 13.5 17 22l-5-3-5 3 1.5-8.5"/></svg></div>
-        <div>
-          <div class="pill-group-label">Reference</div>
-          <div class="pill-group-title">IELTS Band Descriptors</div>
-        </div>
-      </div>
+  <div class="wb-pane task-hidden" id="guideStaticBand">
+    <div class="wb-pane-head">
+      <h2>IELTS Band Descriptors</h2>
     </div>
-    <div class="pill-group-content expanded">
+    <div class="wb-pane-body">
     <p class="band-desc">What each band looks like across the four marking criteria.</p>
     <div style="background:var(--sand);border:1.5px solid var(--border);border-radius:10px;padding:.9rem 1.1rem;margin-bottom:1.2rem">
       <div style="font-family:Outfit,sans-serif;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--sun);margin-bottom:.6rem">How your score is calculated</div>
@@ -6007,16 +5990,15 @@ function showGuideTopicW(i){
   const g = GUIDE_W[i];
   document.querySelectorAll('#guideNavW .guide-nav-item').forEach((b,bi)=>b.classList.toggle('active', bi===i));
   document.getElementById('guideDynamicPill').classList.remove('task-hidden');
-  document.querySelectorAll('#guide-content .pill-group[id^="guideStatic"]').forEach(p=>p.classList.add('task-hidden'));
+  document.querySelectorAll('#guide-content .wb-pane[id^="guideStatic"]').forEach(p=>p.classList.add('task-hidden'));
   try{ localStorage.setItem('jpe-ielts-writing-guide', JSON.stringify({ kind: 'topic', idx: i })); }catch(e){}
-  document.getElementById('guideLabelW').textContent = g.label;
   document.getElementById('guideTitleW').textContent = g.title;
+  document.getElementById('guideDescW').textContent = g.kind === 'passage' ? (g.intro || '') : (g.desc || '');
   let html = '';
   if(g.facts){
     html += '<div class="struct-facts">' + g.facts.map(f=>`<div class="struct-fact"><div class="struct-fact-n">${f.n}</div><div class="struct-fact-l">${f.l}</div></div>`).join('') + '</div>';
   }
   if(g.kind === 'passage'){
-    if(g.intro) html += `<div class="guide-section-desc">${g.intro}</div>`;
     html += '<div class="guide-quicknav">' + g.sections.map(s=>`<button onclick="document.getElementById('wganchor-${s.anchor}').scrollIntoView({behavior:'smooth',block:'start'})">${s.label} &darr;</button>`).join('') + '</div>';
     html += g.sections.map(s => `
       <div class="guide-section" id="wganchor-${s.anchor}">
@@ -6027,7 +6009,6 @@ function showGuideTopicW(i){
         ${s.example ? `<div class="guide-example"><div class="guide-example-label">Worked example</div><div class="guide-example-body">${s.example}</div></div>` : ''}
       </div>`).join('');
   } else {
-    if(g.desc) html += `<div class="guide-section-desc">${g.desc}</div>`;
     html += renderGuideTipsW(g.tips);
     if(g.example) html += `<div class="guide-example"><div class="guide-example-label">Worked example</div><div class="guide-example-body">${g.example}</div></div>`;
   }
@@ -6054,7 +6035,7 @@ function showGuideStatic(key, btn){
   btn.classList.add('active');
   document.getElementById('guideDynamicPill').classList.add('task-hidden');
   const target = GUIDE_STATIC_W.find(s=>s.key===key).panelId;
-  document.querySelectorAll('#guide-content .pill-group[id^="guideStatic"]').forEach(p=>p.classList.toggle('task-hidden', p.id !== target));
+  document.querySelectorAll('#guide-content .wb-pane[id^="guideStatic"]').forEach(p=>p.classList.toggle('task-hidden', p.id !== target));
   try{ localStorage.setItem('jpe-ielts-writing-guide', JSON.stringify({ kind: 'static', key: key })); }catch(e){}
 }
 function buildGuideW(){
@@ -6126,7 +6107,7 @@ try{
     if (savedGuide.kind === 'topic' && GUIDE_W[savedGuide.idx]) {
       showGuideTopicW(savedGuide.idx);
     } else if (savedGuide.kind === 'static' && GUIDE_STATIC_W.find(s => s.key === savedGuide.key)) {
-      const btn = document.querySelector('#guideNavW .task-nav-item[onclick*="' + savedGuide.key + '"]');
+      const btn = document.querySelector('#guideNavW .guide-nav-item[onclick*="' + savedGuide.key + '"]');
       if (btn) showGuideStatic(savedGuide.key, btn);
     }
   }
