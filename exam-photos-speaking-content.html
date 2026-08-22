@@ -288,8 +288,17 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
 .set-rail-head{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.75rem 1rem;border-bottom:1px solid var(--border);cursor:pointer}
 .set-rail-label{font-family:'Outfit',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
 .set-rail-scroll{flex:1;min-height:0;overflow-y:auto;padding:.4rem .5rem .6rem}
-.set-rail-cat{font-family:Outfit,sans-serif;font-size:.62rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);padding:.6rem .6rem .3rem;margin-top:.15rem}
-.set-rail-cat:first-child{margin-top:0}
+.set-rail-cat-group{margin-top:.15rem}
+.set-rail-cat-group:first-child{margin-top:0}
+.set-rail-cat-toggle{-webkit-appearance:none;appearance:none;width:100%;display:flex;align-items:center;gap:.4rem;padding:.55rem .6rem;border:none;background:transparent;cursor:pointer;font-family:Outfit,sans-serif;text-align:left;border-radius:9px;transition:background .12s ease}
+.set-rail-cat-toggle:hover{background:var(--cream)}
+.set-rail-cat-name{font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);flex:1}
+.set-rail-cat-count{font-size:.62rem;font-weight:700;color:var(--muted);background:var(--cream);border-radius:20px;padding:.05rem .45rem}
+.set-rail-cat-chevron{font-size:.65rem;color:var(--muted);transition:transform .18s ease;flex-shrink:0}
+.set-rail-cat-group.open .set-rail-cat-chevron{transform:rotate(180deg)}
+.set-rail-cat-rows{max-height:0;overflow:hidden;transition:max-height .22s ease}
+.set-rail-cat-group.open .set-rail-cat-rows{max-height:900px}
+@media(prefers-reduced-motion:reduce){.set-rail-cat-rows{transition:none}.set-rail-cat-chevron{transition:none}}
 .set-rail-scroll::-webkit-scrollbar{width:4px}
 .set-rail-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
 .set-rail-foot{padding:.55rem .9rem;border-top:1px solid var(--border);font-size:.66rem;color:var(--muted)}
@@ -1293,7 +1302,16 @@ function selectSet(level, i) {
     c.classList.toggle('shown', n === i);
     c.classList.toggle('open', n === i);
   });
-  panel.querySelectorAll('.set-row').forEach((r, n) => r.classList.toggle('on', n === i));
+  const rows = panel.querySelectorAll('.set-row');
+  rows.forEach((r, n) => r.classList.toggle('on', n === i));
+  const activeRow = rows[i];
+  const catGroup = activeRow && activeRow.closest('.set-rail-cat-group');
+  if (catGroup) catGroup.classList.add('open');
+}
+function toggleRailCat(level, ci) {
+  const panel = document.getElementById('panel-' + level);
+  const group = panel.querySelector(`.set-rail-cat-group[data-cat="${ci}"]`);
+  if (group) group.classList.toggle('open');
 }
 function installSetRails() {
   Object.keys(RAIL_META).forEach(level => {
@@ -1311,20 +1329,34 @@ function installSetRails() {
     rail.className = 'set-rail';
     rail.style.setProperty('--rowtint', meta.tint);
     rail.style.setProperty('--rowink', meta.ink);
-    let rows = '';
-    let prevCat = null;
     const rowLabel = level === 'gen' ? 'Image' : 'Set';
-    meta.sets.forEach((s, i) => {
-      if (s.category && s.category !== prevCat) {
-        rows += `<div class="set-rail-cat">${s.category}</div>`;
-        prevCat = s.category;
-      }
-      rows += `<button class="set-row" type="button" onclick="selectSet('${level}',${i})">` +
-                `<span class="set-thumb"><img loading="lazy" alt="" src="${thumbFor(s.photos[0])}"></span>` +
-                `<span class="set-row-txt"><span class="set-row-n">${rowLabel} ${i + 1}</span>` +
-                `<span class="set-row-t">${s.topic}</span></span>` +
-              `</button>`;
-    });
+    const rowHTML = (s, i) =>
+      `<button class="set-row" type="button" onclick="selectSet('${level}',${i})">` +
+        `<span class="set-thumb"><img loading="lazy" alt="" src="${thumbFor(s.photos[0])}"></span>` +
+        `<span class="set-row-txt"><span class="set-row-n">${rowLabel} ${i + 1}</span>` +
+        `<span class="set-row-t">${s.topic}</span></span>` +
+      `</button>`;
+    let rows = '';
+    if (meta.sets.some(s => s.category)) {
+      const cats = [];
+      meta.sets.forEach((s, i) => {
+        let cat = cats[cats.length - 1];
+        if (!cat || cat.name !== s.category) { cat = { name: s.category, items: [] }; cats.push(cat); }
+        cat.items.push(i);
+      });
+      rows = cats.map((cat, ci) =>
+        `<div class="set-rail-cat-group${ci === 0 ? ' open' : ''}" data-cat="${ci}">` +
+          `<button class="set-rail-cat-toggle" type="button" onclick="toggleRailCat('${level}',${ci})">` +
+            `<span class="set-rail-cat-name">${cat.name}</span>` +
+            `<span class="set-rail-cat-count">${cat.items.length}</span>` +
+            `<span class="set-rail-cat-chevron">&#9662;</span>` +
+          `</button>` +
+          `<div class="set-rail-cat-rows">${cat.items.map(i => rowHTML(meta.sets[i], i)).join('')}</div>` +
+        `</div>`
+      ).join('');
+    } else {
+      rows = meta.sets.map((s, i) => rowHTML(s, i)).join('');
+    }
     const railLabel = meta.sets.some(s => s.category) ? 'All categories' : 'All sets';
     rail.innerHTML = `<div class="set-rail-head" onclick="toggleSetRail('${level}')"><span class="set-rail-label">${railLabel}</span><button class="set-rail-toggle" type="button" aria-label="Collapse list" onclick="event.stopPropagation();toggleSetRail('${level}')"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button></div>` +
                      `<div class="set-rail-scroll">${rows}</div>` +
