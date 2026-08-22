@@ -106,8 +106,12 @@ function jpeNavigate(href, push){
   var frame = jpeEnsureFrame();
   if (!frame) { location.href = href; return; }
   frame.style.opacity = '0';
-  frame.onload = function(){ frame.style.opacity = '1'; };
-  frame.src = jpeContentSrc(href);
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){
+      frame.onload = function(){ frame.style.opacity = '1'; };
+      frame.src = jpeContentSrc(href);
+    });
+  });
   jpeActivate(href);
   if (JPE_TITLES[href]) document.title = JPE_TITLES[href];
   if (push !== false) {
