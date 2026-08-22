@@ -69,10 +69,6 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .test-pill.active{background:var(--accent);border-color:var(--accent);color:#fff}
 .test-topic{font-size:.78rem;color:var(--muted);margin:.55rem 0 0}
 .test-topic strong{color:var(--ink);font-weight:700}
-.overview{display:flex;gap:.6rem;flex-wrap:wrap;margin:1.6rem 0 1.2rem;padding:.9rem 1.1rem;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);align-items:center}
-.overview-item{font-size:.78rem;color:var(--muted);display:flex;align-items:center;gap:.35rem}
-.overview-item strong{color:var(--ink);font-weight:800;font-size:.85rem}
-.overview-total{margin-left:auto;font-family:Outfit,sans-serif;font-size:.82rem;font-weight:800;color:var(--accent);background:var(--accent-light);padding:.3rem .8rem;border-radius:8px}
 
 /* top-level tabs (Guide / Tests) */
 .tabs-wrap{max-width:960px;margin:0 auto;padding:0 2rem;position:relative;z-index:1}
@@ -243,7 +239,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .score-summary-item .ss-val{font-family:Outfit,sans-serif;font-size:1.1rem;font-weight:700;color:var(--accent)}
 .score-summary-total{font-family:Outfit,sans-serif;font-size:.85rem;font-weight:700;color:var(--ink);padding-top:10px;border-top:1.5px solid var(--border)}
 
-@media(max-width:640px){.wrap{padding:0 1.2rem 3rem}.page-header{padding:1.6rem 1.2rem 1rem}.p7-texts{grid-template-columns:1fr}.p7-q{align-items:flex-start}.p5-opts{margin-left:0}.overview{gap:.5rem 1rem}.overview-total{margin-left:0;width:100%;text-align:center}}
+@media(max-width:640px){.wrap{padding:0 1.2rem 3rem}.page-header{padding:1.6rem 1.2rem 1rem}.p7-texts{grid-template-columns:1fr}.p7-q{align-items:flex-start}.p5-opts{margin-left:0}}
 </style>
 <style>.topnav{display:none!important}</style>
 </head>
@@ -292,13 +288,6 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 <div class="content-area" id="tests-content">
   <div class="test-picker" id="testPicker"><span class="test-picker-label">Test</span></div>
   <div class="test-topic" id="testTopic"></div>
-
-  <div class="overview" id="overview">
-    <div class="overview-item">Part 5 <strong id="ovP5">-/6</strong></div>
-    <div class="overview-item">Part 6 <strong id="ovP6">-/6</strong></div>
-    <div class="overview-item">Part 7 <strong id="ovP7">-/10</strong></div>
-    <div class="overview-total" id="ovTotal">Total: -/22</div>
-  </div>
 
   <div class="font-switch" id="fontSwitch">
     <button class="font-switch-btn" onclick="toggleFontMenu()" aria-haspopup="true" aria-expanded="false">Aa &nbsp;Reading font</button>
@@ -865,7 +854,6 @@ function finishP5(correct){
   document.getElementById('p5ExpBtn').style.display='inline-flex';
   document.getElementById('p5Explanations').innerHTML = `<div class="exp-title">Explanations</div><div class="exp-grid">` + P5.questions.map((q,qi)=>`
     <div class="exp-item ${state.p5[qi]===q.correct?'was-correct':'was-wrong'}"><div class="exp-num">${qi+1}</div><div class="exp-text"><strong>${String.fromCharCode(65+q.correct)}</strong> - ${q.exp}</div></div>`).join('') + `</div>`;
-  document.getElementById('ovP5').textContent = `${correct}/6`;
   updateOverall();
 }
 function resetP5(){
@@ -876,7 +864,6 @@ function resetP5(){
   document.getElementById('p5ResetBtn').style.display='none';
   document.getElementById('p5ExpBtn').style.display='none';
   document.getElementById('p5Explanations').classList.remove('visible');
-  document.getElementById('ovP5').textContent = '-/6';
   renderP5();
   updateOverall();
 }
@@ -923,7 +910,6 @@ function finishP6(correct){
   }
   rows += `<div class="exp-item"><div class="exp-num">-</div><div class="exp-text">${P6.exp.extra}</div></div>`;
   document.getElementById('p6Explanations').innerHTML = `<div class="exp-title">Explanations</div><div class="exp-grid">${rows}</div>`;
-  document.getElementById('ovP6').textContent = `${correct}/6`;
   updateOverall();
 }
 function resetP6(){
@@ -933,7 +919,6 @@ function resetP6(){
   document.getElementById('p6ResetBtn').style.display='none';
   document.getElementById('p6ExpBtn').style.display='none';
   document.getElementById('p6Explanations').classList.remove('visible');
-  document.getElementById('ovP6').textContent = '-/6';
   renderP6();
   updateOverall();
 }
@@ -981,7 +966,6 @@ function finishP7(correct){
   document.getElementById('p7ExpBtn').style.display='inline-flex';
   document.getElementById('p7Explanations').innerHTML = `<div class="exp-title">Explanations</div><div class="exp-grid">` + P7.questions.map((q,qi)=>`
     <div class="exp-item ${state.p7[qi]===q.correct?'was-correct':'was-wrong'}"><div class="exp-num">${qi+1}</div><div class="exp-text"><strong>${q.correct}</strong> - ${q.exp}</div></div>`).join('') + `</div>`;
-  document.getElementById('ovP7').textContent = `${correct}/10`;
   updateOverall();
 }
 function resetP7(){
@@ -992,7 +976,6 @@ function resetP7(){
   document.getElementById('p7ResetBtn').style.display='none';
   document.getElementById('p7ExpBtn').style.display='none';
   document.getElementById('p7Explanations').classList.remove('visible');
-  document.getElementById('ovP7').textContent = '-/10';
   renderP7();
   updateOverall();
 }
@@ -1011,7 +994,6 @@ function updateOverall(){
   if(p7done){ let c=0; P7.questions.forEach((q,qi)=>{if(state.p7[qi]===q.correct)c++;}); total+=c; document.getElementById('ssP7').textContent=`${c}/10`; }
   else document.getElementById('ssP7').textContent='0/10';
   document.getElementById('ssTotal').textContent = `Total: ${total}/22`;
-  document.getElementById('ovTotal').textContent = `Total: ${total}/22`;
   document.getElementById('overallSummary').classList.toggle('visible', p5done && p6done && p7done);
 }
 function showPart(n){
