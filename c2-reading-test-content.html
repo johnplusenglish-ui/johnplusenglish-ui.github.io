@@ -24,7 +24,7 @@
 })();
 </script>
 <style>
-:root{--sky:#2176FF;--sky-light:#E8EEFF;--sun:#FFB347;--cream:#F7F6F3;--ink:#2D3047;--muted:#7A7D8E;--border:#E8E5DF;--card:#fff;--radius:14px;--radius-sm:10px;--shadow-sm:0 1px 3px rgba(45,48,71,.06);--shadow-md:0 4px 14px rgba(45,48,71,.08);--accent:#1E293B;--accent-light:#E2E8F0;--correct:#34C759;--wrong:#FF3B30}
+:root{--sky:#2176FF;--sky-light:#E8EEFF;--sun:#FFB347;--cream:#F7F6F3;--ink:#2D3047;--muted:#7A7D8E;--border:#E8E5DF;--card:#fff;--radius:14px;--radius-sm:10px;--shadow-sm:0 1px 3px rgba(45,48,71,.06);--shadow-md:0 4px 14px rgba(45,48,71,.08);--accent:#16A88D;--accent-light:#E1F5F1;--correct:#34C759;--wrong:#FF3B30}
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth;overflow-x:hidden;overflow-y:scroll}
 body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
@@ -61,18 +61,87 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .font-opt.active .font-opt-check{opacity:1}
 .font-opt-label{font-family:var(--opt-font,inherit);font-size:.95rem}
 
-.test-picker{display:flex;align-items:center;gap:.45rem;flex-wrap:wrap;margin:1.6rem 0 0}
-.test-picker-label{font-family:Outfit,sans-serif;font-size:.62rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-right:.25rem}
+.test-picker{display:flex;align-items:center;gap:.45rem;flex-wrap:wrap;margin:1rem 0 0}
+.test-picker-label{display:none}
 .test-pill{font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:700;padding:.4rem .9rem;border-radius:999px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:background .16s,color .16s,border-color .16s}
 .test-pill:hover{color:var(--ink);border-color:var(--muted)}
 .test-pill.active{background:var(--accent);border-color:var(--accent);color:#fff}
-.test-topic{font-size:.78rem;color:var(--muted);margin:.55rem 0 0}
+.test-topic{display:none}
 .test-topic strong{color:var(--ink);font-weight:700}
-.overview{display:flex;gap:.6rem;flex-wrap:wrap;margin:1.6rem 0 1.2rem;padding:.9rem 1.1rem;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);align-items:center}
-.overview-item{font-size:.78rem;color:var(--muted);display:flex;align-items:center;gap:.35rem}
-.overview-item strong{color:var(--ink);font-weight:800;font-size:.85rem}
-.overview-total{margin-left:auto;font-family:Outfit,sans-serif;font-size:.82rem;font-weight:800;color:var(--accent);background:var(--accent-light);padding:.3rem .8rem;border-radius:8px}
 
+/* top-level tabs (Guide / Tests) */
+.tabs-wrap{max-width:960px;margin:0 auto;padding:0 2rem;position:relative;z-index:1}
+.tabs{display:flex;gap:4px;row-gap:4px;border-bottom:none;position:relative;margin-bottom:1.5rem;align-items:flex-end;flex-wrap:wrap;padding-top:8px}
+.tabs::before{content:'';position:absolute;left:0;right:0;bottom:0;height:1.5px;background:var(--border)}
+.tab{position:relative;font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;padding:.5rem 1.25rem;color:var(--muted);cursor:pointer;white-space:nowrap;background:color-mix(in srgb,var(--ink) 4%,transparent);border:1.5px solid var(--border);border-radius:12px 12px 0 0;transition:background .18s,color .18s,box-shadow .18s,border-color .18s}
+.tab:not(.active):hover{background:color-mix(in srgb,var(--ink) 8%,transparent);color:var(--ink)}
+.tab:not(.active):focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tab.active{outline:none}
+.tab.active{background:var(--cream);border-color:var(--tab-accent,var(--accent));border-bottom:none!important;color:var(--tab-accent,var(--accent));padding-top:calc(.5rem + 3px);box-shadow:0 -3px 10px rgba(45,48,71,.06);z-index:2}
+.content-area{display:none}
+.content-area.active{display:block}
+
+/* Guide tab (sidebar + pane) */
+.guide-shell{display:grid;grid-template-columns:250px 1fr;gap:1.2rem;align-items:start}
+.wb-sb{background:var(--card);border:1.5px solid var(--border);border-radius:14px;box-shadow:var(--shadow-sm);overflow:hidden;display:flex;flex-direction:column;position:sticky;top:80px;max-height:calc(100vh - 100px)}
+.wb-sb-head{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.75rem 1rem;border-bottom:1px solid var(--border);cursor:pointer;user-select:none}
+.wb-sb-head>span{font-size:.66rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.wb-sb-head .sb-chev{width:26px;height:26px;border:1.5px solid var(--border);border-radius:7px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:1rem;line-height:1;flex-shrink:0;transition:transform .2s}
+.wb-sb-head .sb-chev svg{width:13px;height:13px}
+.wb-sb-head:hover .sb-chev{color:var(--ink);border-color:var(--muted)}
+.wb-sb-scroll{flex:1;min-height:0;overflow-y:auto;padding:.4rem}
+.wb-sb-foot{padding:.55rem .9rem;border-top:1px solid var(--border);font-size:.66rem;color:var(--muted)}
+.wb-sb-foot b{color:var(--ink)}
+.guide-shell.sb-collapsed{grid-template-columns:48px 1fr}
+.guide-shell.sb-collapsed .wb-sb-scroll,.guide-shell.sb-collapsed .wb-sb-foot,.guide-shell.sb-collapsed .wb-sb-head>span{display:none}
+.guide-shell.sb-collapsed .wb-sb-head{justify-content:center;padding:.7rem .4rem}
+.guide-shell.sb-collapsed .sb-chev{transform:rotate(180deg)}
+.guide-nav-item{display:flex;align-items:center;gap:.6rem;padding:.65rem .75rem;border-radius:10px;cursor:pointer;font-family:'Outfit',sans-serif;color:var(--muted);border:1.5px solid transparent;background:none;transition:all .15s;text-align:left;width:100%;font-size:.84rem;font-weight:700;line-height:1.3}
+.guide-nav-item:hover{color:var(--ink);background:var(--cream)}
+.guide-nav-item.active{color:var(--ink);border-color:var(--accent);background:var(--accent-light)}
+.guide-nav-dot{width:6px;height:6px;border-radius:50%;background:var(--border);flex-shrink:0}
+.guide-nav-item.active .guide-nav-dot{background:var(--accent)}
+.guide-nav-group-label{font-family:Outfit,sans-serif;font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:.7rem .75rem .3rem}
+.guide-nav-group-label:first-child{padding-top:.2rem}
+.wb-pane{background:var(--card);border:1.5px solid var(--border);border-radius:14px;box-shadow:var(--shadow-sm);overflow:hidden;min-width:0}
+.wb-pane-head{padding:1rem 1.25rem .8rem;border-bottom:1.5px solid var(--border)}
+.wb-pane-head h2{margin:0;font-size:1.2rem;font-weight:800;letter-spacing:-.01em}
+.wb-pane-head p{margin:.35rem 0 0;font-size:.85rem;color:var(--muted);line-height:1.5}
+.wb-pane-body{padding:1.1rem 1.25rem 1.4rem}
+.guide-tip-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.7rem}
+.guide-tip{display:flex;gap:.7rem;font-size:.88rem;line-height:1.55;color:var(--ink)}
+.guide-tip-num{width:22px;height:22px;border-radius:7px;background:var(--accent-light);color:var(--accent);font-size:.72rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.guide-tip b{font-weight:700}
+.guide-example{margin-top:1.1rem;padding-top:1rem;border-top:1.5px solid var(--border)}
+.guide-example-label{font-family:Outfit,sans-serif;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:.5rem}
+.guide-example-body{font-size:.85rem;line-height:1.6;color:var(--ink);background:var(--cream);border-radius:var(--radius-sm);padding:.8rem .95rem}
+.guide-quicknav{display:flex;flex-wrap:wrap;gap:.5rem;margin:1.1rem 0 0}
+.guide-quicknav button{font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:700;padding:.45rem .85rem;border-radius:999px;border:1.5px solid var(--border);background:var(--card);color:var(--ink);cursor:pointer;transition:all .15s}
+.guide-quicknav button:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
+.guide-section{margin-top:1.6rem;padding-top:1.4rem;border-top:1.5px solid var(--border);scroll-margin-top:24px}
+.guide-section-title{font-size:1.02rem;font-weight:800;color:var(--ink);margin-bottom:.3rem}
+.guide-section-desc{font-size:.85rem;color:var(--muted);margin-bottom:.9rem;line-height:1.5}
+.struct-facts{display:flex;gap:.6rem;margin-bottom:1.1rem;flex-wrap:wrap}
+.struct-fact{flex:1;min-width:90px;background:var(--accent-light);border-radius:var(--radius-sm);padding:.7rem .5rem;text-align:center}
+.struct-fact-n{font-family:Outfit,sans-serif;font-size:1.5rem;font-weight:800;color:var(--accent);line-height:1.1}
+.struct-fact-l{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-top:.15rem}
+.struct-list{display:flex;flex-direction:column;gap:.6rem;margin-bottom:1.3rem}
+.struct-row{display:flex;gap:.9rem;padding:.85rem .95rem;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius-sm);align-items:flex-start;box-shadow:var(--shadow-sm)}
+.struct-badge{width:32px;height:32px;border-radius:9px;background:var(--accent);color:#fff;font-family:Outfit,sans-serif;font-weight:800;font-size:.9rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.struct-info{flex:1;min-width:0}
+.struct-info-top{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.35rem}
+.struct-info-top strong{font-size:.85rem}
+.struct-qrange{font-size:.7rem;color:var(--muted);font-weight:600}
+.struct-diff{font-family:Outfit,sans-serif;font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:.15rem .5rem;border-radius:999px}
+.struct-diff.easy{background:rgba(52,199,89,.14);color:#1a7a34}
+.struct-diff.med{background:rgba(255,179,71,.2);color:#a5690a}
+.struct-diff.hard{background:rgba(255,59,48,.12);color:#c0392b}
+.struct-tasks{display:flex;flex-wrap:wrap;gap:.35rem}
+.struct-task{font-size:.72rem;background:var(--card);border:1px solid var(--border);border-radius:7px;padding:.25rem .55rem;color:var(--ink)}
+.struct-task b{color:var(--accent);font-weight:800;margin-left:.2rem}
+@media(max-width:820px){.guide-shell{grid-template-columns:1fr}.wb-sb{position:static;max-height:none}}
+
+/* part tabs, folder-tab language matching the UoE reference */
 .part-filter{display:flex;gap:4px;row-gap:4px;flex-wrap:wrap;align-items:flex-end;position:relative;padding-top:6px;margin-bottom:0}
 .part-filter::before{content:'';position:absolute;left:0;right:0;bottom:0;height:1.5px;background:var(--border)}
 .part-filter-pill{position:relative;font-size:.8rem;font-weight:700;padding:.6rem .9rem;color:var(--muted);cursor:pointer;white-space:nowrap;background:color-mix(in srgb,var(--ink) 4%,transparent);border:1.5px solid var(--border);border-radius:10px 10px 0 0;transition:all .18s;font-family:'Outfit',sans-serif}
@@ -160,7 +229,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .score-summary-item .ss-val{font-family:Outfit,sans-serif;font-size:1.05rem;font-weight:700;color:var(--accent)}
 .score-summary-total{font-family:Outfit,sans-serif;font-size:.85rem;font-weight:700;color:var(--ink);padding-top:10px;border-top:1.5px solid var(--border)}
 
-@media(max-width:640px){.wrap{padding:0 1.2rem 3rem}.page-header{padding:1.6rem 1.2rem 1rem}.match-q{align-items:flex-start}.mcq-opts{margin-left:0}.overview{gap:.5rem 1rem}.overview-total{margin-left:0;width:100%;text-align:center}}
+@media(max-width:640px){.wrap{padding:0 1.2rem 3rem}.page-header{padding:1.6rem 1.2rem 1rem}.match-q{align-items:flex-start}.mcq-opts{margin-left:0}}
 </style>
 <style>.topnav{display:none!important}</style>
 </head>
@@ -180,16 +249,35 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
   </div>
 </div>
 
+<div class="tabs-wrap">
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-type="guide" onclick="switchType('guide')" style="--tab-accent:#16A88D">Guide</button>
+    <button class="tab" data-type="tests" onclick="switchType('tests')" style="--tab-accent:#16A88D">Tests</button>
+  </div>
+</div>
+
 <div class="wrap">
+
+<div class="content-area active" id="guide-content">
+<div class="guide-shell" id="guideShell">
+  <div class="wb-sb">
+    <div class="wb-sb-head" onclick="toggleGuideSidebar(this)"><span>Guide topics</span><div class="sb-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div></div>
+    <div class="wb-sb-scroll" id="guideNav"></div>
+    <div class="wb-sb-foot">Tips for every task type in Parts 5-7</div>
+  </div>
+  <div class="wb-pane">
+    <div class="wb-pane-head">
+      <h2 id="guidePaneTitle"></h2>
+      <p id="guidePaneDesc"></p>
+    </div>
+    <div class="wb-pane-body" id="guidePaneBody"></div>
+  </div>
+</div>
+</div>
+
+<div class="content-area" id="tests-content">
   <div class="test-picker" id="testPicker"><span class="test-picker-label">Test</span></div>
   <div class="test-topic" id="testTopic"></div>
-
-  <div class="overview">
-    <div class="overview-item">Part 5 <strong id="ov5">-/6</strong></div>
-    <div class="overview-item">Part 6 <strong id="ov6">-/7</strong></div>
-    <div class="overview-item">Part 7 <strong id="ov7">-/10</strong></div>
-    <div class="overview-total" id="ovTotal">Total: -/23</div>
-  </div>
 
   <div class="font-switch" id="fontSwitch">
     <button class="font-switch-btn" onclick="toggleFontMenu()" aria-haspopup="true" aria-expanded="false">Aa &nbsp;Reading font</button>
@@ -268,6 +356,8 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
     </div>
     <div class="score-summary-total" id="ssTotal">Total: 0/23</div>
   </div>
+</div>
+
 </div>
 
 <script>
@@ -754,7 +844,6 @@ function mcCheckShow(show){
   document.getElementById('p5ExpBtn').style.display='inline-flex';
   document.getElementById('p5Explanations').innerHTML = `<div class="exp-title">Explanations</div><div class="exp-grid">` + P5.questions.map((q,qi)=>`
     <div class="exp-item ${state.p5[qi]===q.correct?'was-correct':'was-wrong'}"><div class="exp-num">${qi+1}</div><div class="exp-text"><strong>${String.fromCharCode(65+q.correct)}</strong> - ${q.exp}</div></div>`).join('') + `</div>`;
-  document.getElementById('ov5').textContent = `${correct}/${P5.questions.length}`;
   updateOverall();
 }
 function resetP5(){
@@ -765,7 +854,6 @@ function resetP5(){
   document.getElementById('p5ResetBtn').style.display='none';
   document.getElementById('p5ExpBtn').style.display='none';
   document.getElementById('p5Explanations').classList.remove('visible');
-  document.getElementById('ov5').textContent = `-/${P5.questions.length}`;
   renderP5();
   updateOverall();
 }
@@ -799,7 +887,6 @@ function gapCheckShow(show){
   }
   rows += `<div class="exp-item"><div class="exp-num">-</div><div class="exp-text">${P6.exp.extra}</div></div>`;
   document.getElementById('p6Explanations').innerHTML = `<div class="exp-title">Explanations</div><div class="exp-grid">${rows}</div>`;
-  document.getElementById('ov6').textContent = `${correct}/${GAPCOUNT6}`;
   updateOverall();
 }
 function resetP6(){
@@ -809,7 +896,6 @@ function resetP6(){
   document.getElementById('p6ResetBtn').style.display='none';
   document.getElementById('p6ExpBtn').style.display='none';
   document.getElementById('p6Explanations').classList.remove('visible');
-  document.getElementById('ov6').textContent = `-/${GAPCOUNT6}`;
   renderP6();
   updateOverall();
 }
@@ -844,7 +930,6 @@ function matchCheckShow(show){
   document.getElementById('p7ExpBtn').style.display='inline-flex';
   document.getElementById('p7Explanations').innerHTML = `<div class="exp-title">Explanations</div><div class="exp-grid">` + P7.questions.map((q,qi)=>`
     <div class="exp-item ${state.p7[qi]===q.correct?'was-correct':'was-wrong'}"><div class="exp-num">${qi+1}</div><div class="exp-text"><strong>${q.correct}</strong> - ${q.exp}</div></div>`).join('') + `</div>`;
-  document.getElementById('ov7').textContent = `${correct}/${P7.questions.length}`;
   updateOverall();
 }
 function resetP7(){
@@ -855,7 +940,6 @@ function resetP7(){
   document.getElementById('p7ResetBtn').style.display='none';
   document.getElementById('p7ExpBtn').style.display='none';
   document.getElementById('p7Explanations').classList.remove('visible');
-  document.getElementById('ov7').textContent = `-/${P7.questions.length}`;
   renderP7();
   updateOverall();
 }
@@ -871,7 +955,6 @@ function updateOverall(){
   if(state.p7checked){ let c=0; P7.questions.forEach((q,qi)=>{if(state.p7[qi]===q.correct)c++;}); total+=c; document.getElementById('ss7').textContent=`${c}/${P7.questions.length}`; } else document.getElementById('ss7').textContent=`0/${P7.questions.length}`;
   const allDone = state.p5checked && state.p6checked && state.p7checked;
   document.getElementById('ssTotal').textContent = `Total: ${total}/23`;
-  document.getElementById('ovTotal').textContent = `Total: ${total}/23`;
   document.getElementById('overallSummary').classList.toggle('visible', allDone);
 }
 function showPart(n){
@@ -930,11 +1013,256 @@ function buildPicker(){
   });
 }
 
+/* ============ TABS (Guide / Tests) ============ */
+function switchType(type){
+  ['guide','tests'].forEach(t=>{
+    document.querySelector('[data-type="'+t+'"]').classList.toggle('active', t===type);
+    document.getElementById(t+'-content').classList.toggle('active', t===type);
+  });
+}
+function toggleGuideSidebar(el){ el.closest('.guide-shell').classList.toggle('sb-collapsed'); }
+
+/* ============ GUIDE ============ */
+const GUIDE = [
+  {
+    kind: "structure",
+    label: "Exam Structure",
+    title: "Reading, Parts 5-7",
+    desc: "Parts 5-7 are the Reading half of the Reading and Use of English paper (Parts 1-4 are Use of English, covered on a separate page). The whole paper is 90 minutes; a common rule of thumb is to budget around 45 of those minutes for Parts 5-7, since C2 texts are denser and more abstract than at lower levels.",
+    facts: [
+      {n:"3", l:"reading parts"},
+      {n:"23", l:"questions"},
+      {n:"~45", l:"suggested minutes"}
+    ],
+    breakdown: [
+      {n:5, label:"Part 5", qrange:"Q1-6", diff:"med", diffLabel:"Medium", tasks:[{name:"Multiple Choice",count:"6"}]},
+      {n:6, label:"Part 6", qrange:"Q7-13", diff:"hard", diffLabel:"Hardest", tasks:[{name:"Gapped Text",count:"7"}]},
+      {n:7, label:"Part 7", qrange:"Q14-23", diff:"easy", diffLabel:"Most approachable", tasks:[{name:"Multiple Matching",count:"10"}]}
+    ],
+    tips: [
+      "The three parts test different skills. Part 5 tests close, detailed understanding of one long, often essay-style text. Part 6 tests whether you can follow a sophisticated line of argument well enough to rebuild it. Part 7 tests fast, accurate scanning across several sections of a longer piece.",
+      "At C2, texts are noticeably denser and more abstract than at lower levels, often essays, opinion pieces or literary non-fiction with layered argument, irony and qualification, so budget extra time for a careful first read.",
+      "There's no penalty for guessing, so a filled-in guess always beats a blank answer. Every question is worth one mark, whichever part it's in."
+    ]
+  },
+  {
+    kind: "tips",
+    label: "Strategy & Time",
+    title: "Strategy & Time Management",
+    desc: "Around 45 minutes for 23 questions across three demanding tasks. Here's how I'd split it.",
+    tips: [
+      "Give Part 5 about 13-14 minutes, Part 6 about 17-18 minutes (it's the slowest, since you're rebuilding argument structure across 7 gaps in a dense essay), and Part 7 about 13-14 minutes, since it's mostly scanning once you've read the sections carefully once.",
+      "Read the rubric above each part before the text itself, it tells you exactly what you're matching, choosing, or reassembling, and re-reading it mid-task wastes time you don't have.",
+      "In Part 6, don't get stuck defending a guess on one gap. Place your best answer in every gap and keep moving; a plausible guess based on the surrounding argument often turns out right.",
+      "Do the parts in whichever order suits you. Some candidates prefer Part 7 first, it warms you up on the essay's overall argument before the denser single-text focus of Parts 5 and 6."
+    ]
+  },
+  {
+    kind: "passage",
+    label: "Part 5",
+    title: "Part 5 · Multiple Choice",
+    qrange: "Q1-6", diff: "med", diffLabel: "Medium",
+    intro: "One long text, usually an essay, opinion piece or literary extract, followed by six four-option questions (A, B, C or D). The questions follow the order of the text, so question 1 refers to something near the start and question 6 near the end. At C2 the questions probe detail, opinion, attitude, tone, implication and overall organisation, often several at once.",
+    sections: [
+      {
+        anchor: "detail",
+        label: "Detail, opinion & implication",
+        title: "Detail, Opinion & Implication Questions",
+        desc: "Most questions ask about a specific detail, what the writer implies without stating outright, or what someone in the text thinks or feels about something.",
+        tips: [
+          "Locate the exact part of the text the question is about first (they come in text order), then test all four options against that section, not the whole passage.",
+          "At C2, wrong options are rarely simple factual errors. They're more often subtly overstated, understated, or shifted in emphasis from what the text actually supports, so read every option for degree, not just topic.",
+          "When a question asks what the writer implies, look for what follows logically from the text's own qualifications and hedges ('not entirely', 'at best', 'on reflection'), rather than for a sentence that states the answer directly."
+        ],
+        example: "A question might ask what the writer implies about a claim they've just described. If the text reads 'this premise is so widely shared that it is rarely examined... it is at best half true', an option claiming the writer thinks the premise is 'completely false' overstates the hedge 'at best half true' and can be eliminated."
+      },
+      {
+        anchor: "attitude",
+        label: "Attitude & tone",
+        title: "Attitude & Tone Questions",
+        desc: "These ask how the writer feels about an idea, or what tone a phrase creates, often through irony, understatement or careful hedging rather than direct statement.",
+        tips: [
+          "Watch for self-aware hedging ('I hold this with rather less certainty than the tone suggests', 'I want to suggest', 'it would be easy, and not entirely wrong, to say') , these phrases are where C2 writers signal their real attitude.",
+          "Don't mistake confident, fluent prose for a confident, uncomplicated opinion. Many C2 texts argue a position while explicitly flagging its own limits.",
+          "If two options both sound plausible, choose the one that matches the precise degree of conviction in the text, a text that 'partly agrees' with a criticism doesn't support an option claiming outright rejection or full acceptance."
+        ]
+      },
+      {
+        anchor: "reference",
+        label: "Reference & vocabulary in context",
+        title: "Reference & Vocabulary-in-Context Questions",
+        desc: "Some questions ask what a word like 'this', 'it' or 'such' refers back to, or what a word or phrase means as used in that exact sentence, often a more abstract or figurative use than its everyday meaning.",
+        tips: [
+          "For reference words, check the sentence or two immediately before first, the answer is almost always sitting close by, not several paragraphs back.",
+          "For vocabulary-in-context, C2 texts often use words figuratively ('the life has swallowed the work', 'thinking in inherited grooves'). Work out the meaning from the surrounding logic and imagery, not the word's most common dictionary sense.",
+          "Substitute each option into the sentence and check it preserves both the meaning and the register, an option that's technically synonymous but stylistically wrong for the passage is usually not the intended answer."
+        ]
+      },
+      {
+        anchor: "gist",
+        label: "Organisation & global questions",
+        title: "Organisation & Global Questions",
+        desc: "At least one question usually asks about the text as a whole, its main purpose, its overall structure, or how a particular paragraph functions within the argument.",
+        tips: [
+          "Answer these last, after working through the other questions you'll have a much clearer sense of how the whole argument builds.",
+          "Be suspicious of an option that's only true of one paragraph or one example. A global question needs an answer that fits the entire piece's argument, not just its strongest section.",
+          "For a question about how a paragraph 'functions', think in terms of its job in the argument (introducing a concession, giving a counter-example, softening an earlier claim) rather than just summarising its content."
+        ]
+      }
+    ]
+  },
+  {
+    kind: "passage",
+    label: "Part 6",
+    title: "Part 6 · Gapped Text",
+    qrange: "Q7-13", diff: "hard", diffLabel: "Hardest",
+    intro: "One essay with seven paragraphs removed and placed, jumbled, after the text, along with one extra paragraph that doesn't fit anywhere. You're rebuilding a sophisticated line of argument, not just matching topics, so cohesion and logical progression matter more than surface vocabulary.",
+    sections: [
+      {
+        anchor: "linking",
+        label: "Argument structure & cohesion",
+        title: "Argument Structure & Cohesion",
+        desc: "The sentences immediately before and after each gap are your strongest evidence, more than the removed paragraph's general topic on its own.",
+        tips: [
+          "Read the whole text first, ignoring the gaps, to get a feel for the overall argument, its claim, its qualifications, its examples, its conclusion. Then go back and work gap by gap.",
+          "Linking devices in the removed paragraphs (however, this suggests, taken to its conclusion, none of this amounts to) are strong clues about the kind of paragraph that came just before, concession, consequence, counter-example, or summary.",
+          "A removed paragraph that introduces a brand-new example or named case usually can't open a gap unless that example was already flagged just before it, watch for exactly this kind of mismatch."
+        ]
+      },
+      {
+        anchor: "reference2",
+        label: "Pronoun & reference clues",
+        title: "Pronoun & Reference Clues",
+        desc: "Pronouns and reference words in the removed paragraphs (this, that, such a shift, the claim) point back to something specific in the surrounding text, often an abstract idea rather than a concrete noun.",
+        tips: [
+          "When a removed paragraph opens with 'this' or 'that', identify precisely which claim, idea or example it's replacing, then check the paragraph right before the gap actually contains it.",
+          "At C2, the referent is often an abstract concept (a theory, an implication, a concession) rather than a physical object, so read for logical continuity, not just noun-matching.",
+          "The paragraph after the gap often depends on the removed paragraph's content too. Check both sides of every gap, not just the sentence before it."
+        ]
+      },
+      {
+        anchor: "flow",
+        label: "Paragraph-level argument flow",
+        title: "Paragraph-Level Argument Flow",
+        desc: "A C2 essay typically develops one strand of an argument, concedes a counter-point, then answers it, before moving on. A removed paragraph often marks exactly one of these pivots.",
+        tips: [
+          "If the argument seems to jump abruptly around a gap, from claim to counter-example, or from example back to general principle, that's usually exactly where the missing paragraph bridges the two.",
+          "Cross off each option as you place it, since every removed paragraph fits exactly one gap, this narrows your remaining choices as you work through the text.",
+          "Leave the gap you're least sure about for last. By then, elimination usually leaves only one paragraph that can logically fit."
+        ],
+        example: "If a paragraph ends by naming a general pattern ('the sound idea arriving into an environment not yet equipped to receive it') and the next paragraph opens with a specific historical figure, the missing paragraph in between probably supplies the concrete illustration of that pattern, not another general claim."
+      }
+    ]
+  },
+  {
+    kind: "passage",
+    label: "Part 7",
+    title: "Part 7 · Multiple Matching",
+    qrange: "Q14-23", diff: "easy", diffLabel: "Most approachable",
+    intro: "One essay divided into five lettered sections (A to E), with ten questions to match to the section each relates to. Answers may repeat across sections. Conceptually the most straightforward part, but the sections are long and argumentative, so it takes real time to read them properly.",
+    sections: [
+      {
+        anchor: "keywords",
+        label: "Paraphrase & keyword scanning",
+        title: "Paraphrase & Keyword Scanning",
+        desc: "The wording in the question is almost never the wording in the text, at C2 especially, you're matching an idea or a stance, not a phrase.",
+        tips: [
+          "Underline the key claim in each question before you scan, not every word, just what would make one section clearly right and the other four clearly wrong.",
+          "Expect heavy paraphrasing of abstract ideas. A question about someone 'challenging a widely-held assumption' might appear in the text as 'this premise... is rarely examined... turns out to be at best half true'.",
+          "Watch for questions with two linked conditions (e.g. 'concedes a point AND then rejects its practical conclusion'). Both parts need to be true of the same section, not spread across two."
+        ]
+      },
+      {
+        anchor: "order",
+        label: "Order of sections vs order of questions",
+        title: "Order of Sections vs Order of Questions",
+        desc: "Unlike Part 5, the ten questions are not in the same order as the sections, so a strict top-to-bottom read isn't the fastest approach.",
+        tips: [
+          "Read all five sections first so you have a rough map of each one's role in the argument (introduction, first objection, response, concession, conclusion), then work through the questions in any order.",
+          "Keep a mental or scribbled note of each section's stance, it saves re-reading the whole essay for every question.",
+          "If a question doesn't seem to match your first-choice section, check the others too, at C2 the right section is sometimes one you'd provisionally ruled out because it only touches the idea briefly."
+        ]
+      },
+      {
+        anchor: "process",
+        label: "Elimination & double-checking",
+        title: "Elimination & Double-Checking",
+        desc: "With five sections all discussing related ideas from different angles, small differences in stance, not topic, usually separate the right section from a close but wrong one.",
+        tips: [
+          "More than one section can touch the same general topic, only one will match the question's exact stance or function. Check what the section actually does with the idea, not just whether it mentions it.",
+          "Answers can repeat, a single section can be the correct match for more than one question, don't assume you need to spread answers evenly across all five.",
+          "Leave a couple of minutes at the end to double-check any answer you weren't fully sure about, a second look often reveals which section actually commits to the claim in the question."
+        ],
+        example: "A question asking which section 'concedes that an objection is intellectually appealing before rejecting its practical conclusion' isn't answered by a section that simply states the objection, it needs both the concession and the rejection in the same section, which usually rules out the section that first raises the objection."
+      }
+    ]
+  }
+];
+
+function renderGuideTips(tips){
+  return '<ol class="guide-tip-list">' + tips.map((t,ti)=>`<li class="guide-tip"><span class="guide-tip-num">${ti+1}</span><span>${t}</span></li>`).join('') + '</ol>';
+}
+function showGuideTopic(i){
+  const g = GUIDE[i];
+  document.getElementById('guide-content').querySelectorAll('.guide-nav-item').forEach((b,bi)=>b.classList.toggle('active', bi===i));
+  document.getElementById('guidePaneTitle').textContent = g.title;
+  let html = '';
+
+  if(g.kind === 'passage'){
+    const partNum = g.label.replace(/\D/g,'');
+    document.getElementById('guidePaneDesc').textContent = g.intro;
+    html += `<div class="struct-list"><div class="struct-row">
+      <div class="struct-badge">${partNum}</div>
+      <div class="struct-info">
+        <div class="struct-info-top"><strong>${g.label}</strong><span class="struct-qrange">${g.qrange}</span><span class="struct-diff ${g.diff}">${g.diffLabel}</span></div>
+        <div class="struct-tasks">${g.sections.map(s=>`<span class="struct-task">${s.label}</span>`).join('')}</div>
+      </div>
+    </div></div>`;
+    html += '<div class="guide-quicknav">' + g.sections.map(s=>`<button onclick="document.getElementById('ganchor-${s.anchor}').scrollIntoView({behavior:'smooth',block:'start'})">${s.label} &darr;</button>`).join('') + '</div>';
+    html += g.sections.map(s => `
+      <div class="guide-section" id="ganchor-${s.anchor}">
+        <div class="guide-section-title">${s.title}</div>
+        <div class="guide-section-desc">${s.desc}</div>
+        ${renderGuideTips(s.tips)}
+        ${s.example ? `<div class="guide-example"><div class="guide-example-label">Worked example</div><div class="guide-example-body">${s.example}</div></div>` : ''}
+      </div>`).join('');
+    document.getElementById('guidePaneBody').innerHTML = html;
+    return;
+  }
+
+  document.getElementById('guidePaneDesc').textContent = g.desc;
+  if(g.facts){
+    html += '<div class="struct-facts">' + g.facts.map(f=>`<div class="struct-fact"><div class="struct-fact-n">${f.n}</div><div class="struct-fact-l">${f.l}</div></div>`).join('') + '</div>';
+  }
+  if(g.breakdown){
+    html += '<div class="struct-list">' + g.breakdown.map(p=>`
+      <div class="struct-row">
+        <div class="struct-badge">${p.n}</div>
+        <div class="struct-info">
+          <div class="struct-info-top"><strong>${p.label || ('Part ' + p.n)}</strong><span class="struct-qrange">${p.qrange}</span><span class="struct-diff ${p.diff}">${p.diffLabel}</span></div>
+          <div class="struct-tasks">${p.tasks.map(t=>`<span class="struct-task">${t.name} <b>${t.count}</b></span>`).join('')}</div>
+        </div>
+      </div>`).join('') + '</div>';
+  }
+  html += renderGuideTips(g.tips);
+  if(g.example){
+    html += `<div class="guide-example"><div class="guide-example-label">Worked example</div><div class="guide-example-body">${g.example}</div></div>`;
+  }
+  document.getElementById('guidePaneBody').innerHTML = html;
+}
+function buildGuide(){
+  document.getElementById('guideNav').innerHTML = GUIDE.map((g,i) =>
+    `<button class="guide-nav-item" onclick="showGuideTopic(${i})"><span class="guide-nav-dot"></span><span>${g.label}</span></button>`
+  ).join('');
+  showGuideTopic(0);
+}
+
 /* ============ INIT ============ */
 buildPicker();
 let startTest = 0;
 try{ const sv = parseInt(localStorage.getItem('jpe-c2-reading-test'),10); if(sv>=0 && sv<TESTS.length) startTest = sv; }catch(e){}
 loadTest(startTest);
+buildGuide();
 </script>
 </body>
 </html>
