@@ -366,6 +366,46 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
     <button onclick="switchType('general')">Open General Training Reading &rarr;</button>
   </div>
 </div>
+
+<div class="test-picker" id="guideTypePicker">
+  <span class="test-picker-label">Guide</span>
+  <button class="test-pill active" data-guide="academic" onclick="switchGuideType('academic')">Academic</button>
+  <button class="test-pill" data-guide="general" onclick="switchGuideType('general')">General Training</button>
+</div>
+
+<div id="guideDetailAcademic">
+  <div class="guide-shell" id="guideShellA">
+    <div class="wb-sb">
+      <div class="wb-sb-head" onclick="toggleGuideSidebar_A(this)"><span>Guide topics</span><div class="sb-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div></div>
+      <div class="wb-sb-scroll" id="guideNavA"></div>
+      <div class="wb-sb-foot">Tips for every task type in this test</div>
+    </div>
+    <div class="wb-pane">
+      <div class="wb-pane-head">
+        <h2 id="guidePaneTitleA"></h2>
+        <p id="guidePaneDescA"></p>
+      </div>
+      <div class="wb-pane-body" id="guidePaneBodyA"></div>
+    </div>
+  </div>
+</div>
+
+<div id="guideDetailGeneral" style="display:none">
+  <div class="guide-shell" id="guideShellG">
+    <div class="wb-sb">
+      <div class="wb-sb-head" onclick="toggleGuideSidebar_G(this)"><span>Guide topics</span><div class="sb-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div></div>
+      <div class="wb-sb-scroll" id="guideNavG"></div>
+      <div class="wb-sb-foot">Tips for every task type in this test</div>
+    </div>
+    <div class="wb-pane">
+      <div class="wb-pane-head">
+        <h2 id="guidePaneTitleG"></h2>
+        <p id="guidePaneDescG"></p>
+      </div>
+      <div class="wb-pane-body" id="guidePaneBodyG"></div>
+    </div>
+  </div>
+</div>
 </div>
 
 <div class="content-area active" id="academic-content">
@@ -384,28 +424,9 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
   </div>
 
   <div class="part-filter">
-    <span class="part-filter-pill" data-part="guide" onclick="showPart_A('guide')">Guide</span>
     <span class="part-filter-pill active" data-part="1" onclick="showPart_A(1)">Passage 1</span>
     <span class="part-filter-pill" data-part="2" onclick="showPart_A(2)">Passage 2</span>
     <span class="part-filter-pill" data-part="3" onclick="showPart_A(3)">Passage 3</span>
-  </div>
-
-  <!-- GUIDE_A -->
-  <div class="part-section" data-part="guide" id="sectionGuideA">
-    <div class="guide-shell" id="guideShellA">
-      <div class="wb-sb">
-        <div class="wb-sb-head" onclick="toggleGuideSidebar_A(this)"><span>Guide topics</span><div class="sb-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div></div>
-        <div class="wb-sb-scroll" id="guideNavA"></div>
-        <div class="wb-sb-foot">Tips for every task type in this test</div>
-      </div>
-      <div class="wb-pane">
-        <div class="wb-pane-head">
-          <h2 id="guidePaneTitleA"></h2>
-          <p id="guidePaneDescA"></p>
-        </div>
-        <div class="wb-pane-body" id="guidePaneBodyA"></div>
-      </div>
-    </div>
   </div>
 
   <!-- PASSAGE 1 -->
@@ -1410,28 +1431,9 @@ buildGuide_A();
   </div>
 
   <div class="part-filter">
-    <span class="part-filter-pill" data-part="guide" onclick="showPart_G('guide')">Guide</span>
     <span class="part-filter-pill active" data-part="1" onclick="showPart_G(1)">Section 1</span>
     <span class="part-filter-pill" data-part="2" onclick="showPart_G(2)">Section 2</span>
     <span class="part-filter-pill" data-part="3" onclick="showPart_G(3)">Section 3</span>
-  </div>
-
-  <!-- GUIDE_G -->
-  <div class="part-section" data-part="guide" id="sectionGuideG">
-    <div class="guide-shell" id="guideShellG">
-      <div class="wb-sb">
-        <div class="wb-sb-head" onclick="toggleGuideSidebar_G(this)"><span>Guide topics</span><div class="sb-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div></div>
-        <div class="wb-sb-scroll" id="guideNavG"></div>
-        <div class="wb-sb-foot">Tips for every task type in this test</div>
-      </div>
-      <div class="wb-pane">
-        <div class="wb-pane-head">
-          <h2 id="guidePaneTitleG"></h2>
-          <p id="guidePaneDescG"></p>
-        </div>
-        <div class="wb-pane-body" id="guidePaneBodyG"></div>
-      </div>
-    </div>
   </div>
 
   <!-- SECTION 1 -->
@@ -2509,6 +2511,11 @@ function switchType(type) {
     document.querySelector('[data-type="' + t + '"]').classList.toggle('active', t === type);
     document.getElementById(t + '-content').classList.toggle('active', t === type);
   });
+}
+function switchGuideType(type) {
+  document.querySelectorAll('#guideTypePicker .test-pill').forEach(b => b.classList.toggle('active', b.dataset.guide === type));
+  document.getElementById('guideDetailAcademic').style.display = type === 'academic' ? '' : 'none';
+  document.getElementById('guideDetailGeneral').style.display = type === 'general' ? '' : 'none';
 }
 </script>
 
