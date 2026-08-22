@@ -24,7 +24,7 @@
 })();
 </script>
 <style>
-:root{--sky:#2176FF;--sky-light:#E8EEFF;--sun:#FFB347;--cream:#F7F6F3;--ink:#2D3047;--muted:#7A7D8E;--border:#E8E5DF;--card:#fff;--radius:14px;--radius-sm:10px;--shadow-sm:0 1px 3px rgba(45,48,71,.06);--shadow-md:0 4px 14px rgba(45,48,71,.08);--accent:#1E293B;--accent-light:#E2E8F0;--correct:#34C759;--wrong:#FF3B30}
+:root{--sky:#2176FF;--sky-light:#E8EEFF;--sun:#FFB347;--cream:#F7F6F3;--ink:#2D3047;--muted:#7A7D8E;--border:#E8E5DF;--card:#fff;--radius:14px;--radius-sm:10px;--shadow-sm:0 1px 3px rgba(45,48,71,.06);--shadow-md:0 4px 14px rgba(45,48,71,.08);--accent:#16A88D;--accent-light:#E1F5F1;--correct:#34C759;--wrong:#FF3B30}
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth;overflow-x:hidden;overflow-y:scroll}
 body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
@@ -73,6 +73,78 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .overview-item{font-size:.78rem;color:var(--muted);display:flex;align-items:center;gap:.35rem}
 .overview-item strong{color:var(--ink);font-weight:800;font-size:.85rem}
 .overview-total{margin-left:auto;font-family:Outfit,sans-serif;font-size:.82rem;font-weight:800;color:var(--accent);background:var(--accent-light);padding:.3rem .8rem;border-radius:8px}
+
+/* top-level tabs (Guide / Tests) */
+.tabs-wrap{max-width:960px;margin:0 auto;padding:0 2rem;position:relative;z-index:1}
+.tabs{display:flex;gap:4px;row-gap:4px;border-bottom:none;position:relative;margin-bottom:1.5rem;align-items:flex-end;flex-wrap:wrap;padding-top:8px}
+.tabs::before{content:'';position:absolute;left:0;right:0;bottom:0;height:1.5px;background:var(--border)}
+.tab{position:relative;font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;padding:.5rem 1.25rem;color:var(--muted);cursor:pointer;white-space:nowrap;background:color-mix(in srgb,var(--ink) 4%,transparent);border:1.5px solid var(--border);border-radius:12px 12px 0 0;transition:background .18s,color .18s,box-shadow .18s,border-color .18s}
+.tab:not(.active):hover{background:color-mix(in srgb,var(--ink) 8%,transparent);color:var(--ink)}
+.tab:not(.active):focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tab.active{outline:none}
+.tab.active{background:var(--cream);border-color:var(--tab-accent,var(--accent));border-bottom:none!important;color:var(--tab-accent,var(--accent));padding-top:calc(.5rem + 3px);box-shadow:0 -3px 10px rgba(45,48,71,.06);z-index:2}
+.content-area{display:none}
+.content-area.active{display:block}
+
+/* Guide tab (sidebar + pane) */
+.guide-shell{display:grid;grid-template-columns:250px 1fr;gap:1.2rem;align-items:start}
+.wb-sb{background:var(--card);border:1.5px solid var(--border);border-radius:14px;box-shadow:var(--shadow-sm);overflow:hidden;display:flex;flex-direction:column;position:sticky;top:80px;max-height:calc(100vh - 100px)}
+.wb-sb-head{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.75rem 1rem;border-bottom:1px solid var(--border);cursor:pointer;user-select:none}
+.wb-sb-head>span{font-size:.66rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.wb-sb-head .sb-chev{width:26px;height:26px;border:1.5px solid var(--border);border-radius:7px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:1rem;line-height:1;flex-shrink:0;transition:transform .2s}
+.wb-sb-head .sb-chev svg{width:13px;height:13px}
+.wb-sb-head:hover .sb-chev{color:var(--ink);border-color:var(--muted)}
+.wb-sb-scroll{flex:1;min-height:0;overflow-y:auto;padding:.4rem}
+.wb-sb-foot{padding:.55rem .9rem;border-top:1px solid var(--border);font-size:.66rem;color:var(--muted)}
+.wb-sb-foot b{color:var(--ink)}
+.guide-shell.sb-collapsed{grid-template-columns:48px 1fr}
+.guide-shell.sb-collapsed .wb-sb-scroll,.guide-shell.sb-collapsed .wb-sb-foot,.guide-shell.sb-collapsed .wb-sb-head>span{display:none}
+.guide-shell.sb-collapsed .wb-sb-head{justify-content:center;padding:.7rem .4rem}
+.guide-shell.sb-collapsed .sb-chev{transform:rotate(180deg)}
+.guide-nav-item{display:flex;align-items:center;gap:.6rem;padding:.65rem .75rem;border-radius:10px;cursor:pointer;font-family:'Outfit',sans-serif;color:var(--muted);border:1.5px solid transparent;background:none;transition:all .15s;text-align:left;width:100%;font-size:.84rem;font-weight:700;line-height:1.3}
+.guide-nav-item:hover{color:var(--ink);background:var(--cream)}
+.guide-nav-item.active{color:var(--ink);border-color:var(--accent);background:var(--accent-light)}
+.guide-nav-dot{width:6px;height:6px;border-radius:50%;background:var(--border);flex-shrink:0}
+.guide-nav-item.active .guide-nav-dot{background:var(--accent)}
+.guide-nav-group-label{font-family:Outfit,sans-serif;font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:.7rem .75rem .3rem}
+.guide-nav-group-label:first-child{padding-top:.2rem}
+.wb-pane{background:var(--card);border:1.5px solid var(--border);border-radius:14px;box-shadow:var(--shadow-sm);overflow:hidden;min-width:0}
+.wb-pane-head{padding:1rem 1.25rem .8rem;border-bottom:1.5px solid var(--border)}
+.wb-pane-head h2{margin:0;font-size:1.2rem;font-weight:800;letter-spacing:-.01em}
+.wb-pane-head p{margin:.35rem 0 0;font-size:.85rem;color:var(--muted);line-height:1.5}
+.wb-pane-body{padding:1.1rem 1.25rem 1.4rem}
+.guide-tip-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.7rem}
+.guide-tip{display:flex;gap:.7rem;font-size:.88rem;line-height:1.55;color:var(--ink)}
+.guide-tip-num{width:22px;height:22px;border-radius:7px;background:var(--accent-light);color:var(--accent);font-size:.72rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.guide-tip b{font-weight:700}
+.guide-example{margin-top:1.1rem;padding-top:1rem;border-top:1.5px solid var(--border)}
+.guide-example-label{font-family:Outfit,sans-serif;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:.5rem}
+.guide-example-body{font-size:.85rem;line-height:1.6;color:var(--ink);background:var(--cream);border-radius:var(--radius-sm);padding:.8rem .95rem}
+.guide-quicknav{display:flex;flex-wrap:wrap;gap:.5rem;margin:1.1rem 0 0}
+.guide-quicknav button{font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:700;padding:.45rem .85rem;border-radius:999px;border:1.5px solid var(--border);background:var(--card);color:var(--ink);cursor:pointer;transition:all .15s}
+.guide-quicknav button:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
+.guide-section{margin-top:1.6rem;padding-top:1.4rem;border-top:1.5px solid var(--border);scroll-margin-top:24px}
+.guide-section-title{font-size:1.02rem;font-weight:800;color:var(--ink);margin-bottom:.3rem}
+.guide-section-desc{font-size:.85rem;color:var(--muted);margin-bottom:.9rem;line-height:1.5}
+.struct-facts{display:flex;gap:.6rem;margin-bottom:1.1rem;flex-wrap:wrap}
+.struct-fact{flex:1;min-width:90px;background:var(--accent-light);border-radius:var(--radius-sm);padding:.7rem .5rem;text-align:center}
+.struct-fact-n{font-family:Outfit,sans-serif;font-size:1.5rem;font-weight:800;color:var(--accent);line-height:1.1}
+.struct-fact-l{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-top:.15rem}
+.struct-list{display:flex;flex-direction:column;gap:.6rem;margin-bottom:1.3rem}
+.struct-row{display:flex;gap:.9rem;padding:.85rem .95rem;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius-sm);align-items:flex-start;box-shadow:var(--shadow-sm)}
+.struct-badge{width:32px;height:32px;border-radius:9px;background:var(--accent);color:#fff;font-family:Outfit,sans-serif;font-weight:800;font-size:.9rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.struct-info{flex:1;min-width:0}
+.struct-info-top{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.35rem}
+.struct-info-top strong{font-size:.85rem}
+.struct-qrange{font-size:.7rem;color:var(--muted);font-weight:600}
+.struct-diff{font-family:Outfit,sans-serif;font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:.15rem .5rem;border-radius:999px}
+.struct-diff.easy{background:rgba(52,199,89,.14);color:#1a7a34}
+.struct-diff.med{background:rgba(255,179,71,.2);color:#a5690a}
+.struct-diff.hard{background:rgba(255,59,48,.12);color:#c0392b}
+.struct-tasks{display:flex;flex-wrap:wrap;gap:.35rem}
+.struct-task{font-size:.72rem;background:var(--card);border:1px solid var(--border);border-radius:7px;padding:.25rem .55rem;color:var(--ink)}
+.struct-task b{color:var(--accent);font-weight:800;margin-left:.2rem}
+@media(max-width:820px){.guide-shell{grid-template-columns:1fr}.wb-sb{position:static;max-height:none}}
 
 /* part tabs, folder-tab language matching the UoE reference */
 .part-filter{display:flex;gap:4px;row-gap:4px;flex-wrap:wrap;align-items:flex-end;position:relative;padding-top:6px;margin-bottom:0}
@@ -191,7 +263,33 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
   </div>
 </div>
 
+<div class="tabs-wrap">
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-type="guide" onclick="switchType('guide')" style="--tab-accent:#16A88D">Guide</button>
+    <button class="tab" data-type="tests" onclick="switchType('tests')" style="--tab-accent:#16A88D">Tests</button>
+  </div>
+</div>
+
 <div class="wrap">
+
+<div class="content-area active" id="guide-content">
+<div class="guide-shell" id="guideShell">
+  <div class="wb-sb">
+    <div class="wb-sb-head" onclick="toggleGuideSidebar(this)"><span>Guide topics</span><div class="sb-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div></div>
+    <div class="wb-sb-scroll" id="guideNav"></div>
+    <div class="wb-sb-foot">Tips for every task type in Parts 5-7</div>
+  </div>
+  <div class="wb-pane">
+    <div class="wb-pane-head">
+      <h2 id="guidePaneTitle"></h2>
+      <p id="guidePaneDesc"></p>
+    </div>
+    <div class="wb-pane-body" id="guidePaneBody"></div>
+  </div>
+</div>
+</div>
+
+<div class="content-area" id="tests-content">
   <div class="test-picker" id="testPicker"><span class="test-picker-label">Test</span></div>
   <div class="test-topic" id="testTopic"></div>
 
@@ -282,6 +380,8 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
     </div>
     <div class="score-summary-total" id="ssTotal">Total: 0/22</div>
   </div>
+</div>
+
 </div>
 
 <script>
@@ -970,11 +1070,256 @@ function buildPicker(){
   });
 }
 
+/* ============ TABS (Guide / Tests) ============ */
+function switchType(type){
+  ['guide','tests'].forEach(t=>{
+    document.querySelector('[data-type="'+t+'"]').classList.toggle('active', t===type);
+    document.getElementById(t+'-content').classList.toggle('active', t===type);
+  });
+}
+function toggleGuideSidebar(el){ el.closest('.guide-shell').classList.toggle('sb-collapsed'); }
+
+/* ============ GUIDE ============ */
+const GUIDE = [
+  {
+    kind: "structure",
+    label: "Exam Structure",
+    title: "Reading, Parts 5-7",
+    desc: "Parts 5-7 are the Reading half of the Reading and Use of English paper (Parts 1-4 are Use of English, covered on a separate page). Together the whole paper is 75 minutes; a common rule of thumb is to budget around 40 of those minutes for Parts 5-7.",
+    facts: [
+      {n:"3", l:"reading parts"},
+      {n:"22", l:"questions"},
+      {n:"~40", l:"suggested minutes"}
+    ],
+    breakdown: [
+      {n:5, label:"Part 5", qrange:"Q31-36", diff:"med", diffLabel:"Medium", tasks:[{name:"Multiple Choice",count:"6"}]},
+      {n:6, label:"Part 6", qrange:"Q37-42", diff:"hard", diffLabel:"Hardest", tasks:[{name:"Gapped Text",count:"6"}]},
+      {n:7, label:"Part 7", qrange:"Q43-52", diff:"easy", diffLabel:"Most approachable", tasks:[{name:"Multiple Matching",count:"10"}]}
+    ],
+    tips: [
+      "The three parts get conceptually harder as you go, Part 5 tests understanding of one text closely, Part 6 tests how a text holds together, Part 7 tests fast, accurate scanning across several texts or sections.",
+      "There's no penalty for guessing, so a filled-in guess always beats a blank answer. Every question is worth one mark.",
+      "You transfer answers to the answer sheet as you go in the real exam (or your teacher will tell you the local arrangement), so don't leave all 22 questions until the last minute."
+    ]
+  },
+  {
+    kind: "tips",
+    label: "Strategy & Time",
+    title: "Strategy & Time Management",
+    desc: "Around 40 minutes for 22 questions across three very different tasks. Here's how I'd split it.",
+    tips: [
+      "Give Part 5 about 12-13 minutes, Part 6 about 13-14 minutes (it's the slowest to work through carefully), and Part 7 about 12-13 minutes, since it's mostly scanning once you know the technique.",
+      "Read the instructions above each part before the text itself. They tell you exactly what you're matching or choosing, and re-reading them mid-task wastes time.",
+      "If Part 6 is taking too long, don't get stuck defending a guess. Place your best answer in every gap and move on. Half marks don't exist, but a plausible guess often turns out right anyway.",
+      "Do the parts in whichever order suits you. Some students prefer Part 7 first because it warms you up on scanning before the denser Part 5 and 6 texts."
+    ]
+  },
+  {
+    kind: "passage",
+    label: "Part 5",
+    title: "Part 5 · Multiple Choice",
+    qrange: "Q31-36", diff: "med", diffLabel: "Medium",
+    intro: "One text, usually an article or a fiction extract, followed by six four-option questions (A, B, C or D). Unlike Part 7, these questions follow the order of the text, so question 1 refers to something near the start and question 6 near the end.",
+    sections: [
+      {
+        anchor: "detail",
+        label: "Detail & opinion questions",
+        title: "Detail & Opinion Questions",
+        desc: "Most questions ask about a specific detail, or what someone in the text thinks or feels about something, not just what happens.",
+        tips: [
+          "Find the exact part of the text the question is about first (they come in text order), then compare all four options against that section, not the whole passage.",
+          "Wrong options are almost always close paraphrases that twist one detail, add something the text never says, or reverse a fact. Cross out anything that isn't fully supported.",
+          "If a question asks what someone 'thinks' or 'feels', look for the actual opinion language in the text, not just a topic they mention in passing."
+        ],
+        example: "A question might ask why the writer decided to change careers. If the text says she changed careers 'despite the financial risk, because she'd stopped finding the work meaningful', an option claiming she changed 'for a higher salary' directly contradicts the text and can be eliminated immediately."
+      },
+      {
+        anchor: "attitude",
+        label: "Attitude & tone",
+        title: "Attitude & Tone Questions",
+        desc: "These ask how someone feels about something, or what tone a phrase creates, not what the plain facts are.",
+        tips: [
+          "Look past the content of a sentence to how it's phrased, words like 'unfortunately', 'surprisingly', or a rhetorical question all signal attitude.",
+          "Don't assume a neutral-sounding fact has no attitude attached. Sometimes the attitude is in a nearby sentence, not the one the question quotes.",
+          "If two options both sound plausible, pick the one that matches the intensity of the text. A text expressing mild doubt doesn't support an option describing outright anger."
+        ]
+      },
+      {
+        anchor: "reference",
+        label: "Reference & vocabulary in context",
+        title: "Reference & Vocabulary-in-Context Questions",
+        desc: "Some questions ask what a word like 'this', 'it', 'such' or 'one' refers back to, or what a specific word or phrase means as it's used in the text.",
+        tips: [
+          "For reference words, look at the sentence(s) immediately before, the answer is almost always sitting right there, not several paragraphs back.",
+          "For vocabulary-in-context, ignore what the word usually means and work out what it must mean in that exact sentence, from the surrounding logic.",
+          "Replace the word or phrase with each option in your head and check the sentence still makes complete sense, both in meaning and in grammar."
+        ]
+      },
+      {
+        anchor: "gist",
+        label: "Global / gist questions",
+        title: "Global & Gist Questions",
+        desc: "Occasionally a question (often the last one) asks about the text as a whole, its main purpose, or the writer's overall message.",
+        tips: [
+          "Answer these last, after you've worked through the whole text for the other questions, you'll have a much better feel for the overall point.",
+          "Be suspicious of an option that's true of only one paragraph. A global question needs an answer that fits the entire text, not just a strong section.",
+          "Watch for options that are too extreme or too narrow compared with the text's actual, usually more balanced, overall message."
+        ]
+      }
+    ]
+  },
+  {
+    kind: "passage",
+    label: "Part 6",
+    title: "Part 6 · Gapped Text",
+    qrange: "Q37-42", diff: "hard", diffLabel: "Hardest",
+    intro: "One text with six sentences removed and placed, jumbled, after the text, along with one extra sentence that doesn't fit anywhere. You're rebuilding the text's logic, not just its topic.",
+    sections: [
+      {
+        anchor: "linking",
+        label: "Linking words & cohesion",
+        title: "Linking Words & Cohesion",
+        desc: "The sentences that come before and after each gap are your real evidence, more than the gapped sentence's topic on its own.",
+        tips: [
+          "Read the whole text first, ignoring the gaps, just to get the overall story or argument. Then go back and work gap by gap.",
+          "Linking words in the removed sentences, however, in addition, as a result, this meant that, are strong clues about what kind of sentence came just before.",
+          "A sentence that introduces a brand-new noun (a name, an object, an idea) usually can't open a gap unless that noun was already mentioned nearby, watch for exactly this kind of mismatch."
+        ]
+      },
+      {
+        anchor: "reference2",
+        label: "Pronoun & reference clues",
+        title: "Pronoun & Reference Clues",
+        desc: "Pronouns and reference words in the removed sentences (he, she, it, this, these, such a) point back to something specific in the surrounding text.",
+        tips: [
+          "When a removed sentence starts with 'this' or 'these', ask exactly what noun it's replacing, then check the sentence right before the gap contains that noun or idea.",
+          "Match number and gender exactly. 'They' can't refer back to a single person mentioned just before the gap, that mismatch rules an option out instantly.",
+          "The sentence after the gap often needs the removed sentence's information to make sense too, check both sides, not just the sentence before."
+        ]
+      },
+      {
+        anchor: "flow",
+        label: "Topic flow between paragraphs",
+        title: "Topic Flow Between Paragraphs",
+        desc: "Paragraphs usually develop one idea before moving to the next. A removed sentence often marks exactly that pivot.",
+        tips: [
+          "If a paragraph seems to jump topic abruptly around a gap, that's usually exactly where the missing sentence bridges the two ideas.",
+          "Cross off each option as you use it, since every removed sentence fits exactly one gap. This also narrows your choices as you go.",
+          "Leave the sentence you're least sure about for last. By then, only one option should logically remain, use elimination to your advantage."
+        ],
+        example: "If a paragraph ends discussing rising costs and the next paragraph opens with 'Faced with this, the company decided to relocate its factory', the missing sentence just before probably explains what exactly the company was 'faced with', likely a specific figure or consequence of those costs, not just costs in general."
+      }
+    ]
+  },
+  {
+    kind: "passage",
+    label: "Part 7",
+    title: "Part 7 · Multiple Matching",
+    qrange: "Q43-52", diff: "easy", diffLabel: "Most approachable",
+    intro: "One text split into sections, or several short texts, with ten statements to match to the section or text they relate to. Conceptually the most straightforward part, but it takes real time to do carefully.",
+    sections: [
+      {
+        anchor: "keywords",
+        label: "Paraphrase & keyword scanning",
+        title: "Paraphrase & Keyword Scanning",
+        desc: "The words in the question are almost never the exact words in the text, you're matching meaning, not vocabulary.",
+        tips: [
+          "Underline the key idea in each question before you start scanning, not every word, just what would make one section clearly right and the others wrong.",
+          "Expect heavy paraphrasing. A question about someone 'changing their mind' might be expressed in the text as 'having second thoughts' or 'no longer believing'.",
+          "Watch for questions that combine two conditions (e.g. 'someone who disagreed with a colleague AND later admitted they were wrong'). Both parts need to be true in the same section."
+        ]
+      },
+      {
+        anchor: "order",
+        label: "Order of texts vs order of questions",
+        title: "Order of Texts vs Order of Questions",
+        desc: "Unlike Part 5, the ten questions are not in the same order as the text or texts, so a strict top-to-bottom read isn't the fastest approach.",
+        tips: [
+          "Read all the short texts (or sections) first so you have a rough map of who says what, then work through the questions in any order.",
+          "Keep a mental (or scribbled) note of each section's general theme, it saves you re-reading the whole thing for every single question.",
+          "If a question doesn't seem to match your first-choice section, don't force it, check the other sections too, the answer is sometimes in a section you'd already ruled out."
+        ]
+      },
+      {
+        anchor: "process",
+        label: "Elimination & double-checking",
+        title: "Elimination & Double-Checking",
+        desc: "With several similar texts, small details often separate the right section from a close but wrong one.",
+        tips: [
+          "More than one section can touch on a topic, only one will match every detail of the question. Check the full statement, not just the general subject.",
+          "Answers can repeat, a single section can be the correct match for more than one question, don't assume you need to spread answers evenly.",
+          "Leave a couple of minutes at the end to double-check any answer you weren't fully sure about, a second look with fresh eyes often catches the right section."
+        ],
+        example: "A question asking who 'regretted a decision they made too quickly' isn't answered by a section that just mentions someone making a quick decision, it needs that person to explicitly express regret about it. A section merely describing the decision, without regret, is a common wrong-but-tempting match."
+      }
+    ]
+  }
+];
+
+function renderGuideTips(tips){
+  return '<ol class="guide-tip-list">' + tips.map((t,ti)=>`<li class="guide-tip"><span class="guide-tip-num">${ti+1}</span><span>${t}</span></li>`).join('') + '</ol>';
+}
+function showGuideTopic(i){
+  const g = GUIDE[i];
+  document.getElementById('guide-content').querySelectorAll('.guide-nav-item').forEach((b,bi)=>b.classList.toggle('active', bi===i));
+  document.getElementById('guidePaneTitle').textContent = g.title;
+  let html = '';
+
+  if(g.kind === 'passage'){
+    const partNum = g.label.replace(/\D/g,'');
+    document.getElementById('guidePaneDesc').textContent = g.intro;
+    html += `<div class="struct-list"><div class="struct-row">
+      <div class="struct-badge">${partNum}</div>
+      <div class="struct-info">
+        <div class="struct-info-top"><strong>${g.label}</strong><span class="struct-qrange">${g.qrange}</span><span class="struct-diff ${g.diff}">${g.diffLabel}</span></div>
+        <div class="struct-tasks">${g.sections.map(s=>`<span class="struct-task">${s.label}</span>`).join('')}</div>
+      </div>
+    </div></div>`;
+    html += '<div class="guide-quicknav">' + g.sections.map(s=>`<button onclick="document.getElementById('ganchor-${s.anchor}').scrollIntoView({behavior:'smooth',block:'start'})">${s.label} &darr;</button>`).join('') + '</div>';
+    html += g.sections.map(s => `
+      <div class="guide-section" id="ganchor-${s.anchor}">
+        <div class="guide-section-title">${s.title}</div>
+        <div class="guide-section-desc">${s.desc}</div>
+        ${renderGuideTips(s.tips)}
+        ${s.example ? `<div class="guide-example"><div class="guide-example-label">Worked example</div><div class="guide-example-body">${s.example}</div></div>` : ''}
+      </div>`).join('');
+    document.getElementById('guidePaneBody').innerHTML = html;
+    return;
+  }
+
+  document.getElementById('guidePaneDesc').textContent = g.desc;
+  if(g.facts){
+    html += '<div class="struct-facts">' + g.facts.map(f=>`<div class="struct-fact"><div class="struct-fact-n">${f.n}</div><div class="struct-fact-l">${f.l}</div></div>`).join('') + '</div>';
+  }
+  if(g.breakdown){
+    html += '<div class="struct-list">' + g.breakdown.map(p=>`
+      <div class="struct-row">
+        <div class="struct-badge">${p.n}</div>
+        <div class="struct-info">
+          <div class="struct-info-top"><strong>${p.label || ('Part ' + p.n)}</strong><span class="struct-qrange">${p.qrange}</span><span class="struct-diff ${p.diff}">${p.diffLabel}</span></div>
+          <div class="struct-tasks">${p.tasks.map(t=>`<span class="struct-task">${t.name} <b>${t.count}</b></span>`).join('')}</div>
+        </div>
+      </div>`).join('') + '</div>';
+  }
+  html += renderGuideTips(g.tips);
+  if(g.example){
+    html += `<div class="guide-example"><div class="guide-example-label">Worked example</div><div class="guide-example-body">${g.example}</div></div>`;
+  }
+  document.getElementById('guidePaneBody').innerHTML = html;
+}
+function buildGuide(){
+  document.getElementById('guideNav').innerHTML = GUIDE.map((g,i) =>
+    `<button class="guide-nav-item" onclick="showGuideTopic(${i})"><span class="guide-nav-dot"></span><span>${g.label}</span></button>`
+  ).join('');
+  showGuideTopic(0);
+}
+
 /* ============ INIT ============ */
 buildPicker();
 let startTest = 0;
 try{ const sv = parseInt(localStorage.getItem('jpe-b2-reading-test'),10); if(sv>=0 && sv<TESTS.length) startTest = sv; }catch(e){}
 loadTest(startTest);
+buildGuide();
 </script>
 </body>
 </html>
