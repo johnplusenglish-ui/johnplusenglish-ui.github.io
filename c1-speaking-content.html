@@ -797,8 +797,13 @@ const PROMPTS_C1 = [
   {text:"Answer the task question thoughtfully.",hint:'"I\'d argue that…" / "It depends on…" / "To a certain extent…"'}
 ];
 
+function toggleExclude(el){
+  const wasExcluded = el.classList.contains('excluded');
+  el.parentElement.querySelectorAll('.img-slot.excluded').forEach(s=>s.classList.remove('excluded'));
+  if(!wasExcluded) el.classList.add('excluded');
+}
 function imgs(photos, cls, labels, toggleable) {
-  return `<div class="img-row ${cls||''}">${photos.map((u,i)=>`<div class="img-slot" data-idx="${i}"${toggleable?` onclick="this.classList.toggle('excluded')"`:''}>${labels?`<span class="img-label">${labels[i]}</span>`:''}<img src="${u}" alt="${labels?'Photo '+labels[i]:'Image'}" loading="lazy"></div>`).join('')}</div>${toggleable?`<div class="img-hint">Tap the photo you're not comparing to fade it out, then hit Present to show just the other two.</div>`:''}`;
+  return `<div class="img-row ${cls||''}">${photos.map((u,i)=>`<div class="img-slot" data-idx="${i}"${toggleable?` onclick="toggleExclude(this)"`:''}>${labels?`<span class="img-label">${labels[i]}</span>`:''}<img src="${u}" alt="${labels?'Photo '+labels[i]:'Image'}" loading="lazy"></div>`).join('')}</div>${toggleable?`<div class="img-hint">Tap the photo you're not comparing to fade it out, then hit Present to show just the other two.</div>`:''}`;
 }
 function promptsList(list) {
   return `<div class="prompts-list">${list.map((p,i)=>`<div class="p-item"><span class="p-num">${i+1}</span><div><span class="p-text">${p.text}</span>${p.hint?`<span class="p-hint">${p.hint}</span>`:''}</div></div>`).join('')}</div>`;
