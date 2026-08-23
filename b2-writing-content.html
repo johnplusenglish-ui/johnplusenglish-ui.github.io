@@ -122,6 +122,9 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .task-q{font-family:'Outfit',sans-serif;font-size:.94rem;font-weight:500;line-height:1.65;color:var(--ink);padding:0;margin:16px 0 0}
 .task-q strong{font-weight:800}
 .task-q .src{background:var(--cream);border-radius:8px;padding:.8rem 1rem;margin:.6rem 0;font-size:.9rem;line-height:1.6}
+.task-q .src p{margin:0 0 .5rem}
+.task-q .src ol{margin:.3rem 0 0;padding-left:1.3rem;display:flex;flex-direction:column;gap:.4rem}
+.task-q .src li{padding-left:.2rem}
 .word-target{font-size:.78rem;color:var(--muted);margin-top:.7rem;font-weight:600}
 
 /* register pills */
@@ -777,11 +780,45 @@ function wpWrapBlocks(ctx, text, maxWidth){
   });
   return out;
 }
+/* Walks a rendered .task-q element's <p>/<li> blocks (in document order) so the PNG
+   mirrors the on-page paragraph/list structure exactly, numbering <li> items like the
+   real <ol> markers do, each block getting full paragraph breathing room. */
+function wpWrapQuestionBlocks(ctx, root, maxWidth){
+  var out = [];
+  var blocks = [];
+  root.querySelectorAll('p, li').forEach(function(el){
+    var text = el.textContent.trim();
+    if(!text) return;
+    if(el.tagName === 'LI'){
+      var idx = Array.prototype.indexOf.call(el.parentElement.children, el) + 1;
+      blocks.push(idx + '. ' + text);
+    } else {
+      blocks.push(text);
+    }
+  });
+  blocks.forEach(function(blockText, bi){
+    var words = blockText.split(/\s+/);
+    var line = '';
+    var firstWrapped = true;
+    words.forEach(function(w){
+      var test = line ? line + ' ' + w : w;
+      if(ctx.measureText(test).width > maxWidth && line){
+        out.push({text:line, gap: firstWrapped ? (bi===0?'none':'para') : 'none'});
+        firstWrapped = false;
+        line = w;
+      } else {
+        line = test;
+      }
+    });
+    if(line) out.push({text:line, gap: firstWrapped ? (bi===0?'none':'para') : 'none'});
+  });
+  return out;
+}
 async function wpDownloadImage(id, btn){
   var card = btn.closest('.acc-card');
   var titleEl = card.querySelector('.acc-title');
   var topic = titleEl ? titleEl.textContent.replace(/^\s*\d+\s*/, '').trim() : 'Writing task';
-  var question = (card.querySelector('.task-q') || {innerText:''}).innerText.trim();
+  var questionEl = card.querySelector('.task-q');
   var answer = document.getElementById('wpText-'+id).value.trim();
   if(!answer){ alert('Write your answer first, then download it as an image.'); return; }
 
@@ -803,7 +840,7 @@ async function wpDownloadImage(id, btn){
   measure.font = '700 ' + (46*SCALE) + 'px Outfit, sans-serif';
   var topicLines = wpWrapLines(measure, topic, contentW);
   measure.font = '400 ' + (30*SCALE) + 'px Outfit, sans-serif';
-  var qLines = wpWrapBlocks(measure, question, contentW);
+  var qLines = questionEl ? wpWrapQuestionBlocks(measure, questionEl, contentW) : [];
   measure.font = '400 ' + (38*SCALE) + 'px Outfit, sans-serif';
   var aLines = wpWrapBlocks(measure, answer, contentW);
 
