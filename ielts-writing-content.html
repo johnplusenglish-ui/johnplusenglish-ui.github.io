@@ -327,6 +327,8 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
 .pb-cat.active{background:var(--ielts,#FF9100);border-color:var(--ielts,#FF9100);color:#fff}
 .pb-cat.t2:hover{border-color:var(--sky)}
 .pb-cat.t2.active{background:var(--ink);border-color:var(--ink);color:#fff}
+.res-subcat-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1rem;padding-bottom:.9rem;border-bottom:1.5px solid var(--border)}
+.res-subcat-row .pb-cat{font-size:.72rem;padding:6px 13px}
 .pb-phrases{padding:10px 14px 14px}
 .pb-phrase-group{display:none}
 .pb-phrase-group.active{display:flex;flex-direction:column;gap:6px}
@@ -4926,12 +4928,75 @@ function showResPart(key){
     p.classList.toggle('active', p.id === 'resPane-'+key);
     p.style.display = (p.id === 'resPane-'+key) ? '' : 'none';
   });
-  document.getElementById('resPaneTitle').textContent = document.getElementById('resPane-'+key).dataset.title;
+  updateResPaneTitle(document.getElementById('resPane-'+key));
+}
+function updateResPaneTitle(pane){
+  var base = pane.dataset.title;
+  var activePill = pane.querySelector('.pb-cat.active');
+  document.getElementById('resPaneTitle').textContent = activePill ? (base + ' · ' + activePill.textContent) : base;
+}
+function selectResSubcat(pane, subcat, btn){
+  pane.querySelectorAll('.pb-cat').forEach(function(p){ p.classList.toggle('active', p===btn); });
+  pane.querySelectorAll('.res-subcat-group').forEach(function(g){ g.style.display = (g.dataset.subcat===subcat) ? '' : 'none'; });
+  updateResPaneTitle(pane);
+}
+/* Groups each res-pane's flat "lang-fn + lang-list" sequence into per-subcategory
+   blocks (e.g. "Bar chart" vs "Line graph") with a pill row to switch between them,
+   so a dense task type isn't one long continuous scroll. */
+function enhanceResPanes(){
+  document.querySelectorAll('#phrases-content .res-pane').forEach(function(pane){
+    if(pane.dataset.enhanced) return;
+    pane.dataset.enhanced = '1';
+    var subcats = [];
+    var wrapper = null, currentSubcat = null;
+    var newChildren = [];
+    Array.from(pane.children).forEach(function(el){
+      if(el.classList.contains('lang-fn')){
+        var parts = el.textContent.split(' — ');
+        var subcat = parts.length > 1 ? parts[0] : 'General';
+        if(subcat !== currentSubcat){
+          currentSubcat = subcat;
+          if(subcats.indexOf(subcat) === -1) subcats.push(subcat);
+          wrapper = document.createElement('div');
+          wrapper.className = 'res-subcat-group';
+          wrapper.dataset.subcat = subcat;
+          newChildren.push(wrapper);
+        }
+        wrapper.appendChild(el);
+      } else if(el.classList.contains('lang-list') && wrapper){
+        wrapper.appendChild(el);
+      } else {
+        newChildren.push(el);
+      }
+    });
+    pane.innerHTML = '';
+    if(subcats.length > 1){
+      var pillRow = document.createElement('div');
+      pillRow.className = 'res-subcat-row';
+      subcats.forEach(function(sc, i){
+        var pill = document.createElement('button');
+        pill.className = 'pb-cat' + (i === 0 ? ' active' : '');
+        pill.type = 'button';
+        pill.textContent = sc;
+        pill.onclick = function(){ selectResSubcat(pane, sc, pill); };
+        pillRow.appendChild(pill);
+      });
+      pane.appendChild(pillRow);
+    }
+    newChildren.forEach(function(c){
+      if(c.classList && c.classList.contains('res-subcat-group')){
+        c.style.display = (c.dataset.subcat === subcats[0]) ? '' : 'none';
+      }
+      pane.appendChild(c);
+    });
+  });
 }
 function copyResPhrases(btn){
   var pane = document.querySelector('#phrases-content .res-pane.active');
   if(!pane) return;
-  var phrases = Array.from(pane.querySelectorAll('.chip')).map(c=>c.textContent);
+  var visibleGroup = pane.querySelector('.res-subcat-group:not([style*="none"])');
+  var scope = visibleGroup || pane;
+  var phrases = Array.from(scope.querySelectorAll('.chip')).map(c=>c.textContent);
   navigator.clipboard.writeText(phrases.join('\n')).then(()=>{
     const icon = btn.querySelector('.pb-copy-icon');
     const original = icon.innerHTML;
@@ -4958,9 +5023,11 @@ function wpBuildPhraseLines(measure, groups, contentW, headerFontPx, phraseFontP
 async function wpDownloadPhrasesImage(){
   var pane = document.querySelector('#phrases-content .res-pane.active');
   if(!pane) return;
+  var visibleGroup = pane.querySelector('.res-subcat-group:not([style*="none"])');
+  var scope = visibleGroup || pane;
   var groups = [];
   var curFn = null, curPhrases = [];
-  Array.from(pane.children).forEach(function(el){
+  Array.from(scope.children).forEach(function(el){
     if(el.classList.contains('lang-fn')){
       if(curFn !== null) groups.push({fn:curFn, phrases:curPhrases});
       curFn = el.textContent; curPhrases = [];
@@ -4969,7 +5036,7 @@ async function wpDownloadPhrasesImage(){
     }
   });
   if(curFn !== null) groups.push({fn:curFn, phrases:curPhrases});
-  var title = document.getElementById('resPaneTitle').textContent + ' · All phrases';
+  var title = document.getElementById('resPaneTitle').textContent;
   if(!groups.length) return;
   try{
     await Promise.all([document.fonts.load('700 40px Outfit'), document.fonts.load('400 40px Outfit')]);
@@ -5050,6 +5117,8 @@ async function wpDownloadPhrasesImage(){
 
 /* ============ INIT ============ */
 buildGuideW();
+enhanceResPanes();
+updateResPaneTitle(document.querySelector('#phrases-content .res-pane.active'));
 
 </script>
 
