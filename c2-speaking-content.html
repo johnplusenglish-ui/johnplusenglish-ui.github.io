@@ -241,13 +241,19 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .present-close:hover{background:rgba(255,255,255,.18)}
 .present-inner{width:100%;max-width:1100px;color:#fff;text-align:center}
 .present-inner .task-q{color:#fff;font-size:1.25rem;margin-top:0}
-.present-img-row{display:flex;gap:24px;margin-top:24px;justify-content:center;flex-wrap:wrap}
-.present-img-row .img-slot{flex:1;min-width:200px;max-width:320px;aspect-ratio:4/3;border-radius:16px;border-color:rgba(255,255,255,.25)}
+.present-img-row{display:flex;gap:28px;margin-top:24px;justify-content:center;flex-wrap:wrap}
+.present-img-row .img-slot{flex:1;min-width:280px;max-width:460px;aspect-ratio:4/3;border-radius:16px;border-color:rgba(255,255,255,.25)}
 .present-overlay.light{background:var(--cream)}
 .present-overlay.light .present-close{border-color:var(--border);background:var(--card);color:var(--ink)}
 .present-overlay.light .present-close:hover{background:var(--cream)}
 .present-overlay.light .present-inner{color:var(--ink)}
 .present-overlay.light .present-inner .task-q{color:var(--ink)}
+.present-overlay.light .present-img-row .img-slot{border-color:var(--border);box-shadow:var(--shadow-md)}
+.present-inner .cue-card.present-cue-card{max-width:50vw;min-width:min(94vw,520px);margin:0 auto;padding:44px 48px;text-align:left}
+.present-inner .cue-card.present-cue-card .cue-topic{font-size:1.9rem;margin-bottom:22px}
+.present-inner .cue-card.present-cue-card .cue-bullets{gap:12px}
+.present-inner .cue-card.present-cue-card .cue-bullets li{font-size:1.2rem;line-height:1.6;padding-left:24px}
+@media(max-width:900px){.present-inner .cue-card.present-cue-card{max-width:94vw}}
 .cue-card{background:var(--card);border:2px solid var(--accent);border-radius:var(--radius);padding:20px 22px;margin-top:4px;position:relative}
 .cue-topic{font-family:'Outfit',sans-serif;font-size:1.15rem;color:var(--ink);margin-bottom:12px;line-height:1.4;font-weight:700}
 .cue-prompt{font-size:.84rem;color:var(--muted);margin-bottom:6px;font-weight:600}
@@ -956,6 +962,7 @@ function openPresent(kind, i){
     activePresentTimerId = null;
   }
   if(kind === 'part2mini'){
+    overlay.classList.add('light');
     const s = c2Sets[i];
     const card = document.getElementById('p2set-'+i);
     const selected = card ? [...card.querySelectorAll('.img-slot.selected')].map(el=>parseInt(el.dataset.idx,10)).sort((a,b)=>a-b) : [];
@@ -963,13 +970,14 @@ function openPresent(kind, i){
     if(showIdxs.length !== 2 && showIdxs.length !== 3) showIdxs = s.photos.map((_,pi)=>pi);
     inner.innerHTML = `<div class="task-q">${s.p1Q}</div><div class="present-img-row">${showIdxs.map(pi=>`<div class="img-slot"><span class="img-label">${pi+1}</span><img src="${s.photos[pi]}" alt="Photo ${pi+1}"></div>`).join('')}</div>`;
   } else if(kind === 'part2full'){
+    overlay.classList.add('light');
     const s = c2Sets[i];
     inner.innerHTML = `<div class="task-q">${s.p2Q}</div><div class="present-img-row">${s.photos.map((u,pi)=>`<div class="img-slot"><span class="img-label">${pi+1}</span><img src="${u}" alt="Photo ${pi+1}"></div>`).join('')}</div>`;
   } else if(kind === 'part3a' || kind === 'part3b'){
     overlay.classList.add('light');
     const t = PART3_TOPICS[i][kind === 'part3a' ? 'taskA' : 'taskB'];
     const presentTimerId = 'p3set-'+i+'-'+(kind === 'part3a' ? 'a' : 'b')+'-present';
-    inner.innerHTML = `<div class="cue-card" style="text-align:left;max-width:640px;margin:0 auto"><div class="cue-topic">${t.q}</div><ul class="cue-bullets">${t.bullets.map(b=>`<li>${b}</li>`).join('')}</ul></div><div style="margin-top:24px;max-width:420px;margin-left:auto;margin-right:auto">${timerHTML(presentTimerId, 120, true, 'Speaking time: <strong>2 min</strong>')}</div>`;
+    inner.innerHTML = `<div class="cue-card present-cue-card"><div class="cue-topic">${t.q}</div><ul class="cue-bullets">${t.bullets.map(b=>`<li>${b}</li>`).join('')}</ul></div><div style="margin-top:28px;max-width:420px;margin-left:auto;margin-right:auto">${timerHTML(presentTimerId, 120, true, 'Speaking time: <strong>2 min</strong>')}</div>`;
     timerInit(presentTimerId, 120, true);
     activePresentTimerId = presentTimerId;
   }
