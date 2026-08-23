@@ -243,6 +243,18 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .present-inner .task-q{color:#fff;font-size:1.25rem;margin-top:0}
 .present-img-row{display:flex;gap:24px;margin-top:24px;justify-content:center;flex-wrap:wrap}
 .present-img-row .img-slot{flex:1;min-width:200px;max-width:320px;aspect-ratio:4/3;border-radius:16px;border-color:rgba(255,255,255,.25)}
+.present-overlay.light{background:var(--cream)}
+.present-overlay.light .present-close{border-color:var(--border);background:var(--card);color:var(--ink)}
+.present-overlay.light .present-close:hover{background:var(--cream)}
+.present-overlay.light .present-inner{color:var(--ink)}
+.present-overlay.light .present-inner .task-q{color:var(--ink)}
+.cue-card{background:var(--card);border:2px solid var(--accent);border-radius:var(--radius);padding:20px 22px;margin-top:4px;position:relative}
+.cue-topic{font-family:'Outfit',sans-serif;font-size:1.15rem;color:var(--ink);margin-bottom:12px;line-height:1.4;font-weight:700}
+.cue-prompt{font-size:.84rem;color:var(--muted);margin-bottom:6px;font-weight:600}
+.cue-bullets{list-style:none;display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.cue-bullets li{font-size:.84rem;color:var(--ink);padding-left:16px;position:relative;line-height:1.45}
+.cue-bullets li::before{content:'•';position:absolute;left:4px;color:var(--accent)}
+.cue-footer{font-size:.78rem;color:var(--muted);font-style:italic;border-top:1px solid var(--border);padding-top:10px}
 @media(max-width:700px){.present-img-row{flex-direction:column;align-items:center}}
 
 /* Part 2 - collaborative photo task, 5-photo select interaction */
@@ -251,11 +263,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .p2-block-label{font-family:Outfit,sans-serif;font-size:.66rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);margin-bottom:4px}
 
 /* Part 3 - long turn cards */
-.p3-card-q{font-size:1.02rem;font-weight:700;line-height:1.5;color:var(--ink);margin:14px 0 12px}
-.p3-bullets{list-style:none;padding:0;margin:0 0 4px;display:flex;flex-direction:column;gap:.55rem}
-.p3-bullet{display:flex;gap:.7rem;padding:.7rem .9rem;background:var(--cream);border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:.87rem;line-height:1.5;align-items:flex-start}
-.p3-bullet-mark{color:var(--accent);font-weight:800;flex-shrink:0}
-.p3-note{font-size:.85rem;color:var(--muted);margin:16px 0 0;line-height:1.5}
+.p3-note{font-size:.85rem;color:var(--muted);margin:0 0 12px;line-height:1.5}
 .p3-actions-row{display:flex;justify-content:flex-end;margin-top:14px}
 
 /* Part 4 - discussion question list */
@@ -955,12 +963,19 @@ function toggleRail(level){
 }
 
 /* ============ PRESENT (fullscreen) MODE - shared by Parts 2 & 3 ============ */
+let activePresentTimerId = null;
 function presentBtnHtml(kind, i){
   return `<button class="btn-present" type="button" onclick="openPresent('${kind}',${i})"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3M8 21H5a2 2 0 0 1-2-2v-3m18 0v3a2 2 0 0 1-2 2h-3"/></svg>Present</button>`;
 }
 function openPresent(kind, i){
   const overlay = document.getElementById('presentOverlay');
   const inner = document.getElementById('presentInner');
+  overlay.classList.remove('light');
+  if(activePresentTimerId){
+    const prevSt = timerState[activePresentTimerId];
+    if(prevSt) clearInterval(prevSt.interval);
+    activePresentTimerId = null;
+  }
   if(kind === 'part2mini'){
     const s = c2Sets[i];
     const card = document.getElementById('p2set-'+i);
@@ -972,8 +987,12 @@ function openPresent(kind, i){
     const s = c2Sets[i];
     inner.innerHTML = `<div class="task-q">${s.p2Q}</div><div class="present-img-row">${s.photos.map((u,pi)=>`<div class="img-slot"><span class="img-label">${pi+1}</span><img src="${u}" alt="Photo ${pi+1}"></div>`).join('')}</div>`;
   } else if(kind === 'part3'){
+    overlay.classList.add('light');
     const t = PART3_TOPICS[i];
-    inner.innerHTML = `<div class="task-q"><strong>${t.q}</strong></div><div class="prompts-list" style="margin-top:20px;text-align:left;max-width:640px;margin-left:auto;margin-right:auto">${t.bullets.map((b,bi)=>`<div class="p-item" style="border-bottom-color:rgba(255,255,255,.18)"><span class="p-num" style="color:var(--accent)">${bi+1}</span><span class="p-text" style="color:#fff">${b}</span></div>`).join('')}</div>`;
+    const presentTimerId = 'p3set-'+i+'-present';
+    inner.innerHTML = `<div class="cue-card" style="text-align:left;max-width:640px;margin:0 auto"><div class="cue-topic">${t.q}</div><div class="cue-prompt">You should address:</div><ul class="cue-bullets">${t.bullets.map(b=>`<li>${b}</li>`).join('')}</ul><div class="cue-footer">Your partner will then give a brief comment.</div></div><div style="margin-top:24px;max-width:420px;margin-left:auto;margin-right:auto">${timerHTML(presentTimerId, 120, true, 'Speaking time: <strong>2 min</strong>')}</div>`;
+    timerInit(presentTimerId, 120, true);
+    activePresentTimerId = presentTimerId;
   }
   overlay.classList.add('open');
   if(overlay.requestFullscreen){
@@ -985,6 +1004,11 @@ function closePresent(){
   overlay.classList.remove('open');
   if(document.fullscreenElement){
     document.exitFullscreen().catch(function(){});
+  }
+  if(activePresentTimerId){
+    const st = timerState[activePresentTimerId];
+    if(st) clearInterval(st.interval);
+    activePresentTimerId = null;
   }
 }
 document.addEventListener('keydown', function(e){
@@ -1053,9 +1077,8 @@ function buildPart3(){
   PART3_TOPICS.forEach((t,i) => {
     const id = `p3set-${i}`;
     h += `<div class="acc-card${i===0?' shown':''}" id="${id}"><div class="acc-header"><div class="acc-title"><span class="num-badge">${i+1}</span>${t.topic}</div></div><div class="acc-body">`;
-    h += `<div class="p3-card-q">${t.q}</div>`;
-    h += `<ul class="p3-bullets">${t.bullets.map(b=>`<li class="p3-bullet"><span class="p3-bullet-mark">&bull;</span><span>${b}</span></li>`).join('')}</ul>`;
-    h += `<p class="p3-note">Speak alone for about two minutes, addressing the question and then each bullet point in turn. Your partner will then give a brief comment.</p>`;
+    h += `<p class="p3-note">Speak on your own about the cue card. No preparation time — organise your ideas as you go, then speak for about two minutes.</p>`;
+    h += `<div class="cue-card"><div class="cue-topic">${t.q}</div><div class="cue-prompt">You should address:</div><ul class="cue-bullets">${t.bullets.map(b=>`<li>${b}</li>`).join('')}</ul><div class="cue-footer">Your partner will then give a brief comment.</div></div>`;
     h += `<div class="p2-actions-row">${timerHTML(id, 120, true, 'Speaking time: <strong>2 min</strong>')}${presentBtnHtml('part3', i)}</div>`;
     h += subDrop('Discourse-Organising Language', `<ul class="lang-list"><li class="chip">To begin with…</li><li class="chip">Another aspect worth considering is…</li><li class="chip">A further point that's often overlooked is…</li><li class="chip">Finally, and perhaps most importantly…</li><li class="chip">Having said that…</li><li class="chip">That said, one could equally argue…</li><li class="chip">Coming back to the central question…</li></ul>`);
     h += `<div class="p3-actions-row" style="justify-content:flex-start;margin-top:14px"><span class="p-hint" style="font-style:normal">Partner's brief comment: <em>"I'd broadly agree with what you said about…, although…"</em></span></div>`;
