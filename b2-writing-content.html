@@ -744,6 +744,113 @@ function wpCopyText(id, btn){
     setTimeout(()=>{ icon.innerHTML = original; }, 1500);
   });
 }
+function wpWrapLines(ctx, text, maxWidth){
+  var out = [];
+  String(text).split(/\n+/).forEach(function(para){
+    para = para.trim();
+    if(!para){ out.push(''); return; }
+    var words = para.split(/\s+/);
+    var line = '';
+    words.forEach(function(w){
+      var test = line ? line + ' ' + w : w;
+      if(ctx.measureText(test).width > maxWidth && line){
+        out.push(line);
+        line = w;
+      } else {
+        line = test;
+      }
+    });
+    if(line) out.push(line);
+  });
+  return out;
+}
+async function wpDownloadImage(id, btn){
+  var card = btn.closest('.acc-card');
+  var titleEl = card.querySelector('.acc-title');
+  var topic = titleEl ? titleEl.textContent.replace(/^\s*\d+\s*/, '').trim() : 'Writing task';
+  var question = (card.querySelector('.task-q') || {innerText:''}).innerText.trim();
+  var answer = document.getElementById('wpText-'+id).value.trim();
+  if(!answer){ alert('Write your answer first, then download it as an image.'); return; }
+
+  try{
+    await Promise.all([
+      document.fonts.load('700 40px Outfit'),
+      document.fonts.load('600 40px Outfit'),
+      document.fonts.load('400 40px Outfit')
+    ]);
+  }catch(e){}
+
+  var SCALE = 2;
+  var W = 1600 * SCALE;
+  var minH = Math.round(W * 5 / 4);
+  var padding = 90 * SCALE;
+  var contentW = W - padding * 2;
+
+  var measure = document.createElement('canvas').getContext('2d');
+  measure.font = '600 ' + (30*SCALE) + 'px Outfit, sans-serif';
+  var topicLines = wpWrapLines(measure, topic, contentW);
+  measure.font = '400 ' + (24*SCALE) + 'px Outfit, sans-serif';
+  var qLines = wpWrapLines(measure, question, contentW);
+  measure.font = '400 ' + (26*SCALE) + 'px Outfit, sans-serif';
+  var aLines = wpWrapLines(measure, answer, contentW);
+
+  var lh1 = 40*SCALE, lh2 = 34*SCALE, lh3 = 40*SCALE;
+  var neededH = padding
+    + (28*SCALE) + (36*SCALE)
+    + topicLines.length * lh1 + (24*SCALE)
+    + qLines.length * lh2 + (36*SCALE)
+    + (30*SCALE) + (20*SCALE)
+    + aLines.length * lh3
+    + padding;
+  var H = Math.max(minH, Math.round(neededH));
+
+  var canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  var ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#F7F6F3'; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(padding*0.4, padding*0.4, W-padding*0.8, H-padding*0.8);
+
+  var y = padding;
+  ctx.fillStyle = '#16A88D';
+  ctx.font = '700 ' + (18*SCALE) + 'px Outfit, sans-serif';
+  ctx.fillText('B2 WRITING', padding, y);
+  y += 36*SCALE;
+
+  ctx.fillStyle = '#2D3047';
+  ctx.font = '600 ' + (30*SCALE) + 'px Outfit, sans-serif';
+  topicLines.forEach(function(line){ ctx.fillText(line, padding, y); y += lh1; });
+  y += 24*SCALE;
+
+  ctx.strokeStyle = '#E8E5DF'; ctx.lineWidth = 1*SCALE;
+  ctx.beginPath(); ctx.moveTo(padding, y); ctx.lineTo(W-padding, y); ctx.stroke();
+  y += 34*SCALE;
+
+  ctx.fillStyle = '#7A7D8E';
+  ctx.font = '400 ' + (24*SCALE) + 'px Outfit, sans-serif';
+  qLines.forEach(function(line){ ctx.fillText(line, padding, y); y += lh2; });
+  y += 36*SCALE;
+
+  ctx.fillStyle = '#16A88D';
+  ctx.font = '700 ' + (16*SCALE) + 'px Outfit, sans-serif';
+  ctx.fillText('YOUR ANSWER', padding, y);
+  y += 20*SCALE + 30*SCALE;
+
+  ctx.fillStyle = '#2D3047';
+  ctx.font = '400 ' + (26*SCALE) + 'px Outfit, sans-serif';
+  aLines.forEach(function(line){ ctx.fillText(line, padding, y); y += lh3; });
+
+  canvas.toBlob(function(blob){
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = topic.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + '-answer.png';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
+  }, 'image/png');
+}
 function buildWritingPractice(id){
   return `<div class="editor-wrap">
     <div class="editor-bar">
@@ -752,6 +859,7 @@ function buildWritingPractice(id){
         <button class="btn btn-sm" id="wpTimerBtn-${id}" type="button" onclick="wpToggleTimer('${id}')">Start timer</button>
         <button class="btn btn-sm" type="button" onclick="wpClear('${id}')">Clear</button>
         <button class="btn btn-sm" type="button" title="Copy your writing" aria-label="Copy your writing" onclick="wpCopyText('${id}', this)" style="padding:.5rem;display:flex"><svg class="pb-copy-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+        <button class="btn btn-sm" type="button" title="Download question + answer as an image" aria-label="Download question and answer as an image" onclick="wpDownloadImage('${id}', this)" style="padding:.5rem;display:flex"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></button>
       </div>
     </div>
     <textarea class="wp-textarea" id="wpText-${id}" data-min="140" data-max="190" placeholder="Start writing your response here&hellip;" oninput="wpUpdateWordCount('${id}')"></textarea>
