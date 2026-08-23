@@ -77,6 +77,10 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
 .field-err{font-size:.74rem;color:var(--wrong);margin-top:.3rem;display:none}
 .field-err.show{display:block}
 .consent{font-size:.76rem;color:var(--muted);line-height:1.55;margin:.9rem 0 1.2rem;max-width:60ch}
+.yl-toggle{display:flex;align-items:center;gap:.6rem;cursor:pointer;user-select:none;background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:.7rem .9rem;margin:0 0 1.2rem;font-size:.92rem;font-weight:500;color:var(--ink);transition:border-color .15s,background .15s}
+.yl-toggle:hover{border-color:var(--sky)}
+.yl-toggle input{width:18px;height:18px;flex:none;accent-color:var(--sky);cursor:pointer}
+.yl-toggle .yl-note{display:block;font-size:.74rem;font-weight:400;color:var(--muted);margin-top:.1rem}
 .btn-start[disabled]{opacity:.5;cursor:not-allowed;transform:none!important}
 .btn-start[disabled]:hover{background:var(--sky)}
 
@@ -245,6 +249,11 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
       </div>
     </div>
     <p class="consent">Saved so John can see your result and follow up. Never shared.</p>
+
+    <label class="yl-toggle" for="ylMode">
+      <input type="checkbox" id="ylMode">
+      <span>Young learner mode (ages 10-16)<span class="yl-note">Same test, with questions about school, hobbies and family instead of adult topics.</span></span>
+    </label>
 
     <button class="btn btn-start" id="startBtn">Start the test
       <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
@@ -564,6 +573,236 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     ]
   };
 
+  // ---- Young-learner bank (ages 10-16): same CEFR grammar/vocab targets as the
+  // adult pool above, reframed to school, hobbies, family and friends. Built band
+  // by band; any band not yet written here falls back to the adult item for that
+  // band via bandPool()/bandReserve(), so the engine never breaks mid-build.
+  var POOL_YL = {
+    A1:{ gv:[
+      {id:"yl-a1-g1", s:"I ___ eleven years old.", o:["is","are","am","be"], a:2, w:"With I, the verb be is am."},
+      {id:"yl-a1-g2", s:"My best friend ___ a new bike.", o:["have","having","haves","has"], a:3, w:"He, she and it take has, not have."},
+      {id:"yl-a1-g3", s:"I have four ___ in my pencil case.", o:["pencil","penciles","a pencil","pencils"], a:3, w:"After four, the noun is plural: pencils."},
+      {id:"yl-a1-g4", s:"___ you like pizza?", o:["Do","Does","Are","Is"], a:0, w:"Questions with you use Do."},
+      {id:"yl-a1-g5", s:"School starts ___ nine o&rsquo;clock.", o:["in","on","at","to"], a:2, w:"Use at with clock times."},
+      {id:"yl-a1-g6", s:"Be quiet! The teacher ___ talking now.", o:["are","is","am","be"], a:1, w:"Now signals the present continuous: the teacher is talking."},
+      {id:"yl-a1-g7", s:"We ___ lunch in the school canteen.", o:["do","make","have","take"], a:2, w:"Have lunch is a fixed phrase."},
+      {id:"yl-a1-g8", s:"It&rsquo;s raining. Take your ___.", o:["sunglasses","umbrella","swimsuit","hat"], a:1, w:"You take an umbrella in the rain. Sunglasses and a swimsuit are for sunny days."},
+      {id:"yl-a1-g9", s:"My dad ___ a teacher.", o:["is","are","am","be"], a:0, w:"With a singular subject like dad, use is."},
+      {id:"yl-a1-g10", s:"There ___ thirty children in my class.", o:["is","are","be","am"], a:1, w:"Children is plural, so use are."},
+      {id:"yl-a1-g11", s:"___ your friends play football?", o:["Does","Is","Do","Are"], a:2, w:"Questions with they, like your friends, use Do."},
+      {id:"yl-a1-g12", s:"After school, I ___ home on my bike.", o:["goes","going","went","go"], a:3, w:"With I, use the base form go."},
+      {id:"yl-a1-g13", s:"That is my brother. ___ is very tall.", o:["He","She","It","They"], a:0, w:"Brother tells you it is a boy, so the pronoun is He."},
+      {id:"yl-a1-g14", s:"We live ___ a small town near the sea.", o:["at","in","on","under"], a:1, w:"You live in a town."}
+    ], rc:[
+      {id:"yl-a1-r1", s:"<span class=\"rc-ctx\">Ben goes to school by bus. The bus takes twenty minutes.</span>How does Ben go to school?", o:["By bus","By car","On foot","By train"], a:0, w:"The text says he goes by bus."},
+      {id:"yl-a1-r2", s:"<span class=\"rc-ctx\">Mia has a big dog. Its name is Rex.</span>What is the dog&rsquo;s name?", o:["Max","Rex","Sam","Leo"], a:1, w:"The text says the dog is called Rex."},
+      {id:"yl-a1-r3", s:"<span class=\"rc-ctx\">There are five girls and six boys in the art club.</span>How many boys are in the art club?", o:["Five","Four","Six","Eleven"], a:2, w:"The text says there are six boys."},
+      {id:"yl-a1-r4", s:"<span class=\"rc-ctx\">Today is Saturday, so there is no school.</span>Why is there no school today?", o:["Because it is raining","Because it is a holiday","Because the school is closed","Because it is Saturday"], a:3, w:"The text gives Saturday as the reason."},
+      {id:"yl-a1-r5", s:"<span class=\"rc-ctx\">Jack has football practice on Tuesday and Thursday. Today is Monday.</span>Does Jack have practice today?", o:["No","Yes, in the morning","Yes, with his team","Only at home"], a:0, w:"Practice is on Tuesday and Thursday, and today is Monday."},
+      {id:"yl-a1-r6", s:"<span class=\"rc-ctx\">Sara&rsquo;s schoolbag is old, but she likes it. She does not want a new one.</span>What does Sara think about her bag?", o:["It is new","She does not like it","She wants a new one","It is old but she likes it"], a:3, w:"She says it is old but she likes it and does not want a new one."}
+    ] },
+    A2:{ gv:[
+      {id:"yl-a2-g1", s:"Yesterday I ___ a great film with my sister.", o:["watch","watches","watched","watching"], a:2, w:"Yesterday needs the past simple: watched."},
+      {id:"yl-a2-g2", s:"This game is ___ than the old one.", o:["good","best","gooder","better"], a:3, w:"Good has the irregular comparative better."},
+      {id:"yl-a2-g3", s:"There isn&rsquo;t ___ juice left in the bottle.", o:["some","any","no","a"], a:1, w:"Negative sentences use any, not some."},
+      {id:"yl-a2-g4", s:"She ___ walks to school with her friends.", o:["usually","used","usual","use"], a:0, w:"The adverb of frequency is usually."},
+      {id:"yl-a2-g5", s:"I brush my teeth ___ the morning and at night.", o:["at","on","by","in"], a:3, w:"In is used with parts of the day: in the morning."},
+      {id:"yl-a2-g6", s:"We didn&rsquo;t ___ the school bus, so we were late.", o:["caught","catch","catched","catching"], a:1, w:"After didn&rsquo;t, use the base form: catch."},
+      {id:"yl-a2-g7", s:"I&rsquo;m really ___ in dinosaurs.", o:["interested","interesting","interest","interests"], a:0, w:"People are interested; things are interesting."},
+      {id:"yl-a2-g8", s:"We arrived ___ the swimming pool early.", o:["to","in","at","on"], a:2, w:"You arrive at a place like a pool."},
+      {id:"yl-a2-g9", s:"My little brother ___ to bed at eight o&rsquo;clock.", o:["goes","go","going","went"], a:0, w:"He takes -s in the present simple: goes."},
+      {id:"yl-a2-g10", s:"I&rsquo;m going to ___ my grandma this weekend.", o:["visiting","visit","visits","visited"], a:1, w:"Going to is followed by the base form."},
+      {id:"yl-a2-g11", s:"Maths is ___ difficult than art for me.", o:["more","most","much","very"], a:0, w:"Comparative form: more difficult."},
+      {id:"yl-a2-g12", s:"I haven&rsquo;t got ___ homework tonight.", o:["some","no","much","any"], a:3, w:"Negative sentences use any, not some."},
+      {id:"yl-a2-g13", s:"Hang ___ a second, I can&rsquo;t find my shoes!", o:["up","on","out","off"], a:1, w:"Hang on means wait a moment."},
+      {id:"yl-a2-g14", s:"I was late for school because I ___ hear my alarm this morning.", o:["don&rsquo;t","can&rsquo;t","didn&rsquo;t","won&rsquo;t"], a:2, w:"This morning is the past, so didn&rsquo;t."},
+      {id:"yl-a2-g15", s:"Can you ___ me your eraser for a minute?", o:["borrow","take","keep","lend"], a:3, w:"You lend something to someone; you borrow it from them."}
+    ], rc:[
+      {id:"yl-a2-r1", s:"<span class=\"rc-ctx\">Emma wanted to play outside, but it started to rain, so she stayed in and drew pictures instead.</span>Why did Emma stay inside?", o:["Because she was tired","Because it was getting dark","Because of the rain","Because she had no paper"], a:2, w:"The rain is the reason given in the text."},
+      {id:"yl-a2-r2", s:"<span class=\"rc-ctx\">Leo missed the bus, so he rode his bike to school and arrived a bit late.</span>How did Leo get to school?", o:["He took the bus","His dad drove him","He walked","He rode his bike"], a:3, w:"The text says he rode his bike."},
+      {id:"yl-a2-r3", s:"<span class=\"rc-ctx\">Nina forgot her umbrella and got very wet on the way home.</span>What happened to Nina?", o:["She got wet in the rain","She lost her bag","She missed the bus","She broke her umbrella"], a:0, w:"She forgot her umbrella and got wet."},
+      {id:"yl-a2-r4", s:"<span class=\"rc-ctx\">The library was closed, so Sam borrowed a book from his friend instead.</span>What did Sam do?", o:["He waited outside","He borrowed a book from his friend","He went home","He phoned the library"], a:1, w:"The text says he borrowed a book from his friend."},
+      {id:"yl-a2-r5", s:"<span class=\"rc-ctx\">Mia&rsquo;s first cake did not turn out well, so her mum helped her bake a new one.</span>What did Mia&rsquo;s mum do?", o:["She bought a cake from the shop","She helped Mia bake another one","She fixed the oven","She said sorry to Mia"], a:1, w:"The text says her mum helped her bake a new one."},
+      {id:"yl-a2-r6", s:"<span class=\"rc-ctx\">Tom is learning the guitar. His first lesson was hard, but the second was much easier.</span>How were Tom&rsquo;s guitar lessons?", o:["Both were hard","Both were easy","The second was easier than the first","The first was easier than the second"], a:2, w:"The second lesson was much easier than the first."}
+    ] },
+    B1:{ gv:[
+      {id:"yl-b1-g1", s:"I ___ never been to a water park.", o:["has","have","had","am"], a:1, w:"Present perfect with I: have never been."},
+      {id:"yl-b1-g2", s:"If it&rsquo;s sunny tomorrow, we ___ football in the park.", o:["will play","play","played","would play"], a:0, w:"First conditional: if + present, will + verb."},
+      {id:"yl-b1-g3", s:"I ___ to be scared of dogs, but now I love them.", o:["use","am used","used","using"], a:2, w:"Used to describes a past habit or state that has changed."},
+      {id:"yl-b1-g4", s:"This is the video game ___ I told you about.", o:["who","whose","what","which"], a:3, w:"Which refers to things, like a game."},
+      {id:"yl-b1-g5", s:"The box of books was too heavy ___ lift.", o:["to","for","that","lifting"], a:0, w:"The pattern is too + adjective + to + verb."},
+      {id:"yl-b1-g6", s:"Our school ___ built more than a hundred years ago.", o:["is","has","was","been"], a:2, w:"Past passive: was built."},
+      {id:"yl-b1-g7", s:"My sister is really good ___ drawing cartoons.", o:["in","on","for","at"], a:3, w:"The pattern is good at something."},
+      {id:"yl-b1-g8", s:"I&rsquo;m looking forward ___ you at the party.", o:["to see","to seeing","seeing","see"], a:1, w:"Look forward to is followed by -ing."},
+      {id:"yl-b1-g9", s:"I&rsquo;ve had this bike ___ my last birthday.", o:["for","since","from","at"], a:1, w:"Since is used with a point in time."},
+      {id:"yl-b1-g10", s:"The instructions for the game were far too ___ to follow.", o:["complicating","complicated","complication","complicate"], a:1, w:"After too you need the -ed adjective: complicated. Complication is a noun."},
+      {id:"yl-b1-g11", s:"That&rsquo;s the boy ___ dog ran onto the football pitch.", o:["who","which","whose","that"], a:2, w:"Whose shows possession."},
+      {id:"yl-b1-g12", s:"He apologised ___ breaking my pencil.", o:["to","about","of","for"], a:3, w:"Apologise for is the fixed pattern."},
+      {id:"yl-b1-g13", s:"It&rsquo;s getting late. You&rsquo;d ___ finish your homework now.", o:["better","rather","sooner","instead"], a:0, w:"You&rsquo;d better + base verb is the natural way to give advice or a warning."},
+      {id:"yl-b1-g14", s:"Hurry up, we&rsquo;re running ___ of time before the bus comes.", o:["over","off","down","out"], a:3, w:"Run out of time means have no time left."},
+      {id:"yl-b1-g15", s:"The spelling test was really easy. It was a piece of ___.", o:["bread","pie","cake","sugar"], a:2, w:"A piece of cake means something very easy."}
+    ], rc:[
+      {id:"yl-b1-r1", s:"<span class=\"rc-ctx\">The homework club opens on Saturdays, but only in the morning. In the afternoon the teachers use the room for meetings, so pupils cannot go back in until Monday.</span>When can pupils next use the room after Saturday morning?", o:["Monday","On Sunday","On Saturday afternoon","Any afternoon that week"], a:0, w:"The room reopens to pupils on Monday."},
+      {id:"yl-b1-r2", s:"<span class=\"rc-ctx\">The school trip was put off for a week because of heavy snow, so the class stayed at school and had normal lessons instead.</span>Why was the trip put off?", o:["A problem with the bus","Bad weather","Too few pupils signed up","A change of teacher"], a:1, w:"Heavy snow is the stated reason."},
+      {id:"yl-b1-r3", s:"<span class=\"rc-ctx\">The swimming pool lets children in for free on the first Sunday of the month, but you have to book a place online first.</span>How can a child swim for free?", o:["By paying at the door on the first Sunday","By going on any Sunday of the month","By booking online for the first Sunday","By booking online for any day they like"], a:2, w:"Free entry needs an online booking for the first Sunday."},
+      {id:"yl-b1-r4", s:"<span class=\"rc-ctx\">After the storm, some school buses were cancelled, and families were told to check the school website before leaving home.</span>What were families told to do?", o:["Drive their children to school","Wait at the bus stop as usual","Phone the school for new bus times","Look on the website for the latest news"], a:3, w:"The advice was to check the website."},
+      {id:"yl-b1-r5", s:"<span class=\"rc-ctx\">The sports hall is closed this week for painting. Pupils can use the field instead, but clubs will not run until the hall reopens.</span>What can pupils do this week?", o:["Use the field instead of the hall","Go to their usual clubs in the hall","Use the hall after school only","Pay to use a different hall"], a:0, w:"The field is open; clubs are not running."},
+      {id:"yl-b1-r6", s:"<span class=\"rc-ctx\">A cinema ticket costs 8 pounds online and 10 at the door. Children pay half price, but only at the door with proof of their age.</span>How can a child pay the least?", o:["Online, with proof of age","Online, without proof","At the door, without proof","At the door, with proof of age"], a:3, w:"Half of 10 at the door is 5, which is cheaper than 8 online."}
+    ] },
+    B2:{ gv:[
+      {id:"yl-b2-g1", s:"My hands are covered in paint because I ___ my model plane.", o:["painted","have painted","paint","have been painting"], a:3, w:"Present perfect continuous explains present evidence: have been painting."},
+      {id:"yl-b2-g2", s:"If I ___ known about the test, I would have revised.", o:["have","would","had","did"], a:2, w:"Third conditional: if + past perfect."},
+      {id:"yl-b2-g3", s:"The teacher asked me why I ___ late the day before.", o:["was","am","be","is"], a:0, w:"The day before places it in the past, so the reported verb is was."},
+      {id:"yl-b2-g4", s:"You ___ have told me about the trip earlier, but now it&rsquo;s full.", o:["must","should","can","would"], a:1, w:"Should have + participle criticises a past action."},
+      {id:"yl-b2-g5", s:"I wish I ___ more free time to play football.", o:["have","had","will have","would have"], a:1, w:"Wish + past simple expresses a present regret."},
+      {id:"yl-b2-g6", s:"After a lot of thinking, we finally ___ up with a great idea for the project.", o:["went","put","took","came"], a:3, w:"Come up with means think of an idea."},
+      {id:"yl-b2-g7", s:"It took her a whole week to get ___ a nasty cold.", o:["through","by","over","off"], a:2, w:"Get over means recover from an illness."},
+      {id:"yl-b2-g8", s:"After we argued, he completely ___ me and stopped replying to my messages.", o:["ghosted","vanished","escaped","disappeared"], a:0, w:"To ghost someone means to suddenly cut off all contact, especially online."},
+      {id:"yl-b2-g9", s:"The posters ___ by the time the school show starts.", o:["will have been finished","will finish","finishes","are finished"], a:0, w:"Future perfect passive for a completed future action."},
+      {id:"yl-b2-g10", s:"I&rsquo;d rather you didn&rsquo;t ___ my secret to anyone.", o:["telling","tell","told","to tell"], a:1, w:"Would rather you + base form."},
+      {id:"yl-b2-g11", s:"I&rsquo;m absolutely ___; I haven&rsquo;t eaten since breakfast.", o:["hungry","peckish","starving","tasty"], a:2, w:"Absolutely goes with extreme adjectives like starving. You would say very hungry."},
+      {id:"yl-b2-g12", s:"He&rsquo;s not as fast ___ his older brother.", o:["than","that","like","as"], a:3, w:"As...as for comparisons of equality."},
+      {id:"yl-b2-g13", s:"I can&rsquo;t be ___ to tidy my room tonight.", o:["annoyed","bothered","troubled","worried"], a:1, w:"Can&rsquo;t be bothered means you have no energy or desire to do something."},
+      {id:"yl-b2-g14", s:"I could ___ with a snack. I&rsquo;m starving after PE.", o:["go","make","do","take"], a:2, w:"Could do with something means you need or would really like it."},
+      {id:"yl-b2-g15", s:"We didn&rsquo;t plan to meet. We just bumped ___ each other at the shops.", o:["onto","at","with","into"], a:3, w:"Bump into someone means meet them by chance."},
+      {id:"yl-b2-g16", s:"Don&rsquo;t take it to heart, he&rsquo;s only ___ you up. He doesn&rsquo;t mean it.", o:["winding","turning","pulling","setting"], a:0, w:"Wind someone up means tease or annoy them on purpose."}
+    ], rc:[
+      {id:"yl-b2-r1", s:"<span class=\"rc-ctx\">Everyone said the new science teacher was strict, but our first lesson was actually good fun. She explained everything clearly, though the homework she set was harder than we expected.</span>What is the writer&rsquo;s overall opinion of the lesson?", o:["Mostly positive, apart from the homework","Entirely negative, from start to finish","Mostly negative, but with one good point","Fair enough, since they had been warned she was strict"], a:0, w:"The lesson was fun and clear, with only the hard homework as a downside."},
+      {id:"yl-b2-r2", s:"<span class=\"rc-ctx\">The website promised our new team kits in three days, but three weeks later they still had not arrived, and when they finally came, half of them were the wrong size.</span>How does the writer feel about the kits?", o:["Pleased that they arrived at all","Annoyed by the wait, but happy with the kits","Understanding, since delays sometimes happen","Frustrated by both the long wait and the mistakes"], a:3, w:"A long wait and wrong sizes point to frustration."},
+      {id:"yl-b2-r3", s:"<span class=\"rc-ctx\">Most of the class doubted they could put on a whole play in a month, but after weeks of rehearsals even the doubters admitted it went brilliantly.</span>How did the class end up feeling about the play?", o:["The result won over even the doubters","Most stayed just as doubtful as before","They enjoyed rehearsing but not the show","They wished they had chosen something easier"], a:0, w:"Even the doubters admitted it went brilliantly."},
+      {id:"yl-b2-r4", s:"<span class=\"rc-ctx\">The after-school club became popular very quickly, but rising costs and a shortage of adult helpers meant it had to close two of its four groups.</span>Why did the club close some groups?", o:["Because it had grown too fast to manage","Because costs went up and helpers were short","Because half the members left","Because nobody wanted to come any more"], a:1, w:"Rising costs and too few helpers are the stated causes."},
+      {id:"yl-b2-r5", s:"<span class=\"rc-ctx\">The film club&rsquo;s short movie was praised for its amazing camerawork, though many admitted the story got confusing near the end. The audience did not seem to mind: it won the school prize.</span>What did reviewers think of the movie?", o:["Badly filmed but well written","Great to look at, but weaker towards the end","Praised in every way, including the story","Enjoyed only by the judges, not the audience"], a:1, w:"Camerawork praised; the story got confusing near the end."},
+      {id:"yl-b2-r6", s:"<span class=\"rc-ctx\">Jake was picked as team captain, but turning it down was easier than he thought: it clashed with his music lessons, which mattered more to him.</span>Why did Jake turn down being captain?", o:["He did not think he was good enough","He was hoping to be picked for something better","It clashed with something he cared about more","His friends told him he should refuse"], a:2, w:"It clashed with his music lessons, which mattered more."}
+    ] },
+    C1:{ gv:[
+      {id:"yl-c1-g1", s:"If she had joined the club last year, she ___ a team captain by now.", o:["would be","would have been","will be","is"], a:0, w:"Mixed conditional: past condition, present result."},
+      {id:"yl-c1-g2", s:"I still can&rsquo;t ___ my head around how this maths trick works.", o:["put","get","turn","take"], a:1, w:"Get your head around something means finally understand it."},
+      {id:"yl-c1-g3", s:"I&rsquo;m having my bike ___ at the weekend.", o:["repair","repairing","to repair","repaired"], a:3, w:"Causative have something done: have my bike repaired."},
+      {id:"yl-c1-g4", s:"Don&rsquo;t ___ too much into one bad mark; everyone has an off day.", o:["make","take","read","put"], a:2, w:"Read too much into something means find meaning that is not really there."},
+      {id:"yl-c1-g5", s:"___ back in 1990, the school hall is now far too small for us all.", o:["Building","To build","Built","Build"], a:2, w:"A past participle clause: Built in 1990, ..."},
+      {id:"yl-c1-g6", s:"It was only when the bell rang ___ I realised how long we had been talking.", o:["that","when","did","which"], a:0, w:"A cleft sentence: It was only when ... that I realised."},
+      {id:"yl-c1-g7", s:"I don&rsquo;t know how you ___ up with your little brother all day.", o:["make","put","keep","take"], a:1, w:"Put up with someone means tolerate them."},
+      {id:"yl-c1-g8", s:"The evidence against him was ___; there was really no way to argue.", o:["overdue","overbearing","overflowing","overwhelming"], a:3, w:"Overwhelming means so strong it cannot be resisted or argued with."},
+      {id:"yl-c1-g9", s:"No sooner ___ sat down than the film started.", o:["had we","we had","did we","we did"], a:0, w:"No sooner at the start forces inversion."},
+      {id:"yl-c1-g10", s:"___ hard I try, I just can&rsquo;t beat my brother at chess.", o:["Whatever","However","Despite","Although"], a:1, w:"However + adjective/adverb means no matter how: However hard I try."},
+      {id:"yl-c1-g11", s:"She knew the answer the whole time, but she never ___ on.", o:["gave","showed","let","put"], a:2, w:"Let on means reveal a secret or that you know something."},
+      {id:"yl-c1-g12", s:"The rumour ___ to be completely untrue.", o:["turned up","turned in","turned over","turned out"], a:3, w:"Turn out means to be revealed as."},
+      {id:"yl-c1-g13", s:"He promised he&rsquo;d help at the school fair, then ___ on us at the last minute.", o:["dropped","fell","backed","bailed"], a:3, w:"Bail on someone means let them down by not turning up or pulling out."},
+      {id:"yl-c1-g14", s:"My old friend messaged me out of the ___ after two whole years.", o:["air","sky","blue","dark"], a:2, w:"Out of the blue means completely unexpectedly."}
+    ], rc:[
+      {id:"yl-c1-r1", s:"<span class=\"rc-ctx\">Everyone keeps going on about how amazing my sister&rsquo;s new phone is. Funny, then, that she keeps borrowing mine.</span>What is the writer suggesting?", o:["Her sister secretly prefers the writer&rsquo;s phone","Her sister really loves her new phone","The two phones are exactly the same","The writer wants a new phone too"], a:0, w:"If she keeps borrowing the old phone, she must quietly prefer it."},
+      {id:"yl-c1-r2", s:"<span class=\"rc-ctx\">Liam told us he had &lsquo;basically finished&rsquo; his part of the group project. When we opened the file, there was a title and two sentences.</span>What does the writer imply about Liam?", o:["He had finished his part","He had worked really hard on it","He forgot to save his work","He had done far less than he claimed"], a:3, w:"A title and two sentences is far less than &lsquo;basically finished&rsquo;."},
+      {id:"yl-c1-r3", s:"<span class=\"rc-ctx\">Mia never actually said she was upset about not being picked for the team. She just went very quiet and left early.</span>What does the text suggest about Mia?", o:["She was not bothered at all","She was upset but did not say so","She was simply tired that day","She had somewhere else to be"], a:1, w:"Going quiet and leaving early hints she was upset without saying it."},
+      {id:"yl-c1-r4", s:"<span class=\"rc-ctx\">&lsquo;Wonderful,&rsquo; said Dad, staring at my report. &lsquo;Another whole term of &ldquo;could try harder&rdquo;.&rsquo;</span>How does Dad really feel about the report?", o:["Genuinely pleased with it","Disappointed, though joking about it","Confused by what it says","Proud of the improvement"], a:1, w:"His words are positive but the sarcasm shows he is disappointed."},
+      {id:"yl-c1-r5", s:"<span class=\"rc-ctx\">Noah only said sorry once everyone had already seen the message he sent. Somehow it didn&rsquo;t feel like he really meant it.</span>Why does the apology feel hollow to the writer?", o:["It only came once he had been caught","It was far too long and detailed","He said sorry straight away","He apologised quietly, in private"], a:0, w:"An apology only made after being caught can seem forced, not sincere."},
+      {id:"yl-c1-r6", s:"<span class=\"rc-ctx\">Far from calming everyone down, the teacher&rsquo;s little speech just got the whole class even more wound up about the trip.</span>What effect did the speech have?", o:["It calmed the class right down","It made them lose interest","It made them even more excited","It got the trip cancelled"], a:2, w:"Far from calming them means it did the opposite and excited them more."}
+    ] },
+    C2:{ gv:[
+      {id:"yl-c2-g1", s:"Not until I got home ___ that I&rsquo;d left my keys at school.", o:["I realised","did I realise","realised I","I did realise"], a:1, w:"A negative time phrase at the front (Not until) forces inversion: did I realise."},
+      {id:"yl-c2-g2", s:"The teacher insisted that the essay ___ handed in by Friday.", o:["is","was","will be","be"], a:3, w:"Insist that takes the subjunctive: be handed in."},
+      {id:"yl-c2-g3", s:"Posting his test score in the group chat like that was such a ___.", o:["bend","flex","stretch","pull"], a:1, w:"A flex (slang) is a deliberate show-off, drawing attention to something you are proud of."},
+      {id:"yl-c2-g4", s:"___ finished all his homework, he finally let himself relax.", o:["Having","Being","With","Had"], a:0, w:"A perfect participle clause: Having finished ..., he relaxed."},
+      {id:"yl-c2-g5", s:"___ be any problems on the trip, phone the school at once.", o:["If there","There should","Were there","Should there"], a:3, w:"Should there be = if there should be (inversion instead of if)."},
+      {id:"yl-c2-g6", s:"What I really can&rsquo;t stand ___ people who talk all the way through a film.", o:["is","are","being","be"], a:0, w:"A what-cleft takes a singular verb: What I can&rsquo;t stand is ..."},
+      {id:"yl-c2-g7", s:"She seemed completely ___ to what anyone thought of her.", o:["different","distant","indifferent","difficult"], a:2, w:"Indifferent to something means not caring about it at all."},
+      {id:"yl-c2-g8", s:"He talks ___ he knows everything, but he really doesn&rsquo;t.", o:["as if","like as","even if","so as"], a:0, w:"As if introduces the way something seems: he talks as if he knows everything."},
+      {id:"yl-c2-g9", s:"___ it not for the rain, we would have won the match easily.", o:["Was","Were","Had","If"], a:1, w:"Were it not for is a fixed inversion meaning if it were not for."},
+      {id:"yl-c2-g10", s:"___ as I love gaming, I know I need to sleep sometimes.", o:["So","Much","However","Despite"], a:1, w:"Much as means although: Much as I love gaming, I still need sleep."},
+      {id:"yl-c2-g11", s:"___ did I know that the test was going to be that hard.", o:["Few","Small","Little","Less"], a:2, w:"Little did I know is a fixed inversion meaning I had no idea."},
+      {id:"yl-c2-g12", s:"The clue, ___ tricky at first, led us straight to the answer.", o:["despite","because","unless","though"], a:3, w:"Though can introduce a short concessive aside in the middle of a sentence."},
+      {id:"yl-c2-g13", s:"I ___ have worried about the exam; it turned out really easy.", o:["mustn&rsquo;t","shouldn&rsquo;t","needn&rsquo;t","couldn&rsquo;t"], a:2, w:"Needn&rsquo;t have + participle means the worry was unnecessary."},
+      {id:"yl-c2-g14", s:"The goal was disallowed, ___ by mistake or on purpose we never found out.", o:["regardless","whether","albeit","however"], a:1, w:"Whether ... or presents the two possibilities."},
+      {id:"yl-c2-g15", s:"I really wish I ___ harder for that test now.", o:["studied","would study","had studied","have studied"], a:2, w:"Wish + past perfect expresses a regret about the past."}
+    ], rc:[
+      {id:"yl-c2-r1", s:"<span class=\"rc-ctx\">All of a sudden, everyone says they &lsquo;always liked&rsquo; the new school rules. Funny how that started the very day the head said there would be no more arguing about them.</span>What does the writer suggest about the sudden support?", o:["People genuinely changed their minds","People gave up arguing rather than actually agreeing","Everyone had honestly always liked the rules","The head quietly changed the rules again"], a:1, w:"The timing hints people stopped arguing, they did not truly agree."},
+      {id:"yl-c2-r2", s:"<span class=\"rc-ctx\">The argument about the trip didn&rsquo;t really end when Miss Kaur made her decision. People just stopped bringing it up in front of her.</span>What does the writer imply?", o:["Everyone was happy with the decision","The trip ended up being cancelled","People still disagreed but kept quiet around her","Miss Kaur later changed her mind"], a:2, w:"They stopped mentioning it near her, so the disagreement was hidden, not resolved."},
+      {id:"yl-c2-r3", s:"<span class=\"rc-ctx\">It&rsquo;s easy to say the new seating plan changed nothing. And yet, somehow, the kids who never used to speak in class now do.</span>What is the writer&rsquo;s main point?", o:["The seating plan had a real effect after all","The seating plan honestly changed nothing","The quiet kids ended up leaving the class","The plan was dropped almost straight away"], a:0, w:"The quiet kids now speaking shows the plan did change something."},
+      {id:"yl-c2-r4", s:"<span class=\"rc-ctx\">Ever since we won the tournament, the other team have gone quiet. It&rsquo;s not that they think we deserved it. Admitting that would just hurt too much.</span>Why have the other team gone quiet?", o:["They agree that we deserved to win","They are busy planning a rematch","They never really cared about the tournament","Admitting we deserved it would be too hard for them"], a:3, w:"Their silence is about not wanting to admit the winners were better."},
+      {id:"yl-c2-r5", s:"<span class=\"rc-ctx\">We only settled on a film in the end because Sam said no to every other idea until everyone was too tired to keep arguing.</span>How was the decision really made?", o:["Sam wore everyone down until they gave in","Everyone genuinely agreed on the same film","Sam gave in to what the others wanted","They picked a film completely at random"], a:0, w:"People gave in from tiredness, not because they were persuaded."},
+      {id:"yl-c2-r6", s:"<span class=\"rc-ctx\">Dylan is so helpful whenever a teacher happens to be looking. The second they turn their back, the helping mysteriously stops.</span>What does the writer suggest about Dylan?", o:["He is helpful all of the time","He is just shy around teachers","He only seems helpful when a teacher is watching","Teachers make him nervous"], a:2, w:"Helping only when watched suggests it is a performance, not real."}
+    ] },
+  };
+
+  var RESERVE_YL = {
+    A1:[
+      {id:"yl-a1-x1", s:"My mum ___ in a hospital.", o:["work","works","working","is work"], a:1, w:"He, she and it add -s: works."},
+      {id:"yl-a1-x2", s:"___ is your favourite subject?", o:["Who","Where","How","What"], a:3, w:"Ask about a thing like a subject with What."},
+      {id:"yl-a1-x3", s:"I have three ___ at home.", o:["cats","cat","cates","a cat"], a:0, w:"Three means plural: cats."},
+      {id:"yl-a1-x4", s:"We ___ video games after school.", o:["plays","playing","play","to play"], a:2, w:"We takes the base form: play."},
+      {id:"yl-a1-x5", s:"This is my sister. She ___ nine.", o:["is","are","am","be"], a:0, w:"With she, use is."},
+      {id:"yl-a1-x6", s:"This is ___ pencil case. It belongs to Tom.", o:["her","his","their","its"], a:1, w:"The pencil case belongs to Tom, a boy, so use his."}
+    ],
+    A2:[
+      {id:"yl-a2-x1", s:"This box is ___ heavy to carry on my own.", o:["very","so much","too","enough"], a:2, w:"Too + adjective means more than is good."},
+      {id:"yl-a2-x2", s:"Have you ever ___ on a plane?", o:["flown","flew","fly","flying"], a:0, w:"Ever + past participle: flown."},
+      {id:"yl-a2-x3", s:"He&rsquo;s the ___ runner in our class.", o:["better","good","most good","best"], a:3, w:"The + superlative: the best."},
+      {id:"yl-a2-x4", s:"I went to the shop ___ some sweets.", o:["for buy","to buy","buying","for to buy"], a:1, w:"To + infinitive expresses purpose."},
+      {id:"yl-a2-x5", s:"We ___ pizza for dinner last night.", o:["have","having","had","has"], a:2, w:"Last night needs the past simple: had."},
+      {id:"yl-a2-x6", s:"She can&rsquo;t come to the party ___ she is ill.", o:["so","but","although","because"], a:3, w:"Because gives the reason."}
+    ],
+    B1:[
+      {id:"yl-b1-x1", s:"By the time we got to the cinema, the film ___ already started.", o:["has","was","is","had"], a:3, w:"Past perfect for the earlier of two past actions."},
+      {id:"yl-b1-x2", s:"You ___ wear a helmet when you ride your bike. It&rsquo;s the rule.", o:["might","must","could","would"], a:1, w:"A rule is an obligation: must."},
+      {id:"yl-b1-x3", s:"She asked me ___ I wanted to join the chess club.", o:["what","that","whether","did"], a:2, w:"Whether introduces a yes-or-no choice."},
+      {id:"yl-b1-x4", s:"I&rsquo;m not used ___ up so early for school.", o:["to getting","to get","getting","for getting"], a:0, w:"Be used to is followed by -ing."},
+      {id:"yl-b1-x5", s:"I&rsquo;m sure I ___ my keys somewhere in my bedroom.", o:["have left","left","leave","was leaving"], a:0, w:"Present perfect for a recent action with a present result."},
+      {id:"yl-b1-x6", s:"It was ___ a good book that I read it twice.", o:["so","such","too","very"], a:1, w:"Such + a + noun: such a good book. So would need so good a book."}
+    ],
+    B2:[
+      {id:"yl-b2-x1", s:"The match has been ___ off until next Saturday.", o:["put","taken","given","set"], a:0, w:"Put off means postpone."},
+      {id:"yl-b2-x2", s:"He denied ___ the last biscuit.", o:["to take","take","taking","of taking"], a:2, w:"Deny is followed by -ing."},
+      {id:"yl-b2-x3", s:"___ he said sorry, she was still upset with him.", o:["Despite","Even though","However","Whereas"], a:1, w:"Even though + clause; despite + noun."},
+      {id:"yl-b2-x4", s:"It&rsquo;s high time we ___ a decision about the school trip.", o:["make","will make","are making","made"], a:3, w:"It&rsquo;s high time + past simple."},
+      {id:"yl-b2-x5", s:"You needn&rsquo;t ___; I&rsquo;ve already packed everything.", o:["worrying","to worry","worry","worried"], a:2, w:"Needn&rsquo;t is followed by the base form."},
+      {id:"yl-b2-x6", s:"The sooner we start, ___ we&rsquo;ll finish.", o:["sooner","more sooner","the more sooner","the sooner"], a:3, w:"The + comparative, the + comparative."}
+    ],
+    C1:[
+      {id:"yl-c1-x1", s:"Under no circumstances ___ leave the science lab without permission.", o:["you should","should you","should","you"], a:1, w:"A negative adverbial opener forces inversion."},
+      {id:"yl-c1-x2", s:"Our plans for the sleepover fell ___ at the last minute.", o:["through","out","off","down"], a:0, w:"Fall through means fail to happen."},
+      {id:"yl-c1-x3", s:"She has a real ___ for languages.", o:["attitude","altitude","amplitude","aptitude"], a:3, w:"Aptitude means natural ability."},
+      {id:"yl-c1-x4", s:"___ to say, the concert tickets sold out within minutes.", o:["Useless","Pointless","Needless","Meaningless"], a:2, w:"Needless to say is the fixed phrase."},
+      {id:"yl-c1-x5", s:"___ giving up when it started to rain, they carried on with the whole sports day.", o:["Rather than","Instead","Despite","Although"], a:0, w:"Rather than + -ing means instead of doing something."},
+      {id:"yl-c1-x6", s:"He has a tendency ___ leave everything until the last minute.", o:["of","to","for","at"], a:1, w:"Tendency to is the fixed pattern."}
+    ],
+    C2:[
+      {id:"yl-c2-x1", s:"The test was ___ means easy, but somehow I still passed.", o:["by no","in no","at no","with no"], a:0, w:"By no means is a fixed phrase meaning not at all."},
+      {id:"yl-c2-x2", s:"Only when the final whistle blew ___ that we had actually won.", o:["we realised","we did realise","realised we","did we realise"], a:3, w:"Only when at the start forces inversion: did we realise."},
+      {id:"yl-c2-x3", s:"I can&rsquo;t even do the easy questions, ___ the really hard ones.", o:["let go","let alone","let out","let off"], a:1, w:"Let alone means and certainly not, used after a negative."},
+      {id:"yl-c2-x4", s:"___ he said sorry doesn&rsquo;t mean he actually meant it.", o:["Despite","Although","The fact that","Because of"], a:2, w:"The fact that ... can act as the subject of the sentence."},
+      {id:"yl-c2-x5", s:"I&rsquo;d ___ walk home than wait a whole hour for the late bus.", o:["rather","better","more","instead"], a:0, w:"Would rather + base verb + than is the fixed pattern."},
+      {id:"yl-c2-x6", s:"___ are you to leave the school grounds at lunchtime.", o:["By no means","No way","Not ever","Under no circumstances"], a:3, w:"Under no circumstances is the fixed negative opener that forces inversion."}
+    ],
+  };
+
+  // Descriptions and John's signed quotes, in simpler language for a young reader.
+  // Colours, level names and route links are shared with the adult LV object.
+  var JOHN_YL = {
+    A1:"Everyone starts somewhere. I&rsquo;m really glad you&rsquo;re learning with me.",
+    A2:"You&rsquo;ve got the basics, and that&rsquo;s a great place to be. Let&rsquo;s keep going.",
+    B1:"Really solid work. Now it&rsquo;s all about using your English and having fun with it.",
+    B2:"This is where it all starts to click. You should be really proud of yourself.",
+    C1:"Genuinely impressive. From here it&rsquo;s the small details that make you sound natural.",
+    C2:"Outstanding work. At this level it&rsquo;s all about the finer details, and that&rsquo;s the fun part."
+  };
+  var LV_YL = {
+    A1:{desc:"You can understand and use simple everyday words and say a little about yourself, your family and your school.",
+        focus:"The present simple, easy questions and everyday words."},
+    A2:{desc:"You can talk about everyday things like your school day, your family and what you did at the weekend, using short, simple sentences.",
+        focus:"The past simple, comparing things and common everyday phrases."},
+    B1:{desc:"You can handle most everyday situations, tell a story about what has happened, and give simple opinions and reasons.",
+        focus:"The present perfect, conditionals and phrasal verbs."},
+    B2:{desc:"You can chat comfortably and explain and defend your opinions in detail on lots of different topics.",
+        focus:"Perfect tenses, reported speech and natural, everyday expressions."},
+    C1:{desc:"You can use English flexibly and confidently for school, friendships and almost anything you want to say.",
+        focus:"Inversion, advanced sentence structures and natural phrasal verbs."},
+    C2:{desc:"You can express yourself precisely and understand almost everything you read or hear, like a native speaker your own age.",
+        focus:"Advanced structures like inversion, and picking up on subtle, unspoken meaning."}
+  };
+
+  var isYoungLearner = false;
+  function bandPool(band){ return (isYoungLearner && POOL_YL[band]) ? POOL_YL[band] : POOL[band]; }
+  function bandReserve(band){ return (isYoungLearner && RESERVE_YL[band]) ? RESERVE_YL[band] : RESERVE_POOL[band]; }
+
   var ORDER = ["A1","A2","B1","B2","C1","C2"];
   var CORE = 12, RES = 4, MAXQ = 60;
   // Launch standards: 12-item checks (9 grammar/vocab + 3 reading).
@@ -618,11 +857,13 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
       return m ? (m[1] ? m[1].toUpperCase() : "B2") : null;
     }catch(e){ return null; }
   })();
-  function reset(){ st={band:2, passed:{}, failed:{}, per:{}, before:0, correct:0, items:null, idx:0, ans:null, history:[]}; lock=false; }
+  // Young learners more often start below the adult B1 midpoint, so their staircase
+  // begins one step lower, at A2, while the adult test still starts at B1.
+  function reset(){ st={band:(isYoungLearner?1:2), passed:{}, failed:{}, per:{}, before:0, correct:0, items:null, idx:0, ans:null, history:[]}; lock=false; }
 
   function startStage(){
     st.phase = "core";
-    var pool = POOL[ORDER[st.band]];
+    var pool = bandPool(ORDER[st.band]);
     var gv = shuffle(pool.gv.slice()).slice(0,9);
     var rc = shuffle(pool.rc.slice()).slice(0,3);
     st.items = shuffle(gv.concat(rc));
@@ -683,7 +924,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
       // fail outright if below the floor, or if even a perfect reserve could not reach the bar
       if(c <= FAIL_CORE[b] || c + RES < PASS_TOTAL[b]){ st.per[b] = {c:c, t:CORE}; failBand(); return; }
       st.coreC = c; st.phase = "reserve";
-      st.items = shuffle(RESERVE_POOL[b].slice()).slice(0,4);
+      st.items = shuffle(bandReserve(b).slice()).slice(0,4);
       st.idx = 0;
       st.ans = new Array(st.items.length).fill(null);
       stageBreak(b, "Close call. A few more <b>"+b+"</b> questions to be sure.", render); return;
@@ -761,7 +1002,8 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
       correct: st.correct,
       total: st.before,
       spectrum_pct: Math.round(spectrumPct * 10) / 10,
-      breakdown: breakdown
+      breakdown: breakdown,
+      is_young_learner: isYoungLearner
     };
     try{
       fetch(SUPABASE_URL + "/rest/v1/level_test_results", {
@@ -827,10 +1069,11 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     el("resName").textContent = meta.name;
     var fn = (student.name || "").trim().split(/\s+/)[0] || "there";
     el("resGreet").textContent = (GREET[level] || "Well done") + ", " + fn + "!";
-    el("resJohn").innerHTML = "&ldquo;" + JOHN[level] + "&rdquo;&nbsp; <b>John</b>";
+    var ylMeta = isYoungLearner ? (LV_YL[level] || {}) : {};
+    el("resJohn").innerHTML = "&ldquo;" + ((isYoungLearner && JOHN_YL[level]) || JOHN[level]) + "&rdquo;&nbsp; <b>John</b>";
     setupJohnAudio(level);
-    el("resDesc").textContent = meta.desc;
-    el("resFocus").textContent = meta.focus;
+    el("resDesc").textContent = ylMeta.desc || meta.desc;
+    el("resFocus").textContent = ylMeta.focus || meta.focus;
     var setScore = function(n){
       el("resScore").textContent = "You answered "+n+" of "+st.before+" correctly across "+Object.keys(st.per).length+" level checks.";
     };
@@ -1120,6 +1363,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     if(!nameOk){ nameEl.focus(); return; }
     if(!emailOk){ emailEl.focus(); return; }
     student.name = name; student.email = email;
+    var ylEl = el("ylMode"); isYoungLearner = !!(ylEl && ylEl.checked);
     reset(); intro.hidden = true; result.hidden = true; quiz.hidden = false; startStage();
   });
   if(PREVIEW_LEVEL){
