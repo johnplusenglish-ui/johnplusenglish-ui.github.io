@@ -327,7 +327,10 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
     <div class="wb-pane">
       <div class="wb-pane-head" style="display:flex;align-items:center;justify-content:space-between;gap:.75rem">
         <h2 id="resourcesPaneTitle"></h2>
-        <button class="btn btn-sm" type="button" title="Copy phrases" aria-label="Copy phrases" onclick="copyResourcesPhrases(this)" style="padding:9px;display:flex"><svg class="pb-copy-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+        <div style="display:flex;gap:.4rem;flex-shrink:0">
+          <button class="btn btn-sm" type="button" title="Copy phrases" aria-label="Copy phrases" onclick="copyResourcesPhrases(this)" style="padding:9px;display:flex"><svg class="pb-copy-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+          <button class="btn btn-sm" type="button" title="Download phrases as an image" aria-label="Download phrases as an image" onclick="wpDownloadPhrasesImage()" style="padding:9px;display:flex"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></button>
+        </div>
       </div>
       <div class="wb-pane-body" id="resourcesPaneBody"></div>
     </div>
@@ -1333,6 +1336,8 @@ const PHRASE_BANK = [
   { part:"Review", fn:"Recommending", phrases:["I would highly recommend it to…","Anyone who enjoys … will love this.","It's well worth seeing / reading / trying.","I wouldn't hesitate to recommend it.","If you get the chance, don't miss it."] }
 ];
 let resourcesCopyPhrases = [];
+let resourcesCopyGroups = [];
+let resourcesCopyTitle = '';
 function clearResourcesNavActive(){
   document.getElementById('phrases-content').querySelectorAll('.guide-nav-item, .guide-nav-group-label').forEach(b=>b.classList.remove('active'));
 }
@@ -1341,7 +1346,9 @@ function showResourcesTopic(i){
   const cat = PHRASE_BANK[i];
   document.querySelectorAll('#resourcesNav .guide-nav-item')[i].classList.add('active');
   resourcesCopyPhrases = cat.phrases;
-  document.getElementById('resourcesPaneTitle').textContent = cat.part + ' · ' + cat.fn;
+  resourcesCopyGroups = [{fn:cat.fn, phrases:cat.phrases}];
+  resourcesCopyTitle = cat.part + ' · ' + cat.fn;
+  document.getElementById('resourcesPaneTitle').textContent = resourcesCopyTitle;
   document.getElementById('resourcesPaneBody').innerHTML = `<ul class="lang-list">${cat.phrases.map(p=>`<li class="chip">${p}</li>`).join('')}</ul>`;
 }
 function showResourcesPart(part){
@@ -1349,7 +1356,9 @@ function showResourcesPart(part){
   document.getElementById('resourcesGroup-' + part.replace(/\s+/g,'')).classList.add('active');
   const cats = PHRASE_BANK.filter(c => c.part === part);
   resourcesCopyPhrases = cats.flatMap(c => c.phrases);
-  document.getElementById('resourcesPaneTitle').textContent = part + ' · All phrases';
+  resourcesCopyGroups = cats.map(c => ({fn:c.fn, phrases:c.phrases}));
+  resourcesCopyTitle = part + ' · All phrases';
+  document.getElementById('resourcesPaneTitle').textContent = resourcesCopyTitle;
   document.getElementById('resourcesPaneBody').innerHTML = cats.map(c =>
     `<div class="lang-fn" style="font-family:Outfit,sans-serif;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.11em;padding-bottom:6px;border-bottom:1.5px solid var(--border);margin:1rem 0 4px;color:var(--accent)">${c.fn}</div><ul class="lang-list">${c.phrases.map(p=>`<li class="chip">${p}</li>`).join('')}</ul>`
   ).join('');
@@ -1361,6 +1370,100 @@ function copyResourcesPhrases(btn){
     icon.innerHTML = '<polyline points="20 6 9 17 4 12"/>';
     setTimeout(()=>{ icon.innerHTML = original; }, 1500);
   });
+}
+function wpBuildPhraseLines(measure, groups, contentW, headerFontPx, phraseFontPx){
+  var lines = [];
+  groups.forEach(function(g, gi){
+    measure.font = '700 ' + headerFontPx + 'px Outfit, sans-serif';
+    wpWrapLines(measure, g.fn.toUpperCase(), contentW).forEach(function(t, ti){
+      lines.push({text:t, kind:'header', gapBefore: ti === 0 ? (gi === 0 ? 'none' : 'para') : 'none'});
+    });
+    measure.font = '400 ' + phraseFontPx + 'px Outfit, sans-serif';
+    g.phrases.forEach(function(p){
+      wpWrapLines(measure, '•  ' + p, contentW).forEach(function(t, ti){
+        lines.push({text:t, kind:'phrase', gapBefore: ti === 0 ? 'line' : 'none'});
+      });
+    });
+  });
+  return lines;
+}
+async function wpDownloadPhrasesImage(){
+  if(!resourcesCopyGroups.length) return;
+  try{
+    await Promise.all([document.fonts.load('700 40px Outfit'), document.fonts.load('400 40px Outfit')]);
+  }catch(e){}
+
+  var SCALE = 2;
+  var W = 1600 * SCALE;
+  var minH = Math.round(W * 5 / 4);
+  var padding = 80 * SCALE;
+  var contentW = W - padding * 2;
+
+  var measure = document.createElement('canvas').getContext('2d');
+  var headerPx = 24*SCALE, phrasePx = 30*SCALE, lhTitle = 58*SCALE, lhHeader = 40*SCALE, lhPhrase = 44*SCALE;
+  var paraGap = lhPhrase*0.5, lineGap = lhPhrase*0.15;
+
+  measure.font = '700 ' + (44*SCALE) + 'px Outfit, sans-serif';
+  var titleLines = wpWrapLines(measure, resourcesCopyTitle, contentW);
+  var lines = wpBuildPhraseLines(measure, resourcesCopyGroups, contentW, headerPx, phrasePx);
+
+  var bodyH = 0;
+  lines.forEach(function(l){
+    if(l.kind === 'header'){ if(l.gapBefore === 'para') bodyH += paraGap; bodyH += lhHeader; }
+    else { if(l.gapBefore === 'line') bodyH += lineGap; bodyH += lhPhrase; }
+  });
+
+  var neededH = padding + (28*SCALE) + (46*SCALE) + titleLines.length*lhTitle + (36*SCALE) + bodyH + padding;
+  var H = Math.max(minH, Math.round(neededH));
+
+  var canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  var ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#F7F6F3'; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(padding*0.4, padding*0.4, W-padding*0.8, H-padding*0.8);
+
+  var y = padding;
+  ctx.fillStyle = '#16A88D';
+  ctx.font = '700 ' + (22*SCALE) + 'px Outfit, sans-serif';
+  ctx.fillText('B2 WRITING · PHRASE BANK', padding, y);
+  y += 46*SCALE;
+
+  ctx.fillStyle = '#2D3047';
+  ctx.font = '700 ' + (44*SCALE) + 'px Outfit, sans-serif';
+  titleLines.forEach(function(t){ ctx.fillText(t, padding, y); y += lhTitle; });
+  y += 36*SCALE;
+
+  ctx.strokeStyle = '#E8E5DF'; ctx.lineWidth = 1.5*SCALE;
+  ctx.beginPath(); ctx.moveTo(padding, y); ctx.lineTo(W-padding, y); ctx.stroke();
+  y += 44*SCALE;
+
+  lines.forEach(function(l){
+    if(l.kind === 'header'){
+      if(l.gapBefore === 'para') y += paraGap;
+      ctx.fillStyle = '#16A88D';
+      ctx.font = '700 ' + headerPx + 'px Outfit, sans-serif';
+      ctx.fillText(l.text, padding, y);
+      y += lhHeader;
+    } else {
+      if(l.gapBefore === 'line') y += lineGap;
+      ctx.fillStyle = '#2D3047';
+      ctx.font = '400 ' + phrasePx + 'px Outfit, sans-serif';
+      ctx.fillText(l.text, padding, y);
+      y += lhPhrase;
+    }
+  });
+
+  canvas.toBlob(function(blob){
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = resourcesCopyTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + '-phrases.png';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
+  }, 'image/png');
 }
 function buildResources(){
   let lastPart = null;
