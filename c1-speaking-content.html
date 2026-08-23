@@ -132,6 +132,10 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .img-slot{flex:1;aspect-ratio:4/3;border-radius:var(--radius-sm);overflow:hidden;position:relative;background:var(--cream);border:1.5px solid var(--border)}
 .img-slot img{width:100%;height:100%;object-fit:cover;display:block}
 .img-label{position:absolute;top:8px;left:8px;width:22px;height:22px;border-radius:50%;background:rgba(31,34,51,.6);color:#fff;font-size:.68rem;font-weight:700;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.img-row .img-slot[onclick]{cursor:pointer;transition:opacity .18s ease,filter .18s ease}
+.img-row .img-slot[onclick]:hover:not(.excluded){opacity:.85}
+.img-row .img-slot.excluded{opacity:.35;filter:grayscale(70%)}
+.img-hint{font-size:.74rem;color:var(--muted);margin-bottom:12px}
 
 .task-q{font-family:'Outfit',sans-serif;font-size:1rem;font-weight:500;line-height:1.6;color:var(--ink);padding:0;margin:16px 0 0}
 .task-q strong{font-weight:800}
@@ -793,8 +797,8 @@ const PROMPTS_C1 = [
   {text:"Answer the task question thoughtfully.",hint:'"I\'d argue that…" / "It depends on…" / "To a certain extent…"'}
 ];
 
-function imgs(photos, cls, labels) {
-  return `<div class="img-row ${cls||''}">${photos.map((u,i)=>`<div class="img-slot">${labels?`<span class="img-label">${labels[i]}</span>`:''}<img src="${u}" alt="${labels?'Photo '+labels[i]:'Image'}" loading="lazy"></div>`).join('')}</div>`;
+function imgs(photos, cls, labels, toggleable) {
+  return `<div class="img-row ${cls||''}">${photos.map((u,i)=>`<div class="img-slot" data-idx="${i}"${toggleable?` onclick="this.classList.toggle('excluded')"`:''}>${labels?`<span class="img-label">${labels[i]}</span>`:''}<img src="${u}" alt="${labels?'Photo '+labels[i]:'Image'}" loading="lazy"></div>`).join('')}</div>${toggleable?`<div class="img-hint">Tap the photo you're not comparing to fade it out, then hit Present to show just the other two.</div>`:''}`;
 }
 function promptsList(list) {
   return `<div class="prompts-list">${list.map((p,i)=>`<div class="p-item"><span class="p-num">${i+1}</span><div><span class="p-text">${p.text}</span>${p.hint?`<span class="p-hint">${p.hint}</span>`:''}</div></div>`).join('')}</div>`;
@@ -973,7 +977,11 @@ function openPresent(kind, i){
   const inner = document.getElementById('presentInner');
   if(kind === 'part2'){
     const s = c1Sets[i];
-    inner.innerHTML = `<div class="task-q">${s.question}</div><div class="present-img-row">${s.photos.map((u,pi)=>`<div class="img-slot"><span class="img-label">${['A','B','C'][pi]}</span><img src="${u}" alt="Photo ${['A','B','C'][pi]}"></div>`).join('')}</div>`;
+    const card = document.getElementById('p2set-'+i);
+    const excluded = card ? new Set([...card.querySelectorAll('.img-slot.excluded')].map(el=>parseInt(el.dataset.idx,10))) : new Set();
+    let showIdxs = s.photos.map((_,pi)=>pi).filter(pi=>!excluded.has(pi));
+    if(showIdxs.length !== 2) showIdxs = s.photos.map((_,pi)=>pi);
+    inner.innerHTML = `<div class="task-q">${s.question}</div><div class="present-img-row">${showIdxs.map(pi=>`<div class="img-slot"><span class="img-label">${['A','B','C'][pi]}</span><img src="${s.photos[pi]}" alt="Photo ${['A','B','C'][pi]}"></div>`).join('')}</div>`;
   } else if(kind === 'part3'){
     const t = PART3_TOPICS[i];
     inner.innerHTML = `<div class="debate-card present">${p3DebateHtml(t, false)}</div>`;
@@ -1010,7 +1018,7 @@ function buildPart2(){
     const id = `p2set-${i}`;
     h += `<div class="acc-card${i===0?' shown':''}" id="${id}"><div class="acc-header"><div class="acc-title"><span class="num-badge">${i+1}</span>${s.topic}</div></div><div class="acc-body">`;
     h += `<div class="task-q">${s.question}</div>`;
-    h += imgs(s.photos, '', ['A','B','C']);
+    h += imgs(s.photos, '', ['A','B','C'], true);
     h += `<div class="p2-actions-row">${timerHTML(id, 60, true, 'Speaking time: <strong>1 min</strong>')}${presentBtnHtml('part2', i)}</div>`;
     h += subDrop('Useful Language', langBox());
     h += subDrop('Guided Prompts', promptsList(PROMPTS_C1));
