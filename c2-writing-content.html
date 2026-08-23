@@ -793,30 +793,34 @@ function wpWrapQuestionBlocks(ctx, root, maxWidth){
   var out = [];
   var blocks = [];
   root.querySelectorAll('p, li').forEach(function(el){
-    var text = el.textContent.trim();
-    if(!text) return;
+    var clone = el.cloneNode(true);
+    clone.querySelectorAll('br').forEach(function(br){ br.replaceWith('\n'); });
+    var subLines = clone.textContent.split('\n').map(function(s){ return s.trim(); }).filter(Boolean);
+    if(!subLines.length) return;
     if(el.tagName === 'LI'){
       var idx = Array.prototype.indexOf.call(el.parentElement.children, el) + 1;
-      blocks.push(idx + '. ' + text);
-    } else {
-      blocks.push(text);
+      subLines[0] = idx + '. ' + subLines[0];
     }
+    blocks.push(subLines);
   });
-  blocks.forEach(function(blockText, bi){
-    var words = blockText.split(/\s+/);
-    var line = '';
-    var firstWrapped = true;
-    words.forEach(function(w){
-      var test = line ? line + ' ' + w : w;
-      if(ctx.measureText(test).width > maxWidth && line){
-        out.push({text:line, gap: firstWrapped ? (bi===0?'none':'para') : 'none'});
-        firstWrapped = false;
-        line = w;
-      } else {
-        line = test;
-      }
+  blocks.forEach(function(subLines, bi){
+    subLines.forEach(function(blockText, si){
+      var words = blockText.split(/\s+/);
+      var line = '';
+      var firstWrapped = true;
+      var gapTier = (bi === 0 && si === 0) ? 'none' : (si === 0 ? 'para' : 'line');
+      words.forEach(function(w){
+        var test = line ? line + ' ' + w : w;
+        if(ctx.measureText(test).width > maxWidth && line){
+          out.push({text:line, gap: firstWrapped ? gapTier : 'none'});
+          firstWrapped = false;
+          line = w;
+        } else {
+          line = test;
+        }
+      });
+      if(line) out.push({text:line, gap: firstWrapped ? gapTier : 'none'});
     });
-    if(line) out.push({text:line, gap: firstWrapped ? (bi===0?'none':'para') : 'none'});
   });
   return out;
 }
