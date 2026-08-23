@@ -60,8 +60,10 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .guide-nav-item.active{color:var(--ink)}
 .guide-nav-dot{width:6px;height:6px;border-radius:50%;background:var(--border);flex-shrink:0}
 .guide-nav-item.active .guide-nav-dot{background:var(--accent)}
-.guide-nav-group-label{font-family:Outfit,sans-serif;font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:.7rem .75rem .3rem}
+.guide-nav-group-label{display:block;width:100%;text-align:left;background:none;border:none;cursor:pointer;font-family:Outfit,sans-serif;font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:.7rem .75rem .3rem;transition:color .15s}
 .guide-nav-group-label:first-child{padding-top:.2rem}
+.guide-nav-group-label:hover{color:var(--ink)}
+.guide-nav-group-label.active{color:var(--accent)}
 .wb-pane{background:var(--card);border:1.5px solid var(--border);border-radius:14px;box-shadow:var(--shadow-sm);overflow:hidden;min-width:0}
 .wb-pane-head{padding:1rem 1.25rem .8rem;border-bottom:1.5px solid var(--border)}
 .wb-pane-head h2{margin:0;font-size:1.2rem;font-weight:800;letter-spacing:-.01em}
@@ -228,6 +230,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .p2-actions-row{display:flex;align-items:center;gap:10px;margin-top:14px}
 .p2-actions-row .timer-row{margin-top:0;flex:1}
 .btn-present{font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:700;padding:9px 16px;border-radius:10px;border:1.5px solid var(--accent);background:var(--card);color:var(--accent);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px;flex-shrink:0;white-space:nowrap}
+.btn-icon-only{padding:9px;justify-content:center}
 .btn-present:hover{background:var(--accent);color:#fff}
 .present-overlay{display:none;position:fixed;inset:0;z-index:9999;background:#1B1D2B;padding:2.5rem;align-items:center;justify-content:center;overflow-y:auto}
 .present-overlay.open{display:flex}
@@ -410,7 +413,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
     <div class="wb-pane">
       <div class="wb-pane-head" style="display:flex;align-items:center;justify-content:space-between;gap:.75rem">
         <h2 id="resourcesPaneTitle"></h2>
-        <button class="btn-present" type="button" title="Copy phrases" aria-label="Copy phrases" onclick="copyResourcesPhrases(this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>C</span></button>
+        <button class="btn-present btn-icon-only" type="button" title="Copy phrases" aria-label="Copy phrases" onclick="copyResourcesPhrases(this)"><svg class="pb-copy-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
       </div>
       <div class="wb-pane-body" id="resourcesPaneBody"></div>
     </div>
@@ -1114,29 +1117,42 @@ const PHRASE_BANK = [
   { part:"Part 4", fn:"Disagreeing politely", phrases:["I see your point, but…","I'm not sure that's entirely true.","I'd have to disagree there."] },
   { part:"Part 4", fn:"Speculating & hypothesising", phrases:["I imagine that…","It's likely that…","If that were the case, …","I'd guess that…"] }
 ];
-let resourcesTopicIdx = 0;
+let resourcesCopyPhrases = [];
+function clearResourcesNavActive(){
+  document.getElementById('resources-content').querySelectorAll('.guide-nav-item, .guide-nav-group-label').forEach(b=>b.classList.remove('active'));
+}
 function showResourcesTopic(i){
-  resourcesTopicIdx = i;
+  clearResourcesNavActive();
   const cat = PHRASE_BANK[i];
-  document.getElementById('resources-content').querySelectorAll('.guide-nav-item').forEach((b,bi)=>b.classList.toggle('active', bi===i));
+  document.querySelectorAll('#resourcesNav .guide-nav-item')[i].classList.add('active');
+  resourcesCopyPhrases = cat.phrases;
   document.getElementById('resourcesPaneTitle').textContent = cat.part + ' · ' + cat.fn;
   document.getElementById('resourcesPaneBody').innerHTML = `<ul class="lang-list">${cat.phrases.map(p=>`<li class="chip">${p}</li>`).join('')}</ul>`;
 }
+function showResourcesPart(part){
+  clearResourcesNavActive();
+  document.getElementById('resourcesGroup-' + part.replace(/\s+/g,'')).classList.add('active');
+  const cats = PHRASE_BANK.filter(c => c.part === part);
+  resourcesCopyPhrases = cats.flatMap(c => c.phrases);
+  document.getElementById('resourcesPaneTitle').textContent = part + ' · All phrases';
+  document.getElementById('resourcesPaneBody').innerHTML = cats.map(c =>
+    `<div class="lang-fn" style="margin-top:1rem">${c.fn}</div><ul class="lang-list">${c.phrases.map(p=>`<li class="chip">${p}</li>`).join('')}</ul>`
+  ).join('');
+}
 function copyResourcesPhrases(btn){
-  const cat = PHRASE_BANK[resourcesTopicIdx];
-  navigator.clipboard.writeText(cat.phrases.join('\n')).then(()=>{
-    const label = btn.querySelector('span');
-    const original = label.textContent;
-    label.textContent = '✓';
-    setTimeout(()=>{ label.textContent = original; }, 1500);
+  navigator.clipboard.writeText(resourcesCopyPhrases.join('\n')).then(()=>{
+    const icon = btn.querySelector('.pb-copy-icon');
+    const original = icon.innerHTML;
+    icon.innerHTML = '<polyline points="20 6 9 17 4 12"/>';
+    setTimeout(()=>{ icon.innerHTML = original; }, 1500);
   });
 }
 function buildResources(){
   let lastPart = null;
   document.getElementById('resourcesNav').innerHTML = PHRASE_BANK.map((cat,i) => {
-    const groupHtml = cat.part !== lastPart ? `<div class="guide-nav-group-label">${cat.part}</div>` : '';
+    const groupHtml = cat.part !== lastPart ? `<button class="guide-nav-group-label" id="resourcesGroup-${cat.part.replace(/\s+/g,'')}" onclick="showResourcesPart('${cat.part}')">${cat.part}</button>` : '';
     lastPart = cat.part;
-    return groupHtml + `<button class="guide-nav-item${i===0?' active':''}" onclick="showResourcesTopic(${i})"><span class="guide-nav-dot"></span><span>${cat.fn}</span></button>`;
+    return groupHtml + `<button class="guide-nav-item" onclick="showResourcesTopic(${i})"><span class="guide-nav-dot"></span><span>${cat.fn}</span></button>`;
   }).join('');
   showResourcesTopic(0);
 }
