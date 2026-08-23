@@ -20,7 +20,7 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --sky:#2176FF;--sky-light:#E8EEFF;
+  --sky:#2176FF;--sky-light:#E8EEFF;--amber:#B7791F;--amber-light:#FDF3E0;
   --cream:#F7F6F3;--ink:#2D3047;--muted:#7A7D8E;
   --border:#E8E5DF;--card:#fff;--radius:14px;
   --good:#22c55e;--wrong:#EF4444;
@@ -71,6 +71,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
 .gate{margin-bottom:1.4rem}
 .field{margin-bottom:.9rem}
 .field label{display:block;font-family:'Outfit',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem}
+.field label .optional-tag{font-weight:500;text-transform:none;letter-spacing:0;color:var(--muted);opacity:.75}
 .field input{width:100%;font-family:'Outfit',sans-serif;font-size:1rem;font-weight:500;color:var(--ink);background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:.75rem .9rem;transition:border-color .15s}
 .field input:focus{outline:none;border-color:var(--sky)}
 .field input.err{border-color:var(--wrong)}
@@ -78,8 +79,9 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
 .field-err.show{display:block}
 .consent{font-size:.76rem;color:var(--muted);line-height:1.55;margin:.9rem 0 1.2rem;max-width:60ch}
 .yl-toggle{display:flex;align-items:center;gap:.6rem;cursor:pointer;user-select:none;background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:.7rem .9rem;margin:0 0 1.2rem;font-size:.92rem;font-weight:500;color:var(--ink);transition:border-color .15s,background .15s}
-.yl-toggle:hover{border-color:var(--sky)}
-.yl-toggle input{width:18px;height:18px;flex:none;accent-color:var(--sky);cursor:pointer}
+.yl-toggle:hover{border-color:var(--amber)}
+.yl-toggle:has(input:checked){border-color:var(--amber);background:var(--amber-light)}
+.yl-toggle input{width:18px;height:18px;flex:none;accent-color:var(--amber);cursor:pointer}
 .yl-toggle .yl-note{display:block;font-size:.74rem;font-weight:400;color:var(--muted);margin-top:.1rem}
 .btn-start[disabled]{opacity:.5;cursor:not-allowed;transform:none!important}
 .btn-start[disabled]:hover{background:var(--sky)}
@@ -243,9 +245,13 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
         <div class="field-err" id="gateNameErr">Please enter your full name.</div>
       </div>
       <div class="field">
-        <label for="gateEmail">Email</label>
+        <label for="gateEmail">Email <span class="optional-tag">(optional)</span></label>
         <input type="email" id="gateEmail" autocomplete="email" placeholder="you@example.com">
         <div class="field-err" id="gateEmailErr">Please enter a valid email address.</div>
+      </div>
+      <div class="field">
+        <label for="gateCountry">Country <span class="optional-tag">(optional)</span></label>
+        <input type="text" id="gateCountry" autocomplete="country-name" placeholder="e.g. Italy">
       </div>
     </div>
     <p class="consent">Saved so John can see your result and follow up. Never shared.</p>
@@ -357,7 +363,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
   // The anon key is safe to expose here: Row Level Security only allows INSERT.
   var SUPABASE_URL = "https://uovqsqnxcgvefxpxntcj.supabase.co";
   var SUPABASE_ANON_KEY = "sb_publishable_VTOzRUebaH_xQAs4wngfug_jCVCeCFB";
-  var student = { name: "", email: "" };
+  var student = { name: "", email: "", country: "" };
   // --------------------------------------------------------------------
 
   // ---- Bank: 8 items per band (grammar + vocabulary), ascending ----
@@ -997,6 +1003,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     var payload = {
       full_name: student.name,
       email: student.email,
+      country: student.country,
       level: level,
       level_name: levelName,
       correct: st.correct,
@@ -1338,7 +1345,8 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
   backBtn.addEventListener("click", goBack);
   try{
     el("gateName").addEventListener("keydown", function(e){ if(e.key === "Enter"){ e.preventDefault(); el("gateEmail").focus(); } });
-    el("gateEmail").addEventListener("keydown", function(e){ if(e.key === "Enter"){ e.preventDefault(); el("startBtn").click(); } });
+    el("gateEmail").addEventListener("keydown", function(e){ if(e.key === "Enter"){ e.preventDefault(); el("gateCountry").focus(); } });
+    el("gateCountry").addEventListener("keydown", function(e){ if(e.key === "Enter"){ e.preventDefault(); el("startBtn").click(); } });
     if(!PREVIEW_LEVEL) el("gateName").focus();
   }catch(e){}
   document.addEventListener("mousemove", function(){ opts.classList.remove("nohover"); }, {passive:true});
@@ -1352,17 +1360,17 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
   });
 
   el("startBtn").addEventListener("click", function(){
-    var nameEl = el("gateName"), emailEl = el("gateEmail");
-    var name = nameEl.value.trim(), email = emailEl.value.trim();
+    var nameEl = el("gateName"), emailEl = el("gateEmail"), countryEl = el("gateCountry");
+    var name = nameEl.value.trim(), email = emailEl.value.trim(), country = countryEl.value.trim();
     var nameOk = name.length > 1 && name.indexOf(" ") > -1;
-    var emailOk = validEmail(email);
+    var emailOk = email === "" || validEmail(email);
     nameEl.classList.toggle("err", !nameOk);
     el("gateNameErr").classList.toggle("show", !nameOk);
     emailEl.classList.toggle("err", !emailOk);
     el("gateEmailErr").classList.toggle("show", !emailOk);
     if(!nameOk){ nameEl.focus(); return; }
     if(!emailOk){ emailEl.focus(); return; }
-    student.name = name; student.email = email;
+    student.name = name; student.email = email; student.country = country;
     var ylEl = el("ylMode"); isYoungLearner = !!(ylEl && ylEl.checked);
     reset(); intro.hidden = true; result.hidden = true; quiz.hidden = false; startStage();
   });
