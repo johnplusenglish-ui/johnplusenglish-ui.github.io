@@ -167,7 +167,8 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .lang-groups{display:grid;grid-template-columns:repeat(3,1fr);gap:16px 28px}
 .lang-fn{font-family:Outfit,sans-serif;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.11em;padding-bottom:6px;border-bottom:1.5px solid var(--border);margin-bottom:4px;color:var(--accent)}
 .lang-list{list-style:none;margin:0;padding:0}
-.lang-list .chip{display:block;font-size:.84rem;font-weight:400;line-height:1.4;color:var(--ink);background:none;border:none;border-radius:0;padding:5px 0;transition:color .15s}
+.lang-list .chip{display:block;position:relative;font-size:.84rem;font-weight:400;line-height:1.4;color:var(--ink);background:none;border:none;border-radius:0;padding:5px 0 5px 1rem;transition:color .15s}
+.lang-list .chip::before{content:'';position:absolute;left:0;top:13px;width:5px;height:5px;border-radius:50%;background:var(--accent)}
 .lang-list .chip:hover{background:none;border:none;color:var(--sky)}
 .lang-list .chip.used{text-decoration:line-through;color:var(--muted);opacity:.45;background:none}
 @media(max-width:820px){.lang-groups{grid-template-columns:1fr 1fr}}
@@ -286,7 +287,6 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .p4-num{width:20px;color:var(--accent);font-size:.85rem;font-weight:800;flex-shrink:0}
 
 /* resources tab (phrase bank, reuses guide-shell/wb-sb/wb-pane sidebar pattern) */
-.pb-chips{display:flex;flex-wrap:wrap;gap:.35rem}
 
 @media(max-width:700px){
   .page-header{padding:2rem 1.2rem 1rem}
@@ -406,8 +406,9 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
       <div class="wb-sb-foot">Useful phrases for Part 2</div>
     </div>
     <div class="wb-pane">
-      <div class="wb-pane-head">
+      <div class="wb-pane-head" style="display:flex;align-items:center;justify-content:space-between;gap:.75rem">
         <h2 id="resourcesPaneTitle"></h2>
+        <button class="btn-present" type="button" onclick="copyResourcesPhrases(this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>Copy</span></button>
       </div>
       <div class="wb-pane-body" id="resourcesPaneBody"></div>
     </div>
@@ -1096,11 +1097,22 @@ const PHRASE_BANK_B2 = [
   { fn:"Atmosphere & feeling", phrases:["The atmosphere seems quite…","It gives the impression of…","It feels very…","There's a sense of…","The mood is…","This photo gives the impression of…","It conveys a feeling of…"] },
   { fn:"Responding to follow-up", phrases:["I'd definitely prefer…","For me, the first / second option…","Personally, I think…","I can see why some people…","It depends on…","In my case…","If I had to choose…"] }
 ];
+let resourcesTopicIdx = 0;
 function showResourcesTopic(i){
+  resourcesTopicIdx = i;
   const cat = PHRASE_BANK_B2[i];
   document.getElementById('resources-content').querySelectorAll('.guide-nav-item').forEach((b,bi)=>b.classList.toggle('active', bi===i));
   document.getElementById('resourcesPaneTitle').textContent = cat.fn;
-  document.getElementById('resourcesPaneBody').innerHTML = `<div class="pb-chips">${cat.phrases.map(p=>`<span class="chip">${p}</span>`).join('')}</div>`;
+  document.getElementById('resourcesPaneBody').innerHTML = `<ul class="lang-list">${cat.phrases.map(p=>`<li class="chip">${p}</li>`).join('')}</ul>`;
+}
+function copyResourcesPhrases(btn){
+  const cat = PHRASE_BANK_B2[resourcesTopicIdx];
+  navigator.clipboard.writeText(cat.phrases.join('\n')).then(()=>{
+    const label = btn.querySelector('span');
+    const original = label.textContent;
+    label.textContent = 'Copied!';
+    setTimeout(()=>{ label.textContent = original; }, 1500);
+  });
 }
 function buildResources(){
   document.getElementById('resourcesNav').innerHTML = PHRASE_BANK_B2.map((cat,i) =>
