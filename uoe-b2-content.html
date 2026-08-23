@@ -1313,16 +1313,16 @@ function printPart(part) {
 //  SCORE SUMMARY
 // ══════════════════════════════════════════
 function updateSummary() {
-  // Check if all visible parts are done
+  // Check if all 4 parts are done, regardless of which tab is currently visible
   const parts = [];
   let totalScore = 0, totalMax = 0;
-  
-  if(activeParts.has('1') && p1Checked) {
+
+  if(p1Checked) {
     let s=0; TESTS[currentTest].gaps.forEach(g=>{if(p1State[g.num].selected===g.correct)s++;});
     parts.push({label:'Part 1', score:s, max:TESTS[currentTest].gaps.length});
     totalScore+=s; totalMax+=TESTS[currentTest].gaps.length;
   }
-  if(activeParts.has('2') && p2Checked) {
+  if(p2Checked) {
     let s=0; OC_TESTS[currentTest].gaps.forEach(g=>{
       const inp=document.getElementById('p2inp-'+g.num);
       if(inp&&inp.value.trim().toLowerCase()===g.answer.toLowerCase())s++;
@@ -1330,7 +1330,7 @@ function updateSummary() {
     parts.push({label:'Part 2', score:s, max:OC_TESTS[currentTest].gaps.length});
     totalScore+=s; totalMax+=OC_TESTS[currentTest].gaps.length;
   }
-  if(activeParts.has('3') && p3Checked) {
+  if(p3Checked) {
     let s=0; WF_TESTS[currentTest].gaps.forEach(g=>{
       const inp=document.getElementById('p3inp-'+g.num);
       if(inp&&inp.value.trim().toLowerCase()===g.answer.toLowerCase())s++;
@@ -1338,7 +1338,7 @@ function updateSummary() {
     parts.push({label:'Part 3', score:s, max:WF_TESTS[currentTest].gaps.length});
     totalScore+=s; totalMax+=WF_TESTS[currentTest].gaps.length;
   }
-  if(activeParts.has('4') && p4Checked) {
+  if(p4Checked) {
     let s=0; KWT_TESTS[currentTest].items.forEach((item,i)=>{
       const inp=document.getElementById('p4inp-'+(i+1));
       if(inp&&p4Match(inp.value,item))s++;
@@ -1346,8 +1346,8 @@ function updateSummary() {
     parts.push({label:'Part 4', score:s, max:KWT_TESTS[currentTest].items.length});
     totalScore+=s; totalMax+=KWT_TESTS[currentTest].items.length;
   }
-  
-  const allDone = parts.length === activeParts.size;
+
+  const allDone = parts.length === 4;
   const el = document.getElementById('scoreSummary');
   
   if(allDone && parts.length > 0) {
