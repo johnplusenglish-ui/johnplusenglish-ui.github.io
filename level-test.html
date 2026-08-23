@@ -342,7 +342,6 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
       <button class="btn btn-reset" id="pngBtn"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>Download result</button>
       <button class="btn btn-outline" id="revBtn"><svg viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>Review answers</button>
       <button class="btn btn-reset" id="mistakesBtn" hidden><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>Download mistakes</button>
-      <button class="btn btn-reset" id="copyBtn"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Copy my result</button>
       <button class="btn btn-reset" id="retakeBtn"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>Take it again</button>
     </div>
   </section>
@@ -1461,22 +1460,6 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
       btn.disabled = false;
       el("noteStatus").textContent = "Could not send just now.";
     });
-  });
-
-  // copy result
-  el("copyBtn").addEventListener("click", function(){
-    var txt = "My English level: "+el("badge").textContent+" ("+el("resName").textContent+") · johnplusenglish.com";
-    var btn = el("copyBtn"), old = btn.innerHTML;
-    function done(){ btn.innerHTML = "Copied!"; setTimeout(function(){ btn.innerHTML = old; }, 1600); }
-    function fallback(){
-      var ta = document.createElement("textarea"); ta.value = txt;
-      document.body.appendChild(ta); ta.select();
-      try{ document.execCommand("copy"); done(); }catch(e){}
-      document.body.removeChild(ta);
-    }
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(txt).then(done).catch(fallback);
-    } else fallback();
   });
 
   document.addEventListener("keydown", function(e){
