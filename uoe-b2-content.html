@@ -301,8 +301,9 @@ footer{text-align:center;padding:2.5rem 2rem;font-size:.8rem;color:var(--muted);
   .uoe-content{display:block!important}
   .test-container{display:block!important}
   .part-section{display:none!important}
-  .part-section.print-include{display:block!important;page-break-after:always;margin-bottom:0}
-  .test-card{border:none!important;box-shadow:none!important}
+  .part-section.print-include{display:block!important;margin-bottom:0}
+  .test-card{display:none!important;border:none!important;box-shadow:none!important}
+  .test-card.print-include{display:block!important;page-break-after:always}
   body.print-blank .gap-trigger{border:1px solid #999!important;background:#fff!important;color:#fff!important;min-width:120px}
   body.print-blank .gap-trigger .gap-text{flex:1}
   body.print-blank .gap-trigger .arrow{margin-left:auto;font-size:.6rem;color:#8E8E93;transition:transform .2s}
@@ -390,8 +391,6 @@ footer{text-align:center;padding:2.5rem 2rem;font-size:.8rem;color:var(--muted);
 .pt-reset:hover{border-color:var(--coral);color:var(--coral)}
 /* Next test */
 .next-test-bar{text-align:center;padding:20px 0;margin-top:12px}
-@media print{body *{display:none!important}.part-section.printing,.part-section.printing *{display:revert!important}.part-section.printing{position:absolute;top:0;left:0;width:100%}.part-section.printing .exam-tips,.part-section.printing .actions,.part-section.printing .exam-info,.part-section.printing .score-display,.part-section.printing .progress-bar,.part-section.printing .print-btn,.part-section.printing .part-section-header{display:block!important}.part-section.printing .test-card{border:none!important;box-shadow:none!important}body::before{display:none!important}}
-
 #uoeTestLabel{display:none}
 .combined-header{display:flex;flex-wrap:wrap;align-items:center;padding:.9rem 1.4rem;margin-bottom:2px}.combined-header .header-info-text{font-size:.88rem;font-weight:400;color:var(--muted);margin-top:.35rem;line-height:1.5;flex-basis:100%}.combined-header .header-info-text strong{color:var(--ink);font-weight:600}
 .tip-category{font-family:Outfit,sans-serif;font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:10px 0 4px}
@@ -1289,7 +1288,7 @@ function setPrintParts(part) {
 function executePrint() {
   closePrintModal();
   const partsToShow = printParts === 'all' ? ['1','2','3','4'] : [printParts];
-  document.querySelectorAll('.part-section').forEach(s => {
+  document.querySelectorAll('.part-section, .test-card').forEach(s => {
     s.classList.toggle('print-include', partsToShow.includes(s.dataset.part));
   });
   document.body.classList.toggle('print-blank', printMode === 'blank');
@@ -1298,7 +1297,7 @@ function executePrint() {
     window.print();
     setTimeout(() => {
       document.body.classList.remove('print-blank', 'print-answers');
-      document.querySelectorAll('.part-section').forEach(s => s.classList.remove('print-include'));
+      document.querySelectorAll('.part-section, .test-card').forEach(s => s.classList.remove('print-include'));
     }, 800);
   }, 80);
 }
