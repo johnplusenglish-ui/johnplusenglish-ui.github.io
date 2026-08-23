@@ -60,6 +60,8 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .guide-nav-item.active{color:var(--ink)}
 .guide-nav-dot{width:6px;height:6px;border-radius:50%;background:var(--border);flex-shrink:0}
 .guide-nav-item.active .guide-nav-dot{background:var(--accent)}
+.guide-nav-group-label{font-family:Outfit,sans-serif;font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:.7rem .75rem .3rem}
+.guide-nav-group-label:first-child{padding-top:.2rem}
 .wb-pane{background:var(--card);border:1.5px solid var(--border);border-radius:14px;box-shadow:var(--shadow-sm);overflow:hidden;min-width:0}
 .wb-pane-head{padding:1rem 1.25rem .8rem;border-bottom:1.5px solid var(--border)}
 .wb-pane-head h2{margin:0;font-size:1.2rem;font-weight:800;letter-spacing:-.01em}
@@ -320,7 +322,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
     <button class="tab" data-type="part2" onclick="switchType('part2')" style="--tab-accent:#16A88D">Part 2</button>
     <button class="tab" data-type="part3" onclick="switchType('part3')" style="--tab-accent:#16A88D">Part 3</button>
     <button class="tab" data-type="part4" onclick="switchType('part4')" style="--tab-accent:#16A88D">Part 4</button>
-    <button class="tab" data-type="resources" onclick="switchType('resources')" style="--tab-accent:#16A88D">Resources</button>
+    <button class="tab" data-type="resources" onclick="switchType('resources')" style="--tab-accent:#16A88D">Phrase Bank</button>
   </div>
 </div>
 
@@ -403,12 +405,12 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
     <div class="wb-sb">
       <div class="wb-sb-head" onclick="toggleGuideSidebar(this)"><span>Phrase categories</span><div class="sb-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div></div>
       <div class="wb-sb-scroll" id="resourcesNav"></div>
-      <div class="wb-sb-foot">Useful phrases for Part 2</div>
+      <div class="wb-sb-foot">Useful phrases for every part</div>
     </div>
     <div class="wb-pane">
       <div class="wb-pane-head" style="display:flex;align-items:center;justify-content:space-between;gap:.75rem">
         <h2 id="resourcesPaneTitle"></h2>
-        <button class="btn-present" type="button" onclick="copyResourcesPhrases(this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>Copy</span></button>
+        <button class="btn-present" type="button" title="Copy phrases" aria-label="Copy phrases" onclick="copyResourcesPhrases(this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>C</span></button>
       </div>
       <div class="wb-pane-body" id="resourcesPaneBody"></div>
     </div>
@@ -1089,35 +1091,53 @@ function buildPart4(){
 }
 
 /* ============ RESOURCES ============ */
-const PHRASE_BANK_B2 = [
-  { fn:"Describing", phrases:["In the foreground / background…","On the left / right…","In the centre of the photo…","There seems to be…","It looks like…","You can see…","The photo shows…","In the distance…"] },
-  { fn:"Comparing", phrases:["Both photos show…","Whereas in the first photo…","In contrast to…","One key difference is…","The main similarity is…","Unlike the first photo…","On the other hand…","Compared to…"] },
-  { fn:"Speculating", phrases:["It looks as if…","They seem to be…","I get the impression…","They appear to be…","I'd say the people are probably…","It might be…","Perhaps they're…","This could be…"] },
-  { fn:"Giving opinions", phrases:["I think…","In my opinion…","Personally, I feel…","It seems to me that…","I'd say…","From what I can see…","I believe…","To my mind…"] },
-  { fn:"Atmosphere & feeling", phrases:["The atmosphere seems quite…","It gives the impression of…","It feels very…","There's a sense of…","The mood is…","This photo gives the impression of…","It conveys a feeling of…"] },
-  { fn:"Responding to follow-up", phrases:["I'd definitely prefer…","For me, the first / second option…","Personally, I think…","I can see why some people…","It depends on…","In my case…","If I had to choose…"] }
+const PHRASE_BANK = [
+  { part:"Part 1", fn:"Giving a full answer", phrases:["Well, I usually…","Actually, I…","To be honest, I…","I'd say that…","Not really, but…"] },
+  { part:"Part 1", fn:"Adding a reason or example", phrases:["That's because…","The main reason is…","For example, …","Mainly because…","One reason is that…"] },
+  { part:"Part 1", fn:"Thinking time", phrases:["That's a good question, let me think…","I've never really thought about that, but…","Hmm, I suppose…","Let me see…"] },
+  { part:"Part 1", fn:"Talking about the future", phrases:["I'm planning to…","I'd love to…","I'm hoping to…","I'm thinking about…","I'm not sure yet, but maybe…"] },
+
+  { part:"Part 2", fn:"Describing", phrases:["In the foreground / background…","On the left / right…","In the centre of the photo…","There seems to be…","It looks like…","You can see…","The photo shows…","In the distance…"] },
+  { part:"Part 2", fn:"Comparing", phrases:["Both photos show…","Whereas in the first photo…","In contrast to…","One key difference is…","The main similarity is…","Unlike the first photo…","On the other hand…","Compared to…"] },
+  { part:"Part 2", fn:"Speculating", phrases:["It looks as if…","They seem to be…","I get the impression…","They appear to be…","I'd say the people are probably…","It might be…","Perhaps they're…","This could be…"] },
+  { part:"Part 2", fn:"Giving opinions", phrases:["I think…","In my opinion…","Personally, I feel…","It seems to me that…","I'd say…","From what I can see…","I believe…","To my mind…"] },
+  { part:"Part 2", fn:"Atmosphere & feeling", phrases:["The atmosphere seems quite…","It gives the impression of…","It feels very…","There's a sense of…","The mood is…","This photo gives the impression of…","It conveys a feeling of…"] },
+  { part:"Part 2", fn:"Responding to follow-up", phrases:["I'd definitely prefer…","For me, the first / second option…","Personally, I think…","I can see why some people…","It depends on…","In my case…","If I had to choose…"] },
+
+  { part:"Part 3", fn:"Starting", phrases:["Shall I go first? – Sure, go ahead.","I think the most important point is …","Do you agree?"] },
+  { part:"Part 3", fn:"Discussing", phrases:["I completely agree with that.","I agree with you.","That's true, but on the other hand …","I'm not sure I agree.","Let's rule out …","For instance, …","On top of that, …","And don't forget that …","Hmm, I'm not sure about that one."] },
+  { part:"Part 3", fn:"Moving forward", phrases:["What do you think about …?","Shall we move on?","If I had to choose, I'd say …"] },
+  { part:"Part 3", fn:"Wrapping up", phrases:["So, to sum up, …","In the end, we both think …","Overall, I'd say …"] },
+
+  { part:"Part 4", fn:"Giving your opinion", phrases:["In my opinion, …","I honestly believe…","From my point of view, …","As far as I'm concerned, …"] },
+  { part:"Part 4", fn:"Agreeing", phrases:["I couldn't agree more.","That's exactly how I see it.","Absolutely, and also…"] },
+  { part:"Part 4", fn:"Disagreeing politely", phrases:["I see your point, but…","I'm not sure that's entirely true.","I'd have to disagree there."] },
+  { part:"Part 4", fn:"Speculating & hypothesising", phrases:["I imagine that…","It's likely that…","If that were the case, …","I'd guess that…"] }
 ];
 let resourcesTopicIdx = 0;
 function showResourcesTopic(i){
   resourcesTopicIdx = i;
-  const cat = PHRASE_BANK_B2[i];
+  const cat = PHRASE_BANK[i];
   document.getElementById('resources-content').querySelectorAll('.guide-nav-item').forEach((b,bi)=>b.classList.toggle('active', bi===i));
-  document.getElementById('resourcesPaneTitle').textContent = cat.fn;
+  document.getElementById('resourcesPaneTitle').textContent = cat.part + ' · ' + cat.fn;
   document.getElementById('resourcesPaneBody').innerHTML = `<ul class="lang-list">${cat.phrases.map(p=>`<li class="chip">${p}</li>`).join('')}</ul>`;
 }
 function copyResourcesPhrases(btn){
-  const cat = PHRASE_BANK_B2[resourcesTopicIdx];
+  const cat = PHRASE_BANK[resourcesTopicIdx];
   navigator.clipboard.writeText(cat.phrases.join('\n')).then(()=>{
     const label = btn.querySelector('span');
     const original = label.textContent;
-    label.textContent = 'Copied!';
+    label.textContent = '✓';
     setTimeout(()=>{ label.textContent = original; }, 1500);
   });
 }
 function buildResources(){
-  document.getElementById('resourcesNav').innerHTML = PHRASE_BANK_B2.map((cat,i) =>
-    `<button class="guide-nav-item${i===0?' active':''}" onclick="showResourcesTopic(${i})"><span class="guide-nav-dot"></span><span>${cat.fn}</span></button>`
-  ).join('');
+  let lastPart = null;
+  document.getElementById('resourcesNav').innerHTML = PHRASE_BANK.map((cat,i) => {
+    const groupHtml = cat.part !== lastPart ? `<div class="guide-nav-group-label">${cat.part}</div>` : '';
+    lastPart = cat.part;
+    return groupHtml + `<button class="guide-nav-item${i===0?' active':''}" onclick="showResourcesTopic(${i})"><span class="guide-nav-dot"></span><span>${cat.fn}</span></button>`;
+  }).join('');
   showResourcesTopic(0);
 }
 
