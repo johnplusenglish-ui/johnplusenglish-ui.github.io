@@ -127,10 +127,10 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 /* register pills */
 .register-row{display:flex;gap:.5rem;flex-wrap:wrap}
 .reg{font-family:Outfit,sans-serif;font-size:.62rem;padding:.22rem .6rem;border-radius:6px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;flex-shrink:0}
-.reg-formal{background:var(--lavender-light);color:var(--lavender)}
-.reg-neutral{background:var(--sky-light);color:var(--sky)}
+.reg-formal{background:color-mix(in srgb,#0D9488 12%,#fff);color:#0D9488}
+.reg-neutral{background:color-mix(in srgb,#059669 12%,#fff);color:#059669}
 .reg-semi{background:var(--accent-light);color:var(--accent)}
-.reg-informal{background:#FFF5E6;color:#c97800}
+.reg-informal{background:color-mix(in srgb,#65A30D 12%,#fff);color:#65A30D}
 
 /* model answer box */
 .model{background:var(--cream);border:1.5px dashed var(--border);border-radius:var(--radius-sm);padding:1.1rem 1.3rem;margin:.9rem 0 .4rem;font-size:.88rem;line-height:1.7}
@@ -157,14 +157,6 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .sub-drop-header .sub-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;background:var(--accent)}
 
 /* phrase bank (used inside sub-drop + Phrase Bank tab card view) */
-.phrase-bank{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.7rem;margin:.2rem 0}
-.phrase-col{background:var(--cream);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:.8rem 1rem}
-.phrase-col h5{font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:700;margin-bottom:.45rem;color:var(--accent)}
-.phrase-col ul{list-style:none;padding:0;margin:0}
-.phrase-col li{font-size:.8rem;color:var(--ink);padding:.35rem 0;font-style:italic;line-height:1.4}
-
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{font-size:.8rem;font-weight:500;background:var(--cream);border:1px solid var(--border);border-radius:8px;padding:5px 11px;color:var(--ink);cursor:default;user-select:none}
 .lang-list{list-style:none;margin:0;padding:0}
 .lang-list .chip{display:block;position:relative;font-size:.84rem;font-weight:400;line-height:1.4;color:var(--ink);background:none;border:none;border-radius:0;padding:5px 0 5px 1rem}
 .lang-list .chip::before{content:'';position:absolute;left:0;top:13px;width:5px;height:5px;border-radius:50%;background:var(--accent)}
@@ -206,15 +198,6 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .wp-timer{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted)}
 .wp-actions{display:flex;gap:.4rem;flex-wrap:wrap}
 .wp-textarea{width:100%;min-height:220px;padding:1rem 1.1rem;border:none;outline:none;font-family:'Outfit',sans-serif;font-size:.88rem;line-height:1.65;background:var(--card);color:var(--ink);resize:vertical}
-
-/* self-assessment checklist */
-.checklist{background:var(--cream);border:1.5px solid var(--border);border-radius:var(--radius);padding:1.1rem 1.3rem;margin-top:12px;display:none}
-.checklist.show{display:block}
-.checklist h4{font-size:.92rem;font-weight:700;margin-bottom:.4rem}
-.checklist label{display:flex;align-items:flex-start;gap:.5rem;font-size:.83rem;padding:.28rem 0;cursor:pointer;color:var(--ink)}
-.checklist input[type="checkbox"]{margin-top:.25rem;accent-color:var(--accent)}
-.sa-crit{font-size:.8rem;font-weight:700;margin-top:.7rem;color:var(--accent)}
-.sa-crit:first-of-type{margin-top:.5rem}
 
 @media(max-width:700px){
   .page-header{padding:2rem 1.2rem 1rem}
@@ -682,11 +665,10 @@ function subDrop(label, content, openByDefault=false) {
   return `<div class="sub-drop${openByDefault?' open':''}"><div class="sub-drop-header" onclick="this.parentElement.classList.toggle('open')"><span class="sub-label"><span class="sub-dot"></span>${label}</span><span class="sub-icon">&#9662;</span></div><div class="sub-drop-body">${content}</div></div>`;
 }
 function langBoxFor(cols){
-  const groups = cols.map(g =>
-    `<div class="phrase-col"><h5>${g.h}</h5><ul>` +
-    g.items.map(t => `<li>${t}</li>`).join('') +
-    `</ul></div>`).join('');
-  return `<div class="phrase-bank">${groups}</div>`;
+  return cols.map(g =>
+    `<div class="lang-fn" style="font-family:Outfit,sans-serif;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.11em;padding-bottom:6px;border-bottom:1.5px solid var(--border);margin:1rem 0 4px;color:var(--accent)">${g.h}</div><ul class="lang-list">` +
+    g.items.map(t => `<li class="chip">${t}</li>`).join('') +
+    `</ul>`).join('');
 }
 
 /* ============ SET RAIL (shared by all five task-type tabs) ============ */
@@ -743,13 +725,6 @@ function wpUpdateWordCount(id){
     else if(n > max || n < min - 30) el.classList.add('out-range');
   }
 }
-function wpFinish(id){
-  var t = wpTimers[id];
-  if(t && t.interval){ clearInterval(t.interval); t.interval = null; document.getElementById('wpTimerBtn-'+id).textContent = 'Resume timer'; }
-  var cl = document.getElementById('wpChecklist-'+id);
-  cl.classList.add('show');
-  cl.scrollIntoView({behavior:'smooth', block:'nearest'});
-}
 function wpClear(id){
   var ta = document.getElementById('wpText-'+id);
   if(ta.value && !confirm('Clear your writing and start over?')) return;
@@ -758,29 +733,16 @@ function wpClear(id){
   wpTimers[id] = {elapsed:0, interval:null};
   document.getElementById('wpTimer-'+id).textContent = '⏱ 00:00';
   document.getElementById('wpTimerBtn-'+id).textContent = 'Start timer';
-  document.getElementById('wpChecklist-'+id).classList.remove('show');
   wpUpdateWordCount(id);
 }
-function selfAssessHTML(id){
-  return `<div class="checklist" id="wpChecklist-${id}">
-    <h4>Self-assessment - mark each criterion honestly</h4>
-    <p class="sa-crit">Content</p>
-    <label><input type="checkbox"> I addressed every part of the task (no missing requirements).</label>
-    <label><input type="checkbox"> All my content is relevant, nothing off-topic.</label>
-    <label><input type="checkbox"> My target reader would be fully informed / persuaded / entertained.</label>
-    <p class="sa-crit">Communicative Achievement</p>
-    <label><input type="checkbox"> The register matches the task type.</label>
-    <label><input type="checkbox"> I used the conventions of the genre (headings in a report, hook in an article&hellip;).</label>
-    <label><input type="checkbox"> I communicated my ideas clearly to the reader.</label>
-    <p class="sa-crit">Organisation</p>
-    <label><input type="checkbox"> My text has a clear paragraph structure with a logical flow.</label>
-    <label><input type="checkbox"> I used linking words and cohesive devices (not just "Firstly&hellip; Secondly&hellip;").</label>
-    <label><input type="checkbox"> Ideas connect smoothly within paragraphs, not just between them.</label>
-    <p class="sa-crit">Language</p>
-    <label><input type="checkbox"> I used vocabulary beyond the basics, some B2-level words and phrases.</label>
-    <label><input type="checkbox"> I used a mix of simple and complex grammatical structures.</label>
-    <label><input type="checkbox"> Any errors are minor and don't stop the reader from understanding me.</label>
-  </div>`;
+function wpCopyText(id, btn){
+  var ta = document.getElementById('wpText-'+id);
+  navigator.clipboard.writeText(ta.value).then(()=>{
+    const icon = btn.querySelector('.pb-copy-icon');
+    const original = icon.innerHTML;
+    icon.innerHTML = '<polyline points="20 6 9 17 4 12"/>';
+    setTimeout(()=>{ icon.innerHTML = original; }, 1500);
+  });
 }
 function buildWritingPractice(id){
   return `<div class="editor-wrap">
@@ -788,12 +750,12 @@ function buildWritingPractice(id){
       <div class="editor-bar-left"><span class="word-count" id="wpCount-${id}">0 words</span><span class="wp-timer" id="wpTimer-${id}">⏱ 00:00</span></div>
       <div class="wp-actions">
         <button class="btn btn-sm" id="wpTimerBtn-${id}" type="button" onclick="wpToggleTimer('${id}')">Start timer</button>
-        <button class="btn btn-sm" type="button" onclick="wpFinish('${id}')">Finish &amp; self-assess</button>
         <button class="btn btn-sm" type="button" onclick="wpClear('${id}')">Clear</button>
+        <button class="btn btn-sm" type="button" title="Copy your writing" aria-label="Copy your writing" onclick="wpCopyText('${id}', this)" style="padding:.5rem;display:flex"><svg class="pb-copy-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
       </div>
     </div>
     <textarea class="wp-textarea" id="wpText-${id}" data-min="140" data-max="190" placeholder="Start writing your response here&hellip;" oninput="wpUpdateWordCount('${id}')"></textarea>
-  </div>${selfAssessHTML(id)}`;
+  </div>`;
 }
 
 /* ============ TASK-TYPE DATA (Essay / Article / Letter / Report / Review) ============ */
