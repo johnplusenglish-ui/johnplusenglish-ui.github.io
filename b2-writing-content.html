@@ -745,22 +745,35 @@ function wpCopyText(id, btn){
   });
 }
 function wpWrapLines(ctx, text, maxWidth){
+  return wpWrapBlocks(ctx, text, maxWidth).map(function(l){ return l.text; });
+}
+/* Wraps text into lines, tagging each with 'para' (new paragraph, blank-line separated),
+   'line' (a fresh source line within the same paragraph, e.g. a list item) or 'none'
+   (a wrapped continuation of the previous line) so the caller can add breathing room. */
+function wpWrapBlocks(ctx, text, maxWidth){
   var out = [];
-  String(text).split(/\n+/).forEach(function(para){
-    para = para.trim();
-    if(!para){ out.push(''); return; }
-    var words = para.split(/\s+/);
-    var line = '';
-    words.forEach(function(w){
-      var test = line ? line + ' ' + w : w;
-      if(ctx.measureText(test).width > maxWidth && line){
-        out.push(line);
-        line = w;
-      } else {
-        line = test;
-      }
+  var paras = String(text).split(/\n\s*\n+/);
+  paras.forEach(function(paraBlock, pi){
+    var srcLines = paraBlock.split(/\n/);
+    srcLines.forEach(function(srcLine, li){
+      srcLine = srcLine.trim();
+      var gap = (pi === 0 && li === 0) ? 'none' : (li === 0 ? 'para' : 'line');
+      if(!srcLine){ out.push({text:'', gap:gap}); return; }
+      var words = srcLine.split(/\s+/);
+      var line = '';
+      var firstWrapped = true;
+      words.forEach(function(w){
+        var test = line ? line + ' ' + w : w;
+        if(ctx.measureText(test).width > maxWidth && line){
+          out.push({text:line, gap: firstWrapped ? gap : 'none'});
+          firstWrapped = false;
+          line = w;
+        } else {
+          line = test;
+        }
+      });
+      if(line) out.push({text:line, gap: firstWrapped ? gap : 'none'});
     });
-    if(line) out.push(line);
   });
   return out;
 }
@@ -790,17 +803,39 @@ async function wpDownloadImage(id, btn){
   measure.font = '700 ' + (46*SCALE) + 'px Outfit, sans-serif';
   var topicLines = wpWrapLines(measure, topic, contentW);
   measure.font = '400 ' + (30*SCALE) + 'px Outfit, sans-serif';
-  var qLines = wpWrapLines(measure, question, contentW);
+  var qLines = wpWrapBlocks(measure, question, contentW);
   measure.font = '400 ' + (38*SCALE) + 'px Outfit, sans-serif';
-  var aLines = wpWrapLines(measure, answer, contentW);
+  var aLines = wpWrapBlocks(measure, answer, contentW);
 
-  var lh1 = 58*SCALE, lh2 = 44*SCALE, lh3 = 56*SCALE;
+  var lh1 = 58*SCALE, lh2 = 48*SCALE, lh3 = 60*SCALE;
+  var qParaGap = lh2*0.55, qLineGap = lh2*0.6;
+  var aParaGap = lh3*0.6, aLineGap = lh3*0.35;
+  function wpBlockHeight(lines, lh, paraGap, lineGap){
+    var h = 0;
+    lines.forEach(function(l){
+      if(l.gap === 'para') h += paraGap;
+      else if(l.gap === 'line') h += lineGap;
+      h += lh;
+    });
+    return h;
+  }
+  function wpDrawBlockLines(ctx, lines, x, startY, lh, paraGap, lineGap){
+    var y = startY;
+    lines.forEach(function(l){
+      if(l.gap === 'para') y += paraGap;
+      else if(l.gap === 'line') y += lineGap;
+      ctx.fillText(l.text, x, y);
+      y += lh;
+    });
+    return y;
+  }
+
   var neededH = padding
     + (30*SCALE) + (46*SCALE)
     + topicLines.length * lh1 + (30*SCALE)
-    + qLines.length * lh2 + (44*SCALE)
+    + wpBlockHeight(qLines, lh2, qParaGap, qLineGap) + (44*SCALE)
     + (32*SCALE) + (28*SCALE)
-    + aLines.length * lh3
+    + wpBlockHeight(aLines, lh3, aParaGap, aLineGap)
     + padding;
   var H = Math.max(minH, Math.round(neededH));
 
@@ -828,7 +863,7 @@ async function wpDownloadImage(id, btn){
 
   ctx.fillStyle = '#7A7D8E';
   ctx.font = '400 ' + (30*SCALE) + 'px Outfit, sans-serif';
-  qLines.forEach(function(line){ ctx.fillText(line, padding, y); y += lh2; });
+  y = wpDrawBlockLines(ctx, qLines, padding, y, lh2, qParaGap, qLineGap);
   y += 44*SCALE;
 
   ctx.fillStyle = '#16A88D';
@@ -838,7 +873,7 @@ async function wpDownloadImage(id, btn){
 
   ctx.fillStyle = '#2D3047';
   ctx.font = '400 ' + (38*SCALE) + 'px Outfit, sans-serif';
-  aLines.forEach(function(line){ ctx.fillText(line, padding, y); y += lh3; });
+  wpDrawBlockLines(ctx, aLines, padding, y, lh3, aParaGap, aLineGap);
 
   canvas.toBlob(function(blob){
     var url = URL.createObjectURL(blob);
