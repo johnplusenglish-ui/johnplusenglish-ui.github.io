@@ -1464,17 +1464,7 @@ let resourcesCopyPhrases = [];
 let resourcesCopyGroups = [];
 let resourcesCopyTitle = '';
 function clearResourcesNavActive(){
-  document.getElementById('phrases-content').querySelectorAll('.guide-nav-item, .guide-nav-group-label').forEach(b=>b.classList.remove('active'));
-}
-function showResourcesTopic(i){
-  clearResourcesNavActive();
-  const cat = PHRASE_BANK[i];
-  document.querySelectorAll('#resourcesNav .guide-nav-item')[i].classList.add('active');
-  resourcesCopyPhrases = cat.phrases;
-  resourcesCopyGroups = [{fn:cat.fn, phrases:cat.phrases}];
-  resourcesCopyTitle = cat.part + ' · ' + cat.fn;
-  document.getElementById('resourcesPaneTitle').textContent = resourcesCopyTitle;
-  document.getElementById('resourcesPaneBody').innerHTML = `<ul class="lang-list">${cat.phrases.map(p=>`<li class="chip">${p}</li>`).join('')}</ul>`;
+  document.getElementById('phrases-content').querySelectorAll('.guide-nav-item').forEach(b=>b.classList.remove('active'));
 }
 function showResourcesPart(part){
   clearResourcesNavActive();
@@ -1591,12 +1581,10 @@ async function wpDownloadPhrasesImage(){
   }, 'image/png');
 }
 function buildResources(){
-  let lastPart = null;
-  document.getElementById('resourcesNav').innerHTML = PHRASE_BANK.map((cat,i) => {
-    const groupHtml = cat.part !== lastPart ? `<button class="guide-nav-group-label" id="resourcesGroup-${cat.part.replace(/\s+/g,'')}" onclick="showResourcesPart('${cat.part}')">${cat.part}</button>` : '';
-    lastPart = cat.part;
-    return groupHtml + `<button class="guide-nav-item" onclick="showResourcesTopic(${i})"><span class="guide-nav-dot"></span><span>${cat.fn}</span></button>`;
-  }).join('');
+  const parts = [...new Set(PHRASE_BANK.map(c => c.part))];
+  document.getElementById('resourcesNav').innerHTML = parts.map(part =>
+    `<button class="guide-nav-item" id="resourcesGroup-${part.replace(/\s+/g,'')}" onclick="showResourcesPart('${part}')"><span class="guide-nav-dot"></span><span>${part}</span></button>`
+  ).join('');
   showResourcesPart('Essay');
 }
 
