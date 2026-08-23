@@ -247,10 +247,11 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 /* Part 3 - collaborative task, ported bubble-card style (matches quick-debates-content.html) */
 .p3-note{font-size:.85rem;color:var(--muted);margin:16px 0 0;line-height:1.5}
 .p3-actions-row{display:flex;justify-content:flex-end;margin-top:14px}
-.debate-card{background:var(--card);border:1.5px solid var(--border);border-radius:22px;box-shadow:0 1px 2px rgba(20,30,60,.04),0 20px 44px -28px rgba(30,50,110,.35);display:grid;grid-template-columns:30% 1fr;overflow:hidden;width:100%;margin:14px auto 0;aspect-ratio:5/3;container-type:inline-size}
-.debate-phrases{padding:2.14cqw 1.96cqw;background:var(--cream);border-right:1.5px solid var(--border);overflow-y:auto}
-.debate-phrases-title{font-family:Outfit,sans-serif;font-size:clamp(9px,.98cqw,11px);font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:1.43cqw}
-.phrase-item{font-size:clamp(10px,1.205cqw,13.5px);line-height:1.5;padding:.18cqw .36cqw;border-radius:7px;cursor:pointer;user-select:none;margin-bottom:.18cqw;transition:opacity .3s,background .12s;display:flex;align-items:center;gap:3px}
+.debate-card{background:var(--card);border:1.5px solid var(--border);border-radius:22px;box-shadow:0 1px 2px rgba(20,30,60,.04),0 20px 44px -28px rgba(30,50,110,.35);display:grid;grid-template-columns:30% 1fr;grid-template-rows:minmax(0,1fr);overflow:hidden;width:100%;margin:14px auto 0;aspect-ratio:5/3;container-type:inline-size}
+.debate-phrases{padding:2.14cqw 1.96cqw;background:var(--cream);border-right:1.5px solid var(--border);overflow-y:auto;display:flex;flex-direction:column}
+.debate-phrases-title{font-family:Outfit,sans-serif;font-size:clamp(9px,.98cqw,11px);font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:1.43cqw;flex-shrink:0}
+.debate-phrases-list{flex:1;display:flex;flex-direction:column;justify-content:space-evenly;min-height:0}
+.phrase-item{font-size:clamp(10px,1.205cqw,13.5px);line-height:1.5;padding:.18cqw .36cqw;border-radius:7px;cursor:pointer;user-select:none;transition:opacity .3s,background .12s;display:flex;align-items:center;gap:3px}
 .phrase-item:hover{background:var(--card)}
 .phrase-item.blue{color:var(--accent);font-weight:600;font-style:italic}
 .phrase-item.black{color:var(--ink);font-weight:600}
@@ -1051,9 +1052,9 @@ const PART3_PHRASES = ["Shall I get the ball rolling? – Go ahead.","First and 
 function p3DebateHtml(t, withPhrases){
   let h = '';
   if(withPhrases){
-    h += `<div class="debate-phrases"><div class="debate-phrases-title">Useful phrases</div>`;
+    h += `<div class="debate-phrases"><div class="debate-phrases-title">Useful phrases</div><div class="debate-phrases-list">`;
     h += PART3_PHRASES.map((p,pi)=>`<div class="phrase-item ${pi%2===0?'blue':'black'}" onclick="toggleP3Phrase(this)">${p}</div>`).join('');
-    h += `</div>`;
+    h += `</div></div>`;
   }
   h += `<div class="debate-content">
     <div class="debate-question">${t.question}</div>
