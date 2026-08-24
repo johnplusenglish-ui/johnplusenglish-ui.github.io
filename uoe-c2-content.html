@@ -220,6 +220,7 @@ footer{text-align:center;padding:2.5rem 2rem;font-size:.8rem;color:var(--muted);
 .kwt-correction{display:none;font-family:Outfit,sans-serif;font-size:.72rem;font-weight:600;color:var(--correct);white-space:nowrap}
 .kwt-correction.visible{display:inline-flex;align-items:center;gap:4px}
 .kwt-word-count{font-family:Outfit,sans-serif;font-size:.62rem;color:var(--muted);margin-left:4px;vertical-align:middle}
+.kwt-word-count:empty{display:none;margin-left:0}
 .kwt-word-count.warn{color:var(--coral)}
 @media(max-width:640px){.kwt-input{font-family:'Outfit',sans-serif;font-size:.9rem;font-weight:500;border:none;border-bottom:2px dashed var(--accent);background:transparent;border-radius:0;padding:.2rem .4rem;color:var(--ink);width:auto;min-width:260px;field-sizing:content;outline:none;transition:border-color .2s,color .2s}}
 
@@ -748,8 +749,8 @@ function p1UpdateProgress() {
   document.getElementById('p1ProgressFill').style.width=((n/TESTS[currentTest].gaps.length)*100)+'%';
 }
 function p1UpdateCheck() {
-  let all=true; TESTS[currentTest].gaps.forEach(g=>{if(p1State[g.num].selected===null)all=false;});
-  document.getElementById('p1CheckBtn').disabled=!all;
+  let any=false; TESTS[currentTest].gaps.forEach(g=>{if(p1State[g.num].selected!==null)any=true;});
+  document.getElementById('p1CheckBtn').disabled=!any;
 }
 function p1CloseAll() {
   TESTS[currentTest].gaps.forEach(g=>{document.getElementById('p1panel-'+g.num).classList.remove('open');document.getElementById('p1trigger-'+g.num).classList.remove('open');});
@@ -849,7 +850,7 @@ function p2Input() {
   if(p2Checked)return;
   let n=0; OC_TESTS[currentTest].gaps.forEach(g=>{if(document.getElementById('p2inp-'+g.num).value.trim()!=='')n++;});
   document.getElementById('p2ProgressFill').style.width=((n/OC_TESTS[currentTest].gaps.length)*100)+'%';
-  document.getElementById('p2CheckBtn').disabled=(n<OC_TESTS[currentTest].gaps.length);
+  document.getElementById('p2CheckBtn').disabled=(n<1);
 }
 function p2Check() {
   if(p2Checked)return; p2Checked=true;
@@ -963,7 +964,7 @@ function p3Input() {
   if(p3Checked)return;
   let n=0; WF_TESTS[currentTest].gaps.forEach(g=>{const inp=document.getElementById('p3inp-'+g.num);if(inp.value.trim()!=='')n++;p3AutoSize(inp);});
   document.getElementById('p3ProgressFill').style.width=((n/WF_TESTS[currentTest].gaps.length)*100)+'%';
-  document.getElementById('p3CheckBtn').disabled=(n<WF_TESTS[currentTest].gaps.length);
+  document.getElementById('p3CheckBtn').disabled=(n<1);
 }
 function p3Check() {
   if(p3Checked)return; p3Checked=true;
@@ -1075,7 +1076,7 @@ function p4Input(n) {
   if(words>0){wc.textContent=words+' word'+(words!==1?'s':''); wc.classList.toggle('warn',words<KWT_MIN||words>KWT_MAX);} else {wc.textContent='';}
   let filled=0; KWT_TESTS[currentTest].items.forEach((_,i)=>{if(document.getElementById('p4inp-'+(i+1)).value.trim()!=='')filled++;});
   document.getElementById('p4ProgressFill').style.width=((filled/KWT_TESTS[currentTest].items.length)*100)+'%';
-  document.getElementById('p4CheckBtn').disabled=(filled<KWT_TESTS[currentTest].items.length);
+  document.getElementById('p4CheckBtn').disabled=(filled<1);
 }
 function p4Norm(s) { return s.toLowerCase().replace(/['']/g,"'").replace(/\s+/g,' ').trim(); }
 function p4Match(val, item) { const v=p4Norm(val); if(v===p4Norm(item.answer)) return true; if(item.alts) for(const a of item.alts) if(v===p4Norm(a)) return true; return false; }
