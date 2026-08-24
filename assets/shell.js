@@ -86,7 +86,7 @@ function jpeEnsureFrame(){
   if (empty) empty.style.display = 'none';
   frame = document.createElement('iframe');
   frame.className = 'embed-frame';
-  frame.style.cssText = 'width:100%;height:calc(100vh - 52px);border:none;display:block;background:var(--cream);opacity:0;transition:opacity .18s ease';
+  frame.style.cssText = 'width:100%;height:calc(100vh - 52px);border:none;display:block;background:var(--cream);opacity:0;transition:opacity .1s ease';
   pane.appendChild(frame);
   return frame;
 }
@@ -106,10 +106,8 @@ function jpeNavigate(href, push){
   var frame = jpeEnsureFrame();
   if (!frame) { location.href = href; return; }
   frame.style.opacity = '0';
-  setTimeout(function(){
-    frame.onload = function(){ frame.style.opacity = '1'; };
-    frame.src = jpeContentSrc(href);
-  }, 20);
+  frame.onload = function(){ frame.style.opacity = '1'; };
+  frame.src = jpeContentSrc(href);
   jpeActivate(href);
   if (JPE_TITLES[href]) document.title = JPE_TITLES[href];
   if (push !== false) {
