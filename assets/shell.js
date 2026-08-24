@@ -160,3 +160,138 @@ window.addEventListener('popstate', function(){
   document.addEventListener('mouseover', onIntent, {passive:true});
   document.addEventListener('touchstart', onIntent, {passive:true});
 })();
+
+/* ── Notes side panel (site-wide) ── */
+(function(){
+  document.body.insertAdjacentHTML('beforeend',
+    '<button class="jpe-notes-toggle" id="jpeNotesToggleBtn" onclick="jpeToggleNotes()">Notes ✎</button>' +
+    '<aside class="jpe-notes-panel" id="jpeNotesPanel">' +
+      '<div class="jpe-np-header">' +
+        '<div class="jpe-np-title">Notes</div>' +
+        '<button class="jpe-np-close" onclick="jpeToggleNotes()">&times;</button>' +
+      '</div>' +
+      '<textarea class="jpe-np-box" id="jpeNotesBox" placeholder="..."></textarea>' +
+      '<div class="jpe-np-footer">' +
+        '<button class="jpe-np-btn" id="jpeNpCopyBtn" onclick="jpeCopyNotes()">Copy</button>' +
+        '<button class="jpe-np-btn primary" onclick="jpeDownloadNotesPNG()">PNG</button>' +
+        '<button class="jpe-np-btn danger" onclick="jpeClearNotes()">Clear</button>' +
+      '</div>' +
+    '</aside>'
+  );
+
+  var notesBox = document.getElementById('jpeNotesBox');
+  try { notesBox.value = localStorage.getItem('jpe-notes-text') || ''; } catch(e){}
+
+  function saveNotesBox(){ try { localStorage.setItem('jpe-notes-text', notesBox.value); } catch(e){} }
+
+  notesBox.addEventListener('keydown', function(e){
+    if (e.key === 'Enter'){
+      e.preventDefault();
+      var start = notesBox.selectionStart, end = notesBox.selectionEnd;
+      notesBox.setRangeText('\n• ', start, end, 'end');
+      saveNotesBox();
+    }
+  });
+  notesBox.addEventListener('input', function(){
+    if (notesBox.value.length === 1 && notesBox.value !== '•'){
+      notesBox.value = '• ' + notesBox.value;
+      notesBox.selectionStart = notesBox.selectionEnd = notesBox.value.length;
+    }
+    saveNotesBox();
+  });
+
+  function getNotesLines(){
+    return notesBox.value.split('\n')
+      .map(function(l){ return l.replace(/^[•\s]+/, '').trim(); })
+      .filter(function(l){ return l.length; });
+  }
+
+  window.jpeToggleNotes = function(){
+    document.getElementById('jpeNotesPanel').classList.toggle('open');
+  };
+  window.jpeClearNotes = function(){
+    if (!notesBox.value.trim()) return;
+    if (confirm('Clear all notes?')){ notesBox.value = ''; saveNotesBox(); }
+  };
+  window.jpeCopyNotes = function(){
+    var lines = getNotesLines();
+    if (!lines.length) return;
+    var text = lines.map(function(v){ return '• ' + v; }).join('\n');
+    function flash(msg){
+      var btn = document.getElementById('jpeNpCopyBtn');
+      var old = btn.textContent;
+      btn.textContent = msg;
+      setTimeout(function(){ btn.textContent = old; }, 1400);
+    }
+    function fallbackCopy(){
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); flash('Copied!'); }
+      catch(e){ flash('Copy failed'); }
+      document.body.removeChild(ta);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){ flash('Copied!'); }).catch(fallbackCopy);
+    } else {
+      fallbackCopy();
+    }
+  };
+  function wrapCanvasText(ctx, text, maxWidth){
+    var words = text.split(' '), lines = [], current = '';
+    words.forEach(function(w){
+      var test = current ? current + ' ' + w : w;
+      if (ctx.measureText(test).width > maxWidth && current){ lines.push(current); current = w; }
+      else current = test;
+    });
+    if (current) lines.push(current);
+    return lines;
+  }
+  window.jpeDownloadNotesPNG = function(){
+    var items = getNotesLines();
+    if (!items.length){ alert('Add a few notes first.'); return; }
+    document.fonts.ready.then(function(){
+      var width = 600, padding = 32, fontSize = 17, lineH = 27, titleSize = 21;
+      var measureCanvas = document.createElement('canvas');
+      var mctx = measureCanvas.getContext('2d');
+      mctx.font = fontSize + 'px Outfit, sans-serif';
+      var maxTextW = width - padding * 2 - 22;
+      var lines = [];
+      items.forEach(function(item){
+        wrapCanvasText(mctx, item, maxTextW).forEach(function(l, idx){ lines.push({text:l, first: idx === 0}); });
+      });
+      var height = padding * 2 + titleSize + 34 + lines.length * lineH + 14;
+      var canvas = document.createElement('canvas');
+      var scale = 2;
+      canvas.width = width * scale; canvas.height = height * scale;
+      var ctx = canvas.getContext('2d');
+      ctx.scale(scale, scale);
+
+      ctx.fillStyle = '#F7F6F3'; ctx.fillRect(0, 0, width, height);
+      ctx.strokeStyle = '#E8E5DF'; ctx.lineWidth = 1; ctx.strokeRect(.5, .5, width - 1, height - 1);
+
+      ctx.fillStyle = '#2D3047';
+      ctx.font = '800 ' + titleSize + 'px Outfit, sans-serif';
+      ctx.fillText('johnplusenglish Notes', padding, padding + titleSize - 4);
+
+      ctx.strokeStyle = '#E8E5DF';
+      ctx.beginPath(); ctx.moveTo(padding, padding + titleSize + 16); ctx.lineTo(width - padding, padding + titleSize + 16); ctx.stroke();
+
+      var y = padding + titleSize + 16 + 32;
+      ctx.font = fontSize + 'px Outfit, sans-serif';
+      lines.forEach(function(l){
+        if (l.first){ ctx.fillStyle = '#7A7D8E'; ctx.fillText('•', padding, y); }
+        ctx.fillStyle = '#2D3047';
+        ctx.fillText(l.text, padding + 20, y);
+        y += lineH;
+      });
+
+      var link = document.createElement('a');
+      link.download = 'notes.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+  };
+})();
