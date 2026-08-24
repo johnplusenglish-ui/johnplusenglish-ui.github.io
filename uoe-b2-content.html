@@ -898,7 +898,9 @@ function p2Show() {
   let score=0; const t=OC_TESTS[currentTest];
   t.gaps.forEach(g=>{
     const inp=document.getElementById('p2inp-'+g.num), btn=document.getElementById('p2hint-'+g.num);
-    if(p2IsCorrect(g, inp.value))score++;
+    const wasCorrect=p2IsCorrect(g, inp.value);
+    if(wasCorrect)score++;
+    inp.dataset.wasCorrect=wasCorrect?'1':'0';
     inp.value=g.answer; inp.disabled=true; inp.classList.add('shown'); btn.style.display='none';
   });
   document.getElementById('p2ScoreVal').textContent=score+' / '+t.gaps.length;
@@ -915,7 +917,7 @@ function p2RenderExp() {
   const el=document.getElementById('p2Explanations'), t=OC_TESTS[currentTest];
   let h='<div class="exp-title">Answers & Hints</div><div class="exp-grid">';
   t.gaps.forEach(g=>{
-    const inp=document.getElementById('p2inp-'+g.num), ok=p2IsCorrect(g, inp.value);
+    const inp=document.getElementById('p2inp-'+g.num), ok=inp.dataset.wasCorrect!==undefined?inp.dataset.wasCorrect==='1':p2IsCorrect(g, inp.value);
     const altsTxt=(g.alts&&g.alts.length)?' <span class="exp-alts">(also accepted: '+g.alts.join(', ')+')</span>':'';
     h+='<div class="exp-item '+(ok?'was-correct':'was-wrong')+'"><span class="exp-num">'+g.num+'</span><div class="exp-text"><strong>'+g.answer+'</strong>'+altsTxt+' - '+g.hint+'</div></div>';
   });
@@ -1008,7 +1010,9 @@ function p3Show() {
   let score=0; const t=WF_TESTS[currentTest];
   t.gaps.forEach(g=>{
     const inp=document.getElementById('p3inp-'+g.num),btn=document.getElementById('p3hint-'+g.num);
-    if(inp.value.trim().toLowerCase()===g.answer.toLowerCase())score++;
+    const wasCorrect=inp.value.trim().toLowerCase()===g.answer.toLowerCase();
+    if(wasCorrect)score++;
+    inp.dataset.wasCorrect=wasCorrect?'1':'0';
     inp.value=g.answer; p3AutoSize(inp); inp.disabled=true; inp.classList.add('shown'); btn.style.display='none';
   });
   document.getElementById('p3ScoreVal').textContent=score+' / '+t.gaps.length;
@@ -1025,7 +1029,7 @@ function p3RenderExp() {
   const el=document.getElementById('p3Explanations'),t=WF_TESTS[currentTest];
   let h='<div class="exp-title">Answers</div><div class="exp-grid">';
   t.gaps.forEach(g=>{
-    const inp=document.getElementById('p3inp-'+g.num), ok=inp.value.trim().toLowerCase()===g.answer.toLowerCase();
+    const inp=document.getElementById('p3inp-'+g.num), ok=inp.dataset.wasCorrect!==undefined?inp.dataset.wasCorrect==='1':inp.value.trim().toLowerCase()===g.answer.toLowerCase();
     h+='<div class="exp-item '+(ok?'was-correct':'was-wrong')+'"><span class="exp-num">'+g.num+'</span><div class="exp-text"><strong>'+g.prompt+' → '+g.answer+'</strong> - '+g.hint+'</div></div>';
   });
   h+='</div>'; el.innerHTML=h;
@@ -1136,7 +1140,9 @@ function p4Show() {
   let score=0; const t=KWT_TESTS[currentTest];
   t.items.forEach((item,i)=>{
     const n=i+1, inp=document.getElementById('p4inp-'+n), btn=document.getElementById('p4hint-'+n), wc=document.getElementById('p4wc-'+n);
-    if(p4Match(inp.value,item))score++;
+    const wasCorrect=p4Match(inp.value,item);
+    if(wasCorrect)score++;
+    inp.dataset.wasCorrect=wasCorrect?'1':'0';
     inp.value=item.answer; p4AutoSize(inp); inp.disabled=true; inp.classList.add('shown'); btn.style.display='none'; wc.style.display='none';
   });
   document.getElementById('p4ScoreVal').textContent=score+' / '+t.items.length;
@@ -1153,7 +1159,7 @@ function p4RenderExp() {
   const el=document.getElementById('p4Explanations'),t=KWT_TESTS[currentTest];
   let h='<div class="exp-title">Answers</div><div class="exp-grid">';
   t.items.forEach((item,i)=>{
-    const n=i+1, inp=document.getElementById('p4inp-'+n), ok=p4Match(inp.value,item);
+    const n=i+1, inp=document.getElementById('p4inp-'+n), ok=inp.dataset.wasCorrect!==undefined?inp.dataset.wasCorrect==='1':p4Match(inp.value,item);
     h+='<div class="exp-item '+(ok?'was-correct':'was-wrong')+'"><span class="exp-num">'+n+'</span><div class="exp-text"><strong>'+item.answer+'</strong> - '+item.hint+'</div></div>';
   });
   h+='</div>'; el.innerHTML=h;
