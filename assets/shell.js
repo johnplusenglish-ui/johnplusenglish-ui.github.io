@@ -86,7 +86,7 @@ function jpeEnsureFrame(){
   if (empty) empty.style.display = 'none';
   frame = document.createElement('iframe');
   frame.className = 'embed-frame';
-  frame.style.cssText = 'width:100%;height:calc(100vh - 52px);border:none;display:block;background:var(--cream);opacity:0;transition:opacity .1s ease';
+  frame.style.cssText = 'width:100%;height:calc(100vh - 52px);border:none;display:block;background:var(--cream);opacity:0;transition:opacity .06s linear';
   pane.appendChild(frame);
   return frame;
 }
