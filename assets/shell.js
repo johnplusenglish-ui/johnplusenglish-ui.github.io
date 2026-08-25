@@ -208,11 +208,14 @@ window.addEventListener('popstate', function(){
   jpeActivate(here);
 })();
 
-// Swipe to open/close the mobile sidebar overlay. A swipe starting near the
-// left edge opens it; a swipe left anywhere while it's open closes it.
-// No-op on desktop: .sidebar.open only has a visual effect below 900px.
+// Swipe left to close the open mobile sidebar overlay. Deliberately does NOT
+// swipe-open from the left edge — that zone is reserved by iOS Safari and
+// Android Chrome for their own "swipe back" gesture, so a page-level listener
+// there would fight the OS rather than reliably open the menu. Opening stays
+// a real tap on the bottom-left button. No-op on desktop: .sidebar.open only
+// has a visual effect below 900px.
 (function(){
-  var EDGE = 28, MIN_DX = 60, MAX_OFF_AXIS = 80, MAX_MS = 700;
+  var MIN_DX = 60, MAX_OFF_AXIS = 80, MAX_MS = 700;
   var startX = null, startY = null, startT = 0;
   document.addEventListener('touchstart', function(e){
     if (e.touches.length !== 1) { startX = null; return; }
@@ -226,19 +229,11 @@ window.addEventListener('popstate', function(){
     var dx = touch.clientX - startX;
     var dy = touch.clientY - startY;
     var dt = Date.now() - startT;
-    var fromEdge = startX;
     startX = null;
     if (dt > MAX_MS || Math.abs(dy) > MAX_OFF_AXIS || Math.abs(dx) < MIN_DX) return;
     var sidebar = document.getElementById('sidebar');
     if (!sidebar) return;
-    var isOpen = sidebar.classList.contains('open');
-    if (!isOpen && dx > 0 && fromEdge < EDGE) {
-      sidebar.classList.add('open');
-      var bd = document.getElementById('sidebarBackdrop');
-      if (bd) bd.classList.add('open');
-    } else if (isOpen && dx < 0) {
-      closeSidebar();
-    }
+    if (sidebar.classList.contains('open') && dx < 0) closeSidebar();
   }, {passive:true});
 })();
 
