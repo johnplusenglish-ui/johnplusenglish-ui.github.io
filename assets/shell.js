@@ -302,8 +302,12 @@ window.addEventListener('popstate', function(){
   document.addEventListener('touchstart', onIntent, {passive:true});
 })();
 
-/* ── Notes side panel (site-wide) ── */
+/* ── Notes side panel (site-wide) ──
+   Disabled 2026-08-25 at John's request ("remove but remember for future
+   use") — the feature is fully intact below, just gated behind this early
+   return. Delete the `return;` line to bring it back. */
 (function(){
+  return;
   document.body.insertAdjacentHTML('beforeend',
     '<button class="jpe-notes-toggle" id="jpeNotesToggleBtn" onclick="jpeToggleNotes()">Notes ✎</button>' +
     '<aside class="jpe-notes-panel" id="jpeNotesPanel">' +
