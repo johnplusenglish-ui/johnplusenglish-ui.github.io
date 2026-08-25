@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <script src="lock.js"></script>
+<script src="/assets/deeplink.js"></script>
 <base target="_top">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1288,7 +1289,7 @@ function renderMenu(){
   box.querySelectorAll('.bk').forEach(function(b){ b.addEventListener('click', function(){ pickCat(b.getAttribute('data-c')); }); });
   box.querySelectorAll('.cat-toggle').forEach(function(t){ t.addEventListener('click', function(){ var n=t.getAttribute('data-g'); menuShut[n]=!menuShut[n]; renderMenu(); }); });
 }
-function pickCat(c){ curCat = c; renderMenu(); renderPane(); scrollPaneIntoView(); }
+function pickCat(c){ curCat = c; renderMenu(); renderPane(); scrollPaneIntoView(); JPE_DEEPLINK.setParams({cat: c === 'all' ? null : c}); }
 
 /* ── Language mode: single-column phrase list ── */
 function phraseRow(p){
@@ -1452,6 +1453,7 @@ function setMode(m){
   var noun = m==='compare' ? 'phrases' : 'English';
   $('phHideLabel').textContent = (hideEn ? 'Show ' : 'Hide ') + noun;
   buildTabs(); renderMenu(); renderPane();
+  JPE_DEEPLINK.setParams({mode: m === 'lang' ? null : m});
 }
 
 function setLang(id){
@@ -1460,17 +1462,27 @@ function setLang(id){
   $('phIntro').innerHTML = curLang.intro;
   store('jpe-phrases-lang', curLang.id);
   buildTabs(); renderMenu(); renderPane();
+  JPE_DEEPLINK.setParams({lang: curLang.id});
 }
 
 (function init(){
+  // Capture deep-link params BEFORE setLang()/setMode()/pickCat() run below —
+  // each writes its own URL param, so reading fresh after would just read back
+  // what we ourselves already overwrote with the default state.
+  var dlLang = JPE_DEEPLINK.getParam('lang');
+  var dlMode = JPE_DEEPLINK.getParam('mode');
+  var dlCat = JPE_DEEPLINK.getParam('cat');
   var savedLang = store('jpe-phrases-lang');
-  var start = LANGS.filter(function(l){ return l.id===savedLang; })[0] || LANGS[0];
+  var startId = (dlLang && LANGS.some(function(l){ return l.id===dlLang; })) ? dlLang : savedLang;
+  var start = LANGS.filter(function(l){ return l.id===startId; })[0] || LANGS[0];
   if(store('jpe-phrases-rail-collapsed') === '1'){
     $('phSb').classList.add('collapsed');
     $('phPicker').classList.add('sb-collapsed');
   }
   curLang = start;
   setLang(start.id);
+  if (dlMode === 'compare') setMode('compare');
+  if (dlCat && (dlCat === 'all' || CAT_NAME[dlCat])) pickCat(dlCat);
 })();
 </script>
 </body>
