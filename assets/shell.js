@@ -440,3 +440,238 @@ window.addEventListener('popstate', function(){
     });
   };
 })();
+
+/* ── Annotation tool (hidden dev utility, John only) ──
+   Cmd/Ctrl+Shift+A toggles it. While on, clicking anywhere on the page's
+   actual content (inside the iframe) drops a numbered pin and prompts for
+   an instruction. "Copy JSON" exports every pin across every page you've
+   annotated, in one paste-ready block, for a Claude session to act on.
+   Data lives only in localStorage (jpe-annotations) — never sent anywhere.
+   Scope: content inside the iframe only, not the outer sidebar/topnav. */
+(function(){
+  var DATA_KEY = 'jpe-annotations';
+  var MODE_KEY = 'jpe-annotate-mode';
+  var anns = [];
+  try { anns = JSON.parse(localStorage.getItem(DATA_KEY)) || []; } catch(e){ anns = []; }
+  var nextN = 1;
+  anns.forEach(function(a){ if (a.n >= nextN) nextN = a.n + 1; });
+
+  var mode = false, toolbar = null;
+
+  function save(){ try { localStorage.setItem(DATA_KEY, JSON.stringify(anns)); } catch(e){} }
+  function currentPage(){ return location.pathname.split('/').pop() || 'index.html'; }
+
+  function cssPath(el){
+    if (!el || el.nodeType !== 1) return '';
+    var parts = [], depth = 0;
+    while (el && el.nodeType === 1 && depth < 6) {
+      if (el.id) { parts.unshift('#' + el.id); break; }
+      var sel = el.tagName.toLowerCase();
+      var parent = el.parentElement;
+      if (parent) {
+        var same = Array.prototype.filter.call(parent.children, function(c){ return c.tagName === el.tagName; });
+        if (same.length > 1) sel += ':nth-child(' + (Array.prototype.indexOf.call(parent.children, el) + 1) + ')';
+      }
+      parts.unshift(sel);
+      el = parent;
+      depth++;
+    }
+    return parts.join(' > ');
+  }
+
+  function contextText(el){
+    var t = (el && el.textContent || '').trim().replace(/\s+/g, ' ');
+    return t.slice(0, 90);
+  }
+
+  function ensureToolbar(){
+    if (toolbar) return toolbar;
+    toolbar = document.createElement('div');
+    toolbar.id = 'jpeAnnToolbar';
+    toolbar.innerHTML =
+      '<div class="jpe-ann-title">Annotate <span id="jpeAnnCount"></span></div>' +
+      '<div class="jpe-ann-row">' +
+        '<button id="jpeAnnUndo">Undo</button>' +
+        '<button id="jpeAnnClear">Clear all</button>' +
+        '<button id="jpeAnnCopy">Copy JSON</button>' +
+        '<button id="jpeAnnExit">&times;</button>' +
+      '</div>';
+    document.body.appendChild(toolbar);
+    document.getElementById('jpeAnnUndo').onclick = annUndo;
+    document.getElementById('jpeAnnClear').onclick = annClearAll;
+    document.getElementById('jpeAnnCopy').onclick = annCopyJSON;
+    document.getElementById('jpeAnnExit').onclick = annToggle;
+    return toolbar;
+  }
+
+  function updateCount(){
+    var el = document.getElementById('jpeAnnCount');
+    if (el) el.textContent = '(' + anns.length + ' total)';
+  }
+
+  function pinStyleTag(doc){
+    if (doc.getElementById('jpeAnnPinStyle')) return;
+    var s = doc.createElement('style');
+    s.id = 'jpeAnnPinStyle';
+    s.textContent =
+      '.jpe-ann-pin{position:absolute;width:26px;height:26px;border-radius:50%;background:#FF6B6B;color:#fff;font:700 13px Outfit,sans-serif;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.35);z-index:99999;transform:translate(-50%,-50%);border:2px solid #fff}' +
+      '.jpe-ann-pin:hover{background:#e14f4f}';
+    (doc.head || doc.documentElement).appendChild(s);
+  }
+
+  function clearPins(doc){
+    if (!doc) return;
+    var old = doc.querySelectorAll('.jpe-ann-pin');
+    Array.prototype.forEach.call(old, function(p){ p.remove(); });
+  }
+
+  function renderPins(){
+    var frame = jpeEnsureFrame();
+    if (!frame || !frame.contentDocument) return;
+    var doc = frame.contentDocument;
+    clearPins(doc);
+    if (doc.body) doc.body.style.cursor = mode ? 'crosshair' : '';
+    if (!mode) return;
+    pinStyleTag(doc);
+    var page = currentPage();
+    anns.filter(function(a){ return a.page === page; }).forEach(function(a){
+      var target = null;
+      try { target = doc.querySelector(a.selector); } catch(e){}
+      var x, y;
+      if (target) {
+        var r = target.getBoundingClientRect();
+        x = r.left + r.width * (a.xPct != null ? a.xPct : 0.5) + doc.defaultView.scrollX;
+        y = r.top + r.height * (a.yPct != null ? a.yPct : 0.5) + doc.defaultView.scrollY;
+      } else {
+        x = a.absX || 40; y = a.absY || 40;
+      }
+      var pin = doc.createElement('div');
+      pin.className = 'jpe-ann-pin';
+      pin.textContent = a.n;
+      pin.style.left = x + 'px';
+      pin.style.top = y + 'px';
+      pin.title = a.text;
+      pin.addEventListener('click', function(ev){
+        ev.preventDefault(); ev.stopPropagation();
+        annEditOrDelete(a.n);
+      });
+      doc.body.appendChild(pin);
+    });
+  }
+
+  function annAdd(x, y, doc){
+    var el = doc.elementFromPoint(x, y);
+    var text = window.prompt('Instruction for this spot:');
+    if (!text) return;
+    var selector = cssPath(el);
+    var rect = el ? el.getBoundingClientRect() : {left:x, top:y, width:1, height:1};
+    anns.push({
+      n: nextN++,
+      page: currentPage(),
+      text: text,
+      selector: selector,
+      context: contextText(el),
+      xPct: rect.width ? (x - rect.left) / rect.width : 0.5,
+      yPct: rect.height ? (y - rect.top) / rect.height : 0.5,
+      absX: x + doc.defaultView.scrollX,
+      absY: y + doc.defaultView.scrollY,
+      url: location.href
+    });
+    save();
+    updateCount();
+    renderPins();
+  }
+
+  function annEditOrDelete(n){
+    var a = anns.filter(function(x){ return x.n === n; })[0];
+    if (!a) return;
+    var next = window.prompt('Edit instruction (clear the text + OK to delete this pin):', a.text);
+    if (next === null) return;
+    if (next.trim() === '') {
+      anns = anns.filter(function(x){ return x.n !== n; });
+    } else {
+      a.text = next;
+    }
+    save();
+    updateCount();
+    renderPins();
+  }
+
+  function annUndo(){
+    anns.pop();
+    save();
+    updateCount();
+    renderPins();
+  }
+
+  function annClearAll(){
+    if (!window.confirm('Clear ALL annotations across every page? This cannot be undone.')) return;
+    anns = [];
+    nextN = 1;
+    save();
+    updateCount();
+    renderPins();
+  }
+
+  function annCopyJSON(){
+    var payload = JSON.stringify({exportedAt: new Date().toISOString(), site: location.host, annotations: anns}, null, 2);
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(payload).then(function(){
+        alert('Copied ' + anns.length + ' annotation(s) to clipboard.');
+      }, function(){
+        window.prompt('Copy this JSON:', payload);
+      });
+    } else {
+      window.prompt('Copy this JSON:', payload);
+    }
+  }
+
+  function frameClickHandler(e){
+    if (!mode) return;
+    if (e.target.closest && e.target.closest('.jpe-ann-pin')) return;
+    e.preventDefault();
+    e.stopPropagation();
+    annAdd(e.clientX, e.clientY, e.target.ownerDocument);
+  }
+
+  function attachFrameListeners(){
+    var frame = jpeEnsureFrame();
+    if (!frame || !frame.contentDocument) return;
+    var doc = frame.contentDocument;
+    if (!doc._jpeAnnBound) {
+      doc._jpeAnnBound = true;
+      doc.addEventListener('click', frameClickHandler, true);
+      doc.addEventListener('keydown', keyHandler);
+    }
+    renderPins();
+  }
+
+  function keyHandler(e){
+    if ((e.metaKey || e.ctrlKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+      e.preventDefault();
+      annToggle();
+    }
+  }
+
+  function annToggle(){
+    mode = !mode;
+    try { sessionStorage.setItem(MODE_KEY, mode ? '1' : '0'); } catch(e){}
+    ensureToolbar().style.display = mode ? 'flex' : 'none';
+    updateCount();
+    renderPins();
+  }
+
+  document.addEventListener('keydown', keyHandler);
+  var frameEl = jpeEnsureFrame();
+  if (frameEl) frameEl.addEventListener('load', attachFrameListeners);
+
+  try {
+    if (sessionStorage.getItem(MODE_KEY) === '1') {
+      mode = true;
+      ensureToolbar().style.display = 'flex';
+      updateCount();
+    }
+  } catch(e){}
+
+  attachFrameListeners();
+})();
