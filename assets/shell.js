@@ -182,7 +182,6 @@ function jpeNavigate(href, push){
   if (push !== false) {
     try { history.pushState({jpeHref:href}, '', href); } catch(e){}
   }
-  closeSidebar();
 }
 document.addEventListener('click', function(e){
   var a = e.target.closest && e.target.closest('.sidebar a.row[href]');
@@ -207,6 +206,40 @@ window.addEventListener('popstate', function(){
   document.getElementById('sidebar').classList.add('js-anim');
   var here = location.pathname.split('/').pop() || 'index.html';
   jpeActivate(here);
+})();
+
+// Swipe to open/close the mobile sidebar overlay. A swipe starting near the
+// left edge opens it; a swipe left anywhere while it's open closes it.
+// No-op on desktop: .sidebar.open only has a visual effect below 900px.
+(function(){
+  var EDGE = 28, MIN_DX = 60, MAX_OFF_AXIS = 80, MAX_MS = 700;
+  var startX = null, startY = null, startT = 0;
+  document.addEventListener('touchstart', function(e){
+    if (e.touches.length !== 1) { startX = null; return; }
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    startT = Date.now();
+  }, {passive:true});
+  document.addEventListener('touchend', function(e){
+    if (startX === null) return;
+    var touch = e.changedTouches[0];
+    var dx = touch.clientX - startX;
+    var dy = touch.clientY - startY;
+    var dt = Date.now() - startT;
+    var fromEdge = startX;
+    startX = null;
+    if (dt > MAX_MS || Math.abs(dy) > MAX_OFF_AXIS || Math.abs(dx) < MIN_DX) return;
+    var sidebar = document.getElementById('sidebar');
+    if (!sidebar) return;
+    var isOpen = sidebar.classList.contains('open');
+    if (!isOpen && dx > 0 && fromEdge < EDGE) {
+      sidebar.classList.add('open');
+      var bd = document.getElementById('sidebarBackdrop');
+      if (bd) bd.classList.add('open');
+    } else if (isOpen && dx < 0) {
+      closeSidebar();
+    }
+  }, {passive:true});
 })();
 
 (function(){
