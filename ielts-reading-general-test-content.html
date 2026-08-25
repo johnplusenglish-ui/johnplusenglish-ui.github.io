@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <script src="lock.js"></script>
+<script src="/assets/deeplink.js"></script>
 <base target="_top">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1036,6 +1037,7 @@ function updateOverall(){
 function showPart(n){
   document.querySelectorAll('.part-filter-pill').forEach(p=>p.classList.toggle('active', p.dataset.part===String(n)));
   document.querySelectorAll('.part-section').forEach(s=>s.classList.toggle('visible', s.dataset.part===String(n)));
+  JPE_DEEPLINK.setParams({part: n});
 }
 
 /* ============ TEST PICKER ============ */
@@ -1060,6 +1062,7 @@ function loadTest(i){
 
   showPart(1);
   try{ localStorage.setItem('jpe-ielts-reading-general-test', i); }catch(e){}
+  JPE_DEEPLINK.setParams({test: i+1});
   window.scrollTo(0,0);
 }
 function buildPicker(){
@@ -1344,11 +1347,19 @@ function buildGuide(){
 }
 
 /* ============ INIT ============ */
+// Capture any deep-link params BEFORE the default loadTest() below overwrites
+// the URL (its own setParams call would otherwise clobber these first).
+var jpeDlTest = parseInt(JPE_DEEPLINK.getParam('test'), 10);
+var jpeDlPart = JPE_DEEPLINK.getParam('part');
 buildPicker();
 let startTest = 0;
 try{ const sv = parseInt(localStorage.getItem('jpe-ielts-reading-general-test'),10); if(sv>=0 && sv<TESTS.length) startTest = sv; }catch(e){}
 loadTest(startTest);
 buildGuide();
+
+// Restore a shared/refreshed deep link: ?test=2&part=2
+if (jpeDlTest >= 1 && jpeDlTest <= TESTS.length) loadTest(jpeDlTest - 1);
+if (jpeDlPart && document.querySelector('.part-filter-pill[data-part="'+jpeDlPart+'"]')) showPart(jpeDlPart);
 </script>
 </body>
 </html>
