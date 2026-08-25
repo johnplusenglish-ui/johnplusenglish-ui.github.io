@@ -82,9 +82,21 @@ function jpeRows(group, el, open){
     group.classList.add('open');
     if (!el) return;
     if (reduce){ el.style.maxHeight = 'none'; return; }
-    el.style.maxHeight = el.scrollHeight + 'px';
+    // Measure the TRUE open height with transitions off — read live it comes back
+    // ~5px short (the padding is still animating in), which would make the pill
+    // below jump when we later release to 'none'. Snapping padding to final here
+    // gives an exact target, so open lands clean and the release is seamless.
+    var tr = el.style.transition;
+    el.style.transition = 'none';
+    el.style.maxHeight = 'none';
+    var target = el.scrollHeight;
+    el.style.maxHeight = '0px';
+    void el.offsetHeight;
+    el.style.transition = tr;
+    void el.offsetHeight;
+    el.style.maxHeight = target + 'px';
     // release to 'none' after the open finishes so nested menus can grow freely
-    el._jpeT = setTimeout(function(){ el.style.maxHeight = 'none'; el._jpeT = null; }, 150);
+    el._jpeT = setTimeout(function(){ el.style.maxHeight = 'none'; el._jpeT = null; }, 110);
   } else {
     if (!el){ group.classList.remove('open'); return; }
     if (reduce){ el.style.maxHeight = '0px'; group.classList.remove('open'); return; }
