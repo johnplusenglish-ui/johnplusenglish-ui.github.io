@@ -96,7 +96,7 @@ function jpeRows(group, el, open){
     void el.offsetHeight;
     el.style.maxHeight = target + 'px';
     // release to 'none' after the open finishes so nested menus can grow freely
-    el._jpeT = setTimeout(function(){ el.style.maxHeight = 'none'; el._jpeT = null; }, 110);
+    el._jpeT = setTimeout(function(){ el.style.maxHeight = 'none'; el._jpeT = null; }, 90);
   } else {
     if (!el){ group.classList.remove('open'); return; }
     if (reduce){ el.style.maxHeight = '0px'; group.classList.remove('open'); return; }
