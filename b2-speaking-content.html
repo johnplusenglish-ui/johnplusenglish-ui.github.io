@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <script src="lock.js"></script>
+<script src="/assets/deeplink.js"></script>
 <base target="_top">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -427,6 +428,7 @@ function switchType(type){
     document.querySelector('[data-type="'+t+'"]').classList.toggle('active', t===type);
     document.getElementById(t+'-content').classList.toggle('active', t===type);
   });
+  JPE_DEEPLINK.setParams({type: type === 'guide' ? null : type});
 }
 function toggleGuideSidebar(el){ el.closest('.guide-shell').classList.toggle('sb-collapsed'); }
 
@@ -1181,6 +1183,12 @@ buildPart2();
 buildPart3();
 buildPart4();
 buildResources();
+
+// Restore a shared/refreshed deep link: ?type=part2
+(function(){
+  var t = JPE_DEEPLINK.getParam('type');
+  if (t && document.querySelector('[data-type="'+t+'"]')) switchType(t);
+})();
 </script>
 </body>
 </html>
