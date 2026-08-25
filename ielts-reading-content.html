@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <script src="lock.js"></script>
+<script src="/assets/deeplink.js"></script>
 <base target="_top">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1045,6 +1046,7 @@ function updateOverall_A(){
 function showPart_A(n){
   document.getElementById('academic-content').querySelectorAll('.part-filter-pill').forEach(p=>p.classList.toggle('active', p.dataset.part===String(n)));
   document.getElementById('academic-content').querySelectorAll('.part-section').forEach(s=>s.classList.toggle('visible', s.dataset.part===String(n)));
+  if (document.querySelector('[data-type="academic"]').classList.contains('active')) JPE_DEEPLINK.setParams({part_a: n});
 }
 
 /* ============ TEST PICKER ============ */
@@ -1064,6 +1066,7 @@ function loadTest_A(i){
   resetFill_A('p3cA');
   showPart_A(1);
   try{ localStorage.setItem('jpe-ielts-reading-test', i); }catch(e){}
+  if (document.querySelector('[data-type="academic"]').classList.contains('active')) JPE_DEEPLINK.setParams({type:'academic', test_a: i+1});
   window.scrollTo(0,0);
 }
 function buildPicker_A(){
@@ -2233,6 +2236,7 @@ function updateOverall_G(){
 function showPart_G(n){
   document.getElementById('general-content').querySelectorAll('.part-filter-pill').forEach(p=>p.classList.toggle('active', p.dataset.part===String(n)));
   document.getElementById('general-content').querySelectorAll('.part-section').forEach(s=>s.classList.toggle('visible', s.dataset.part===String(n)));
+  if (document.querySelector('[data-type="general"]').classList.contains('active')) JPE_DEEPLINK.setParams({part_g: n});
 }
 
 /* ============ TEST PICKER ============ */
@@ -2257,6 +2261,7 @@ function loadTest_G(i){
 
   showPart_G(1);
   try{ localStorage.setItem('jpe-ielts-reading-general-test', i); }catch(e){}
+  if (document.querySelector('[data-type="general"]').classList.contains('active')) JPE_DEEPLINK.setParams({type:'general', test_g: i+1});
   window.scrollTo(0,0);
 }
 function buildPicker_G(){
@@ -2336,7 +2341,40 @@ function switchType(type) {
     document.querySelector('[data-type="' + t + '"]').classList.toggle('active', t === type);
     document.getElementById(t + '-content').classList.toggle('active', t === type);
   });
+  if (type === 'academic') {
+    var pillA = document.querySelector('#academic-content .part-filter-pill.active');
+    JPE_DEEPLINK.setParams({type:'academic', test_a: TI_A+1, part_a: pillA ? pillA.dataset.part : null, test_g: null, part_g: null});
+  } else if (type === 'general') {
+    var pillG = document.querySelector('#general-content .part-filter-pill.active');
+    JPE_DEEPLINK.setParams({type:'general', test_g: TI_G+1, part_g: pillG ? pillG.dataset.part : null, test_a: null, part_a: null});
+  } else {
+    JPE_DEEPLINK.setParams({type: type === 'guide' ? null : type, test_a: null, part_a: null, test_g: null, part_g: null});
+  }
 }
+
+// Restore a shared/refreshed deep link: ?type=academic&test_a=2&part_a=3
+(function(){
+  // Capture ALL params before calling switchType(), which itself writes
+  // test_a/part_a (or test_g/part_g) back from current state and would
+  // otherwise clobber these before loadTest_A/loadTest_G get to read them.
+  var t = JPE_DEEPLINK.getParam('type');
+  var testAParam = JPE_DEEPLINK.getParam('test_a');
+  var partAParam = JPE_DEEPLINK.getParam('part_a');
+  var testGParam = JPE_DEEPLINK.getParam('test_g');
+  var partGParam = JPE_DEEPLINK.getParam('part_g');
+  if (t && document.querySelector('[data-type="'+t+'"]')) {
+    switchType(t);
+    if (t === 'academic') {
+      var n = parseInt(testAParam, 10);
+      if (n >= 1 && n <= TESTS_A.length) loadTest_A(n - 1);
+      if (partAParam && document.querySelector('#academic-content .part-filter-pill[data-part="'+partAParam+'"]')) showPart_A(partAParam);
+    } else if (t === 'general') {
+      var ng = parseInt(testGParam, 10);
+      if (ng >= 1 && ng <= TESTS_G.length) loadTest_G(ng - 1);
+      if (partGParam && document.querySelector('#general-content .part-filter-pill[data-part="'+partGParam+'"]')) showPart_G(partGParam);
+    }
+  }
+})();
 </script>
 
 </body>
