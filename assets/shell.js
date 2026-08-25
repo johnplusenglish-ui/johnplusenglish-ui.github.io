@@ -237,6 +237,52 @@ window.addEventListener('popstate', function(){
   }, {passive:true});
 })();
 
+// Let the mobile Menu button be dragged up/down to wherever's comfortable to
+// reach one-handed; position is remembered. A tap (no real vertical move)
+// still opens/closes the sidebar as normal via the button's own onclick.
+(function(){
+  var btn = document.querySelector('.sidebar-collapse-btn');
+  if (!btn) return;
+  var STORAGE_KEY = 'jpe-menu-btn-bottom';
+  var dragging = false, moved = false, startY = 0, startBottom = 0;
+  function isMobile(){ return window.innerWidth <= 900; }
+  function clampBottom(v){
+    var h = btn.offsetHeight || 52;
+    var max = window.innerHeight - h - 12 - 52;
+    return Math.max(12, Math.min(max, v));
+  }
+  try {
+    var saved = parseFloat(localStorage.getItem(STORAGE_KEY));
+    if (!isNaN(saved) && isMobile()) btn.style.bottom = clampBottom(saved) + 'px';
+  } catch(e){}
+  btn.addEventListener('pointerdown', function(e){
+    if (!isMobile() || e.pointerType === 'mouse') return;
+    dragging = true; moved = false;
+    startY = e.clientY;
+    startBottom = parseFloat(getComputedStyle(btn).bottom) || 16;
+  });
+  btn.addEventListener('pointermove', function(e){
+    if (!dragging) return;
+    var dy = e.clientY - startY;
+    if (Math.abs(dy) > 8) {
+      moved = true;
+      btn.style.bottom = clampBottom(startBottom - dy) + 'px';
+    }
+  });
+  function endDrag(){
+    if (!dragging) return;
+    dragging = false;
+    if (moved) {
+      try { localStorage.setItem(STORAGE_KEY, parseFloat(getComputedStyle(btn).bottom)); } catch(e){}
+    }
+  }
+  btn.addEventListener('pointerup', endDrag);
+  btn.addEventListener('pointercancel', endDrag);
+  btn.addEventListener('click', function(e){
+    if (moved) { e.preventDefault(); e.stopImmediatePropagation(); moved = false; }
+  }, true);
+})();
+
 (function(){
   if (!window.fetch) return;
   var warmed = Object.create(null);
