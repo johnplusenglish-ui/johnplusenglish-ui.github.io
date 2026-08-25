@@ -84,14 +84,16 @@ function jpeRows(group, el, open){
     if (reduce){ el.style.maxHeight = 'none'; return; }
     el.style.maxHeight = el.scrollHeight + 'px';
     // release to 'none' after the open finishes so nested menus can grow freely
-    el._jpeT = setTimeout(function(){ el.style.maxHeight = 'none'; el._jpeT = null; }, 200);
+    el._jpeT = setTimeout(function(){ el.style.maxHeight = 'none'; el._jpeT = null; }, 150);
   } else {
     if (!el){ group.classList.remove('open'); return; }
     if (reduce){ el.style.maxHeight = '0px'; group.classList.remove('open'); return; }
+    // freeze the open height, then drive height AND padding to 0 together so the
+    // container never floors on its padding (which would snap the row below it).
     el.style.maxHeight = el.scrollHeight + 'px';
     void el.offsetHeight;
+    group.classList.remove('open');
     el.style.maxHeight = '0px';
-    el._jpeT = setTimeout(function(){ group.classList.remove('open'); el.style.maxHeight = ''; el._jpeT = null; }, 170);
   }
 }
 function toggleCatGroup(btn){
