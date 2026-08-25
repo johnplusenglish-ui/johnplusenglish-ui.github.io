@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <script src="lock.js"></script>
+<script src="/assets/deeplink.js"></script>
 <base target="_top">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -955,6 +956,7 @@ function updateOverall(){
 function showPart(n){
   document.querySelectorAll('.part-filter-pill').forEach(p=>p.classList.toggle('active', +p.dataset.part===n));
   document.querySelectorAll('.part-section').forEach(s=>s.classList.toggle('visible', +s.dataset.part===n));
+  if (document.querySelector('[data-type="tests"]').classList.contains('active')) JPE_DEEPLINK.setParams({part: n});
 }
 
 var READING_FONTS = {
@@ -996,6 +998,7 @@ function loadTest(i){
   resetP5(); resetP6(); resetP7();
   showPart(5);
   try{ localStorage.setItem('jpe-c2-reading-test', i); }catch(e){}
+  if (document.querySelector('[data-type="tests"]').classList.contains('active')) JPE_DEEPLINK.setParams({type:'tests', test: i+1});
   window.scrollTo(0,0);
 }
 function buildPicker(){
@@ -1014,6 +1017,12 @@ function switchType(type){
     document.querySelector('[data-type="'+t+'"]').classList.toggle('active', t===type);
     document.getElementById(t+'-content').classList.toggle('active', t===type);
   });
+  if (type === 'tests') {
+    var activePill = document.querySelector('.part-filter-pill.active');
+    JPE_DEEPLINK.setParams({type: 'tests', test: TI+1, part: activePill ? activePill.dataset.part : null});
+  } else {
+    JPE_DEEPLINK.setParams({type: null, test: null, part: null});
+  }
 }
 function toggleGuideSidebar(el){ el.closest('.guide-shell').classList.toggle('sb-collapsed'); }
 
@@ -1258,6 +1267,18 @@ let startTest = 0;
 try{ const sv = parseInt(localStorage.getItem('jpe-c2-reading-test'),10); if(sv>=0 && sv<TESTS.length) startTest = sv; }catch(e){}
 loadTest(startTest);
 buildGuide();
+
+// Restore a shared/refreshed deep link: ?type=tests&test=4&part=6
+(function(){
+  var t = JPE_DEEPLINK.getParam('type');
+  var n = parseInt(JPE_DEEPLINK.getParam('test'), 10);
+  var p = parseInt(JPE_DEEPLINK.getParam('part'), 10);
+  if (t === 'tests') {
+    switchType('tests');
+    if (n >= 1 && n <= TESTS.length) loadTest(n - 1);
+    if (p && document.querySelector('.part-filter-pill[data-part="'+p+'"]')) showPart(p);
+  }
+})();
 </script>
 </body>
 </html>
