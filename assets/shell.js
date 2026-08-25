@@ -64,19 +64,46 @@ function closeSidebar(){
   document.getElementById('sidebar').classList.remove('open');
   document.getElementById('sidebarBackdrop').classList.remove('open');
 }
+// Animate a collapsible (.cat-rows/.level-rows) to its exact content height so
+// there is no dead space to crawl through — open/close stays tight regardless of
+// how many items the menu holds. After opening we release to 'none' so nested
+// menus can grow the parent without clipping.
+function jpeRows(el, open){
+  if (!el) return;
+  if (el._jpeT){ clearTimeout(el._jpeT); el._jpeT = null; }
+  var reduce = false;
+  try { reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch(e){}
+  if (open){
+    if (reduce){ el.style.maxHeight = 'none'; return; }
+    el.style.maxHeight = el.scrollHeight + 'px';
+    el._jpeT = setTimeout(function(){ el.style.maxHeight = 'none'; el._jpeT = null; }, 200);
+  } else {
+    if (reduce){ el.style.maxHeight = '0px'; return; }
+    el.style.maxHeight = el.scrollHeight + 'px';
+    void el.offsetHeight;
+    el.style.maxHeight = '0px';
+  }
+}
 function toggleCatGroup(btn){
   var group = btn.closest('.cat-group');
-  var wasOpen = group.classList.contains('open');
-  var siblings = group.parentElement.querySelectorAll(':scope > .cat-group.open');
-  siblings.forEach(function(g){ if (g !== group) g.classList.remove('open'); });
-  group.classList.toggle('open', !wasOpen);
+  var willOpen = !group.classList.contains('open');
+  group.parentElement.querySelectorAll(':scope > .cat-group.open').forEach(function(g){
+    if (g !== group){ g.classList.remove('open'); jpeRows(g.querySelector(':scope > .cat-rows'), false); }
+  });
+  group.classList.toggle('open', willOpen);
+  jpeRows(group.querySelector(':scope > .cat-rows'), willOpen);
 }
 function toggleLevelGroup(btn){
   var group = btn.closest('.level-group');
-  var wasOpen = group.classList.contains('open');
-  var siblings = group.parentElement.querySelectorAll(':scope > .level-group.open');
-  siblings.forEach(function(g){ if (g !== group) g.classList.remove('open'); });
-  group.classList.toggle('open', !wasOpen);
+  var willOpen = !group.classList.contains('open');
+  group.parentElement.querySelectorAll(':scope > .level-group.open').forEach(function(g){
+    if (g !== group){ g.classList.remove('open'); jpeRows(g.querySelector(':scope > .level-rows'), false); }
+  });
+  group.classList.toggle('open', willOpen);
+  // keep the enclosing category free to grow so the level grid isn't clipped
+  var catRows = group.closest('.cat-rows');
+  if (catRows){ if (catRows._jpeT){ clearTimeout(catRows._jpeT); catRows._jpeT = null; } catRows.style.maxHeight = 'none'; }
+  jpeRows(group.querySelector(':scope > .level-rows'), willOpen);
 }
 function jpeContentSrc(href){
   if (href === 'index.html' || href === '') return 'home-content.html';
@@ -102,12 +129,24 @@ function jpeActivate(href){
   var rows = document.querySelectorAll('.sidebar a.row');
   for (var i=0;i<rows.length;i++){ rows[i].classList.remove('active'); }
   var groups = document.querySelectorAll('.sidebar .cat-group');
-  for (var j=0;j<groups.length;j++){ groups[j].classList.remove('open'); }
+  for (var j=0;j<groups.length;j++){
+    groups[j].classList.remove('open');
+    var cr = groups[j].querySelector(':scope > .cat-rows');
+    if (cr){ if (cr._jpeT){ clearTimeout(cr._jpeT); cr._jpeT = null; } cr.style.maxHeight = ''; }
+  }
+  var levels = document.querySelectorAll('.sidebar .level-group');
+  for (var k=0;k<levels.length;k++){
+    levels[k].classList.remove('open');
+    var lr = levels[k].querySelector(':scope > .level-rows');
+    if (lr){ if (lr._jpeT){ clearTimeout(lr._jpeT); lr._jpeT = null; } lr.style.maxHeight = ''; }
+  }
   var link = document.querySelector('.sidebar a.row[href="' + href + '"]');
   if (link) {
     link.classList.add('active');
     var group = link.closest('.cat-group');
-    if (group) group.classList.add('open');
+    if (group){ group.classList.add('open'); var gr = group.querySelector(':scope > .cat-rows'); if (gr) gr.style.maxHeight = 'none'; }
+    var lg = link.closest('.level-group');
+    if (lg){ lg.classList.add('open'); var lgr = lg.querySelector(':scope > .level-rows'); if (lgr) lgr.style.maxHeight = 'none'; }
   }
 }
 function jpeNavigate(href, push){
