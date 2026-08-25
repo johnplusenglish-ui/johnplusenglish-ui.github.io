@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <script src="lock.js"></script>
+<script src="/assets/deeplink.js"></script>
 <base target="_top">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1129,6 +1130,7 @@ function switchMainTab(tab, btn) {
   }
   if (btn) btn.classList.add('on');
   document.getElementById('tab-' + tab).classList.add('active');
+  JPE_DEEPLINK.setParams({type: tab === 'guide' ? null : tab});
 }
 
 /* ===== set-rail engine (shared by Part 1, 2, 3) ===== */
@@ -1419,6 +1421,12 @@ buildPart1();
 buildPart2();
 buildPart3();
 buildPhraseBank();
+
+// Restore a shared/refreshed deep link: ?type=part2
+(function(){
+  var t = JPE_DEEPLINK.getParam('type');
+  if (t && document.getElementById('tab-'+t)) switchMainTab(t);
+})();
 </script>
 </body>
 </html>

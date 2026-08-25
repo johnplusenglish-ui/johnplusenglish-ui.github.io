@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <script src="lock.js"></script>
+<script src="/assets/deeplink.js"></script>
 <base target="_top">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -4672,6 +4673,7 @@ function switchType(type){
     document.getElementById(t+'-content').classList.toggle('active', t===type);
   });
   if(type==='academic-t1'){ initializeCharts(); resizeVisibleCharts(); }
+  JPE_DEEPLINK.setParams({type: type === 'guide' ? null : type});
 }
 
 /* ============ SET RAIL (shared by the 4 task-type tabs) ============ */
@@ -5118,6 +5120,11 @@ buildGuideW();
 enhanceResPanes();
 updateResPaneTitle(document.querySelector('#phrases-content .res-pane.active'));
 
+// Restore a shared/refreshed deep link: ?type=academic-t1
+(function(){
+  var t = JPE_DEEPLINK.getParam('type');
+  if (t && document.querySelector('[data-type="'+t+'"]')) switchType(t);
+})();
 </script>
 
 </div><!-- .wrap -->
