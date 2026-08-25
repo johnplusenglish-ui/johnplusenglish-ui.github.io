@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <script src="lock.js"></script>
+<script src="/assets/deeplink.js"></script>
 <base target="_top">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -601,7 +602,7 @@ const NUM_TESTS = 20;
 // ══════════════════════════════════════════
 //  STATE
 // ══════════════════════════════════════════
-let currentTest = 0;
+let currentTest = null;
 let activeParts = new Set(['1']);
 let p1State = {}, p1Checked = false;
 let p2Checked = false;
@@ -648,7 +649,7 @@ function buildSidebar() {
   }).join('');
 }
 
-function switchTest(idx) {
+function switchTest(idx, opts) {
   currentTest = idx;
   document.getElementById('uoeEmptyState').style.display = 'none';
   document.getElementById('uoeContentArea').style.display = 'block';
@@ -656,8 +657,11 @@ function switchTest(idx) {
   buildSidebar();
   loadAll();
   applyFilter();
-  const top = document.getElementById('uoeContentArea').getBoundingClientRect().top + window.scrollY - 90;
-  window.scrollTo({top: Math.max(0, top), behavior: 'smooth'});
+  JPE_DEEPLINK.setParams({type:'tests', test: idx+1});
+  if (!opts || !opts.skipScroll) {
+    const top = document.getElementById('uoeContentArea').getBoundingClientRect().top + window.scrollY - 90;
+    window.scrollTo({top: Math.max(0, top), behavior: 'smooth'});
+  }
 }
 
 
@@ -1316,6 +1320,7 @@ function switchType(type){
     document.querySelector('[data-type="'+t+'"]').classList.toggle('active', t===type);
     document.getElementById(t+'-content').classList.toggle('active', t===type);
   });
+  JPE_DEEPLINK.setParams({type: type, test: type==='tests' && currentTest!==null ? currentTest+1 : null});
 }
 function toggleGuideSidebar(el){ el.closest('.guide-shell').classList.toggle('sb-collapsed'); }
 
@@ -1588,6 +1593,15 @@ function buildGuide(){
 }
 buildGuide();
 
+// Restore a shared/refreshed deep link: ?type=tests&test=4
+(function(){
+  var t = JPE_DEEPLINK.getParam('type');
+  var n = parseInt(JPE_DEEPLINK.getParam('test'), 10);
+  if (t === 'tests') {
+    switchType('tests');
+    if (n >= 1 && n <= NUM_TESTS) switchTest(n - 1, {skipScroll: true});
+  }
+})();
 </script>
 </body>
 </html>
