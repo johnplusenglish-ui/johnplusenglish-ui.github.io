@@ -65,10 +65,18 @@ function closeSidebar(){
   document.getElementById('sidebarBackdrop').classList.remove('open');
 }
 function toggleCatGroup(btn){
-  btn.closest('.cat-group').classList.toggle('open');
+  var group = btn.closest('.cat-group');
+  var wasOpen = group.classList.contains('open');
+  var siblings = group.parentElement.querySelectorAll(':scope > .cat-group.open');
+  siblings.forEach(function(g){ if (g !== group) g.classList.remove('open'); });
+  group.classList.toggle('open', !wasOpen);
 }
 function toggleLevelGroup(btn){
-  btn.closest('.level-group').classList.toggle('open');
+  var group = btn.closest('.level-group');
+  var wasOpen = group.classList.contains('open');
+  var siblings = group.parentElement.querySelectorAll(':scope > .level-group.open');
+  siblings.forEach(function(g){ if (g !== group) g.classList.remove('open'); });
+  group.classList.toggle('open', !wasOpen);
 }
 function jpeContentSrc(href){
   if (href === 'index.html' || href === '') return 'home-content.html';
