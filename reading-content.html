@@ -37,9 +37,6 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .topnav-links a:hover{color:var(--sky)}
 
 .page-header{padding:2rem 2rem 1rem;max-width:960px;margin:0 auto;position:relative;z-index:1}
-.back-pill{display:inline-flex;align-items:center;gap:.4rem;font-family:'Outfit',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-decoration:none;background:var(--card);border:1.5px solid var(--border);border-radius:999px;padding:.5rem 1.1rem .5rem .85rem;cursor:pointer;transition:all .18s;margin-bottom:1.2rem;box-shadow:var(--shadow-sm)}
-.back-pill:hover{color:var(--accent);border-color:var(--accent)}
-.back-pill svg{width:13px;height:13px;flex-shrink:0}
 .topic-hero{display:flex;align-items:flex-start;gap:1.2rem}
 .topic-icon{width:52px;height:52px;border-radius:12px;background:color-mix(in srgb, #2D3047 8%, #fff);color:#2D3047;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .topic-icon svg{width:24px;height:24px;stroke-width:1.8;fill:none;stroke:currentColor}
@@ -47,32 +44,54 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 
 .wrap{max-width:960px;margin:0 auto;padding:0 2rem 4rem;position:relative;z-index:1}
 
-/* topic picker: category menu (left) + selected category's passages (right) - same
-   shape as the Open Cloze picker on prepositions-content.html/phrasal-verbs-content.html */
-.topic-picker{display:grid;grid-template-columns:250px 1fr;gap:1.25rem;align-items:start;margin-top:1.8rem;transition:grid-template-columns .22s ease}
-.topic-picker.sb-collapsed{grid-template-columns:48px 1fr}
-.rp-sidebar{background:var(--card);border:1.5px solid var(--border);border-radius:14px;box-shadow:var(--shadow-sm);overflow:hidden;display:flex;flex-direction:column;position:sticky;top:80px;max-height:calc(100vh - 100px)}
-.rp-sidebar-header{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.75rem 1rem;border-bottom:1px solid var(--border);cursor:pointer;user-select:none}
-.rp-sidebar.collapsed .rp-sidebar-header{border-bottom:none;justify-content:center;padding:.7rem .4rem}
-.rp-sidebar-header-label{font-family:'Outfit',sans-serif;font-size:.66rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.rp-sidebar.collapsed .rp-sidebar-header-label{display:none}
-.rp-sidebar-toggle{width:26px;height:26px;border-radius:7px;border:1.5px solid var(--border);background:transparent;display:flex;align-items:center;justify-content:center;color:var(--muted);cursor:pointer;transition:all .15s;flex-shrink:0}
-.rp-sidebar-toggle:hover{border-color:var(--ink);color:var(--ink)}
-.rp-sidebar-toggle svg{width:13px;height:13px;transition:transform .2s ease}
-.rp-sidebar.collapsed .rp-sidebar-toggle svg{transform:rotate(180deg)}
-.rp-sidebar.collapsed .rp-sidebar-scroll{display:none}
-.rp-sidebar-scroll{flex:1;min-height:0;overflow-y:auto;padding:.4rem}
-.rp-cat-item{display:flex;align-items:center;gap:.6rem;padding:.65rem .75rem;border-radius:10px;cursor:pointer;font-family:'Outfit',sans-serif;color:var(--muted);border:1.5px solid transparent;background:none;transition:all .15s;margin-bottom:.15rem;font-size:.84rem;font-weight:700;line-height:1.3}
-.rp-cat-item:hover{color:var(--ink);background:var(--cream)}
-.rp-cat-item.active{color:var(--ink);border-color:var(--accent);background:var(--accent-light)}
-.rp-cat-dot{width:6px;height:6px;border-radius:50%;background:var(--border);flex-shrink:0}
-.rp-cat-item.active .rp-cat-dot{background:var(--accent)}
-.rp-cat-name{flex:1;font-size:.84rem;font-weight:700}
-.rp-cat-count{font-weight:600;color:var(--muted);background:var(--cream);border-radius:20px;padding:.1rem .55rem;font-size:.66rem;flex-shrink:0}
-.rp-cat-item.active .rp-cat-count{background:var(--card);color:var(--accent)}
-.rp-content-head{display:flex;align-items:center;gap:.55rem;padding-bottom:.5rem;margin-bottom:.7rem;border-bottom:1.5px solid var(--border)}
-.rp-content-head h2{font-family:'Outfit',sans-serif;font-size:1rem;font-weight:800;color:var(--ink)}
-.topic-group-list{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm)}
+/* ── Tabs (page-level: B1 / B2 / C1 / C2) ── */
+.tabs-wrap{max-width:960px;margin:0 auto;padding:0 2rem;position:relative;z-index:1}
+.tabs{display:flex;gap:4px;row-gap:4px;border-bottom:none;position:relative;margin-bottom:1.5rem;align-items:flex-end;flex-wrap:wrap;padding-top:8px}
+.tabs::before{content:'';position:absolute;left:0;right:0;bottom:0;height:1.5px;background:var(--border)}
+.tab{position:relative;font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;padding:.5rem 1.25rem;color:var(--muted);cursor:pointer;white-space:nowrap;background:color-mix(in srgb,var(--ink) 4%,transparent);border:1.5px solid var(--border);border-radius:12px 12px 0 0;transition:background .18s,color .18s,box-shadow .18s,border-color .18s}
+.tab:not(.active):hover{background:color-mix(in srgb,var(--ink) 8%,transparent);color:var(--ink)}
+.tab:not(.active):focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tab.active{outline:none;background:var(--cream);border-color:var(--tab-accent,var(--accent));border-bottom:none!important;color:var(--tab-accent,var(--accent));padding-top:calc(.5rem + 3px);box-shadow:0 -3px 10px rgba(45,48,71,.06);z-index:2}
+
+/* ── Guide-style shell: categories sidebar + content pane ── */
+.guide-shell{display:grid;grid-template-columns:250px 1fr;gap:1.2rem;align-items:start}
+.guide-shell.sb-collapsed{grid-template-columns:48px 1fr}
+.wb-sb{background:var(--card);border:1.5px solid var(--border);border-radius:14px;box-shadow:var(--shadow-sm);overflow:hidden;display:flex;flex-direction:column;position:sticky;top:80px;max-height:calc(100vh - 100px)}
+.wb-sb-head{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.75rem 1rem;border-bottom:1px solid var(--border);cursor:pointer;user-select:none}
+.wb-sb-head>span{font-size:.66rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.wb-sb-head .sb-chev{width:26px;height:26px;border:1.5px solid var(--border);border-radius:7px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:1rem;line-height:1;flex-shrink:0;transition:transform .2s}
+.wb-sb-head .sb-chev svg{width:13px;height:13px}
+.wb-sb-head:hover .sb-chev{color:var(--ink);border-color:var(--muted)}
+.wb-sb-scroll{flex:1;min-height:0;overflow-y:auto;padding:.4rem}
+.wb-sb-foot{padding:.55rem .9rem;border-top:1px solid var(--border);font-size:.66rem;color:var(--muted)}
+.wb-sb-foot b{color:var(--ink)}
+.guide-shell.sb-collapsed .wb-sb-scroll,.guide-shell.sb-collapsed .wb-sb-foot,.guide-shell.sb-collapsed .wb-sb-head>span{display:none}
+.guide-shell.sb-collapsed .wb-sb-head{justify-content:center;padding:.7rem .4rem}
+.guide-shell.sb-collapsed .sb-chev{transform:rotate(180deg)}
+
+.guide-nav-item{display:flex;align-items:center;gap:.6rem;padding:.65rem .75rem;border-radius:10px;cursor:pointer;font-family:'Outfit',sans-serif;color:var(--muted);border:1.5px solid transparent;background:none;transition:all .15s;text-align:left;width:100%;font-size:.84rem;font-weight:700;line-height:1.3}
+.guide-nav-item:hover{color:var(--ink);background:var(--cream)}
+.guide-nav-item.active{color:var(--ink);border-color:var(--accent);background:var(--accent-light)}
+.guide-nav-dot{width:6px;height:6px;border-radius:50%;background:var(--border);flex-shrink:0}
+.guide-nav-item.active .guide-nav-dot{background:var(--accent)}
+.guide-nav-count{margin-left:auto;font-weight:600;color:var(--muted);background:var(--cream);border-radius:20px;padding:.1rem .55rem;font-size:.66rem;flex-shrink:0}
+.guide-nav-item.active .guide-nav-count{background:var(--card);color:var(--accent)}
+
+@media(max-width:820px){.guide-shell{grid-template-columns:1fr}.wb-sb{position:static;max-height:none}}
+
+/* ── content pane ── */
+.wb-pane{background:var(--card);border:1.5px solid var(--border);border-radius:14px;box-shadow:var(--shadow-sm);overflow:hidden;min-width:0}
+.wb-pane-head{padding:1rem 1.25rem .8rem;border-bottom:1.5px solid var(--border)}
+.wb-pane-head h2{margin:0;font-size:1.2rem;font-weight:800;letter-spacing:-.01em}
+.wb-pane-head p{margin:.35rem 0 0;font-size:.85rem;color:var(--muted);line-height:1.5}
+.wb-pane-body{padding:1.1rem 1.25rem 1.4rem}
+.wb-pane-head.with-actions{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.guide-quicknav-back{font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:700;padding:.35rem .8rem;border-radius:999px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s;margin-bottom:.7rem;display:inline-block}
+.guide-quicknav-back:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
+.passage-tag{font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);background:var(--accent-light);display:inline-block;padding:.25rem .7rem;border-radius:6px;margin:0 0 .6rem .5rem}
+.wb-pane-head-title{font-family:'Outfit',sans-serif;font-size:clamp(1.2rem,2.6vw,1.6rem);font-weight:900;letter-spacing:-.01em;line-height:1.2;margin:0}
+
+.topic-group-list{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden}
 .topic-row{display:flex;align-items:center;gap:.9rem;width:100%;text-align:left;padding:.8rem 1.1rem;border:none;background:none;cursor:pointer;font-family:'Outfit',sans-serif;border-bottom:1px solid var(--border);transition:background .12s}
 .topic-row:last-child{border-bottom:none}
 .topic-row:hover{background:var(--cream)}
@@ -81,30 +100,12 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .topic-row-arr{color:var(--muted);font-size:1rem;flex-shrink:0}
 .topic-row:hover .topic-row-arr{color:var(--accent)}
 
-/* reading view */
-#readingView{display:none}
-.back-link{display:inline-flex;align-items:center;gap:.4rem;font-size:.85rem;font-weight:600;color:var(--muted);text-decoration:none;margin:1.6rem 0 1.2rem;transition:color .2s;background:none;border:none;cursor:pointer;font-family:'Outfit',sans-serif;padding:0}
-.back-link:hover{color:var(--accent)}
-.back-link svg{width:14px;height:14px;flex-shrink:0}
-.passage-topbar{margin-bottom:1.1rem}
-.passage-tag{font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);background:var(--accent-light);display:inline-block;padding:.25rem .7rem;border-radius:6px;margin-bottom:.7rem}
-.passage-title{font-family:'Outfit',sans-serif;font-size:clamp(1.5rem,3.2vw,2.1rem);font-weight:900;letter-spacing:-.01em;line-height:1.15;margin-bottom:1.2rem}
-
-.level-select{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.6rem;margin-bottom:1.6rem}
-.segmented{display:inline-flex;flex-wrap:wrap;gap:.25rem;background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:.3rem;box-shadow:var(--shadow-sm)}
-.seg{font-family:'Outfit',sans-serif;display:flex;flex-direction:column;align-items:flex-start;gap:.1rem;padding:.5rem 1.1rem;border:none;border-radius:12px;background:transparent;color:var(--segc,var(--ink));cursor:pointer;transition:all .18s;text-align:left;line-height:1.25}
-.seg:hover{background:var(--cream)}
-.seg .seg-main{font-size:.82rem;font-weight:800;letter-spacing:.01em}
-.seg .seg-sub{font-size:.65rem;font-weight:500;color:var(--muted)}
-.seg.active{background:var(--segc,var(--accent));color:#fff}
-.seg.active .seg-sub{color:rgba(255,255,255,.75)}
-.level-actions{display:flex;align-items:center;gap:.5rem}
+.level-actions{display:flex;align-items:center;gap:.5rem;flex-shrink:0}
 .icon-btn{display:inline-flex;align-items:center;gap:.45rem;font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:600;padding:.5rem .95rem;border:1.5px solid var(--border);border-radius:10px;background:var(--card);color:var(--ink);cursor:pointer;transition:all .18s;box-shadow:var(--shadow-sm)}
 .icon-btn:hover{border-color:var(--ink);background:var(--ink);color:var(--cream)}
 .icon-btn svg{width:14px;height:14px}
-@media print{.icon-btn,.back-pill,.topnav,.page-header{display:none!important}}
+@media print{.icon-btn,.topnav,.page-header,.tabs-wrap,.wb-sb,.guide-quicknav-back{display:none!important}}
 
-.passage-card{max-width:700px;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:1.9rem 2.1rem}
 .passage-body{font-size:1.02rem;line-height:1.85;-webkit-user-select:text;user-select:text;font-family:var(--reading-font,inherit)}
 
 .font-switch{position:relative;display:inline-flex}
@@ -120,13 +121,10 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .passage-body p:last-child{margin-bottom:0}
 .passage-body mark.hl{background:#FFE08A;color:inherit;padding:.05em 0;border-radius:2px;cursor:pointer;transition:background .15s;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .passage-body mark.hl:hover{background:#FFD35C}
-.hl-hint{font-size:.75rem;color:var(--muted);margin:-.9rem 0 1.3rem;font-style:italic}
-@media print{.hl-hint{display:none}.passage-card{box-shadow:none;border:none;padding:0}}
+.hl-hint{font-size:.75rem;color:var(--muted);margin:0 0 1.1rem;font-style:italic}
+@media print{.hl-hint{display:none}.wb-pane{box-shadow:none;border:none}.wb-pane-body{padding:0}}
 
-@media(max-width:600px){.wrap{padding:0 1.2rem 3rem}.page-header{padding:1.6rem 1.2rem 1rem}.topic-picker{grid-template-columns:1fr}.topic-row{flex-wrap:wrap}.topic-row-region{width:100%;order:1}.topic-row-title{order:2;width:100%}.topic-row-arr{display:none}.segmented{width:100%;justify-content:space-between}.seg{flex:1;align-items:center;text-align:center;padding:.5rem .3rem}.seg .seg-main{font-size:.74rem}.seg .seg-sub{font-size:.58rem}.level-actions{margin-left:auto}.passage-card{padding:1.3rem 1.3rem}}
-.back-pill{display:inline-flex;align-items:center;gap:.4rem;font-family:'Outfit',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-decoration:none;background:var(--card);border:1.5px solid var(--border);border-radius:999px;padding:.5rem 1.1rem .5rem .85rem;cursor:pointer;transition:all .18s;margin-bottom:1.2rem;box-shadow:var(--shadow-sm)}
-.back-pill:hover{color:var(--sky);border-color:var(--sky);box-shadow:var(--shadow-md);transform:translateY(-1px)}
-.back-pill svg{width:13px;height:13px;flex-shrink:0}
+@media(max-width:600px){.wrap{padding:0 1.2rem 3rem}.page-header{padding:1.6rem 1.2rem 1rem}.tabs-wrap{padding:0 1.2rem}.topic-row{flex-wrap:wrap}.topic-row-region{width:100%;order:1}.topic-row-title{order:2;width:100%}.topic-row-arr{display:none}.wb-pane-head.with-actions{flex-direction:column}.level-actions{margin-left:0}}
 </style>
 <style>.topnav{display:none!important}</style></head>
 <body>
@@ -144,17 +142,29 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
   </div>
 </div>
 
-<div class="wrap">
-  <div id="topicGrid"></div>
+<div class="tabs-wrap">
+  <div class="tabs" role="tablist" id="levelTabs"></div>
+</div>
 
-  <div id="readingView">
-    <div class="passage-topbar">
-      <button class="back-pill" onclick="closePassage()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
+<div class="wrap">
+  <div class="guide-shell" id="guideShell">
+    <div class="wb-sb" id="wbSb">
+      <div class="wb-sb-head" onclick="toggleWbSidebar()"><span>Categories</span><div class="sb-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div></div>
+      <div class="wb-sb-scroll" id="catNav"></div>
+      <div class="wb-sb-foot" id="sbFoot"></div>
     </div>
-    <div class="passage-tag" id="passageTag"></div>
-    <div class="level-select">
-      <div class="segmented" id="levelSeg"></div>
-      <div class="level-actions">
+    <div class="wb-pane" id="wbPane">
+      <div class="wb-pane-head" id="catHead">
+        <h2 id="catHeadTitle"></h2>
+        <p id="catHeadSub"></p>
+      </div>
+      <div class="wb-pane-head with-actions" id="readerHead" style="display:none">
+        <div>
+          <button class="guide-quicknav-back" onclick="closePassage()" id="readerBackBtn"></button>
+          <div class="passage-tag" id="passageTag"></div>
+          <h2 class="wb-pane-head-title" id="passageTitle"></h2>
+        </div>
+        <div class="level-actions">
         <div class="font-switch" id="fontSwitch">
           <button class="icon-btn" onclick="toggleFontMenu()" aria-haspopup="true" aria-expanded="false">Aa &nbsp;Reading font</button>
           <div class="font-switch-menu" id="fontMenu">
@@ -167,12 +177,15 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
         </div>
         <button class="icon-btn" onclick="window.print()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Print</button>
         <button class="icon-btn" id="exportBtn" onclick="exportPNG()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>Export</button>
+        </div>
       </div>
-    </div>
-    <p class="hl-hint">Select any text to highlight it. Tap a highlight to remove it.</p>
-    <div class="passage-card">
-      <h1 class="passage-title" id="passageTitle"></h1>
-      <div class="passage-body" id="passageBody"></div>
+      <div class="wb-pane-body" id="catBody">
+        <div class="topic-group-list" id="rpContent"></div>
+      </div>
+      <div class="wb-pane-body" id="readerBody" style="display:none">
+        <p class="hl-hint">Select any text to highlight it. Tap a highlight to remove it.</p>
+        <div class="passage-body" id="passageBody"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -522,20 +535,19 @@ function handleSelection(){
   renderPassageBody();
 }
 
-function renderLevelSeg(){
-  const seg = document.getElementById('levelSeg');
+function renderLevelTabs(){
+  const tabs = document.getElementById('levelTabs');
   let html = '';
   ['B1','B2','C1','C2'].forEach(function(lvl){
-    const wc = WORD_COUNTS[currentPassage][lvl];
-    html += '<button class="seg' + (lvl===currentLevel?' active':'') + '" onclick="setLevel(\'' + lvl + '\')"><span class="seg-main">' + lvl + '</span><span class="seg-sub">' + wc + ' words</span></button>';
+    html += '<button class="tab' + (lvl===currentLevel?' active':'') + '" data-level="' + lvl + '" onclick="setLevel(\'' + lvl + '\')" style="--tab-accent:#2176FF">' + lvl + '</button>';
   });
-  seg.innerHTML = html;
+  tabs.innerHTML = html;
 }
 
 function setLevel(lvl){
   currentLevel = lvl;
-  renderLevelSeg();
-  renderPassageBody();
+  renderLevelTabs();
+  if (currentPassage) renderPassageBody();
 }
 
 function groupedTopics(){
@@ -557,79 +569,81 @@ function groupedTopics(){
 let currentCatIdx = 0;
 const TOPIC_SIDEBAR_COLLAPSED_KEY = 'jpe-reading-sidebar-collapsed';
 
-function renderTopicGrid(){
+function renderSidebarNav(){
   const grouped = groupedTopics();
   let collapsed = false;
   try { collapsed = localStorage.getItem(TOPIC_SIDEBAR_COLLAPSED_KEY) === '1'; } catch(e){}
+  document.getElementById('guideShell').classList.toggle('sb-collapsed', collapsed);
 
   let menuHtml = '';
   grouped.catNames.forEach(function(cat, i){
-    menuHtml += '<div class="rp-cat-item' + (i === currentCatIdx ? ' active' : '') + '" onclick="selectCategory(' + i + ')"><span class="rp-cat-dot"></span><span class="rp-cat-name">' + escapeHtml(cat) + '</span><span class="rp-cat-count">' + grouped.groups[cat].length + '</span></div>';
+    menuHtml += '<button class="guide-nav-item' + (i === currentCatIdx ? ' active' : '') + '" onclick="selectCategory(' + i + ')"><span class="guide-nav-dot"></span><span>' + escapeHtml(cat) + '</span><span class="guide-nav-count">' + grouped.groups[cat].length + '</span></button>';
   });
+  document.getElementById('catNav').innerHTML = menuHtml;
+  document.getElementById('sbFoot').innerHTML = READING_PASSAGES.length + ' passages across <b>' + grouped.catNames.length + '</b> categories';
 
-  const html =
-    '<div class="topic-picker' + (collapsed ? ' sb-collapsed' : '') + '" id="topicPicker">' +
-      '<div class="rp-sidebar' + (collapsed ? ' collapsed' : '') + '" id="rpSidebarWrap">' +
-        '<div class="rp-sidebar-header" onclick="toggleTopicSidebar()">' +
-          '<span class="rp-sidebar-header-label">Categories</span>' +
-          '<button class="rp-sidebar-toggle" type="button" aria-label="Collapse categories" onclick="event.stopPropagation();toggleTopicSidebar()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>' +
-        '</div>' +
-        '<div class="rp-sidebar-scroll" id="rpCatMenu">' + menuHtml + '</div>' +
-      '</div>' +
-      '<div id="rpContent"></div>' +
-    '</div>';
-
-  document.getElementById('topicGrid').innerHTML = html;
   renderCategoryContent();
 }
 
 function selectCategory(idx){
   currentCatIdx = idx;
-  document.querySelectorAll('#rpCatMenu .rp-cat-item').forEach(function(el, i){
+  document.querySelectorAll('#catNav .guide-nav-item').forEach(function(el, i){
     el.classList.toggle('active', i === idx);
   });
-  renderCategoryContent();
+  closePassage();
+}
+
+function showListView(){
+  document.getElementById('catHead').style.display = 'block';
+  document.getElementById('catBody').style.display = 'block';
+  document.getElementById('readerHead').style.display = 'none';
+  document.getElementById('readerBody').style.display = 'none';
+}
+
+function showReaderView(){
+  document.getElementById('catHead').style.display = 'none';
+  document.getElementById('catBody').style.display = 'none';
+  document.getElementById('readerHead').style.display = 'flex';
+  document.getElementById('readerBody').style.display = 'block';
 }
 
 function renderCategoryContent(){
   const grouped = groupedTopics();
   const cat = grouped.catNames[currentCatIdx];
   const items = grouped.groups[cat] || [];
-  let html = '<div class="rp-content-head"><h2>' + escapeHtml(cat) + '</h2><span class="rp-cat-count">' + items.length + '</span></div>';
-  html += '<div class="topic-group-list">';
+  document.getElementById('catHeadTitle').textContent = cat;
+  document.getElementById('catHeadSub').textContent = items.length + (items.length === 1 ? ' passage' : ' passages');
+  let html = '';
   items.forEach(function(it){
     html += '<button class="topic-row" onclick="openPassage(\'' + it.id + '\')"><span class="topic-row-region">' + escapeHtml(it.region) + '</span><span class="topic-row-title">' + escapeHtml(it.title) + '</span><span class="topic-row-arr">&rsaquo;</span></button>';
   });
-  html += '</div>';
   document.getElementById('rpContent').innerHTML = html;
+  showListView();
 }
 
-function toggleTopicSidebar(){
-  const sb = document.getElementById('rpSidebarWrap');
-  const picker = document.getElementById('topicPicker');
-  const collapsed = sb.classList.toggle('collapsed');
-  picker.classList.toggle('sb-collapsed', collapsed);
+function toggleWbSidebar(){
+  const shell = document.getElementById('guideShell');
+  const collapsed = shell.classList.toggle('sb-collapsed');
   try { localStorage.setItem(TOPIC_SIDEBAR_COLLAPSED_KEY, collapsed ? '1' : '0'); } catch(e){}
 }
 
 function openPassage(id){
   currentPassage = id;
-  currentLevel = 'B2';
   const p = READING_PASSAGES.find(function(x){ return x.id === id; });
+  const grouped = groupedTopics();
+  document.getElementById('readerBackBtn').textContent = '‹ ' + grouped.catNames[currentCatIdx];
   document.getElementById('passageTag').textContent = p.tag;
   document.getElementById('passageTitle').textContent = p.title;
-  renderLevelSeg();
+  renderLevelTabs();
   renderPassageBody();
-  document.getElementById('topicGrid').style.display = 'none';
-  document.getElementById('readingView').style.display = 'block';
+  showReaderView();
   window.scrollTo(0,0);
   history.replaceState(null, '', '#' + id);
 }
 
 function closePassage(){
   currentPassage = null;
-  document.getElementById('readingView').style.display = 'none';
-  document.getElementById('topicGrid').style.display = 'block';
+  renderCategoryContent();
   window.scrollTo(0,0);
   history.replaceState(null, '', location.pathname);
 }
@@ -834,7 +848,8 @@ async function exportPNG(){
   }
 }
 
-renderTopicGrid();
+renderLevelTabs();
+renderSidebarNav();
 
 (function(){
   const hash = location.hash.replace('#','');
