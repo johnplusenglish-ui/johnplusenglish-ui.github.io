@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <script src="lock.js"></script>
+<script src="/assets/deeplink.js"></script>
 <base target="_top">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1198,6 +1199,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
       tab.classList.add('active');
       document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
       if (history.replaceState) history.replaceState(null, '', '#' + tab.dataset.tab);
+      JPE_DEEPLINK.setParams({tab: tab.dataset.tab === 'guide' ? null : tab.dataset.tab});
     });
   });
 </script>
@@ -1946,7 +1948,7 @@ renderPvList(); renderPvPane();
   document.getElementById('nounTotal').textContent=nounData.length;
   renderNounList(); renderNounPane();
   (function(){
-    var h=decodeURIComponent(location.hash.slice(1));
+    var h=JPE_DEEPLINK.getParam('tab') || decodeURIComponent(location.hash.slice(1));
     var t=h&&document.querySelector('.tab[data-tab="'+h+'"]');
     if(t) t.click();
   })();

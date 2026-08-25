@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <script src="lock.js"></script>
+<script src="/assets/deeplink.js"></script>
 <base target="_top">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1003,6 +1004,7 @@ function switchTab(key){
   document.querySelectorAll('.tab').forEach(function(t){t.classList.toggle('active',t.dataset.tab===key)});
   document.querySelectorAll('.tab-content').forEach(function(p){p.classList.toggle('active',p.id==='tab-'+key)});
   if(history.replaceState) history.replaceState(null,'','#'+key);
+  JPE_DEEPLINK.setParams({tab: key === 'guide' ? null : key});
 }
 document.querySelectorAll('.tab').forEach(function(t){t.addEventListener('click',function(){switchTab(t.dataset.tab)})});
 
@@ -1526,7 +1528,7 @@ renderDepList(); renderDepPane();
 renderPpList(); renderPpPane();
 clozeRenderSidebar();
 (function(){
-  var h=decodeURIComponent(location.hash.slice(1));
+  var h=JPE_DEEPLINK.getParam('tab') || decodeURIComponent(location.hash.slice(1));
   if(h&&document.getElementById('tab-'+h)) switchTab(h);
 })();
 </script>
