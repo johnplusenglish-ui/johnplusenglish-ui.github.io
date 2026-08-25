@@ -68,42 +68,50 @@ function closeSidebar(){
 // there is no dead space to crawl through — open/close stays tight regardless of
 // how many items the menu holds. After opening we release to 'none' so nested
 // menus can grow the parent without clipping.
-function jpeRows(el, open){
-  if (!el) return;
-  if (el._jpeT){ clearTimeout(el._jpeT); el._jpeT = null; }
+// Animate a collapsible (.cat-rows/.level-rows) to its exact content height so
+// there is no dead space to crawl through — open/close stays tight regardless of
+// how many items the menu holds. The 'open' class carries the padding/border, so
+// on OPEN we add it up front and on CLOSE we keep it until the collapse finishes
+// (removing it early would drop the padding and jump the content).
+function jpeRows(group, el, open){
+  if (!group) return;
+  if (el && el._jpeT){ clearTimeout(el._jpeT); el._jpeT = null; }
   var reduce = false;
   try { reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch(e){}
   if (open){
+    group.classList.add('open');
+    if (!el) return;
     if (reduce){ el.style.maxHeight = 'none'; return; }
     el.style.maxHeight = el.scrollHeight + 'px';
+    // release to 'none' after the open finishes so nested menus can grow freely
     el._jpeT = setTimeout(function(){ el.style.maxHeight = 'none'; el._jpeT = null; }, 200);
   } else {
-    if (reduce){ el.style.maxHeight = '0px'; return; }
+    if (!el){ group.classList.remove('open'); return; }
+    if (reduce){ el.style.maxHeight = '0px'; group.classList.remove('open'); return; }
     el.style.maxHeight = el.scrollHeight + 'px';
     void el.offsetHeight;
     el.style.maxHeight = '0px';
+    el._jpeT = setTimeout(function(){ group.classList.remove('open'); el.style.maxHeight = ''; el._jpeT = null; }, 170);
   }
 }
 function toggleCatGroup(btn){
   var group = btn.closest('.cat-group');
   var willOpen = !group.classList.contains('open');
   group.parentElement.querySelectorAll(':scope > .cat-group.open').forEach(function(g){
-    if (g !== group){ g.classList.remove('open'); jpeRows(g.querySelector(':scope > .cat-rows'), false); }
+    if (g !== group) jpeRows(g, g.querySelector(':scope > .cat-rows'), false);
   });
-  group.classList.toggle('open', willOpen);
-  jpeRows(group.querySelector(':scope > .cat-rows'), willOpen);
+  jpeRows(group, group.querySelector(':scope > .cat-rows'), willOpen);
 }
 function toggleLevelGroup(btn){
   var group = btn.closest('.level-group');
   var willOpen = !group.classList.contains('open');
   group.parentElement.querySelectorAll(':scope > .level-group.open').forEach(function(g){
-    if (g !== group){ g.classList.remove('open'); jpeRows(g.querySelector(':scope > .level-rows'), false); }
+    if (g !== group) jpeRows(g, g.querySelector(':scope > .level-rows'), false);
   });
-  group.classList.toggle('open', willOpen);
   // keep the enclosing category free to grow so the level grid isn't clipped
   var catRows = group.closest('.cat-rows');
   if (catRows){ if (catRows._jpeT){ clearTimeout(catRows._jpeT); catRows._jpeT = null; } catRows.style.maxHeight = 'none'; }
-  jpeRows(group.querySelector(':scope > .level-rows'), willOpen);
+  jpeRows(group, group.querySelector(':scope > .level-rows'), willOpen);
 }
 function jpeContentSrc(href){
   if (href === 'index.html' || href === '') return 'home-content.html';
