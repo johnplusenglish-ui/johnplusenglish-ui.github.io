@@ -491,22 +491,27 @@ window.addEventListener('popstate', function(){
     toolbar.innerHTML =
       '<div class="jpe-ann-title">Annotate <span id="jpeAnnCount"></span></div>' +
       '<div class="jpe-ann-row">' +
+        '<button id="jpeAnnPinToggle">Pin: Off</button>' +
         '<button id="jpeAnnUndo">Undo</button>' +
         '<button id="jpeAnnClear">Clear all</button>' +
         '<button id="jpeAnnCopy">Copy JSON</button>' +
-        '<button id="jpeAnnExit">&times;</button>' +
       '</div>';
     document.body.appendChild(toolbar);
+    document.getElementById('jpeAnnPinToggle').onclick = annToggle;
     document.getElementById('jpeAnnUndo').onclick = annUndo;
     document.getElementById('jpeAnnClear').onclick = annClearAll;
     document.getElementById('jpeAnnCopy').onclick = annCopyJSON;
-    document.getElementById('jpeAnnExit').onclick = annToggle;
     return toolbar;
   }
 
   function updateCount(){
     var el = document.getElementById('jpeAnnCount');
     if (el) el.textContent = '(' + anns.length + ' total)';
+    var pinBtn = document.getElementById('jpeAnnPinToggle');
+    if (pinBtn) {
+      pinBtn.textContent = mode ? 'Pin: On' : 'Pin: Off';
+      pinBtn.classList.toggle('jpe-ann-pin-on', mode);
+    }
   }
 
   function pinStyleTag(doc){
@@ -656,7 +661,6 @@ window.addEventListener('popstate', function(){
   function annToggle(){
     mode = !mode;
     try { sessionStorage.setItem(MODE_KEY, mode ? '1' : '0'); } catch(e){}
-    ensureToolbar().style.display = mode ? 'flex' : 'none';
     updateCount();
     renderPins();
   }
@@ -665,13 +669,11 @@ window.addEventListener('popstate', function(){
   var frameEl = jpeEnsureFrame();
   if (frameEl) frameEl.addEventListener('load', attachFrameListeners);
 
+  ensureToolbar();
   try {
-    if (sessionStorage.getItem(MODE_KEY) === '1') {
-      mode = true;
-      ensureToolbar().style.display = 'flex';
-      updateCount();
-    }
+    if (sessionStorage.getItem(MODE_KEY) === '1') mode = true;
   } catch(e){}
+  updateCount();
 
   attachFrameListeners();
 })();
