@@ -28,7 +28,7 @@ var JPE_DEEPLINK = {
           if (v === null || v === undefined || v === '') url.searchParams.delete(k);
           else url.searchParams.set(k, v);
         });
-        return url.pathname + url.search;
+        return url.pathname + url.search + url.hash;
       };
       history.replaceState(null, '', apply(new URL(location.href)));
       if (window.parent && window.parent !== window) {

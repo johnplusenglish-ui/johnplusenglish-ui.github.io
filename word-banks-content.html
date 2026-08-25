@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <script src="lock.js"></script>
+<script src="/assets/deeplink.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Word Banks · johnplusenglish</title>
@@ -288,8 +289,9 @@ const POS_SHORT  = {'n.':'Nouns','adj.':'Adjectives','v.':'Verbs','phr.v.':'Phra
                     'colloc.':'Collocations','idiom':'Idioms','phrase':'Phrases','slang':'Slang'};
 
 const GROUP_COLOR = ['#2176FF'];
+const dlBankId = JPE_DEEPLINK.getParam('bank');
 const hashId = decodeURIComponent(location.hash.slice(1));
-let bankId = (hashId && TOPICS[hashId]) ? hashId : GROUPS[0].ids[0];
+let bankId = (dlBankId && TOPICS[dlBankId]) ? dlBankId : (hashId && TOPICS[hashId]) ? hashId : GROUPS[0].ids[0];
 let tab='browse', pos='all', tier='all';
 let selMode=false;                 /* word-picking mode */
 let curShown=[];                   /* entries currently rendered in Browse */
@@ -480,6 +482,7 @@ function goBank(id, skipHash){
   if (!TOPICS[id]) return;
   bankId = id; pos='all';
   if (!skipHash) history.pushState({bank:id}, '', '#'+id);
+  JPE_DEEPLINK.setParams({bank: id});
   renderRail(); render();
   /* stacked layout: the menu sits above the pane, so bring the pane into view */
   if (window.matchMedia('(max-width:820px)').matches){
