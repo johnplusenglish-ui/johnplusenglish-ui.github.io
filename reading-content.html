@@ -24,7 +24,7 @@
 })();
 </script>
 <style>
-:root{--sky:#2176FF;--sky-light:#E8EEFF;--sea:#1DD3B0;--sea-light:#E4F8F6;--coral:#FF6B6B;--coral-light:#FFE8E8;--lavender:#9B72CF;--lavender-light:#F0E8FA;--cream:#F7F6F3;--ink:#2D3047;--muted:#7A7D8E;--border:#E8E5DF;--card:#fff;--radius:14px;--radius-sm:10px;--shadow-sm:0 1px 3px rgba(45,48,71,.06);--shadow-md:0 4px 14px rgba(45,48,71,.08);--accent:#1E293B;--accent-light:#E2E8F0}
+:root{--sky:#2176FF;--sky-light:#E8EEFF;--sea:#1DD3B0;--sea-light:#E4F8F6;--coral:#FF6B6B;--coral-light:#FFE8E8;--lavender:#9B72CF;--lavender-light:#F0E8FA;--cream:#F7F6F3;--ink:#2D3047;--muted:#7A7D8E;--border:#E8E5DF;--card:#fff;--radius:14px;--radius-sm:10px;--shadow-sm:0 1px 3px rgba(45,48,71,.06);--shadow-md:0 4px 14px rgba(45,48,71,.08);--accent:#2176FF;--accent-light:#E8EEFF}
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth;overflow-x:hidden;overflow-y:scroll}
 body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-y:auto}
@@ -49,25 +49,27 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 
 /* topic picker: category menu (left) + selected category's passages (right) - same
    shape as the Open Cloze picker on prepositions-content.html/phrasal-verbs-content.html */
-.topic-picker{display:grid;grid-template-columns:220px 1fr;gap:1.25rem;align-items:start;margin-top:1.8rem;transition:grid-template-columns .22s ease}
-.topic-picker.sb-collapsed{grid-template-columns:52px 1fr}
-.rp-sidebar{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);display:flex;flex-direction:column}
-.rp-sidebar-header{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.75rem 1rem;border-bottom:1px solid var(--border);cursor:pointer}
-.rp-sidebar.collapsed .rp-sidebar-header{border-bottom:none;justify-content:center;padding:.75rem .5rem}
-.rp-sidebar-header-label{font-family:'Outfit',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topic-picker{display:grid;grid-template-columns:250px 1fr;gap:1.25rem;align-items:start;margin-top:1.8rem;transition:grid-template-columns .22s ease}
+.topic-picker.sb-collapsed{grid-template-columns:48px 1fr}
+.rp-sidebar{background:var(--card);border:1.5px solid var(--border);border-radius:14px;box-shadow:var(--shadow-sm);overflow:hidden;display:flex;flex-direction:column;position:sticky;top:80px;max-height:calc(100vh - 100px)}
+.rp-sidebar-header{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.75rem 1rem;border-bottom:1px solid var(--border);cursor:pointer;user-select:none}
+.rp-sidebar.collapsed .rp-sidebar-header{border-bottom:none;justify-content:center;padding:.7rem .4rem}
+.rp-sidebar-header-label{font-family:'Outfit',sans-serif;font-size:.66rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rp-sidebar.collapsed .rp-sidebar-header-label{display:none}
 .rp-sidebar-toggle{width:26px;height:26px;border-radius:7px;border:1.5px solid var(--border);background:transparent;display:flex;align-items:center;justify-content:center;color:var(--muted);cursor:pointer;transition:all .15s;flex-shrink:0}
-.rp-sidebar-toggle:hover{border-color:var(--accent);color:var(--accent)}
+.rp-sidebar-toggle:hover{border-color:var(--ink);color:var(--ink)}
 .rp-sidebar-toggle svg{width:13px;height:13px;transition:transform .2s ease}
 .rp-sidebar.collapsed .rp-sidebar-toggle svg{transform:rotate(180deg)}
 .rp-sidebar.collapsed .rp-sidebar-scroll{display:none}
-.rp-sidebar-scroll{padding:.5rem}
-.rp-cat-item{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.65rem .75rem;border-radius:8px;cursor:pointer;transition:background .12s;margin-bottom:.15rem;font-family:'Outfit',sans-serif}
-.rp-cat-item:hover{background:var(--cream)}
-.rp-cat-item.active{background:var(--accent);color:#fff}
-.rp-cat-name{font-size:.85rem;font-weight:700}
+.rp-sidebar-scroll{flex:1;min-height:0;overflow-y:auto;padding:.4rem}
+.rp-cat-item{display:flex;align-items:center;gap:.6rem;padding:.65rem .75rem;border-radius:10px;cursor:pointer;font-family:'Outfit',sans-serif;color:var(--muted);border:1.5px solid transparent;background:none;transition:all .15s;margin-bottom:.15rem;font-size:.84rem;font-weight:700;line-height:1.3}
+.rp-cat-item:hover{color:var(--ink);background:var(--cream)}
+.rp-cat-item.active{color:var(--ink);border-color:var(--accent);background:var(--accent-light)}
+.rp-cat-dot{width:6px;height:6px;border-radius:50%;background:var(--border);flex-shrink:0}
+.rp-cat-item.active .rp-cat-dot{background:var(--accent)}
+.rp-cat-name{flex:1;font-size:.84rem;font-weight:700}
 .rp-cat-count{font-weight:600;color:var(--muted);background:var(--cream);border-radius:20px;padding:.1rem .55rem;font-size:.66rem;flex-shrink:0}
-.rp-cat-item.active .rp-cat-count{background:rgba(255,255,255,.2);color:#fff}
+.rp-cat-item.active .rp-cat-count{background:var(--card);color:var(--accent)}
 .rp-content-head{display:flex;align-items:center;gap:.55rem;padding-bottom:.5rem;margin-bottom:.7rem;border-bottom:1.5px solid var(--border)}
 .rp-content-head h2{font-family:'Outfit',sans-serif;font-size:1rem;font-weight:800;color:var(--ink)}
 .topic-group-list{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm)}
@@ -564,7 +566,7 @@ function renderTopicGrid(){
 
   let menuHtml = '';
   grouped.catNames.forEach(function(cat, i){
-    menuHtml += '<div class="rp-cat-item' + (i === currentCatIdx ? ' active' : '') + '" onclick="selectCategory(' + i + ')"><span class="rp-cat-name">' + escapeHtml(cat) + '</span><span class="rp-cat-count">' + grouped.groups[cat].length + '</span></div>';
+    menuHtml += '<div class="rp-cat-item' + (i === currentCatIdx ? ' active' : '') + '" onclick="selectCategory(' + i + ')"><span class="rp-cat-dot"></span><span class="rp-cat-name">' + escapeHtml(cat) + '</span><span class="rp-cat-count">' + grouped.groups[cat].length + '</span></div>';
   });
 
   const html =
