@@ -32,6 +32,7 @@ var JPE_TITLES = {
   "ielts-writing.html": "IELTS Writing - johnplusenglish",
   "index.html": "johnplusenglish - Online English Classes - johnplusenglish",
   "interview-questions.html": "Interview Questions - johnplusenglish",
+  "mistakes.html": "My Mistakes - johnplusenglish",
   "odd-one-out.html": "Odd One Out - johnplusenglish",
   "oet-listening.html": "OET Listening · johnplusenglish",
   "oet-reading.html": "OET Reading (Parts A to C) · johnplusenglish",

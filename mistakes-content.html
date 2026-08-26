@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="lock.js"></script>
+<script src="mistakes.js"></script>
+<base target="_top">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Mistakes - johnplusenglish</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --sky:#2176FF;--cream:#F7F6F3;--ink:#2D3047;--muted:#7A7D8E;--border:#E8E5DF;--card:#fff;
+  --sea:#0F7D71;--coral:#C0392B;--radius:14px;
+}
+body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:720px;margin:0 auto;padding:2.4rem 1.4rem 5rem}
+.head{display:flex;align-items:flex-start;gap:1rem;margin-bottom:.4rem}
+.head-icon{width:46px;height:46px;border-radius:12px;background:#E8EEFF;color:var(--sky);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.head-icon svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.9}
+h1{font-size:clamp(1.7rem,4vw,2.4rem);font-weight:900;letter-spacing:-.01em;line-height:1.1}
+.sub{color:var(--muted);font-size:.92rem;margin:.2rem 0 1.6rem}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem;margin-bottom:1.6rem}
+.count{font-weight:800;font-size:.85rem;background:var(--card);border:1.5px solid var(--border);border-radius:20px;padding:.35rem .9rem}
+.count b{color:var(--sky)}
+select{font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:600;color:var(--ink);background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:.4rem .7rem;cursor:pointer}
+.btn{font-family:'Outfit',sans-serif;font-weight:700;font-size:.85rem;border:1.5px solid var(--border);border-radius:10px;background:var(--card);color:var(--ink);cursor:pointer;padding:.5rem 1rem;transition:all .15s}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--sky);border-color:var(--sky);color:#fff}
+.btn.primary:hover{filter:brightness(.95)}
+.btn.good{background:var(--sea);border-color:var(--sea);color:#fff}
+.btn.again{background:#fff;border-color:var(--coral);color:var(--coral)}
+.btn.ghost{color:var(--muted);border-color:transparent}
+.btn.ghost:hover{color:var(--coral);border-color:transparent}
+.card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);box-shadow:0 4px 14px rgba(45,48,71,.06);padding:1.6rem 1.5rem;margin-bottom:1.2rem}
+.tag{display:inline-block;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);background:var(--cream);border:1.5px solid var(--border);border-radius:6px;padding:.16rem .5rem;margin-bottom:.9rem}
+.q{font-size:1.15rem;font-weight:700;line-height:1.5}
+.reveal{margin-top:1.1rem;padding-top:1.1rem;border-top:1.5px dashed var(--border);display:none}
+.reveal.show{display:block}
+.lbl{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.15rem}
+.ans{font-size:1.05rem;font-weight:800;color:var(--sea);margin-bottom:.7rem}
+.yours{font-size:.92rem;color:var(--coral);text-decoration:line-through;opacity:.8}
+.actions{display:flex;gap:.6rem;margin-top:1.3rem;flex-wrap:wrap}
+.progress{font-size:.78rem;color:var(--muted);margin-top:.2rem}
+.empty{text-align:center;padding:4rem 1rem;color:var(--muted)}
+.empty svg{width:54px;height:54px;stroke:var(--border);fill:none;stroke-width:1.5;margin-bottom:1rem}
+.empty h2{font-size:1.3rem;font-weight:800;color:var(--ink);margin-bottom:.4rem}
+.empty p{font-size:.92rem;max-width:380px;margin:0 auto}
+@media(max-width:600px){.wrap{padding:1.6rem 1rem 4rem}.q{font-size:1.05rem}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <div class="head-icon"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+    <div>
+      <h1>My Mistakes</h1>
+      <div class="sub">Every question you get wrong across the site lands here. Recall it, check yourself, and it only leaves once you have got it right twice.</div>
+    </div>
+  </div>
+
+  <div class="bar" id="bar">
+    <span class="count" id="count"></span>
+    <select id="filter" aria-label="Filter by source"></select>
+    <button class="btn ghost" id="clearBtn" title="Delete all saved mistakes">Clear all</button>
+  </div>
+
+  <div id="stage"></div>
+</div>
+
+<script>
+(function(){
+  var store = window.jpeMistakes;
+  var stage = document.getElementById('stage');
+  var countEl = document.getElementById('count');
+  var filterEl = document.getElementById('filter');
+  var bar = document.getElementById('bar');
+  var current = null;
+  var srcFilter = '';
+
+  function all(){ return store ? store.load() : []; }
+  function pool(){
+    var a = all();
+    if (srcFilter) a = a.filter(function(m){ return m.src === srcFilter; });
+    // due first: lowest box, then oldest
+    a.sort(function(x,y){ return (x.box||0)-(y.box||0) || (x.ts||0)-(y.ts||0); });
+    return a;
+  }
+
+  function esc(s){ return (s==null?'':''+s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+
+  function buildFilter(){
+    var a = all();
+    var srcs = [];
+    a.forEach(function(m){ if(m.src && srcs.indexOf(m.src)===-1) srcs.push(m.src); });
+    srcs.sort();
+    if (srcFilter && srcs.indexOf(srcFilter)===-1) srcFilter = '';
+    filterEl.innerHTML = '<option value="">All sources</option>' +
+      srcs.map(function(s){ return '<option value="'+esc(s)+'"'+(s===srcFilter?' selected':'')+'>'+esc(s)+'</option>'; }).join('');
+    filterEl.style.display = srcs.length > 1 ? '' : 'none';
+  }
+
+  function render(){
+    buildFilter();
+    var a = all();
+    var p = pool();
+    countEl.innerHTML = '<b>'+p.length+'</b> to review' + (a.length!==p.length ? ' ('+a.length+' total)' : '');
+    document.getElementById('clearBtn').style.display = a.length ? '' : 'none';
+
+    if (!a.length){
+      bar.style.display = 'none';
+      stage.innerHTML = '<div class="empty">'
+        + '<svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>'
+        + '<h2>Nothing to review yet</h2>'
+        + '<p>Do some exercises around the site. Any answer you get wrong will be saved here so you can practise it later.</p></div>';
+      return;
+    }
+    bar.style.display = 'flex';
+    if (!p.length){
+      stage.innerHTML = '<div class="empty"><h2>All clear here</h2><p>No mistakes to review for this source. Switch the filter to “All sources”.</p></div>';
+      return;
+    }
+    current = p[0];
+    var m = current;
+    stage.innerHTML =
+      '<div class="card">'
+      + (m.type ? '<span class="tag">'+esc(m.type)+(m.src?' · '+esc(m.src):'')+'</span>' : (m.src?'<span class="tag">'+esc(m.src)+'</span>':''))
+      + '<div class="q">'+esc(m.q || '(no prompt)')+'</div>'
+      + '<div class="reveal" id="rev">'
+        + '<div class="lbl">Correct answer</div><div class="ans">'+esc(m.correct)+'</div>'
+        + (m.your ? '<div class="lbl">You wrote</div><div class="yours">'+esc(m.your)+'</div>' : '')
+      + '</div>'
+      + '<div class="actions" id="act">'
+        + '<button class="btn primary" id="showBtn">Show answer</button>'
+      + '</div>'
+      + (m.n>1 ? '<div class="progress">Missed '+m.n+' times</div>' : '')
+      + '</div>';
+
+    document.getElementById('showBtn').onclick = function(){
+      document.getElementById('rev').classList.add('show');
+      document.getElementById('act').innerHTML =
+        '<button class="btn good" id="gotBtn">Got it</button>'
+      + '<button class="btn again" id="againBtn">Review again</button>';
+      document.getElementById('gotBtn').onclick = function(){ store.grade(m.id, true); render(); };
+      document.getElementById('againBtn').onclick = function(){ store.grade(m.id, false); render(); };
+    };
+  }
+
+  filterEl.onchange = function(){ srcFilter = filterEl.value; render(); };
+  document.getElementById('clearBtn').onclick = function(){
+    if (confirm('Delete all saved mistakes? This cannot be undone.')){ store.clear(); render(); }
+  };
+
+  if (!store){
+    stage.innerHTML = '<div class="empty"><h2>Review is unavailable</h2><p>The mistakes store did not load.</p></div>';
+    bar.style.display = 'none';
+  } else {
+    render();
+  }
+})();
+</script>
+</body>
+</html>
