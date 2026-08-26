@@ -455,12 +455,25 @@ window.addEventListener('popstate', function(){
 (function(){
   var DATA_KEY = 'jpe-annotations';
   var MODE_KEY = 'jpe-annotate-mode';
+  var VIS_KEY = 'jpe-annotate-visible';
   var anns = [];
   try { anns = JSON.parse(localStorage.getItem(DATA_KEY)) || []; } catch(e){ anns = []; }
   var nextN = 1;
   anns.forEach(function(a){ if (a.n >= nextN) nextN = a.n + 1; });
 
-  var mode = false, toolbar = null;
+  var mode = false, toolbar = null, visible = false;
+
+  // Show/hide the whole annotation toolbar. It stays hidden for normal visitors;
+  // Cmd/Ctrl+Shift+A reveals it (John only). Hiding it also forces pin mode off so
+  // no crosshair/pins can linger once the tool is put away.
+  function setToolbarVisible(v){
+    visible = v;
+    try { sessionStorage.setItem(VIS_KEY, v ? '1' : '0'); } catch(e){}
+    if (toolbar) toolbar.classList.toggle('jpe-ann-open', v);
+    if (!v && mode){ mode = false; try { sessionStorage.setItem(MODE_KEY, '0'); } catch(e){} }
+    updateCount();
+    renderPins();
+  }
 
   function save(){ try { localStorage.setItem(DATA_KEY, JSON.stringify(anns)); } catch(e){} }
   function currentPage(){ return location.pathname.split('/').pop() || 'index.html'; }
@@ -658,7 +671,7 @@ window.addEventListener('popstate', function(){
   function keyHandler(e){
     if ((e.metaKey || e.ctrlKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
       e.preventDefault();
-      annToggle();
+      setToolbarVisible(!visible);
     }
   }
 
@@ -675,8 +688,10 @@ window.addEventListener('popstate', function(){
 
   ensureToolbar();
   try {
-    if (sessionStorage.getItem(MODE_KEY) === '1') mode = true;
+    if (sessionStorage.getItem(VIS_KEY) === '1') visible = true;
+    if (visible && sessionStorage.getItem(MODE_KEY) === '1') mode = true;
   } catch(e){}
+  if (toolbar) toolbar.classList.toggle('jpe-ann-open', visible);
   updateCount();
 
   attachFrameListeners();
