@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="lock.js"></script>
+<script src="/assets/deeplink.js"></script>
+<base target="_top">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OET Reading (Parts A to C) · johnplusenglish</title>
+<meta name="description" content="Practice test for OET Reading: Part A expeditious reading across four healthcare texts, Part B short workplace texts, Part C two long healthcare texts.">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>
+(function(){
+  var FONTS = {
+    outfit: "'Outfit',sans-serif",
+    georgia: "Georgia,'Times New Roman',serif",
+    verdana: "Verdana,Geneva,sans-serif",
+    atkinson: "'Atkinson Hyperlegible',sans-serif",
+    lexend: "'Lexend',sans-serif"
+  };
+  var saved = 'outfit';
+  try { saved = localStorage.getItem('jpe-reading-font') || 'outfit'; } catch(e) {}
+  document.documentElement.style.setProperty('--reading-font', FONTS[saved] || FONTS.outfit);
+})();
+</script>
+<style>
+:root{--sky:#2176FF;--sky-light:#E8EEFF;--sun:#7A7D8E;--cream:#F7F6F3;--ink:#2D3047;--muted:#7A7D8E;--border:#E8E5DF;--card:#fff;--radius:14px;--radius-sm:10px;--shadow-sm:0 1px 3px rgba(45,48,71,.06);--shadow-md:0 4px 14px rgba(45,48,71,.08);--accent:#2176FF;--accent-light:#E8EEFF;--correct:#1DD3B0;--wrong:#FF3B30}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;overflow-x:hidden;overflow-y:scroll}
+body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,var(--border) 1px,transparent 1px);background-size:28px 28px;opacity:.4;pointer-events:none;z-index:0}
+.topnav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(247,246,243,.88);backdrop-filter:blur(16px);border-bottom:1.5px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-family:'Outfit',sans-serif;font-size:1.3rem;font-weight:800;letter-spacing:-.02em;color:var(--ink);text-decoration:none}
+.nav-logo span{color:#2563EB}
+.topnav-links{display:flex;gap:1.2rem;align-items:center}
+.topnav-links a{font-size:.8rem;font-weight:600;color:var(--muted);text-decoration:none}
+
+.page-header{padding:2rem 2rem 1rem;max-width:960px;margin:0 auto;position:relative;z-index:1}
+.topic-hero{display:flex;align-items:flex-start;gap:1.2rem}
+.topic-icon{width:52px;height:52px;border-radius:12px;background:color-mix(in srgb, #2D3047 8%, #fff);color:#2D3047;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.topic-icon svg{width:24px;height:24px;stroke-width:1.8;fill:none;stroke:currentColor}
+.page-header h1{font-family:'Outfit',sans-serif;font-size:clamp(1.6rem,3.6vw,2.3rem);line-height:1.15;letter-spacing:-.01em;font-weight:900}
+.hero-meta{display:flex;gap:1.4rem;margin-top:.5rem;flex-wrap:wrap}
+.hero-meta span{font-size:.8rem;color:var(--muted)}
+.hero-meta strong{color:var(--ink);font-weight:800}
+
+.wrap{max-width:960px;margin:0 auto;padding:0 2rem 4rem;position:relative;z-index:1}
+.font-switch{position:relative;display:flex;justify-content:flex-end;margin:0 0 .8rem}
+.font-switch-btn{display:inline-flex;align-items:center;gap:.4rem;font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:700;padding:.4rem .9rem;border:1.5px solid var(--border);border-radius:20px;background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s}
+.font-switch-btn:hover{border-color:var(--accent);color:var(--ink)}
+.font-switch-menu{position:absolute;top:calc(100% + 6px);right:0;background:var(--card);border:1.5px solid var(--border);border-radius:12px;box-shadow:var(--shadow-md);padding:.4rem;display:none;flex-direction:column;gap:.1rem;min-width:210px;z-index:20}
+.font-switch-menu.open{display:flex}
+.font-opt{font-size:.87rem;text-align:left;padding:.55rem .65rem;border:none;border-radius:8px;background:transparent;color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:.6rem;font-family:'Outfit',sans-serif}
+.font-opt:hover{background:var(--cream)}
+.font-opt.active{background:var(--accent-light);color:var(--accent);font-weight:700}
+.font-opt-check{opacity:0;font-size:.8rem}
+.font-opt.active .font-opt-check{opacity:1}
+.font-opt-label{font-family:var(--opt-font,inherit);font-size:.95rem}
+
+.test-picker{display:flex;align-items:center;gap:.45rem;flex-wrap:wrap;margin:1rem 0 0}
+.test-picker-label{display:none}
+.test-pill{font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:700;padding:.4rem .9rem;border-radius:999px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:background .16s,color .16s,border-color .16s}
+.test-pill:hover{color:var(--ink);border-color:var(--muted)}
+.test-pill.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.test-topic{display:none}
+.test-topic strong{color:var(--ink);font-weight:700}
+
+.tabs-wrap{max-width:960px;margin:0 auto;padding:0 2rem;position:relative;z-index:1}
+.tabs{display:flex;gap:4px;row-gap:4px;border-bottom:none;position:relative;margin-bottom:1.5rem;align-items:flex-end;flex-wrap:wrap;padding-top:8px}
+.tabs::before{content:'';position:absolute;left:0;right:0;bottom:0;height:1.5px;background:var(--border)}
+.tab{position:relative;font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;padding:.5rem 1.25rem;color:var(--muted);cursor:pointer;white-space:nowrap;background:color-mix(in srgb,var(--ink) 4%,transparent);border:1.5px solid var(--border);border-radius:12px 12px 0 0;transition:background .18s,color .18s,box-shadow .18s,border-color .18s}
+.tab:not(.active):hover{background:color-mix(in srgb,var(--ink) 8%,transparent);color:var(--ink)}
+.tab:not(.active):focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tab.active{outline:none}
+.tab.active{background:var(--cream);border-color:var(--tab-accent,var(--accent));border-bottom:none!important;color:var(--tab-accent,var(--accent));padding-top:calc(.5rem + 3px);box-shadow:0 -3px 10px rgba(45,48,71,.06);z-index:2}
+.content-area{display:none}
+.content-area.active{display:block}
+
+.guide-shell{display:grid;grid-template-columns:250px 1fr;gap:1.2rem;align-items:start}
+.wb-sb{background:var(--card);border:1.5px solid var(--border);border-radius:14px;box-shadow:var(--shadow-sm);overflow:hidden;display:flex;flex-direction:column;position:sticky;top:80px;max-height:calc(100vh - 100px)}
+.wb-sb-head{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.75rem 1rem;border-bottom:1px solid var(--border);cursor:pointer;user-select:none}
+.wb-sb-head>span{font-size:.66rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.wb-sb-head .sb-chev{width:26px;height:26px;border:1.5px solid var(--border);border-radius:7px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:1rem;line-height:1;flex-shrink:0;transition:transform .2s}
+.wb-sb-head .sb-chev svg{width:13px;height:13px}
+.wb-sb-head:hover .sb-chev{color:var(--ink);border-color:var(--muted)}
+.wb-sb-scroll{flex:1;min-height:0;overflow-y:auto;padding:.4rem}
+.wb-sb-foot{padding:.55rem .9rem;border-top:1px solid var(--border);font-size:.66rem;color:var(--muted)}
+.wb-sb-foot b{color:var(--ink)}
+.guide-shell.sb-collapsed{grid-template-columns:48px 1fr}
+.guide-shell.sb-collapsed .wb-sb-scroll,.guide-shell.sb-collapsed .wb-sb-foot,.guide-shell.sb-collapsed .wb-sb-head>span{display:none}
+.guide-shell.sb-collapsed .wb-sb-head{justify-content:center;padding:.7rem .4rem}
+.guide-shell.sb-collapsed .sb-chev{transform:rotate(180deg)}
+.guide-nav-item{display:flex;align-items:center;gap:.6rem;padding:.65rem .75rem;border-radius:10px;cursor:pointer;font-family:'Outfit',sans-serif;color:var(--muted);border:1.5px solid transparent;background:none;transition:all .15s;text-align:left;width:100%;font-size:.84rem;font-weight:700;line-height:1.3}
+.guide-nav-item:hover{color:var(--ink);background:var(--cream)}
+.guide-nav-item.active{color:#fff;border-color:var(--accent);background:var(--accent)}
+.guide-nav-dot{width:6px;height:6px;border-radius:50%;background:var(--border);flex-shrink:0}
+.guide-nav-item.active .guide-nav-dot{background:#fff}
+.guide-nav-group-label{font-family:Outfit,sans-serif;font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:.7rem .75rem .3rem}
+.guide-nav-group-label:first-child{padding-top:.2rem}
+.wb-pane{background:var(--card);border:1.5px solid var(--border);border-radius:14px;box-shadow:var(--shadow-sm);overflow:hidden;min-width:0}
+.wb-pane-head{padding:1rem 1.25rem .8rem;border-bottom:1.5px solid var(--border)}
+.wb-pane-head h2{margin:0;font-size:1.2rem;font-weight:800;letter-spacing:-.01em}
+.wb-pane-head p{margin:.35rem 0 0;font-size:.85rem;color:var(--muted);line-height:1.5}
+.wb-pane-body{padding:1.1rem 1.25rem 1.4rem}
+.guide-tip-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.7rem}
+.guide-tip{display:flex;gap:.7rem;font-size:.88rem;line-height:1.55;color:var(--ink)}
+.guide-tip-num{width:22px;height:22px;border-radius:7px;background:var(--accent-light);color:var(--accent);font-size:.72rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.guide-tip b{font-weight:700}
+.guide-example{margin-top:1.1rem;padding-top:1rem;border-top:1.5px solid var(--border)}
+.guide-example-label{font-family:Outfit,sans-serif;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:.5rem}
+.guide-example-body{font-size:.85rem;line-height:1.6;color:var(--ink);background:var(--cream);border-radius:var(--radius-sm);padding:.8rem .95rem}
+.guide-quicknav{display:flex;flex-wrap:wrap;gap:.5rem;margin:1.1rem 0 0}
+.guide-quicknav button{font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:700;padding:.45rem .85rem;border-radius:999px;border:1.5px solid var(--border);background:var(--card);color:var(--ink);cursor:pointer;transition:all .15s}
+.guide-quicknav button:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
+.guide-section{margin-top:1.6rem;padding-top:1.4rem;border-top:1.5px solid var(--border);scroll-margin-top:24px}
+.guide-section-title{font-size:1.02rem;font-weight:800;color:var(--ink);margin-bottom:.3rem}
+.guide-section-desc{font-size:.85rem;color:var(--muted);margin-bottom:.9rem;line-height:1.5}
+.struct-facts{display:flex;gap:.6rem;margin-bottom:1.1rem;flex-wrap:wrap}
+.struct-fact{flex:1;min-width:90px;background:var(--accent-light);border-radius:var(--radius-sm);padding:.7rem .5rem;text-align:center}
+.struct-fact-n{font-family:Outfit,sans-serif;font-size:1.5rem;font-weight:800;color:var(--accent);line-height:1.1}
+.struct-fact-l{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-top:.15rem}
+.struct-list{display:flex;flex-direction:column;gap:.6rem;margin-bottom:1.3rem}
+.struct-row{display:flex;gap:.9rem;padding:.85rem .95rem;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius-sm);align-items:flex-start;box-shadow:var(--shadow-sm)}
+.struct-badge{width:32px;height:32px;border-radius:9px;background:var(--accent-light);color:var(--accent);font-family:Outfit,sans-serif;font-weight:800;font-size:.9rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.struct-info{flex:1;min-width:0}
+.struct-info-top{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.35rem}
+.struct-info-top strong{font-size:.85rem}
+.struct-qrange{font-size:.7rem;color:var(--muted);font-weight:600}
+.struct-diff{font-family:Outfit,sans-serif;font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:.15rem .5rem;border-radius:999px}
+.struct-diff.easy{background:rgba(52,199,89,.14);color:#1a7a34}
+.struct-diff.med{background:rgba(255,179,71,.2);color:#a5690a}
+.struct-diff.hard{background:rgba(255,59,48,.12);color:#c0392b}
+.struct-tasks{display:flex;flex-wrap:wrap;gap:.35rem}
+.struct-task{font-size:.72rem;background:var(--card);border:1px solid var(--border);border-radius:7px;padding:.25rem .55rem;color:var(--ink)}
+.struct-task b{color:var(--accent);font-weight:800;margin-left:.2rem}
+@media(max-width:820px){.guide-shell{grid-template-columns:1fr}.wb-sb{position:static;max-height:none}}
+
+.part-filter{display:flex;gap:4px;row-gap:4px;flex-wrap:wrap;align-items:flex-end;position:relative;padding-top:6px;margin-bottom:0}
+.part-filter::before{content:'';position:absolute;left:0;right:0;bottom:0;height:1.5px;background:var(--border)}
+.part-filter-pill{position:relative;font-size:.82rem;font-weight:700;padding:.6rem 1rem;color:var(--muted);cursor:pointer;white-space:nowrap;background:color-mix(in srgb,var(--ink) 4%,transparent);border:1.5px solid var(--border);border-radius:10px 10px 0 0;transition:all .18s;font-family:'Outfit',sans-serif}
+.part-filter-pill:hover{background:color-mix(in srgb,var(--ink) 8%,transparent);color:var(--ink)}
+.part-filter-pill.active{background:var(--cream);border-color:var(--accent);border-bottom-color:var(--cream);color:var(--accent);box-shadow:0 -3px 10px rgba(45,48,71,.06);z-index:2}
+
+.part-section{display:none;padding-top:1.4rem}
+.part-section.visible{display:block}
+.exam-info{display:flex;gap:10px;align-items:flex-start;padding:12px 16px;border-radius:var(--radius-sm);margin-bottom:16px;font-size:.86rem;line-height:1.55;color:var(--ink);background:var(--accent-light)}
+.exam-info svg{flex-shrink:0;margin-top:2px}
+
+.test-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:0 20px}
+.test-header{padding:16px 4px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;border-bottom:1.5px solid var(--border)}
+.test-title{font-weight:800;font-size:.95rem}
+.score-display{font-family:Outfit,sans-serif;font-size:.82rem;font-weight:500;color:var(--muted);display:none;align-items:center;gap:6px}
+.score-display.visible{display:flex}
+.score-display .score-val{color:var(--accent);font-weight:800}
+.passage{padding:20px 4px 6px;font-size:.95rem;line-height:1.95;font-family:var(--reading-font,inherit)}
+.passage p{margin-bottom:1rem}
+.passage-title{font-weight:800;text-align:center;font-size:1.05rem;margin-bottom:14px}
+.passage-sub{font-weight:700;font-size:.78rem;text-align:center;color:var(--muted);margin:-8px 0 14px;text-transform:uppercase;letter-spacing:.06em}
+
+.notice-item{margin:0 0 1.5rem}
+.notice-item:last-child{margin-bottom:0}
+.notice-card{background:var(--cream);border:1.5px dashed var(--border);border-radius:var(--radius-sm);padding:.9rem 1.05rem;font-size:.86rem;line-height:1.6;white-space:pre-line;margin-bottom:.7rem}
+.notice-card-label{font-family:Outfit,sans-serif;font-size:.62rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem}
+
+.mcq{margin:1.5rem 0;padding-top:1.3rem;border-top:1px solid var(--border)}
+.mcq:first-child{margin-top:0;padding-top:0;border-top:none}
+.mcq-stem{display:flex;gap:.7rem;font-weight:700;margin-bottom:.7rem;font-size:.92rem}
+.mcq-num{width:24px;height:24px;border-radius:7px;background:var(--accent);color:#fff;font-size:.72rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mcq-opts{display:flex;flex-direction:column;gap:.5rem;margin-left:2.05rem}
+.mcq-opt{display:flex;gap:.6rem;text-align:left;padding:.65rem .9rem;border:1.5px solid var(--border);border-radius:10px;background:var(--card);cursor:pointer;font-family:'Outfit',sans-serif;font-size:.86rem;transition:all .15s;color:var(--ink)}
+.mcq-opt:hover{border-color:var(--accent)}
+.mcq-opt .mcq-letter{font-weight:800;color:var(--muted);flex-shrink:0}
+.mcq-opt.selected{border-color:var(--accent);background:var(--accent-light)}
+.mcq-opt.correct-ans{border-color:var(--correct);background:rgba(29,211,176,.08);color:#0F7D71;font-weight:600}
+.mcq-opt.wrong-ans{border-color:var(--wrong);background:rgba(255,59,48,.06);color:#c0392b}
+.mcq-opt.correct-ans .mcq-letter{color:#0F7D71}
+.mcq-opt.wrong-ans .mcq-letter{color:#c0392b}
+.mcq-opt.locked{cursor:default}
+
+.match-texts{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin:0 4px 1.4rem}
+.match-text-card{background:var(--cream);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:.8rem .95rem}
+.match-text-name{font-family:Outfit,sans-serif;font-weight:800;font-size:.8rem;margin-bottom:.35rem;display:flex;align-items:center;gap:.5rem}
+.match-text-letter{width:20px;height:20px;border-radius:6px;background:var(--accent);color:#fff;font-size:.68rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.match-text-body{font-size:.8rem;line-height:1.55;color:var(--ink)}
+.match-q{display:flex;align-items:flex-start;flex-wrap:wrap;gap:.7rem;padding:.7rem 4px;border-top:1px solid var(--border)}
+.match-q:first-of-type{border-top:1.5px solid var(--border);margin-top:.2rem}
+.match-stem{flex:1;min-width:220px;font-size:.87rem;display:flex;gap:.6rem}
+.match-pills{display:flex;gap:.3rem;flex-wrap:wrap;flex-shrink:0;max-width:340px}
+.match-pill{font-family:'Outfit',sans-serif;font-size:.74rem;font-weight:700;padding:.36rem .62rem;border-radius:7px;border:1.5px solid var(--border);background:var(--card);color:var(--ink);cursor:pointer;transition:all .15s}
+.match-pill:hover{border-color:var(--accent)}
+.match-pill.selected{border-color:var(--accent);background:var(--accent);color:#fff}
+.match-pill.correct-ans{border-color:var(--correct);background:rgba(29,211,176,.12);color:#0F7D71}
+.match-pill.wrong-ans{border-color:var(--wrong);background:rgba(255,59,48,.1);color:#c0392b}
+.match-pill.locked{cursor:default}
+
+.actions{padding:16px 4px;border-top:1.5px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.btn{font-family:'Outfit',sans-serif;font-size:.84rem;font-weight:700;padding:10px 20px;border-radius:10px;border:2px solid transparent;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:var(--shadow-md)}
+.btn-secondary{background:var(--card);color:var(--muted);border-color:var(--border)}
+.btn-secondary:hover{color:var(--ink);border-color:var(--accent)}
+.btn-amber{background:var(--sun);color:var(--ink);border-color:var(--sun)}
+.btn-amber:hover{background:var(--ink);border-color:var(--ink);color:#fff}
+.explanations{display:none;padding:4px 4px 18px}
+.explanations.visible{display:block}
+.exp-title{font-family:Outfit,sans-serif;font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:10px;font-weight:600}
+.exp-grid{display:flex;flex-direction:column;gap:8px}
+.exp-item{display:flex;gap:10px;padding:10px 14px;border-radius:var(--radius-sm);background:var(--cream);border:1.5px solid transparent}
+.exp-item.was-correct{border-color:rgba(29,211,176,.2)}
+.exp-item.was-wrong{border-color:rgba(255,59,48,.2)}
+.exp-num{width:24px;height:24px;border-radius:6px;font-size:.7rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--accent-light);color:var(--accent)}
+.exp-text{font-size:.84rem;line-height:1.55;color:var(--ink)}
+.exp-text strong{font-weight:700}
+
+.score-summary{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-top:24px;box-shadow:var(--shadow-sm);text-align:center;display:none}
+.score-summary.visible{display:block}
+.score-summary-title{font-family:'Outfit',sans-serif;font-size:1.15rem;margin-bottom:12px}
+.score-summary-grid{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-bottom:14px}
+.score-summary-item{text-align:center;min-width:70px}
+.score-summary-item .ss-label{font-family:Outfit,sans-serif;font-size:.6rem;font-weight:500;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.score-summary-item .ss-val{font-family:Outfit,sans-serif;font-size:1.05rem;font-weight:700;color:var(--accent)}
+.score-summary-total{font-family:Outfit,sans-serif;font-size:.85rem;font-weight:700;color:var(--ink);padding-top:10px;border-top:1.5px solid var(--border)}
+
+@media(max-width:640px){.wrap{padding:0 1.2rem 3rem}.page-header{padding:1.6rem 1.2rem 1rem}.match-texts{grid-template-columns:1fr}.match-q{align-items:flex-start}.mcq-opts{margin-left:0}.match-pills{max-width:none}}
+</style>
+<style>.topnav{display:none!important}</style>
+</head>
+<body>
+<div class="topnav">
+  <a href="index.html" class="nav-logo">john<span>plus</span>english</a>
+  <div class="topnav-links"><a href="index.html#about">About</a><a href="index.html#contact">Contact</a></div>
+</div>
+
+<div class="page-header">  <div class="topic-hero">
+    <div class="topic-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+    <div>
+      <h1>OET Reading - Parts A to C</h1>
+    </div>
+  </div>
+</div>
+
+<div class="tabs-wrap">
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-type="guide" onclick="switchType('guide')" style="--tab-accent:#2176FF">Guide</button>
+    <button class="tab" data-type="tests" onclick="switchType('tests')" style="--tab-accent:#2176FF">Tests</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+<div class="content-area active" id="guide-content">
+<div class="guide-shell" id="guideShell">
+  <div class="wb-sb">
+    <div class="wb-sb-head" onclick="toggleGuideSidebar(this)"><span>Guide topics</span><div class="sb-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div></div>
+    <div class="wb-sb-scroll" id="guideNav"></div>
+    <div class="wb-sb-foot">Tips for every task type in Parts A-C</div>
+  </div>
+  <div class="wb-pane">
+    <div class="wb-pane-head">
+      <h2 id="guidePaneTitle"></h2>
+      <p id="guidePaneDesc"></p>
+    </div>
+    <div class="wb-pane-body" id="guidePaneBody"></div>
+  </div>
+</div>
+</div>
+
+<div class="content-area" id="tests-content">
+  <div class="test-picker" id="testPicker"><span class="test-picker-label">Test</span></div>
+  <div class="test-topic" id="testTopic"></div>
+
+  <div class="font-switch" id="fontSwitch">
+    <button class="font-switch-btn" onclick="toggleFontMenu()" aria-haspopup="true" aria-expanded="false">Aa &nbsp;Reading font</button>
+    <div class="font-switch-menu" id="fontMenu">
+      <button class="font-opt" data-font="outfit" onclick="setReadingFont('outfit')"><span class="font-opt-label" style="--opt-font:'Outfit',sans-serif">Default</span><span class="font-opt-check">&#10003;</span></button>
+      <button class="font-opt" data-font="georgia" onclick="setReadingFont('georgia')"><span class="font-opt-label" style="--opt-font:Georgia,serif">Georgia</span><span class="font-opt-check">&#10003;</span></button>
+      <button class="font-opt" data-font="verdana" onclick="setReadingFont('verdana')"><span class="font-opt-label" style="--opt-font:Verdana,sans-serif">Verdana</span><span class="font-opt-check">&#10003;</span></button>
+      <button class="font-opt" data-font="atkinson" onclick="setReadingFont('atkinson')"><span class="font-opt-label" style="--opt-font:'Atkinson Hyperlegible',sans-serif">Atkinson Hyperlegible</span><span class="font-opt-check">&#10003;</span></button>
+      <button class="font-opt" data-font="lexend" onclick="setReadingFont('lexend')"><span class="font-opt-label" style="--opt-font:'Lexend',sans-serif">Lexend</span><span class="font-opt-check">&#10003;</span></button>
+    </div>
+  </div>
+
+  <div class="part-filter">
+    <span class="part-filter-pill active" data-part="a" onclick="showPart('a')">Part A · Matching</span>
+    <span class="part-filter-pill" data-part="b" onclick="showPart('b')">Part B · Short Texts</span>
+    <span class="part-filter-pill" data-part="c" onclick="showPart('c')">Part C · Multiple Choice</span>
+  </div>
+
+  <!-- PART A -->
+  <div class="part-section visible" data-part="a" id="sectionA">
+    <div class="exam-info"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span id="rubA"></span></div>
+    <div class="test-card">
+      <div class="test-header"><div class="test-title">Part A · Matching (15 minutes)</div><div class="score-display" id="paScoreDisplay">Score: <span class="score-val" id="paScoreVal"></span></div></div>
+      <div class="passage" id="paPassage" style="padding-bottom:0">
+        <div class="passage-title" id="paTitle"></div>
+        <div class="match-texts" id="paTexts"></div>
+      </div>
+      <div class="passage" id="paQuestions" style="padding-top:0"></div>
+      <div class="explanations" id="paExplanations"></div>
+      <div class="actions">
+        <button class="btn btn-primary" id="paCheckBtn" onclick="checkPA()">Check Answers</button>
+        <button class="btn btn-amber" onclick="showPA()">Show Answers</button>
+        <button class="btn btn-secondary" id="paResetBtn" style="display:none" onclick="resetPA()">Try Again</button>
+        <button class="btn btn-secondary" id="paExpBtn" style="display:none" onclick="toggleExp('pa')">Explanations</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PART B -->
+  <div class="part-section" data-part="b" id="sectionB">
+    <div class="exam-info"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span id="rubB"></span></div>
+    <div class="test-card">
+      <div class="test-header"><div class="test-title">Part B · Short Texts</div><div class="score-display" id="pbScoreDisplay">Score: <span class="score-val" id="pbScoreVal"></span></div></div>
+      <div class="passage" id="pbQuestions"></div>
+      <div class="explanations" id="pbExplanations"></div>
+      <div class="actions">
+        <button class="btn btn-primary" id="pbCheckBtn" onclick="checkPB()">Check Answers</button>
+        <button class="btn btn-amber" onclick="showPB()">Show Answers</button>
+        <button class="btn btn-secondary" id="pbResetBtn" style="display:none" onclick="resetPB()">Try Again</button>
+        <button class="btn btn-secondary" id="pbExpBtn" style="display:none" onclick="toggleExp('pb')">Explanations</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PART C -->
+  <div class="part-section" data-part="c" id="sectionC">
+    <div class="exam-info"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span id="rubC"></span></div>
+    <div class="test-card">
+      <div class="test-header"><div class="test-title">Part C · Multiple Choice</div><div class="score-display" id="pcScoreDisplay">Score: <span class="score-val" id="pcScoreVal"></span></div></div>
+      <div class="passage" id="pcQuestions"></div>
+      <div class="explanations" id="pcExplanations"></div>
+      <div class="actions">
+        <button class="btn btn-primary" id="pcCheckBtn" onclick="checkPC()">Check Answers</button>
+        <button class="btn btn-amber" onclick="showPC()">Show Answers</button>
+        <button class="btn btn-secondary" id="pcResetBtn" style="display:none" onclick="resetPC()">Try Again</button>
+        <button class="btn btn-secondary" id="pcExpBtn" style="display:none" onclick="toggleExp('pc')">Explanations</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="score-summary" id="overallSummary">
+    <div class="score-summary-title">Test complete</div>
+    <div class="score-summary-grid">
+      <div class="score-summary-item"><div class="ss-label">Part A</div><div class="ss-val" id="ssA">0/20</div></div>
+      <div class="score-summary-item"><div class="ss-label">Part B</div><div class="ss-val" id="ssB">0/6</div></div>
+      <div class="score-summary-item"><div class="ss-label">Part C</div><div class="ss-val" id="ssC">0/16</div></div>
+    </div>
+    <div class="score-summary-total" id="ssTotal">Total: 0/42</div>
+  </div>
+</div>
+
+</div>
+
+<script>
+/* ============ DATA ============ */
+const TESTS = [
+{
+  topic: "Pressure injury prevention on a hospital ward",
+  PA: {
+    rubric: "You are going to read four texts about preventing and managing pressure injuries (pressure ulcers). For questions 1 to 20, choose from the texts A to D. The texts may be chosen more than once.",
+    title: "Pressure Injury Prevention: Four Extracts",
+    texts: [
+      {letter:"A", name:"Extract from Ward Wound-Care Policy", body:"All patients must have a pressure-injury risk assessment completed using the Waterlow score within 6 hours of admission, and repeated weekly or whenever the patient's condition changes significantly. Patients scoring 15 or above are classed as high risk and must be repositioned at least every 2 hours, with turns documented on the repositioning chart at the bedside. Heels should be fully offloaded using a foam wedge or heel-suspension boot for any patient identified as high risk, since the heel is the second most common site for pressure damage after the sacrum. Staff who identify broken skin must escalate to the tissue-viability nurse the same day, not wait for the next scheduled ward round."},
+      {letter:"B", name:"Extract from a Nursing Journal Article", body:"A recent multi-site audit found that documented repositioning was completed as scheduled in only 61% of cases on general medical wards, most commonly missed overnight between 11pm and 6am. Interviews with staff suggested this was less about workload than about reluctance to wake settled patients. The authors argue that pressure-relieving mattresses should not be seen as a substitute for repositioning but as a supplementary measure, since even the best alternating-pressure mattress cannot fully replace regular movement for patients who are completely immobile. The article also notes that malnutrition and dehydration substantially increase pressure-injury risk independent of how often a patient is turned, meaning nutritional status should be assessed alongside skin integrity, not separately from it."},
+      {letter:"C", name:"Manufacturer's Leaflet for an Alternating-Pressure Mattress", body:"The AirGlide 400 mattress cycles air between alternating cell sections every 10 minutes, redistributing pressure away from bony prominences without requiring manual repositioning between cycles. It is suitable for patients assessed as high or very high risk, and for patients recovering from surgery who cannot easily be repositioned due to pain or medical devices. The mattress includes a CPR deflation valve for emergency use and a low-pressure alarm that alerts staff if the pump loses power. Weight limit is 180kg. The manufacturer recommends the mattress is used in addition to, not instead of, a documented repositioning schedule, and that skin checks continue at every shift handover regardless of which surface a patient is on."},
+      {letter:"D", name:"Local Clinical Guideline: Staging Pressure Ulcers", body:"Category 1 pressure damage presents as non-blanchable redness of intact skin, most visible over bony prominences and sometimes the only external sign in patients with darker skin tones, where colour changes may instead present as a change in temperature or texture. Category 2 involves partial-thickness skin loss presenting as a shallow open ulcer or intact blister. Category 3 involves full-thickness tissue loss where fat may be visible but bone, tendon or muscle is not exposed. Category 4 involves full-thickness tissue loss with exposed bone, tendon or muscle. Any category 3 or 4 injury, or any injury where the true depth cannot be confirmed due to slough or dead tissue covering the wound base, must be reported as a clinical incident."}
+    ],
+    questions: [
+      {stem:"specifies exactly how often a risk assessment tool should be repeated for a stable patient?", correct:"A", exp:"Text A states the Waterlow assessment is “repeated weekly or whenever the patient's condition changes significantly.”"},
+      {stem:"reports a specific percentage showing how often a recommended action was actually carried out?", correct:"B", exp:"Text B: “documented repositioning was completed as scheduled in only 61% of cases.”"},
+      {stem:"gives a maximum patient weight for a piece of equipment?", correct:"C", exp:"Text C: “Weight limit is 180kg.”"},
+      {stem:"explains that skin colour change may not be a reliable sign in some patients?", correct:"D", exp:"Text D notes that in darker skin tones, “colour changes may instead present as a change in temperature or texture.”"},
+      {stem:"identifies which time period repositioning is most often missed?", correct:"B", exp:"Text B: missed turns were “most commonly missed overnight between 11pm and 6am.”"},
+      {stem:"names the body area that is the second most common site of pressure damage?", correct:"A", exp:"Text A: “the heel is the second most common site for pressure damage after the sacrum.”"},
+      {stem:"states that a piece of equipment should not replace a documented care routine?", correct:"C", exp:"Text C: the mattress should be “used in addition to, not instead of, a documented repositioning schedule.”"},
+      {stem:"describes a safety feature for use in a cardiac arrest?", correct:"C", exp:"Text C: “a CPR deflation valve for emergency use.”"},
+      {stem:"states that two nutritional factors increase risk independently of repositioning frequency?", correct:"B", exp:"Text B: “malnutrition and dehydration substantially increase pressure-injury risk independent of how often a patient is turned.”"},
+      {stem:"identifies a specific score above which a patient is classed as high risk?", correct:"A", exp:"Text A: “Patients scoring 15 or above are classed as high risk.”"},
+      {stem:"states that a certain category of injury must always be reported as an incident?", correct:"D", exp:"Text D: “Any category 3 or 4 injury... must be reported as a clinical incident.”"},
+      {stem:"recommends a specific piece of equipment to keep a body part completely free of pressure?", correct:"A", exp:"Text A: “Heels should be fully offloaded using a foam wedge or heel-suspension boot.”"},
+      {stem:"suggests that staff avoid a recommended action for a reason unrelated to being busy?", correct:"B", exp:"Text B: missed turns were about “reluctance to wake settled patients”, not primarily workload."},
+      {stem:"describes how frequently a piece of equipment automatically changes where pressure falls?", correct:"C", exp:"Text C: the mattress “cycles air between alternating cell sections every 10 minutes.”"},
+      {stem:"explains what distinguishes the two most severe categories of pressure damage from each other?", correct:"D", exp:"Text D: Category 3 has no exposed bone, tendon or muscle, while Category 4 does."},
+      {stem:"instructs staff to escalate a finding on the same day rather than waiting?", correct:"A", exp:"Text A: staff “must escalate to the tissue-viability nurse the same day, not wait for the next scheduled ward round.”"},
+      {stem:"warns that a wound's true severity may be difficult to determine because of dead tissue?", correct:"D", exp:"Text D: injuries “where the true depth cannot be confirmed due to slough or dead tissue covering the wound base” must be reported."},
+      {stem:"identifies which patients are suitable for a specific type of mattress?", correct:"C", exp:"Text C: suitable “for patients assessed as high or very high risk, and for patients recovering from surgery who cannot easily be repositioned.”"},
+      {stem:"describes an alarm that alerts staff to an equipment fault?", correct:"C", exp:"Text C: “a low-pressure alarm that alerts staff if the pump loses power.”"},
+      {stem:"states where documentation of a specific care action should be recorded?", correct:"A", exp:"Text A: turns must be “documented on the repositioning chart at the bedside.”"}
+    ]
+  },
+  PB: {
+    rubric: "You are going to read six short workplace texts. For questions 1 to 6, choose the answer (A, B or C) which you think fits best according to the text.",
+    items: [
+      {letter:"1", label:"Staff notice board", body:"HAND HYGIENE AUDIT - THIS WEEK\nEvery bay will be observed twice daily by the infection-control team. Staff scoring below 90% compliance on any single observation will be asked to complete refresher training before their next shift, not at a later date. Results are anonymised on the board but will be discussed individually with any staff member below target. Please continue to use the alcohol gel at bay entry points even when wearing gloves.", q:{stem:"What will happen to a staff member whose compliance falls below 90%?", opts:["Their name will be posted publicly on the board.","They must complete refresher training before working again.","They will be observed a third time that same day."], correct:1, exp:"“Staff scoring below 90%... will be asked to complete refresher training before their next shift.”"}},
+      {letter:"2", label:"Medication chart alert", body:"PHARMACY ALERT - PATIENT SAFETY\nThis patient's chart shows an allergy to penicillin recorded on admission. A prescription for co-amoxiclav was added to the drug chart this morning. Do not administer this medication. Contact the prescribing doctor to review and re-chart an alternative antibiotic before the next scheduled dose. Do not simply omit the dose without escalation, as the underlying infection still requires treatment.", q:{stem:"What should staff do about the prescribed antibiotic?", opts:["Give it as prescribed, since the allergy was recorded some time ago.","Skip the dose only, without contacting the doctor.","Contact the doctor so an alternative can be prescribed."], correct:2, exp:"“Contact the prescribing doctor to review and re-chart an alternative antibiotic” - and not to simply omit the dose."}},
+      {letter:"3", label:"Internal memo", body:"To all ward staff,\nFrom Monday, shift handover will move from the nurses' station to the bedside for all patients able to participate. This is intended to improve patient involvement in their own care and reduce information lost between shifts. Handover at the nurses' station will still be used to discuss confidential details not appropriate to share at the bedside. Please allow 5 extra minutes per patient during the first two weeks while staff adjust to the new format.", q:{stem:"Why is bedside handover being introduced?", opts:["To reduce the total time handover takes.","To involve patients more and reduce lost information.","To replace all discussion at the nurses' station."], correct:1, exp:"“Intended to improve patient involvement in their own care and reduce information lost between shifts.” Nurses' station handover continues for confidential details."}},
+      {letter:"4", label:"Equipment instruction extract", body:"INFUSION PUMP - OCCLUSION ALARM\nIf the occlusion alarm sounds, first check the line for visible kinks between the pump and the patient before adjusting the pressure sensitivity setting. Increasing sensitivity without checking the line first may mask a genuine blockage. If no kink is found and the alarm persists after the line is straightened, do not silence the alarm repeatedly; escalate to the equipment library for a replacement pump.", q:{stem:"What should staff do first when the occlusion alarm sounds?", opts:["Increase the pressure sensitivity setting.","Check the line for kinks.","Request a replacement pump."], correct:1, exp:"“First check the line for visible kinks... before adjusting the pressure sensitivity setting.”"}},
+      {letter:"5", label:"Incident-report policy extract", body:"All near-miss events, not only events that caused harm, must be reported using the online incident system within 24 hours. A near miss is any event that could have caused harm but did not, whether by chance or because it was intercepted. Reports are used to identify patterns across the organisation and are not intended to identify or discipline individual staff. Managers reviewing reports should focus discussion on system factors first.", q:{stem:"According to the policy, what is the main purpose of reporting near misses?", opts:["To discipline the staff member involved.","To identify patterns across the organisation.","To record only events that caused actual harm."], correct:1, exp:"Reports “are used to identify patterns across the organisation and are not intended to identify or discipline individual staff.”"}},
+      {letter:"6", label:"Infection control bulletin", body:"MRSA SCREENING - UPDATED CRITERIA\nFrom this month, screening swabs are required for all patients admitted from another healthcare facility, in addition to all planned surgical admissions. Screening is no longer routinely required for same-day day-case patients unless they have a known previous MRSA-positive result on record. Results should be available within 48 hours; do not delay a planned procedure while awaiting results unless clinically indicated.", q:{stem:"Which patients no longer routinely require an MRSA screening swab?", opts:["Patients transferred from another healthcare facility.","Same-day day-case patients with no previous positive result.","All planned surgical admissions."], correct:1, exp:"“Screening is no longer routinely required for same-day day-case patients unless they have a known previous MRSA-positive result on record.”"}}
+    ]
+  },
+  PC: {
+    rubric: "You are going to read two texts about healthcare topics. For questions 1 to 16, choose the answer (A, B, C or D) which you think fits best according to the text.",
+    texts: [
+      {
+        title: "The Expansion of Nurse-Led Clinics",
+        passage: [
+          "Nurse-led clinics, in which a specialist nurse rather than a doctor manages the majority of a patient's routine care, have expanded considerably over the past fifteen years, moving from a handful of pilot schemes into a mainstream feature of chronic-disease management in many health systems. The model was first developed for conditions such as diabetes and asthma, where much of the ongoing work involves monitoring, education and dose adjustment within an established treatment plan rather than new diagnosis, tasks well suited to a nurse with appropriate specialist training and prescribing rights.",
+          "Evidence for the approach has generally been favourable, at least for the conditions it was originally designed around. Several large studies comparing nurse-led and doctor-led follow-up for stable chronic conditions found broadly equivalent clinical outcomes, alongside consistently higher patient satisfaction scores in the nurse-led group, a finding researchers attribute partly to longer average appointment times and a communication style patients frequently describe as less rushed. Cost comparisons are more mixed: nurse-led clinics are often cheaper per appointment, but this saving can be reduced or eliminated if patients need more frequent visits than they would under doctor-led care, which some studies have found to be the case for certain conditions.",
+          "Expansion beyond the original chronic-disease context has been less straightforward. Attempts to extend the model into areas requiring complex diagnostic judgement, rather than management of an already-diagnosed condition, have produced far more mixed results, with some services reporting increased referral rates back to doctors when nurses encountered presentations outside their specific training, which some critics argue undermines the efficiency the model was meant to deliver. Professional bodies remain divided on how far the model should extend, with some arguing that appropriately trained nurses could safely manage a much wider range of presentations than currently permitted, and others warning that expanding scope without proportionate investment in training risks patient safety being treated as a cost-saving measure rather than a genuine clinical decision.",
+          "A separate concern, raised repeatedly by nursing unions rather than patient groups, is workforce sustainability. Specialist nurse training for these roles typically takes several years beyond initial registration, and several health systems report struggling to train replacements quickly enough as experienced nurse specialists retire, a problem doctor-led services have historically faced far less acutely because medical training pipelines are typically larger and more centrally planned. Some services have responded by building the specialist role gradually across a small team rather than relying on a single named specialist, which reduces the impact of any one departure but requires more junior staff to be released from other duties for training, itself a resourcing challenge in already-stretched services.",
+          "Looking ahead, most commentators expect nurse-led models to keep expanding within their proven area, chronic, stable, well-understood conditions, rather than into diagnostically complex new territory, at least in the near term. The more interesting open question, several researchers suggest, is not whether the model works, since for its original purpose the evidence is now fairly settled, but how health systems plan for the specialist workforce it depends on, an issue that has arguably received far less attention than the clinical evidence supporting the model itself."
+        ],
+        questions: [
+          {stem:"What were nurse-led clinics originally developed to manage?", opts:["Complex new diagnoses requiring specialist judgement.","Ongoing monitoring and adjustment of established chronic conditions.","Emergency presentations in hospital settings.","Surgical follow-up appointments."], correct:1, exp:"“The model was first developed for conditions such as diabetes and asthma, where much of the ongoing work involves monitoring, education and dose adjustment within an established treatment plan.”"},
+          {stem:"What does the writer suggest explains higher patient satisfaction in nurse-led clinics?", opts:["Nurses are generally preferred over doctors by most patients.","Nurse-led clinics are always significantly cheaper.","Longer appointments and a less rushed communication style.","Nurse-led clinics require fewer follow-up visits."], correct:2, exp:"“Longer average appointment times and a communication style patients frequently describe as less rushed.”"},
+          {stem:"What does the writer say about the cost comparison between nurse-led and doctor-led care?", opts:["Nurse-led care is always cheaper overall.","Savings can be reduced if more frequent visits are needed.","Doctor-led care is consistently more cost-effective.","Cost has not been studied for either model."], correct:1, exp:"“This saving can be reduced or eliminated if patients need more frequent visits than they would under doctor-led care.”"},
+          {stem:"According to the text, what has happened when the model is extended into more complex diagnostic areas?", opts:["Outcomes have generally improved compared to chronic care.","Results have been consistently positive across all services.","Some services have reported increased referrals back to doctors.","The approach has been abandoned everywhere it was tried."], correct:2, exp:"“Some services reporting increased referral rates back to doctors when nurses encountered presentations outside their specific training.”"},
+          {stem:"What is one concern raised by critics of expanding nurse-led scope?", opts:["That doctors would lose their jobs as a result.","That patient satisfaction would decrease.","That expanded scope without proper training investment could compromise safety.","That nurses are generally unwilling to take on more responsibility."], correct:2, exp:"“Expanding scope without proportionate investment in training risks patient safety being treated as a cost-saving measure.”"},
+          {stem:"Who is described as raising concerns about workforce sustainability?", opts:["Patient advocacy groups.","Nursing unions.","Hospital finance departments.","Medical training bodies."], correct:1, exp:"“A separate concern, raised repeatedly by nursing unions rather than patient groups, is workforce sustainability.”"},
+          {stem:"Why do doctor-led services face the training-pipeline problem less acutely, according to the text?", opts:["Doctors rarely retire from specialist roles.","Medical training pipelines are typically larger and more centrally planned.","Doctor-led services require less specialist training overall.","Fewer doctors choose to specialise compared to nurses."], correct:1, exp:"“A problem doctor-led services have historically faced far less acutely because medical training pipelines are typically larger and more centrally planned.”"},
+          {stem:"What does the writer suggest is the more important unresolved question about nurse-led clinics?", opts:["Whether the clinical model produces good outcomes at all.","How health systems plan for the specialist workforce the model depends on.","Whether patients prefer nurses to doctors.","Whether the model should be discontinued."], correct:1, exp:"“The more interesting open question... is not whether the model works... but how health systems plan for the specialist workforce it depends on.”"}
+        ]
+      },
+      {
+        title: "Sleep Deprivation Among Shift-Working Healthcare Staff",
+        passage: [
+          "Rotating shift patterns, particularly those involving frequent transitions between day and night shifts, place a measurable strain on healthcare workers that extends well beyond simple tiredness. Research into circadian disruption among nurses and junior doctors has consistently found impaired reaction times and decision-making accuracy during and immediately after night shifts, effects comparable in some studies to moderate alcohol impairment, a comparison researchers use deliberately to convey the scale of the effect to policymakers who might otherwise treat fatigue as a minor inconvenience.",
+          "What makes healthcare shift work particularly demanding, compared with shift work in many other industries, is the combination of irregular rotation with high-stakes decision-making that cannot simply be paused or slowed down when staff are fatigued. A delivery driver who feels drowsy can, in principle, pull over; a nurse midway through administering medication to a full bay of patients generally cannot. Several hospitals have experimented with forward-rotating schedules, in which shifts move from morning to afternoon to night rather than the reverse, since this pattern aligns more closely with the body's natural tendency to drift toward a slightly longer day, and early results suggest modestly better sleep quality and fewer reported errors, though the studies involved are generally small and difficult to generalise from.",
+          "Napping policies have proven more contentious. Some hospitals now permit brief, scheduled naps during night shifts, typically twenty to thirty minutes, arguing the evidence for improved alertness afterward is strong and the safety benefit outweighs any perception of staff appearing to rest on duty. Others have resisted formal napping policies, partly from concern about how patients or families might perceive staff sleeping during a shift, and partly from more practical staffing constraints, since a formal nap policy requires enough staff on shift to safely cover for a colleague's break, something chronically understaffed departments say they cannot reliably guarantee.",
+          "The financial and legal dimension of the issue has grown more prominent in recent years, as several high-profile clinical incidents involving fatigued staff have prompted closer scrutiny of institutional responsibility. Where an error can be plausibly linked to inadequate rest between shifts, questions increasingly arise not only about the individual involved but about whether the rostering system itself created foreseeable risk, a shift in framing that some hospital administrators privately describe as uncomfortable, since it moves responsibility from an individual mistake toward a systemic staffing decision made well above ward level.",
+          "For now, most experts agree the evidence clearly establishes that fatigue impairs performance in ways directly relevant to patient safety; the harder, largely unresolved question is what a genuinely sustainable rostering system would look like in departments already facing chronic staff shortages, where the theoretically ideal schedule and the practically achievable one are often, frustratingly, quite far apart."
+        ],
+        questions: [
+          {stem:"What comparison do researchers use to describe the effects of night-shift fatigue?", opts:["Comparable to jet lag after long-haul travel.","Comparable in some studies to moderate alcohol impairment.","Comparable to the effects of missing a single meal.","Comparable to mild seasonal illness."], correct:1, exp:"“Effects comparable in some studies to moderate alcohol impairment, a comparison researchers use deliberately to convey the scale of the effect to policymakers.”"},
+          {stem:"What makes healthcare shift work particularly demanding compared with other industries, according to the text?", opts:["Healthcare shifts are generally longer than in other industries.","High-stakes decisions cannot easily be paused when staff are fatigued.","Healthcare workers receive less holiday time than other shift workers.","Healthcare shifts always involve night work."], correct:1, exp:"“The combination of irregular rotation with high-stakes decision-making that cannot simply be paused or slowed down when staff are fatigued.”"},
+          {stem:"Why do forward-rotating schedules (morning to afternoon to night) reportedly work better?", opts:["They involve fewer total shifts per month.","They align with the body's natural tendency toward a slightly longer day.","They eliminate night shifts altogether.","They were mandated by health and safety law."], correct:1, exp:"“This pattern aligns more closely with the body's natural tendency to drift toward a slightly longer day.”"},
+          {stem:"What is one reason some hospitals resist formal napping policies?", opts:["Evidence for improved alertness after napping is weak.","Staffing constraints make covering a colleague's nap break difficult.","Napping has been shown to increase clinical errors.","Patients have never expressed any concern about it."], correct:1, exp:"“A formal nap policy requires enough staff on shift to safely cover for a colleague's break, something chronically understaffed departments say they cannot reliably guarantee.”"},
+          {stem:"What has prompted closer scrutiny of institutional responsibility for fatigue-related errors?", opts:["New national fatigue-management legislation.","Several high-profile clinical incidents involving fatigued staff.","A decline in nursing school applications.","Increased hospital insurance premiums generally."], correct:1, exp:"“Several high-profile clinical incidents involving fatigued staff have prompted closer scrutiny of institutional responsibility.”"},
+          {stem:"How does the text describe the shift in how fatigue-related errors are increasingly framed?", opts:["As purely a matter of individual staff competence.","As moving from an individual mistake toward a systemic staffing decision.","As no longer a legitimate patient-safety concern.","As primarily a matter for patients to raise directly."], correct:1, exp:"“A shift in framing... moves responsibility from an individual mistake toward a systemic staffing decision made well above ward level.”"},
+          {stem:"According to the text, what do most experts agree on?", opts:["That fatigue has no measurable effect on patient safety.","That fatigue clearly impairs performance in ways relevant to patient safety.","That napping policies should be banned in all hospitals.","That forward-rotating schedules should be mandatory everywhere."], correct:1, exp:"“Most experts agree the evidence clearly establishes that fatigue impairs performance in ways directly relevant to patient safety.”"},
+          {stem:"What does the writer identify as the harder, unresolved question?", opts:["Whether fatigue is a genuine clinical concern at all.","What a sustainable rostering system would look like given chronic staff shortages.","Whether night shifts should be abolished entirely.","How much nurses should be paid for night shifts."], correct:1, exp:"“The harder, largely unresolved question is what a genuinely sustainable rostering system would look like in departments already facing chronic staff shortages.”"}
+        ]
+      }
+    ]
+  }
+}
+];
+
+/* ============ STATE ============ */
+let TI = 0;
+let PA, PB, PC;
+const state = {
+  pa: [], pachecked:false,
+  pb: [], pbchecked:false,
+  pc: [], pcchecked:false
+};
+
+/* ============ RENDER ============ */
+function renderPA(){
+  document.getElementById('paTitle').textContent = PA.title;
+  document.getElementById('paTexts').innerHTML = PA.texts.map(t=>`
+    <div class="match-text-card">
+      <div class="match-text-name"><span class="match-text-letter">${t.letter}</span>${t.name}</div>
+      <div class="match-text-body">${t.body}</div>
+    </div>`).join('');
+  document.getElementById('paQuestions').innerHTML = PA.questions.map((q,qi)=>`
+    <div class="match-q" data-prefix="pa" data-qi="${qi}">
+      <div class="match-stem"><span class="mcq-num" style="flex-shrink:0">${qi+1}</span><span>${q.stem}</span></div>
+      <div class="match-pills">${PA.texts.map(t=>`<button class="match-pill" data-letter="${t.letter}" onclick="pickMatch('pa',${qi},'${t.letter}')">${t.letter}</button>`).join('')}</div>
+    </div>`).join('');
+}
+function renderPB(){
+  document.getElementById('pbQuestions').innerHTML = PB.items.map((it,qi)=>`
+    <div class="mcq" data-prefix="pb" data-qi="${qi}">
+      <div class="notice-item"><div class="notice-card-label">${it.label}</div><div class="notice-card">${it.body}</div></div>
+      <div class="mcq-stem"><span class="mcq-num">${qi+1}</span><span>${it.q.stem}</span></div>
+      <div class="mcq-opts">${it.q.opts.map((o,oi)=>`<button class="mcq-opt" data-oi="${oi}" onclick="pickAns('pb',${qi},${oi})"><span class="mcq-letter">${String.fromCharCode(65+oi)}</span><span>${o}</span></button>`).join('')}</div>
+    </div>`).join('');
+}
+function renderPC(){
+  let html = '';
+  let qi = 0;
+  PC.texts.forEach((t,ti)=>{
+    html += `<div class="passage-title">${t.title}</div><div class="passage-sub">Text ${ti+1} of ${PC.texts.length}</div>`;
+    html += t.passage.map(p=>`<p>${p}</p>`).join('');
+    html += t.questions.map(q=>{
+      const html_q = `<div class="mcq" data-prefix="pc" data-qi="${qi}">
+        <div class="mcq-stem"><span class="mcq-num">${qi+1}</span><span>${q.stem}</span></div>
+        <div class="mcq-opts">${q.opts.map((o,oi)=>`<button class="mcq-opt" data-oi="${oi}" onclick="pickAns('pc',${qi},${oi})"><span class="mcq-letter">${String.fromCharCode(65+oi)}</span><span>${o}</span></button>`).join('')}</div>
+      </div>`;
+      qi++;
+      return html_q;
+    }).join('');
+  });
+  document.getElementById('pcQuestions').innerHTML = html;
+}
+function flatPC(){ return PC.texts.flatMap(t=>t.questions); }
+
+/* ============ GENERIC MC LOGIC (Parts B & C) ============ */
+function pickAns(prefix,qi,oi){
+  if(state[prefix+'checked']) return;
+  state[prefix][qi]=oi;
+  const qDiv = document.querySelector(`.mcq[data-prefix="${prefix}"][data-qi="${qi}"]`);
+  qDiv.querySelectorAll('.mcq-opt').forEach(b=>b.classList.remove('selected'));
+  qDiv.querySelector(`.mcq-opt[data-oi="${oi}"]`).classList.add('selected');
+}
+function mcCheckShow(prefix, dataArr, show){
+  state[prefix+'checked'] = true;
+  let correct=0;
+  dataArr.forEach((q,qi)=>{
+    const qDiv = document.querySelector(`.mcq[data-prefix="${prefix}"][data-qi="${qi}"]`);
+    qDiv.querySelectorAll('.mcq-opt').forEach((b,oi)=>{
+      b.classList.add('locked');
+      if(oi===q.correct) b.classList.add('correct-ans');
+      else if(!show && oi===state[prefix][qi]) b.classList.add('wrong-ans');
+    });
+    if(state[prefix][qi]===q.correct) correct++;
+  });
+  document.getElementById(prefix+'ScoreDisplay').classList.add('visible');
+  document.getElementById(prefix+'ScoreVal').textContent = `${correct}/${dataArr.length}`;
+  document.getElementById(prefix+'CheckBtn').style.display='none';
+  document.getElementById(prefix+'ResetBtn').style.display='inline-flex';
+  document.getElementById(prefix+'ExpBtn').style.display='inline-flex';
+  document.getElementById(prefix+'Explanations').innerHTML = `<div class="exp-title">Explanations</div><div class="exp-grid">` + dataArr.map((q,qi)=>`
+    <div class="exp-item ${state[prefix][qi]===q.correct?'was-correct':'was-wrong'}"><div class="exp-num">${qi+1}</div><div class="exp-text"><strong>${String.fromCharCode(65+q.correct)}</strong> - ${q.exp}</div></div>`).join('') + `</div>`;
+  updateOverall();
+}
+function mcReset(prefix, dataArr, renderFn){
+  state[prefix] = new Array(dataArr.length).fill(null);
+  state[prefix+'checked']=false;
+  document.getElementById(prefix+'ScoreDisplay').classList.remove('visible');
+  document.getElementById(prefix+'CheckBtn').style.display='inline-flex';
+  document.getElementById(prefix+'ResetBtn').style.display='none';
+  document.getElementById(prefix+'ExpBtn').style.display='none';
+  document.getElementById(prefix+'Explanations').classList.remove('visible');
+  renderFn();
+  updateOverall();
+}
+function checkPB(){ mcCheckShow('pb', PB.items.map(it=>it.q), false); }
+function showPB(){ const arr=PB.items.map(it=>it.q); arr.forEach((q,qi)=>{ if(state.pb[qi]===null||state.pb[qi]===undefined) state.pb[qi]=-1; }); mcCheckShow('pb', arr, true); }
+function resetPB(){ mcReset('pb', PB.items, renderPB); }
+function checkPC(){ mcCheckShow('pc', flatPC(), false); }
+function showPC(){ const arr=flatPC(); arr.forEach((q,qi)=>{ if(state.pc[qi]===null||state.pc[qi]===undefined) state.pc[qi]=-1; }); mcCheckShow('pc', arr, true); }
+function resetPC(){ mcReset('pc', flatPC(), renderPC); }
+
+/* ============ PART A - MATCHING LOGIC ============ */
+function pickMatch(prefix,qi,letter){
+  if(state[prefix+'checked']) return;
+  state[prefix][qi]=letter;
+  const qDiv = document.querySelector(`.match-q[data-prefix="${prefix}"][data-qi="${qi}"]`);
+  qDiv.querySelectorAll('.match-pill').forEach(b=>b.classList.remove('selected'));
+  qDiv.querySelector(`.match-pill[data-letter="${letter}"]`).classList.add('selected');
+}
+function checkPA(){ matchCheckShow(false); }
+function showPA(){ PA.questions.forEach((q,qi)=>{ if(state.pa[qi]===null||state.pa[qi]===undefined) state.pa[qi]=''; }); matchCheckShow(true); }
+function matchCheckShow(show){
+  state.pachecked = true;
+  let correct=0;
+  PA.questions.forEach((q,qi)=>{
+    const qDiv = document.querySelector(`.match-q[data-prefix="pa"][data-qi="${qi}"]`);
+    qDiv.querySelectorAll('.match-pill').forEach(b=>{
+      b.classList.add('locked');
+      const l = b.dataset.letter;
+      if(l===q.correct) b.classList.add('correct-ans');
+      else if(!show && l===state.pa[qi]) b.classList.add('wrong-ans');
+    });
+    if(state.pa[qi]===q.correct) correct++;
+  });
+  document.getElementById('paScoreDisplay').classList.add('visible');
+  document.getElementById('paScoreVal').textContent = `${correct}/${PA.questions.length}`;
+  document.getElementById('paCheckBtn').style.display='none';
+  document.getElementById('paResetBtn').style.display='inline-flex';
+  document.getElementById('paExpBtn').style.display='inline-flex';
+  document.getElementById('paExplanations').innerHTML = `<div class="exp-title">Explanations</div><div class="exp-grid">` + PA.questions.map((q,qi)=>`
+    <div class="exp-item ${state.pa[qi]===q.correct?'was-correct':'was-wrong'}"><div class="exp-num">${qi+1}</div><div class="exp-text"><strong>${q.correct}</strong> - ${q.exp}</div></div>`).join('') + `</div>`;
+  updateOverall();
+}
+function resetPA(){
+  state.pa = new Array(PA.questions.length).fill(null);
+  state.pachecked=false;
+  document.getElementById('paScoreDisplay').classList.remove('visible');
+  document.getElementById('paCheckBtn').style.display='inline-flex';
+  document.getElementById('paResetBtn').style.display='none';
+  document.getElementById('paExpBtn').style.display='none';
+  document.getElementById('paExplanations').classList.remove('visible');
+  renderPA();
+  updateOverall();
+}
+
+/* ============ SHARED ============ */
+function toggleExp(prefix){
+  document.getElementById(prefix+'Explanations').classList.toggle('visible');
+}
+function updateOverall(){
+  let total=0;
+  if(state.pachecked){ let c=0; PA.questions.forEach((q,qi)=>{if(state.pa[qi]===q.correct)c++;}); total+=c; document.getElementById('ssA').textContent=`${c}/${PA.questions.length}`; } else document.getElementById('ssA').textContent=`0/${PA.questions.length}`;
+  if(state.pbchecked){ let c=0; PB.items.forEach((it,qi)=>{if(state.pb[qi]===it.q.correct)c++;}); total+=c; document.getElementById('ssB').textContent=`${c}/${PB.items.length}`; } else document.getElementById('ssB').textContent=`0/${PB.items.length}`;
+  if(state.pcchecked){ let c=0; const arr=flatPC(); arr.forEach((q,qi)=>{if(state.pc[qi]===q.correct)c++;}); total+=c; document.getElementById('ssC').textContent=`${c}/${arr.length}`; } else document.getElementById('ssC').textContent=`0/${flatPC().length}`;
+  const allDone = state.pachecked && state.pbchecked && state.pcchecked;
+  document.getElementById('ssTotal').textContent = `Total: ${total}/${PA.questions.length + PB.items.length + flatPC().length}`;
+  document.getElementById('overallSummary').classList.toggle('visible', allDone);
+}
+function showPart(p){
+  document.querySelectorAll('.part-filter-pill').forEach(el=>el.classList.toggle('active', el.dataset.part===p));
+  document.querySelectorAll('.part-section').forEach(s=>s.classList.toggle('visible', s.dataset.part===p));
+  if (document.querySelector('[data-type="tests"]').classList.contains('active')) JPE_DEEPLINK.setParams({part: p});
+}
+
+var READING_FONTS = {
+  outfit: "'Outfit',sans-serif",
+  georgia: "Georgia,'Times New Roman',serif",
+  verdana: "Verdana,Geneva,sans-serif",
+  atkinson: "'Atkinson Hyperlegible',sans-serif",
+  lexend: "'Lexend',sans-serif"
+};
+function setReadingFont(key){
+  if (!READING_FONTS[key]) key = 'outfit';
+  document.documentElement.style.setProperty('--reading-font', READING_FONTS[key]);
+  document.querySelectorAll('.font-opt').forEach(function(b){ b.classList.toggle('active', b.dataset.font===key); });
+  try { localStorage.setItem('jpe-reading-font', key); } catch(e) {}
+}
+function toggleFontMenu(){
+  document.getElementById('fontMenu').classList.toggle('open');
+}
+document.addEventListener('click', function(e){
+  var sw = document.getElementById('fontSwitch');
+  if (sw && !sw.contains(e.target)) document.getElementById('fontMenu').classList.remove('open');
+});
+(function(){
+  var saved = 'outfit';
+  try { saved = localStorage.getItem('jpe-reading-font') || 'outfit'; } catch(e) {}
+  setReadingFont(saved);
+})();
+
+/* ============ TEST PICKER ============ */
+function loadTest(i){
+  TI = i;
+  const T = TESTS[i];
+  PA = T.PA; PB = T.PB; PC = T.PC;
+  document.getElementById('rubA').textContent = PA.rubric;
+  document.getElementById('rubB').textContent = PB.rubric;
+  document.getElementById('rubC').textContent = PC.rubric;
+  document.getElementById('testTopic').innerHTML = '<strong>Test ' + (i+1) + '</strong> - ' + T.topic;
+  document.querySelectorAll('.test-pill').forEach((b,bi)=>b.classList.toggle('active', bi===i));
+  resetPA(); resetPB(); resetPC();
+  showPart('a');
+  try{ localStorage.setItem('jpe-oet-reading-test', i); }catch(e){}
+  if (document.querySelector('[data-type="tests"]').classList.contains('active')) JPE_DEEPLINK.setParams({type:'tests', test: i+1});
+  window.scrollTo(0,0);
+}
+function buildPicker(){
+  const wrap = document.getElementById('testPicker');
+  TESTS.forEach((t,i)=>{
+    const b = document.createElement('button');
+    b.className = 'test-pill'; b.textContent = 'Test ' + (i+1);
+    b.onclick = ()=>loadTest(i);
+    wrap.appendChild(b);
+  });
+}
+
+/* ============ TABS (Guide / Tests) ============ */
+function switchType(type){
+  ['guide','tests'].forEach(t=>{
+    document.querySelector('[data-type="'+t+'"]').classList.toggle('active', t===type);
+    document.getElementById(t+'-content').classList.toggle('active', t===type);
+  });
+  if (type === 'tests') {
+    var activePill = document.querySelector('.part-filter-pill.active');
+    JPE_DEEPLINK.setParams({type: 'tests', test: TI+1, part: activePill ? activePill.dataset.part : null});
+  } else {
+    JPE_DEEPLINK.setParams({type: null, test: null, part: null});
+  }
+}
+function toggleGuideSidebar(el){ el.closest('.guide-shell').classList.toggle('sb-collapsed'); }
+
+/* ============ GUIDE ============ */
+const GUIDE = [
+  {
+    kind: "structure",
+    label: "Exam Structure",
+    title: "OET Reading, Parts A-C",
+    desc: "The OET Reading sub-test is the same for every profession (nursing, medicine, dentistry, pharmacy and others all read the same texts). It has three parts and lasts 60 minutes total: 15 minutes for Part A, then 45 minutes for Parts B and C together.",
+    facts: [
+      {n:"3", l:"reading parts"},
+      {n:"42", l:"questions"},
+      {n:"60", l:"minutes total"}
+    ],
+    breakdown: [
+      {n:"A", label:"Part A", qrange:"Q1-20", diff:"hard", diffLabel:"Fastest pace", tasks:[{name:"Matching across 4 texts",count:"20"}]},
+      {n:"B", label:"Part B", qrange:"Q1-6", diff:"easy", diffLabel:"Most approachable", tasks:[{name:"Short workplace texts",count:"6"}]},
+      {n:"C", label:"Part C", qrange:"Q1-16", diff:"med", diffLabel:"Medium", tasks:[{name:"Multiple choice, 2 long texts",count:"16"}]}
+    ],
+    tips: [
+      "Part A is timed separately and strictly, when the 15 minutes are up, most test centres move everyone on to Parts B and C regardless of where they are, so pace yourself against the clock rather than against the questions.",
+      "Part A is testing expeditious reading, scanning quickly for specific information across four related texts, not close reading for full understanding. Don't read every text start to finish before looking at the questions.",
+      "Parts B and C share one 45-minute block, so you can move between them. Many candidates do the six short Part B texts first since each one is quick, then spend the remaining time on the two longer Part C texts."
+    ]
+  },
+  {
+    kind: "tips",
+    label: "Strategy & Time",
+    title: "Strategy & Time Management",
+    desc: "Different parts reward different reading speeds. Here's roughly how the time is meant to be used.",
+    tips: [
+      "In Part A, read the 20 questions (or at least skim them) before diving into the four texts, then hunt for the specific detail each question needs. You are matching information, not analysing arguments.",
+      "In Part B, each short text is self-contained with just one question, so there's no need to cross-reference between texts. Read the text once, answer, move on.",
+      "In Part C, treat it like a standard reading-comprehension test: skim the whole text first for overall gist, then go through the eight questions in order, since they generally follow the order of the text.",
+      "There's no penalty for guessing anywhere in OET Reading, so never leave a question blank, even a rushed final guess in Part A is better than nothing."
+    ]
+  },
+  {
+    kind: "passage",
+    label: "Part A",
+    title: "Part A · Matching",
+    qrange: "Q1-20", diff: "hard", diffLabel: "Fastest pace",
+    intro: "Four short texts on a single healthcare topic (often a mix of a policy extract, a journal article, a product leaflet and a clinical guideline), with 20 questions asking which text a specific piece of information appears in. In the real exam, some of these questions are short-answer completion rather than matching, but the underlying skill, locating information fast, is the same.",
+    sections: [
+      {
+        anchor: "scan",
+        label: "Scanning, not reading",
+        title: "Scanning, Not Reading",
+        desc: "Part A rewards speed. You are looking for specific facts, figures, names or instructions, not evaluating the writer's argument.",
+        tips: [
+          "Look for numbers, proper nouns, and specific technical terms in the questions first, these are usually the fastest things to spot when scanning a text.",
+          "Don't assume a text is irrelevant just because its title doesn't obviously match the question, the four texts often overlap in subject matter deliberately.",
+          "If you can't find an answer within about 30-40 seconds of scanning, mark your best guess and move on. Time lost on one question in Part A can't be recovered."
+        ],
+        example: "A question asking which text “gives a maximum patient weight for a piece of equipment” is answered by scanning for a number followed by a unit like kg, not by reading the manufacturer's leaflet in full."
+      },
+      {
+        anchor: "paraphrase",
+        label: "Paraphrasing across texts",
+        title: "Paraphrasing Across Texts",
+        desc: "Questions rarely use the exact wording found in the text, so keyword-only scanning without checking meaning can lead you to the wrong text.",
+        tips: [
+          "Underline the core idea of each question, not every word, before scanning, then check that the text you find genuinely matches that idea, not just a shared keyword.",
+          "Watch for two texts that mention the same general topic (e.g. two texts both discussing repositioning) but where only one gives the specific detail the question actually asks for.",
+          "Negative or conditional phrasing in a question ('should not', 'unless', 'no longer required') needs matching negative or conditional phrasing in the text, a text that states the opposite is a common wrong-but-tempting match."
+        ]
+      },
+      {
+        anchor: "coverage",
+        label: "Using all four texts",
+        title: "Using All Four Texts",
+        desc: "With 20 questions across only 4 texts, no single text is likely to hold all the answers, and some texts are used more than others depending on how much specific detail they contain.",
+        tips: [
+          "Don't assume answers are evenly spread, a dense policy document will usually generate more matches than a short manufacturer's leaflet.",
+          "If you've matched most questions to two texts and hardly touched the other two, go back and check you haven't missed distinguishing detail in the texts you've under-used.",
+          "Keep a mental map of what each text covers as you go (who wrote it, what kind of document it is, its main focus), it speeds up every subsequent question."
+        ]
+      }
+    ]
+  },
+  {
+    kind: "passage",
+    label: "Part B",
+    title: "Part B · Short Texts",
+    qrange: "Q1-6", diff: "easy", diffLabel: "Most approachable",
+    intro: "Six short, independent workplace texts, notices, memos, extracts from policies or equipment manuals, each followed by one three-option multiple-choice question about its main point, purpose or a specific instruction.",
+    sections: [
+      {
+        anchor: "purpose",
+        label: "Purpose & main point",
+        title: "Purpose & Main Point",
+        desc: "Most Part B questions ask what a text is mainly telling the reader to do, or why a policy or instruction exists, not a minor supporting detail.",
+        tips: [
+          "Read the whole short text once before looking at the options, these texts are short enough that a single careful read is usually enough.",
+          "Be wary of an option that repeats a detail from the text accurately but isn't actually what the question is asking about, three-option questions often include one true-but-irrelevant distractor.",
+          "If a text gives an instruction and then a reason or exception, the question is very often about that exception or reason, not the basic instruction itself."
+        ],
+        example: "A memo stating staff below 90% hand-hygiene compliance 'will be asked to complete refresher training before their next shift, not at a later date' is testing whether you noticed the timing detail, not just that training exists."
+      },
+      {
+        anchor: "tone",
+        label: "Instruction vs explanation",
+        title: "Instruction vs Explanation",
+        desc: "Workplace texts often mix a direct instruction ('do this') with an explanation of why ('because...'). Questions can target either.",
+        tips: [
+          "Separate what the text is telling someone to do from why it's telling them to do it, wrong options frequently swap the two.",
+          "Watch for texts giving two related but different instructions (e.g. what to do first, and what to do if that doesn't work), the question usually asks about one specific step, not the whole sequence.",
+          "Three-option questions leave less room for a 'safe middle' choice than four-option ones, if two options both sound partly right, re-read the exact wording of the text one more time before choosing."
+        ]
+      }
+    ]
+  },
+  {
+    kind: "passage",
+    label: "Part C",
+    title: "Part C · Multiple Choice",
+    qrange: "Q1-16", diff: "med", diffLabel: "Medium",
+    intro: "Two longer texts on general health-related topics (not necessarily clinical), each followed by eight four-option multiple-choice questions covering gist, detail, opinion, attitude and inference, in the order the information appears in the text.",
+    sections: [
+      {
+        anchor: "gist",
+        label: "Gist & structure",
+        title: "Gist & Structure",
+        desc: "Before the detailed questions, it helps to know roughly what each paragraph is doing in the argument as a whole.",
+        tips: [
+          "Skim the whole text once for structure, what's the overall argument, and roughly what does each paragraph contribute, before answering any question in detail.",
+          "The eight questions per text generally follow the order of the text, so question 1 is usually answered near the start and question 8 near the end.",
+          "A question about the writer's overall message or the article's main purpose is often placed last, answer it after you've worked through the specific detail questions."
+        ]
+      },
+      {
+        anchor: "opinion",
+        label: "Opinion, attitude & inference",
+        title: "Opinion, Attitude & Inference",
+        desc: "Part C texts often report several viewpoints (researchers, critics, professional bodies), and questions test whether you can attribute the right opinion to the right source.",
+        tips: [
+          "When a text quotes or reports what 'researchers', 'critics' or 'some hospitals' think, keep track of which group holds which view, questions often test this attribution directly.",
+          "Distinguish a fact the writer reports from an opinion the writer or a quoted source expresses about that fact, wrong options sometimes state the fact correctly but misattribute the opinion.",
+          "For inference questions, the answer needs to be strongly supported by the text, not just plausible in general. Eliminate any option requiring outside knowledge the text doesn't actually provide."
+        ],
+        example: "If a text says 'critics argue this undermines the efficiency the model was meant to deliver', a question about what critics believe is answered directly, but a question about what the original researchers believe needs a different part of the text entirely."
+      }
+    ]
+  }
+];
+
+function renderGuideTips(tips){
+  return '<ol class="guide-tip-list">' + tips.map((t,ti)=>`<li class="guide-tip"><span class="guide-tip-num">${ti+1}</span><span>${t}</span></li>`).join('') + '</ol>';
+}
+function showGuideTopic(i){
+  const g = GUIDE[i];
+  document.getElementById('guide-content').querySelectorAll('.guide-nav-item').forEach((b,bi)=>b.classList.toggle('active', bi===i));
+  document.getElementById('guidePaneTitle').textContent = g.title;
+  let html = '';
+
+  if(g.kind === 'passage'){
+    document.getElementById('guidePaneDesc').textContent = g.intro;
+    html += `<div class="struct-list"><div class="struct-row">
+      <div class="struct-badge">${g.label.slice(-1)}</div>
+      <div class="struct-info">
+        <div class="struct-info-top"><strong>${g.label}</strong><span class="struct-qrange">${g.qrange}</span><span class="struct-diff ${g.diff}">${g.diffLabel}</span></div>
+        <div class="struct-tasks">${g.sections.map(s=>`<span class="struct-task">${s.label}</span>`).join('')}</div>
+      </div>
+    </div></div>`;
+    html += '<div class="guide-quicknav">' + g.sections.map(s=>`<button onclick="document.getElementById('ganchor-${s.anchor}').scrollIntoView({behavior:'smooth',block:'start'})">${s.label} &darr;</button>`).join('') + '</div>';
+    html += g.sections.map(s => `
+      <div class="guide-section" id="ganchor-${s.anchor}">
+        <div class="guide-section-title">${s.title}</div>
+        <div class="guide-section-desc">${s.desc}</div>
+        ${renderGuideTips(s.tips)}
+        ${s.example ? `<div class="guide-example"><div class="guide-example-label">Worked example</div><div class="guide-example-body">${s.example}</div></div>` : ''}
+      </div>`).join('');
+    document.getElementById('guidePaneBody').innerHTML = html;
+    return;
+  }
+
+  document.getElementById('guidePaneDesc').textContent = g.desc;
+  if(g.facts){
+    html += '<div class="struct-facts">' + g.facts.map(f=>`<div class="struct-fact"><div class="struct-fact-n">${f.n}</div><div class="struct-fact-l">${f.l}</div></div>`).join('') + '</div>';
+  }
+  if(g.breakdown){
+    html += '<div class="struct-list">' + g.breakdown.map(p=>`
+      <div class="struct-row">
+        <div class="struct-badge">${p.n}</div>
+        <div class="struct-info">
+          <div class="struct-info-top"><strong>${p.label}</strong><span class="struct-qrange">${p.qrange}</span><span class="struct-diff ${p.diff}">${p.diffLabel}</span></div>
+          <div class="struct-tasks">${p.tasks.map(t=>`<span class="struct-task">${t.name} <b>${t.count}</b></span>`).join('')}</div>
+        </div>
+      </div>`).join('') + '</div>';
+  }
+  html += renderGuideTips(g.tips);
+  if(g.example){
+    html += `<div class="guide-example"><div class="guide-example-label">Worked example</div><div class="guide-example-body">${g.example}</div></div>`;
+  }
+  document.getElementById('guidePaneBody').innerHTML = html;
+}
+function buildGuide(){
+  document.getElementById('guideNav').innerHTML = GUIDE.map((g,i) =>
+    `<button class="guide-nav-item" onclick="showGuideTopic(${i})"><span class="guide-nav-dot"></span><span>${g.label}</span></button>`
+  ).join('');
+  showGuideTopic(0);
+}
+
+/* ============ INIT ============ */
+buildPicker();
+let startTest = 0;
+try{ const sv = parseInt(localStorage.getItem('jpe-oet-reading-test'),10); if(sv>=0 && sv<TESTS.length) startTest = sv; }catch(e){}
+loadTest(startTest);
+buildGuide();
+
+(function(){
+  var t = JPE_DEEPLINK.getParam('type');
+  var n = parseInt(JPE_DEEPLINK.getParam('test'), 10);
+  var p = JPE_DEEPLINK.getParam('part');
+  if (t === 'tests') {
+    switchType('tests');
+    if (n >= 1 && n <= TESTS.length) loadTest(n - 1);
+    if (p && document.querySelector('.part-filter-pill[data-part="'+p+'"]')) showPart(p);
+  }
+})();
+</script>
+</body>
+</html>

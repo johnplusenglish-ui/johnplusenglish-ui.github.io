@@ -33,6 +33,7 @@ var JPE_TITLES = {
   "index.html": "johnplusenglish - Online English Classes - johnplusenglish",
   "interview-questions.html": "Interview Questions - johnplusenglish",
   "odd-one-out.html": "Odd One Out - johnplusenglish",
+  "oet-reading.html": "OET Reading (Parts A to C) · johnplusenglish",
   "phrasal-verbs.html": "Phrasal Verbs - johnplusenglish",
   "prepositions.html": "Prepositions - johnplusenglish",
   "quick-debates.html": "Quick Debates - johnplusenglish",
