@@ -528,6 +528,7 @@ function buildLesson(l, idx){
           <div class="ec-input-row">
             <input class="ec-input" id="ec-${l.id}-${ei}-${ii}" data-answer="${it.correct}" placeholder="Write the correct sentence…">
           </div>
+          <div class="transform-reveal" id="ec-rev-${l.id}-${ei}-${ii}"></div>
           <div style="font-size:11px;color:var(--ink3);margin-top:4px">Hint: ${it.hint}</div>
         </div>`).join('');
       return `<div class="exercise-card">
@@ -831,8 +832,9 @@ function checkEC(lid,ei,count){
     const inp=document.getElementById(`ec-${lid}-${ei}-${i}`);
     const ans=inp.dataset.answer.toLowerCase().replace(/[.!?,]/g,'').trim();
     const val=inp.value.toLowerCase().replace(/[.!?,]/g,'').trim();
-    if(val===ans){inp.className='ec-input correct';correct++;}
-    else inp.className='ec-input wrong';
+    const rev=document.getElementById(`ec-rev-${lid}-${ei}-${i}`);
+    if(val===ans){inp.className='ec-input correct';if(rev){rev.textContent='';rev.className='transform-reveal';}correct++;}
+    else{inp.className='ec-input wrong';if(rev){rev.textContent='→ '+inp.dataset.answer;rev.className='transform-reveal show';}}
   }
   const badge=document.getElementById(`score-ec-${lid}-${ei}`);
   const pct=Math.round((correct/count)*100);
@@ -840,7 +842,7 @@ function checkEC(lid,ei,count){
   badge.className=`score-badge show ${pct===100?'full':pct>=50?'partial':'low'}`;
 }
 function resetEC(lid,ei,count){
-  for(let i=0;i<count;i++){const inp=document.getElementById(`ec-${lid}-${ei}-${i}`);inp.value='';inp.className='ec-input';}
+  for(let i=0;i<count;i++){const inp=document.getElementById(`ec-${lid}-${ei}-${i}`);inp.value='';inp.className='ec-input';const rev=document.getElementById(`ec-rev-${lid}-${ei}-${i}`);if(rev){rev.textContent='';rev.className='transform-reveal';}}
   document.getElementById(`score-ec-${lid}-${ei}`).className='score-badge';
 }
 
