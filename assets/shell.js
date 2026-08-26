@@ -69,11 +69,11 @@ function closeSidebar(){
   document.getElementById('sidebarBackdrop').classList.remove('open');
 }
 // Animate a collapsible (.cat-rows/.level-rows) to its exact content height so
-// there is no dead space to crawl through — open/close stays tight regardless of
+// there is no dead space to crawl through - open/close stays tight regardless of
 // how many items the menu holds. After opening we release to 'none' so nested
 // menus can grow the parent without clipping.
 // Animate a collapsible (.cat-rows/.level-rows) to its exact content height so
-// there is no dead space to crawl through — open/close stays tight regardless of
+// there is no dead space to crawl through - open/close stays tight regardless of
 // how many items the menu holds. The 'open' class carries the padding/border, so
 // on OPEN we add it up front and on CLOSE we keep it until the collapse finishes
 // (removing it early would drop the padding and jump the content).
@@ -86,7 +86,7 @@ function jpeRows(group, el, open){
     group.classList.add('open');
     if (!el) return;
     if (reduce){ el.style.maxHeight = 'none'; return; }
-    // Measure the TRUE open height with transitions off — read live it comes back
+    // Measure the TRUE open height with transitions off - read live it comes back
     // ~5px short (the padding is still animating in), which would make the pill
     // below jump when we later release to 'none'. Snapping padding to final here
     // gives an exact target, so open lands clean and the release is seamless.
@@ -213,7 +213,7 @@ window.addEventListener('popstate', function(){
 })();
 
 // Swipe left to close the open mobile sidebar overlay. Deliberately does NOT
-// swipe-open from the left edge — that zone is reserved by iOS Safari and
+// swipe-open from the left edge - that zone is reserved by iOS Safari and
 // Android Chrome for their own "swipe back" gesture, so a page-level listener
 // there would fight the OS rather than reliably open the menu. Opening stays
 // a real tap on the bottom-left button. No-op on desktop: .sidebar.open only
@@ -308,7 +308,7 @@ window.addEventListener('popstate', function(){
 
 /* ── Notes side panel (site-wide) ──
    Disabled 2026-08-25 at John's request ("remove but remember for future
-   use") — the feature is fully intact below, just gated behind this early
+   use") - the feature is fully intact below, just gated behind this early
    return. Delete the `return;` line to bring it back. */
 (function(){
   return;
@@ -450,7 +450,7 @@ window.addEventListener('popstate', function(){
    actual content (inside the iframe) drops a numbered pin and prompts for
    an instruction. "Copy JSON" exports every pin across every page you've
    annotated, in one paste-ready block, for a Claude session to act on.
-   Data lives only in localStorage (jpe-annotations) — never sent anywhere.
+   Data lives only in localStorage (jpe-annotations) - never sent anywhere.
    Scope: content inside the iframe only, not the outer sidebar/topnav. */
 (function(){
   var DATA_KEY = 'jpe-annotations';
