@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="lock.js"></script>
+<script src="/assets/deeplink.js"></script>
+<base target="_top">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TOEFL Reading · johnplusenglish</title>
+<meta name="description" content="Full TOEFL iBT Reading practice: Complete the Words, Read in Daily Life, and Read an Academic Passage — the real 2026 redesigned format, with interactive checking.">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/theme.css">
+<style>
+:root{--sun:#7A7D8E;--correct:#1DD3B0;--wrong:#FF3B30}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;overflow-x:hidden;overflow-y:scroll}
+body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,var(--border) 1px,transparent 1px);background-size:28px 28px;opacity:.4;pointer-events:none;z-index:0}
+.topnav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(247,246,243,.88);backdrop-filter:blur(16px);border-bottom:1.5px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-family:'Outfit',sans-serif;font-size:1.3rem;font-weight:800;letter-spacing:-.02em;color:var(--ink);text-decoration:none}
+.nav-logo span{color:#2563EB}
+.topnav-links{display:flex;gap:1.2rem;align-items:center}
+.topnav-links a{font-size:.8rem;font-weight:600;color:var(--muted);text-decoration:none}
+
+.page-header{padding:2rem 2rem 1rem;max-width:960px;margin:0 auto;position:relative;z-index:1}
+.topic-hero{display:flex;align-items:flex-start;gap:1.2rem}
+.topic-icon{width:52px;height:52px;border-radius:12px;background:color-mix(in srgb, #2D3047 8%, #fff);color:#2D3047;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.topic-icon svg{width:24px;height:24px;stroke-width:1.8;fill:none;stroke:currentColor}
+.page-header h1{font-family:'Outfit',sans-serif;font-size:clamp(1.6rem,3.6vw,2.3rem);line-height:1.15;letter-spacing:-.01em;font-weight:900}
+.hero-meta{display:flex;gap:1.4rem;margin-top:.5rem;flex-wrap:wrap}
+.hero-meta span{font-size:.8rem;color:var(--muted)}
+.hero-meta strong{color:var(--ink);font-weight:800}
+.pilot-flag{display:inline-flex;align-items:center;gap:.4rem;font-family:Outfit,sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--cream);border:1.5px solid var(--border);padding:.3rem .8rem;border-radius:999px;margin-bottom:1rem}
+
+.wrap{max-width:960px;margin:0 auto;padding:0 2rem 4rem;position:relative;z-index:1}
+.font-switch{position:relative;display:flex;justify-content:flex-end;margin:.6rem 0 .5rem}
+.font-switch-btn{display:inline-flex;align-items:center;gap:.4rem;font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:700;padding:.4rem .9rem;border:1.5px solid var(--border);border-radius:20px;background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s}
+.font-switch-btn:hover{border-color:var(--accent);color:var(--ink)}
+.font-switch-menu{position:absolute;top:calc(100% + 6px);right:0;background:var(--card);border:1.5px solid var(--border);border-radius:12px;box-shadow:var(--shadow-md);padding:.4rem;display:none;flex-direction:column;gap:.1rem;min-width:210px;z-index:20}
+.font-switch-menu.open{display:flex}
+.font-opt{font-size:.87rem;text-align:left;padding:.55rem .65rem;border:none;border-radius:8px;background:transparent;color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:.6rem;font-family:'Outfit',sans-serif}
+.font-opt:hover{background:var(--cream)}
+.font-opt.active{background:var(--accent-light);color:var(--accent);font-weight:700}
+.font-opt-check{opacity:0;font-size:.8rem}
+.font-opt.active .font-opt-check{opacity:1}
+.font-opt-label{font-family:var(--opt-font,inherit);font-size:.95rem}
+
+.test-picker{display:flex;align-items:center;gap:.45rem;flex-wrap:wrap;margin:1rem 0 0}
+.test-picker-label{display:none}
+.test-pill{font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:700;padding:.4rem .9rem;border-radius:999px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:background .16s,color .16s,border-color .16s}
+.test-pill:hover{color:var(--ink);border-color:var(--muted)}
+.test-pill.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.test-topic{display:none}
+
+/* ── Guide tab (sidebar + pane) ───────────────────────── */
+.guide-shell{display:grid;grid-template-columns:250px 1fr;gap:1.2rem;align-items:start}
+.wb-sb{background:var(--card);border:1.5px solid var(--border);border-radius:14px;box-shadow:var(--shadow-sm);overflow:hidden;display:flex;flex-direction:column;position:sticky;top:80px;max-height:calc(100vh - 100px)}
+.wb-sb-head{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.75rem 1rem;border-bottom:1px solid var(--border);cursor:pointer;user-select:none}
+.wb-sb-head>span{font-size:.66rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.wb-sb-head .sb-chev{width:26px;height:26px;border:1.5px solid var(--border);border-radius:7px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:1rem;line-height:1;flex-shrink:0;transition:transform .2s}
+.wb-sb-head .sb-chev svg{width:13px;height:13px}
+.wb-sb-head:hover .sb-chev{color:var(--ink);border-color:var(--muted)}
+.wb-sb-scroll{flex:1;min-height:0;overflow-y:auto;padding:.4rem}
+.wb-sb-foot{padding:.55rem .9rem;border-top:1px solid var(--border);font-size:.66rem;color:var(--muted)}
+.wb-sb-foot b{color:var(--ink)}
+.guide-shell.sb-collapsed{grid-template-columns:48px 1fr}
+.guide-shell.sb-collapsed .wb-sb-scroll,.guide-shell.sb-collapsed .wb-sb-foot,.guide-shell.sb-collapsed .wb-sb-head>span{display:none}
+.guide-shell.sb-collapsed .wb-sb-head{justify-content:center;padding:.7rem .4rem}
+.guide-shell.sb-collapsed .sb-chev{transform:rotate(180deg)}
+.guide-nav-item{display:flex;align-items:center;gap:.6rem;padding:.65rem .75rem;border-radius:10px;cursor:pointer;font-family:'Outfit',sans-serif;color:var(--muted);border:1.5px solid transparent;background:none;transition:all .15s;text-align:left;width:100%;font-size:.84rem;font-weight:700;line-height:1.3}
+.guide-nav-item:hover{color:var(--ink);background:var(--cream)}
+.guide-nav-item.active{color:#fff;border-color:var(--accent);background:var(--accent)}
+.guide-nav-dot{width:6px;height:6px;border-radius:50%;background:var(--border);flex-shrink:0}
+.guide-nav-item.active .guide-nav-dot{background:#fff}
+.guide-nav-group-label{font-family:Outfit,sans-serif;font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:.7rem .75rem .3rem}
+.guide-nav-group-label:first-child{padding-top:.2rem}
+.wb-pane{background:var(--card);border:1.5px solid var(--border);border-radius:14px;box-shadow:var(--shadow-sm);overflow:hidden;min-width:0}
+.wb-pane-head{padding:1rem 1.25rem .8rem;border-bottom:1.5px solid var(--border)}
+.wb-pane-head h2{margin:0;font-size:1.2rem;font-weight:800;letter-spacing:-.01em}
+.wb-pane-head p{margin:.35rem 0 0;font-size:.85rem;color:var(--muted);line-height:1.5}
+.wb-pane-body{padding:1.1rem 1.25rem 1.4rem}
+.guide-tip-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.7rem}
+.guide-tip{display:flex;gap:.7rem;font-size:.88rem;line-height:1.55;color:var(--ink)}
+.guide-tip-num{width:22px;height:22px;border-radius:7px;background:var(--accent-light);color:var(--accent);font-size:.72rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.guide-tip b{font-weight:700}
+.guide-example{margin-top:1.1rem;padding-top:1rem;border-top:1.5px solid var(--border)}
+.guide-example-label{font-family:Outfit,sans-serif;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:.5rem}
+.guide-example-body{font-size:.85rem;line-height:1.6;color:var(--ink);background:var(--cream);border-radius:var(--radius-sm);padding:.8rem .95rem}
+.guide-quicknav{display:flex;flex-wrap:wrap;gap:.5rem;margin:1.1rem 0 0}
+.guide-quicknav button{font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:700;padding:.45rem .85rem;border-radius:999px;border:1.5px solid var(--border);background:var(--card);color:var(--ink);cursor:pointer;transition:all .15s}
+.guide-quicknav button:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
+.guide-section{margin-top:1.6rem;padding-top:1.4rem;border-top:1.5px solid var(--border);scroll-margin-top:24px}
+.guide-section-title{font-size:1.02rem;font-weight:800;color:var(--ink);margin-bottom:.3rem}
+.guide-section-desc{font-size:.85rem;color:var(--muted);margin-bottom:.9rem;line-height:1.5}
+.struct-facts{display:flex;gap:.6rem;margin-bottom:1.1rem;flex-wrap:wrap}
+.struct-fact{flex:1;min-width:90px;background:var(--accent-light);border-radius:var(--radius-sm);padding:.7rem .5rem;text-align:center}
+.struct-fact-n{font-family:Outfit,sans-serif;font-size:1.5rem;font-weight:800;color:var(--accent);line-height:1.1}
+.struct-fact-l{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-top:.15rem}
+.struct-list{display:flex;flex-direction:column;gap:.6rem;margin-bottom:1.3rem}
+.struct-row{display:flex;gap:.9rem;padding:.85rem .95rem;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius-sm);align-items:flex-start;box-shadow:var(--shadow-sm)}
+.struct-badge{width:32px;height:32px;border-radius:9px;background:var(--accent-light);color:var(--accent);font-family:Outfit,sans-serif;font-weight:800;font-size:.9rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.struct-info{flex:1;min-width:0}
+.struct-info-top{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.35rem}
+.struct-info-top strong{font-size:.85rem}
+.struct-qrange{font-size:.7rem;color:var(--muted);font-weight:600}
+.struct-diff{font-family:Outfit,sans-serif;font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:.15rem .5rem;border-radius:999px}
+.struct-diff.easy{background:rgba(52,199,89,.14);color:#1a7a34}
+.struct-diff.med{background:rgba(255,179,71,.2);color:#a5690a}
+.struct-diff.hard{background:rgba(255,59,48,.12);color:#c0392b}
+.struct-tasks{display:flex;flex-wrap:wrap;gap:.35rem}
+.struct-task{font-size:.72rem;background:var(--card);border:1px solid var(--border);border-radius:7px;padding:.25rem .55rem;color:var(--ink)}
+.struct-task b{color:var(--accent);font-weight:800;margin-left:.2rem}
+@media(max-width:820px){.guide-shell{grid-template-columns:1fr}.wb-sb{position:static;max-height:none}}
+
+.part-filter{display:flex;gap:4px;row-gap:4px;flex-wrap:wrap;align-items:flex-end;position:relative;padding-top:6px;margin-bottom:0}
+.part-filter::before{content:'';position:absolute;left:0;right:0;bottom:0;height:1.5px;background:var(--border)}
+.part-filter-pill{position:relative;font-size:.82rem;font-weight:700;padding:.6rem 1rem;color:var(--muted);cursor:pointer;white-space:nowrap;background:color-mix(in srgb,var(--ink) 4%,transparent);border:1.5px solid var(--border);border-radius:10px 10px 0 0;transition:all .18s;font-family:'Outfit',sans-serif}
+.part-filter-pill:hover{background:color-mix(in srgb,var(--ink) 8%,transparent);color:var(--ink)}
+.part-filter-pill.active{background:var(--cream);border-color:var(--accent);border-bottom-color:var(--cream);color:var(--accent);box-shadow:0 -3px 10px rgba(45,48,71,.06);z-index:2}
+
+.part-section{display:none;padding-top:1.4rem}
+.part-section.visible{display:block}
+.exam-info{display:flex;gap:10px;align-items:flex-start;padding:12px 16px;border-radius:var(--radius-sm);margin-bottom:16px;font-size:.86rem;line-height:1.55;color:var(--ink);background:var(--accent-light)}
+.exam-info svg{flex-shrink:0;margin-top:2px}
+
+.test-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:0 20px;margin-bottom:1.4rem}
+.test-header{padding:16px 4px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;border-bottom:1.5px solid var(--border)}
+.test-title{font-weight:800;font-size:.95rem}
+.score-display{font-family:Outfit,sans-serif;font-size:.82rem;font-weight:500;color:var(--muted);display:none;align-items:center;gap:6px}
+.score-display.visible{display:flex}
+.score-display .score-val{color:var(--accent);font-weight:800}
+.passage{padding:20px 4px 6px;font-size:.95rem;line-height:1.95;font-family:var(--reading-font,inherit)}
+.passage p{margin-bottom:1rem}
+.passage-title{font-weight:800;text-align:center;font-size:1.05rem;margin-bottom:14px}
+.para-letter{font-family:Outfit,sans-serif;font-weight:800;color:var(--accent);margin-right:6px}
+
+/* multiple choice */
+.mcq{margin:1.5rem 0;padding-top:1.3rem;border-top:1px solid var(--border)}
+.mcq:first-child{margin-top:0;padding-top:0;border-top:none}
+.mcq-stem{display:flex;gap:.7rem;font-weight:700;margin-bottom:.7rem;font-size:.92rem}
+.mcq-num{width:24px;height:24px;border-radius:7px;background:var(--accent);color:#fff;font-size:.72rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mcq-opts{display:flex;flex-direction:column;gap:.5rem;margin-left:2.05rem}
+.mcq-opt{display:flex;gap:.6rem;text-align:left;padding:.65rem .9rem;border:1.5px solid var(--border);border-radius:10px;background:var(--card);cursor:pointer;font-family:'Outfit',sans-serif;font-size:.86rem;transition:all .15s;color:var(--ink)}
+.mcq-opt:hover{border-color:var(--accent)}
+.mcq-opt .mcq-letter{font-weight:800;color:var(--muted);flex-shrink:0}
+.mcq-opt.selected{border-color:var(--accent);background:var(--accent-light)}
+.mcq-opt.correct-ans{border-color:var(--correct);background:rgba(29,211,176,.08);color:#0F7D71;font-weight:600}
+.mcq-opt.wrong-ans{border-color:var(--wrong);background:rgba(255,59,48,.06);color:#c0392b}
+.mcq-opt.correct-ans .mcq-letter{color:#0F7D71}
+.mcq-opt.wrong-ans .mcq-letter{color:#c0392b}
+.mcq-opt.locked{cursor:default}
+
+/* 3-choice (True/False/Not Given, Yes/No/Not Given) */
+.c3-row{display:flex;align-items:center;flex-wrap:wrap;gap:.7rem;padding:.7rem 4px;border-top:1px solid var(--border)}
+.c3-row:first-of-type{border-top:1.5px solid var(--border);margin-top:.2rem}
+.c3-stem{flex:1;min-width:220px;font-size:.87rem;display:flex;gap:.6rem}
+.c3-btns{display:flex;gap:.35rem;flex-shrink:0}
+.c3-btn{font-family:'Outfit',sans-serif;font-size:.74rem;font-weight:700;padding:.4rem .7rem;border-radius:8px;border:1.5px solid var(--border);background:var(--card);color:var(--ink);cursor:pointer;transition:all .15s;white-space:nowrap}
+.c3-btn:hover{border-color:var(--accent)}
+.c3-btn.selected{border-color:var(--accent);background:var(--accent);color:#fff}
+.c3-btn.correct-ans{border-color:var(--correct);background:rgba(29,211,176,.12);color:#0F7D71}
+.c3-btn.wrong-ans{border-color:var(--wrong);background:rgba(255,59,48,.1);color:#c0392b}
+.c3-btn.locked{cursor:default}
+
+/* matching pills (matching information / matching sentence endings) */
+.match-q{display:flex;align-items:center;flex-wrap:wrap;gap:.7rem;padding:.7rem 4px;border-top:1px solid var(--border)}
+.match-q:first-of-type{border-top:1.5px solid var(--border);margin-top:.2rem}
+.match-stem{flex:1;min-width:220px;font-size:.87rem;display:flex;gap:.6rem}
+.match-pills{display:flex;gap:.35rem;flex-wrap:wrap;flex-shrink:0}
+.match-pill{font-family:'Outfit',sans-serif;font-size:.76rem;font-weight:700;padding:.4rem .7rem;border-radius:8px;border:1.5px solid var(--border);background:var(--card);color:var(--ink);cursor:pointer;transition:all .15s}
+.match-pill:hover{border-color:var(--accent)}
+.match-pill.selected{border-color:var(--accent);background:var(--accent);color:#fff}
+.match-pill.correct-ans{border-color:var(--correct);background:rgba(29,211,176,.12);color:#0F7D71}
+.match-pill.wrong-ans{border-color:var(--wrong);background:rgba(255,59,48,.1);color:#c0392b}
+.match-pill.locked{cursor:default}
+
+/* reference box (headings list / endings list) */
+.ref-box{margin:1.2rem 4px 0;padding:16px 18px;background:var(--cream);border:1.5px solid var(--border);border-radius:var(--radius-sm)}
+.ref-box-title{font-family:Outfit,sans-serif;font-size:.66rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.7rem}
+.ref-row{display:flex;gap:.6rem;font-size:.86rem;line-height:1.55;margin-bottom:.55rem}
+.ref-row:last-child{margin-bottom:0}
+.ref-row b{flex-shrink:0;color:var(--accent)}
+
+/* heading-matching per paragraph */
+.head-row{display:flex;align-items:center;gap:.7rem;padding:.6rem 4px;border-top:1px solid var(--border)}
+.head-row:first-of-type{border-top:1.5px solid var(--border);margin-top:.2rem}
+.head-row-label{font-family:Outfit,sans-serif;font-weight:800;font-size:.85rem;flex-shrink:0;width:110px}
+.head-select{font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;border:none;border-bottom:2px dashed var(--accent);background:transparent;padding:.15rem .3rem;color:var(--accent);cursor:pointer;flex:1;max-width:340px}
+.head-select:disabled{opacity:1;cursor:default}
+.head-select.correct{border-bottom-color:var(--correct);color:#0F7D71}
+.head-select.wrong{border-bottom-color:var(--wrong);color:#c0392b}
+
+/* fill-in-the-blank (summary/note completion) */
+.fill-input{font-family:'Outfit',sans-serif;font-size:.92rem;font-weight:600;border:none;border-bottom:2px dashed var(--accent);background:transparent;padding:.1rem .3rem;color:var(--ink);width:auto;min-width:110px;outline:none}
+.fill-input:focus{border-bottom-color:var(--sky)}
+.fill-input.correct{border-bottom-color:var(--correct);background:rgba(29,211,176,.08);color:#0F7D71;font-weight:700}
+.fill-input.wrong{border-bottom-color:var(--wrong);background:rgba(255,59,48,.06);color:#c0392b}
+.fill-input:disabled{cursor:default;opacity:1}
+.summary-block{font-size:.95rem;line-height:2.1}
+
+/* shared actions / explanations / score summary */
+.actions{padding:16px 4px;border-top:1.5px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.btn{font-family:'Outfit',sans-serif;font-size:.84rem;font-weight:700;padding:10px 20px;border-radius:10px;border:2px solid transparent;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:var(--shadow-md)}
+.btn-secondary{background:var(--card);color:var(--muted);border-color:var(--border)}
+.btn-secondary:hover{color:var(--ink);border-color:var(--accent)}
+.btn-amber{background:var(--sun);color:var(--ink);border-color:var(--sun)}
+.btn-amber:hover{background:var(--ink);border-color:var(--ink);color:#fff}
+.explanations{display:none;padding:4px 4px 18px}
+.explanations.visible{display:block}
+.exp-title{font-family:Outfit,sans-serif;font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:10px;font-weight:600}
+.exp-grid{display:flex;flex-direction:column;gap:8px}
+.exp-item{display:flex;gap:10px;padding:10px 14px;border-radius:var(--radius-sm);background:var(--cream);border:1.5px solid transparent}
+.exp-item.was-correct{border-color:rgba(29,211,176,.2)}
+.exp-item.was-wrong{border-color:rgba(255,59,48,.2)}
+.exp-num{width:24px;height:24px;border-radius:6px;font-size:.7rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--accent-light);color:var(--accent)}
+.exp-text{font-size:.84rem;line-height:1.55;color:var(--ink)}
+.exp-text strong{font-weight:700}
+
+.score-summary{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-top:24px;box-shadow:var(--shadow-sm);text-align:center;display:none}
+.score-summary.visible{display:block}
+.score-summary-title{font-family:'Outfit',sans-serif;font-size:1.15rem;margin-bottom:12px}
+.score-summary-grid{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-bottom:14px}
+.score-summary-item{text-align:center;min-width:70px}
+.score-summary-item .ss-label{font-family:Outfit,sans-serif;font-size:.6rem;font-weight:500;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.score-summary-item .ss-val{font-family:Outfit,sans-serif;font-size:1.05rem;font-weight:700;color:var(--accent)}
+.score-summary-total{font-family:Outfit,sans-serif;font-size:.85rem;font-weight:700;color:var(--ink);padding-top:10px;border-top:1.5px solid var(--border)}
+.score-band{font-family:Outfit,sans-serif;font-size:1.6rem;font-weight:800;color:var(--accent);margin-top:10px}
+.score-band-note{font-size:.72rem;color:var(--muted);margin-top:6px;max-width:420px;margin-left:auto;margin-right:auto;line-height:1.4}
+
+@media(max-width:640px){.wrap{padding:0 1.2rem 3rem}.page-header{padding:1.6rem 1.2rem 1rem}.match-q,.c3-row{align-items:flex-start}.mcq-opts{margin-left:0}.overview{gap:.5rem 1rem}.overview-total{margin-left:0;width:100%;text-align:center}.head-row{flex-wrap:wrap}.head-row-label{width:100%}}
+
+/* short answer (Section 2, Q25-26) */
+.sa-row{display:flex;align-items:center;flex-wrap:wrap;gap:.7rem;padding:.7rem 4px;border-top:1px solid var(--border)}
+.sa-row:first-of-type{border-top:1.5px solid var(--border);margin-top:.2rem}
+.sa-stem{flex:1;min-width:220px;font-size:.87rem;display:flex;gap:.6rem}
+.sa-input{font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:600;padding:.5rem .7rem;border:1.5px solid var(--border);border-radius:8px;min-width:180px;background:var(--card);color:var(--ink);outline:none}
+.sa-input:focus{border-color:var(--accent)}
+.sa-input.correct{border-color:var(--correct);background:rgba(29,211,176,.08);color:#0F7D71;font-weight:700}
+.sa-input.wrong{border-color:var(--wrong);background:rgba(255,59,48,.06);color:#c0392b}
+.sa-input:disabled{cursor:default;opacity:1}
+
+/* ── Tabs (page-level: Guide / Academic / General) ── */
+.tabs-wrap{max-width:960px;margin:0 auto;padding:0 2rem;position:relative;z-index:1}
+.tabs{display:flex;gap:4px;row-gap:4px;border-bottom:none;position:relative;margin-bottom:1.5rem;align-items:flex-end;flex-wrap:wrap;padding-top:8px}
+.tabs::before{content:'';position:absolute;left:0;right:0;bottom:0;height:1.5px;background:var(--border)}
+.tab{position:relative;font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;padding:.5rem 1.25rem;color:var(--muted);cursor:pointer;white-space:nowrap;background:color-mix(in srgb,var(--ink) 4%,transparent);border:1.5px solid var(--border);border-radius:12px 12px 0 0;transition:background .18s,color .18s,box-shadow .18s,border-color .18s}
+.tab:not(.active):hover{background:color-mix(in srgb,var(--ink) 8%,transparent);color:var(--ink)}
+.tab:not(.active):focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tab.active{outline:none}
+.tab.active{background:var(--cream);border-color:var(--tab-accent,var(--accent));border-bottom:none!important;color:var(--tab-accent,var(--accent));padding-top:calc(.5rem + 3px);box-shadow:0 -3px 10px rgba(45,48,71,.06);z-index:2}
+
+/* ── page-level content-area show/hide ── */
+.content-area{display:none}
+.content-area.active{display:block}
+
+/* ── Guide landing tab ── */
+.guide-landing{max-width:820px}
+.guide-landing-intro{font-size:.88rem;color:var(--ink);line-height:1.5;margin-bottom:1rem}
+.guide-compare{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:1rem}
+.guide-compare-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:.85rem 1rem;box-shadow:var(--shadow-sm)}
+.guide-compare-card h3{font-size:.92rem;font-weight:800;margin-bottom:.1rem}
+.guide-compare-card .gc-sub{font-size:.7rem;color:var(--muted);margin-bottom:.55rem}
+.guide-compare-card ul{list-style:none;display:flex;flex-direction:column;gap:.4rem}
+.guide-compare-card li{font-size:.8rem;line-height:1.4;color:var(--ink);display:flex;gap:.45rem}
+.guide-compare-card li b{flex-shrink:0;color:var(--accent);font-weight:800}
+.guide-note{font-size:.8rem;color:var(--muted);line-height:1.45;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:.7rem .85rem;margin-bottom:.9rem}
+.guide-note b{color:var(--ink)}
+.guide-cta{display:flex;gap:.6rem;flex-wrap:wrap}
+.guide-cta button{font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:700;padding:.6rem 1.1rem;border-radius:999px;border:1.5px solid var(--border);background:var(--card);color:var(--ink);cursor:pointer;transition:all .15s}
+.guide-cta button:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
+
+/* ── Resources tab (external link cards) ── */
+.resource-grid{display:flex;flex-direction:column;gap:.7rem;max-width:680px}
+.resource-group-label{font-family:Outfit,sans-serif;font-size:.66rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin:1.3rem 0 .5rem}
+.resource-group-label:first-child{margin-top:0}
+.resource-card{display:flex;align-items:center;gap:.9rem;padding:.9rem 1.1rem;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius-sm);text-decoration:none;color:inherit;transition:all .15s;box-shadow:var(--shadow-sm)}
+.resource-card:hover{border-color:var(--accent);box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.resource-card-icon{width:38px;height:38px;border-radius:10px;background:var(--accent-light);color:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.resource-card-icon svg{width:18px;height:18px;stroke-width:1.8;fill:none;stroke:currentColor}
+.resource-card-body{flex:1;min-width:0}
+.resource-card-title{font-size:.9rem;font-weight:700;color:var(--ink);margin-bottom:.15rem}
+.resource-card-desc{font-size:.78rem;color:var(--muted);line-height:1.4}
+.resource-card-arrow{color:var(--muted);flex-shrink:0;display:flex}
+.resource-card-arrow svg{width:16px;height:16px}
+.resource-note{font-size:.82rem;color:var(--muted);line-height:1.6;background:var(--cream);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:.85rem 1rem;margin-top:1.4rem;max-width:680px}
+.resource-note b{color:var(--ink)}
+@media (max-width:640px){.guide-compare{grid-template-columns:1fr}}
+</style>
+<style>.topnav{display:none!important}</style>
+
+</head>
+<body>
+
+<div class="topnav">
+  <a href="index.html" class="nav-logo">john<span>plus</span>english</a>
+  <div class="topnav-links"><a href="index.html#about">About</a><a href="index.html#contact">Contact</a></div>
+</div>
+
+<div class="page-header">  <div class="topic-hero">
+    <div class="topic-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+    <div>
+      <h1>TOEFL Reading</h1>
+    </div>
+  </div>
+</div>
+
+<div class="tabs-wrap">
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-type="guide" onclick="switchType('guide')" style="--tab-accent:#2176FF">Guide</button>
+    <button class="tab" data-type="practice" onclick="switchType('practice')" style="--tab-accent:#2176FF">Practice</button>
+    <button class="tab" data-type="resources" onclick="switchType('resources')" style="--tab-accent:#2176FF">Resources</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+<div class="content-area active" id="guide-content">
+<div class="guide-shell" id="guideShell">
+  <div class="wb-sb">
+    <div class="wb-sb-head" onclick="toggleGuideSidebar(this)"><span>Guide topics</span><div class="sb-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div></div>
+    <div class="wb-sb-scroll" id="guideNav"></div>
+    <div class="wb-sb-foot">Tips for every task type in this section</div>
+  </div>
+  <div class="wb-pane">
+    <div class="wb-pane-head">
+      <h2 id="guidePaneTitle"></h2>
+      <p id="guidePaneDesc"></p>
+    </div>
+    <div class="wb-pane-body" id="guidePaneBody"></div>
+  </div>
+</div>
+</div>
+
+<div class="content-area" id="practice-content">
+
+  <div class="test-picker" id="setPicker"><span class="test-picker-label">Set</span>
+    <button class="test-pill active" data-set="0" onclick="loadSet(0)">Set 1</button>
+    <button class="test-pill" data-set="1" onclick="loadSet(1)">Set 2</button>
+  </div>
+
+  <div class="exam-info"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span>Complete the Words. Type the missing letters for each of the 10 gapped words in this academic paragraph.</span></div>
+  <div class="test-card">
+    <div class="test-header"><div class="test-title">Complete the Words</div><div class="score-display" id="wordsScoreDisplay">Score: <span class="score-val" id="wordsScoreVal"></span></div></div>
+    <div class="passage summary-block" id="wordsParagraph" style="padding:20px 4px"></div>
+    <div class="explanations" id="wordsExplanations"></div>
+    <div class="actions">
+      <button class="btn btn-primary" id="wordsCheckBtn" onclick="checkWords()">Check Answers</button>
+      <button class="btn btn-amber" onclick="showWords()">Show Answers</button>
+      <button class="btn btn-secondary" id="wordsResetBtn" style="display:none" onclick="resetWords()">Try Again</button>
+      <button class="btn btn-secondary" id="wordsExpBtn" style="display:none" onclick="toggleExp('wordsExplanations','wordsExpBtn')">Explanations</button>
+    </div>
+  </div>
+
+  <div id="dailyWrap"></div>
+
+  <div class="exam-info"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span>Read an Academic Passage. Read the ~200-word passage, then answer 5 multiple-choice questions.</span></div>
+  <div class="test-card">
+    <div class="test-header"><div class="test-title" id="academicTitle"></div><div class="score-display" id="academicScoreDisplay">Score: <span class="score-val" id="academicScoreVal"></span></div></div>
+    <div class="passage" id="academicPassage"></div>
+    <div id="academicQuestions" style="padding:4px"></div>
+    <div class="explanations" id="academicExplanations"></div>
+    <div class="actions">
+      <button class="btn btn-primary" id="academicCheckBtn" onclick="checkMCQBlock('academic')">Check Answers</button>
+      <button class="btn btn-amber" onclick="showMCQBlock('academic')">Show Answers</button>
+      <button class="btn btn-secondary" id="academicResetBtn" style="display:none" onclick="resetMCQBlock('academic')">Try Again</button>
+      <button class="btn btn-secondary" id="academicExpBtn" style="display:none" onclick="toggleExp('academicExplanations','academicExpBtn')">Explanations</button>
+    </div>
+  </div>
+
+  <div class="score-summary" id="scoreSummary">
+    <div class="score-summary-title">Set Summary</div>
+    <div class="score-summary-grid" id="scoreSummaryGrid"></div>
+  </div>
+
+</div>
+
+<div class="content-area" id="resources-content">
+  <div class="resource-grid">
+    <a class="resource-card" href="https://www.ets.org/toefl/test-takers/ibt/about/content.html" target="_blank" rel="noopener">
+      <div class="resource-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+      <div class="resource-card-body"><div class="resource-card-title">TOEFL iBT Test Content, Official (ETS)</div><div class="resource-card-desc">ETS's own breakdown of the redesigned TOEFL iBT: sections, timing and the current task types.</div></div>
+      <div class="resource-card-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg></div>
+    </a>
+    <a class="resource-card" href="https://www.ets.org/toefl/test-takers/ibt/prepare.html" target="_blank" rel="noopener">
+      <div class="resource-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+      <div class="resource-card-body"><div class="resource-card-title">Official TOEFL iBT Prep Resources (ETS)</div><div class="resource-card-desc">ETS's free and paid preparation materials, sample questions and test-day guidance.</div></div>
+      <div class="resource-card-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg></div>
+    </a>
+  </div>
+</div>
+
+</div>
+
+<script>
+const GUIDE = [{"label": "Overview", "title": "Reading — overview", "desc": "About 30 minutes, up to 50 items, split into two adaptive modules.", "facts": [{"n": "~30", "l": "Minutes"}, {"n": "≤50", "l": "Items"}, {"n": "2", "l": "Modules"}, {"n": "3", "l": "Task types"}], "tips": ["Everyone answers the same Module 1. How well you do on it decides whether Module 2 is easier or harder — there's no way to \"see\" the difficulty shift happening, so just answer every question as accurately as you can.", "There is no overall time limit shown per passage — manage the ~30 minutes yourself across all three task types.", "Unlike the old TOEFL, reading is not just long academic passages any more: a third of the section is short, practical, everyday texts."]}, {"label": "Complete the Words", "title": "Complete the Words", "desc": "An academic paragraph with 10 words missing several letters each. You type the missing letters back in — there are no answer choices.", "tips": ["This is a vocabulary-in-context task, not a spelling trick: use the surrounding sentence to work out which word fits before you try to recall its exact letters.", "Because there are no options to choose from, near-guesses don't help — if you're not sure of the ending of a word, look at its part of speech (noun, verb, adjective) from the sentence structure for a clue.", "Academic words in these paragraphs tend to be Latinate and multi-syllable (e.g. -tion, -ment, -logical endings) — practising common academic suffixes pays off across the whole section."], "example": "Paragraph: \"Corals themselves are colonies of small animals called polyps, which build hard calcium carbonate skeletons over many gen_____.\" The missing letters are <b>erations</b> — the sentence is about repeated cycles over time, so \"generations\" fits both the meaning and the grammar."}, {"label": "Read in Daily Life", "title": "Read in Daily Life", "desc": "Short, practical texts — emails, texts, menus, bills, notices, announcements — between 15 and 150 words, each with a couple of comprehension questions.", "tips": ["These texts are short on purpose: read the whole thing once before answering, it usually takes under thirty seconds.", "Questions test practical understanding — what happened, why, what to do next — not literary analysis. Look for the plain factual answer.", "Numbers, dates, prices and deadlines are common trap material: reread the exact figure in the text before selecting an option that restates it."]}, {"label": "Academic Passage", "title": "Read an Academic Passage", "desc": "A roughly 200-word academic passage (natural sciences, history, social sciences or the arts) followed by 5 multiple-choice questions.", "tips": ["At 200 words this is much shorter than the old TOEFL's 700-word passages — read for overall structure first (what is each paragraph doing?), then hunt for detail once you see a question that needs it.", "Expect one question per paragraph roughly, plus a question testing the passage as a whole (main idea, author's purpose, or an inference).", "Wrong options are usually built from a true detail used in the wrong place, or a detail that's almost — but not exactly — what the passage says. Match the option back to the exact sentence before choosing it."]}];
+
+function toggleGuideSidebar(el){ el.closest(".guide-shell").classList.toggle("sb-collapsed"); }
+function renderGuideTips(tips){
+  return '<ol class="guide-tip-list">' + tips.map((t,ti)=>`<li class="guide-tip"><span class="guide-tip-num">${ti+1}</span><span>${t}</span></li>`).join('') + '</ol>';
+}
+function showGuideTopic(i){
+  const g = GUIDE[i];
+  document.getElementById('guide-content').querySelectorAll('.guide-nav-item').forEach((b,bi)=>b.classList.toggle('active', bi===i));
+  document.getElementById('guidePaneTitle').textContent = g.title;
+  document.getElementById('guidePaneDesc').textContent = g.desc || '';
+  let html = '';
+  if(g.facts){
+    html += '<div class="struct-facts">' + g.facts.map(f=>`<div class="struct-fact"><div class="struct-fact-n">${f.n}</div><div class="struct-fact-l">${f.l}</div></div>`).join('') + '</div>';
+  }
+  if(g.breakdown){
+    html += '<div class="struct-list">' + g.breakdown.map(p=>`
+      <div class="struct-row">
+        <div class="struct-badge">${p.n}</div>
+        <div class="struct-info">
+          <div class="struct-info-top"><strong>${p.label}</strong>${p.qrange?`<span class="struct-qrange">${p.qrange}</span>`:''}</div>
+          <div class="struct-tasks">${(p.tasks||[]).map(t=>`<span class="struct-task">${t}</span>`).join('')}</div>
+        </div>
+      </div>`).join('') + '</div>';
+  }
+  html += renderGuideTips(g.tips);
+  if(g.example){
+    html += `<div class="guide-example"><div class="guide-example-label">Worked example</div><div class="guide-example-body">${g.example}</div></div>`;
+  }
+  document.getElementById('guidePaneBody').innerHTML = html;
+}
+function buildGuide(){
+  document.getElementById('guideNav').innerHTML = GUIDE.map((g,i) => `<button class="guide-nav-item" onclick="showGuideTopic(${i})"><span class="guide-nav-dot"></span><span>${g.label}</span></button>`).join('');
+  showGuideTopic(0);
+}
+buildGuide();
+
+function switchType(type) {
+  ['guide', 'practice', 'resources'].forEach(t => {
+    document.querySelector('[data-type="' + t + '"]').classList.toggle('active', t === type);
+    document.getElementById(t + '-content').classList.toggle('active', t === type);
+  });
+  JPE_DEEPLINK.setParams({type: type === 'guide' ? null : type});
+}
+(function(){
+  var t = JPE_DEEPLINK.getParam('type');
+  if (t && document.querySelector('[data-type="'+t+'"]')) switchType(t);
+})();
+
+
+const SETS = [{"wordsParagraph": "Coral reefs are among the most [[0]] diverse [[1]] on Earth, despite covering less than one percent of the ocean floor. A single reef can support thousands of species, from tiny [[2]] to large [[3]] fish, all depending on the coral [[4]] for shelter and food. Corals themselves are colonies of small animals called polyps, which build hard calcium carbonate skeletons over many [[5]]. Rising sea [[6]] cause a stress [[7]] known as bleaching, in which corals expel the algae living in their [[8]] and lose their color. Without [[9]], prolonged bleaching events can lead to widespread mortality across entire reef systems.", "words": [{"stem": "bio", "missing": "logically", "full": "biologically"}, {"stem": "eco", "missing": "systems", "full": "ecosystems"}, {"stem": "in", "missing": "vertebrates", "full": "invertebrates"}, {"stem": "pre", "missing": "datory", "full": "predatory"}, {"stem": "str", "missing": "ucture", "full": "structure"}, {"stem": "gen", "missing": "erations", "full": "generations"}, {"stem": "temp", "missing": "eratures", "full": "temperatures"}, {"stem": "re", "missing": "sponse", "full": "response"}, {"stem": "tis", "missing": "sues", "full": "tissues"}, {"stem": "inter", "missing": "vention", "full": "intervention"}], "daily": [{"kind": "Email", "title": "Room change for orientation", "text": "Hi everyone,\n\nBecause of a plumbing issue in Hall B, tomorrow's international student orientation has been moved to Hall C, Room 214, starting at 9:30 instead of 9:00. Please bring your registration confirmation and a photo ID. Coffee and light snacks will be available from 9:15. If you already picked up a welcome folder at the front desk, you do not need another one. Contact the housing office if you need accommodations for a disability.\n\n— Student Services", "questions": [{"q": "Why was the orientation moved?", "options": ["Room 214 was double-booked", "A plumbing issue in Hall B", "Hall C has more coffee", "The start time changed to 9:00"], "correct": 1, "explanation": "The message says the move happened \"because of a plumbing issue in Hall B.\""}, {"q": "What should students who already have a welcome folder do?", "options": ["Pick up a new one anyway", "Return it to the front desk", "Nothing, they don't need another", "Bring it to Hall B"], "correct": 2, "explanation": "\"You do not need another one\" means no action is required."}]}, {"kind": "Notice", "title": "Building C laundry room", "text": "NOTICE — Building C Laundry Room\n\nThe two dryers on the second floor are out of service until Thursday. Please use the machines in the basement, or the first-floor room in Building A. Coin machines still accept quarters only; the card reader is being repaired.\n\nSorry for the inconvenience.\n— Facilities", "questions": [{"q": "What is out of service?", "options": ["Both washers", "The two second-floor dryers", "The basement laundry room", "The card reader in Building A"], "correct": 1, "explanation": "\"The two dryers on the second floor are out of service.\""}, {"q": "How can residents pay for the machines in the meantime?", "options": ["Only with a card", "Only with quarters", "Either card or quarters", "Payment isn't required this week"], "correct": 1, "explanation": "The card reader is being repaired, so coin machines \"still accept quarters only.\""}]}], "academic": {"title": "Monarch Migration", "passage": "Each autumn, millions of monarch butterflies in eastern North America begin a remarkable journey southward, traveling as far as 4,000 kilometers to overwintering sites in the oyamel fir forests of central Mexico. What makes this migration especially unusual is that no single butterfly completes the round trip. The individuals that fly south in October are two or three generations removed from the monarchs that departed Mexico the previous spring, yet they navigate to the same forest groves their ancestors used, sometimes clustering on the very same trees.\n\nResearchers believe monarchs rely on a combination of cues to find their way, including the position of the sun and an internal magnetic compass that helps correct for cloudy days. Temperature also plays a role: falling autumn temperatures appear to trigger the shift from breeding behavior to migratory flight. Once monarchs reach Mexico, cooler mountain air slows their metabolism, allowing them to conserve energy through the winter months.\n\nThe migration has become harder in recent decades. Milkweed, the only plant monarch caterpillars can eat, has declined sharply due to agricultural herbicide use, while logging has reduced the fir forest habitat the butterflies depend on for winter shelter.", "questions": [{"q": "According to the passage, what is unusual about the monarch migration?", "options": ["It only happens in spring", "No single butterfly completes the entire round trip", "Monarchs travel less than 100 kilometers", "It occurs only in Mexico"], "correct": 1, "explanation": "The passage states plainly that \"no single butterfly completes the round trip.\""}, {"q": "What helps monarchs navigate, according to researchers?", "options": ["Sound frequencies", "Wing colour changes", "The sun's position and a magnetic compass", "Following other migrating birds"], "correct": 2, "explanation": "Researchers cite \"the position of the sun and an internal magnetic compass.\""}, {"q": "What effect does cooler mountain air have on monarchs in Mexico?", "options": ["It speeds up their metabolism", "It slows their metabolism, conserving energy", "It triggers reproduction", "It causes them to migrate further south"], "correct": 1, "explanation": "\"Cooler mountain air slows their metabolism, allowing them to conserve energy.\""}, {"q": "What has contributed to the decline of milkweed?", "options": ["Cooler temperatures", "Logging", "Agricultural herbicide use", "Overpopulation of monarchs"], "correct": 2, "explanation": "Milkweed \"has declined sharply due to agricultural herbicide use.\""}, {"q": "What does logging threaten, according to the passage?", "options": ["The monarchs' food supply in Mexico", "The fir forest habitat used for winter shelter", "The sun's position", "The internal magnetic compass"], "correct": 1, "explanation": "\"Logging has reduced the fir forest habitat the butterflies depend on for winter shelter.\""}]}}, {"wordsParagraph": "The [[0]] of the printing press in the fifteenth century transformed how information circulated across Europe. Before movable type, texts were copied by hand, a slow process that limited the availability of books to wealthy [[1]]. Johannes Gutenberg's press made it possible to [[2]] identical pages quickly, and printed material became [[3]] cheaper within a few decades. This shift had [[4]] consequences for [[5]], religious reform, and scientific [[6]], since ideas could now spread between distant cities without depending on a single manuscript surviving the journey. Historians frequently describe the press as one of the most [[7]] technologies ever developed.", "words": [{"stem": "in", "missing": "vention", "full": "invention"}, {"stem": "in", "missing": "stitutions", "full": "institutions"}, {"stem": "re", "missing": "produce", "full": "reproduce"}, {"stem": "dra", "missing": "matically", "full": "dramatically"}, {"stem": "sig", "missing": "nificant", "full": "significant"}, {"stem": "lit", "missing": "eracy", "full": "literacy"}, {"stem": "col", "missing": "laboration", "full": "collaboration"}, {"stem": "in", "missing": "fluential", "full": "influential"}], "daily": [{"kind": "Text message", "title": "Study group location change", "text": "Hey, quick heads up — the study group moved from the library to the café next to the gym because the 3rd floor rooms are booked for exams until Friday. Same time, 6pm. Bring your laptop if you want to work on the group slides, I'll bring the notes from Tuesday's lecture. Let me know if that works or if we should just push it to next week.", "questions": [{"q": "Why did the study group move location?", "options": ["The café is quieter", "The library rooms are booked for exams", "The gym closed early", "Someone forgot the notes"], "correct": 1, "explanation": "\"The 3rd floor rooms are booked for exams until Friday.\""}, {"q": "What does the sender offer to bring?", "options": ["A laptop", "Notes from Tuesday's lecture", "Group slides", "Snacks for everyone"], "correct": 1, "explanation": "\"I'll bring the notes from Tuesday's lecture.\""}]}, {"kind": "Receipt", "title": "Campus print center receipt", "text": "CAMPUS PRINT CENTER — RECEIPT\n45 pages b/w @ $0.08 = $3.60\n12 pages color @ $0.35 = $4.20\nBinding (1x) = $2.00\nSubtotal: $9.80\nStudent discount (10%): -$0.98\nTotal due: $8.82\n\nPick up after 2pm today; unclaimed orders are recycled after 5 business days.", "questions": [{"q": "What is the total due after the student discount?", "options": ["$9.80", "$8.82", "$0.98", "$2.00"], "correct": 1, "explanation": "Subtotal $9.80 minus the $0.98 discount equals $8.82."}, {"q": "What happens to orders left unclaimed for more than 5 business days?", "options": ["They are shipped to the student", "They are recycled", "A late fee is charged", "They are held indefinitely"], "correct": 1, "explanation": "\"Unclaimed orders are recycled after 5 business days.\""}]}], "academic": {"title": "The Silk Road", "passage": "The Silk Road was not a single route but a shifting network of overland and maritime paths that connected East Asia, Central Asia, the Middle East, and Europe for roughly fifteen centuries. Its name, coined by a nineteenth-century geographer, understates what actually moved along it: alongside silk, traders carried spices, glass, paper, precious metals, and, less visibly, ideas.\n\nBuddhism spread from India into China largely along these trade corridors, carried by merchants and traveling monks rather than by armies. Papermaking technology moved in the opposite direction, reaching the Middle East by the eighth century and Europe several centuries later, eventually reshaping how knowledge was recorded and shared. Even diseases traveled the routes; historians consider Silk Road contact a factor in the spread of the bubonic plague in the fourteenth century.\n\nCentral Asian cities such as Samarkand and Bukhara grew wealthy as stopover points, developing into centers of scholarship where astronomers, mathematicians, and poets from many cultures worked side by side. The network declined gradually after the fifteenth century as maritime trade routes around Africa offered European merchants a faster, more direct alternative.", "questions": [{"q": "What does the passage say about the name \"Silk Road\"?", "options": ["It was used throughout all fifteen centuries", "It understates the range of goods that moved along it", "It refers only to a single fixed route", "It was coined in the eighth century"], "correct": 1, "explanation": "The name \"understates what actually moved along it.\""}, {"q": "How did Buddhism spread into China, according to the passage?", "options": ["Through military conquest", "Along trade corridors via merchants and monks", "Through maritime routes only", "By government decree"], "correct": 1, "explanation": "Buddhism was \"carried by merchants and traveling monks rather than by armies.\""}, {"q": "Where did papermaking technology reach several centuries after arriving in the Middle East?", "options": ["China", "India", "Europe", "Central Asia"], "correct": 2, "explanation": "Papermaking reached \"the Middle East by the eighth century and Europe several centuries later.\""}, {"q": "What does the passage suggest about Samarkand and Bukhara?", "options": ["They were abandoned after the plague", "They became centers of scholarship due to trade wealth", "They only traded in silk", "They were maritime ports"], "correct": 1, "explanation": "They \"grew wealthy as stopover points, developing into centers of scholarship.\""}, {"q": "Why did the Silk Road decline after the fifteenth century?", "options": ["The plague destroyed all trading cities", "Maritime routes around Africa offered a faster alternative", "Papermaking became obsolete", "Buddhism stopped spreading"], "correct": 1, "explanation": "\"Maritime trade routes around Africa offered European merchants a faster, more direct alternative.\""}]}}];
+let CUR_SET = 0;
+
+function selectOpt(btn){
+  if(btn.classList.contains('locked')) return;
+  btn.closest('.mcq-opts').querySelectorAll('.mcq-opt').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function loadSet(i){
+  CUR_SET = i;
+  document.querySelectorAll('#setPicker .test-pill').forEach((b,bi)=>b.classList.toggle('active', bi===i));
+  renderWords();
+  renderDaily();
+  renderAcademic();
+  document.getElementById('scoreSummary').classList.remove('visible');
+}
+
+/* ---- Complete the Words ---- */
+function renderWords(){
+  const s = SETS[CUR_SET];
+  let html = s.wordsParagraph;
+  s.words.forEach((w,i)=>{
+    html = html.replace('[['+i+']]', `<span class="wgap">${w.stem}<input type="text" class="fill-input" id="wgap-${i}" data-i="${i}" style="width:${Math.max(60, w.missing.length*11)}px" autocomplete="off" spellcheck="false"></span>`);
+  });
+  document.getElementById('wordsParagraph').innerHTML = html;
+  document.getElementById('wordsScoreDisplay').classList.remove('visible');
+  document.getElementById('wordsExplanations').classList.remove('visible');
+  document.getElementById('wordsExpBtn').style.display='none';
+  document.getElementById('wordsResetBtn').style.display='none';
+  document.getElementById('wordsCheckBtn').style.display='inline-flex';
+}
+function checkWords(){
+  const s = SETS[CUR_SET];
+  let correct = 0;
+  s.words.forEach((w,i)=>{
+    const inp = document.getElementById('wgap-'+i);
+    const ok = inp.value.trim().toLowerCase() === w.missing.toLowerCase();
+    inp.classList.add(ok?'correct':'wrong');
+    inp.disabled = true;
+    if(ok) correct++;
+  });
+  document.getElementById('wordsScoreVal').textContent = correct + ' / ' + s.words.length;
+  document.getElementById('wordsScoreDisplay').classList.add('visible');
+  document.getElementById('wordsCheckBtn').style.display='none';
+  document.getElementById('wordsResetBtn').style.display='inline-flex';
+  document.getElementById('wordsExpBtn').style.display='inline-flex';
+  const exp = document.getElementById('wordsExplanations');
+  exp.innerHTML = '<div class="exp-title">Full Words</div><div class="exp-grid">' + s.words.map((w,i)=>{
+    const inp = document.getElementById('wgap-'+i);
+    const wasCorrect = inp.classList.contains('correct');
+    return `<div class="exp-item ${wasCorrect?'was-correct':'was-wrong'}"><div class="exp-num">${i+1}</div><div class="exp-text"><strong>${w.stem}${w.missing}</strong> — you typed “${inp.value.trim()||'(blank)'}”</div></div>`;
+  }).join('') + '</div>';
+  updateSummary();
+}
+function showWords(){
+  const s = SETS[CUR_SET];
+  s.words.forEach((w,i)=>{ const inp = document.getElementById('wgap-'+i); inp.value = w.missing; });
+  checkWords();
+}
+function resetWords(){ renderWords(); }
+
+/* ---- Daily life ---- */
+function renderDaily(){
+  const s = SETS[CUR_SET];
+  document.getElementById('dailyWrap').innerHTML = s.daily.map((d,di)=>`
+    <div class="exam-info"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span>Read in Daily Life — ${d.kind}. Read the text, then answer the questions.</span></div>
+    <div class="test-card">
+      <div class="test-header"><div class="test-title">${d.title}</div><div class="score-display" id="dailyScoreDisplay${di}">Score: <span class="score-val" id="dailyScoreVal${di}"></span></div></div>
+      <div class="passage" style="white-space:pre-line">${d.text}</div>
+      <div id="dailyQuestions${di}" style="padding:4px"></div>
+      <div class="explanations" id="dailyExplanations${di}"></div>
+      <div class="actions">
+        <button class="btn btn-primary" id="dailyCheckBtn${di}" onclick="checkMCQBlock('daily', ${di})">Check Answers</button>
+        <button class="btn btn-amber" onclick="showMCQBlock('daily', ${di})">Show Answers</button>
+        <button class="btn btn-secondary" id="dailyResetBtn${di}" style="display:none" onclick="resetMCQBlock('daily', ${di})">Try Again</button>
+        <button class="btn btn-secondary" id="dailyExpBtn${di}" style="display:none" onclick="toggleExp('dailyExplanations${di}','dailyExpBtn${di}')">Explanations</button>
+      </div>
+    </div>`).join('');
+  s.daily.forEach((d,di)=>{
+    document.getElementById('dailyQuestions'+di).innerHTML = d.questions.map((q,qi)=>q_html(qi,q)).join('');
+  });
+}
+function q_html(qi,q){
+  const opts = q.options.map((o,oi)=>`<button class="mcq-opt" data-i="${oi}" onclick="selectOpt(this)"><span class="mcq-letter">${String.fromCharCode(65+oi)}</span><span>${o}</span></button>`).join('');
+  return `<div class="mcq" data-q="${qi}"><div class="mcq-stem"><span class="mcq-num">${qi+1}</span><span>${q.q}</span></div><div class="mcq-opts">${opts}</div></div>`;
+}
+
+/* ---- generic MCQ block checker (used by daily[di] and academic) ---- */
+function getBlockQuestions(kind, di){
+  const s = SETS[CUR_SET];
+  return kind==='academic' ? s.academic.questions : s.daily[di].questions;
+}
+/* id builder: matches the literal ids written in the template markup above.
+   academic ids are "academic"+Field (no index); daily ids are "daily"+Field+di. */
+function fid(kind, di, field){ return kind==='academic' ? ('academic'+field) : ('daily'+field+di); }
+function checkMCQBlock(kind, di){
+  const qs = getBlockQuestions(kind, di);
+  const container = document.getElementById(fid(kind, di, 'Questions'));
+  let correct = 0;
+  qs.forEach((q,qi)=>{
+    const block = container.querySelectorAll('.mcq')[qi];
+    const opts = block.querySelectorAll('.mcq-opt');
+    const selected = block.querySelector('.mcq-opt.selected');
+    const selIdx = selected ? parseInt(selected.dataset.i,10) : -1;
+    opts.forEach(o=>{o.classList.add('locked'); o.onclick=null;});
+    if(selIdx === q.correct){ correct++; if(selected) selected.classList.add('correct-ans'); }
+    else { if(selected) selected.classList.add('wrong-ans'); opts[q.correct].classList.add('correct-ans'); }
+  });
+  document.getElementById(fid(kind, di, 'ScoreVal')).textContent = correct + ' / ' + qs.length;
+  document.getElementById(fid(kind, di, 'ScoreDisplay')).classList.add('visible');
+  document.getElementById(fid(kind, di, 'CheckBtn')).style.display='none';
+  document.getElementById(fid(kind, di, 'ResetBtn')).style.display='inline-flex';
+  document.getElementById(fid(kind, di, 'ExpBtn')).style.display='inline-flex';
+  const exp = document.getElementById(fid(kind, di, 'Explanations'));
+  exp.innerHTML = '<div class="exp-title">Explanations</div><div class="exp-grid">' + qs.map((q,qi)=>{
+    const block = container.querySelectorAll('.mcq')[qi];
+    const selected = block.querySelector('.mcq-opt.correct-ans, .mcq-opt.wrong-ans');
+    const wasCorrect = !block.querySelector('.mcq-opt.wrong-ans');
+    return `<div class="exp-item ${wasCorrect?'was-correct':'was-wrong'}"><div class="exp-num">${qi+1}</div><div class="exp-text"><strong>${String.fromCharCode(65+q.correct)}.</strong> ${q.explanation}</div></div>`;
+  }).join('') + '</div>';
+  updateSummary();
+}
+function showMCQBlock(kind, di){
+  const qs = getBlockQuestions(kind, di);
+  const container = document.getElementById(fid(kind, di, 'Questions'));
+  qs.forEach((q,qi)=>{
+    const block = container.querySelectorAll('.mcq')[qi];
+    block.querySelectorAll('.mcq-opt')[q.correct].classList.add('selected');
+  });
+  checkMCQBlock(kind, di);
+}
+function resetMCQBlock(kind, di){
+  if(kind==='academic') renderAcademic(); else renderDaily();
+}
+
+/* ---- Academic passage ---- */
+function renderAcademic(){
+  const s = SETS[CUR_SET].academic;
+  document.getElementById('academicTitle').textContent = s.title;
+  document.getElementById('academicPassage').innerHTML = s.passage.split('\n\n').map(p=>`<p>${p}</p>`).join('');
+  document.getElementById('academicQuestions').innerHTML = s.questions.map((q,qi)=>q_html(qi,q)).join('');
+  document.getElementById('academicScoreDisplay').classList.remove('visible');
+  document.getElementById('academicExplanations').classList.remove('visible');
+  document.getElementById('academicExpBtn').style.display='none';
+  document.getElementById('academicResetBtn').style.display='none';
+  document.getElementById('academicCheckBtn').style.display='inline-flex';
+}
+
+function toggleExp(expId, btnId){
+  document.getElementById(expId).classList.toggle('visible');
+}
+
+function updateSummary(){
+  const wordsDone = document.getElementById('wordsScoreDisplay').classList.contains('visible');
+  const academicDone = document.getElementById('academicScoreDisplay').classList.contains('visible');
+  const dailyEls = SETS[CUR_SET].daily.map((d,di)=>document.getElementById('dailyScoreDisplay'+di));
+  const dailyDone = dailyEls.every(el=>el && el.classList.contains('visible'));
+  if(!(wordsDone && academicDone && dailyDone)) return;
+  const wordsScore = document.getElementById('wordsScoreVal').textContent;
+  const academicScore = document.getElementById('academicScoreVal').textContent;
+  const dailyScores = SETS[CUR_SET].daily.map((d,di)=>document.getElementById('dailyScoreVal'+di).textContent);
+  const grid = document.getElementById('scoreSummaryGrid');
+  grid.innerHTML = `<div class="score-summary-item"><div class="ss-label">Words</div><div class="ss-val">${wordsScore}</div></div>` +
+    dailyScores.map((sc,i)=>`<div class="score-summary-item"><div class="ss-label">Daily ${i+1}</div><div class="ss-val">${sc}</div></div>`).join('') +
+    `<div class="score-summary-item"><div class="ss-label">Academic</div><div class="ss-val">${academicScore}</div></div>`;
+  document.getElementById('scoreSummary').classList.add('visible');
+}
+
+loadSet(0);
+
+</script>
+</body>
+</html>

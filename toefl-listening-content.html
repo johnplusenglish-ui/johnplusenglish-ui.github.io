@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="lock.js"></script>
+<script src="/assets/deeplink.js"></script>
+<base target="_top">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TOEFL Listening · johnplusenglish</title>
+<meta name="description" content="Full TOEFL iBT Listening practice: Choose a Response, Conversations, Announcements, and Academic Talks — the real 2026 redesigned format, presented as transcripts with interactive checking.">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/theme.css">
+<style>
+:root{--sun:#7A7D8E;--correct:#1DD3B0;--wrong:#FF3B30}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;overflow-x:hidden;overflow-y:scroll}
+body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,var(--border) 1px,transparent 1px);background-size:28px 28px;opacity:.4;pointer-events:none;z-index:0}
+.topnav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(247,246,243,.88);backdrop-filter:blur(16px);border-bottom:1.5px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-family:'Outfit',sans-serif;font-size:1.3rem;font-weight:800;letter-spacing:-.02em;color:var(--ink);text-decoration:none}
+.nav-logo span{color:#2563EB}
+.topnav-links{display:flex;gap:1.2rem;align-items:center}
+.topnav-links a{font-size:.8rem;font-weight:600;color:var(--muted);text-decoration:none}
+
+.page-header{padding:2rem 2rem 1rem;max-width:960px;margin:0 auto;position:relative;z-index:1}
+.topic-hero{display:flex;align-items:flex-start;gap:1.2rem}
+.topic-icon{width:52px;height:52px;border-radius:12px;background:color-mix(in srgb, #2D3047 8%, #fff);color:#2D3047;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.topic-icon svg{width:24px;height:24px;stroke-width:1.8;fill:none;stroke:currentColor}
+.page-header h1{font-family:'Outfit',sans-serif;font-size:clamp(1.6rem,3.6vw,2.3rem);line-height:1.15;letter-spacing:-.01em;font-weight:900}
+.hero-meta{display:flex;gap:1.4rem;margin-top:.5rem;flex-wrap:wrap}
+.hero-meta span{font-size:.8rem;color:var(--muted)}
+.hero-meta strong{color:var(--ink);font-weight:800}
+.pilot-flag{display:inline-flex;align-items:center;gap:.4rem;font-family:Outfit,sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--cream);border:1.5px solid var(--border);padding:.3rem .8rem;border-radius:999px;margin-bottom:1rem}
+
+.wrap{max-width:960px;margin:0 auto;padding:0 2rem 4rem;position:relative;z-index:1}
+.font-switch{position:relative;display:flex;justify-content:flex-end;margin:.6rem 0 .5rem}
+.font-switch-btn{display:inline-flex;align-items:center;gap:.4rem;font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:700;padding:.4rem .9rem;border:1.5px solid var(--border);border-radius:20px;background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s}
+.font-switch-btn:hover{border-color:var(--accent);color:var(--ink)}
+.font-switch-menu{position:absolute;top:calc(100% + 6px);right:0;background:var(--card);border:1.5px solid var(--border);border-radius:12px;box-shadow:var(--shadow-md);padding:.4rem;display:none;flex-direction:column;gap:.1rem;min-width:210px;z-index:20}
+.font-switch-menu.open{display:flex}
+.font-opt{font-size:.87rem;text-align:left;padding:.55rem .65rem;border:none;border-radius:8px;background:transparent;color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:.6rem;font-family:'Outfit',sans-serif}
+.font-opt:hover{background:var(--cream)}
+.font-opt.active{background:var(--accent-light);color:var(--accent);font-weight:700}
+.font-opt-check{opacity:0;font-size:.8rem}
+.font-opt.active .font-opt-check{opacity:1}
+.font-opt-label{font-family:var(--opt-font,inherit);font-size:.95rem}
+
+.test-picker{display:flex;align-items:center;gap:.45rem;flex-wrap:wrap;margin:1rem 0 0}
+.test-picker-label{display:none}
+.test-pill{font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:700;padding:.4rem .9rem;border-radius:999px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:background .16s,color .16s,border-color .16s}
+.test-pill:hover{color:var(--ink);border-color:var(--muted)}
+.test-pill.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.test-topic{display:none}
+
+/* ── Guide tab (sidebar + pane) ───────────────────────── */
+.guide-shell{display:grid;grid-template-columns:250px 1fr;gap:1.2rem;align-items:start}
+.wb-sb{background:var(--card);border:1.5px solid var(--border);border-radius:14px;box-shadow:var(--shadow-sm);overflow:hidden;display:flex;flex-direction:column;position:sticky;top:80px;max-height:calc(100vh - 100px)}
+.wb-sb-head{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.75rem 1rem;border-bottom:1px solid var(--border);cursor:pointer;user-select:none}
+.wb-sb-head>span{font-size:.66rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.wb-sb-head .sb-chev{width:26px;height:26px;border:1.5px solid var(--border);border-radius:7px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:1rem;line-height:1;flex-shrink:0;transition:transform .2s}
+.wb-sb-head .sb-chev svg{width:13px;height:13px}
+.wb-sb-head:hover .sb-chev{color:var(--ink);border-color:var(--muted)}
+.wb-sb-scroll{flex:1;min-height:0;overflow-y:auto;padding:.4rem}
+.wb-sb-foot{padding:.55rem .9rem;border-top:1px solid var(--border);font-size:.66rem;color:var(--muted)}
+.wb-sb-foot b{color:var(--ink)}
+.guide-shell.sb-collapsed{grid-template-columns:48px 1fr}
+.guide-shell.sb-collapsed .wb-sb-scroll,.guide-shell.sb-collapsed .wb-sb-foot,.guide-shell.sb-collapsed .wb-sb-head>span{display:none}
+.guide-shell.sb-collapsed .wb-sb-head{justify-content:center;padding:.7rem .4rem}
+.guide-shell.sb-collapsed .sb-chev{transform:rotate(180deg)}
+.guide-nav-item{display:flex;align-items:center;gap:.6rem;padding:.65rem .75rem;border-radius:10px;cursor:pointer;font-family:'Outfit',sans-serif;color:var(--muted);border:1.5px solid transparent;background:none;transition:all .15s;text-align:left;width:100%;font-size:.84rem;font-weight:700;line-height:1.3}
+.guide-nav-item:hover{color:var(--ink);background:var(--cream)}
+.guide-nav-item.active{color:#fff;border-color:var(--accent);background:var(--accent)}
+.guide-nav-dot{width:6px;height:6px;border-radius:50%;background:var(--border);flex-shrink:0}
+.guide-nav-item.active .guide-nav-dot{background:#fff}
+.guide-nav-group-label{font-family:Outfit,sans-serif;font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:.7rem .75rem .3rem}
+.guide-nav-group-label:first-child{padding-top:.2rem}
+.wb-pane{background:var(--card);border:1.5px solid var(--border);border-radius:14px;box-shadow:var(--shadow-sm);overflow:hidden;min-width:0}
+.wb-pane-head{padding:1rem 1.25rem .8rem;border-bottom:1.5px solid var(--border)}
+.wb-pane-head h2{margin:0;font-size:1.2rem;font-weight:800;letter-spacing:-.01em}
+.wb-pane-head p{margin:.35rem 0 0;font-size:.85rem;color:var(--muted);line-height:1.5}
+.wb-pane-body{padding:1.1rem 1.25rem 1.4rem}
+.guide-tip-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.7rem}
+.guide-tip{display:flex;gap:.7rem;font-size:.88rem;line-height:1.55;color:var(--ink)}
+.guide-tip-num{width:22px;height:22px;border-radius:7px;background:var(--accent-light);color:var(--accent);font-size:.72rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.guide-tip b{font-weight:700}
+.guide-example{margin-top:1.1rem;padding-top:1rem;border-top:1.5px solid var(--border)}
+.guide-example-label{font-family:Outfit,sans-serif;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:.5rem}
+.guide-example-body{font-size:.85rem;line-height:1.6;color:var(--ink);background:var(--cream);border-radius:var(--radius-sm);padding:.8rem .95rem}
+.guide-quicknav{display:flex;flex-wrap:wrap;gap:.5rem;margin:1.1rem 0 0}
+.guide-quicknav button{font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:700;padding:.45rem .85rem;border-radius:999px;border:1.5px solid var(--border);background:var(--card);color:var(--ink);cursor:pointer;transition:all .15s}
+.guide-quicknav button:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
+.guide-section{margin-top:1.6rem;padding-top:1.4rem;border-top:1.5px solid var(--border);scroll-margin-top:24px}
+.guide-section-title{font-size:1.02rem;font-weight:800;color:var(--ink);margin-bottom:.3rem}
+.guide-section-desc{font-size:.85rem;color:var(--muted);margin-bottom:.9rem;line-height:1.5}
+.struct-facts{display:flex;gap:.6rem;margin-bottom:1.1rem;flex-wrap:wrap}
+.struct-fact{flex:1;min-width:90px;background:var(--accent-light);border-radius:var(--radius-sm);padding:.7rem .5rem;text-align:center}
+.struct-fact-n{font-family:Outfit,sans-serif;font-size:1.5rem;font-weight:800;color:var(--accent);line-height:1.1}
+.struct-fact-l{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-top:.15rem}
+.struct-list{display:flex;flex-direction:column;gap:.6rem;margin-bottom:1.3rem}
+.struct-row{display:flex;gap:.9rem;padding:.85rem .95rem;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius-sm);align-items:flex-start;box-shadow:var(--shadow-sm)}
+.struct-badge{width:32px;height:32px;border-radius:9px;background:var(--accent-light);color:var(--accent);font-family:Outfit,sans-serif;font-weight:800;font-size:.9rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.struct-info{flex:1;min-width:0}
+.struct-info-top{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.35rem}
+.struct-info-top strong{font-size:.85rem}
+.struct-qrange{font-size:.7rem;color:var(--muted);font-weight:600}
+.struct-diff{font-family:Outfit,sans-serif;font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:.15rem .5rem;border-radius:999px}
+.struct-diff.easy{background:rgba(52,199,89,.14);color:#1a7a34}
+.struct-diff.med{background:rgba(255,179,71,.2);color:#a5690a}
+.struct-diff.hard{background:rgba(255,59,48,.12);color:#c0392b}
+.struct-tasks{display:flex;flex-wrap:wrap;gap:.35rem}
+.struct-task{font-size:.72rem;background:var(--card);border:1px solid var(--border);border-radius:7px;padding:.25rem .55rem;color:var(--ink)}
+.struct-task b{color:var(--accent);font-weight:800;margin-left:.2rem}
+@media(max-width:820px){.guide-shell{grid-template-columns:1fr}.wb-sb{position:static;max-height:none}}
+
+.part-filter{display:flex;gap:4px;row-gap:4px;flex-wrap:wrap;align-items:flex-end;position:relative;padding-top:6px;margin-bottom:0}
+.part-filter::before{content:'';position:absolute;left:0;right:0;bottom:0;height:1.5px;background:var(--border)}
+.part-filter-pill{position:relative;font-size:.82rem;font-weight:700;padding:.6rem 1rem;color:var(--muted);cursor:pointer;white-space:nowrap;background:color-mix(in srgb,var(--ink) 4%,transparent);border:1.5px solid var(--border);border-radius:10px 10px 0 0;transition:all .18s;font-family:'Outfit',sans-serif}
+.part-filter-pill:hover{background:color-mix(in srgb,var(--ink) 8%,transparent);color:var(--ink)}
+.part-filter-pill.active{background:var(--cream);border-color:var(--accent);border-bottom-color:var(--cream);color:var(--accent);box-shadow:0 -3px 10px rgba(45,48,71,.06);z-index:2}
+
+.part-section{display:none;padding-top:1.4rem}
+.part-section.visible{display:block}
+.exam-info{display:flex;gap:10px;align-items:flex-start;padding:12px 16px;border-radius:var(--radius-sm);margin-bottom:16px;font-size:.86rem;line-height:1.55;color:var(--ink);background:var(--accent-light)}
+.exam-info svg{flex-shrink:0;margin-top:2px}
+
+.test-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:0 20px;margin-bottom:1.4rem}
+.test-header{padding:16px 4px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;border-bottom:1.5px solid var(--border)}
+.test-title{font-weight:800;font-size:.95rem}
+.score-display{font-family:Outfit,sans-serif;font-size:.82rem;font-weight:500;color:var(--muted);display:none;align-items:center;gap:6px}
+.score-display.visible{display:flex}
+.score-display .score-val{color:var(--accent);font-weight:800}
+.passage{padding:20px 4px 6px;font-size:.95rem;line-height:1.95;font-family:var(--reading-font,inherit)}
+.passage p{margin-bottom:1rem}
+.passage-title{font-weight:800;text-align:center;font-size:1.05rem;margin-bottom:14px}
+.para-letter{font-family:Outfit,sans-serif;font-weight:800;color:var(--accent);margin-right:6px}
+
+/* multiple choice */
+.mcq{margin:1.5rem 0;padding-top:1.3rem;border-top:1px solid var(--border)}
+.mcq:first-child{margin-top:0;padding-top:0;border-top:none}
+.mcq-stem{display:flex;gap:.7rem;font-weight:700;margin-bottom:.7rem;font-size:.92rem}
+.mcq-num{width:24px;height:24px;border-radius:7px;background:var(--accent);color:#fff;font-size:.72rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mcq-opts{display:flex;flex-direction:column;gap:.5rem;margin-left:2.05rem}
+.mcq-opt{display:flex;gap:.6rem;text-align:left;padding:.65rem .9rem;border:1.5px solid var(--border);border-radius:10px;background:var(--card);cursor:pointer;font-family:'Outfit',sans-serif;font-size:.86rem;transition:all .15s;color:var(--ink)}
+.mcq-opt:hover{border-color:var(--accent)}
+.mcq-opt .mcq-letter{font-weight:800;color:var(--muted);flex-shrink:0}
+.mcq-opt.selected{border-color:var(--accent);background:var(--accent-light)}
+.mcq-opt.correct-ans{border-color:var(--correct);background:rgba(29,211,176,.08);color:#0F7D71;font-weight:600}
+.mcq-opt.wrong-ans{border-color:var(--wrong);background:rgba(255,59,48,.06);color:#c0392b}
+.mcq-opt.correct-ans .mcq-letter{color:#0F7D71}
+.mcq-opt.wrong-ans .mcq-letter{color:#c0392b}
+.mcq-opt.locked{cursor:default}
+
+/* 3-choice (True/False/Not Given, Yes/No/Not Given) */
+.c3-row{display:flex;align-items:center;flex-wrap:wrap;gap:.7rem;padding:.7rem 4px;border-top:1px solid var(--border)}
+.c3-row:first-of-type{border-top:1.5px solid var(--border);margin-top:.2rem}
+.c3-stem{flex:1;min-width:220px;font-size:.87rem;display:flex;gap:.6rem}
+.c3-btns{display:flex;gap:.35rem;flex-shrink:0}
+.c3-btn{font-family:'Outfit',sans-serif;font-size:.74rem;font-weight:700;padding:.4rem .7rem;border-radius:8px;border:1.5px solid var(--border);background:var(--card);color:var(--ink);cursor:pointer;transition:all .15s;white-space:nowrap}
+.c3-btn:hover{border-color:var(--accent)}
+.c3-btn.selected{border-color:var(--accent);background:var(--accent);color:#fff}
+.c3-btn.correct-ans{border-color:var(--correct);background:rgba(29,211,176,.12);color:#0F7D71}
+.c3-btn.wrong-ans{border-color:var(--wrong);background:rgba(255,59,48,.1);color:#c0392b}
+.c3-btn.locked{cursor:default}
+
+/* matching pills (matching information / matching sentence endings) */
+.match-q{display:flex;align-items:center;flex-wrap:wrap;gap:.7rem;padding:.7rem 4px;border-top:1px solid var(--border)}
+.match-q:first-of-type{border-top:1.5px solid var(--border);margin-top:.2rem}
+.match-stem{flex:1;min-width:220px;font-size:.87rem;display:flex;gap:.6rem}
+.match-pills{display:flex;gap:.35rem;flex-wrap:wrap;flex-shrink:0}
+.match-pill{font-family:'Outfit',sans-serif;font-size:.76rem;font-weight:700;padding:.4rem .7rem;border-radius:8px;border:1.5px solid var(--border);background:var(--card);color:var(--ink);cursor:pointer;transition:all .15s}
+.match-pill:hover{border-color:var(--accent)}
+.match-pill.selected{border-color:var(--accent);background:var(--accent);color:#fff}
+.match-pill.correct-ans{border-color:var(--correct);background:rgba(29,211,176,.12);color:#0F7D71}
+.match-pill.wrong-ans{border-color:var(--wrong);background:rgba(255,59,48,.1);color:#c0392b}
+.match-pill.locked{cursor:default}
+
+/* reference box (headings list / endings list) */
+.ref-box{margin:1.2rem 4px 0;padding:16px 18px;background:var(--cream);border:1.5px solid var(--border);border-radius:var(--radius-sm)}
+.ref-box-title{font-family:Outfit,sans-serif;font-size:.66rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.7rem}
+.ref-row{display:flex;gap:.6rem;font-size:.86rem;line-height:1.55;margin-bottom:.55rem}
+.ref-row:last-child{margin-bottom:0}
+.ref-row b{flex-shrink:0;color:var(--accent)}
+
+/* heading-matching per paragraph */
+.head-row{display:flex;align-items:center;gap:.7rem;padding:.6rem 4px;border-top:1px solid var(--border)}
+.head-row:first-of-type{border-top:1.5px solid var(--border);margin-top:.2rem}
+.head-row-label{font-family:Outfit,sans-serif;font-weight:800;font-size:.85rem;flex-shrink:0;width:110px}
+.head-select{font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;border:none;border-bottom:2px dashed var(--accent);background:transparent;padding:.15rem .3rem;color:var(--accent);cursor:pointer;flex:1;max-width:340px}
+.head-select:disabled{opacity:1;cursor:default}
+.head-select.correct{border-bottom-color:var(--correct);color:#0F7D71}
+.head-select.wrong{border-bottom-color:var(--wrong);color:#c0392b}
+
+/* fill-in-the-blank (summary/note completion) */
+.fill-input{font-family:'Outfit',sans-serif;font-size:.92rem;font-weight:600;border:none;border-bottom:2px dashed var(--accent);background:transparent;padding:.1rem .3rem;color:var(--ink);width:auto;min-width:110px;outline:none}
+.fill-input:focus{border-bottom-color:var(--sky)}
+.fill-input.correct{border-bottom-color:var(--correct);background:rgba(29,211,176,.08);color:#0F7D71;font-weight:700}
+.fill-input.wrong{border-bottom-color:var(--wrong);background:rgba(255,59,48,.06);color:#c0392b}
+.fill-input:disabled{cursor:default;opacity:1}
+.summary-block{font-size:.95rem;line-height:2.1}
+
+/* shared actions / explanations / score summary */
+.actions{padding:16px 4px;border-top:1.5px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.btn{font-family:'Outfit',sans-serif;font-size:.84rem;font-weight:700;padding:10px 20px;border-radius:10px;border:2px solid transparent;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:var(--shadow-md)}
+.btn-secondary{background:var(--card);color:var(--muted);border-color:var(--border)}
+.btn-secondary:hover{color:var(--ink);border-color:var(--accent)}
+.btn-amber{background:var(--sun);color:var(--ink);border-color:var(--sun)}
+.btn-amber:hover{background:var(--ink);border-color:var(--ink);color:#fff}
+.explanations{display:none;padding:4px 4px 18px}
+.explanations.visible{display:block}
+.exp-title{font-family:Outfit,sans-serif;font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:10px;font-weight:600}
+.exp-grid{display:flex;flex-direction:column;gap:8px}
+.exp-item{display:flex;gap:10px;padding:10px 14px;border-radius:var(--radius-sm);background:var(--cream);border:1.5px solid transparent}
+.exp-item.was-correct{border-color:rgba(29,211,176,.2)}
+.exp-item.was-wrong{border-color:rgba(255,59,48,.2)}
+.exp-num{width:24px;height:24px;border-radius:6px;font-size:.7rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--accent-light);color:var(--accent)}
+.exp-text{font-size:.84rem;line-height:1.55;color:var(--ink)}
+.exp-text strong{font-weight:700}
+
+.score-summary{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-top:24px;box-shadow:var(--shadow-sm);text-align:center;display:none}
+.score-summary.visible{display:block}
+.score-summary-title{font-family:'Outfit',sans-serif;font-size:1.15rem;margin-bottom:12px}
+.score-summary-grid{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-bottom:14px}
+.score-summary-item{text-align:center;min-width:70px}
+.score-summary-item .ss-label{font-family:Outfit,sans-serif;font-size:.6rem;font-weight:500;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.score-summary-item .ss-val{font-family:Outfit,sans-serif;font-size:1.05rem;font-weight:700;color:var(--accent)}
+.score-summary-total{font-family:Outfit,sans-serif;font-size:.85rem;font-weight:700;color:var(--ink);padding-top:10px;border-top:1.5px solid var(--border)}
+.score-band{font-family:Outfit,sans-serif;font-size:1.6rem;font-weight:800;color:var(--accent);margin-top:10px}
+.score-band-note{font-size:.72rem;color:var(--muted);margin-top:6px;max-width:420px;margin-left:auto;margin-right:auto;line-height:1.4}
+
+@media(max-width:640px){.wrap{padding:0 1.2rem 3rem}.page-header{padding:1.6rem 1.2rem 1rem}.match-q,.c3-row{align-items:flex-start}.mcq-opts{margin-left:0}.overview{gap:.5rem 1rem}.overview-total{margin-left:0;width:100%;text-align:center}.head-row{flex-wrap:wrap}.head-row-label{width:100%}}
+
+/* short answer (Section 2, Q25-26) */
+.sa-row{display:flex;align-items:center;flex-wrap:wrap;gap:.7rem;padding:.7rem 4px;border-top:1px solid var(--border)}
+.sa-row:first-of-type{border-top:1.5px solid var(--border);margin-top:.2rem}
+.sa-stem{flex:1;min-width:220px;font-size:.87rem;display:flex;gap:.6rem}
+.sa-input{font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:600;padding:.5rem .7rem;border:1.5px solid var(--border);border-radius:8px;min-width:180px;background:var(--card);color:var(--ink);outline:none}
+.sa-input:focus{border-color:var(--accent)}
+.sa-input.correct{border-color:var(--correct);background:rgba(29,211,176,.08);color:#0F7D71;font-weight:700}
+.sa-input.wrong{border-color:var(--wrong);background:rgba(255,59,48,.06);color:#c0392b}
+.sa-input:disabled{cursor:default;opacity:1}
+
+/* ── Tabs (page-level: Guide / Academic / General) ── */
+.tabs-wrap{max-width:960px;margin:0 auto;padding:0 2rem;position:relative;z-index:1}
+.tabs{display:flex;gap:4px;row-gap:4px;border-bottom:none;position:relative;margin-bottom:1.5rem;align-items:flex-end;flex-wrap:wrap;padding-top:8px}
+.tabs::before{content:'';position:absolute;left:0;right:0;bottom:0;height:1.5px;background:var(--border)}
+.tab{position:relative;font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;padding:.5rem 1.25rem;color:var(--muted);cursor:pointer;white-space:nowrap;background:color-mix(in srgb,var(--ink) 4%,transparent);border:1.5px solid var(--border);border-radius:12px 12px 0 0;transition:background .18s,color .18s,box-shadow .18s,border-color .18s}
+.tab:not(.active):hover{background:color-mix(in srgb,var(--ink) 8%,transparent);color:var(--ink)}
+.tab:not(.active):focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tab.active{outline:none}
+.tab.active{background:var(--cream);border-color:var(--tab-accent,var(--accent));border-bottom:none!important;color:var(--tab-accent,var(--accent));padding-top:calc(.5rem + 3px);box-shadow:0 -3px 10px rgba(45,48,71,.06);z-index:2}
+
+/* ── page-level content-area show/hide ── */
+.content-area{display:none}
+.content-area.active{display:block}
+
+/* ── Guide landing tab ── */
+.guide-landing{max-width:820px}
+.guide-landing-intro{font-size:.88rem;color:var(--ink);line-height:1.5;margin-bottom:1rem}
+.guide-compare{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:1rem}
+.guide-compare-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:.85rem 1rem;box-shadow:var(--shadow-sm)}
+.guide-compare-card h3{font-size:.92rem;font-weight:800;margin-bottom:.1rem}
+.guide-compare-card .gc-sub{font-size:.7rem;color:var(--muted);margin-bottom:.55rem}
+.guide-compare-card ul{list-style:none;display:flex;flex-direction:column;gap:.4rem}
+.guide-compare-card li{font-size:.8rem;line-height:1.4;color:var(--ink);display:flex;gap:.45rem}
+.guide-compare-card li b{flex-shrink:0;color:var(--accent);font-weight:800}
+.guide-note{font-size:.8rem;color:var(--muted);line-height:1.45;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:.7rem .85rem;margin-bottom:.9rem}
+.guide-note b{color:var(--ink)}
+.guide-cta{display:flex;gap:.6rem;flex-wrap:wrap}
+.guide-cta button{font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:700;padding:.6rem 1.1rem;border-radius:999px;border:1.5px solid var(--border);background:var(--card);color:var(--ink);cursor:pointer;transition:all .15s}
+.guide-cta button:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
+
+/* ── Resources tab (external link cards) ── */
+.resource-grid{display:flex;flex-direction:column;gap:.7rem;max-width:680px}
+.resource-group-label{font-family:Outfit,sans-serif;font-size:.66rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin:1.3rem 0 .5rem}
+.resource-group-label:first-child{margin-top:0}
+.resource-card{display:flex;align-items:center;gap:.9rem;padding:.9rem 1.1rem;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius-sm);text-decoration:none;color:inherit;transition:all .15s;box-shadow:var(--shadow-sm)}
+.resource-card:hover{border-color:var(--accent);box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.resource-card-icon{width:38px;height:38px;border-radius:10px;background:var(--accent-light);color:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.resource-card-icon svg{width:18px;height:18px;stroke-width:1.8;fill:none;stroke:currentColor}
+.resource-card-body{flex:1;min-width:0}
+.resource-card-title{font-size:.9rem;font-weight:700;color:var(--ink);margin-bottom:.15rem}
+.resource-card-desc{font-size:.78rem;color:var(--muted);line-height:1.4}
+.resource-card-arrow{color:var(--muted);flex-shrink:0;display:flex}
+.resource-card-arrow svg{width:16px;height:16px}
+.resource-note{font-size:.82rem;color:var(--muted);line-height:1.6;background:var(--cream);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:.85rem 1rem;margin-top:1.4rem;max-width:680px}
+.resource-note b{color:var(--ink)}
+@media (max-width:640px){.guide-compare{grid-template-columns:1fr}}
+</style>
+<style>.topnav{display:none!important}</style>
+
+</head>
+<body>
+
+<div class="topnav">
+  <a href="index.html" class="nav-logo">john<span>plus</span>english</a>
+  <div class="topnav-links"><a href="index.html#about">About</a><a href="index.html#contact">Contact</a></div>
+</div>
+
+<div class="page-header">  <div class="topic-hero">
+    <div class="topic-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></div>
+    <div>
+      <h1>TOEFL Listening</h1>
+    </div>
+  </div>
+</div>
+
+<div class="tabs-wrap">
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-type="guide" onclick="switchType('guide')" style="--tab-accent:#2176FF">Guide</button>
+    <button class="tab" data-type="practice" onclick="switchType('practice')" style="--tab-accent:#2176FF">Practice</button>
+    <button class="tab" data-type="resources" onclick="switchType('resources')" style="--tab-accent:#2176FF">Resources</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+<div class="content-area active" id="guide-content">
+<div class="guide-shell" id="guideShell">
+  <div class="wb-sb">
+    <div class="wb-sb-head" onclick="toggleGuideSidebar(this)"><span>Guide topics</span><div class="sb-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div></div>
+    <div class="wb-sb-scroll" id="guideNav"></div>
+    <div class="wb-sb-foot">Tips for every task type in this section</div>
+  </div>
+  <div class="wb-pane">
+    <div class="wb-pane-head">
+      <h2 id="guidePaneTitle"></h2>
+      <p id="guidePaneDesc"></p>
+    </div>
+    <div class="wb-pane-body" id="guidePaneBody"></div>
+  </div>
+</div>
+</div>
+
+<div class="content-area" id="practice-content">
+
+  <div class="test-picker" id="setPicker"><span class="test-picker-label">Set</span>
+    <button class="test-pill active" data-set="0" onclick="loadSet(0)">Set 1</button>
+    <button class="test-pill" data-set="1" onclick="loadSet(1)">Set 2</button>
+  </div>
+
+  <div class="exam-info"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span>Listen and Choose a Response. In the real exam this is audio only — here it's shown as a transcript line. Pick the most natural reply.</span></div>
+  <div id="responsesWrap"></div>
+
+  <div id="conversationWrap"></div>
+  <div id="announcementWrap"></div>
+  <div id="talkWrap"></div>
+
+  <div class="score-summary" id="scoreSummary">
+    <div class="score-summary-title">Set Summary</div>
+    <div class="score-summary-grid" id="scoreSummaryGrid"></div>
+  </div>
+
+</div>
+
+<div class="content-area" id="resources-content">
+  <div class="resource-grid">
+    <a class="resource-card" href="https://www.ets.org/toefl/test-takers/ibt/about/content.html" target="_blank" rel="noopener">
+      <div class="resource-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></div>
+      <div class="resource-card-body"><div class="resource-card-title">TOEFL iBT Test Content, Official (ETS)</div><div class="resource-card-desc">ETS's own breakdown of the redesigned TOEFL iBT: sections, timing and the current task types.</div></div>
+      <div class="resource-card-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg></div>
+    </a>
+    <a class="resource-card" href="https://www.ets.org/toefl/test-takers/ibt/prepare.html" target="_blank" rel="noopener">
+      <div class="resource-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+      <div class="resource-card-body"><div class="resource-card-title">Official TOEFL iBT Prep Resources (ETS)</div><div class="resource-card-desc">ETS's free and paid preparation materials, sample questions and test-day guidance.</div></div>
+      <div class="resource-card-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg></div>
+    </a>
+  </div>
+</div>
+
+</div>
+
+<script>
+const GUIDE = [{"label": "Overview", "title": "Listening — overview", "desc": "About 29 minutes, up to 47 items, split into two adaptive modules. No replay is allowed on any clip.", "facts": [{"n": "~29", "l": "Minutes"}, {"n": "≤47", "l": "Items"}, {"n": "2", "l": "Modules"}, {"n": "0", "l": "Replays"}], "tips": ["You hear everything exactly once — there is no replay button anywhere in this section, so active first-listen note-taking matters more here than almost anywhere else in the exam.", "Like Reading, everyone hears the same Module 1; your performance there shapes how challenging Module 2's audio and questions are.", "All four task types are multiple choice, so even an educated guess costs you nothing — never leave a question unanswered."]}, {"label": "Choose a Response", "title": "Listen and Choose a Response", "desc": "You hear one short spoken sentence (about 5 seconds), then choose the most natural reply from 4 options. On this text-based practice site it's shown as a transcript line, but in the real exam it is audio only, nothing is written on screen.", "tips": ["This tests conversational instinct, not grammar rules — the \"correct\" answer is whichever reply a native speaker would actually say next, not just whichever is grammatically possible.", "Watch for register and tone: a casual remark expects a casual reply, a request expects acceptance/refusal, a statement of opinion expects agreement/disagreement, not a random fact.", "Wrong options are often built by picking a word from the prompt and reusing it in an unrelated sentence — don't choose an option just because a word sounds familiar."]}, {"label": "Conversations", "title": "Conversations", "desc": "A roughly 30-second exchange between two people (a student and staff member, two students, etc.), followed by 2 questions.", "tips": ["Conversations usually involve a problem and a resolution — track what the problem is, and what gets decided or agreed by the end.", "Pay attention to changes of plan mid-conversation (\"actually...\", \"wait, let's...\") — these moments are frequently what a question targets.", "Because there's no replay, jot down 3-4 keywords as you listen (names, numbers, decisions) rather than trying to remember the whole exchange."]}, {"label": "Announcements", "title": "Announcements", "desc": "A roughly 30-second single-speaker public or campus announcement, followed by 2 questions.", "tips": ["Announcements are information-dense in a short space — listen for the reason something is happening (why) and the resulting action or change (what happens next).", "These are typically administrative in nature: schedule changes, closures, deadlines, policy updates. Numbers and dates are common question targets.", "The speaker often states a cause and effect (\"due to X, Y will happen\") — that structure is worth listening for specifically."]}, {"label": "Academic Talks", "title": "Academic Talks", "desc": "A professor's short lecture or talk on an academic topic, followed by several multiple-choice questions.", "tips": ["These talks usually define a concept, then illustrate it with an example — questions often test both the definition and the detail of the example separately, so track them as two distinct things.", "Listen for signposting language (\"here's a classic example\", \"this shows up in...\", \"researchers have found\") — it tells you exactly where the testable content is.", "A talk's final point often broadens the idea beyond the opening example (\"this matters well beyond X\") — that broader takeaway is a common question target."]}];
+
+function toggleGuideSidebar(el){ el.closest(".guide-shell").classList.toggle("sb-collapsed"); }
+function renderGuideTips(tips){
+  return '<ol class="guide-tip-list">' + tips.map((t,ti)=>`<li class="guide-tip"><span class="guide-tip-num">${ti+1}</span><span>${t}</span></li>`).join('') + '</ol>';
+}
+function showGuideTopic(i){
+  const g = GUIDE[i];
+  document.getElementById('guide-content').querySelectorAll('.guide-nav-item').forEach((b,bi)=>b.classList.toggle('active', bi===i));
+  document.getElementById('guidePaneTitle').textContent = g.title;
+  document.getElementById('guidePaneDesc').textContent = g.desc || '';
+  let html = '';
+  if(g.facts){
+    html += '<div class="struct-facts">' + g.facts.map(f=>`<div class="struct-fact"><div class="struct-fact-n">${f.n}</div><div class="struct-fact-l">${f.l}</div></div>`).join('') + '</div>';
+  }
+  if(g.breakdown){
+    html += '<div class="struct-list">' + g.breakdown.map(p=>`
+      <div class="struct-row">
+        <div class="struct-badge">${p.n}</div>
+        <div class="struct-info">
+          <div class="struct-info-top"><strong>${p.label}</strong>${p.qrange?`<span class="struct-qrange">${p.qrange}</span>`:''}</div>
+          <div class="struct-tasks">${(p.tasks||[]).map(t=>`<span class="struct-task">${t}</span>`).join('')}</div>
+        </div>
+      </div>`).join('') + '</div>';
+  }
+  html += renderGuideTips(g.tips);
+  if(g.example){
+    html += `<div class="guide-example"><div class="guide-example-label">Worked example</div><div class="guide-example-body">${g.example}</div></div>`;
+  }
+  document.getElementById('guidePaneBody').innerHTML = html;
+}
+function buildGuide(){
+  document.getElementById('guideNav').innerHTML = GUIDE.map((g,i) => `<button class="guide-nav-item" onclick="showGuideTopic(${i})"><span class="guide-nav-dot"></span><span>${g.label}</span></button>`).join('');
+  showGuideTopic(0);
+}
+buildGuide();
+
+function switchType(type) {
+  ['guide', 'practice', 'resources'].forEach(t => {
+    document.querySelector('[data-type="' + t + '"]').classList.toggle('active', t === type);
+    document.getElementById(t + '-content').classList.toggle('active', t === type);
+  });
+  JPE_DEEPLINK.setParams({type: type === 'guide' ? null : type});
+}
+(function(){
+  var t = JPE_DEEPLINK.getParam('type');
+  if (t && document.querySelector('[data-type="'+t+'"]')) switchType(t);
+})();
+
+
+const SETS = [{"responses": [{"line": "A: \"Would you mind grabbing my badge from the front desk on your way in?\"", "options": ["\"Sure, no problem at all.\"", "\"I've never been to the front desk.\"", "\"It's on the second floor.\"", "\"Yes, I minded that yesterday.\""], "correct": 0, "explanation": "A polite request (\"would you mind...\") is naturally answered with agreement, not a location or an unrelated comment."}, {"line": "A: \"I can't believe how quiet the cafeteria is today.\"", "options": ["\"Me neither, I guess most people are away for the holiday.\"", "\"I believe you completely.\"", "\"The cafeteria opens at eight.\"", "\"No, I can't hear anything.\""], "correct": 0, "explanation": "The natural reply agrees with the observation and offers a plausible reason, matching the conversational tone."}], "conversation": {"title": "At the registrar's office", "transcript": "Man: Hi, I'm trying to switch from the Tuesday lab section to the Thursday one — is that still possible this late?\nWoman: Let me check... it looks like Thursday's section is actually full right now, but there's a waitlist. Do you want me to add you?\nMan: How long is the waitlist usually?\nWoman: It varies, but for labs it usually clears within the first week since a few people always drop. I'd say you have a good chance.\nMan: Okay, please add me then. And if a spot doesn't open up, I'll just stay in the Tuesday section, right?\nWoman: Exactly, you won't lose your current spot while you're on the waitlist.", "questions": [{"q": "What does the man want to do?", "options": ["Drop his lab course entirely", "Switch to the Thursday lab section", "Join a different course", "Cancel his registration"], "correct": 1, "explanation": "He asks about switching \"from the Tuesday lab section to the Thursday one.\""}, {"q": "What does the woman say about staying on the waitlist?", "options": ["He will lose his current Tuesday spot", "He won't lose his current spot while waitlisted", "He must decide within 24 hours", "He cannot join a waitlist for labs"], "correct": 1, "explanation": "\"You won't lose your current spot while you're on the waitlist.\""}]}, "announcement": {"title": "Campus shuttle change", "transcript": "Attention riders: due to construction on Elm Street, the North Campus shuttle will temporarily use a detour via College Avenue starting Monday. This adds approximately five minutes to the usual route. The College Avenue stop will serve as a replacement for the Elm Street stop during this period. Regular service resumes once construction is complete, expected in about three weeks. Thank you for your patience.", "questions": [{"q": "Why is the shuttle route changing?", "options": ["A shortage of drivers", "Construction on Elm Street", "Low ridership", "A new campus building opening"], "correct": 1, "explanation": "The detour is \"due to construction on Elm Street.\""}, {"q": "What will happen to the Elm Street stop during this period?", "options": ["It will be removed permanently", "It will be replaced by the College Avenue stop", "It will run on a separate schedule", "It will only operate on weekends"], "correct": 1, "explanation": "\"The College Avenue stop will serve as a replacement for the Elm Street stop.\""}]}, "talk": {"title": "Introductory Psychology — cognitive bias", "transcript": "Professor: Today I want to introduce a concept called confirmation bias. In simple terms, it's our tendency to search for, favor, and remember information that confirms what we already believe, while giving less weight to information that contradicts it. This isn't the same as being closed-minded on purpose — it happens automatically, often without us noticing.\n\nHere's a classic example from research: if someone already believes a certain diet is effective, they're more likely to notice and remember the days it seemed to work, and quietly forget the days it didn't. The evidence they end up remembering isn't representative of what actually happened, it's just what fit the existing belief.\n\nConfirmation bias matters well beyond nutrition, though. It shows up in how people evaluate political arguments, medical symptoms, even relationships. Being aware that this bias exists doesn't eliminate it entirely, but researchers have found that deliberately seeking out disconfirming evidence, actively looking for reasons you might be wrong, can meaningfully reduce its effect.", "questions": [{"q": "What is confirmation bias, according to the professor?", "options": ["A deliberate refusal to consider new evidence", "A tendency to favor information that confirms existing beliefs", "A memory disorder affecting decision-making", "A bias found only in political reasoning"], "correct": 1, "explanation": "It is described as \"our tendency to search for, favor, and remember information that confirms what we already believe.\""}, {"q": "In the diet example, what happens to evidence that contradicts the belief?", "options": ["It is remembered more clearly", "It is quietly forgotten", "It is written down for later review", "It changes the person's belief immediately"], "correct": 1, "explanation": "The person \"quietly forgets the days it didn't\" work."}, {"q": "What have researchers found can reduce the effect of confirmation bias?", "options": ["Ignoring the topic altogether", "Deliberately seeking out disconfirming evidence", "Relying only on personal memory", "Avoiding discussion of beliefs entirely"], "correct": 1, "explanation": "\"Deliberately seeking out disconfirming evidence... can meaningfully reduce its effect.\""}]}}, {"responses": [{"line": "A: \"Did you end up finishing the reading for tomorrow?\"", "options": ["\"Almost, I've got about ten pages left.\"", "\"Tomorrow is Wednesday.\"", "\"The reading is in the library.\"", "\"I finished eating an hour ago.\""], "correct": 0, "explanation": "The most natural reply directly answers the yes/no question about progress on the reading."}, {"line": "A: \"This printer has been jamming all morning.\"", "options": ["\"Yeah, I already reported it to IT.\"", "\"Printers are usually gray.\"", "\"I haven't eaten breakfast yet.\"", "\"It's morning already?\""], "correct": 0, "explanation": "A natural reaction to a shared complaint is agreement plus a relevant follow-up action, not an unrelated comment."}], "conversation": {"title": "At the library help desk", "transcript": "Woman: Excuse me, I placed a hold on a book two weeks ago and I still haven't gotten a notification. Is there a way to check the status?\nMan: Sure, can I get your student ID number? ... Okay, I see it here — it looks like the copy that was supposed to come to you got sent to the wrong campus branch by mistake.\nWoman: Oh no. So what happens now?\nMan: I'll flag it to be redirected here. It should arrive within two business days, and I'll email you the moment it's ready for pickup.\nWoman: That works, thank you.", "questions": [{"q": "Why hasn't the woman received her hold notification?", "options": ["She never actually placed the hold", "The book was sent to the wrong campus branch", "The book was checked out by someone else", "Her student ID was invalid"], "correct": 1, "explanation": "\"The copy... got sent to the wrong campus branch by mistake.\""}, {"q": "What does the man say he will do?", "options": ["Cancel the hold entirely", "Redirect the book and email her when it's ready", "Ask her to visit the other branch herself", "Refund her library fees"], "correct": 1, "explanation": "\"I'll flag it to be redirected here... I'll email you the moment it's ready for pickup.\""}]}, "announcement": {"title": "Dining hall menu update", "transcript": "A quick note for anyone heading to the West Dining Hall this week: due to a supplier delay, several menu items listed on the app will not be available Monday through Wednesday. Substitute options will be posted at the entrance each morning. Students with meal plans can still use their regular swipe, and the dining hall will offer a small discount on prepared meals during this period as an apology for the inconvenience.", "questions": [{"q": "Why are some menu items unavailable this week?", "options": ["The dining hall is being renovated", "A supplier delay", "Low student attendance", "A change in the meal plan system"], "correct": 1, "explanation": "The items are unavailable \"due to a supplier delay.\""}, {"q": "What is being offered as an apology for the inconvenience?", "options": ["Free meals for a week", "A small discount on prepared meals", "Extra meal plan swipes", "A refund to all students"], "correct": 1, "explanation": "\"A small discount on prepared meals during this period as an apology.\""}]}, "talk": {"title": "Intro to Economics — sunk cost fallacy", "transcript": "Professor: Let's talk about something called the sunk cost fallacy. A sunk cost is money, time, or effort that you've already spent and can't get back, no matter what you decide next. The fallacy is letting that already-spent cost influence a decision it shouldn't logically affect.\n\nA simple example: imagine you bought a nonrefundable concert ticket, and on the day of the show, you're sick and would honestly rather stay home. Economically speaking, the ticket price is already gone either way, whether you go or not. So the only real question left is, would you rather go to the concert sick, or rest at home? But many people go anyway, reasoning that otherwise the money would be \"wasted\" — even though it's already spent regardless of their choice.\n\nThis shows up constantly in business decisions too. Companies sometimes keep funding a failing project specifically because they've already invested heavily in it, rather than evaluating the project fresh, based only on its future prospects. Economists generally argue that rational decisions should be based on future costs and benefits only, ignoring what's already been spent.", "questions": [{"q": "What is a sunk cost, as defined by the professor?", "options": ["Money you expect to spend in the future", "Money, time, or effort already spent that can't be recovered", "A cost that changes depending on your decision", "A type of refundable expense"], "correct": 1, "explanation": "It is \"money, time, or effort that you've already spent and can't get back.\""}, {"q": "In the concert ticket example, what should the decision logically be based on, according to the professor?", "options": ["How much the ticket cost", "Whether the money would be \"wasted\"", "Whether the person would rather go sick or rest at home", "What other people paid for their tickets"], "correct": 2, "explanation": "\"The only real question left is, would you rather go to the concert sick, or rest at home?\""}, {"q": "Why do companies sometimes keep funding a failing project, according to the talk?", "options": ["Because the project's future prospects are strong", "Because they've already invested heavily in it", "Because competitors are doing the same", "Because it is required by law"], "correct": 1, "explanation": "They keep funding it \"because they've already invested heavily in it.\""}]}}];
+let CUR_SET = 0;
+
+function selectOpt(btn){
+  if(btn.classList.contains('locked')) return;
+  btn.closest('.mcq-opts').querySelectorAll('.mcq-opt').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+function mcqHtml(qi,q){
+  const opts = q.options.map((o,oi)=>`<button class="mcq-opt" data-i="${oi}" onclick="selectOpt(this)"><span class="mcq-letter">${String.fromCharCode(65+oi)}</span><span>${o}</span></button>`).join('');
+  return `<div class="mcq" data-q="${qi}"><div class="mcq-stem"><span class="mcq-num">${qi+1}</span><span>${q.q}</span></div><div class="mcq-opts">${opts}</div></div>`;
+}
+
+function loadSet(i){
+  CUR_SET = i;
+  document.querySelectorAll('#setPicker .test-pill').forEach((b,bi)=>b.classList.toggle('active', bi===i));
+  renderResponses();
+  renderBlock('conversationWrap','conversation','conversation', SETS[i].conversation, 'A short conversation between two speakers.');
+  renderBlock('announcementWrap','announcement','announcement', SETS[i].announcement, 'A single-speaker campus announcement.');
+  renderBlock('talkWrap','talk','talk', SETS[i].talk, 'A professor\'s short academic talk.');
+  document.getElementById('scoreSummary').classList.remove('visible');
+}
+
+/* ---- Choose a Response (each item is its own single-question mcq) ---- */
+function renderResponses(){
+  const items = SETS[CUR_SET].responses;
+  document.getElementById('responsesWrap').innerHTML = items.map((r,ri)=>`
+    <div class="test-card">
+      <div class="test-header"><div class="test-title">Item ${ri+1}</div><div class="score-display" id="respScoreDisplay${ri}">Score: <span class="score-val" id="respScoreVal${ri}"></span></div></div>
+      <div class="passage" style="font-style:italic">${r.line}</div>
+      <div id="respQ${ri}" style="padding:4px"></div>
+      <div class="explanations" id="respExp${ri}"></div>
+      <div class="actions">
+        <button class="btn btn-primary" id="respCheckBtn${ri}" onclick="checkResponse(${ri})">Check Answer</button>
+        <button class="btn btn-amber" onclick="showResponse(${ri})">Show Answer</button>
+        <button class="btn btn-secondary" id="respResetBtn${ri}" style="display:none" onclick="renderResponses()">Try Again</button>
+        <button class="btn btn-secondary" id="respExpBtn${ri}" style="display:none" onclick="toggleExp('respExp${ri}')">Explanation</button>
+      </div>
+    </div>`).join('');
+  items.forEach((r,ri)=>{
+    document.getElementById('respQ'+ri).innerHTML = mcqHtml(0, {q:'Choose the most natural reply.', options:r.options});
+  });
+}
+function checkResponse(ri){
+  const r = SETS[CUR_SET].responses[ri];
+  const container = document.getElementById('respQ'+ri);
+  const opts = container.querySelectorAll('.mcq-opt');
+  const selected = container.querySelector('.mcq-opt.selected');
+  const selIdx = selected ? parseInt(selected.dataset.i,10) : -1;
+  opts.forEach(o=>{o.classList.add('locked'); o.onclick=null;});
+  const ok = selIdx === r.correct;
+  if(selected) selected.classList.add(ok?'correct-ans':'wrong-ans');
+  if(!ok) opts[r.correct].classList.add('correct-ans');
+  document.getElementById('respScoreVal'+ri).textContent = (ok?1:0) + ' / 1';
+  document.getElementById('respScoreDisplay'+ri).classList.add('visible');
+  document.getElementById('respCheckBtn'+ri).style.display='none';
+  document.getElementById('respResetBtn'+ri).style.display='inline-flex';
+  document.getElementById('respExpBtn'+ri).style.display='inline-flex';
+  document.getElementById('respExp'+ri).innerHTML = `<div class="exp-title">Explanation</div><div class="exp-grid"><div class="exp-item ${ok?'was-correct':'was-wrong'}"><div class="exp-num">1</div><div class="exp-text"><strong>${String.fromCharCode(65+r.correct)}.</strong> ${r.explanation}</div></div></div>`;
+  updateSummary();
+}
+function showResponse(ri){
+  const r = SETS[CUR_SET].responses[ri];
+  document.getElementById('respQ'+ri).querySelectorAll('.mcq-opt')[r.correct].classList.add('selected');
+  checkResponse(ri);
+}
+
+/* ---- Conversation / Announcement / Talk (shared MCQ-block renderer) ---- */
+function renderBlock(wrapId, idp, kindLabel, data, introText){
+  document.getElementById(wrapId).innerHTML = `
+    <div class="exam-info"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span>${introText}</span></div>
+    <div class="test-card">
+      <div class="test-header"><div class="test-title">${data.title}</div><div class="score-display" id="${idp}ScoreDisplay">Score: <span class="score-val" id="${idp}ScoreVal"></span></div></div>
+      <div class="passage" style="white-space:pre-line">${data.transcript}</div>
+      <div id="${idp}Questions" style="padding:4px"></div>
+      <div class="explanations" id="${idp}Explanations"></div>
+      <div class="actions">
+        <button class="btn btn-primary" id="${idp}CheckBtn" onclick="checkBlockMCQ('${idp}')">Check Answers</button>
+        <button class="btn btn-amber" onclick="showBlockMCQ('${idp}')">Show Answers</button>
+        <button class="btn btn-secondary" id="${idp}ResetBtn" style="display:none" onclick="resetBlockMCQ('${idp}')">Try Again</button>
+        <button class="btn btn-secondary" id="${idp}ExpBtn" style="display:none" onclick="toggleExp('${idp}Explanations')">Explanations</button>
+      </div>
+    </div>`;
+  document.getElementById(idp+'Questions').innerHTML = data.questions.map((q,qi)=>mcqHtml(qi,q)).join('');
+}
+function blockData(idp){
+  return SETS[CUR_SET][idp];
+}
+function checkBlockMCQ(idp){
+  const data = blockData(idp);
+  const container = document.getElementById(idp+'Questions');
+  let correct = 0;
+  data.questions.forEach((q,qi)=>{
+    const block = container.querySelectorAll('.mcq')[qi];
+    const opts = block.querySelectorAll('.mcq-opt');
+    const selected = block.querySelector('.mcq-opt.selected');
+    const selIdx = selected ? parseInt(selected.dataset.i,10) : -1;
+    opts.forEach(o=>{o.classList.add('locked'); o.onclick=null;});
+    if(selIdx === q.correct){ correct++; if(selected) selected.classList.add('correct-ans'); }
+    else { if(selected) selected.classList.add('wrong-ans'); opts[q.correct].classList.add('correct-ans'); }
+  });
+  document.getElementById(idp+'ScoreVal').textContent = correct + ' / ' + data.questions.length;
+  document.getElementById(idp+'ScoreDisplay').classList.add('visible');
+  document.getElementById(idp+'CheckBtn').style.display='none';
+  document.getElementById(idp+'ResetBtn').style.display='inline-flex';
+  document.getElementById(idp+'ExpBtn').style.display='inline-flex';
+  const exp = document.getElementById(idp+'Explanations');
+  exp.innerHTML = '<div class="exp-title">Explanations</div><div class="exp-grid">' + data.questions.map((q,qi)=>{
+    const block = container.querySelectorAll('.mcq')[qi];
+    const wasCorrect = !block.querySelector('.mcq-opt.wrong-ans');
+    return `<div class="exp-item ${wasCorrect?'was-correct':'was-wrong'}"><div class="exp-num">${qi+1}</div><div class="exp-text"><strong>${String.fromCharCode(65+q.correct)}.</strong> ${q.explanation}</div></div>`;
+  }).join('') + '</div>';
+  updateSummary();
+}
+function showBlockMCQ(idp){
+  const data = blockData(idp);
+  const container = document.getElementById(idp+'Questions');
+  data.questions.forEach((q,qi)=>{ container.querySelectorAll('.mcq')[qi].querySelectorAll('.mcq-opt')[q.correct].classList.add('selected'); });
+  checkBlockMCQ(idp);
+}
+function resetBlockMCQ(idp){
+  const labels = {conversation:'A short conversation between two speakers.', announcement:'A single-speaker campus announcement.', talk:'A professor\'s short academic talk.'};
+  const wrapIds = {conversation:'conversationWrap', announcement:'announcementWrap', talk:'talkWrap'};
+  renderBlock(wrapIds[idp], idp, idp, SETS[CUR_SET][idp], labels[idp]);
+}
+
+function toggleExp(expId){ document.getElementById(expId).classList.toggle('visible'); }
+
+function updateSummary(){
+  const respEls = SETS[CUR_SET].responses.map((r,ri)=>document.getElementById('respScoreDisplay'+ri));
+  const respDone = respEls.every(el=>el && el.classList.contains('visible'));
+  const otherIds = ['conversation','announcement','talk'];
+  const otherDone = otherIds.every(idp=>{ const el = document.getElementById(idp+'ScoreDisplay'); return el && el.classList.contains('visible'); });
+  if(!(respDone && otherDone)) return;
+  const grid = document.getElementById('scoreSummaryGrid');
+  let html = SETS[CUR_SET].responses.map((r,ri)=>`<div class="score-summary-item"><div class="ss-label">Item ${ri+1}</div><div class="ss-val">${document.getElementById('respScoreVal'+ri).textContent}</div></div>`).join('');
+  html += otherIds.map(idp=>`<div class="score-summary-item"><div class="ss-label">${idp[0].toUpperCase()+idp.slice(1)}</div><div class="ss-val">${document.getElementById(idp+'ScoreVal').textContent}</div></div>`).join('');
+  grid.innerHTML = html;
+  document.getElementById('scoreSummary').classList.add('visible');
+}
+
+loadSet(0);
+
+</script>
+</body>
+</html>
