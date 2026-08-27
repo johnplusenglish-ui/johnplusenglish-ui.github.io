@@ -704,6 +704,17 @@ document.getElementById('colTotal').textContent=DATA.length;
 
 renderGuideList(); goGuide('what-are-collocations');
 renderColList(); renderColPane();
+
+// Deep link from site search: ?find=look%20forward%20to
+(function(){
+  var find=JPE_DEEPLINK.getParam("find");
+  if(!find) return;
+  var tb=document.querySelector('.tab[data-tab="list"]'); if(tb) tb.click();
+  colCat="all"; colQ=find.toLowerCase();
+  renderColList(); renderColPane();
+  var sh=document.getElementById("colSheet");
+  if(sh) setTimeout(function(){ sh.scrollIntoView({behavior:"smooth",block:"start"}); }, 90);
+})();
 (function(){
   var h=JPE_DEEPLINK.getParam('tab') || decodeURIComponent(location.hash.slice(1));
   var t=h&&document.querySelector('.tab[data-tab="'+h+'"]');
