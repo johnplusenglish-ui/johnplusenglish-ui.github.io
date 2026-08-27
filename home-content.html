@@ -17,31 +17,47 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 @media(prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}
 a:focus-visible,button:focus-visible{outline:2px solid var(--sky);outline-offset:2px;border-radius:8px}
 
-
-/* ── Top nav ── */
-.topnav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(255,252,247,.88);backdrop-filter:blur(16px);border-bottom:1.5px solid #E8E5DF;padding:0 2rem;display:flex;align-items:center;justify-content:space-between}
-.nav-logo{font-family:'Outfit',sans-serif;font-size:1.3rem;font-weight:800;letter-spacing:-.01em;color:var(--ink);text-decoration:none;display:inline-flex;align-items:center;gap:.4rem}
-.nav-logo-icon{width:22px;height:22px;stroke-width:1.9;color:var(--sky);flex-shrink:0}
-.nav-logo-text span{color:#2563EB}
-.topnav-links{display:flex;gap:1.2rem;align-items:center}
-.topnav-links a{font-size:.8rem;font-weight:600;color:var(--muted);text-decoration:none;transition:color .2s}
-.topnav-links a:hover{color:var(--sky)}
-
-/* ── Main ── */
 .main{padding-top:0;position:relative;z-index:1}
 
-/* ── Hero (two-column: text + framed illustration) ── */
+/* Hero */
 .empty-pane{display:grid;grid-template-columns:1fr 440px;gap:3rem;align-items:center;max-width:1080px;margin:0 auto;padding:3.5rem 2rem 2.5rem;color:var(--muted);animation:fadeUp .55s cubic-bezier(.16,1,.3,1) backwards}
-.hero-text{text-align:left}
+.hero-text{text-align:left;min-width:0}
 .empty-pane-badge{display:inline-flex;align-items:center;gap:.4rem;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--sky);background:var(--sky-light);padding:.3rem .9rem;border-radius:6px;margin-bottom:1rem}
-.empty-pane h2{font-family:'Outfit',sans-serif;font-size:2.2rem;font-weight:900;color:var(--ink);margin-bottom:.7rem;letter-spacing:-.01em}
+.empty-pane h2{font-family:'Outfit',sans-serif;font-size:2rem;font-weight:900;color:var(--ink);margin-bottom:.6rem;letter-spacing:-.01em}
 .empty-pane h2 em{font-style:italic;color:var(--sky);position:relative}
 .empty-pane h2 em::after{content:'';position:absolute;bottom:2px;left:-3px;right:-3px;height:8px;background:var(--sun);opacity:.4;border-radius:4px;z-index:-1}
-.empty-pane p{font-size:.95rem;max-width:420px;line-height:1.65}
+.empty-pane p.lede{font-size:.92rem;max-width:420px;line-height:1.6;margin-bottom:1.4rem}
 .hero-image{border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-md);border:1.5px solid var(--border);aspect-ratio:1280/730}
 .hero-image img{width:100%;height:100%;object-fit:cover;display:block}
 
-/* ── About + Contact, merged into one compact footer band ── */
+/* Search */
+.searchwrap{position:relative;max-width:460px}
+.searchbox{display:flex;align-items:center;gap:.6rem;background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:.7rem 1rem;box-shadow:var(--shadow-sm);transition:border-color .15s,box-shadow .15s}
+.searchbox:focus-within{border-color:var(--sky);box-shadow:0 0 0 3px var(--sky-light)}
+.searchbox svg.sicon{width:19px;height:19px;stroke:var(--muted);fill:none;stroke-width:2;flex-shrink:0}
+.searchbox input{flex:1;border:none;outline:none;background:none;font-family:'Outfit',sans-serif;font-size:1rem;color:var(--ink);min-width:0}
+.searchbox input::placeholder{color:var(--muted)}
+.sclear{border:none;background:none;color:var(--muted);cursor:pointer;font-size:1.1rem;line-height:1;padding:.1rem .3rem;border-radius:6px;display:none}
+.sclear:hover{background:var(--cream);color:var(--ink)}
+.searchbox.has-val .sclear{display:block}
+.schips{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.7rem}
+.schip{font-size:.72rem;font-weight:600;color:var(--muted);background:var(--card);border:1.5px solid var(--border);border-radius:20px;padding:.28rem .7rem;cursor:pointer;transition:all .15s;font-family:'Outfit',sans-serif}
+.schip:hover{border-color:var(--sky);color:var(--sky)}
+
+.results{position:absolute;top:calc(100% + .5rem);left:0;right:0;background:var(--card);border:1.5px solid var(--border);border-radius:12px;box-shadow:var(--shadow-md);max-height:min(60vh,420px);overflow-y:auto;z-index:50;display:none;padding:.35rem}
+.results.open{display:block;animation:fadeUp .12s ease}
+.ritem{display:flex;align-items:center;gap:.7rem;padding:.6rem .7rem;border-radius:9px;text-decoration:none;color:var(--ink);cursor:pointer}
+.ritem:hover,.ritem.active{background:var(--sky-light)}
+.ritem .rmain{flex:1;min-width:0}
+.ritem .rlabel{font-size:.9rem;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ritem .rsub{font-size:.74rem;color:var(--muted);margin-top:.05rem}
+.rpill{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:.2rem .5rem;border-radius:5px;flex-shrink:0}
+.rpill.tool{background:var(--sky-light);color:var(--sky)}
+.rpill.topic{background:var(--sea-light);color:#0FA085}
+.rempty{padding:1rem .8rem;font-size:.85rem;color:var(--muted);text-align:center}
+.rhead{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);padding:.55rem .7rem .3rem}
+
+/* footband + footer */
 .footband{max-width:800px;margin:1.6rem auto 0;padding:1.6rem 2rem;border-top:1.5px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;gap:1.5rem;flex-wrap:wrap}
 .footband-left{display:flex;flex-direction:column}
 .bio-row{display:flex;align-items:flex-start;gap:.9rem}
@@ -50,46 +66,48 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--sky);outline-offset
 .contact-chip{display:inline-flex;align-items:center;gap:.5rem;font-size:.82rem;font-weight:600;color:var(--ink);text-decoration:none;padding:.55rem 1rem;border:1.5px solid var(--border);border-radius:10px;background:var(--card);transition:all .2s}
 .contact-chip:hover{border-color:var(--sky);color:var(--sky);transform:translateY(-2px);box-shadow:0 4px 12px rgba(74,144,217,.1)}
 .contact-chip svg{width:15px;height:15px;flex-shrink:0;stroke-width:1.8}
-
-/* ── Footer ── */
 footer{text-align:center;padding:2.5rem 2rem;font-size:.8rem;color:var(--muted);border-top:1.5px solid var(--border);max-width:800px;margin:2rem auto 0;position:relative;z-index:1}
 
-/* ── Responsive ── */
 @media(max-width:860px){
   .empty-pane{grid-template-columns:1fr;padding:2.8rem 1.5rem 1.5rem;gap:1.8rem}
-  .hero-image{max-width:440px;width:100%}
+  .hero-image{max-width:440px;width:100%;order:-1}
+  .searchwrap{max-width:none}
 }
 @media(max-width:700px){
-  .topnav{padding:0 1.2rem}
   .footband{padding:1.3rem 1.2rem;flex-direction:column;align-items:flex-start}
 }
-
-body{overflow-x:hidden}</style>
-<style>.topnav{display:none!important}</style></head>
+body{overflow-x:hidden}
+</style>
+</head>
 <body>
-
-<!-- Top nav -->
-<div class="topnav">
-  <a href="index.html" class="nav-logo"><svg class="nav-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2 8l10 5 10-5-10-5z"/><path d="M6 10.5v4.5c0 1.5 3 3 6 3s6-1.5 6-3v-4.5"/><path d="M22 8v6"/></svg><span class="nav-logo-text">john<span>plus</span>english</span></a>
-  <div class="topnav-links">
-    <a href="#about">About</a>
-    <a href="#contact">Contact</a>
-  </div>
-</div>
 
 <div class="main">
 
-  <!-- Hero: text + illustration. Everything else now lives in the sidebar's own category menu -->
   <div class="empty-pane">
     <div class="hero-text">
       <span class="empty-pane-badge">8 categories &middot; 50+ tools</span>
-      <h2>Sound <em>natural</em>, not just correct.</h2>
-      <p>Grammar, vocabulary, reading, writing and speaking practice built around real English, not textbook English.</p>
+      <h2>What do you want to <em>practise</em>?</h2>
+      <p class="lede">Search a topic like <strong>travel</strong>, a tool like <strong>phrasal verbs</strong>, or an exam like <strong>IELTS reading</strong>.</p>
+
+      <div class="searchwrap">
+        <div class="searchbox" id="sBox">
+          <svg class="sicon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input id="sInput" type="text" autocomplete="off" spellcheck="false" placeholder="Search travel, idioms, C1 writing&hellip;" aria-label="Search the site" role="combobox" aria-expanded="false" aria-controls="sResults">
+          <button class="sclear" id="sClear" aria-label="Clear search">&times;</button>
+        </div>
+        <div class="results" id="sResults" role="listbox"></div>
+        <div class="schips" id="sChips">
+          <button class="schip" data-q="travel">Travel</button>
+          <button class="schip" data-q="phrasal verbs">Phrasal verbs</button>
+          <button class="schip" data-q="ielts">IELTS</button>
+          <button class="schip" data-q="idioms">Idioms</button>
+          <button class="schip" data-q="speaking">Speaking</button>
+        </div>
+      </div>
     </div>
     <div class="hero-image"><img src="images/study-hero.jpg" alt="An open book, a notebook with a pen, and a johnplusenglish book with a chat bubble icon, next to a small potted plant" loading="eager"></div>
   </div>
 
-  <!-- About + Contact -->
   <div class="footband" id="about">
     <div class="footband-left">
       <div class="bio-row">
@@ -103,9 +121,98 @@ body{overflow-x:hidden}</style>
     </div>
   </div>
 
-  <footer>© 2026 johnplusenglish. All rights reserved.</footer>
+  <footer>&copy; 2026 johnplusenglish. All rights reserved.</footer>
 
 </div>
+
+<script>
+const SIDX=[["IELTS Reading","IELTS","ielts-reading.html","ielts academic exam reading","tool"],["IELTS Writing","IELTS","ielts-writing.html","ielts academic exam writing","tool"],["IELTS Speaking","IELTS","ielts-speaking.html","ielts academic exam speaking","tool"],["IELTS Listening","IELTS","ielts-listening.html","ielts academic exam listening","tool"],["TOEFL Reading","TOEFL","toefl-reading.html","toefl ibt exam reading","tool"],["TOEFL Writing","TOEFL","toefl-writing.html","toefl ibt exam writing","tool"],["TOEFL Speaking","TOEFL","toefl-speaking.html","toefl ibt exam speaking","tool"],["TOEFL Listening","TOEFL","toefl-listening.html","toefl ibt exam listening","tool"],["OET Reading","OET","oet-reading.html","oet medical healthcare nursing exam reading","tool"],["OET Writing","OET","oet-writing.html","oet medical healthcare nursing exam writing","tool"],["OET Speaking","OET","oet-speaking.html","oet medical healthcare nursing exam speaking","tool"],["OET Listening","OET","oet-listening.html","oet medical healthcare nursing exam listening","tool"],["B1 Preliminary (PET) Reading","B1 Preliminary (PET)","b1-reading-test.html","cambridge pet preliminary b1 exam reading","tool"],["B1 Preliminary (PET) Use of English","B1 Preliminary (PET)","uoe-b1.html","cambridge pet preliminary b1 exam use of english grammar vocabulary","tool"],["B1 Preliminary (PET) Writing","B1 Preliminary (PET)","b1-writing.html","cambridge pet preliminary b1 exam writing","tool"],["B1 Preliminary (PET) Speaking","B1 Preliminary (PET)","b1-speaking.html","cambridge pet preliminary b1 exam speaking","tool"],["B2 First (FCE) Reading","B2 First (FCE)","b2-reading-test.html","cambridge fce first b2 exam reading","tool"],["B2 First (FCE) Use of English","B2 First (FCE)","uoe-b2.html","cambridge fce first b2 exam use of english grammar vocabulary","tool"],["B2 First (FCE) Writing","B2 First (FCE)","b2-writing.html","cambridge fce first b2 exam writing","tool"],["B2 First (FCE) Speaking","B2 First (FCE)","b2-speaking.html","cambridge fce first b2 exam speaking","tool"],["B2 First for Schools Reading","B2 First for Schools","b2fs-reading-test.html","cambridge fce first schools b2 exam reading","tool"],["B2 First for Schools Use of English","B2 First for Schools","uoe-b2fs.html","cambridge fce first schools b2 exam use of english grammar vocabulary","tool"],["B2 First for Schools Writing","B2 First for Schools","b2fs-writing.html","cambridge fce first schools b2 exam writing","tool"],["B2 First for Schools Speaking","B2 First for Schools","b2fs-speaking.html","cambridge fce first schools b2 exam speaking","tool"],["C1 Advanced (CAE) Reading","C1 Advanced (CAE)","c1-reading-test.html","cambridge cae advanced c1 exam reading","tool"],["C1 Advanced (CAE) Use of English","C1 Advanced (CAE)","uoe-c1.html","cambridge cae advanced c1 exam use of english grammar vocabulary","tool"],["C1 Advanced (CAE) Writing","C1 Advanced (CAE)","c1-writing.html","cambridge cae advanced c1 exam writing","tool"],["C1 Advanced (CAE) Speaking","C1 Advanced (CAE)","c1-speaking.html","cambridge cae advanced c1 exam speaking","tool"],["C2 Proficiency (CPE) Reading","C2 Proficiency (CPE)","c2-reading-test.html","cambridge cpe proficiency c2 exam reading","tool"],["C2 Proficiency (CPE) Use of English","C2 Proficiency (CPE)","uoe-c2.html","cambridge cpe proficiency c2 exam use of english grammar vocabulary","tool"],["C2 Proficiency (CPE) Writing","C2 Proficiency (CPE)","c2-writing.html","cambridge cpe proficiency c2 exam writing","tool"],["C2 Proficiency (CPE) Speaking","C2 Proficiency (CPE)","c2-speaking.html","cambridge cpe proficiency c2 exam speaking","tool"],["Prepositions","Vocabulary","prepositions.html","prepositions in on at dependent","tool"],["Phrasal Verbs","Vocabulary","phrasal-verbs.html","phrasal verbs multi-word","tool"],["Idioms","Vocabulary","idioms.html","idioms expressions sayings","tool"],["Adjectives","Vocabulary","adjectives.html","adjectives descriptive words","tool"],["Collocations","Vocabulary","collocations.html","collocations word pairs combinations","tool"],["Fixed Expressions","Vocabulary","fixed-expressions.html","fixed expressions chunks set phrases","tool"],["Word Banks","Vocabulary","word-banks.html","vocabulary topic words themes lists","tool"],["Word Formation","Vocabulary","word-formation.html","word formation prefixes suffixes families","tool"],["Say It in English","Vocabulary","everyday-phrases.html","phrases everyday conversational natural spoken","tool"],["A1 Beginner Grammar","Grammar","a1-grammar.html","grammar a1 beginner elementary basics","tool"],["A2 Elementary Grammar","Grammar","a2-grammar.html","grammar a2 elementary","tool"],["B1 Grammar","Grammar","b1-grammar.html","grammar b1 pre-intermediate intermediate","tool"],["B2 Grammar","Grammar","b2-grammar.html","grammar b2 upper intermediate","tool"],["C1 Grammar","Grammar","c1-grammar.html","grammar c1 advanced","tool"],["Grammar Guides","Grammar","grammar-guides.html","grammar reference rules explanations guides","tool"],["Reading Passages","Reading","reading.html","reading passages stories articles comprehension","tool"],["Role Play Cards","Speaking","role-play-cards.html","role play speaking scenarios cards","tool"],["Speaking Topics","Speaking","speaking-questions.html","speaking topics questions conversation discussion","tool"],["Quick Debates","Speaking","quick-debates.html","debates arguing opinions","tool"],["Collaborative Tasks","Speaking","collaborative-tasks.html","collaborative pair group tasks","tool"],["Would You Rather","Speaking","would-you-rather.html","would you rather choices game","tool"],["Describe a Photo","Speaking","exam-photos-speaking.html?only=gen","describe photo picture speaking image","tool"],["Speaking by Grammar","Speaking","speaking-by-grammar.html","speaking grammar practice","tool"],["Interview Questions","Speaking","interview-questions.html","interview job questions","tool"],["Writing Skills","Writing","writing-skills.html","writing skills essays","tool"],["Creative Writing","Writing","creative-writing.html","creative writing stories imagination","tool"],["Chat Activity","Fun","chat-activity.html","chat conversation messaging","tool"],["Taboo Cards","Fun","taboo.html","taboo game describing words","tool"],["Odd One Out","Fun","odd-one-out.html","odd one out game vocabulary","tool"],["Story Dice","Fun","story-dice.html","story dice storytelling game","tool"],["Hot Takes","Fun","hot-takes.html","hot takes opinions debate","tool"],["Accent Challenge","Fun","accent-challenge.html","accent pronunciation challenge","tool"],["Shrink It","Fun","shrink-it.html","shrink summarising paraphrase","tool"],["Conversation Roulette","Fun","conversation-roulette.html","conversation random speaking","tool"],["Alibi","Fun","alibi.html","alibi game speaking detective","tool"],["Food & Cooking vocabulary","Word Bank","word-banks.html?bank=food-cooking","food cooking eat restaurant meal recipe kitchen diet vocabulary word bank topic","topic"],["Travel & Transport vocabulary","Word Bank","word-banks.html?bank=travel-transport","travel transport trip holiday vacation tourism flight airport train car journey commute vocabulary word bank topic","topic"],["Home & Housework vocabulary","Word Bank","word-banks.html?bank=home-housework","home house housework chores cleaning furniture rooms vocabulary word bank topic","topic"],["Health & Wellbeing vocabulary","Word Bank","word-banks.html?bank=health-wellbeing","health wellbeing fitness illness doctor medicine wellness body vocabulary word bank topic","topic"],["Relationships & People vocabulary","Word Bank","word-banks.html?bank=relationships-people","relationships people family friends dating marriage vocabulary word bank topic","topic"],["Emotions & Character vocabulary","Word Bank","word-banks.html?bank=emotions-character","emotions character feelings personality mood vocabulary word bank topic","topic"],["Work & Careers vocabulary","Word Bank","word-banks.html?bank=work-careers","work careers job employment office business profession vocabulary word bank topic","topic"],["Money & Finance vocabulary","Word Bank","word-banks.html?bank=money-finance","money finance banking economy budget salary spending vocabulary word bank topic","topic"],["Education & Learning vocabulary","Word Bank","word-banks.html?bank=education-learning","education learning school university study students vocabulary word bank topic","topic"],["Technology vocabulary","Word Bank","word-banks.html?bank=technology","technology tech computers internet devices digital ai online vocabulary word bank topic","topic"],["Media & News vocabulary","Word Bank","word-banks.html?bank=media-news","media news journalism press tv radio newspaper vocabulary word bank topic","topic"],["Society & Social Issues vocabulary","Word Bank","word-banks.html?bank=society-issues","society social issues politics community vocabulary word bank topic","topic"],["Crime & Law vocabulary","Word Bank","word-banks.html?bank=crime-law","crime law police justice court legal punishment vocabulary word bank topic","topic"],["Environment & Nature vocabulary","Word Bank","word-banks.html?bank=environment-nature","environment nature climate wildlife animals ecology green vocabulary word bank topic","topic"],["Shopping & Consumer Life vocabulary","Word Bank","word-banks.html?bank=shopping-consumer","shopping consumer buying shops retail brands vocabulary word bank topic","topic"],["Fashion & Appearance vocabulary","Word Bank","word-banks.html?bank=fashion-appearance","fashion appearance clothes style clothing looks vocabulary word bank topic","topic"],["Communication & Language vocabulary","Word Bank","word-banks.html?bank=communication-language","communication language speaking words talking vocabulary word bank topic","topic"],["Science & Research vocabulary","Word Bank","word-banks.html?bank=science-research","science research experiments discovery lab vocabulary word bank topic","topic"],["Housing & Urban Life vocabulary","Word Bank","word-banks.html?bank=housing-urban","housing urban city living apartment buildings vocabulary word bank topic","topic"],["Weather & Climate vocabulary","Word Bank","word-banks.html?bank=weather-climate","weather climate rain temperature seasons vocabulary word bank topic","topic"],["Arts & Entertainment vocabulary","Word Bank","word-banks.html?bank=arts-entertainment","arts entertainment music film cinema theatre culture vocabulary word bank topic","topic"],["Sport & Fitness vocabulary","Word Bank","word-banks.html?bank=sport-fitness","sport fitness exercise gym football games athletics vocabulary word bank topic","topic"],["Greetings & Goodbyes phrases","Say It in English","everyday-phrases.html?cat=greet","greetings hello goodbye hi bye phrases everyday","topic"],["Small Talk phrases","Say It in English","everyday-phrases.html?cat=small","small talk chat casual chit-chat phrases everyday","topic"],["Making Plans phrases","Say It in English","everyday-phrases.html?cat=plans","plans arrangements meeting up organising phrases everyday","topic"],["Agreeing & Disagreeing phrases","Say It in English","everyday-phrases.html?cat=agree","agreeing disagreeing opinions phrases everyday","topic"],["Reactions & Surprise phrases","Say It in English","everyday-phrases.html?cat=react","reactions surprise responses phrases everyday","topic"],["Feelings & Moods phrases","Say It in English","everyday-phrases.html?cat=feel","feelings moods emotions phrases everyday","topic"],["Effort & Laziness phrases","Say It in English","everyday-phrases.html?cat=effort","effort laziness trying hard work phrases everyday","topic"],["Annoyance & Complaining phrases","Say It in English","everyday-phrases.html?cat=annoy","annoyance complaining frustration phrases everyday","topic"],["Softeners & Fillers phrases","Say It in English","everyday-phrases.html?cat=soft","softeners fillers polite hedging phrases everyday","topic"],["Slang & Emphasis phrases","Say It in English","everyday-phrases.html?cat=slang","slang emphasis informal phrases everyday","topic"]];
+(function(){
+  var input=document.getElementById('sInput'), box=document.getElementById('sBox'),
+      panel=document.getElementById('sResults'), clearBtn=document.getElementById('sClear'),
+      chips=document.getElementById('sChips');
+  var active=-1, rows=[];
+
+  // precompute lowercase haystacks
+  SIDX.forEach(function(e){ e[5]=(e[0]+' '+e[1]+' '+e[3]).toLowerCase(); });
+
+  function esc(s){ return s.replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+
+  function search(q){
+    q=q.trim().toLowerCase();
+    if(!q) return [];
+    var toks=q.split(/\s+/);
+    var out=[];
+    SIDX.forEach(function(e){
+      var hay=e[5];
+      // every token must appear somewhere
+      for(var i=0;i<toks.length;i++){ if(hay.indexOf(toks[i])===-1) return; }
+      var label=e[0].toLowerCase();
+      var score=0;
+      if(label.indexOf(q)===0) score+=1000;
+      else if(label.indexOf(q)!==-1) score+=300;
+      // word-start bonus per token
+      toks.forEach(function(t){
+        if(new RegExp('\\b'+t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).test(hay)) score+=20;
+      });
+      if(e[4]==='topic') score+=3; // gentle nudge so topic matches surface for topical queries
+      out.push([score,e]);
+    });
+    out.sort(function(a,b){ return b[0]-a[0] || a[1][0].localeCompare(b[1][0]); });
+    return out.slice(0,10).map(function(x){return x[1];});
+  }
+
+  function render(list){
+    rows=list; active=-1;
+    if(!list.length){
+      panel.innerHTML='<div class="rempty">No matches. Try a topic (travel, money), a tool (idioms), or an exam (IELTS).</div>';
+      open(true); return;
+    }
+    var html='';
+    list.forEach(function(e,i){
+      html+='<a class="ritem" role="option" href="'+e[2]+'" data-i="'+i+'">'+
+              '<div class="rmain"><div class="rlabel">'+esc(e[0])+'</div><div class="rsub">'+esc(e[1])+'</div></div>'+
+              '<span class="rpill '+e[4]+'">'+(e[4]==='topic'?'Topic':'Tool')+'</span>'+
+            '</a>';
+    });
+    panel.innerHTML=html;
+    open(true);
+  }
+
+  function open(o){ panel.classList.toggle('open',o); input.setAttribute('aria-expanded',o?'true':'false'); }
+  function setActive(n){
+    var items=panel.querySelectorAll('.ritem');
+    items.forEach(function(el){el.classList.remove('active');});
+    if(n>=0 && n<items.length){ items[n].classList.add('active'); items[n].scrollIntoView({block:'nearest'}); active=n; }
+    else active=-1;
+  }
+
+  function onInput(){
+    var v=input.value;
+    box.classList.toggle('has-val', !!v);
+    if(!v.trim()){ open(false); return; }
+    render(search(v));
+  }
+
+  input.addEventListener('input', onInput);
+  input.addEventListener('focus', function(){ if(input.value.trim()) render(search(input.value)); });
+  input.addEventListener('keydown', function(e){
+    var items=panel.querySelectorAll('.ritem');
+    if(e.key==='ArrowDown'){ e.preventDefault(); setActive(Math.min(active+1,items.length-1)); }
+    else if(e.key==='ArrowUp'){ e.preventDefault(); setActive(Math.max(active-1,-1)); }
+    else if(e.key==='Enter'){ if(active>=0 && rows[active]){ window.top.location.href=rows[active][2]; } }
+    else if(e.key==='Escape'){ input.value=''; box.classList.remove('has-val'); open(false); }
+  });
+  clearBtn.addEventListener('click', function(){ input.value=''; box.classList.remove('has-val'); open(false); input.focus(); });
+  chips.addEventListener('click', function(e){
+    var c=e.target.closest('.schip'); if(!c) return;
+    input.value=c.dataset.q; box.classList.add('has-val'); render(search(c.dataset.q)); input.focus();
+  });
+  document.addEventListener('click', function(e){
+    if(!e.target.closest('.searchwrap')) open(false);
+  });
+})();
+</script>
 
 </body>
 </html>
