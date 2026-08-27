@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <script src="lock.js"></script>
+<script src="/assets/deeplink.js"></script>
 <base target="_top">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -476,6 +477,8 @@ function selectDebate(val){
   if (val === '') return;
   idx = parseInt(val, 10);
   render();
+  var g = debates.indexOf(filtered[idx]);
+  JPE_DEEPLINK.setParams({debate: g >= 0 ? g : null});
 }
 
 function go(dir){
@@ -1078,6 +1081,13 @@ populatePresets();
 render();
 selectDuration(timerDefaultSeconds);
 buildId = custom.length ? custom[0].id : null;
+
+// Restore a shared/searched deep link: ?debate=36 (index into the full list;
+// filter is 'all' at boot, so filtered[n] === debates[n]).
+(function(){
+  var n = parseInt(JPE_DEEPLINK.getParam('debate'), 10);
+  if (n >= 0 && n < debates.length) { idx = n; populateDropdown(); render(); }
+})();
 </script>
 </body>
 </html>

@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <script src="lock.js"></script>
+<script src="/assets/deeplink.js"></script>
 <base target="_top">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -391,6 +392,7 @@ function selectTopic(idx) {
   openGroupIdx = groupIndexForTopic(idx);
   renderTopicMenu();
   renderDeck();
+  JPE_DEEPLINK.setParams({topic: idx});
 }
 
 function setLevel(lvl, btn) {
@@ -778,6 +780,12 @@ document.addEventListener('keydown', function(e) {
 
 buildTopicSidebar();
 renderDeck();
+
+// Restore a shared/searched deep link: ?topic=4
+(function(){
+  var n = parseInt(JPE_DEEPLINK.getParam('topic'), 10);
+  if (n >= 0 && n < topics.length) selectTopic(n);
+})();
 </script>
 
 <!-- /main -->
