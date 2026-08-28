@@ -1,4 +1,8 @@
-# C1 tooling
+# Cambridge exam page tooling
+
+Covers both the C1 Advanced pages and the B2 First pages. The two levels have real format
+differences (see `validate-b2.mjs`'s header comment) — never assume a C1 rule carries over to
+B2 without checking the relevant handbook first.
 
 ## `validate-c1.mjs`
 
@@ -34,6 +38,23 @@ fail the run.
 Add new rules inside the relevant section. Use `ERR(...)` for "this is wrong / unfair to a
 student" and `WARN(...)` for "worth a look but not a hard failure".
 
+## `validate-b2.mjs`
+
+Same idea, for the four B2 First exam pages (`b2-reading-test-content.html`,
+`uoe-b2-content.html`, `b2-writing-content.html`, `b2-speaking-content.html`). B2 First is
+**not** just "C1 with smaller numbers" — confirmed against the official Cambridge "First
+Handbook for teachers": Use of English Part 4 (KWT) answers are **2–5 words** (not 3–6);
+Reading has only **three** parts (5 MCQ, 6 sentence-removal, 7 ten-question multiple matching —
+no C1-style Part 8); Writing's essay is built from **two** given notes plus the candidate's own
+third idea (not three quoted opinions), target **140–190** words; Speaking Part 2 gives **two**
+photos and **one** printed question (not three photos / a two-aspect prompt). Run:
+
+```bash
+node tools/validate-b2.mjs
+```
+
+Same ERROR/WARN convention as `validate-c1.mjs`.
+
 ## `build-c1-manifest.mjs` + item analytics
 
 The C1 Use of English (Parts 1–4) and Reading (Parts 5–8) pages log **anonymous, aggregate**
@@ -56,11 +77,13 @@ Worst items sort to the top. Counts are cached in the browser; **Refresh from se
 
 ## `hooks/pre-commit`
 
-Optional git hook that runs the validator automatically, but only when a C1 page is staged.
+Optional git hook that runs the relevant validator automatically — C1's when a C1 page is
+staged, B2's when a B2 page is staged. Untouched levels are skipped, so a commit to one
+doesn't run the other's checks.
 
 ```bash
 cp tools/hooks/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
 ```
 
-Once installed, a commit that touches a C1 page and fails validation is blocked (override a
-single commit with `git commit --no-verify`).
+Once installed, a commit that touches an exam page and fails its validator is blocked
+(override a single commit with `git commit --no-verify`).
