@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>B2 Item Insights - johnplusenglish</title>
+<style>
+:root{--ink:#2D3047;--muted:#7A7D8E;--border:#E8E5DF;--card:#fff;--bg:#F7F6F3;--sky:#2176FF;
+      --red:#C0392B;--redbg:#FDECEA;--amber:#B7791F;--amberbg:#FDF6E3;--green:#1E874B;--grey:#9AA0A6;}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Outfit',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
+.wrap{max-width:1080px;margin:0 auto;padding:28px 20px 80px}
+h1{font-size:1.5rem;margin:0 0 4px}
+.sub{color:var(--muted);margin:0 0 20px;font-size:.92rem}
+.controls{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px}
+.controls label{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:4px}
+select,input[type=number]{font:inherit;padding:.5rem .6rem;border:1px solid var(--border);border-radius:8px;background:#fff;color:var(--ink)}
+button{font:inherit;font-weight:600;padding:.55rem 1rem;border:none;border-radius:8px;background:var(--sky);color:#fff;cursor:pointer}
+button.ghost{background:#fff;color:var(--ink);border:1px solid var(--border)}
+button:disabled{opacity:.5;cursor:default}
+.progress{font-size:.85rem;color:var(--muted);margin:6px 0 14px;min-height:1.2em}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:.8rem;color:var(--muted);margin-bottom:14px}
+.pill{display:inline-block;padding:.1rem .5rem;border-radius:999px;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+.pill.miss{background:var(--redbg);color:var(--red)} .pill.amb{background:var(--amberbg);color:var(--amber)}
+.pill.ok{background:#E7F6EE;color:var(--green)} .pill.low{background:#EEF0F2;color:var(--grey)}
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;font-size:.9rem}
+th,td{text-align:left;padding:.6rem .7rem;border-bottom:1px solid var(--border);vertical-align:top}
+th{background:#faf9f7;font-size:.72rem;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);cursor:pointer;user-select:none;white-space:nowrap}
+th.num,td.num{text-align:right;font-variant-numeric:tabular-nums}
+tr:last-child td{border-bottom:none}
+.lab{font-weight:500}
+.dist{font-size:.74rem;color:var(--muted);margin-top:3px;font-variant-numeric:tabular-nums}
+.note{font-size:.8rem;color:var(--muted)}
+.empty{padding:40px;text-align:center;color:var(--muted)}
+code{background:#eef0f2;padding:.05rem .3rem;border-radius:4px;font-size:.85em}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>B2 Item Insights</h1>
+  <p class="sub">Anonymous, aggregate answer data from the live B2 First pages. It surfaces items that almost everyone gets wrong (likely mis-keyed or too hard) and multiple-choice items where a wrong option is chosen nearly as often as the key (likely ambiguous). No student names or accounts, just counts. Data is collected from the moment learners start answering, so early on the numbers will be thin.</p>
+
+  <div class="controls">
+    <div><label>Group</label>
+      <select id="group"></select></div>
+    <div><label>Min attempts to judge</label>
+      <input id="min" type="number" value="10" min="1" style="width:5rem"></div>
+    <div><button id="load">Load</button></div>
+    <div><button id="refresh" class="ghost" title="Ignore cached counts and re-fetch">Refresh from server</button></div>
+  </div>
+  <div class="progress" id="progress"></div>
+
+  <div class="legend">
+    <span><span class="pill miss">high miss</span> most learners get it wrong</span>
+    <span><span class="pill amb">ambiguous</span> a wrong option rivals the key</span>
+    <span><span class="pill low">low data</span> not enough attempts yet</span>
+    <span><span class="pill ok">ok</span> behaving normally</span>
+  </div>
+
+  <div id="out"><div class="empty">Pick a group and press <strong>Load</strong>.</div></div>
+</div>
+
+<script>
+const GET = 'https://abacus.jasoncameron.dev/get/johnplusenglish/b2f_';
+const GROUPS = [
+  ['uoe_p1', 'Use of English · Part 1 (MC cloze)'],
+  ['uoe_p2', 'Use of English · Part 2 (open cloze)'],
+  ['uoe_p3', 'Use of English · Part 3 (word formation)'],
+  ['uoe_p4', 'Use of English · Part 4 (key word transf.)'],
+  ['rd_p5', 'Reading · Part 5 (multiple choice)'],
+  ['rd_p6', 'Reading · Part 6 (gapped text)'],
+  ['rd_p7', 'Reading · Part 7 (multiple matching)'],
+  ['', 'Everything (slow)'],
+];
+let MANIFEST = null, rows = [], sortKey = 'sev', sortDir = -1, doneCounters = 0, totalCounters = 0;
+
+const gSel = document.getElementById('group');
+GROUPS.forEach(([v, l]) => { const o = document.createElement('option'); o.value = v; o.textContent = l; gSel.appendChild(o); });
+
+async function manifest() {
+  if (MANIFEST) return MANIFEST;
+  const r = await fetch('/b2-item-manifest.json', { cache: 'no-cache' });
+  MANIFEST = (await r.json()).items;
+  return MANIFEST;
+}
+async function counter(name, refresh) {
+  const ck = 'jpe-ins-b2:' + name;
+  if (!refresh) { const c = localStorage.getItem(ck); if (c !== null) return +c; }
+  let v = 0;
+  try { const j = await (await fetch(GET + name)).json(); if (j && typeof j.value === 'number') v = j.value; } catch (e) {}
+  try { localStorage.setItem(ck, v); } catch (e) {}
+  return v;
+}
+async function throttle(tasks, limit) {
+  const res = new Array(tasks.length); let i = 0;
+  async function work() { while (i < tasks.length) { const k = i++; res[k] = await tasks[k](); doneCounters++; if (doneCounters % 10 === 0) tick(); } }
+  await Promise.all(Array.from({ length: Math.min(limit, tasks.length) }, work));
+  return res;
+}
+function tick() { document.getElementById('progress').textContent = totalCounters ? `Fetched ${doneCounters} / ${totalCounters} counters…` : ''; }
+
+async function load(refresh) {
+  const items = (await manifest()).filter(it => !gSel.value || it.key.startsWith(gSel.value));
+  // Build the counter fetch list per item.
+  const plan = items.map(it => {
+    if (it.type === 'mc') return { it, counters: Array.from({ length: it.nOpts }, (_, k) => it.key + '_o' + k) };
+    return { it, counters: [it.key + '_n', it.key + '_ok'] };
+  });
+  const flat = []; plan.forEach(p => p.counters.forEach(c => flat.push(c)));
+  doneCounters = 0; totalCounters = flat.length; tick();
+  document.getElementById('load').disabled = true; document.getElementById('refresh').disabled = true;
+  const vals = await throttle(flat.map(c => () => counter(c, refresh)), 14);
+  const map = {}; flat.forEach((c, i) => map[c] = vals[i]);
+  document.getElementById('load').disabled = false; document.getElementById('refresh').disabled = false;
+  document.getElementById('progress').textContent = `Done. ${items.length} items.`;
+
+  const min = Math.max(1, +document.getElementById('min').value || 10);
+  rows = plan.map(({ it, counters }) => {
+    if (it.type === 'mc') {
+      const opts = counters.map(c => map[c] || 0);
+      const n = opts.reduce((a, b) => a + b, 0);
+      const correct = opts[it.correctIdx] || 0;
+      const wrongMax = Math.max(0, ...opts.filter((_, k) => k !== it.correctIdx));
+      const wrongIdx = opts.indexOf(wrongMax);
+      const missPct = n ? 1 - correct / n : 0;
+      let sev = 0, flag = 'ok';
+      if (n < min) { sev = -1; flag = 'low'; }
+      else if (missPct >= 0.6) { sev = 3 + missPct; flag = 'miss'; }
+      else if (correct > 0 && wrongMax >= 0.8 * correct) { sev = 2 + wrongMax / n; flag = 'amb'; }
+      const dist = opts.map((v, k) => `${String.fromCharCode(65 + k)}${k === it.correctIdx ? '✓' : ''}:${v}`).join('  ');
+      return { it, n, missPct, flag, sev, dist, correct: it.correct, extra: flag === 'amb' ? `option ${String.fromCharCode(65 + wrongIdx)} chosen ${wrongMax}× vs key ${correct}×` : '' };
+    }
+    const n = map[it.key + '_n'] || 0, ok = map[it.key + '_ok'] || 0;
+    const missPct = n ? 1 - ok / n : 0;
+    let sev = 0, flag = 'ok';
+    if (n < min) { sev = -1; flag = 'low'; }
+    else if (missPct >= 0.7) { sev = 3 + missPct; flag = 'miss'; }
+    return { it, n, missPct, flag, sev, dist: `${ok}/${n} correct`, correct: it.answer, extra: '' };
+  });
+  render();
+}
+
+function render() {
+  const keyf = { sev: r => r.sev, miss: r => r.missPct, n: r => r.n, label: r => r.it.label };
+  rows.sort((a, b) => { const va = keyf[sortKey](a), vb = keyf[sortKey](b); return (va < vb ? -1 : va > vb ? 1 : 0) * sortDir; });
+  const flagged = rows.filter(r => r.flag === 'miss' || r.flag === 'amb').length;
+  const pill = f => ({ miss: '<span class="pill miss">high miss</span>', amb: '<span class="pill amb">ambiguous</span>', low: '<span class="pill low">low data</span>', ok: '<span class="pill ok">ok</span>' }[f]);
+  const th = (k, t, cls) => `<th data-k="${k}" class="${cls || ''}">${t}${sortKey === k ? (sortDir < 0 ? ' ▾' : ' ▴') : ''}</th>`;
+  let html = `<p class="sub">${rows.length} items · <strong>${flagged}</strong> flagged for a look.</p>`;
+  html += `<table><thead><tr>${th('sev', 'Flag')}${th('label', 'Item')}${th('n', 'Attempts', 'num')}${th('miss', 'Miss %', 'num')}<th>Key / answer</th><th>Answer spread</th></tr></thead><tbody>`;
+  html += rows.map(r => `<tr>
+    <td>${pill(r.flag)}${r.extra ? `<div class="note">${r.extra}</div>` : ''}</td>
+    <td class="lab">${r.it.label}</td>
+    <td class="num">${r.n}</td>
+    <td class="num">${r.n ? Math.round(r.missPct * 100) + '%' : '–'}</td>
+    <td><code>${r.correct}</code></td>
+    <td><span class="dist">${r.dist}</span></td>
+  </tr>`).join('');
+  html += '</tbody></table>';
+  document.getElementById('out').innerHTML = rows.length ? html : '<div class="empty">No items in this group.</div>';
+  document.querySelectorAll('th[data-k]').forEach(h => h.onclick = () => {
+    const k = h.dataset.k; if (sortKey === k) sortDir *= -1; else { sortKey = k; sortDir = (k === 'label') ? 1 : -1; }
+    render();
+  });
+}
+
+document.getElementById('load').onclick = () => load(false);
+document.getElementById('refresh').onclick = () => load(true);
+</script>
+</body></html>
