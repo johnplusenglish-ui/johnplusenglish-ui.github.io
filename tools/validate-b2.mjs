@@ -1,19 +1,22 @@
 #!/usr/bin/env node
 /**
- * validate-c1.mjs — structural + content invariants for the C1 Advanced exam pages.
+ * validate-b2.mjs — structural + content invariants for the B2 First exam pages.
  *
- * Run:  node tools/validate-c1.mjs        (from the repo root)
+ * Run:  node tools/validate-b2.mjs        (from the repo root)
  * Exit: 0 if all ERROR-level checks pass, 1 otherwise. WARN-level issues never fail the build.
  *
- * This encodes the rules that kept biting us during the C1 audit work:
- *  - Use of English: gap counts, valid MC answer indices, KWT answers 3-6 words with the key
- *    word INSIDE the gap, single-word open-cloze answers, no word-formation answer reused across
- *    sets, all {1}-{8} placeholders present.
- *  - Reading: Part 5/6/7/8 shapes, Part 7 = 6 keys + 7 options + exactly one unused, and every
- *    in-context Part 5 vocab item's `lineWord` actually appears in its passage.
- *  - Writing: three quoted opinions + the rubric line per essay, no B2 framing, models 220-260.
- *  - Speaking: 72 Part 1 questions, two-aspect Part 2 prompts, 5-option Part 3 tasks, 1:1 Part 4.
- *  - Every page: no em dash (— / &mdash;) and no spaced en dash, per John's house rule.
+ * B2 First format differs from C1 Advanced in several load-bearing ways (confirmed against the
+ * official Cambridge "First Handbook for teachers", Aug 2026) — do NOT copy C1 assumptions here:
+ *  - Use of English Part 4 (KWT) answers are 2-5 words, NOT 3-6.
+ *  - Reading has only THREE parts (5, 6, 7), not four: Part 6 is SENTENCE removal (6 gaps + 7
+ *    single-sentence options + one unused), Part 7 is 10-question multiple matching against up
+ *    to 6 short texts. There is no C1-style Part 8 or cross-text opinion-matching part.
+ *  - Writing Part 1 essay is built from TWO given notes plus the candidate's OWN third idea
+ *    (not three quoted opinions like C1); word target is 140-190, not 220-260.
+ *  - Speaking Part 2 gives TWO photos and ONE printed question above them (not three photos and
+ *    a two-aspect prompt); the partner's follow-up is still ~30 seconds.
+ *  - Writing Part 2 task types are article / email / letter / review / report (no "story" — that
+ *    substitution is unique to B2 First for Schools, a different exam variant).
  *
  * To extend: add a check inside the relevant section. Keep ERROR for "this is wrong / unfair to a
  * student"; use WARN for "worth a look but not a hard failure".
@@ -62,31 +65,9 @@ function dashScan(file, src) {
   if (/ – | &ndash; /.test(src)) ERR(file, 'contains a spaced en dash used as punctuation');
 }
 
-/* passage line model (mirrors renderP5 in the reading page) */
-function splitPassageLines(text, maxChars) {
-  const ws = text.split(/\s+/).filter(Boolean);
-  const lines = []; let cur = '';
-  for (const w of ws) {
-    if (cur && (cur.length + 1 + w.length) > maxChars) { lines.push(cur); cur = w; }
-    else cur = cur ? cur + ' ' + w : w;
-  }
-  if (cur) lines.push(cur);
-  return lines;
-}
-function lineOf(paras, phrase) {
-  const strip = (s) => s.toLowerCase().replace(/[^a-z0-9-]/g, '');
-  const first = strip(phrase.split(/\s+/)[0]);
-  let no = 0;
-  for (const para of paras) for (const line of splitPassageLines(para, 64)) {
-    no++;
-    if (line.split(/\s+/).some((w) => strip(w) === first || strip(w).startsWith(first))) return no;
-  }
-  return null;
-}
-
 /* ------------------------------------------------------------------ Use of English */
 function checkUoE() {
-  const F = 'uoe-c1-content.html';
+  const F = 'uoe-b2-content.html';
   const src = read(F);
   dashScan(F, src);
   const T = evalArray(src, 'TESTS');       // Part 1
@@ -139,13 +120,13 @@ function checkUoE() {
     if (s.items.length !== 6) ERR(F, `${tag}: ${s.items.length} items, expected 6`);
     s.items.forEach((it, k) => {
       const wc = words(it.answer).length;
-      if (wc < 3 || wc > 6) ERR(F, `${tag} item ${k + 1} (${it.key}): answer "${it.answer}" is ${wc} words, must be 3-6`);
+      // B2 First: 2-5 words (C1 Advanced is 3-6 — do not copy that number here).
+      if (wc < 2 || wc > 5) ERR(F, `${tag} item ${k + 1} (${it.key}): answer "${it.answer}" is ${wc} words, must be 2-5`);
       const keyRe = new RegExp('\\b' + it.key.replace(/[^A-Za-z]/g, '') + '\\b', 'i');
       if (!keyRe.test(expandContractions(it.answer))) ERR(F, `${tag} item ${k + 1}: key word "${it.key}" not inside the answer "${it.answer}"`);
-      // Accepted alternatives must obey the same rules: 3-6 words, key word present and unchanged.
       (it.alts || []).forEach((alt) => {
         const awc = words(alt).length;
-        if (awc < 3 || awc > 6) ERR(F, `${tag} item ${k + 1} (${it.key}): alt "${alt}" is ${awc} words, must be 3-6`);
+        if (awc < 2 || awc > 5) ERR(F, `${tag} item ${k + 1} (${it.key}): alt "${alt}" is ${awc} words, must be 2-5`);
         if (!keyRe.test(expandContractions(alt))) ERR(F, `${tag} item ${k + 1} (${it.key}): alt "${alt}" is missing the unchanged key word`);
       });
       if (!/_{3,}|\.{3,}/.test(it.gapped)) WARN(F, `${tag} item ${k + 1}: gapped sentence has no visible blank`);
@@ -155,47 +136,50 @@ function checkUoE() {
 
 /* ------------------------------------------------------------------ Reading */
 function checkReading() {
-  const F = 'c1-reading-test-content.html';
+  const F = 'b2-reading-test-content.html';
   const src = read(F);
   dashScan(F, src);
   const T = evalArray(src, 'TESTS');
   if (T.length !== 5) ERR(F, `expected 5 tests, found ${T.length}`);
   T.forEach((t, i) => {
     const tag = `Test ${i + 1}`;
-    // Part 5
+    // Part 5: one text, 6 four-option MCQs.
     if (!t.P5 || t.P5.questions.length !== 6) ERR(F, `${tag} Part 5: expected 6 questions`);
     t.P5.questions.forEach((q, qi) => {
       if (q.opts.length !== 4) ERR(F, `${tag} Part 5 Q${qi + 1}: needs 4 options`);
       if (!(q.correct >= 0 && q.correct < 4)) ERR(F, `${tag} Part 5 Q${qi + 1}: correct index ${q.correct} out of range`);
-      if (q.lineWord) {
-        if (!/\{line\}/.test(q.stem)) ERR(F, `${tag} Part 5 Q${qi + 1}: has lineWord but no {line} placeholder in stem`);
-        if (lineOf(t.P5.passage, q.lineWord) == null) ERR(F, `${tag} Part 5 Q${qi + 1}: lineWord "${q.lineWord}" not found in passage`);
-      }
     });
-    // Part 6
-    if (!t.P6 || t.P6.questions.length !== 4) ERR(F, `${tag} Part 6: expected 4 questions`);
-    // Part 7
-    const p7 = t.P7;
-    const keys = Object.values(p7.correct);
-    if (keys.length !== 6) ERR(F, `${tag} Part 7: expected 6 keys, found ${keys.length}`);
-    if (p7.options.length !== 7) ERR(F, `${tag} Part 7: expected 7 paragraph options, found ${p7.options.length}`);
-    if (new Set(keys).size !== keys.length) ERR(F, `${tag} Part 7: duplicate key letters ${keys.join(',')}`);
-    const letters = p7.options.map((o) => o.letter);
-    const unused = letters.filter((l) => !keys.includes(l));
-    if (unused.length !== 1) ERR(F, `${tag} Part 7: exactly one option should be unused, found ${unused.length} (${unused.join(',')})`);
-    keys.forEach((k) => { if (!letters.includes(k)) ERR(F, `${tag} Part 7: key "${k}" is not an available option`); });
-    // Part 8
-    if (!t.P8 || t.P8.questions.length !== 10) ERR(F, `${tag} Part 8: expected 10 questions, found ${t.P8 ? t.P8.questions.length : 'none'}`);
+    // Part 6: SENTENCE removal — 6 gaps, 7 single-sentence options, exactly one unused.
+    const p6 = t.P6;
+    if (!p6) { ERR(F, `${tag}: missing Part 6`); }
+    else {
+      const keys = Object.values(p6.correct || {});
+      if (keys.length !== 6) ERR(F, `${tag} Part 6: expected 6 keys, found ${keys.length}`);
+      if (!p6.options || p6.options.length !== 7) ERR(F, `${tag} Part 6: expected 7 sentence options, found ${p6.options ? p6.options.length : 0}`);
+      if (new Set(keys).size !== keys.length) ERR(F, `${tag} Part 6: duplicate key letters ${keys.join(',')}`);
+      const letters = (p6.options || []).map((o) => o.letter);
+      const unused = letters.filter((l) => !keys.includes(l));
+      if (unused.length !== 1) ERR(F, `${tag} Part 6: exactly one option should be unused, found ${unused.length} (${unused.join(',')})`);
+      keys.forEach((k) => { if (!letters.includes(k)) ERR(F, `${tag} Part 6: key "${k}" is not an available option`); });
+      // Part 6 options must be single sentences, not full paragraphs (a common copy-from-C1 mistake).
+      (p6.options || []).forEach((o) => {
+        const sentences = (o.text.match(/[.!?]+(\s|$)/g) || []).length;
+        if (sentences > 2) WARN(F, `${tag} Part 6 option ${o.letter}: reads like a full paragraph (${sentences} sentences) — B2 Part 6 options should be one sentence`);
+      });
+    }
+    // Part 7: 10-question multiple matching against up to 6 short texts.
+    if (!t.P7 || t.P7.questions.length !== 10) ERR(F, `${tag} Part 7: expected 10 questions, found ${t.P7 ? t.P7.questions.length : 'none'}`);
+    if (t.P7 && (!t.P7.texts || t.P7.texts.length < 2 || t.P7.texts.length > 6)) ERR(F, `${tag} Part 7: expected 2-6 texts, found ${t.P7.texts ? t.P7.texts.length : 0}`);
   });
 }
 
 /* ------------------------------------------------------------------ Speaking */
 function checkSpeaking() {
-  const F = 'c1-speaking-content.html';
+  const F = 'b2-speaking-content.html';
   const src = read(F);
   dashScan(F, src);
   const P1 = evalArray(src, 'P1_QUESTIONS');
-  const sets = evalArray(src, 'c1Sets');
+  const sets = evalArray(src, 'b2Sets');
   const p3 = evalArray(src, 'PART3_TOPICS');
   const p4 = evalArray(src, 'PART4_TOPICS');
 
@@ -204,16 +188,16 @@ function checkSpeaking() {
   P1.forEach((q) => cats.set(q.category, (cats.get(q.category) || 0) + 1));
   if (cats.size !== 12) ERR(F, `Part 1: expected 12 categories, found ${cats.size}`);
 
+  // B2 Part 2: TWO photos, ONE printed question (not C1's three photos / two-aspect prompt).
   if (sets.length !== 10) ERR(F, `Part 2: expected 10 photo sets, found ${sets.length}`);
   sets.forEach((s, i) => {
-    if (s.photos.length !== 3) ERR(F, `Part 2 set ${i + 1} (${s.topic}): expected 3 photos`);
-    const m = s.question.match(/<strong>([\s\S]*?)<\/strong>/);
-    if (!m || !/\band\b/.test(m[1])) ERR(F, `Part 2 set ${i + 1} (${s.topic}): long-turn prompt must address two aspects (needs "and" inside <strong>)`);
+    if (s.photos.length !== 2) ERR(F, `Part 2 set ${i + 1} (${s.topic}): expected 2 photos (B2 First uses two, not three)`);
+    if (!s.question || !s.question.trim()) ERR(F, `Part 2 set ${i + 1} (${s.topic}): missing the long-turn question`);
     if (!s.followUp) ERR(F, `Part 2 set ${i + 1}: missing partner follow-up`);
   });
 
   if (p3.length !== 10) ERR(F, `Part 3: expected 10 sets, found ${p3.length}`);
-  p3.forEach((s, i) => { if (s.options.length !== 5) ERR(F, `Part 3 set ${i + 1} (${s.topic}): expected 5 options, found ${s.options.length}`); });
+  p3.forEach((s, i) => { if (s.options.length !== 5) ERR(F, `Part 3 set ${i + 1} (${s.topic}): expected 5 written prompts, found ${s.options.length}`); });
 
   if (p4.length !== 10) ERR(F, `Part 4: expected 10 sets, found ${p4.length}`);
   if (p4.length !== p3.length) ERR(F, `Part 4 sets (${p4.length}) do not map 1:1 to Part 3 (${p3.length})`);
@@ -221,29 +205,26 @@ function checkSpeaking() {
 
 /* ------------------------------------------------------------------ Writing */
 function checkWriting() {
-  const F = 'c1-writing-content.html';
+  const F = 'b2-writing-content.html';
   const src = read(F);
   dashScan(F, src);
-  // Essays: each "Some opinions expressed in the discussion:" block should carry exactly 3 quotes,
-  // and the standard rubric line should appear once per essay.
-  const rubric = 'You may, if you wish, make use of the opinions expressed in the discussion';
-  const rubricCount = (src.match(new RegExp(rubric, 'g')) || []).length;
-  const opinionBlocks = src.match(/Some opinions expressed in the discussion:[\s\S]*?<\/div>/g) || [];
-  if (opinionBlocks.length && rubricCount !== opinionBlocks.length)
-    ERR(F, `Essay rubric line appears ${rubricCount}x but there are ${opinionBlocks.length} opinion blocks`);
-  opinionBlocks.forEach((b, i) => {
-    const quotes = (b.match(/<p>[“"][^]*?[”"]<\/p>/g) || []).length;
-    if (quotes !== 3) ERR(F, `Essay ${i + 1}: has ${quotes} quoted opinions, real CAE Part 1 gives 3`);
+  // Essay: built from a "Notes - Write about:" list of exactly THREE items — TWO given content
+  // points plus a third "your own idea" prompt (B2 essays do not use C1-style quoted opinions).
+  const noteBlocks = src.match(/Notes - Write about:<\/strong><\/p>\s*<ol[^>]*>([\s\S]*?)<\/ol>/g) || [];
+  noteBlocks.forEach((b, i) => {
+    const lis = (b.match(/<li>/g) || []).length;
+    if (lis !== 3) ERR(F, `Essay ${i + 1}: has ${lis} notes, real B2 First essays give 2 points + "your own idea" (3 total)`);
+    if (!/your own idea/i.test(b)) WARN(F, `Essay ${i + 1}: notes list doesn't mention "your own idea" — B2 essays require a third, candidate-supplied point`);
   });
-  if (/teacher has asked you to write an essay based on the notes below/.test(src))
-    ERR(F, 'Essay uses B2-style "teacher has asked..." framing; C1 uses "Your class has listened to / watched a discussion..."');
-  // Model answers: each "Word count: N" should sit inside 220-260 and match the real (stripped) count.
+  if (/Some opinions expressed in the discussion/.test(src))
+    ERR(F, 'Essay uses C1-style "quoted opinions" framing; B2 First essays use two given notes + the candidate\'s own idea, no opinion quotes');
+  // Model answers: each "Word count: N" should sit inside 140-190 and match the real (stripped) count.
   const modelRe = /model:\s*`([\s\S]*?)`,\s*\n?\s*note:"Word count:\s*(\d+)/g;
   let m;
   while ((m = modelRe.exec(src)) !== null) {
     const real = words(stripTags(m[1])).length;
     const stated = Number(m[2]);
-    if (real < 220 || real > 260) ERR(F, `A model answer is ${real} words (label ${stated}); must be 220-260`);
+    if (real < 140 || real > 190) ERR(F, `A model answer is ${real} words (label ${stated}); B2 First target is 140-190`);
     else if (Math.abs(real - stated) > 6) WARN(F, `A model answer's label says ${stated} but it is really ${real} words`);
   }
 }
@@ -264,6 +245,6 @@ const warns = findings.filter((f) => f.level === 'WARN');
 const line = (f) => `  ${f.level === 'ERROR' ? '✗' : '!'} [${f.file}] ${f.msg}`;
 if (errors.length) { console.log('\nERRORS:'); errors.forEach((f) => console.log(line(f))); }
 if (warns.length) { console.log('\nWARNINGS:'); warns.forEach((f) => console.log(line(f))); }
-if (!findings.length) console.log('All C1 checks passed. ✓');
+if (!findings.length) console.log('All B2 checks passed. ✓');
 else console.log(`\n${errors.length} error(s), ${warns.length} warning(s).`);
 process.exit(errors.length ? 1 : 0);
