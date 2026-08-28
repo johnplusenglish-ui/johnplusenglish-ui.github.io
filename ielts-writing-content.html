@@ -559,7 +559,7 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
     <div class="checklist-tabs">
       <button class="checklist-tab active" onclick="switchChecklist('cl-t1',this)">Task 1 - Report</button>
       <button class="checklist-tab" onclick="switchChecklist('cl-t2',this)">Task 2 - Essay</button>
-      <button class="checklist-tab" onclick="switchChecklist('cl-letter',this)">GT Letter</button>
+      <button class="checklist-tab" onclick="switchChecklist('cl-letter',this)">General Letter</button>
     </div>
 
     <!-- T1 Report -->
@@ -643,7 +643,7 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
       <button class="checklist-reset" onclick="resetChecklist('cl-t2')">↺ Reset checklist</button>
     </div>
 
-    <!-- GT Letter -->
+    <!-- General Letter -->
     <div class="checklist-panel" id="cl-letter">
       <div class="checklist-progress"><div class="checklist-progress-bar" id="cl-letter-bar" style="width:0%"></div></div>
       <div class="checklist-criterion">
@@ -690,7 +690,7 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
     <div class="errors-tabs">
       <button class="errors-tab active" onclick="switchErrors('err-t1',this)">Task 1 - Report</button>
       <button class="errors-tab" onclick="switchErrors('err-t2',this)">Task 2 - Essay</button>
-      <button class="errors-tab" onclick="switchErrors('err-letter',this)">GT Letter</button>
+      <button class="errors-tab" onclick="switchErrors('err-letter',this)">General Letter</button>
     </div>
 
     <div class="errors-panel active" id="err-t1">
@@ -3973,6 +3973,35 @@ function toggleBandRow(header) {
   header.nextElementSibling.classList.toggle('open');
 }
 function toggleWbSidebar(el){ el.closest(".content-area").classList.toggle("sb-collapsed"); }
+function switchChecklist(id, btn){
+  btn.closest('.checklist-tabs').querySelectorAll('.checklist-tab').forEach(t=>t.classList.toggle('active', t===btn));
+  btn.closest('.wb-pane-body').querySelectorAll('.checklist-panel').forEach(p=>p.classList.toggle('active', p.id===id));
+}
+function updateChecklistProgress(id){
+  const panel = document.getElementById(id);
+  const items = panel.querySelectorAll('.checklist-item input[type="checkbox"]');
+  const checked = panel.querySelectorAll('.checklist-item input[type="checkbox"]:checked').length;
+  const bar = document.getElementById(id+'-bar');
+  if (bar) bar.style.width = (items.length ? Math.round(checked/items.length*100) : 0) + '%';
+}
+function toggleCheck(item, id){
+  const box = item.querySelector('input[type="checkbox"]');
+  box.checked = !box.checked;
+  item.classList.toggle('checked', box.checked);
+  updateChecklistProgress(id);
+}
+function resetChecklist(id){
+  const panel = document.getElementById(id);
+  panel.querySelectorAll('.checklist-item').forEach(item=>{
+    item.querySelector('input[type="checkbox"]').checked = false;
+    item.classList.remove('checked');
+  });
+  updateChecklistProgress(id);
+}
+function switchErrors(id, btn){
+  btn.closest('.errors-tabs').querySelectorAll('.errors-tab').forEach(t=>t.classList.toggle('active', t===btn));
+  btn.closest('.wb-pane-body').querySelectorAll('.errors-panel').forEach(p=>p.classList.toggle('active', p.id===id));
+}
 // Chart instances storage
 let chartInstances = {};
 function resizeVisibleCharts(){
@@ -4465,7 +4494,7 @@ const GUIDE_W = [
   },
   {
     kind: "passage",
-    label: "Task 1: Letters (GT)",
+    label: "Task 1: Letters",
     title: "Task 1: Letters",
     intro: "General Training swaps the report for a letter. Same time, same word count, different skill: hitting the right tone for who you're writing to.",
     sections: [
