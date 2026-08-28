@@ -1,0 +1,18 @@
+#!/bin/sh
+# Pre-commit hook: validate the C1 Advanced exam pages before they can be committed.
+# It only runs when a C1 page is actually staged, so commits to the rest of the site are unaffected.
+# Install: cp tools/hooks/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+# Bypass once (not recommended): git commit --no-verify
+
+staged=$(git diff --cached --name-only)
+case "$staged" in
+  *c1-reading-test-content.html*|*uoe-c1-content.html*|*c1-writing-content.html*|*c1-speaking-content.html*)
+    echo "Running C1 validation…"
+    if ! node tools/validate-c1.mjs; then
+      echo ""
+      echo "Commit blocked: fix the C1 errors above, or use 'git commit --no-verify' to override."
+      exit 1
+    fi
+    ;;
+esac
+exit 0
