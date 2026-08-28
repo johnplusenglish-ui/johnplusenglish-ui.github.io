@@ -138,6 +138,12 @@ function checkUoE() {
       if (wc < 3 || wc > 6) ERR(F, `${tag} item ${k + 1} (${it.key}): answer "${it.answer}" is ${wc} words, must be 3-6`);
       const keyRe = new RegExp('\\b' + it.key.replace(/[^A-Za-z]/g, '') + '\\b', 'i');
       if (!keyRe.test(it.answer)) ERR(F, `${tag} item ${k + 1}: key word "${it.key}" not inside the answer "${it.answer}"`);
+      // Accepted alternatives must obey the same rules: 3-6 words, key word present and unchanged.
+      (it.alts || []).forEach((alt) => {
+        const awc = words(alt).length;
+        if (awc < 3 || awc > 6) ERR(F, `${tag} item ${k + 1} (${it.key}): alt "${alt}" is ${awc} words, must be 3-6`);
+        if (!keyRe.test(alt)) ERR(F, `${tag} item ${k + 1} (${it.key}): alt "${alt}" is missing the unchanged key word`);
+      });
       if (!/_{3,}|\.{3,}/.test(it.gapped)) WARN(F, `${tag} item ${k + 1}: gapped sentence has no visible blank`);
     });
   });
