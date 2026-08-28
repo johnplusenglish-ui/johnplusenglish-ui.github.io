@@ -140,6 +140,9 @@ h2.wb-pane-head-title{font-family:'Outfit',sans-serif;font-size:clamp(1.8rem,3.4
 .discuss-head{display:flex;align-items:baseline;gap:.6rem;margin-bottom:1.1rem}
 .discuss-head h3{font-family:'Outfit',sans-serif;font-size:1.15rem;font-weight:800;letter-spacing:-.01em}
 .discuss-head .discuss-lvl{font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.discuss-toggle{margin-left:auto;font-family:'Outfit',sans-serif;font-size:.76rem;font-weight:700;padding:.35rem .8rem;border-radius:999px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s}
+.discuss-toggle:hover{border-color:var(--accent);color:var(--accent)}
+.discuss-hidden-note{font-size:.88rem;color:var(--muted);font-style:italic;padding:.4rem 0}
 .discuss-q{display:flex;gap:.8rem;align-items:flex-start;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:1rem 1.15rem;margin-bottom:.8rem}
 .discuss-q:last-child{margin-bottom:0}
 .discuss-q-num{flex-shrink:0;width:24px;height:24px;border-radius:7px;background:var(--accent-light);color:var(--accent);font-size:.78rem;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:.05rem}
@@ -577,15 +580,30 @@ function renderPassageBody(){
 }
 
 /* ---- talk about it: leveled discussion / follow-up questions ---- */
+const DISCUSS_HIDDEN_KEY = 'jpe-reading-discuss-hidden';
+function isDiscussHidden(){
+  try { return localStorage.getItem(DISCUSS_HIDDEN_KEY) === '1'; } catch(e){ return false; }
+}
+function toggleDiscussHidden(){
+  const hidden = !isDiscussHidden();
+  try { localStorage.setItem(DISCUSS_HIDDEN_KEY, hidden ? '1' : '0'); } catch(e){}
+  renderDiscuss();
+}
 function renderDiscuss(){
   const wrap = document.getElementById('passageDiscuss');
   const p = READING_PASSAGES.find(function(x){ return x.id === currentPassage; });
   const qs = p && p.discuss && p.discuss[currentLevel];
   if (!qs || !qs.length) { wrap.innerHTML = ''; return; }
-  let html = '<div class="discuss-head"><h3>Talk about it</h3><span class="discuss-lvl">' + currentLevel + '</span></div>';
-  qs.forEach(function(q, qi){
-    html += '<div class="discuss-q"><span class="discuss-q-num">' + (qi + 1) + '</span><span class="discuss-q-text">' + escapeHtml(q) + '</span></div>';
-  });
+  const hidden = isDiscussHidden();
+  let html = '<div class="discuss-head"><h3>Talk about it</h3><span class="discuss-lvl">' + currentLevel + '</span>' +
+    '<button class="discuss-toggle" onclick="toggleDiscussHidden()">' + (hidden ? 'Show questions' : 'Hide questions') + '</button></div>';
+  if (hidden) {
+    html += '<p class="discuss-hidden-note">Questions hidden. Click "Show questions" when you\'re ready.</p>';
+  } else {
+    qs.forEach(function(q, qi){
+      html += '<div class="discuss-q"><span class="discuss-q-num">' + (qi + 1) + '</span><span class="discuss-q-text">' + escapeHtml(q) + '</span></div>';
+    });
+  }
   wrap.innerHTML = html;
 }
 
