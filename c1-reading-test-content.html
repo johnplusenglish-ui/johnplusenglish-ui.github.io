@@ -3,6 +3,7 @@
 <head>
 <script src="lock.js"></script>
 <script src="/assets/deeplink.js"></script>
+<script src="/item-analytics.js"></script>
 <base target="_top">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -989,6 +990,7 @@ function mcCheckShow(show){
     });
     if(state.p5[qi]===q.correct) correct++;
   });
+  if(!show){P5.questions.forEach((q,qi)=>{if(window.jpeLogMC)jpeLogMC('rd','p5',TI,qi+1,state.p5[qi]);});}
   document.getElementById('p5ScoreDisplay').classList.add('visible');
   document.getElementById('p5ScoreVal').textContent = `${correct}/${P5.questions.length}`;
   document.getElementById('p5CheckBtn').style.display='none';
@@ -1032,6 +1034,7 @@ function matchCheckShow(prefix, data, sectionNum, show){
     });
     if(state[prefix][qi]===q.correct) correct++;
   });
+  if(!show){data.questions.forEach((q,qi)=>{if(window.jpeLogMC)jpeLogMC('rd',prefix,TI,qi+1,(state[prefix][qi]?state[prefix][qi].charCodeAt(0)-65:-1));});}
   document.getElementById(prefix+'ScoreDisplay').classList.add('visible');
   document.getElementById(prefix+'ScoreVal').textContent = `${correct}/${data.questions.length}`;
   document.getElementById(prefix+'CheckBtn').style.display='none';
@@ -1076,6 +1079,7 @@ function gapCheckShow(show){
     if(sel.value===P7.correct[n]){ sel.classList.add('correct'); correct++; }
     else sel.classList.add('wrong');
   }
+  if(!show){for(let n=1;n<=GAPCOUNT7;n++){const v=state.p7[n];if(window.jpeLogMC)jpeLogMC('rd','p7',TI,n,(v?v.charCodeAt(0)-65:-1));}}
   document.getElementById('p7ScoreDisplay').classList.add('visible');
   document.getElementById('p7ScoreVal').textContent = `${correct}/${GAPCOUNT7}`;
   document.getElementById('p7CheckBtn').style.display='none';

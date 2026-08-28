@@ -34,6 +34,26 @@ fail the run.
 Add new rules inside the relevant section. Use `ERR(...)` for "this is wrong / unfair to a
 student" and `WARN(...)` for "worth a look but not a hard failure".
 
+## `build-c1-manifest.mjs` + item analytics
+
+The C1 Use of English (Parts 1–4) and Reading (Parts 5–8) pages log **anonymous, aggregate**
+answer data via `/item-analytics.js` (same cookieless abacus counter service as the pageview
+counter — no accounts, no names, no per-student records). For multiple-choice items it counts
+which option was chosen; for typed gaps it counts attempts and correct answers.
+
+`node tools/build-c1-manifest.mjs` regenerates `c1-item-manifest.json` (the list of every
+scored item + its correct answer). **Run it after editing C1 exam content** so the dashboard
+stays in sync.
+
+Open **`/c1-insights.html`** (John-only, `noindex`, not linked anywhere) to read the data back.
+Pick a part, press **Load**, and it flags:
+
+- **high miss** — most learners get it wrong (likely mis-keyed or too hard),
+- **ambiguous** — a wrong option is chosen nearly as often as the key,
+- **low data** — not enough attempts yet to judge.
+
+Worst items sort to the top. Counts are cached in the browser; **Refresh from server** re-fetches.
+
 ## `hooks/pre-commit`
 
 Optional git hook that runs the validator automatically, but only when a C1 page is staged.

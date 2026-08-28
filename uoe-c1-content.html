@@ -3,6 +3,7 @@
 <head>
 <script src="lock.js"></script>
 <script src="/assets/deeplink.js"></script>
+<script src="/item-analytics.js"></script>
 <base target="_top">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -783,6 +784,7 @@ function p1Check() {
     tr.classList.add('locked'); const ro=document.getElementById('p1ro-'+g.num); if(ro)ro.style.display='none';
     if(s.selected===g.correct){tr.classList.add('correct');score++;}
     else{tr.classList.add('wrong');corr.textContent='→ '+g.options[g.correct].substring(2);corr.classList.add('visible');}
+    if(window.jpeLogMC)jpeLogMC('uoe','p1',currentTest,g.num,s.selected);
   });
   document.getElementById('p1ScoreVal').textContent=score+' / '+TESTS[currentTest].gaps.length;
   document.getElementById('p1ScoreDisplay').classList.add('visible');
@@ -886,6 +888,7 @@ function p2Check() {
     inp.disabled=true; btn.style.display='none';
     if(p2IsCorrect(g, inp.value)){inp.classList.add('correct');score++;}
     else{inp.classList.add('wrong');corr.textContent='→ '+g.answer;corr.classList.add('visible');}
+    if(window.jpeLogTyped)jpeLogTyped('uoe','p2',currentTest,g.num,p2IsCorrect(g,inp.value));
   });
   document.getElementById('p2ScoreVal').textContent=score+' / '+t.gaps.length;
   document.getElementById('p2ScoreDisplay').classList.add('visible');
@@ -1002,6 +1005,7 @@ function p3Check() {
     inp.disabled=true; btn.style.display='none';
     if(inp.value.trim().toLowerCase()===g.answer.toLowerCase()){inp.classList.add('correct');score++;}
     else{inp.classList.add('wrong');corr.textContent='→ '+g.answer;corr.classList.add('visible');}
+    if(window.jpeLogTyped)jpeLogTyped('uoe','p3',currentTest,g.num,inp.value.trim().toLowerCase()===g.answer.toLowerCase());
   });
   document.getElementById('p3ScoreVal').textContent=score+' / '+t.gaps.length;
   document.getElementById('p3ScoreDisplay').classList.add('visible');
@@ -1118,6 +1122,7 @@ function p4Check() {
     inp.disabled=true; btn.style.display='none'; wc.style.display='none';
     if(p4Match(inp.value,item)){inp.classList.add('correct');score++;}
     else{inp.classList.add('wrong');corr.textContent='→ '+item.answer;corr.classList.add('visible');}
+    if(window.jpeLogTyped)jpeLogTyped('uoe','p4',currentTest,n,p4Match(inp.value,item));
   });
   document.getElementById('p4ScoreVal').textContent=score+' / '+t.items.length;
   document.getElementById('p4ScoreDisplay').classList.add('visible');
