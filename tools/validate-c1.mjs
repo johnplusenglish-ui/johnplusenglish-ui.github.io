@@ -238,7 +238,7 @@ function checkWriting() {
   if (/teacher has asked you to write an essay based on the notes below/.test(src))
     ERR(F, 'Essay uses B2-style "teacher has asked..." framing; C1 uses "Your class has listened to / watched a discussion..."');
   // Model answers: each "Word count: N" should sit inside 220-260 and match the real (stripped) count.
-  const modelRe = /model:\s*`([\s\S]*?)`,\s*\n?\s*note:"Word count:\s*(\d+)/g;
+  const modelRe = /model:\s*`([\s\S]*?)`,\s*\n?\s*note:\s*"Word count:\s*(\d+)/g;
   let m;
   while ((m = modelRe.exec(src)) !== null) {
     const real = words(stripTags(m[1])).length;

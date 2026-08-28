@@ -219,7 +219,7 @@ function checkWriting() {
   if (/Some opinions expressed in the discussion/.test(src))
     ERR(F, 'Essay uses C1-style "quoted opinions" framing; B2 First essays use two given notes + the candidate\'s own idea, no opinion quotes');
   // Model answers: each "Word count: N" should sit inside 140-190 and match the real (stripped) count.
-  const modelRe = /model:\s*`([\s\S]*?)`,\s*\n?\s*note:"Word count:\s*(\d+)/g;
+  const modelRe = /model:\s*`([\s\S]*?)`,\s*\n?\s*note:\s*"Word count:\s*(\d+)/g;
   let m;
   while ((m = modelRe.exec(src)) !== null) {
     const real = words(stripTags(m[1])).length;
