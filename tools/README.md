@@ -74,6 +74,23 @@ node tools/validate-b1.mjs
 
 Same ERROR/WARN convention as the others.
 
+## `validate-c2.mjs`
+
+For the four C2 Proficiency (CPE) pages (`uoe-c2-content.html`, `c2-reading-test-content.html`,
+`c2-writing-content.html`, `c2-speaking-content.html`). C2 differs from C1 (confirmed against the
+official Cambridge C2 Proficiency 2020 sample papers): Use of English Part 4 (KWT) answers are
+**three to eight** words; Reading has **three** parts (5 MC on a literary extract, 6 a GAPPED TEXT
+with **seven** paragraphs removed and eight options, 7 multiple matching of 10 questions to
+sections A-E which **may be reused**); Writing Part 1 is a 240-280-word essay summarising and
+evaluating **two** input texts and Part 2 (article/letter/report/review) is 280-320 words;
+Speaking has **three** parts. Word-formation answer reuse is a WARN here (not an ERROR as in
+C1/B2): the C2 bank is large and rotated one test at a time, so a repeat is a diversity nudge
+rather than a defect. Run:
+
+```bash
+node tools/validate-c2.mjs
+```
+
 ## `build-c1-manifest.mjs` + item analytics
 
 The C1 Use of English (Parts 1–4) and Reading (Parts 5–8) pages log **anonymous, aggregate**
@@ -109,8 +126,8 @@ default `c1a_`). B2 First Reading has only Parts 5-7 (no Part 8).
 
 ## `hooks/pre-commit`
 
-Optional git hook that runs the relevant validator automatically - C1's when a C1 page is
-staged, B2's when a B2 page is staged, B1's when a B1 page is staged. Untouched levels are
+Optional git hook that runs the relevant validator automatically - the matching level's
+validator runs when one of its pages is staged (C1, C2, B2 or B1). Untouched levels are
 skipped, so a commit to one doesn't run the others' checks.
 
 ```bash
