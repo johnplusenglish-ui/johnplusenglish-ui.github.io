@@ -3,6 +3,7 @@
 <head>
 <script src="lock.js"></script>
 <script src="/assets/deeplink.js"></script>
+<script src="matching.js"></script>
 <base target="_top">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -284,11 +285,11 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
 .oc-passage{font-family:'Outfit',sans-serif;font-size:1.05rem;color:var(--ink);line-height:2.2;margin-bottom:1.5rem}
 .oc-gap{display:inline-block;position:relative;margin:0 .15em}
 .oc-gap-num{font-family:Outfit,sans-serif;font-size:.68rem;color:var(--muted);vertical-align:super;margin-right:.15em;font-weight:700}
-.oc-gap-input{font-family:'Outfit',sans-serif;font-weight:700;font-size:1rem;color:var(--ink);background:transparent;border:none;border-bottom:2px dotted var(--muted);padding:.25rem .25rem;width:9.5em;text-align:center;outline:none;transition:all .15s}
-.oc-gap-input:focus{border-bottom-color:var(--sky);background:rgba(33,118,255,.06)}
-.oc-gap-input.correct{color:#0F7D71;border-bottom-color:#1DD3B0;background:rgba(29,211,176,.08)}
-.oc-gap-input.wrong{color:#FF6B6B;border-bottom-color:#FF6B6B;background:rgba(255,107,107,.06)}
-.oc-gap-input.revealed{color:#0F7D71;border-bottom-color:#1DD3B0;background:rgba(29,211,176,.08);font-style:italic}
+.oc-gap-input{font-family:'Outfit',sans-serif;font-weight:700;font-size:1rem;color:var(--ink);background:#fff;border:1.5px solid var(--border);border-radius:8px;padding:.3rem .5rem;width:9.5em;text-align:center;outline:none;transition:all .15s}
+.oc-gap-input:focus{border-color:var(--sky);background:rgba(33,118,255,.06)}
+.oc-gap-input.correct{color:#0F7D71;border-color:#1DD3B0;background:rgba(29,211,176,.08)}
+.oc-gap-input.wrong{color:#FF6B6B;border-color:#FF6B6B;background:rgba(255,107,107,.06)}
+.oc-gap-input.revealed{color:#0F7D71;border-color:#1DD3B0;background:rgba(29,211,176,.08);font-style:italic}
 .oc-gap-input:disabled{cursor:default}
 .oc-bank{margin-bottom:1.5rem;padding:1rem 1.25rem;background:var(--cream);border:1.5px dashed var(--border);border-radius:12px}
 .oc-bank-label{font-family:Outfit,sans-serif;font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.75rem;font-weight:700}
@@ -656,53 +657,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
   <!-- MATCHING TAB -->
   <div class="tab-content" id="tab-defmatch">
     <section class="practice-pane" id="practice-defmatch">
-
-      <div id="dm-controls">
-        <h3 class="mg-launch-title">Matching</h3>
-
-        <div class="mg-freq-row" id="dm-freq-row">
-          <button type="button" class="mg-freq-chip active" data-freq="all">All</button>
-          <button type="button" class="mg-freq-chip" data-freq="verycommon">Very common</button>
-          <button type="button" class="mg-freq-chip" data-freq="common">Common</button>
-          <button type="button" class="mg-freq-chip" data-freq="less">Less common</button>
-        </div>
-      </div>
-
-      <div class="mg-session" id="dm-session" hidden>
-        <div class="mg-exit-row">
-          <button type="button" class="mg-exit-btn" id="dm-new-btn">New set</button>
-        </div>
-        <div class="mg-set-label" id="dm-set-label"></div>
-        <div class="mg-bar">
-          <span><strong id="dm-matched">0</strong> of <strong id="dm-set-size">8</strong> matched</span>
-          <span><strong id="dm-mistakes">0</strong> mistakes</span>
-        </div>
-        <div class="mg-progress"><div class="mg-progress-fill" id="dm-progress-fill"></div></div>
-        <div class="mg-connections" id="dm-connections"></div>
-        <div class="mg-cols" id="dm-cols">
-          <div>
-            <div class="mg-col-head">Idiom</div>
-            <div class="mg-col mg-left" id="dm-left"></div>
-          </div>
-          <div>
-            <div class="mg-col-head">Definition</div>
-            <div class="mg-col mg-right" id="dm-right"></div>
-          </div>
-        </div>
-        <div class="mg-set-done" id="dm-set-done" hidden>
-          <div class="mg-set-done-msg" id="dm-set-msg">Set complete!</div>
-          <div class="mg-set-done-sub" id="dm-set-sub"></div>
-          <button type="button" class="mg-next-set-btn" id="dm-next-set-btn">Next set &rarr;</button>
-        </div>
-      </div>
-
-      <div class="mg-complete" id="dm-complete" hidden>
-        <div class="mg-complete-title">All sets complete!</div>
-        <div class="mg-complete-score" id="dm-final-score"></div>
-        <div class="mg-complete-sub" id="dm-final-sub"></div>
-        <button type="button" class="mg-restart-btn" id="dm-restart-btn">Play again</button>
-      </div>
-
+      <div id="dm-matching"></div>
     </section>
   </div>
 
@@ -1791,217 +1746,14 @@ function ocDoPrint(){
   }, 250);
 }
 
-/* ============ MATCH GRID ============ */
+/* ============ MATCH GRID (shared component) ============ */
 (function(){
-  var MG_FLAT = DATA.map(function(d){ return {term: d.i, def: d.d, freq: d.freq}; });
-
-  var state = {
-    freq: 'all',
-    allSets:[], currentSet:0,
-    selected:null, matchCount:0, mistakes:0, setSize:0,
-    setMistakes:[]
-  };
-
-  function el(id){ return document.getElementById(id); }
-
-  function shuffle(a){
-    for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t; }
-    return a;
-  }
-
-  function buildPool(){
-    return MG_FLAT.filter(function(e){
-      if(state.freq !== 'all' && e.freq !== state.freq) return false;
-      return true;
-    });
-  }
-
-  function updatePoolCount(){}
-
-  document.querySelectorAll('#dm-freq-row .mg-freq-chip').forEach(function(btn){
-    btn.addEventListener('click', function(){
-      document.querySelectorAll('#dm-freq-row .mg-freq-chip').forEach(function(b){ b.classList.remove('active'); });
-      btn.classList.add('active');
-      state.freq = btn.dataset.freq;
-      updatePoolCount();
-      startSession();
-    });
+  var data = DATA.map(function(d){ return {term:d.i, def:d.d, freq:d.freq}; });
+  Matching.init({
+    mount: 'dm-matching', data: data, title: 'Matching',
+    leftLabel: 'Idiom', rightLabel: 'Definition', swapKey: 'jpe_idioms_mg_swap',
+    freqChips: [{v:'all',label:'All'},{v:'verycommon',label:'Very common'},{v:'common',label:'Common'},{v:'less',label:'Less common'}]
   });
-
-  function chunkPool(){
-    var pool = shuffle(buildPool().slice());
-    var sets = [];
-    while(pool.length){
-      var cur = [], terms = {}, defs = {}, leftover = [];
-      for(var j = 0; j < pool.length; j++){
-        var e = pool[j];
-        if(cur.length < 8 && !terms[e.term] && !defs[e.def]){
-          cur.push(e); terms[e.term] = 1; defs[e.def] = 1;
-        } else {
-          leftover.push(e);
-        }
-      }
-      if(cur.length === 0) break;
-      sets.push(cur);
-      pool = leftover;
-    }
-    return sets;
-  }
-
-  function startSession(){
-    state.allSets = chunkPool();
-    if(state.allSets.length === 0) return;
-    state.currentSet = 0;
-    state.setMistakes = [];
-    el('dm-complete').hidden = true;
-    el('dm-session').hidden = false;
-    loadSet(0);
-  }
-
-  function updateSetLabel(){
-    el('dm-set-label').textContent = 'Set ' + (state.currentSet + 1) + ' of ' + state.allSets.length;
-  }
-
-  function loadSet(idx){
-    state.currentSet = idx;
-    state.matchCount = 0;
-    state.mistakes = 0;
-    state.selected = null;
-    var pairs = state.allSets[idx];
-    state.validPairs = {};
-    pairs.forEach(function(p){ state.validPairs[p.term + ' :: ' + p.def] = true; });
-    state.setSize = pairs.length;
-    el('dm-set-size').textContent = pairs.length;
-    el('dm-set-done').hidden = true;
-    el('dm-cols').style.display = '';
-    el('dm-connections').innerHTML = '';
-    updateSetLabel();
-    renderGrid(pairs);
-    updateBar();
-  }
-
-  function renderGrid(pairs){
-    var left = shuffle(pairs.map(function(p,i){ return {idx:i, text:p.term, term:p.term}; }));
-    var right = shuffle(pairs.map(function(p,i){ return {idx:i, text:p.def, def:p.def}; }));
-    var leftCol = el('dm-left'); leftCol.innerHTML = '';
-    var rightCol = el('dm-right'); rightCol.innerHTML = '';
-    left.forEach(function(item,i){
-      var label = String(i + 1);
-      var btn = document.createElement('button');
-      btn.type = 'button'; btn.className = 'mg-item';
-      btn.innerHTML = '<span class="mg-item-label">' + label + '.</span>' + escHtml(item.text);
-      btn.dataset.idx = item.idx; btn.dataset.side = 'left'; btn.dataset.label = label; btn.dataset.term = item.term;
-      btn.addEventListener('click', function(){ handleClick(btn); });
-      leftCol.appendChild(btn);
-    });
-    right.forEach(function(item,i){
-      var label = String.fromCharCode(65 + i);
-      var btn = document.createElement('button');
-      btn.type = 'button'; btn.className = 'mg-item';
-      btn.innerHTML = '<span class="mg-item-label">' + label + '.</span>' + escHtml(item.text);
-      btn.dataset.idx = item.idx; btn.dataset.side = 'right'; btn.dataset.label = label; btn.dataset.def = item.def;
-      btn.addEventListener('click', function(){ handleClick(btn); });
-      rightCol.appendChild(btn);
-    });
-  }
-
-  function escHtml(s){
-    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  }
-
-  function handleClick(btn){
-    if(btn.classList.contains('matched')) return;
-    if(!state.selected){
-      clearSelection();
-      btn.classList.add('selected');
-      state.selected = btn;
-      return;
-    }
-    if(btn === state.selected){ btn.classList.remove('selected'); state.selected = null; return; }
-    if(btn.dataset.side === state.selected.dataset.side){
-      state.selected.classList.remove('selected');
-      btn.classList.add('selected');
-      state.selected = btn;
-      return;
-    }
-    var leftBtn = state.selected.dataset.side === 'left' ? state.selected : btn;
-    var rightBtn = state.selected.dataset.side === 'left' ? btn : state.selected;
-    if(state.validPairs && state.validPairs[(leftBtn.dataset.term||'') + ' :: ' + (rightBtn.dataset.def||'')]){
-      addConnection(leftBtn.dataset.label, rightBtn.dataset.label);
-      state.selected.classList.remove('selected');
-      state.selected.classList.add('matched');
-      btn.classList.add('matched');
-      state.matchCount++;
-      state.selected = null;
-      updateBar();
-      if(state.matchCount === state.setSize) setTimeout(completeSet, 500);
-    } else {
-      state.mistakes++;
-      var prev = state.selected;
-      btn.classList.add('wrong'); prev.classList.add('wrong'); prev.classList.remove('selected');
-      state.selected = null;
-      updateBar();
-      setTimeout(function(){ btn.classList.remove('wrong'); prev.classList.remove('wrong'); }, 600);
-    }
-  }
-
-  function clearSelection(){
-    document.querySelectorAll('#dm-left .mg-item, #dm-right .mg-item').forEach(function(b){
-      b.classList.remove('selected','wrong');
-    });
-  }
-
-  function addConnection(leftLabel, rightLabel){
-    var chip = document.createElement('span');
-    chip.className = 'mg-conn-chip';
-    chip.textContent = leftLabel + '-' + rightLabel;
-    el('dm-connections').appendChild(chip);
-  }
-
-  function updateBar(){
-    el('dm-matched').textContent = state.matchCount;
-    el('dm-mistakes').textContent = state.mistakes;
-    el('dm-progress-fill').style.width = ((state.matchCount / state.setSize) * 100) + '%';
-  }
-
-  function completeSet(){
-    state.setMistakes[state.currentSet] = state.mistakes;
-    if(state.currentSet >= state.allSets.length - 1){ showFinal(); return; }
-    el('dm-cols').style.display = 'none';
-    el('dm-set-done').hidden = false;
-    el('dm-set-msg').textContent = 'Set ' + (state.currentSet + 1) + ' of ' + state.allSets.length + ' complete!';
-    el('dm-set-sub').textContent = state.mistakes === 0 ? 'No mistakes - perfect!' : state.mistakes + ' mistake' + (state.mistakes===1?'':'s');
-  }
-
-  function showFinal(){
-    el('dm-session').hidden = true;
-    el('dm-complete').hidden = false;
-    var totalMistakes = 0;
-    var perfect = 0;
-    for(var i = 0; i < state.setMistakes.length; i++){
-      totalMistakes += (state.setMistakes[i] || 0);
-      if(!state.setMistakes[i]) perfect++;
-    }
-    var totalPairs = state.allSets.reduce(function(a,s){ return a+s.length; }, 0);
-    el('dm-final-score').textContent = totalPairs + ' / ' + totalPairs + ' matched';
-    el('dm-final-sub').textContent = totalMistakes === 0
-      ? 'No mistakes across all ' + state.allSets.length + ' sets - outstanding!'
-      : totalMistakes + ' mistake' + (totalMistakes===1?'':'s') + ' total \u00b7 ' + perfect + ' of ' + state.allSets.length + ' sets perfect';
-  }
-
-    el('dm-next-set-btn').addEventListener('click', function(){
-    loadSet(state.currentSet + 1);
-  });
-  el('dm-restart-btn').addEventListener('click', function(){
-    el('dm-complete').hidden = true;
-    startSession();
-  });
-  el('dm-new-btn').addEventListener('click', function(){
-    startSession();
-  });
-
-  updatePoolCount();
-  startSession();
 })();
 
 
