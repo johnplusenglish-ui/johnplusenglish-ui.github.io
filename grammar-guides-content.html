@@ -119,6 +119,22 @@ table.form-table{width:100%;border-collapse:separate;border-spacing:0;font-size:
 
 .search-highlight{background:rgba(255,179,71,.4);border-radius:2px;padding:0 1px}
 
+/* ── PNG export ── */
+.topic-export-btn{background:none;border:1.5px solid var(--border);border-radius:8px;padding:.3rem .46rem;cursor:pointer;color:var(--muted);display:inline-flex;align-items:center;justify-content:center;transition:border-color .15s,color .15s;flex-shrink:0;font-family:inherit;min-width:29px;min-height:27px}
+.topic-export-btn:hover{border-color:var(--sky);color:var(--sky)}
+.topic-export-btn:disabled{opacity:.55;cursor:default;border-color:var(--border);color:var(--muted)}
+.topic-export-btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:block}
+.png-export-card{width:760px;box-sizing:border-box;background:var(--cream);padding:38px;font-family:'Outfit',sans-serif;color:var(--ink)}
+.pec-inner{background:#fff;border:1.5px solid var(--border);border-radius:18px;padding:34px 36px 26px}
+.pec-eyebrow{font-size:.72rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 12px}
+.pec-head{display:flex;align-items:center;gap:12px;margin:0}
+.pec-badge{font-family:'Outfit',sans-serif;font-size:.66rem;font-weight:700;padding:.22rem .55rem;border-radius:5px;text-transform:uppercase;letter-spacing:.05em}
+.pec-title{font-size:1.75rem;font-weight:900;letter-spacing:-.01em;margin:0;line-height:1.12}
+.pec-body{margin-top:22px}
+.pec-body>.section-label:first-child{margin-top:2px}
+.pec-foot{margin-top:28px;padding-top:16px;border-top:1.5px solid var(--border);font-size:.75rem;font-weight:600;color:var(--muted)}
+.pec-foot b{color:var(--sky);font-weight:800}
+
 /* ── No results ── */
 .no-results{text-align:center;padding:3rem 1rem;color:var(--muted);font-size:.95rem}
 
@@ -272,6 +288,9 @@ function render(){
           '<span class="topic-title">' + titleDisplay + '</span>' +
         '</div>' +
         '<div style="display:flex;align-items:center;gap:.5rem">' +
+          '<button class="topic-export-btn" title="Save this guide as a PNG image" aria-label="Save as PNG image" onclick="event.stopPropagation();exportTopicPNG(\'' + t.id + '\',this)">' +
+            '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>' +
+          '</button>' +
           '<span class="topic-level-badge ' + badgeClass(t.level) + '">' + levelLabel(t.level) + '</span>' +
           '<span class="topic-chevron">▾</span>' +
         '</div>' +
@@ -329,6 +348,57 @@ try{
 
 // Initial render
 render();
+</script>
+
+<script>
+/* High-res PNG export of a single grammar guide, via html2canvas
+   (same library/CDN used elsewhere on the site - draws the DOM directly,
+   so the canvas is never tainted). */
+(function(){
+  var H2C='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+  function loadH2C(){
+    return new Promise(function(res,rej){
+      if(typeof html2canvas!=='undefined') return res();
+      var s=document.createElement('script'); s.src=H2C;
+      s.onload=function(){res();}; s.onerror=function(){rej(new Error('html2canvas failed to load'));};
+      document.head.appendChild(s);
+    });
+  }
+
+  window.exportTopicPNG = function(id, btn){
+    var topic = TOPICS.find(function(t){return t.id===id;});
+    if(!topic) return;
+    var orig; if(btn){ orig=btn.innerHTML; btn.disabled=true; btn.innerHTML='<span style="font-size:.7rem;font-weight:700;line-height:1">…</span>'; }
+
+    var host=document.createElement('div');
+    host.style.cssText='position:fixed;left:-100000px;top:0;z-index:-1;pointer-events:none';
+    var card=document.createElement('div');
+    card.className='png-export-card';
+    card.innerHTML='<div class="pec-inner">'
+      +'<div class="pec-eyebrow">Grammar Guides</div>'
+      +'<div class="pec-head"><span class="pec-badge badge-'+topic.level+'">'+topic.level.toUpperCase()+'</span><h2 class="pec-title">'+topic.title+'</h2></div>'
+      +'<div class="pec-body">'+topic.body+'</div>'
+      +'<div class="pec-foot"><b>johnplusenglish</b> &nbsp;·&nbsp; English grammar, one guide at a time</div>'
+    +'</div>';
+    host.appendChild(card); document.body.appendChild(host);
+
+    var ready = (document.fonts && document.fonts.ready) ? document.fonts.ready.catch(function(){}) : Promise.resolve();
+    loadH2C().then(function(){ return ready; }).then(function(){
+      return html2canvas(card,{scale:3,backgroundColor:'#F7F6F3',useCORS:true,logging:false,width:card.offsetWidth,height:card.offsetHeight});
+    }).then(function(canvas){
+      var link=document.createElement('a');
+      link.download='grammar-'+topic.id+'.png';
+      link.href=canvas.toDataURL('image/png');
+      document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    }).catch(function(err){
+      console.error('PNG export failed:',err);
+      alert('Sorry, the image export failed. Please check your connection and try again.');
+    }).then(function(){
+      if(host.parentNode) host.parentNode.removeChild(host);
+      if(btn){ btn.disabled=false; if(orig!=null) btn.innerHTML=orig; }
+    });
+  };
+})();
 </script>
 </body>
 </html>
