@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 /**
- * validate-b1.mjs — structural + content invariants for the B1 Preliminary exam pages.
+ * validate-b1.mjs - structural + content invariants for the B1 Preliminary exam pages.
  *
  * Run:  node tools/validate-b1.mjs        (from the repo root)
  * Exit: 0 if all ERROR-level checks pass, 1 otherwise. WARN-level issues never fail the build.
  *
  * B1 Preliminary (PET) format differs from B2 First / C1 Advanced (confirmed against the official
- * Cambridge B1 Preliminary 2022 sample papers) — do NOT copy higher-level assumptions here:
+ * Cambridge B1 Preliminary 2022 sample papers) - do NOT copy higher-level assumptions here:
  *  - Reading has SIX parts: P1 = 5 signs/notices (3-option MC), P2 = match 5 people to 8 short
  *    texts (letters A-H, three unused), P3 = 5 four-option MC on one long text, P4 = 5 sentences
  *    removed from a text with 8 options (three unused), P5 = 6 four-option MC cloze (vocabulary),
