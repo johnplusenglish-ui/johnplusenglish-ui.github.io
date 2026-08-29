@@ -55,6 +55,25 @@ node tools/validate-b2.mjs
 
 Same ERROR/WARN convention as `validate-c1.mjs`.
 
+## `validate-b1.mjs`
+
+For the four B1 Preliminary pages (`b1-reading-test-content.html`, `b1-writing-content.html`,
+`b1-speaking-content.html`, `b1-grammar-content.html`). B1 Preliminary (PET) is a different
+exam again, confirmed against the official Cambridge B1 Preliminary 2022 sample papers:
+Reading has **six** parts (P1 five signs / 3 options, P2 match five people to eight texts,
+P3 five 4-option MC on a long text, P4 five sentences removed from a text with eight options,
+P5 six 4-option MC cloze, P6 six open-cloze one-word gaps); Writing is a compulsory Part 1
+**email** (~100 words, replying to a friend's email and **four** notes, one of which asks a
+question back) plus a Part 2 choice of an **article or a story** (~100 words, the story given
+as an opening sentence); Speaking Part 2 is describing **one** photo alone (not comparing two).
+The `grammar` page is a supplementary resource, so only the dash check applies to it. Run:
+
+```bash
+node tools/validate-b1.mjs
+```
+
+Same ERROR/WARN convention as the others.
+
 ## `build-c1-manifest.mjs` + item analytics
 
 The C1 Use of English (Parts 1–4) and Reading (Parts 5–8) pages log **anonymous, aggregate**
@@ -91,8 +110,8 @@ default `c1a_`). B2 First Reading has only Parts 5-7 (no Part 8).
 ## `hooks/pre-commit`
 
 Optional git hook that runs the relevant validator automatically - C1's when a C1 page is
-staged, B2's when a B2 page is staged. Untouched levels are skipped, so a commit to one
-doesn't run the other's checks.
+staged, B2's when a B2 page is staged, B1's when a B1 page is staged. Untouched levels are
+skipped, so a commit to one doesn't run the others' checks.
 
 ```bash
 cp tools/hooks/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit

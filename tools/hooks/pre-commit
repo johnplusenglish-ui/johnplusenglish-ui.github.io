@@ -22,6 +22,13 @@ case "$staged" in
     ;;
 esac
 
+case "$staged" in
+  *b1-reading-test-content.html*|*b1-writing-content.html*|*b1-speaking-content.html*|*b1-grammar-content.html*)
+    echo "Running B1 validation…"
+    node tools/validate-b1.mjs || fail=1
+    ;;
+esac
+
 if [ "$fail" = "1" ]; then
   echo ""
   echo "Commit blocked: fix the errors above, or use 'git commit --no-verify' to override."
