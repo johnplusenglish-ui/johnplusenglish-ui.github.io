@@ -328,7 +328,7 @@ footer{text-align:center;padding:3rem 2rem;font-size:.8rem;color:var(--muted);bo
 
 <div class="content-area auction-area" id="view-auction">
 <div class="auction-setup" id="auction-setup">
-<h3>⚙️ Game Setup</h3>
+<h3>Game Setup</h3>
 <div class="auction-setup-row">
 <div class="auction-field"><label>Level</label>
 <div class="auction-level-pills" id="auction-level-pills">
@@ -358,7 +358,7 @@ footer{text-align:center;padding:3rem 2rem;font-size:.8rem;color:var(--muted);bo
 </div>
 </div>
 <div class="auction-results" id="auction-results">
-<h3>🏆 Auction Results</h3>
+<h3>Auction Results</h3>
 <div class="auction-results-grid" id="auction-results-grid"></div>
 <div style="text-align:center"><button class="btn" onclick="auctionReset()" style="background:var(--sun);color:#fff;border-color:var(--sun)">Play Again</button></div>
 </div>
@@ -469,11 +469,11 @@ function renderBrowse(){
   container.innerHTML=filtered.map(function(g,gi){
     var gid='g'+gi;
     var h='<div class="grammar-card fade-in" style="animation-delay:'+Math.min(gi*.08,.4)+'s">';
-    h+='<div class="grammar-card-header"><div class="gc-title-row"><div class="gc-title">'+g.grammar+'</div><button class="gc-print" onclick="event.stopPropagation();printCard(this)">🖨️ Print</button></div>';
+    h+='<div class="grammar-card-header"><div class="gc-title-row"><div class="gc-title">'+g.grammar+'</div><button class="gc-print" onclick="event.stopPropagation();printCard(this)">Print</button></div>';
     h+='<div class="gc-rule">'+g.rule+'</div></div>';
     // Teacher tip
     if(g.teacherTip){
-      h+='<button class="teacher-tip-toggle" onclick="toggleTip(\''+gid+'\')">🍎 Teacher Tip</button>';
+      h+='<button class="teacher-tip-toggle" onclick="toggleTip(\''+gid+'\')">Teacher Tip</button>';
       h+='<div class="teacher-tip" id="tip-'+gid+'"><div class="teacher-tip-text">'+g.teacherTip+'</div></div>';
     }
     h+='<div class="prompt-list">';
@@ -488,7 +488,7 @@ function renderBrowse(){
     h+='<button class="shuffler-btn" onclick="shufflePrompt(\''+gid+'\','+gi+')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-.15em"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg> Random Prompt</button>';
     h+='</div>';
     // Error bank
-    h+='<button class="error-bank-toggle" onclick="toggleErrors(\''+gid+'\')">✏️ Error Bank</button>';
+    h+='<button class="error-bank-toggle" onclick="toggleErrors(\''+gid+'\')">Error Bank</button>';
     h+='<div class="error-bank" id="errors-'+gid+'">';
     h+='<div style="display:flex;gap:.5rem"><input class="error-input" id="errinput-'+gid+'" placeholder="Type an error you heard…" style="min-height:36px;resize:none" onkeydown="if(event.key===\'Enter\'){addError(\''+gid+'\');event.preventDefault()}"><button class="btn btn-sea" onclick="addError(\''+gid+'\')" style="padding:.4rem .8rem;font-size:.75rem;flex-shrink:0">Add</button></div>';
     h+='<div class="error-list" id="errlist-'+gid+'"></div></div>';
@@ -1335,7 +1335,7 @@ function auctionStart(){
     (bank[topic]||[]).forEach(function(item){pool.push({s:item.s,ok:item.ok,fix:item.fix||'',note:item.note,topic:topic})});
   }
   pool.sort(function(){return Math.random()-0.5});
-  var teamEmojis=['🔴','🔵','🟢'];
+  var teamEmojis=['','',''];
   var teamNames=['Red Team','Blue Team','Green Team'];
   auctionGame={sentences:pool.slice(0,Math.min(count,pool.length)),current:0,teams:[]};
   for(var i=0;i<numTeams;i++) auctionGame.teams.push({name:teamNames[i],emoji:teamEmojis[i],budget:budget,score:0,correct:0});
@@ -1382,7 +1382,7 @@ function auctionReveal(){
   });
   auctionRenderTeams();
   var cls=s.ok?'correct':'incorrect';
-  var verdict=s.ok?'✅ CORRECT':'❌ INCORRECT';
+  var verdict=s.ok?'CORRECT':'INCORRECT';
   var expl=s.ok?'<strong>This sentence is correct.</strong> '+s.note:'<strong>Correction:</strong> '+s.fix+'<br>'+s.note;
   rev.className='auction-reveal '+cls;
   rev.innerHTML='<div class="auction-reveal-verdict">'+verdict+'</div><div class="auction-reveal-note">'+expl+'</div>';
@@ -1404,7 +1404,7 @@ function auctionEnd(){
     h+='<div class="auction-result-score">Profit: €'+t.score.toLocaleString()+'</div>';
     h+='<div class="auction-result-score">Budget: €'+t.budget.toLocaleString()+'</div>';
     h+='<div class="auction-result-score">Correct bids: '+t.correct+'</div>';
-    if(w)h+='<div class="auction-result-label">🏆 Winner!</div>';
+    if(w)h+='<div class="auction-result-label">Winner!</div>';
     h+='</div>';
   });
   document.getElementById('auction-results-grid').innerHTML=h;
