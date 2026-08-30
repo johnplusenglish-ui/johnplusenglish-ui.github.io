@@ -68,6 +68,19 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
 .action-btn.solid{background:var(--ink);border-color:var(--ink);color:var(--cream)}
 .action-btn.solid:hover{opacity:.85;background:var(--ink);color:var(--cream)}
 
+/* Present mode (house pattern, full-screen, for projecting to the class - reuses the debate card unchanged) */
+.focus-overlay{position:fixed;inset:0;z-index:200;background:rgba(247,246,243,.97);backdrop-filter:blur(20px);display:none;flex-direction:column;align-items:center;justify-content:center;padding:2rem;overflow:auto}
+.focus-overlay.show{display:flex}
+.focus-btn{font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:700;padding:.55rem 1.4rem;border:1.5px solid var(--border);border-radius:10px;background:var(--card);color:var(--ink);cursor:pointer;transition:all .15s}
+.focus-btn:hover{border-color:var(--sky);color:var(--sky)}
+.focus-btn.primary{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+.focus-btn.primary:hover{opacity:.85}
+.focus-btn.close{position:absolute;top:1.2rem;right:1.5rem;font-size:1.2rem;border:none;background:none;color:var(--muted);cursor:pointer;padding:.5rem;line-height:1}
+.focus-btn.close:hover{color:var(--ink)}
+.focus-counter{font-family:Outfit,sans-serif;font-size:.82rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.focus-nav{display:flex;gap:.8rem;justify-content:center;align-items:center;flex-wrap:wrap;margin-top:1.6rem}
+.present-debate-mount{width:100%;max-width:1120px}
+
 .main{max-width:960px;margin:0 auto;padding:0 2rem 3rem;position:relative;z-index:1}
 
 /* ── Debate card ──────────────────────────────────────────────────
@@ -243,7 +256,7 @@ footer{text-align:center;padding:3rem 2rem;font-size:.8rem;color:var(--muted);bo
 
 @media(max-width:640px){nav{padding:.75rem 1.2rem}.nav-links{gap:1rem}.page-header{padding:1.6rem 1.2rem .8rem}.controls{padding:0 1.2rem .5rem}.main{padding:0 1.2rem 2rem}}
 @media print{
-  nav,.topnav,.page-header,.controls,.card-nav,.timer-section,.mode-toggle,.action-btn,.build-strip,.build-fields,.build-status,footer{display:none}
+  nav,.topnav,.page-header,.controls,.card-nav,.timer-section,.mode-toggle,.action-btn,.build-strip,.build-fields,.build-status,.focus-overlay,footer{display:none}
   .main{padding:0;margin:0;max-width:none}
   .debate-card{box-shadow:none;border:1px solid #ccc;aspect-ratio:auto;max-width:none}
   .phrase-item.crossed{text-decoration:none;opacity:1}
@@ -293,6 +306,7 @@ footer{text-align:center;padding:3rem 2rem;font-size:.8rem;color:var(--muted);bo
 <select class="debate-select" id="debateSelect" onchange="selectDebate(this.value)"><option value="">Browse by topic...</option></select>
 <div class="ctrl-spacer"></div>
 <div style="display:flex;gap:.8rem;flex-shrink:0">
+<button class="action-btn" onclick="openPresentMode()" title="Present mode - big screen view for the class (Esc to exit)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
 <button class="action-btn" id="downloadPngBtn" onclick="downloadCardPng('debateCard')" title="Download as PNG"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
 <button class="action-btn" onclick="window.print()" title="Print"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8" rx="1"/></svg></button>
 </div>
@@ -361,6 +375,17 @@ footer{text-align:center;padding:3rem 2rem;font-size:.8rem;color:var(--muted);bo
 <div class="build-stage" id="buildStage"></div>
 </div>
 
+</div>
+
+<!-- Present mode overlay -->
+<div class="focus-overlay" id="presentOverlay">
+<button class="focus-btn close" onclick="closePresentMode()" title="Close present mode (Esc)">&times;</button>
+<div class="present-debate-mount" id="presentDebateMount"></div>
+<div class="focus-nav">
+<button class="focus-btn" onclick="presentNav(-1)">&larr; Previous</button>
+<span class="focus-counter" id="presentCounter"></span>
+<button class="focus-btn primary" onclick="presentNav(1)">Next &rarr;</button>
+</div>
 </div>
 
 <footer>&copy; 2026 johnplusenglish. All rights reserved.</footer>
@@ -490,6 +515,28 @@ function go(dir){
   render();
 }
 
+// ── Present mode (full-screen, for projecting the current debate to the class - reuses the card markup unchanged) ──
+function presentOpen(){ return document.getElementById('presentOverlay').classList.contains('show'); }
+function openPresentMode(){
+  if (!filtered.length) return;
+  renderPresentCard();
+  document.getElementById('presentOverlay').className = 'focus-overlay show';
+  document.body.style.overflow = 'hidden';
+}
+function closePresentMode(){
+  document.getElementById('presentOverlay').className = 'focus-overlay';
+  document.body.style.overflow = '';
+}
+function renderPresentCard(){
+  var d = filtered[idx];
+  if (!d) return;
+  var mount = document.getElementById('presentDebateMount');
+  mount.innerHTML = '<div class="debate-card" style="--level-color:' + levelColor(d.level) + '">' + cardHtml(d) + '</div>';
+  updateProgress(mount.querySelector('.debate-card'));
+  document.getElementById('presentCounter').textContent = (idx + 1) + ' / ' + filtered.length;
+}
+function presentNav(dir){ go(dir); if (presentOpen()) renderPresentCard(); }
+
 /* ── The debate card ───────────────────────────────────────────── */
 function cardHtml(d){
   var h = '<div class="debate-phrases"><div class="debate-phrases-title">Useful phrases (' + esc(d.level) + ')</div>';
@@ -503,17 +550,17 @@ function cardHtml(d){
   (d.bubbles || []).forEach(function(b){ h += '<div class="bubble" onclick="toggleBubble(this)">' + esc(b) + '</div>'; });
   h += '</div>';
   h += '<div class="debate-task">' + esc(d.task) + '</div>';
-  h += '<div class="debate-progress" id="cardProgress"></div>';
+  h += '<div class="debate-progress"></div>';
   h += '</div>';
   return h;
 }
 
-function togglePhrase(el){ el.classList.toggle('crossed'); updateProgress(); }
-function toggleBubble(el){ el.classList.toggle('highlighted'); updateProgress(); }
+function togglePhrase(el){ el.classList.toggle('crossed'); updateProgress(el.closest('.debate-card')); }
+function toggleBubble(el){ el.classList.toggle('highlighted'); updateProgress(el.closest('.debate-card')); }
 
-function updateProgress(){
-  var card = document.getElementById('debateCard');
-  var out = document.getElementById('cardProgress');
+function updateProgress(card){
+  card = card || document.getElementById('debateCard');
+  var out = card ? card.querySelector('.debate-progress') : null;
   if (!card || !out) return;
   var bubbles = card.querySelectorAll('.bubble');
   var phrases = card.querySelectorAll('.phrase-item');
@@ -1068,9 +1115,15 @@ function updateTimerBtn(){
 
 /* Arrow keys page through debates, but never while a field is focused. */
 document.addEventListener('keydown', function(e){
-  if (mode !== 'debates') return;
   var t = e.target;
   if (t && (t.isContentEditable || /^(input|textarea|select)$/i.test(t.tagName))) return;
+  if (presentOpen()){
+    if (e.key === 'Escape'){ closePresentMode(); return; }
+    if (e.key === 'ArrowLeft') presentNav(-1);
+    if (e.key === 'ArrowRight') presentNav(1);
+    return;
+  }
+  if (mode !== 'debates') return;
   if (e.key === 'ArrowLeft') go(-1);
   if (e.key === 'ArrowRight') go(1);
 });

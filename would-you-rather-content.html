@@ -123,6 +123,23 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
 .wyr-follow-panel.open{display:block}
 .wyr-follow-text{font-size:.88rem;color:var(--ink);line-height:1.6}
 
+/* Present mode (house pattern, full-screen, for projecting to the class) */
+.focus-overlay{position:fixed;inset:0;z-index:200;background:rgba(247,246,243,.97);backdrop-filter:blur(20px);display:none;flex-direction:column;align-items:center;justify-content:center;padding:2rem;overflow:auto}
+.focus-overlay.show{display:flex}
+.focus-btn{font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:700;padding:.55rem 1.4rem;border:1.5px solid var(--border);border-radius:10px;background:var(--card);color:var(--ink);cursor:pointer;transition:all .15s}
+.focus-btn:hover{border-color:var(--sky);color:var(--sky)}
+.focus-btn.primary{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+.focus-btn.primary:hover{opacity:.85}
+.focus-btn.close{position:absolute;top:1.2rem;right:1.5rem;font-size:1.2rem;border:none;background:none;color:var(--muted);cursor:pointer;padding:.5rem;line-height:1}
+.focus-btn.close:hover{color:var(--ink)}
+.focus-counter{font-family:Outfit,sans-serif;font-size:.82rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.focus-nav{display:flex;gap:.8rem;justify-content:center;align-items:center;flex-wrap:wrap;margin-top:2rem}
+.wyr-present-inner{max-width:900px;width:100%}
+.wyr-present-inner .wyr-card{box-shadow:0 8px 30px rgba(45,48,71,.1)}
+.wyr-present-inner .wyr-question{font-size:1.3rem}
+.wyr-present-inner .wyr-option-text{font-size:1.35rem;line-height:1.5}
+.wyr-present-inner .wyr-opt{padding:2rem 2.2rem}
+
 /* Quick-fire mode */
 .quickfire-bar{max-width:700px;margin:0 auto 1rem;display:flex;align-items:center;justify-content:center;gap:1rem;flex-wrap:wrap}
 .qf-progress{width:100%;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
@@ -200,7 +217,7 @@ nav{padding:.75rem 1.2rem}.nav-links{gap:1rem}.nav-links a{font-size:.78rem}
 .grid-view.active{grid-template-columns:1fr}
 }
 @media print{
-nav,.filters,.mode-toggle-wrap,.setup-bar,.card-nav,.timer-section,.back-link,.filters-actions{display:none!important}
+nav,.filters,.mode-toggle-wrap,.setup-bar,.card-nav,.timer-section,.back-link,.filters-actions,.focus-overlay{display:none!important}
 .page-header{padding-top:1rem}
 .wyr-card{border:1px solid #ccc;break-inside:avoid}
 }
@@ -246,6 +263,7 @@ nav,.filters,.mode-toggle-wrap,.setup-bar,.card-nav,.timer-section,.back-link,.f
 <span class="setup-summary" id="setupSummary">All levels &middot; All categories</span>
 </button>
 <div class="filters-actions">
+<button class="action-btn" onclick="openPresentMode()" title="Present mode - big screen view for the class (Esc to exit)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg> Present</button>
 <button class="action-btn" onclick="shuffleAll()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg> Random</button>
 <button class="action-btn" onclick="window.print()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> Print</button>
 </div>
@@ -277,6 +295,17 @@ nav,.filters,.mode-toggle-wrap,.setup-bar,.card-nav,.timer-section,.back-link,.f
 
 <!-- Grid View -->
 <div class="grid-view" id="gridView"></div>
+</div>
+
+<!-- Present mode overlay -->
+<div class="focus-overlay" id="presentOverlay">
+<button class="focus-btn close" onclick="closePresentMode()" title="Close present mode (Esc)">&times;</button>
+<div class="wyr-present-inner" id="presentCardMount"></div>
+<div class="focus-nav">
+<button class="focus-btn" onclick="presentNav(-1)">&larr; Previous</button>
+<span class="focus-counter" id="presentCounter"></span>
+<button class="focus-btn primary" onclick="presentNav(1)">Next &rarr;</button>
+</div>
 </div>
 
 <footer>&copy; 2026 johnplusenglish. All rights reserved.</footer>
@@ -470,7 +499,29 @@ function applyFilters(){
   updateSummary();
   renderCard();
   if(mode==='grid')renderGrid();
+  if(presentOpen())renderPresentCard();
   try{ localStorage.setItem('jpe-would-you-rather-cat', cat); }catch(e){}
+}
+
+function buildWyrCardHTML(q,withFollow){
+  var h='<div class="wyr-card">';
+  h+='<div class="wyr-header">';
+  h+='<span class="wyr-level '+q.level+'">'+q.level+'</span>';
+  h+='<span class="wyr-cat">'+q.cat+'</span>';
+  h+='</div>';
+  h+='<div class="wyr-body">';
+  h+='<div class="wyr-question">Would you rather...</div>';
+  h+='<div class="wyr-options">';
+  h+='<div class="wyr-opt wyr-opt-a"><div class="wyr-opt-label">Option A</div><div class="wyr-option-text">'+q.a+'?</div></div>';
+  h+='<div class="wyr-opt wyr-opt-b"><div class="wyr-opt-label">Option B</div><div class="wyr-option-text">'+q.b+'?</div></div>';
+  h+='</div>';
+  h+='</div>';
+  if(withFollow && q.follow){
+    h+='<button class="wyr-follow-toggle" onclick="toggleFollow(this)">Follow-up question &#9662;</button>';
+    h+='<div class="wyr-follow-panel"><div class="wyr-follow-text">'+q.follow+'</div></div>';
+  }
+  h+='</div>';
+  return h;
 }
 
 function renderCard(){
@@ -480,48 +531,37 @@ function renderCard(){
   }
   var q=filtered[idx];
   document.getElementById('cardCounter').textContent=(idx+1)+' / '+filtered.length;
-  var h='<div class="wyr-card">';
-  h+='<div class="wyr-header">';
-  h+='<span class="wyr-level '+q.level+'">'+q.level+'</span>';
-  h+='<span class="wyr-cat">'+q.cat+'</span>';
-  h+='</div>';
-  h+='<div class="wyr-body">';
-  h+='<div class="wyr-question">Would you rather...</div>';
-  h+='<div class="wyr-options">';
-  h+='<div class="wyr-opt wyr-opt-a"><div class="wyr-opt-label">Option A</div><div class="wyr-option-text">'+q.a+'?</div></div>';
-  h+='<div class="wyr-opt wyr-opt-b"><div class="wyr-opt-label">Option B</div><div class="wyr-option-text">'+q.b+'?</div></div>';
-  h+='</div>';
-  h+='</div>';
-  if(q.follow){
-    h+='<button class="wyr-follow-toggle" onclick="toggleFollow(this)">Follow-up question &#9662;</button>';
-    h+='<div class="wyr-follow-panel"><div class="wyr-follow-text">'+q.follow+'</div></div>';
-  }
-  h+='</div>';
-  document.getElementById('wyrCard').innerHTML=h;
+  document.getElementById('wyrCard').innerHTML=buildWyrCardHTML(q,true);
 }
 
 function updateQfCard(){
   if(!filtered.length){document.getElementById('qfCard').innerHTML='';return;}
   var q=filtered[qfIdx%filtered.length];
   document.getElementById('qfScore').textContent='Question '+(qfIdx%filtered.length+1)+' of '+filtered.length;
-  var h='<div class="wyr-card">';
-  h+='<div class="wyr-header">';
-  h+='<span class="wyr-level '+q.level+'">'+q.level+'</span>';
-  h+='<span class="wyr-cat">'+q.cat+'</span>';
-  h+='</div>';
-  h+='<div class="wyr-body">';
-  h+='<div class="wyr-question">Would you rather...</div>';
-  h+='<div class="wyr-options">';
-  h+='<div class="wyr-opt wyr-opt-a"><div class="wyr-opt-label">Option A</div><div class="wyr-option-text">'+q.a+'?</div></div>';
-  h+='<div class="wyr-opt wyr-opt-b"><div class="wyr-opt-label">Option B</div><div class="wyr-option-text">'+q.b+'?</div></div>';
-  h+='</div>';
-  h+='</div>';
-  h+='</div>';
-  document.getElementById('qfCard').innerHTML=h;
+  document.getElementById('qfCard').innerHTML=buildWyrCardHTML(q,false);
 }
 
-function prev(){if(filtered.length){idx=(idx-1+filtered.length)%filtered.length;renderCard();}}
-function next(){if(filtered.length){idx=(idx+1)%filtered.length;renderCard();}}
+function prev(){if(filtered.length){idx=(idx-1+filtered.length)%filtered.length;renderCard();if(presentOpen())renderPresentCard();}}
+function next(){if(filtered.length){idx=(idx+1)%filtered.length;renderCard();if(presentOpen())renderPresentCard();}}
+
+// ── Present mode (full-screen, for projecting the current card to the class) ──
+function presentOpen(){return document.getElementById('presentOverlay').classList.contains('show');}
+function openPresentMode(){
+  if(!filtered.length)return;
+  renderPresentCard();
+  document.getElementById('presentOverlay').className='focus-overlay show';
+  document.body.style.overflow='hidden';
+}
+function closePresentMode(){
+  document.getElementById('presentOverlay').className='focus-overlay';
+  document.body.style.overflow='';
+}
+function renderPresentCard(){
+  var q=filtered[idx];
+  document.getElementById('presentCardMount').innerHTML=buildWyrCardHTML(q,true);
+  document.getElementById('presentCounter').textContent=(idx+1)+' / '+filtered.length;
+}
+function presentNav(dir){ if(dir<0)prev(); else next(); }
 
 function setMode(m){
   mode=m;
@@ -561,7 +601,7 @@ function openFromGrid(i){
 
 function shuffleAll(){
   for(var i=filtered.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=filtered[i];filtered[i]=filtered[j];filtered[j]=t;}
-  idx=0;renderCard();if(mode==='grid')renderGrid();
+  idx=0;renderCard();if(mode==='grid')renderGrid();if(presentOpen())renderPresentCard();
 }
 
 function toggleFollow(btn){
@@ -769,6 +809,13 @@ function updateQfDisplay(){
 
 // Keyboard nav
 document.addEventListener('keydown',function(e){
+  if(/^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName)||e.target.isContentEditable)return;
+  if(presentOpen()){
+    if(e.key==='Escape'){closePresentMode();return;}
+    if(e.key==='ArrowLeft')prev();
+    if(e.key==='ArrowRight')next();
+    return;
+  }
   if(e.key==='Escape'){closeSetup();return;}
   if(mode==='card'){if(e.key==='ArrowLeft')prev();if(e.key==='ArrowRight')next();}
 });

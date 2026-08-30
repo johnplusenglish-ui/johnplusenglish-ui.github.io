@@ -177,6 +177,22 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
 .phrase-list{display:flex;flex-wrap:wrap;gap:.4rem}
 .phrase-chip{font-size:.8rem;padding:.35rem .8rem;background:var(--sky-light);color:var(--sky);border-radius:6px;font-weight:600}
 
+/* Present mode (house pattern, full-screen, for projecting to the class) */
+.focus-overlay{position:fixed;inset:0;z-index:200;background:rgba(247,246,243,.97);backdrop-filter:blur(20px);display:none;flex-direction:column;align-items:center;justify-content:center;padding:2rem;overflow:auto}
+.focus-overlay.show{display:flex}
+.focus-btn{font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:700;padding:.55rem 1.4rem;border:1.5px solid var(--border);border-radius:10px;background:var(--card);color:var(--ink);cursor:pointer;transition:all .15s}
+.focus-btn:hover{border-color:var(--sky);color:var(--sky)}
+.focus-btn.primary{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+.focus-btn.primary:hover{opacity:.85}
+.focus-btn.close{position:absolute;top:1.2rem;right:1.5rem;font-size:1.2rem;border:none;background:none;color:var(--muted);cursor:pointer;padding:.5rem;line-height:1}
+.focus-btn.close:hover{color:var(--ink)}
+.focus-counter{font-family:Outfit,sans-serif;font-size:.82rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.focus-nav{display:flex;gap:.8rem;justify-content:center;align-items:center;flex-wrap:wrap;margin-top:2rem}
+.present-task-inner{max-width:900px;width:100%;max-height:90vh;overflow:auto}
+.present-task-inner .task-card{box-shadow:0 8px 30px rgba(45,48,71,.1)}
+.present-task-inner .task-title{font-size:1.5rem}
+.present-task-inner .task-scenario{font-size:1.05rem}
+
 /* Timer - unified design */
 .timer-section{max-width:800px;margin:.8rem auto 0}
 .timer-progress{width:100%;height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:.6rem}
@@ -242,7 +258,7 @@ nav{padding:.75rem 1.2rem}.nav-links{gap:1rem}.nav-links a{font-size:.78rem}
 .task-shared{padding:1rem 1.4rem 1.2rem}
 }
 @media print{
-nav,.filters,.view-toggle-wrap,.setup-bar,.card-nav,.timer-section,.phrases-toggle,.view-toggle,.filters-actions,.back-link,.group-size{display:none!important}
+nav,.filters,.view-toggle-wrap,.setup-bar,.card-nav,.timer-section,.phrases-toggle,.view-toggle,.filters-actions,.back-link,.group-size,.focus-overlay{display:none!important}
 .page-header{padding-top:1rem}
 .task-card{border:1px solid #ccc;break-inside:avoid}
 }
@@ -288,6 +304,7 @@ nav,.filters,.view-toggle-wrap,.setup-bar,.card-nav,.timer-section,.phrases-togg
 <span class="setup-summary" id="setupSummary">All levels &middot; All types &middot; Pairs</span>
 </button>
 <div class="filters-actions">
+<button class="action-btn" onclick="openPresentMode()" title="Present mode - big screen view for the class (Esc to exit)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg> Present</button>
 <button class="action-btn" onclick="shuffleTasks()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg> Shuffle</button>
 <button class="action-btn" onclick="window.print()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> Print</button>
 </div>
@@ -324,6 +341,17 @@ nav,.filters,.view-toggle-wrap,.setup-bar,.card-nav,.timer-section,.phrases-togg
 <div id="timerMount"></div>
 </div>
 <div class="grid-view" id="gridView"></div>
+</div>
+
+<!-- Present mode overlay -->
+<div class="focus-overlay" id="presentOverlay">
+<button class="focus-btn close" onclick="closePresentMode()" title="Close present mode (Esc)">&times;</button>
+<div class="present-task-inner" id="presentCardMount"></div>
+<div class="focus-nav">
+<button class="focus-btn" onclick="presentNav(-1)">&larr; Previous</button>
+<span class="focus-counter" id="presentCounter"></span>
+<button class="focus-btn primary" onclick="presentNav(1)">Next &rarr;</button>
+</div>
 </div>
 
 <footer>&copy; 2026 johnplusenglish. All rights reserved.</footer>
@@ -944,7 +972,11 @@ function renderCurrent(){
   }
   var t=filtered[currentIdx];
   document.getElementById('cardCounter').textContent=(currentIdx+1)+' / '+filtered.length;
+  document.getElementById('taskCard').innerHTML=buildTaskCardHTML(t);
+  if(presentOpen())renderPresentCard();
+}
 
+function buildTaskCardHTML(t){
   var groupLabel = groupSize===2?'Pairs':'Groups of '+groupSize;
   var h='<div class="task-card">';
   h+='<div class="task-header">';
@@ -1028,7 +1060,7 @@ function renderCurrent(){
     h+='</div></div>';
   }
   h+='</div>';
-  document.getElementById('taskCard').innerHTML=h;
+  return h;
 }
 
 function renderGrid(){
@@ -1071,6 +1103,25 @@ function togglePhrases(btn){
   var p=btn.nextElementSibling;p.classList.toggle('open');
   btn.innerHTML=p.classList.contains('open')?'Useful phrases &#9652;':'Useful phrases &#9662;';
 }
+
+// ── Present mode (full-screen, for projecting the current task to the class) ──
+function presentOpen(){return document.getElementById('presentOverlay').classList.contains('show');}
+function openPresentMode(){
+  if(!filtered.length)return;
+  renderPresentCard();
+  document.getElementById('presentOverlay').className='focus-overlay show';
+  document.body.style.overflow='hidden';
+}
+function closePresentMode(){
+  document.getElementById('presentOverlay').className='focus-overlay';
+  document.body.style.overflow='';
+}
+function renderPresentCard(){
+  var t=filtered[currentIdx];
+  document.getElementById('presentCardMount').innerHTML=buildTaskCardHTML(t);
+  document.getElementById('presentCounter').textContent=(currentIdx+1)+' / '+filtered.length;
+}
+function presentNav(dir){ if(dir<0)prevTask(); else nextTask(); }
 
 // ===== Reusable timer widget (multi-instance: one button, m:ss typing, progress bar on top) =====
 var timerState = {};
@@ -1204,7 +1255,17 @@ function timerUpdateBtn(id){
 document.getElementById('timerMount').innerHTML = timerWidgetHTML('main', 300, false);
 timerInit('main', 300, false);
 
-document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeSetup();return;}if(currentView==='single'){if(e.key==='ArrowLeft')prevTask();if(e.key==='ArrowRight')nextTask();}});
+document.addEventListener('keydown',function(e){
+  if(/^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName)||e.target.isContentEditable)return;
+  if(presentOpen()){
+    if(e.key==='Escape'){closePresentMode();return;}
+    if(e.key==='ArrowLeft')prevTask();
+    if(e.key==='ArrowRight')nextTask();
+    return;
+  }
+  if(e.key==='Escape'){closeSetup();return;}
+  if(currentView==='single'){if(e.key==='ArrowLeft')prevTask();if(e.key==='ArrowRight')nextTask();}
+});
 init();
 </script>
 

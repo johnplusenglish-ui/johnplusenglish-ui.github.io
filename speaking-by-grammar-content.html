@@ -76,7 +76,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
 .gc-title{font-family:'Outfit',sans-serif;font-size:1.4rem;margin-bottom:.3rem;flex:1}
 .gc-print{background:none;border:1.5px solid var(--border);border-radius:6px;padding:.35rem .7rem;cursor:pointer;font-size:.75rem;font-weight:600;color:var(--muted);font-family:'Outfit',sans-serif;transition:all .2s;flex-shrink:0;display:flex;align-items:center;gap:.3rem}
 .gc-print:hover{border-color:var(--sky);color:var(--sky)}
-@media print{nav,.mode-section,.grammar-bar,.q-count,.teacher-tip-toggle,.error-bank-toggle,.error-bank,.gc-print,.prompt-level{display:none!important}.page-header{padding-top:1rem!important}.grammar-card{break-inside:avoid;border:1px solid #ccc}.prompt-item.done{opacity:.4;text-decoration:line-through}}
+@media print{nav,.mode-section,.grammar-bar,.q-count-row,.teacher-tip-toggle,.error-bank-toggle,.error-bank,.gc-print,.prompt-level,.focus-overlay{display:none!important}.page-header{padding-top:1rem!important}.grammar-card{break-inside:avoid;border:1px solid #ccc}.prompt-item.done{opacity:.4;text-decoration:line-through}}
 
 /* Fullscreen */
 .fullscreen-btn{position:absolute;top:1rem;right:1rem;background:none;border:1.5px solid var(--border);border-radius:8px;padding:.4rem .6rem;cursor:pointer;font-size:.85rem;color:var(--muted);transition:all .2s}
@@ -133,7 +133,26 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
 .timer-display.warn{color:var(--warn)}
 
 /* Count */
-.q-count{font-family:Outfit,sans-serif;font-size:.78rem;color:var(--muted);margin-bottom:1rem}
+.q-count-row{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1rem;flex-wrap:wrap}
+.q-count{font-family:Outfit,sans-serif;font-size:.78rem;color:var(--muted)}
+
+/* Action button + Present mode (house pattern, full-screen, for projecting to the class) */
+.action-btn{font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:600;padding:.45rem 1rem;border:1.5px solid var(--border);border-radius:10px;background:var(--card);color:var(--ink);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:.4rem}
+.action-btn:hover{border-color:var(--ink);background:var(--cream)}
+.action-btn svg{flex-shrink:0}
+.focus-overlay{position:fixed;inset:0;z-index:200;background:rgba(247,246,243,.97);backdrop-filter:blur(20px);display:none;flex-direction:column;align-items:center;justify-content:center;padding:2rem;overflow:auto}
+.focus-overlay.show{display:flex}
+.focus-card{max-width:800px;width:100%;text-align:center}
+.focus-topic{font-family:Outfit,sans-serif;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--sky);margin-bottom:.5rem}
+.focus-question{font-family:'Outfit',sans-serif;font-size:clamp(1.6rem,4vw,2.4rem);font-weight:800;line-height:1.35;margin-bottom:2rem;color:var(--ink)}
+.focus-btn{font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:700;padding:.55rem 1.4rem;border:1.5px solid var(--border);border-radius:10px;background:var(--card);color:var(--ink);cursor:pointer;transition:all .15s}
+.focus-btn:hover{border-color:var(--sky);color:var(--sky)}
+.focus-btn.primary{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+.focus-btn.primary:hover{opacity:.85}
+.focus-btn.close{position:absolute;top:1.2rem;right:1.5rem;font-size:1.2rem;border:none;background:none;color:var(--muted);cursor:pointer;padding:.5rem;line-height:1}
+.focus-btn.close:hover{color:var(--ink)}
+.focus-counter{font-family:Outfit,sans-serif;font-size:.82rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.focus-nav{display:flex;gap:.8rem;justify-content:center;align-items:center;flex-wrap:wrap;margin-top:2rem}
 
 /* Level tags */
 .prompt-level{font-family:Outfit,sans-serif;font-size:.6rem;font-weight:700;padding:.15rem .45rem;border-radius:5px;flex-shrink:0;margin-top:.2rem}
@@ -299,7 +318,10 @@ footer{text-align:center;padding:3rem 2rem;font-size:.8rem;color:var(--muted);bo
 </div>
 
 <div class="content-area" id="view-browse">
+<div class="q-count-row">
 <div class="q-count" id="q-count"></div>
+<button class="action-btn" onclick="openPresentMode()" title="Present mode - big screen view for the class (Esc to exit)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg> Present</button>
+</div>
 <div id="grammar-list"></div>
 </div>
 
@@ -364,6 +386,20 @@ footer{text-align:center;padding:3rem 2rem;font-size:.8rem;color:var(--muted);bo
 </div>
 </div>
 
+<!-- Present mode overlay -->
+<div class="focus-overlay" id="presentOverlay">
+<button class="focus-btn close" onclick="closePresentMode()" title="Close present mode (Esc)">&times;</button>
+<div class="focus-card">
+<div class="focus-topic" id="presentTopic"></div>
+<div class="focus-question" id="presentQuestion"></div>
+<div class="focus-nav">
+<button class="focus-btn" onclick="presentNav(-1)">&larr; Previous</button>
+<span class="focus-counter" id="presentCounter"></span>
+<button class="focus-btn primary" onclick="presentNav(1)">Next &rarr;</button>
+</div>
+</div>
+</div>
+
 <footer>&copy; 2026 johnplusenglish. All rights reserved.</footer>
 
 <script>
@@ -398,7 +434,7 @@ var data = [
 {grammar:"Modals of Obligation & Permission",rule:"<strong>Must/have to</strong> = obligation. <strong>Should/ought to</strong> = advice. <strong>Can/be allowed to</strong> = permission. <strong>Don't have to</strong> = no obligation. <strong>Mustn't</strong> = prohibited.",prompts:["What do you have to do at work that you wish you didn't have to?","What should tourists know before visiting your country? What must they avoid?","What were you allowed to do as a teenager that your parents probably shouldn't have let you do?","What rules do you think every workplace should have?","You're writing house rules for a new flatshare. What must residents do? What mustn't they do? What don't they have to do?","What do you think people ought to do more of in daily life?","Compare school rules when you were young vs now. What did you have to do? What weren't you allowed to do?","You're designing rules for a language school. What must students do? What should they do? What are they allowed to do?"],examples:["You must wear a seatbelt - it's the law.","You don't have to tip in Japan, but you can if you want.","You shouldn't eat so much sugar. / You ought to exercise more."],mistakes:[{wrong:"You mustn't come if you don't want to.",right:"You don't have to come if you don't want to. (no obligation, not prohibition)"},{wrong:"I must to finish this today.",right:"I must finish this today."},{wrong:"You haven't to worry.",right:"You don't have to worry."}],teacherTip:"The must/have to distinction is subtle: \'must\' often implies the speaker\'s authority, \'have to\' implies external rules. But the real teaching point is mustn\'t (prohibition) vs don\'t have to (no obligation) - students confuse these constantly.",levels:["B2","B2","B2","B2","B2","B2","B1","B2"]},
 {grammar:"Countable vs Uncountable Nouns",rule:"Countable nouns have singular/plural forms (a chair, two chairs). Uncountable nouns have <strong>no plural</strong> and take singular verbs: information, advice, furniture, luggage, news, progress, research, work, money, weather.",prompts:["Give your partner some advice about learning English. How much advice can you give in one minute?","Describe your furniture at home. What would you change?","Talk about a recent trip. How much luggage did you take? Was it too much?","What kind of research have you done recently - for work, for a purchase, or just out of curiosity?","Has your city made much progress on any big projects recently?","What equipment do you need for your job or hobby? Is any of it expensive?","You're helping a friend move house. Describe what you see: furniture, luggage, equipment, boxes, clothes.","Describe your work using uncountable nouns: How much progress have you made? What research have you done? What advice would you give a newcomer?"],examples:["Can you give me some advice? (NOT an advice / advices)","I need to buy some new furniture. (NOT furnitures)","The news is on at six. (NOT The news are)"],mistakes:[{wrong:"She gave me a good advice.",right:"She gave me some good advice. / She gave me a good piece of advice."},{wrong:"I have too many luggages.",right:"I have too much luggage."},{wrong:"The informations are useful.",right:"The information is useful."}],teacherTip:"Keep a running list of tricky uncountables on the board: advice, information, furniture, luggage, news, progress, research, equipment, homework. Students from Romance language backgrounds especially struggle because many of these are countable in their L1.",levels:["B1","B2","B2","B2","B2","B2","B1","B2"]}];
 
-var currentMode='browse',activeGrammar='all',allPrompts=[];
+var currentMode='browse',activeGrammar='all',allPrompts=[],presentIdx=0;
 
 // Build grammar pills into groups
 (function(){
@@ -515,6 +551,39 @@ function buildPromptList(){
     });
   });
 }
+
+// ── Present mode (full-screen, for projecting the current prompt set to the class) ──
+function presentOpen(){return document.getElementById('presentOverlay').classList.contains('show');}
+function openPresentMode(){
+  buildPromptList();
+  if(!allPrompts.length)return;
+  if(presentIdx>=allPrompts.length)presentIdx=0;
+  renderPresentCard();
+  document.getElementById('presentOverlay').className='focus-overlay show';
+  document.body.style.overflow='hidden';
+}
+function closePresentMode(){
+  document.getElementById('presentOverlay').className='focus-overlay';
+  document.body.style.overflow='';
+}
+function renderPresentCard(){
+  var p=allPrompts[presentIdx];
+  document.getElementById('presentTopic').textContent=p.grammar;
+  document.getElementById('presentQuestion').textContent=p.prompt;
+  document.getElementById('presentCounter').textContent=(presentIdx+1)+' / '+allPrompts.length;
+}
+function presentNav(dir){
+  if(!allPrompts.length)return;
+  presentIdx=(presentIdx+dir+allPrompts.length)%allPrompts.length;
+  renderPresentCard();
+}
+document.addEventListener('keydown',function(e){
+  if(/^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName)||e.target.isContentEditable)return;
+  if(!presentOpen())return;
+  if(e.key==='Escape'){closePresentMode();return;}
+  if(e.key==='ArrowLeft')presentNav(-1);
+  if(e.key==='ArrowRight')presentNav(1);
+});
 
 // Teacher tip toggle
 function toggleTip(gid){var el=document.getElementById('tip-'+gid);el.classList.toggle('show');}

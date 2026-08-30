@@ -136,6 +136,35 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .rp-phrases-list ul{list-style:none;display:flex;flex-wrap:wrap;gap:.4rem}
 .rp-phrases-list li{font-size:.84rem;color:var(--ink);padding:.35rem .8rem;background:var(--cream);border:1px solid var(--border);border-radius:8px;line-height:1.4}
 
+/* Action button (house pattern, matches Speaking Topics' Focus mode pill) */
+.action-btn{font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:600;padding:.45rem 1rem;border:1.5px solid var(--border);border-radius:10px;background:var(--card);color:var(--ink);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:.4rem}
+.action-btn:hover{border-color:var(--ink);background:var(--cream)}
+.action-btn svg{flex-shrink:0}
+
+/* Present mode (house pattern, full-screen, for projecting to the class) */
+.focus-overlay{position:fixed;inset:0;z-index:200;background:rgba(247,246,243,.97);backdrop-filter:blur(20px);display:none;flex-direction:column;align-items:center;justify-content:center;padding:2rem;overflow:auto}
+.focus-overlay.show{display:flex}
+.focus-btn{font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:700;padding:.55rem 1.4rem;border:1.5px solid var(--border);border-radius:10px;background:var(--card);color:var(--ink);cursor:pointer;transition:all .15s}
+.focus-btn:hover{border-color:var(--sky);color:var(--sky)}
+.focus-btn.primary{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+.focus-btn.primary:hover{opacity:.85}
+.focus-btn.close{position:absolute;top:1.2rem;right:1.5rem;font-size:1.2rem;border:none;background:none;color:var(--muted);cursor:pointer;padding:.5rem;line-height:1}
+.focus-btn.close:hover{color:var(--ink)}
+.focus-counter{font-family:Outfit,sans-serif;font-size:.82rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.focus-nav{display:flex;gap:.8rem;justify-content:center;align-items:center;flex-wrap:wrap;margin-top:2rem}
+
+.rp-present-inner{max-width:1000px;width:100%;text-align:center}
+.rp-present-eyebrow{font-family:Outfit,sans-serif;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--sky);margin-bottom:.7rem}
+.rp-present-title{font-family:'Outfit',sans-serif;font-size:clamp(1.8rem,4vw,2.6rem);font-weight:900;line-height:1.15;margin-bottom:2rem;color:var(--ink)}
+.rp-present-roles{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;text-align:left}
+.rp-present-roles.three-col{grid-template-columns:1fr 1fr 1fr}
+.rp-present-roles.four-col{grid-template-columns:1fr 1fr 1fr 1fr}
+.rp-present-roles .role{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:1.6rem 1.8rem}
+.rp-present-roles .role-tag{font-size:.72rem;letter-spacing:1.8px;margin-bottom:.6rem;color:var(--sky)}
+.rp-present-roles .role-name{font-size:1.35rem;margin-bottom:.5rem}
+.rp-present-roles .role-desc{font-size:1.05rem;line-height:1.65}
+@media(max-width:800px){.rp-present-roles,.rp-present-roles.three-col,.rp-present-roles.four-col{grid-template-columns:1fr}.rp-present-title{margin-bottom:1.4rem}}
+
 /* Timer (house widget) */
 .timer-section{max-width:none;margin:1.8rem auto 0}
 .timer-progress{width:100%;height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:.6rem}
@@ -163,7 +192,7 @@ footer{text-align:center;padding:3rem 2rem;font-size:.8rem;color:var(--muted);bo
 @media print{
 body{background:#fff}
 body::before{display:none}
-.topnav,.page-header,.mode-toggle-wrap,.setup-bar,.timer-section,.rp-phrases-toggle,.card-nav-btn,footer{display:none!important}
+.topnav,.page-header,.mode-toggle-wrap,.setup-bar,.timer-section,.rp-phrases-toggle,.card-nav-btn,.focus-overlay,footer{display:none!important}
 .card-viewer{margin:0;padding:0;max-width:none}
 .rp-card{box-shadow:none;border:1px solid #ccc;break-inside:avoid}
 .rp-roles,.rp-roles.three-col,.rp-roles.four-col{grid-template-columns:1fr 1fr}
@@ -226,6 +255,7 @@ body::before{display:none}
 <span class="setup-word">Setup</span><span class="setup-sep"></span>
 <span class="setup-summary" id="setupSummary">All levels &middot; All topics &middot; 2 students</span>
 </button>
+<button class="action-btn" onclick="openPresentMode()" title="Present mode - big screen view for the class (Esc to exit)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg> Present</button>
 </div>
 <div class="setup-body" id="setupBody">
 <div class="setup-group"><div class="filter-pills" id="levelPills"></div></div>
@@ -253,6 +283,21 @@ body::before{display:none}
 <div id="timerMount"></div>
 </div>
 <div class="grid-view" id="gridView"></div>
+</div>
+
+<!-- Present mode overlay -->
+<div class="focus-overlay" id="presentOverlay">
+<button class="focus-btn close" onclick="closePresentMode()" title="Close present mode (Esc)">&times;</button>
+<div class="rp-present-inner">
+<div class="rp-present-eyebrow" id="presentEyebrow"></div>
+<div class="rp-present-title" id="presentTitle"></div>
+<div class="rp-present-roles" id="presentRoles"></div>
+<div class="focus-nav">
+<button class="focus-btn" onclick="presentNav(-1)">&larr; Previous</button>
+<span class="focus-counter" id="presentCounter"></span>
+<button class="focus-btn primary" onclick="presentNav(1)">Next &rarr;</button>
+</div>
+</div>
 </div>
 
 <footer>&copy; 2026 johnplusenglish. All rights reserved.</footer>
@@ -1185,6 +1230,7 @@ function applyFilters(){
   updateSummary();
   if(currentView==='single')renderCard();
   else renderGrid();
+  if(document.getElementById('presentOverlay').classList.contains('show'))renderPresentCard();
 }
 
 function renderCard(){
@@ -1257,7 +1303,13 @@ function setView(view){
 document.addEventListener('keydown',function(e){
   if(/^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName)||e.target.isContentEditable)return;
   if(e.metaKey||e.ctrlKey||e.altKey)return;
-  if(e.key==='Escape'){closeSetup();return;}
+  var presenting=document.getElementById('presentOverlay').classList.contains('show');
+  if(e.key==='Escape'){ if(presenting)closePresentMode(); else closeSetup(); return;}
+  if(presenting){
+    if(e.key==='ArrowLeft')presentNav(-1);
+    if(e.key==='ArrowRight')presentNav(1);
+    return;
+  }
   if(currentView!=='single')return;
   if(e.key==='ArrowLeft')goCard(-1);
   if(e.key==='ArrowRight')goCard(1);
@@ -1267,6 +1319,35 @@ function togglePhrases(btn){
   btn.classList.toggle('open');
   var list=btn.nextElementSibling;
   list.classList.toggle('show');
+}
+
+// ── Present mode (full-screen, for projecting the current role play to the class) ──
+function openPresentMode(){
+  if(filtered.length===0)return;
+  renderPresentCard();
+  document.getElementById('presentOverlay').className='focus-overlay show';
+  document.body.style.overflow='hidden';
+}
+function closePresentMode(){
+  document.getElementById('presentOverlay').className='focus-overlay';
+  document.body.style.overflow='';
+}
+function renderPresentCard(){
+  var d=filtered[cardIdx];
+  document.getElementById('presentEyebrow').textContent=d.lvl+' · '+d.cat+' · #'+d.id;
+  document.getElementById('presentTitle').textContent=d.title;
+  var colClass=playerCount===3?'three-col':playerCount===4?'four-col':'';
+  var h='<div class="role role-a"><div class="role-tag">Student A</div><div class="role-name">'+d.a.role+'</div><div class="role-desc">'+d.a.desc+'</div></div>';
+  h+='<div class="role role-b"><div class="role-tag">Student B</div><div class="role-name">'+d.b.role+'</div><div class="role-desc">'+d.b.desc+'</div></div>';
+  if(playerCount>=3 && d.c)h+='<div class="role role-c"><div class="role-tag">Student C</div><div class="role-name">'+d.c.role+'</div><div class="role-desc">'+d.c.desc+'</div></div>';
+  if(playerCount>=4 && d.d)h+='<div class="role role-d"><div class="role-tag">Student D</div><div class="role-name">'+d.d.role+'</div><div class="role-desc">'+d.d.desc+'</div></div>';
+  document.getElementById('presentRoles').innerHTML=h;
+  document.getElementById('presentRoles').className='rp-present-roles '+colClass;
+  document.getElementById('presentCounter').textContent=(cardIdx+1)+' / '+filtered.length;
+}
+function presentNav(dir){
+  goCard(dir);
+  renderPresentCard();
 }
 
 // ===== Reusable timer widget (multi-instance: one button, m:ss typing, progress bar on top) =====
