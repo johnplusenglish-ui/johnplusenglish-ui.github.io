@@ -60,8 +60,8 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .main{max-width:760px;margin:0 auto;padding:0 2rem 4rem;position:relative;z-index:1}
 
 /* HOT TAKE CARD */
-.card-wrap{margin-bottom:1.6rem}
-.hot-card{background:var(--card);border-radius:22px;border:2px solid var(--border);box-shadow:var(--shadow-lg);overflow:hidden}
+.card-wrap{margin-bottom:0}
+.hot-card{background:var(--card);border-radius:22px 22px 0 0;border:2px solid var(--border);border-bottom:none;box-shadow:var(--shadow-lg);overflow:hidden}
 .card-top{padding:.85rem 1.4rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1.5px solid var(--border)}
 .card-meta{display:flex;align-items:center;gap:.6rem}
 .level-badge{font-family:Outfit,sans-serif;font-size:.6rem;font-weight:700;padding:.2rem .5rem;border-radius:5px}
@@ -116,11 +116,11 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .timer-duration-input{font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;border:none;background:transparent;color:var(--ink);width:4.2ch;text-align:center;outline:none;padding:0}
 
 /* ACTION BUTTONS */
-.action-row{display:flex;gap:.7rem;justify-content:center;flex-wrap:wrap;margin-bottom:1.4rem}
-.btn-primary{font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;padding:.7rem 1.8rem;border-radius:12px;border:none;background:var(--ink);color:#fff;cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:.45rem}
+.action-row{display:flex;gap:.7rem;justify-content:center;flex-wrap:wrap;background:var(--card);border:2px solid var(--border);border-top:1.5px solid var(--border);border-radius:0 0 22px 22px;padding:1.1rem 1.4rem;margin:0 0 1.6rem;box-shadow:var(--shadow-lg)}
+.btn-primary{font-family:'Outfit',sans-serif;font-size:.84rem;font-weight:700;padding:10px 20px;border-radius:10px;border:2px solid var(--ink);background:var(--ink);color:#fff;cursor:pointer;transition:all .18s;display:inline-flex;align-items:center}
 .btn-primary:hover{background:#1a1d2e;transform:translateY(-1px)}
 .btn-primary svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
-.btn-secondary{font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:600;padding:.55rem 1.2rem;border-radius:10px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:.4rem}
+.btn-secondary{font-family:'Outfit',sans-serif;font-size:.84rem;font-weight:700;padding:10px 20px;border-radius:10px;border:2px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center}
 .btn-secondary:hover{border-color:var(--ink);color:var(--ink)}
 .btn-secondary svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 
@@ -200,19 +200,10 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
   <div id="timerMount"></div>
 
   <!-- Actions -->
-  <div class="action-row">
-    <button class="btn-secondary" onclick="skipCard()">
-      <svg viewBox="0 0 24 24"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>
-      Skip
-    </button>
-    <button class="btn-primary" onclick="nextCard()">
-      Next statement
-      <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-    </button>
-    <button class="btn-secondary" onclick="rebuildDeck()">
-      <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.03"/></svg>
-      Shuffle
-    </button>
+  <div class="action-row" id="actionRow">
+    <button class="btn-secondary" onclick="skipCard()">Skip</button>
+    <button class="btn-primary" onclick="nextCard()">Next statement</button>
+    <button class="btn-secondary" onclick="rebuildDeck()">Shuffle</button>
   </div>
 
 </div>
@@ -381,15 +372,19 @@ function rebuildDeck() {
 
 function renderCard() {
   var wrap = document.getElementById('cardWrap');
+  var actionRow = document.getElementById('actionRow');
   if (!deck.length) {
+    if (actionRow) actionRow.style.display = 'none';
     wrap.innerHTML = '<div class="end-card"><h2>No statements match</h2><p>Try adjusting the level or topic filter.</p></div>';
     return;
   }
   if (currentIdx >= deck.length) {
-    wrap.innerHTML = '<div class="end-card"><h2>All done!</h2><p>You\'ve been through all '+deck.length+' statements in this set.</p><button class="btn-primary" onclick="rebuildDeck()" style="margin:0 auto;display:flex">Go again</button></div>';
+    if (actionRow) actionRow.style.display = 'none';
+    wrap.innerHTML = '<div class="end-card"><h2>All done!</h2><p>You\'ve been through all '+deck.length+' statements in this set.</p><button class="btn-primary" onclick="rebuildDeck()">Go again</button></div>';
     if (timerState['main'] && timerState['main'].running) timerToggle('main');
     return;
   }
+  if (actionRow) actionRow.style.display = '';
 
   var take = deck[currentIdx];
   var pos = null;

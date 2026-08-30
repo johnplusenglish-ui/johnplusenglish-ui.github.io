@@ -37,7 +37,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .main{max-width:700px;margin:0 auto;padding:0 2rem 4rem;position:relative;z-index:1}
 
 /* CARD */
-.ac-card{background:var(--card);border-radius:22px;border:2px solid var(--border);box-shadow:var(--shadow-lg);overflow:hidden;margin-bottom:1.6rem}
+.ac-card{background:var(--card);border-radius:22px 22px 0 0;border:2px solid var(--border);border-bottom:none;box-shadow:var(--shadow-lg);overflow:hidden;margin-bottom:0}
 .card-top{padding:.8rem 1.4rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1.5px solid var(--border)}
 .card-num{font-family:Outfit,sans-serif;font-size:.6rem;color:var(--muted)}
 
@@ -82,11 +82,13 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .filter-pill.active{background:var(--ink);color:#fff;border-color:var(--ink)}
 .filter-divider{width:1px;height:20px;background:var(--border)}
 
-.action-row{display:flex;gap:.7rem;justify-content:center;flex-wrap:wrap}
-.btn-primary{font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;padding:.7rem 1.8rem;border-radius:12px;border:none;background:var(--ink);color:#fff;cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:.45rem}
+.action-row{display:flex;gap:.7rem;justify-content:center;flex-wrap:wrap;background:var(--card);border:2px solid var(--border);border-top:1.5px solid var(--border);border-radius:0 0 22px 22px;padding:1.1rem 1.4rem;margin:0 0 1.6rem;box-shadow:var(--shadow-lg)}
+.end-card{background:var(--card);border-radius:20px;border:2px solid var(--border);padding:3rem 2rem;text-align:center;box-shadow:var(--shadow-md);margin-bottom:1.6rem}
+.end-card h2{font-size:1.6rem;font-weight:900;margin-bottom:1rem}
+.btn-primary{font-family:'Outfit',sans-serif;font-size:.84rem;font-weight:700;padding:10px 20px;border-radius:10px;border:2px solid var(--ink);background:var(--ink);color:#fff;cursor:pointer;transition:all .18s;display:inline-flex;align-items:center}
 .btn-primary:hover{background:#1a1d2e;transform:translateY(-1px)}
 .btn-primary svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
-.btn-secondary{font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:600;padding:.55rem 1.2rem;border-radius:10px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:.4rem}
+.btn-secondary{font-family:'Outfit',sans-serif;font-size:.84rem;font-weight:700;padding:10px 20px;border-radius:10px;border:2px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center}
 .btn-secondary:hover{border-color:var(--ink);color:var(--ink)}
 .btn-secondary svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .card-count{font-family:Outfit,sans-serif;font-size:.7rem;color:var(--muted);text-align:center;margin-bottom:1.4rem}
@@ -114,19 +116,10 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
   <div class="card-count" id="cardCount"></div>
   <div id="cardWrap"></div>
   <div id="timerMount"></div>
-  <div class="action-row">
-    <button class="btn-secondary" onclick="skipCard()">
-      <svg viewBox="0 0 24 24"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>
-      Skip
-    </button>
-    <button class="btn-primary" onclick="nextCard()">
-      Next
-      <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-    </button>
-    <button class="btn-secondary" onclick="rebuildDeck()">
-      <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.03"/></svg>
-      Shuffle
-    </button>
+  <div class="action-row" id="actionRow">
+    <button class="btn-secondary" onclick="skipCard()">Skip</button>
+    <button class="btn-primary" onclick="nextCard()">Next</button>
+    <button class="btn-secondary" onclick="rebuildDeck()">Shuffle</button>
   </div>
 </div>
 <script>
@@ -269,8 +262,10 @@ function rebuildDeck(){
 
 function renderCard(){
   var wrap=document.getElementById('cardWrap');
-  if(!deck.length){wrap.innerHTML='<div style="text-align:center;padding:3rem;color:var(--muted)">No cards match that filter.</div>';return;}
-  if(currentIdx>=deck.length){wrap.innerHTML='<div style="text-align:center;padding:3rem;background:var(--card);border-radius:20px;border:2px solid var(--border)"><div style="font-size:2rem;margin-bottom:.5rem">🎉</div><div style="font-weight:900;font-size:1.2rem;margin-bottom:.5rem">All done!</div><button class="btn-primary" onclick="rebuildDeck()" style="margin:.5rem auto 0;display:flex">Play again</button></div>';if (timerState['main'] && timerState['main'].running) timerToggle('main');return;}
+  var actionRow=document.getElementById('actionRow');
+  if(!deck.length){if(actionRow)actionRow.style.display='none';wrap.innerHTML='<div style="text-align:center;padding:3rem;color:var(--muted)">No cards match that filter.</div>';return;}
+  if(currentIdx>=deck.length){if(actionRow)actionRow.style.display='none';wrap.innerHTML='<div class="end-card"><h2>All done!</h2><button class="btn-primary" onclick="rebuildDeck()">Play again</button></div>';if (timerState['main'] && timerState['main'].running) timerToggle('main');return;}
+  if(actionRow)actionRow.style.display='';
   var c=deck[currentIdx];
   wrap.innerHTML='<div class="ac-card">'
     +'<div class="card-top"><span style="font-family:Outfit,sans-serif;font-size:.6rem;color:var(--muted)">'+c.type.toUpperCase()+'</span><span class="card-num">'+(currentIdx+1)+' / '+deck.length+'</span></div>'

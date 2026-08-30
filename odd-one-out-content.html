@@ -79,7 +79,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .timer-duration-input{font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;border:none;background:transparent;color:var(--ink);width:4.2ch;text-align:center;outline:none;padding:0}
 
 /* QUESTION CARD */
-.q-card{background:var(--card);border-radius:20px;border:2px solid var(--border);box-shadow:var(--shadow-lg);overflow:hidden;max-width:580px;margin:0 auto 1.6rem}
+.q-card{background:var(--card);border-radius:20px 20px 0 0;border:2px solid var(--border);border-bottom:none;box-shadow:var(--shadow-lg);overflow:hidden;max-width:580px;margin:0 auto}
 .q-header{padding:.7rem 1.2rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1.5px solid var(--border)}
 .q-level{font-family:Outfit,sans-serif;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:.2rem .5rem;border-radius:5px}
 .q-level.b2{background:var(--b2-light);color:var(--b2)}
@@ -109,13 +109,13 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .fb-alt strong{color:var(--muted);font-weight:700}
 
 /* NEXT BUTTON */
-.next-wrap{display:flex;justify-content:center;margin-bottom:1rem}
-.btn-next{font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;padding:.7rem 2rem;border-radius:12px;border:none;background:var(--ink);color:#fff;cursor:pointer;transition:all .18s;display:none;align-items:center;gap:.45rem}
+.action-row{display:flex;justify-content:center;gap:.6rem;flex-wrap:wrap;max-width:580px;margin:0 auto 1.6rem;background:var(--card);border:2px solid var(--border);border-top:1.5px solid var(--border);border-radius:0 0 20px 20px;padding:1.1rem 1.4rem;box-shadow:var(--shadow-lg)}
+.btn-next{font-family:'Outfit',sans-serif;font-size:.84rem;font-weight:700;padding:10px 20px;border-radius:10px;border:2px solid var(--ink);background:var(--ink);color:#fff;cursor:pointer;transition:all .18s;display:none;align-items:center}
 .btn-next:hover{background:#1a1d2e;transform:translateY(-1px)}
 .btn-next svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
 
-.bottom-row{display:flex;justify-content:center;gap:.6rem;flex-wrap:wrap}
-.btn-secondary{font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:600;padding:.45rem 1rem;border-radius:10px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:.4rem}
+
+.btn-secondary{font-family:'Outfit',sans-serif;font-size:.84rem;font-weight:700;padding:10px 20px;border-radius:10px;border:2px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center}
 .btn-secondary:hover{border-color:var(--ink);color:var(--ink)}
 .btn-secondary svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 
@@ -123,7 +123,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .empty-state,.end-card{text-align:center;padding:4rem 2rem;background:var(--card);border-radius:20px;border:2px solid var(--border);box-shadow:var(--shadow-md);max-width:580px;margin:0 auto}
 .empty-state h3,.end-card h2{font-size:1.2rem;font-weight:800;color:var(--ink);margin-bottom:.5rem}
 .empty-state p,.end-card p{font-size:.9rem;color:var(--muted);margin-bottom:1.5rem}
-.btn-primary{font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;padding:.7rem 1.8rem;border-radius:12px;border:none;background:var(--ink);color:#fff;cursor:pointer;transition:all .18s}
+.btn-primary{font-family:'Outfit',sans-serif;font-size:.84rem;font-weight:700;padding:10px 20px;border-radius:10px;border:2px solid var(--ink);background:var(--ink);color:#fff;cursor:pointer;transition:all .18s}
 .btn-primary:hover{background:#1a1d2e}
 
 @media(max-width:600px){
@@ -173,22 +173,10 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 
   <div id="qCardWrap"></div>
 
-  <div class="next-wrap">
-    <button class="btn-next" id="btnNext" onclick="nextQuestion()">
-      Next question
-      <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-    </button>
-  </div>
-
-  <div class="bottom-row">
-    <button class="btn-secondary" onclick="skipQuestion()">
-      <svg viewBox="0 0 24 24"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>
-      Skip
-    </button>
-    <button class="btn-secondary" onclick="rebuildDeck()">
-      <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.03"/></svg>
-      Shuffle &amp; restart
-    </button>
+  <div class="action-row" id="actionRow">
+    <button class="btn-secondary" onclick="skipQuestion()">Skip</button>
+    <button class="btn-next" id="btnNext" onclick="nextQuestion()">Next question</button>
+    <button class="btn-secondary" onclick="rebuildDeck()">Shuffle &amp; restart</button>
   </div>
 
 </div>
@@ -559,18 +547,22 @@ function rebuildDeck() {
 
 function renderQuestion() {
   var wrap = document.getElementById('qCardWrap');
+  var actionRow = document.getElementById('actionRow');
   answered = false;
   document.getElementById('btnNext').style.display = 'none';
 
   if (!deck.length) {
+    if (actionRow) actionRow.style.display = 'none';
     wrap.innerHTML = '<div class="empty-state"><h3>No questions match that filter</h3><p>Try selecting a different level or topic.</p></div>';
     return;
   }
   if (currentIdx >= deck.length) {
+    if (actionRow) actionRow.style.display = 'none';
     wrap.innerHTML = '<div class="end-card"><h2>All done!</h2><p>You\'ve been through all '+deck.length+' questions in this set.</p><button class="btn-primary" onclick="rebuildDeck()">Play again</button></div>';
     if (timerState['main'] && timerState['main'].running) timerToggle('main');
     return;
   }
+  if (actionRow) actionRow.style.display = '';
 
   var q = deck[currentIdx];
   // Shuffle word display order but track original indices
