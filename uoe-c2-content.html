@@ -872,10 +872,21 @@ function p2Input() {
   document.getElementById('p2ProgressFill').style.width=((n/OC_TESTS[currentTest].gaps.length)*100)+'%';
   document.getElementById('p2CheckBtn').disabled=(n<1);
 }
+function _contract(s){return (' '+String(s).toLowerCase()+' ')
+ .replace(/\bcan not\b/g,'cannot').replace(/\bcannot\b/g,"can't")
+ .replace(/\b(is|are|was|were|do|does|did|have|has|had|would|could|should|must|might|need|dare|ought|will|shall) not\b/g,function(m,v){return {is:"isn't",are:"aren't",was:"wasn't",were:"weren't",do:"don't",does:"doesn't",did:"didn't",have:"haven't",has:"hasn't",had:"hadn't",would:"wouldn't",could:"couldn't",should:"shouldn't",must:"mustn't",might:"mightn't",need:"needn't",dare:"daren't",ought:"oughtn't",will:"won't",shall:"shan't"}[v];})
+ .replace(/\b(i|you|he|she|it|we|they) had\b/g,"$1'd").replace(/\b(i|you|he|she|it|we|they) would\b/g,"$1'd")
+ .replace(/\b(i|you|we|they) have\b/g,"$1've").replace(/\b(would|could|should|must|might) have\b/g,"$1've")
+ .replace(/\b(i|you|he|she|it|we|they) will\b/g,"$1'll")
+ .replace(/\b(you|we|they) are\b/g,"$1're").replace(/\bi am\b/g,"i'm").replace(/\blet us\b/g,"let's")
+ .replace(/\s+/g,' ').trim();}
 function p2IsCorrect(g, val) {
   const v=val.trim().toLowerCase();
   if(v===g.answer.toLowerCase())return true;
-  return !!(g.alts && g.alts.some(a=>a.toLowerCase()===v));
+  if(g.alts && g.alts.some(a=>a.toLowerCase()===v))return true;
+  const cv=_contract(v);
+  if(cv===_contract(g.answer))return true;
+  return !!(g.alts && g.alts.some(a=>_contract(a)===cv));
 }
 function p2Check() {
   if(p2Checked)return; p2Checked=true;
@@ -1108,7 +1119,7 @@ function p4Input(n) {
   document.getElementById('p4CheckBtn').disabled=(filled<1);
 }
 function p4Norm(s) { return s.toLowerCase().replace(/['']/g,"'").replace(/\s+/g,' ').trim(); }
-function p4Match(val, item) { const v=p4Norm(val); if(v===p4Norm(item.answer)) return true; if(item.alts) for(const a of item.alts) if(v===p4Norm(a)) return true; return false; }
+function p4Match(val, item) { const v=p4Norm(val); if(v===p4Norm(item.answer)) return true; if(item.alts) for(const a of item.alts) if(v===p4Norm(a)) return true; const cv=_contract(v); if(cv===_contract(p4Norm(item.answer))) return true; if(item.alts) for(const a of item.alts) if(cv===_contract(p4Norm(a))) return true; return false; }
 function p4Check() {
   if(p4Checked)return; p4Checked=true;
   document.querySelectorAll('.kwt-hint-tip').forEach(t=>t.classList.remove('visible'));

@@ -234,8 +234,20 @@ table.g-table{width:100%;border-collapse:separate;border-spacing:0;font-size:.92
   function save(){try{localStorage.setItem(KEY,JSON.stringify({done:done,current:current}));}catch(e){}}
   function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
   function norm(s){return String(s).toLowerCase().replace(/\s+/g,' ').replace(/[.,!?;:"']/g,'').trim();}
+  function _contract(s){return (' '+String(s).toLowerCase()+' ')
+   .replace(/\bcan not\b/g,'cannot').replace(/\bcannot\b/g,"can't")
+   .replace(/\b(is|are|was|were|do|does|did|have|has|had|would|could|should|must|might|need|will|shall) not\b/g,function(m,v){return {is:"isn't",are:"aren't",was:"wasn't",were:"weren't",do:"don't",does:"doesn't",did:"didn't",have:"haven't",has:"hasn't",had:"hadn't",would:"wouldn't",could:"couldn't",should:"shouldn't",must:"mustn't",might:"mightn't",need:"needn't",will:"won't",shall:"shan't"}[v];})
+   .replace(/\b(i|you|he|she|it|we|they) had\b/g,"$1'd").replace(/\b(i|you|he|she|it|we|they) would\b/g,"$1'd")
+   .replace(/\b(i|you|we|they) have\b/g,"$1've").replace(/\b(would|could|should|must|might) have\b/g,"$1've")
+   .replace(/\b(i|you|he|she|it|we|they) will\b/g,"$1'll")
+   .replace(/\b(you|we|they) are\b/g,"$1're").replace(/\bi am\b/g,"i'm").replace(/\blet us\b/g,"let's")
+   .replace(/\s+/g,' ').trim();}
+  function _cnorm(s){return _contract(s).replace(/[.,!?;:"']/g,'').replace(/\s+/g,' ').trim();}
   function accepts(val,answer){ // answer may hold "/" alternatives
-    var v=norm(val); return String(answer).split('/').map(norm).some(function(a){return a===v;});
+    var v=norm(val), parts=String(answer).split('/');
+    if(parts.map(norm).some(function(a){return a===v;})) return true;
+    var cv=_cnorm(val);
+    return parts.map(_cnorm).some(function(a){return a===cv;});
   }
   var CHECK='<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
   var ARROW='<svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
