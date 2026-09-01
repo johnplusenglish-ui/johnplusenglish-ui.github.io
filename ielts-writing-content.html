@@ -521,7 +521,7 @@ nav{position:fixed;top:0;left:0;right:0;height:52px;z-index:200;background:rgba(
 <div class="page-header">  <div class="topic-hero">
     <div class="topic-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
     <div>
-      <h1 class="page-title">Academic & General Writing</h1>
+      <h1>IELTS Writing</h1>
     </div>
   </div>
 </div>
@@ -4691,6 +4691,22 @@ function buildGuideW(){
     `<button class="guide-nav-item" onclick="showGuideStatic('${s.key}',this)"><span class="guide-nav-dot"></span><span>${s.label}</span></button>`
   ).join('');
   document.getElementById('guideNavW').innerHTML = dynamicBtns + staticBtns;
+  restoreGuideW();
+}
+function restoreGuideW(){
+  let saved = null;
+  try{ saved = JSON.parse(localStorage.getItem('jpe-ielts-writing-guide')); }catch(e){}
+  if(saved && saved.kind === 'topic' && Number.isInteger(saved.idx) && saved.idx >= 0 && saved.idx < GUIDE_W.length){
+    showGuideTopicW(saved.idx);
+    return;
+  }
+  if(saved && saved.kind === 'static'){
+    const staticIdx = GUIDE_STATIC_W.findIndex(s=>s.key === saved.key);
+    if(staticIdx !== -1){
+      const btn = document.querySelectorAll('#guideNavW .guide-nav-item')[GUIDE_W.length + staticIdx];
+      if(btn){ showGuideStatic(saved.key, btn); return; }
+    }
+  }
   showGuideTopicW(0);
 }
 
