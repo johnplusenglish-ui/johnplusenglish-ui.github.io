@@ -7,6 +7,7 @@
 <meta name="description" content="A1 grammar, one lesson at a time. Work through 15 core A1 structures with clear explanations in plain English and practice that checks itself.">
 <script src="lock.js"></script>
 <script src="/assets/deeplink.js"></script>
+<script src="matching.js"></script>
 <base target="_top">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <style>
@@ -303,8 +304,14 @@ table.g-table{width:100%;border-collapse:separate;border-spacing:0;font-size:.92
       var bank=[]; ex.categories.forEach(function(c){c.items.forEach(function(it){bank.push({w:it,cat:c.name});});});
       h+='<div class="cat-bank" id="'+eid+'-bank">'+shuffle(bank.slice()).map(function(b){return '<button class="cat-item" data-w="'+esc(b.w)+'" data-cat="'+esc(b.cat)+'">'+esc(b.w)+'</button>';}).join('')+'</div><div class="cat-cols" style="grid-template-columns:repeat('+Math.min(ex.categories.length,3)+',1fr)">'+
          ex.categories.map(function(c){return '<div class="cat-col"><div class="cat-col-h">'+esc(c.name)+'</div><div class="cat-drop" data-cat="'+esc(c.name)+'"></div></div>';}).join('')+'</div>';
+    } else if(ex.type==='match'){
+      h+='<div class="g-match-mount" id="'+eid+'-match"></div>';
     }
-    h+='</div><button class="chk-btn" data-check="'+eid+'" data-type="'+ex.type+'">Check answers</button><button class="chk-link" data-show="'+eid+'">Show answers</button><span class="ex-score" id="'+eid+'-score"></span></div>';
+    if(ex.type==='match'){
+      h+='</div></div>';
+    } else {
+      h+='</div><button class="chk-btn" data-check="'+eid+'" data-type="'+ex.type+'">Check answers</button><button class="chk-link" data-show="'+eid+'">Show answers</button><span class="ex-score" id="'+eid+'-score"></span></div>';
+    }
     return {html:h, eid:eid, ex:ex};
   }
   function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t;}return a;}
@@ -341,6 +348,7 @@ table.g-table{width:100%;border-collapse:separate;border-spacing:0;font-size:.92
     h+='<div class="g-foot"><button class="g-complete'+(isDone?' done':'')+'" id="markBtn">'+(isDone?CHECK+' Completed':'Mark lesson complete')+'</button>'+
        '<button class="g-next" id="nextBtn"'+(i>=LESSONS.length-1?' disabled':'')+'>Next lesson '+ARROW+'</button></div>';
     lessonEl.innerHTML=h;
+    Object.keys(exReg).forEach(function(k){var r=exReg[k];if(r.ex.type==='match'&&window.Matching){Matching.init({mount:k+'-match',data:(r.ex.pairs||[]).map(function(p){return {term:p.left,def:p.right};}),leftLabel:r.ex.leftHead||'Match',rightLabel:r.ex.rightHead||'',setSize:(r.ex.pairs||[]).length,freqChips:[]});}});
     renderRoad(); updateProgress();
     window.scrollTo({top:0,behavior:'smooth'});
   }
