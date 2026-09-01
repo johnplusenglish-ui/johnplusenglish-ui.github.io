@@ -704,7 +704,7 @@ var wpTimers = {};
 function wpFmtTime(s){
   var m = Math.floor(s/60).toString().padStart(2,'0');
   var ss = (s%60).toString().padStart(2,'0');
-  return '⏱ ' + m + ':' + ss;
+  return '' + m + ':' + ss;
 }
 function wpToggleTimer(id){
   if(!wpTimers[id]) wpTimers[id] = {elapsed:0, interval:null};
@@ -740,7 +740,7 @@ function wpClear(id){
   ta.value = '';
   if(wpTimers[id] && wpTimers[id].interval){ clearInterval(wpTimers[id].interval); }
   wpTimers[id] = {elapsed:0, interval:null};
-  document.getElementById('wpTimer-'+id).textContent = '⏱ 00:00';
+  document.getElementById('wpTimer-'+id).textContent = '00:00';
   document.getElementById('wpTimerBtn-'+id).textContent = 'Start timer';
   wpUpdateWordCount(id);
 }
@@ -936,7 +936,7 @@ async function wpDownloadImage(id, btn){
 function buildWritingPractice(id){
   return `<div class="editor-wrap">
     <div class="editor-bar">
-      <div class="editor-bar-left"><span class="word-count" id="wpCount-${id}">0 words</span><span class="wp-timer" id="wpTimer-${id}">⏱ 00:00</span></div>
+      <div class="editor-bar-left"><span class="word-count" id="wpCount-${id}">0 words</span><span class="wp-timer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="vertical-align:-2px"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg> <span id="wpTimer-${id}">00:00</span></span></div>
       <div class="wp-actions">
         <button class="btn btn-sm" id="wpTimerBtn-${id}" type="button" onclick="wpToggleTimer('${id}')">Start timer</button>
         <button class="btn btn-sm" type="button" onclick="wpClear('${id}')">Clear</button>
