@@ -148,6 +148,14 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
 .part-badge.p1{background:var(--p1-light);color:var(--p1)}
 .part-badge.p2{background:var(--p2-light);color:var(--p2)}
 .part-badge.p3{background:var(--p3-light);color:var(--p3)}
+.part-badge.ft{background:var(--ielts-light);color:var(--ielts)}
+
+/* Full-test part sections */
+.ft-part{padding-top:22px;margin-top:22px;border-top:1.5px dashed var(--border)}
+.ft-part:first-child{padding-top:18px;margin-top:0;border-top:none}
+.ft-part-head{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.ft-part-title{font-family:Outfit,sans-serif;font-weight:800;font-size:1rem;color:var(--ink)}
+.ft-part-note{font-size:.82rem;color:var(--muted);line-height:1.5;margin-bottom:6px}
 
 /* Timer */
 .timer-row{position:relative;overflow:hidden;display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--cream);border-radius:var(--radius-sm);margin-top:12px;margin-bottom:4px;border:1.5px solid var(--border);font-size:.84rem;color:var(--muted)}
@@ -260,6 +268,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
     <button class="tab" onclick="switchType('part1',this)" style="--tab-accent:var(--ielts)">Part 1</button>
     <button class="tab" onclick="switchType('part2',this)" style="--tab-accent:var(--ielts)">Part 2</button>
     <button class="tab" onclick="switchType('part3',this)" style="--tab-accent:var(--ielts)">Part 3</button>
+    <button class="tab" onclick="switchType('fulltests',this)" style="--tab-accent:var(--ielts)">Full Tests</button>
     <button class="tab" onclick="switchType('phrasebank',this)" style="--tab-accent:var(--ielts)">Phrase Bank</button>
   </div>
 </div>
@@ -317,6 +326,19 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
         <div class="set-rail-foot"><b>25</b> topics across 6 groups</div>
       </aside>
       <div class="set-pane" id="part3Pane"></div>
+    </div>
+  </div>
+
+  <!-- FULL TESTS TAB -->
+  <div class="tab-panel" id="tab-fulltests">
+    <div class="exam-info"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg><div><strong>Full test.</strong> A complete speaking test run in order: Part 1 interview, Part 2 long turn, then a Part 3 discussion linked to it. Work through all three in one sitting, about 11 to 14 minutes.</div></div>
+    <div class="set-picker" id="fulltestsPicker">
+      <aside class="set-rail" id="fulltestsRail">
+        <div class="set-rail-head" onclick="toggleRail('fulltests')"><span class="set-rail-label">Full tests</span><button class="set-rail-toggle" type="button" aria-label="Collapse list" onclick="event.stopPropagation();toggleRail('fulltests')"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button></div>
+        <div class="set-rail-scroll" id="fulltestsRailScroll"></div>
+        <div class="set-rail-foot"><b>10</b> complete tests</div>
+      </aside>
+      <div class="set-pane" id="fulltestsPane"></div>
     </div>
   </div>
 
@@ -1427,11 +1449,367 @@ function buildPhraseBank(){
   showPbPart('Part 1');
 }
 
+/* ============ FULL TESTS - 10 complete speaking tests (Part 1 + Part 2 + Part 3, thematically linked) ============ */
+const FULL_TESTS = [
+  {
+    theme: "Technology & Communication",
+    p1Intro: "Two familiar topics: your phone, and keeping in touch with people.",
+    p1Qs: [
+      { q: "How often do you use your mobile phone during a typical day?", hint: "Give a rough idea and an example." },
+      { q: "What do you use your phone for the most?", hint: "Name one or two main uses." },
+      { q: "Is there an app you would find hard to live without?", hint: "Say what it does for you." },
+      { q: "Do you prefer texting or calling people?", hint: "Give a reason for your preference." },
+      { q: "How do you usually keep in touch with friends who live far away?", hint: "Mention the methods you use." },
+      { q: "Have the ways you communicate changed since you were younger?", hint: "Compare then and now." },
+      { q: "Do you think you spend too much time looking at screens?", hint: "Be honest and explain." },
+      { q: "Is there a form of communication you think is old-fashioned but still valuable?", hint: "For example letters or face-to-face chats." },
+    ],
+    p2Topic: "Describe an app or website you use very often.",
+    p2Bullets: ["what it is and what it does", "how often you use it", "how you first started using it"],
+    p2Rounding: "…and explain why you find it so useful.",
+    p2FollowUps: [
+      "Would you recommend it to other people?",
+      "Is there anything you would improve about it?",
+    ],
+    p3Topic: "Technology and Communication",
+    p3Qs: [
+      { q: "How has technology changed the way people build and keep friendships?", hint: "Consider social media and messaging." },
+      { q: "Do you think online communication is as meaningful as talking face to face?", hint: "Weigh up convenience against depth." },
+      { q: "What are the downsides of people being constantly connected to their devices?", hint: "Think about attention and wellbeing." },
+      { q: "Should there be limits on how much technology children use?", hint: "Consider development and safety." },
+      { q: "How might the way we communicate change in the next twenty years?", hint: "Speculate about new technology." },
+      { q: "Do you think technology brings people together or pushes them apart?", hint: "Argue one side or find a balance." },
+    ],
+  },
+  {
+    theme: "Food & Health",
+    p1Intro: "Two familiar topics: food and cooking, and staying healthy.",
+    p1Qs: [
+      { q: "What kind of food do you enjoy eating most?", hint: "Name a type and say why." },
+      { q: "Do you prefer eating at home or eating out?", hint: "Give a reason for your choice." },
+      { q: "Can you cook? What can you make?", hint: "Mention a dish or two." },
+      { q: "Has your diet changed much over the years?", hint: "Compare past and present." },
+      { q: "What do you usually do to stay healthy?", hint: "Give one or two habits." },
+      { q: "Do you think you get enough exercise?", hint: "Be honest and explain." },
+      { q: "How important is sleep to your daily wellbeing?", hint: "Say how it affects you." },
+      { q: "Is there a healthy habit you would like to start?", hint: "Speculate about the future." },
+    ],
+    p2Topic: "Describe a meal you enjoyed on a special occasion.",
+    p2Bullets: ["what the occasion was", "what you ate and who you were with", "where the meal took place"],
+    p2Rounding: "…and explain why the meal was so enjoyable.",
+    p2FollowUps: [
+      "Do you often eat out on special occasions?",
+      "Is food an important part of celebrations in your culture?",
+    ],
+    p3Topic: "Food, Health and Society",
+    p3Qs: [
+      { q: "Why do you think fast food has become so popular around the world?", hint: "Consider cost, time and taste." },
+      { q: "Whose responsibility is it to make sure people eat healthily - individuals or governments?", hint: "Weigh up personal choice and policy." },
+      { q: "How have eating habits in your country changed over the last few decades?", hint: "Think about lifestyle and globalisation." },
+      { q: "Do you think traditional home cooking is dying out?", hint: "Consider busy lifestyles." },
+      { q: "Should unhealthy foods be taxed more heavily?", hint: "Argue for or against." },
+      { q: "How can schools encourage children to eat more healthily?", hint: "Suggest practical ideas." },
+    ],
+  },
+  {
+    theme: "Learning & Skills",
+    p1Intro: "Two familiar topics: your studies or work, and learning new things.",
+    p1Qs: [
+      { q: "Are you studying or working at the moment?", hint: "Give a short, natural answer." },
+      { q: "What subject or skill are you best at?", hint: "Say why you think so." },
+      { q: "How do you prefer to learn something new - alone or with others?", hint: "Give a reason." },
+      { q: "Was there a subject at school you particularly disliked?", hint: "Explain briefly." },
+      { q: "Do you find it easy to concentrate when you study?", hint: "Mention what helps or distracts you." },
+      { q: "Have you ever taught someone else a skill?", hint: "Give an example if so." },
+      { q: "Do you prefer learning practical skills or academic subjects?", hint: "Compare the two." },
+      { q: "Is there something you have always wanted to learn?", hint: "Speculate about doing it." },
+    ],
+    p2Topic: "Describe a skill you would like to learn.",
+    p2Bullets: ["what the skill is", "why you want to learn it", "how you would go about learning it"],
+    p2Rounding: "…and explain how learning it would change things for you.",
+    p2FollowUps: [
+      "Do you think it would be difficult to learn?",
+      "Do you know anyone who already has this skill?",
+    ],
+    p3Topic: "Education and Learning",
+    p3Qs: [
+      { q: "Do you think people learn more effectively at school or from real-life experience?", hint: "Compare the two sources." },
+      { q: "Should schools focus more on practical skills than on academic knowledge?", hint: "Weigh up employability and understanding." },
+      { q: "Why do some adults find it harder to learn new things than children?", hint: "Consider confidence and habits." },
+      { q: "How has technology changed the way people learn?", hint: "Think about online courses and resources." },
+      { q: "Is it ever too late to learn something new?", hint: "Give your view with a reason." },
+      { q: "Should governments pay for adults to retrain for new careers?", hint: "Consider cost and benefit." },
+    ],
+  },
+  {
+    theme: "Nature & the Environment",
+    p1Intro: "Two familiar topics: the weather and the outdoors, and your local area.",
+    p1Qs: [
+      { q: "What kind of weather do you enjoy most?", hint: "Say why it suits you." },
+      { q: "Do you spend much time outdoors?", hint: "Give an example of what you do." },
+      { q: "Is there a park or green space near where you live?", hint: "Describe it briefly." },
+      { q: "Did you spend more time outside when you were a child?", hint: "Compare then and now." },
+      { q: "How does the weather affect your mood or plans?", hint: "Give an example." },
+      { q: "Do you prefer the countryside or the city?", hint: "Give a reason for your choice." },
+      { q: "Are there any animals or plants you particularly like?", hint: "Say why." },
+      { q: "Would you like to live somewhere with a different climate?", hint: "Speculate about it." },
+    ],
+    p2Topic: "Describe a natural place that you find beautiful.",
+    p2Bullets: ["where it is", "what it looks like", "when you go there or first saw it"],
+    p2Rounding: "…and explain why you find it so beautiful.",
+    p2FollowUps: [
+      "Is this kind of place common in your country?",
+      "Do you think it will stay the same in the future?",
+    ],
+    p3Topic: "The Environment and Conservation",
+    p3Qs: [
+      { q: "What do you think are the most serious environmental problems today?", hint: "Name one or two and explain." },
+      { q: "Whose responsibility is it to protect the environment - individuals, businesses or governments?", hint: "Weigh up the roles." },
+      { q: "How can ordinary people reduce their impact on the planet?", hint: "Suggest practical actions." },
+      { q: "Do you think people care more about the environment now than in the past?", hint: "Compare attitudes over time." },
+      { q: "Should protecting the environment come before economic growth?", hint: "Argue one side or find a balance." },
+      { q: "How might climate change affect the way people live in the future?", hint: "Speculate about consequences." },
+    ],
+  },
+  {
+    theme: "Work & Ambition",
+    p1Intro: "Two familiar topics: your daily routine, and your plans for the future.",
+    p1Qs: [
+      { q: "What does a typical day look like for you?", hint: "Give a brief overview." },
+      { q: "Are you a morning person or an evening person?", hint: "Explain how it affects you." },
+      { q: "What part of your day do you enjoy the most?", hint: "Give a reason." },
+      { q: "How do you usually plan or organise your time?", hint: "Mention any tools or habits." },
+      { q: "Has your daily routine changed much in recent years?", hint: "Compare then and now." },
+      { q: "Do you have any goals you are working towards right now?", hint: "Give an example." },
+      { q: "Where do you see yourself in five years' time?", hint: "Speculate realistically." },
+      { q: "Is success more about hard work or luck, in your opinion?", hint: "Give your view." },
+    ],
+    p2Topic: "Describe a job you would like to do in the future.",
+    p2Bullets: ["what the job is", "what it would involve", "why it appeals to you"],
+    p2Rounding: "…and explain what you would need to do to get it.",
+    p2FollowUps: [
+      "Is this a common career choice in your country?",
+      "Do you think your view of the ideal job has changed over time?",
+    ],
+    p3Topic: "Work and Careers",
+    p3Qs: [
+      { q: "What makes a job satisfying, in your opinion?", hint: "Consider more than just salary." },
+      { q: "Do you think people change jobs more often now than in the past?", hint: "Compare attitudes across generations." },
+      { q: "Is a high salary more important than enjoying your work?", hint: "Weigh up the two." },
+      { q: "How has technology changed the kinds of jobs available?", hint: "Think about automation and new roles." },
+      { q: "Should young people follow their passion or choose a secure career?", hint: "Argue one side or balance them." },
+      { q: "Do you think the idea of a 'job for life' still exists?", hint: "Give your view with a reason." },
+    ],
+  },
+  {
+    theme: "Media & Entertainment",
+    p1Intro: "Two familiar topics: films and television, and how you relax.",
+    p1Qs: [
+      { q: "What kind of films or TV programmes do you enjoy?", hint: "Name a genre and say why." },
+      { q: "Do you prefer watching things at home or at the cinema?", hint: "Give a reason." },
+      { q: "How much time do you spend watching things each week?", hint: "Give a rough idea." },
+      { q: "Do you usually watch alone or with other people?", hint: "Explain your preference." },
+      { q: "What do you like to do to relax after a busy day?", hint: "Give one or two examples." },
+      { q: "Have your entertainment habits changed over the years?", hint: "Compare then and now." },
+      { q: "Do you prefer stories that are realistic or imaginative?", hint: "Give a reason." },
+      { q: "Is there a type of entertainment you would like to try?", hint: "Speculate about it." },
+    ],
+    p2Topic: "Describe a film or TV programme that made a strong impression on you.",
+    p2Bullets: ["what it was about", "when and where you watched it", "who you watched it with"],
+    p2Rounding: "…and explain why it made such a strong impression.",
+    p2FollowUps: [
+      "Would you watch it again?",
+      "Do you often recommend films or programmes to others?",
+    ],
+    p3Topic: "Media and Entertainment",
+    p3Qs: [
+      { q: "Why do you think streaming services have become so popular?", hint: "Consider choice and convenience." },
+      { q: "Do you think films and television can influence people's behaviour?", hint: "Give an example if you can." },
+      { q: "Is it important for a country to produce its own films and programmes?", hint: "Think about culture and identity." },
+      { q: "Has the way people consume entertainment changed for the better?", hint: "Compare past and present." },
+      { q: "Should there be limits on the kind of content available online?", hint: "Weigh up freedom and protection." },
+      { q: "Do you think traditional television will disappear in the future?", hint: "Speculate with a reason." },
+    ],
+  },
+  {
+    theme: "Travel & Culture",
+    p1Intro: "Two familiar topics: holidays and travel, and where you come from.",
+    p1Qs: [
+      { q: "Do you enjoy travelling?", hint: "Say what you like or dislike about it." },
+      { q: "What kind of holiday do you prefer - relaxing or active?", hint: "Give a reason." },
+      { q: "Where did you go on your last trip?", hint: "Give a brief description." },
+      { q: "Do you prefer travelling alone or with others?", hint: "Explain your preference." },
+      { q: "What is your hometown or region known for?", hint: "Mention one or two things." },
+      { q: "Would you recommend your area to visitors?", hint: "Say why or why not." },
+      { q: "Has tourism changed your area in any way?", hint: "Give an example if so." },
+      { q: "Is there a country you have always wanted to visit?", hint: "Speculate about going there." },
+    ],
+    p2Topic: "Describe a country you would like to visit.",
+    p2Bullets: ["which country it is", "what you know about it", "what you would do there"],
+    p2Rounding: "…and explain why you want to visit it in particular.",
+    p2FollowUps: [
+      "Do you think you will visit it one day?",
+      "How did you first become interested in this country?",
+    ],
+    p3Topic: "Culture and Globalisation",
+    p3Qs: [
+      { q: "What are the benefits of experiencing other cultures?", hint: "Consider understanding and perspective." },
+      { q: "Do you think the world is becoming too similar as cultures mix?", hint: "Weigh up connection against loss of identity." },
+      { q: "How can travelling change a person's outlook?", hint: "Give an example." },
+      { q: "Is it important to learn the language of a country before visiting?", hint: "Consider respect and practicality." },
+      { q: "Should countries do more to protect their traditional culture?", hint: "Argue one side or balance them." },
+      { q: "Do you think international travel will become more or less common in the future?", hint: "Speculate with reasons." },
+    ],
+  },
+  {
+    theme: "Friends & Community",
+    p1Intro: "Two familiar topics: your friends, and the area you live in.",
+    p1Qs: [
+      { q: "Do you have a large circle of friends or a few close ones?", hint: "Say which you prefer." },
+      { q: "How did you meet your closest friend?", hint: "Give a brief story." },
+      { q: "What do you usually do when you meet up with friends?", hint: "Give one or two examples." },
+      { q: "Is it easy to make new friends where you live?", hint: "Explain why or why not." },
+      { q: "Do you know your neighbours well?", hint: "Say a little about them." },
+      { q: "Are there many community events in your area?", hint: "Give an example if so." },
+      { q: "Has your idea of friendship changed as you've got older?", hint: "Compare then and now." },
+      { q: "Would you like to be more involved in your local community?", hint: "Speculate about it." },
+    ],
+    p2Topic: "Describe an event that brought people in your community together.",
+    p2Bullets: ["what the event was", "where and when it happened", "who took part"],
+    p2Rounding: "…and explain why it was good for the community.",
+    p2FollowUps: [
+      "Are events like this common where you live?",
+      "Do you think they are important? Why?",
+    ],
+    p3Topic: "Community and Social Connection",
+    p3Qs: [
+      { q: "Why do you think some people feel lonely even in busy cities?", hint: "Consider modern lifestyles." },
+      { q: "How can communities become more connected?", hint: "Suggest practical ideas." },
+      { q: "Do you think people today are less involved in their communities than before?", hint: "Compare past and present." },
+      { q: "What role can local events play in bringing people together?", hint: "Give an example." },
+      { q: "Should people have a duty to help others in their community?", hint: "Give your view with a reason." },
+      { q: "How might communities change as more life moves online?", hint: "Speculate about the future." },
+    ],
+  },
+  {
+    theme: "Shopping & Money",
+    p1Intro: "Two familiar topics: shopping, and how you manage everyday spending.",
+    p1Qs: [
+      { q: "Do you enjoy shopping?", hint: "Say what kind and why." },
+      { q: "Do you prefer shopping in stores or online?", hint: "Give a reason for your preference." },
+      { q: "How often do you go shopping for things you don't strictly need?", hint: "Be honest and explain." },
+      { q: "Are you good at saving money?", hint: "Give an example of a habit." },
+      { q: "Did you receive pocket money when you were a child?", hint: "Say what you did with it." },
+      { q: "Do you plan your spending or buy on impulse?", hint: "Explain your approach." },
+      { q: "Has the way you spend money changed over the years?", hint: "Compare then and now." },
+      { q: "Is there something you are saving up for at the moment?", hint: "Speculate about it." },
+    ],
+    p2Topic: "Describe something you bought that you were really pleased with.",
+    p2Bullets: ["what it was", "why you bought it", "where and when you got it"],
+    p2Rounding: "…and explain why you were so pleased with it.",
+    p2FollowUps: [
+      "Do you still use or have it now?",
+      "Do you usually take a long time to decide on purchases?",
+    ],
+    p3Topic: "Consumer Culture and Money",
+    p3Qs: [
+      { q: "Why do you think people are encouraged to buy more than they need?", hint: "Consider advertising and trends." },
+      { q: "Does having more money make people happier, in your view?", hint: "Give your opinion with a reason." },
+      { q: "How has online shopping changed the way people spend?", hint: "Think about convenience and habits." },
+      { q: "Should children be taught how to manage money at school?", hint: "Weigh up the benefits." },
+      { q: "Do you think people today are more materialistic than in the past?", hint: "Compare attitudes over time." },
+      { q: "Is it better to spend money on experiences or on possessions?", hint: "Argue one side or balance them." },
+    ],
+  },
+  {
+    theme: "Art & Creativity",
+    p1Intro: "Two familiar topics: music and hobbies, and being creative.",
+    p1Qs: [
+      { q: "What kind of music do you enjoy listening to?", hint: "Name a style and say why." },
+      { q: "When do you usually listen to music?", hint: "Give an example situation." },
+      { q: "Do you play any musical instruments?", hint: "Say a little about it." },
+      { q: "What hobbies do you have in your free time?", hint: "Give one or two." },
+      { q: "Do you consider yourself a creative person?", hint: "Explain your answer." },
+      { q: "Did you do any creative activities as a child?", hint: "Give an example." },
+      { q: "Do you prefer making things or watching others perform?", hint: "Give a reason." },
+      { q: "Is there a creative activity you would like to try?", hint: "Speculate about it." },
+    ],
+    p2Topic: "Describe a creative activity you enjoy doing.",
+    p2Bullets: ["what the activity is", "how you got into it", "how often you do it"],
+    p2Rounding: "…and explain why you find it enjoyable.",
+    p2FollowUps: [
+      "Do you do this activity alone or with others?",
+      "Would you like to become more skilled at it?",
+    ],
+    p3Topic: "Art and Creativity in Society",
+    p3Qs: [
+      { q: "Why do you think creativity is important for people?", hint: "Consider wellbeing and problem-solving." },
+      { q: "Should creative subjects like art and music be taught in all schools?", hint: "Weigh up their value." },
+      { q: "Do you think anyone can be creative, or is it a natural talent?", hint: "Give your view with a reason." },
+      { q: "How does art contribute to a society or city?", hint: "Think about culture and identity." },
+      { q: "Should governments fund the arts with public money?", hint: "Argue one side or balance them." },
+      { q: "Do you think technology has made people more or less creative?", hint: "Speculate with examples." },
+    ],
+  },
+];
+function buildFullTests(){
+  const pane = document.getElementById('fulltestsPane');
+  let h = '';
+  FULL_TESTS.forEach(function(t,i){
+    const p1id = 'ft-'+i+'-p1', prepId = 'ft-'+i+'-prep', speakId = 'ft-'+i+'-speak', p3id = 'ft-'+i+'-p3';
+    h += `<div class="acc-card${i===0?' shown':''}"><div class="acc-header"><div class="acc-title"><span class="num-badge">${i+1}</span>Test ${i+1}: ${t.theme}</div><span class="part-badge ft">Full test</span></div><div class="acc-body">`;
+    // Part 1
+    h += `<div class="ft-part"><div class="ft-part-head"><span class="part-badge p1">Part 1</span><span class="ft-part-title">Interview</span></div>`;
+    h += `<div class="ft-part-note">${t.p1Intro} About 4 to 5 minutes. Remember the examiner opens with an ID and name check first.</div>`;
+    h += `<div class="part-timers" style="margin:12px 0 4px">${timerHTML(p1id, 270, '')}</div>`;
+    h += qList(t.p1Qs, 'p1');
+    h += `</div>`;
+    // Part 2
+    h += `<div class="ft-part"><div class="ft-part-head"><span class="part-badge p2">Part 2</span><span class="ft-part-title">Long turn</span></div>`;
+    h += `<div class="ft-part-note">One minute to prepare, then speak on your own for 1 to 2 minutes.</div>`;
+    h += `<div class="cue-card"><div class="cue-topic">${t.p2Topic}</div><ul class="cue-bullets">${t.p2Bullets.map(function(b){ return `<li>${b}</li>`; }).join('')}</ul><div class="cue-footer">${t.p2Rounding}</div></div>`;
+    h += `<div class="p2-actions-row">${timerHTML(prepId, 60, 'Prep')}${timerHTML(speakId, 120, 'Speak')}<button class="btn-present" type="button" onclick="openFullPresent(${i})"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3M8 21H5a2 2 0 0 1-2-2v-3m18 0v3a2 2 0 0 1-2 2h-3"/></svg>Present</button></div>`;
+    if (t.p2FollowUps && t.p2FollowUps.length) {
+      h += subDrop('Examiner follow-up questions', 'p2', qListClean(t.p2FollowUps));
+    }
+    h += `</div>`;
+    // Part 3
+    h += `<div class="ft-part"><div class="ft-part-head"><span class="part-badge p3">Part 3</span><span class="ft-part-title">Discussion &middot; ${t.p3Topic}</span></div>`;
+    h += `<div class="ft-part-note">A two-way discussion linked to the Part 2 topic, on more abstract ideas. About 4 to 5 minutes.</div>`;
+    h += `<div class="part-timers" style="margin:12px 0 4px">${timerHTML(p3id, 270, '')}</div>`;
+    h += qList(t.p3Qs, 'p3');
+    h += `</div>`;
+    h += `</div></div>`;
+  });
+  pane.innerHTML = h;
+  FULL_TESTS.forEach(function(t,i){
+    timerInit('ft-'+i+'-p1', 270, true);
+    timerInit('ft-'+i+'-prep', 60, true);
+    timerInit('ft-'+i+'-speak', 120, true);
+    timerInit('ft-'+i+'-p3', 270, true);
+  });
+  buildRail('fulltests', FULL_TESTS, { labelOf: function(t){ return t.theme; }, groupOf: function(){ return null; } });
+}
+function openFullPresent(i){
+  const overlay = document.getElementById('presentOverlay');
+  const inner = document.getElementById('presentInner');
+  activePresentTimerIds.forEach(function(id){ const st = timerState[id]; if (st) clearInterval(st.interval); });
+  activePresentTimerIds = [];
+  const t = FULL_TESTS[i];
+  const prepId = 'ftpresent-prep', speakId = 'ftpresent-speak';
+  inner.innerHTML = `<div class="cue-card"><div class="cue-topic">${t.p2Topic}</div><ul class="cue-bullets">${t.p2Bullets.map(function(b){ return `<li>${b}</li>`; }).join('')}</ul><div class="cue-footer">${t.p2Rounding}</div></div><div class="present-timers">${timerHTML(prepId, 60, 'Prep')}${timerHTML(speakId, 120, 'Speak')}</div>`;
+  timerInit(prepId, 60, true);
+  timerInit(speakId, 120, true);
+  activePresentTimerIds = [prepId, speakId];
+  overlay.classList.add('open');
+}
+
 /* ============ INIT ============ */
 buildGuideS();
 buildPart1();
 buildPart2();
 buildPart3();
+buildFullTests();
 buildPhraseBank();
 
 // Restore a shared/refreshed deep link: ?type=part2
