@@ -249,9 +249,89 @@ body{
   100% { opacity:0; transform:translateX(92vw)  translateY(24px) rotate(8deg); }
 }
 
+/* ---- Practice exercises (tabs within a set) ---- */
+.exercise-tabs{
+  display:flex; gap:6px; width:100%; justify-content:center; flex-wrap:wrap;
+}
+.ex-tab{
+  border:none; cursor:pointer; font-family:'Outfit',sans-serif;
+  font-size:.82rem; font-weight:600; color:var(--pink-deep);
+  background:rgba(255,255,255,.55); padding:8px 14px; border-radius:99px;
+  transition:background .15s ease, color .15s ease, transform .1s ease;
+}
+.ex-tab:active{ transform:scale(.95); }
+.ex-tab.active{ background:var(--pink); color:var(--white); box-shadow:0 6px 14px -6px rgba(217,62,115,.5); }
+
+.tab-panel{ width:100%; display:flex; flex-direction:column; align-items:center; gap:18px; }
+.tab-panel[hidden]{ display:none; }
+
+.ex-intro{ font-size:.9rem; font-weight:500; color:var(--ink); opacity:.7; text-align:center; }
+.ex-footer{ display:flex; align-items:center; gap:16px; min-height:44px; }
+.ex-status{ font-size:.85rem; font-weight:600; color:var(--muted); font-variant-numeric:tabular-nums; }
+.ex-btn{
+  border:none; cursor:pointer; font-family:'Outfit',sans-serif;
+  font-size:.9rem; font-weight:700; color:var(--white);
+  background:linear-gradient(155deg,var(--pink),var(--pink-deep));
+  padding:11px 22px; border-radius:99px; box-shadow:0 8px 18px -8px rgba(217,62,115,.5);
+  transition:transform .1s ease, opacity .2s ease;
+}
+.ex-btn:active{ transform:scale(.94); }
+
+/* Match-up */
+.match-cols{ display:flex; gap:12px; width:100%; }
+.match-col{ flex:1; min-width:0; display:flex; flex-direction:column; gap:10px; }
+.match-item{
+  border:2px solid transparent; cursor:pointer; font-family:'Outfit',sans-serif;
+  font-size:.88rem; font-weight:600; color:var(--ink);
+  background:var(--white); border-radius:14px;
+  padding:12px 10px; text-align:center; line-height:1.25; min-height:56px;
+  box-shadow:0 6px 16px -10px rgba(217,62,115,.4);
+  transition:transform .1s ease, border-color .15s ease, background .15s ease, opacity .25s ease;
+  display:flex; align-items:center; justify-content:center;
+}
+.match-item.selected{ border-color:var(--pink); background:#FFF3F8; }
+.match-item.matched{ opacity:.3; pointer-events:none; border-color:transparent; }
+.match-item.wrong{ animation:exShake .35s ease; border-color:var(--pink-deep); }
+
+/* Reverse recall reuses .stage / .card / .face */
+.recall-stage{ max-height:44vh; }
+
+/* Fill the gap */
+.fill-card{
+  width:100%; background:var(--white); border-radius:22px; padding:26px 22px;
+  box-shadow:0 14px 30px -16px rgba(217,62,115,.4);
+  display:flex; flex-direction:column; gap:14px; align-items:center; text-align:center;
+}
+.fill-en{ font-size:1rem; font-weight:500; color:var(--muted); }
+.fill-it{ font-size:1.45rem; font-weight:800; color:var(--ink); line-height:1.35; }
+.fill-it .blank{
+  display:inline-block; min-width:58px; border-bottom:3px solid var(--pink);
+  color:var(--pink-deep); vertical-align:baseline;
+}
+.fill-options{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; width:100%; }
+.fill-opt{
+  border:2px solid rgba(217,62,115,.25); cursor:pointer; font-family:'Outfit',sans-serif;
+  font-size:1rem; font-weight:700; color:var(--pink-deep);
+  background:var(--white); border-radius:14px; padding:12px 18px;
+  transition:transform .1s ease, background .15s, border-color .15s, color .15s;
+}
+.fill-opt:active{ transform:scale(.94); }
+.fill-opt.correct{ background:var(--pink); border-color:var(--pink); color:var(--white); }
+.fill-opt.wrong{ border-color:var(--pink-deep); animation:exShake .35s ease; }
+.fill-opt.disabled{ pointer-events:none; opacity:.85; }
+
+@keyframes exShake{
+  0%,100%{ transform:translateX(0); }
+  20%{ transform:translateX(-6px); }
+  40%{ transform:translateX(6px); }
+  60%{ transform:translateX(-4px); }
+  80%{ transform:translateX(4px); }
+}
+
 @media (prefers-reduced-motion: reduce){
   .card{ transition:none; }
   .polaroid.drift{ animation:none; opacity:0; }
+  .match-item.wrong, .fill-opt.wrong{ animation:none; }
 }
 </style>
 </head>
@@ -273,6 +353,17 @@ body{
     <div class="eyebrow">Everyday Italian for My Baby</div>
     <div class="set-label" id="setLabel"></div>
 
+    <div class="exercise-tabs" id="exerciseTabs">
+      <button class="ex-tab active" data-tab="flash">Cards</button>
+      <button class="ex-tab" data-tab="match">Match</button>
+      <button class="ex-tab" data-tab="recall">Recall</button>
+      <button class="ex-tab" data-tab="fill">Fill gap</button>
+    </div>
+
+    <audio id="itAudio" preload="none"></audio>
+    <audio id="kissAudio" preload="none"></audio>
+
+    <div class="tab-panel" id="tabFlash">
     <div class="stage" id="stage">
       <div class="card" id="card">
         <div class="face front">
@@ -300,8 +391,6 @@ body{
         <div class="kiss-text">A kiss from John</div>
       </div>
     </div>
-    <audio id="itAudio" preload="none"></audio>
-    <audio id="kissAudio" preload="none"></audio>
 
     <div class="nav-row">
       <div class="tap-hint" id="tapHint">Tap the card to flip</div>
@@ -323,6 +412,63 @@ body{
     <div class="completions" id="completions">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
       <span id="completionsText">Completed 0 times</span>
+    </div>
+    </div><!-- /#tabFlash -->
+
+    <div class="tab-panel" id="tabMatch" hidden>
+      <p class="ex-intro">Tap an Italian phrase, then its English match.</p>
+      <div class="match-cols">
+        <div class="match-col" id="matchLeft"></div>
+        <div class="match-col" id="matchRight"></div>
+      </div>
+      <div class="ex-footer">
+        <span class="ex-status" id="matchStatus"></span>
+        <button class="ex-btn" id="matchNext" hidden>Next 5</button>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tabRecall" hidden>
+      <p class="ex-intro">Say it in Italian, then tap to check.</p>
+      <div class="stage recall-stage" id="recallStage">
+        <div class="card" id="recallCard">
+          <div class="face front">
+            <div class="word-en" id="recallEn"></div>
+            <svg class="hint-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+          </div>
+          <div class="face back">
+            <div class="word-it" id="recallIt"></div>
+            <div class="pron" id="recallPron"></div>
+            <div class="speak-row">
+              <button class="speak-btn" id="recallSpeak" aria-label="Play pronunciation">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+              </button>
+              <div class="speak-slow-wrap">
+                <button class="speak-btn" id="recallSpeakSlow" aria-label="Play pronunciation slowly">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+                </button>
+                <span class="turtle-label">🐢</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ex-footer">
+        <span class="ex-status" id="recallStatus">1 / 21</span>
+        <button class="ex-btn" id="recallNext">Next</button>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tabFill" hidden>
+      <p class="ex-intro">Which word is missing?</p>
+      <div class="fill-card">
+        <div class="fill-en" id="fillEn"></div>
+        <div class="fill-it" id="fillIt"></div>
+      </div>
+      <div class="fill-options" id="fillOptions"></div>
+      <div class="ex-footer">
+        <span class="ex-status" id="fillStatus">1 / 21</span>
+        <button class="ex-btn" id="fillNext" hidden>Next</button>
+      </div>
     </div>
   </div>
 
@@ -655,6 +801,7 @@ function startSet(i){
   setLabel.textContent = currentSet.label;
   completionsText.textContent = "Completed " + completions[currentSet.key] + (completions[currentSet.key] === 1 ? " time" : " times");
   showCard();
+  setTab("flash");
   fill();
 }
 
@@ -870,6 +1017,233 @@ function kissConfetti(){
     }
   })();
 }
+
+// ================= Practice exercises (Match / Recall / Fill the gap) =================
+var exerciseTabs = document.getElementById("exerciseTabs");
+var tabPanels = {
+  flash: document.getElementById("tabFlash"),
+  match: document.getElementById("tabMatch"),
+  recall: document.getElementById("tabRecall"),
+  fill: document.getElementById("tabFill")
+};
+function setTab(name){
+  Array.prototype.forEach.call(exerciseTabs.querySelectorAll(".ex-tab"), function(b){
+    b.classList.toggle("active", b.getAttribute("data-tab") === name);
+  });
+  for(var k in tabPanels){ tabPanels[k].hidden = (k !== name); }
+  stopItalian();
+  if(name === "match") initMatch();
+  else if(name === "recall") initRecall();
+  else if(name === "fill") initFill();
+}
+exerciseTabs.addEventListener("click", function(e){
+  var b = e.target.closest(".ex-tab");
+  if(!b) return;
+  setTab(b.getAttribute("data-tab"));
+});
+
+// ---- Match-up: tap an Italian phrase (left), then its English meaning (right) ----
+var matchLeft = document.getElementById("matchLeft");
+var matchRight = document.getElementById("matchRight");
+var matchStatus = document.getElementById("matchStatus");
+var matchNextBtn = document.getElementById("matchNext");
+var MATCH_SIZE = 5;
+var matchQueue = [], matchChunk = [], matchSel = null, matchDone = 0;
+
+function initMatch(){
+  matchQueue = shuffle(currentSet.phrases);
+  matchNextBtn.textContent = "Next 5";
+  loadMatchChunk();
+}
+function loadMatchChunk(){
+  var take = matchQueue.length <= MATCH_SIZE + 1 ? matchQueue.length : MATCH_SIZE;
+  matchChunk = matchQueue.slice(0, take);
+  matchQueue = matchQueue.slice(take);
+  matchSel = null; matchDone = 0;
+  matchNextBtn.hidden = true;
+  matchStatus.textContent = "";
+  var rightOrder = shuffle(matchChunk);
+  matchLeft.innerHTML = "";
+  matchRight.innerHTML = "";
+  matchChunk.forEach(function(p){
+    var b = document.createElement("button");
+    b.className = "match-item"; b.textContent = p.it;
+    b.addEventListener("click", function(){ matchPickLeft(b, p); });
+    matchLeft.appendChild(b);
+  });
+  rightOrder.forEach(function(p){
+    var b = document.createElement("button");
+    b.className = "match-item"; b.textContent = p.en;
+    b.addEventListener("click", function(){ matchPickRight(b, p); });
+    matchRight.appendChild(b);
+  });
+}
+function matchPickLeft(btn, p){
+  if(btn.classList.contains("matched")) return;
+  if(matchSel) matchSel.btn.classList.remove("selected");
+  matchSel = { btn: btn, p: p };
+  btn.classList.add("selected");
+  playItalian(p.a1);
+}
+function matchPickRight(btn, p){
+  if(btn.classList.contains("matched") || !matchSel) return;
+  if(matchSel.p.it === p.it){
+    matchSel.btn.classList.remove("selected");
+    matchSel.btn.classList.add("matched");
+    btn.classList.add("matched");
+    matchSel = null;
+    matchDone++;
+    if(matchDone >= matchChunk.length){
+      if(matchQueue.length > 0){
+        matchStatus.textContent = "Nice!";
+        matchNextBtn.hidden = false;
+      } else {
+        matchStatus.textContent = "All matched!";
+        matchNextBtn.textContent = "Again";
+        matchNextBtn.hidden = false;
+      }
+    }
+  } else {
+    btn.classList.add("wrong");
+    setTimeout(function(){ btn.classList.remove("wrong"); }, 400);
+  }
+}
+matchNextBtn.addEventListener("click", function(){
+  if(matchQueue.length === 0) initMatch();
+  else loadMatchChunk();
+});
+
+// ---- Reverse recall: see English, flip to check the Italian (no gate) ----
+var recallStage = document.getElementById("recallStage");
+var recallCard = document.getElementById("recallCard");
+var recallEn = document.getElementById("recallEn");
+var recallIt = document.getElementById("recallIt");
+var recallPron = document.getElementById("recallPron");
+var recallSpeak = document.getElementById("recallSpeak");
+var recallSpeakSlow = document.getElementById("recallSpeakSlow");
+var recallStatus = document.getElementById("recallStatus");
+var recallNext = document.getElementById("recallNext");
+var recallDeck = [], recallIdx = 0, recallFlipped = false;
+
+function initRecall(){
+  recallDeck = shuffle(currentSet.phrases);
+  recallIdx = 0;
+  recallFill();
+}
+function recallFill(){
+  var p = recallDeck[recallIdx];
+  recallEn.textContent = p.en;
+  recallIt.textContent = p.it;
+  recallPron.textContent = p.pron;
+  recallFlipped = false;
+  recallCard.classList.remove("flipped");
+  recallStatus.textContent = (recallIdx + 1) + " / " + recallDeck.length;
+  stopItalian();
+}
+function recallFlip(){
+  recallFlipped = !recallFlipped;
+  recallCard.classList.toggle("flipped", recallFlipped);
+  if(recallFlipped) playItalian(recallDeck[recallIdx].a1); else stopItalian();
+}
+recallStage.addEventListener("click", recallFlip);
+recallSpeak.addEventListener("click", function(e){ e.stopPropagation(); playItalian(recallDeck[recallIdx].a1); });
+recallSpeakSlow.addEventListener("click", function(e){ e.stopPropagation(); playItalian(recallDeck[recallIdx].a08); });
+recallNext.addEventListener("click", function(){
+  recallIdx++;
+  if(recallIdx >= recallDeck.length){ recallDeck = shuffle(currentSet.phrases); recallIdx = 0; }
+  recallFill();
+});
+
+// ---- Fill the gap: one word blanked from a real phrase, pick it from options ----
+var fillEn = document.getElementById("fillEn");
+var fillIt = document.getElementById("fillIt");
+var fillOptions = document.getElementById("fillOptions");
+var fillStatus = document.getElementById("fillStatus");
+var fillNext = document.getElementById("fillNext");
+var fillDeck = [], fillIdx = 0, fillAnswered = false;
+
+function fillClean(t){ return t.replace(/^[^\p{L}]+|[^\p{L}]+$/gu, ""); }
+function fillCandidates(it){
+  return it.split(/\s+/).map(fillClean).filter(function(w){ return w.length >= 4; });
+}
+// A phrase is fair game for fill-the-gap only if it has a blankable word AND enough
+// surrounding words to give context (single-word phrases would just blank the whole thing).
+function fillEligible(p){
+  return p.it.split(/\s+/).length >= 2 && fillCandidates(p.it).length > 0;
+}
+function fillEscape(s){ return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+function fillPool(){
+  var pool = [];
+  currentSet.phrases.forEach(function(p){
+    fillCandidates(p.it).forEach(function(w){ pool.push(w); });
+  });
+  return pool;
+}
+function initFill(){
+  fillDeck = shuffle(currentSet.phrases).filter(fillEligible);
+  fillIdx = 0;
+  fillLoad();
+}
+function fillLoad(){
+  fillAnswered = false;
+  fillNext.hidden = true;
+  var p = fillDeck[fillIdx];
+  var cands = fillCandidates(p.it);
+  var answer = cands[Math.floor(Math.random() * cands.length)];
+  var blanked = false;
+  var html = p.it.split(/\s+/).map(function(t){
+    if(!blanked && fillClean(t).toLowerCase() === answer.toLowerCase()){
+      blanked = true;
+      var lead = (t.match(/^[^\p{L}]*/u) || [""])[0];
+      var trail = (t.match(/[^\p{L}]*$/u) || [""])[0];
+      return fillEscape(lead) + '<span class="blank">&nbsp;&nbsp;&nbsp;</span>' + fillEscape(trail);
+    }
+    return fillEscape(t);
+  }).join(" ");
+  fillEn.textContent = p.en;
+  fillIt.innerHTML = html;
+
+  var seen = {}; seen[answer.toLowerCase()] = true;
+  var distract = [];
+  shuffle(fillPool()).forEach(function(w){
+    if(distract.length >= 3) return;
+    var lw = w.toLowerCase();
+    if(!seen[lw]){ seen[lw] = true; distract.push(w); }
+  });
+  var opts = shuffle([answer].concat(distract));
+  fillOptions.innerHTML = "";
+  opts.forEach(function(w){
+    var b = document.createElement("button");
+    b.className = "fill-opt"; b.textContent = w;
+    b.addEventListener("click", function(){ fillPick(b, w, answer, p); });
+    fillOptions.appendChild(b);
+  });
+  fillStatus.textContent = (fillIdx + 1) + " / " + fillDeck.length;
+  stopItalian();
+}
+function fillPick(btn, w, answer, p){
+  if(fillAnswered) return;
+  if(w.toLowerCase() === answer.toLowerCase()){
+    fillAnswered = true;
+    btn.classList.add("correct");
+    Array.prototype.forEach.call(fillOptions.children, function(c){ c.classList.add("disabled"); });
+    var blank = fillIt.querySelector(".blank");
+    if(blank){ blank.textContent = answer; }
+    playItalian(p.a1);
+    fillNext.hidden = false;
+  } else {
+    btn.classList.add("wrong");
+    setTimeout(function(){ btn.classList.remove("wrong"); }, 400);
+  }
+}
+fillNext.addEventListener("click", function(){
+  fillIdx++;
+  if(fillIdx >= fillDeck.length){
+    fillDeck = shuffle(currentSet.phrases).filter(fillEligible);
+    fillIdx = 0;
+  }
+  fillLoad();
+});
 
 stageEl.addEventListener("click", toggleFlip);
 speakBtn.addEventListener("click", function(e){
