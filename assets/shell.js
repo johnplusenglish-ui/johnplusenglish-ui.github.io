@@ -55,16 +55,31 @@ var JPE_TITLES = {
   "would-you-rather.html": "Would You Rather...? - johnplusenglish",
   "writing-skills.html": "Writing Skills - johnplusenglish"
 };
+// Keep the sidebar out of the accessibility tree + tab order whenever it is
+// visually hidden: off-screen on mobile (no .open) or width:0 on desktop
+// (.collapsed). Reopen controls live outside the sidebar, so inert is safe.
+function jpeSyncSidebarA11y(){
+  var sb = document.getElementById('sidebar');
+  if (!sb) return;
+  var mobile = window.matchMedia('(max-width:900px)').matches;
+  var hidden = mobile ? !sb.classList.contains('open') : sb.classList.contains('collapsed');
+  if (hidden){ sb.setAttribute('aria-hidden','true'); sb.setAttribute('inert',''); }
+  else { sb.removeAttribute('aria-hidden'); sb.removeAttribute('inert'); }
+  var toggle = document.querySelector('.sidebar-toggle');
+  if (toggle) toggle.setAttribute('aria-expanded', String(!hidden));
+}
 function toggleSidebar(){
   var sidebar = document.getElementById('sidebar');
   sidebar.classList.toggle('open');
   sidebar.classList.toggle('collapsed');
   document.getElementById('sidebarBackdrop').classList.toggle('open');
   try { localStorage.setItem('jpe-sidebar-collapsed', sidebar.classList.contains('collapsed') ? '1' : '0'); } catch(e) {}
+  jpeSyncSidebarA11y();
 }
 function closeSidebar(){
   document.getElementById('sidebar').classList.remove('open');
   document.getElementById('sidebarBackdrop').classList.remove('open');
+  jpeSyncSidebarA11y();
 }
 // Animate a collapsible (.cat-rows/.level-rows) to its exact content height so
 // there is no dead space to crawl through - open/close stays tight regardless of
@@ -208,6 +223,9 @@ window.addEventListener('popstate', function(){
   document.getElementById('sidebar').classList.add('js-anim');
   var here = location.pathname.split('/').pop() || 'index.html';
   jpeActivate(here);
+  jpeSyncSidebarA11y();
+  var mq = window.matchMedia('(max-width:900px)');
+  (mq.addEventListener ? mq.addEventListener.bind(mq,'change') : mq.addListener.bind(mq))(jpeSyncSidebarA11y);
 })();
 
 // Swipe left to close the open mobile sidebar overlay. Deliberately does NOT
