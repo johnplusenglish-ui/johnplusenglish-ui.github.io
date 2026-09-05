@@ -5,8 +5,8 @@ Static site, GitHub Pages (`CNAME` → johnplusenglish.com), deployed straight f
 
 ## Freshness check — do this first, every session
 
-This file was last synced against commit `6e927ce` (2026-08-21). Run
-`git log --oneline 6e927ce..HEAD | wc -l` — if it's a large number (this repo moves fast, ~2-3
+This file was last synced against commit `f7a79a1` (2026-09-06). Run
+`git log --oneline f7a79a1..HEAD | wc -l` — if it's a large number (this repo moves fast, ~2-3
 commits/hour is normal across concurrent sessions; treat 40+ as "a lot"), skim
 `git log --oneline 6e927ce..HEAD` for anything structural (new page pattern, new gating/redirect
 logic, sidebar/tools.html changes, a new shared component) before starting your task, and update
@@ -73,13 +73,24 @@ Two page shapes, both must be understood before editing anything nav-related:
    backward compatibility — don't add new content here, treat it as a redirect shim.
 
 **The sidebar IS a shared component (since 2026-08-21, commit `f9ba4a1`)** — do not paste it back
-into individual files. The 51 sidebar-bearing wrapper pages (all except the legacy `tools.html`
-shim) each load three shared assets instead of embedding the sidebar directly:
+into individual files. The ~68 sidebar-bearing wrapper pages (all except the legacy `tools.html`
+shim) each load these shared assets instead of embedding the sidebar directly:
+- `/assets/theme.css` — **the single source of truth for all colour/type/spacing tokens** (since
+  2026-09-05). `shell.css` `@import`s it; every content page links it too. Change a colour once
+  here and it applies everywhere. The only intentional override lives in `shell.css`
+  (`:root{--accent:#FFB347}` — wrapper/landing pages use the amber accent; content pages keep blue
+  `--accent` inline, so never delete `--accent`/`--accent-light` from a content page). Legacy alias
+  tokens (`--accent-teal`, `--mint`, `--text-primary`, etc.) all point at canonical values here.
 - `/assets/shell.css` — sitewide chrome CSS (topnav, sidebar, accordion, collapse behaviour)
-- `/assets/shell.js` — `JPE_TITLES` map + all nav/collapse/soft-navigation JS
+- `/assets/shell.js` — `JPE_TITLES` map + all nav/collapse/soft-navigation JS. Also keeps the
+  closed sidebar `inert`+`aria-hidden` (`jpeSyncSidebarA11y`) for screen readers.
 - `/assets/sidebar-nav.html` — the actual category/tool-link markup, injected via a synchronous
   `document.write(XHR(...))` at the exact spot the old inline `<nav id="sidebar">` used to sit
   (keeps it render-blocking so there's no flash of an empty sidebar)
+
+Tab a11y: content pages with `role="tab"` carry a small self-contained script (marker
+`/* jpe-a11y-tabs */`) that mirrors `aria-selected` off the active class (`active`/`on`) via a
+microtask-debounced MutationObserver — reuse that pattern rather than hand-rolling per page.
 
 To change a category or tool row: edit `/assets/sidebar-nav.html` once — it applies to every page
 immediately, no multi-file sed needed. To change sidebar styling: edit `/assets/shell.css`. To
