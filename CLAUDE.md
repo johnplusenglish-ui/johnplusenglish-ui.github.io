@@ -92,6 +92,14 @@ Tab a11y: content pages with `role="tab"` carry a small self-contained script (m
 `/* jpe-a11y-tabs */`) that mirrors `aria-selected` off the active class (`active`/`on`) via a
 microtask-debounced MutationObserver — reuse that pattern rather than hand-rolling per page.
 
+Classroom timer is a shared component (since 2026-09-06): `/assets/present.js` (all timer* functions:
+`timerInit(id,secs,locked)` + `timerWidgetHTML(id,...)`) and `/assets/present.css` (the solid
+sky-blue timer PILL only). 17 speaking/exam `-content` pages link both and keep only their own
+`.timer-section`/`.timer-row` container + progress bar inline. Do NOT re-inline a timer; link the
+shared files. Three pages have a divergent inline timer (custom `timerTick`/`timerUpdateBtn`) and
+were left un-migrated on purpose — reconcile before sharing: `ielts-speaking-content.html`,
+`shrink-it-content.html`, `hot-takes-content.html`.
+
 To change a category or tool row: edit `/assets/sidebar-nav.html` once — it applies to every page
 immediately, no multi-file sed needed. To change sidebar styling: edit `/assets/shell.css`. To
 change nav/collapse behaviour: edit `/assets/shell.js`. `index.html` and `exam-photos-speaking.html`
