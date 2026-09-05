@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
 <link rel="stylesheet" href="assets/theme.css">
+<link rel="stylesheet" href="assets/present.css">
+<script src="assets/present.js"></script>
 <script src="lock.js"></script>
 <script src="/assets/deeplink.js"></script>
 <base target="_top">
@@ -176,19 +178,6 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .timer-row strong{color:var(--ink);font-weight:700}
 .timer-progress-fill{position:absolute;left:0;top:0;height:3px;background:var(--accent);width:0%;transition:width .3s linear}
 .timer-progress-fill.warn{background:#FF6B6B}
-.timer-btn-wrap{margin-left:auto;display:inline-flex;border-radius:10px;overflow:hidden}
-.timer-btn{background:var(--sky);color:#fff;border:none;padding:6px 16px;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;font-family:'Outfit',sans-serif;display:inline-flex;align-items:center;gap:6px}
-.timer-btn:hover{background:#2176FF}
-.timer-btn-icon{font-size:.85em;line-height:1}
-.timer-btn .timer-btn-time{font-family:'JetBrains Mono',monospace}
-.timer-btn.running{background:#FF6B6B}
-.timer-btn.running:hover{background:#D6453F}
-.timer-btn.paused{background:var(--sun)}
-.timer-btn.done{background:#FF6B6B}
-.timer-edit-btn{width:22px;height:22px;border-radius:6px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;margin-left:6px;flex-shrink:0}
-.timer-edit-btn:hover{border-color:var(--accent);color:var(--accent)}
-.timer-duration-edit{display:none;align-items:baseline;gap:.3rem;font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:700;padding:6px 10px;border:1.5px solid var(--ink);border-radius:10px;background:var(--card);color:var(--ink);margin-left:auto}
-.timer-duration-input{font-family:'JetBrains Mono',monospace;font-size:.9rem;font-weight:700;border:none;background:transparent;color:var(--ink);width:4.2ch;text-align:center;outline:none;padding:0}
 
 .editor-wrap{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-top:16px}
 .editor-bar{display:flex;justify-content:space-between;align-items:center;padding:.6rem .9rem;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:.4rem}
@@ -554,21 +543,8 @@ function toggleRail(level){
 
 /* ============ reusable countdown timer widget ============ */
 var timerState = {};
-function timerFormatTime(totalSeconds){
-  var m=Math.floor(totalSeconds/60), s=totalSeconds%60;
-  return m+':'+(s<10?'0':'')+s;
-}
-function timerParseTime(str){
-  var parts=String(str).trim().split(':');
-  var m, s;
-  if(parts.length>=2){ m=parseInt(parts[0],10); s=parseInt(parts[1],10); }
-  else { m=parseInt(parts[0],10); s=0; }
-  if(isNaN(m)) m=0;
-  if(isNaN(s)||s<0||s>59) s=0;
-  var total=m*60+s;
-  if(!total || total<1) return null;
-  return Math.min(total,5999);
-}
+
+
 function timerHTML(id, secs, locked, labelText) {
   const m = Math.floor(secs/60), s = secs%60;
   const labelHTML = labelText !== undefined ? labelText : `Time: <strong>${m>0?m+' min':''}${s>0?' '+s+' sec':''}</strong>`;
@@ -581,103 +557,15 @@ function timerHTML(id, secs, locked, labelText) {
     <span class="timer-btn-wrap"><button class="timer-btn" id="timerBtn-${id}" onclick="timerHandleClick('${id}')"><span class="timer-btn-icon" id="timerBtnIcon-${id}">&#9654;</span><span id="timerBtnLabel-${id}"></span></button>${editBits}</span>
   </div>`;
 }
-function timerInit(id, defaultSecs, locked){
-  timerState[id] = {interval:null, seconds:defaultSecs, total:defaultSecs, running:false, paused:false, defaultSecs:defaultSecs, locked:!!locked};
-  timerUpdateBtn(id);
-}
-function timerSelectDuration(id, secs){
-  var st = timerState[id];
-  clearInterval(st.interval); st.interval=null;
-  st.running=false; st.paused=false;
-  st.total=secs; st.seconds=secs;
-  var prog = document.getElementById('timerProgress-'+id);
-  prog.style.width='0%'; prog.className='timer-progress-fill';
-  timerUpdateBtn(id);
-}
-function timerEditDuration(id){
-  var st = timerState[id];
-  if(st.locked) return;
-  clearInterval(st.interval); st.interval=null; st.running=false; st.paused=false;
-  var input=document.getElementById('timerDurationInput-'+id);
-  input.value=timerFormatTime(st.defaultSecs);
-  document.getElementById('timerBtn-'+id).style.display='none';
-  document.getElementById('timerEditBtn-'+id).style.display='none';
-  document.getElementById('timerDurationEdit-'+id).style.display='inline-flex';
-  input.focus();
-  input.select();
-}
-function timerCommitDuration(id){
-  var st = timerState[id];
-  if(st._canceling){ st._canceling=false; return; }
-  var parsed=timerParseTime(document.getElementById('timerDurationInput-'+id).value);
-  if(parsed) st.defaultSecs=parsed;
-  document.getElementById('timerDurationEdit-'+id).style.display='none';
-  document.getElementById('timerBtn-'+id).style.display='inline-flex';
-  timerSelectDuration(id, st.defaultSecs);
-}
-function timerCancelEdit(id){
-  var st = timerState[id];
-  st._canceling=true;
-  document.getElementById('timerDurationEdit-'+id).style.display='none';
-  document.getElementById('timerBtn-'+id).style.display='inline-flex';
-  timerUpdateBtn(id);
-}
-function timerHandleClick(id){
-  var st = timerState[id];
-  if(!st.running && !st.paused && st.seconds<=0 && st.total>0){ timerSelectDuration(id, st.defaultSecs); return; }
-  timerToggle(id);
-}
-function timerToggle(id){
-  var st = timerState[id];
-  if(!st.total) return;
-  if(!st.running && !st.paused){ st.running=true; timerTick(id); }
-  else if(st.running){ clearInterval(st.interval); st.interval=null; st.running=false; st.paused=true; }
-  else{ st.paused=false; st.running=true; timerTick(id); }
-  timerUpdateBtn(id);
-}
-function timerTick(id){
-  var st = timerState[id];
-  var prog=document.getElementById('timerProgress-'+id);
-  st.interval=setInterval(function(){
-    st.seconds--;
-    var pct=((st.total-st.seconds)/st.total)*100;
-    prog.style.width=pct+'%';
-    if(st.seconds<=10 && st.seconds>0){ prog.className='timer-progress-fill warn'; }
-    if(st.seconds<=0){
-      clearInterval(st.interval); st.interval=null; st.running=false;
-      prog.style.width='100%'; prog.className='timer-progress-fill warn';
-      setTimeout(function(){
-        if(!st.running && !st.paused && st.seconds<=0){ timerSelectDuration(id, st.defaultSecs); }
-      },2500);
-    }
-    timerUpdateBtn(id);
-  },1000);
-}
-function timerUpdateBtn(id){
-  var st = timerState[id];
-  var btn=document.getElementById('timerBtn-'+id);
-  var icon=document.getElementById('timerBtnIcon-'+id);
-  var label=document.getElementById('timerBtnLabel-'+id);
-  var editBtn=document.getElementById('timerEditBtn-'+id);
-  if(editBtn) editBtn.style.display = st.locked ? 'none' : 'inline-flex';
-  if(st.running){
-    icon.innerHTML='&#9208;';
-    label.innerHTML='<span class="timer-btn-time">'+timerFormatTime(st.seconds)+'</span>';
-    btn.className='timer-btn running'+(st.seconds<=10?' warn':'');
-  } else if(st.paused){
-    icon.innerHTML='&#9654;';
-    label.innerHTML='<span class="timer-btn-time">'+timerFormatTime(st.seconds)+'</span>';
-    btn.className='timer-btn paused';
-  } else if(st.seconds<=0 && st.total>0){
-    icon.innerHTML='&#8635;';
-    label.textContent='Done';
-    btn.className='timer-btn done';
-  } else {
-    icon.innerHTML='&#9654;';
-    label.innerHTML='<span class="timer-btn-time">'+timerFormatTime(st.defaultSecs)+'</span>';
-    btn.className='timer-btn';
-  }
-}
+
+
+
+
+
+
+
+
+
 
 /* ============ writing practice: word counter + timer (per topic) ============ */
 function wpUpdateWordCount(id){
