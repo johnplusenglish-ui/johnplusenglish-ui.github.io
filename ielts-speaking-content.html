@@ -12,6 +12,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/theme.css">
+<link rel="stylesheet" href="/assets/present.css">
+<script src="/assets/present.js"></script>
 <style>
 :root{--sea:#1DD3B0;--sea-light:#E4F8F6;--coral:#FF6B6B;--coral-light:#FDECEC;--ielts:#2176FF;--ielts-light:#E8EEFF;--p1:#A8C8FF;--p1-light:#EEF4FF;--p2:#2176FF;--p2-light:#E8EEFF;--p3:#123E82;--p3-light:#D6E4FF}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -162,19 +164,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,246,243,
 .timer-row strong{color:var(--ink);font-weight:700}
 .timer-progress-fill{position:absolute;left:0;top:0;height:3px;background:var(--sea);width:0%;transition:width .3s linear}
 .timer-progress-fill.warn{background:var(--coral)}
-.timer-btn{position:relative;overflow:hidden;background:#EEF0F3;color:#68707E;border:none;border-radius:999px;padding:.28rem .7rem;font-size:.74rem;font-weight:700;cursor:pointer;transition:all .15s;font-family:'Outfit',sans-serif;display:inline-flex;align-items:center;gap:.35rem}
-.timer-btn .timer-btn-icon{color:var(--ielts);font-size:.82em}
-.timer-btn.running{background:var(--ielts);color:#fff}
-.timer-btn.running .timer-btn-icon{color:#fff}
-.timer-btn.paused{background:var(--ielts-light);color:#2176FF}
-.timer-btn.paused .timer-btn-icon{color:var(--ielts)}
-.timer-btn.done{background:#EEF0F3;color:#68707E}
 .timer-pre{opacity:.7;font-weight:600}
 .timer-btn .timer-progress-fill{position:absolute;left:0;bottom:0;top:auto;height:2px;background:rgba(33,118,255,.55);width:0%}
 .timer-btn.running .timer-progress-fill{background:rgba(255,255,255,.7)}
-.timer-btn:hover{background:#2176FF}
-.timer-btn-icon{font-size:.85em;line-height:1}
-.timer-btn .timer-btn-time{font-family:'JetBrains Mono',monospace}
 .part-timers{display:inline-flex;gap:.4rem;flex-shrink:0}
 
 /* Question list (Part 1 / Part 3) */
@@ -1040,78 +1032,13 @@ function stripTags(html){ return String(html).replace(/<[^>]*>/g, ''); }
 
 /* ===== reusable timer widget engine (multi-instance, locked to official exam durations) ===== */
 var timerState = {};
-function timerFormatTime(totalSeconds){
-  var m=Math.floor(totalSeconds/60), s=totalSeconds%60;
-  return m+':'+(s<10?'0':'')+s;
-}
-function timerInit(id, defaultSecs, locked){
-  timerState[id] = {interval:null, seconds:defaultSecs, total:defaultSecs, running:false, paused:false, defaultSecs:defaultSecs, locked:!!locked};
-  timerUpdateBtn(id);
-}
-function timerSelectDuration(id, secs){
-  var st = timerState[id];
-  clearInterval(st.interval); st.interval=null;
-  st.running=false; st.paused=false;
-  st.total=secs; st.seconds=secs;
-  var prog = document.getElementById('timerProgress-'+id);
-  prog.style.width='0%'; prog.className='timer-progress-fill';
-  timerUpdateBtn(id);
-}
-function timerHandleClick(id){
-  var st = timerState[id];
-  if(!st.running && !st.paused && st.seconds<=0 && st.total>0){ timerSelectDuration(id, st.defaultSecs); return; }
-  timerToggle(id);
-}
-function timerToggle(id){
-  var st = timerState[id];
-  if(!st.total) return;
-  if(!st.running && !st.paused){ st.running=true; timerTick(id); }
-  else if(st.running){ clearInterval(st.interval); st.interval=null; st.running=false; st.paused=true; }
-  else{ st.paused=false; st.running=true; timerTick(id); }
-  timerUpdateBtn(id);
-}
-function timerTick(id){
-  var st = timerState[id];
-  var prog=document.getElementById('timerProgress-'+id);
-  st.interval=setInterval(function(){
-    st.seconds--;
-    var pct=((st.total-st.seconds)/st.total)*100;
-    prog.style.width=pct+'%';
-    if(st.seconds<=10 && st.seconds>0){ prog.className='timer-progress-fill warn'; }
-    if(st.seconds<=0){
-      clearInterval(st.interval); st.interval=null; st.running=false;
-      prog.style.width='100%'; prog.className='timer-progress-fill warn';
-      setTimeout(function(){
-        if(!st.running && !st.paused && st.seconds<=0){ timerSelectDuration(id, st.defaultSecs); }
-      },2500);
-    }
-    timerUpdateBtn(id);
-  },1000);
-}
-function timerUpdateBtn(id){
-  var st = timerState[id];
-  var btn=document.getElementById('timerBtn-'+id);
-  var icon=document.getElementById('timerBtnIcon-'+id);
-  var label=document.getElementById('timerBtnLabel-'+id);
-  if(!btn) return;
-  if(st.running){
-    icon.innerHTML='&#9208;';
-    label.innerHTML='<span class="timer-btn-time">'+timerFormatTime(st.seconds)+'</span>';
-    btn.className='timer-btn running'+(st.seconds<=10?' warn':'');
-  } else if(st.paused){
-    icon.innerHTML='&#9654;';
-    label.innerHTML='<span class="timer-btn-time">'+timerFormatTime(st.seconds)+'</span>';
-    btn.className='timer-btn paused';
-  } else if(st.seconds<=0 && st.total>0){
-    icon.innerHTML='&#8635;';
-    label.textContent='Done';
-    btn.className='timer-btn done';
-  } else {
-    icon.innerHTML='&#9654;';
-    label.innerHTML='<span class="timer-btn-time">'+timerFormatTime(st.defaultSecs)+'</span>';
-    btn.className='timer-btn';
-  }
-}
+
+
+
+
+
+
+
 function timerHTML(id, secs, pre) {
   return `<button class="timer-btn" id="timerBtn-${id}" data-secs="${secs}" onclick="timerHandleClick('${id}')" title="Start timer">`
     + `<span class="timer-btn-icon" id="timerBtnIcon-${id}">&#9654;</span>`

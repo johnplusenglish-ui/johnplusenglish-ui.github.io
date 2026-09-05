@@ -35,8 +35,8 @@ function timerWidgetHTML(id, defaultSecs, locked){
     '</div>';
 }
 
-function timerInit(id, defaultSecs, locked){
-  timerState[id] = {interval:null, seconds:defaultSecs, total:defaultSecs, running:false, paused:false, defaultSecs:defaultSecs, locked:!!locked};
+function timerInit(id, defaultSecs, locked, onEnd){
+  timerState[id] = {interval:null, seconds:defaultSecs, total:defaultSecs, running:false, paused:false, defaultSecs:defaultSecs, locked:!!locked, onEnd:(typeof onEnd==='function'?onEnd:null)};
   timerUpdateBtn(id);
 }
 
@@ -107,6 +107,7 @@ function timerTick(id){
     if(st.seconds<=0){
       clearInterval(st.interval); st.interval=null; st.running=false;
       prog.style.width='100%'; prog.className='timer-progress-fill warn';
+      if(st.onEnd) st.onEnd(id);
       setTimeout(function(){
         if(!st.running && !st.paused && st.seconds<=0){ timerSelectDuration(id, st.defaultSecs); }
       },2500);
@@ -118,6 +119,7 @@ function timerTick(id){
 function timerUpdateBtn(id){
   var st = timerState[id];
   var btn=document.getElementById('timerBtn-'+id);
+  if(!btn) return;
   var icon=document.getElementById('timerBtnIcon-'+id);
   var label=document.getElementById('timerBtnLabel-'+id);
   var editBtn=document.getElementById('timerEditBtn-'+id);
