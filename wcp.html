@@ -18,7 +18,7 @@
   --muted: #8892a4;
   --gold: #ffd700;
   --gold2: #ffaa00;
-  --red: #ef233c;
+  --red: #D6453F;
   --blue: #2176ff;
   --green: #1dd3b0;
   --orange: #ff9100;
@@ -973,28 +973,28 @@ function selectPlayer(p) { currentPlayer = p; renderPredictions(); }
 
 async function savePred(matchId, player) {
   const fixture = FIXTURES.find(f => f.id === matchId);
-  if (fixture && isLocked(fixture)) { showToast('Match is locked - too late!', '#ef233c'); return; }
+  if (fixture && isLocked(fixture)) { showToast('Match is locked - too late!', '#D6453F'); return; }
   const h = document.getElementById('ph-'+matchId)?.value;
   const a = document.getElementById('pa-'+matchId)?.value;
-  if (h === '' || a === '') { showToast('Enter both scores!', '#ef233c'); return; }
+  if (h === '' || a === '') { showToast('Enter both scores!', '#D6453F'); return; }
   showToast('Saving…', '#2176ff');
   try {
     await savePredToDb(matchId, player, h, a);
     showToast('Prediction saved!');
     renderPredictions();
   } catch(e) {
-    showToast('Error saving - check connection', '#ef233c');
+    showToast('Error saving - check connection', '#D6453F');
   }
 }
 
 async function editPred(matchId, player) {
   const fixture = FIXTURES.find(f => f.id === matchId);
-  if (fixture && isLocked(fixture)) { showToast('Match is locked - too late!', '#ef233c'); return; }
+  if (fixture && isLocked(fixture)) { showToast('Match is locked - too late!', '#D6453F'); return; }
   try {
     await deletePredFromDb(matchId, player);
     renderPredictions();
   } catch(e) {
-    showToast('Error - check connection', '#ef233c');
+    showToast('Error - check connection', '#D6453F');
   }
 }
 
@@ -1009,13 +1009,13 @@ function copyDayPredictions(date, player) {
     if (hasPred) anyPred = true;
     lines.push(`${f.home} vs ${f.away}  →  ${hasPred ? `${pred.h} - ${pred.a}` : '? - ?'}`);
   });
-  if (!anyPred) { showToast('No predictions for this day yet!', '#ef233c'); return; }
+  if (!anyPred) { showToast('No predictions for this day yet!', '#D6453F'); return; }
   lines.push('─'.repeat(36), '🏆 johnplusenglish.com/wcp');
   navigator.clipboard.writeText(lines.join('\n')).then(() => {
     const btn = document.getElementById('copybtn-' + date.replace(' ',''));
     if (btn) { btn.textContent = '✓ Copied!'; btn.classList.add('copied'); setTimeout(() => { btn.innerHTML = '📋 Copy my picks'; btn.classList.remove('copied'); }, 2000); }
     showToast('Copied to clipboard!');
-  }).catch(() => showToast('Copy failed', '#ef233c'));
+  }).catch(() => showToast('Copy failed', '#D6453F'));
 }
 
 /* ---- RESULTS PAGE ---- */
@@ -1109,7 +1109,7 @@ function selectAdminDate(d) { currentAdminDate = d; renderAdmin(); }
 async function saveResult(matchId) {
   const h = document.getElementById('ar-h-'+matchId)?.value;
   const a = document.getElementById('ar-a-'+matchId)?.value;
-  if (h === '' || a === '') { showToast('Enter both scores!', '#ef233c'); return; }
+  if (h === '' || a === '') { showToast('Enter both scores!', '#D6453F'); return; }
   showToast('Saving…', '#ff9100');
   try {
     await saveResultToDb(matchId, h, a);
@@ -1117,7 +1117,7 @@ async function saveResult(matchId) {
     if (btn) { btn.textContent = '✓ Saved'; btn.classList.add('saved'); }
     showToast(`Result saved: ${h} - ${a}`);
   } catch(e) {
-    showToast('Error saving - check connection', '#ef233c');
+    showToast('Error saving - check connection', '#D6453F');
   }
 }
 
@@ -1146,7 +1146,7 @@ async function init() {
   try {
     await loadAllData();
   } catch(e) {
-    showToast('Could not connect to database', '#ef233c');
+    showToast('Could not connect to database', '#D6453F');
   }
   hideLoading();
   renderLeaderboard();
