@@ -40,6 +40,12 @@ locally/live, set that sessionStorage key first.
 grouping study-tool links inside a content page rather than the sidebar — check that file as the
 reference if asked to add something similar elsewhere, rather than inventing a new pattern.
 
+Reading-test pages have a `.rt-split` desktop split-view (since 2026-09-06): passage sits beside its
+questions (passage sticky, own scroll), stacking below 760px. Applied only to single-passage parts
+(gapped-text/cloze parts skipped). To add/adjust, reuse the `.rt-split` block — Cambridge wraps two
+`.passage` divs; IELTS wraps the passage `.test-card` + a `.rt-questions` wrapper. The Reading
+Passages before/during/after workflow was deferred, not built.
+
 ## Read this first: shared, concurrent repo
 
 This working tree is used by multiple Claude Code sessions at once (routinely 5-9 concurrent
