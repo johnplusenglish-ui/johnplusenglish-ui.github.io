@@ -42,9 +42,13 @@ reference if asked to add something similar elsewhere, rather than inventing a n
 
 Reading-test pages have a `.rt-split` desktop split-view (since 2026-09-06): passage sits beside its
 questions (passage sticky, own scroll), stacking below 760px. Applied only to single-passage parts
-(gapped-text/cloze parts skipped). To add/adjust, reuse the `.rt-split` block — Cambridge wraps two
-`.passage` divs; IELTS wraps the passage `.test-card` + a `.rt-questions` wrapper. The Reading
-Passages before/during/after workflow was deferred, not built.
+(gapped-text/cloze parts skipped). All CSS/JS is CENTRALIZED in `/assets/reading.css` +
+`/assets/reading.js` (linked on the 6 reading pages; ielts uses `/assets/` absolute paths) — edit
+there once, do not re-inline. `reading.js` injects a "Hide/Show questions" collapse toggle above each
+split (passage reads full width when collapsed). To add a split to a new part, wrap passage+questions
+in `<div class="rt-split">` — Cambridge wraps two `.passage` divs; IELTS wraps the passage
+`.test-card` + a `.rt-questions` wrapper. The Reading Passages before/during/after workflow was
+deferred, not built.
 
 ## Read this first: shared, concurrent repo
 
