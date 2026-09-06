@@ -48,6 +48,7 @@ a{color:var(--sky);text-decoration:none}
 .g-step-n{width:26px;height:26px;border-radius:50%;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;border:1.5px solid var(--border);color:var(--muted);background:var(--card)}
 .g-step.active .g-step-n{border-color:var(--sky);color:var(--sky)}
 .g-step.done .g-step-n{background:var(--sea);border-color:var(--sea);color:#fff}
+.g-step.practised .g-step-n{border-color:var(--sea);color:var(--sea)}
 .g-step-n svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
 .g-step-t{font-size:.9rem;font-weight:600;line-height:1.3;min-width:0}
 .g-step.active .g-step-t{color:var(--sky)}
@@ -177,6 +178,10 @@ table.g-table{width:100%;border-collapse:separate;border-spacing:0;font-size:.92
 .g-complete:hover{background:var(--sea-d)}
 .g-complete.done{background:var(--sea-tint);color:var(--sea-d);border:1.5px solid var(--sea-bd)}
 .g-complete svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.g-status{font-family:inherit;font-weight:700;font-size:.92rem;border-radius:12px;padding:.75rem 1.5rem;display:inline-flex;align-items:center;gap:8px;background:var(--cream);color:var(--muted);border:1.5px solid var(--border)}
+.g-status.practised{background:var(--sea-tint);color:var(--sea-d);border-color:var(--sea-bd)}
+.g-status.mastered{background:var(--sea);color:#fff;border:none}
+.g-status svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
 .g-next{font-family:inherit;font-weight:700;font-size:.92rem;color:var(--ink);background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:.75rem 1.4rem;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:border-color .15s}
 .g-next:hover{border-color:var(--ink)}
 .g-next svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
@@ -226,9 +231,36 @@ table.g-table{width:100%;border-collapse:separate;border-spacing:0;font-size:.92
 <script>
 (function(){
   var KEY='jpe_a1grammar_progress_v1';
-  var done={}, current=0;
-  try{var raw=localStorage.getItem(KEY); if(raw){var o=JSON.parse(raw); done=o.done||{}; current=o.current||0;}}catch(e){}
-  function save(){try{localStorage.setItem(KEY,JSON.stringify({done:done,current:current}));}catch(e){}}
+  // progress[lessonId] = {status:'read'|'practised'|'mastered', ex:{exerciseIndex:{correct,total}}}.
+  // Status is derived from real exercise activity, never set directly by a click - a lesson
+  // only reaches "mastered" once every one of its exercises has been checked with a perfect
+  // score at least once (best-ever score is kept, so a later retry can't un-master it).
+  var progress={}, current=0;
+  try{
+    var raw=localStorage.getItem(KEY);
+    if(raw){
+      var o=JSON.parse(raw); current=o.current||0;
+      if(o.progress) progress=o.progress;
+      else if(o.done) Object.keys(o.done).forEach(function(id){if(o.done[id])progress[id]={status:'mastered',ex:{}};});
+    }
+  }catch(e){}
+  function save(){try{localStorage.setItem(KEY,JSON.stringify({progress:progress,current:current}));}catch(e){}}
+  function lessonStatus(id){return (progress[id]&&progress[id].status)||null;}
+  function markRead(id){if(!progress[id])progress[id]={status:'read',ex:{}};}
+  function recordExercise(lessonId,exIndex,correct,total){
+    if(!progress[lessonId])progress[lessonId]={status:'read',ex:{}};
+    var p=progress[lessonId], prev=p.ex[exIndex];
+    p.ex[exIndex]={correct:Math.max(prev?prev.correct:0,correct),total:total};
+    var l=LESSONS.filter(function(x){return x.id===lessonId;})[0];
+    // "match" exercises (a1's shared matching.js widget) never call checkExercise, so they
+    // can't contribute a score here - exclude them or a lesson using one could never master.
+    var trackableIdx=[]; if(l)l.exercises.forEach(function(ex,xi){if(ex.type!=='match')trackableIdx.push(xi);});
+    var allMastered=trackableIdx.length>0&&trackableIdx.every(function(xi){
+      var rec=p.ex[xi]; return rec&&rec.total>0&&rec.correct===rec.total;
+    });
+    p.status=allMastered?'mastered':'practised';
+    save();
+  }
   function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
   function norm(s){return String(s).toLowerCase().replace(/\s+/g,' ').replace(/[.,!?;:"']/g,'').trim();}
   // norm() strips the apostrophe (so "isn't" -> "isnt"), but that alone can't
@@ -264,16 +296,24 @@ table.g-table{width:100%;border-collapse:separate;border-spacing:0;font-size:.92
   document.getElementById('pTotal').textContent=LESSONS.length;
 
   function updateProgress(){
-    var n=Object.keys(done).filter(function(k){return done[k];}).length;
+    var n=LESSONS.filter(function(l){return lessonStatus(l.id)==='mastered';}).length;
     document.getElementById('pDone').textContent=n;
     document.getElementById('pFill').style.width=(n/LESSONS.length*100)+'%';
   }
   function renderRoad(){
     roadEl.innerHTML=LESSONS.map(function(l,i){
-      var cls='g-step'+(i===current?' active':'')+(done[l.id]?' done':'');
-      var num=done[l.id]?CHECK:(i+1);
+      var st=lessonStatus(l.id);
+      var cls='g-step'+(i===current?' active':'')+(st==='mastered'?' done':'')+(st==='practised'?' practised':'');
+      var num=st==='mastered'?CHECK:(i+1);
       return '<button class="'+cls+'" data-i="'+i+'"><span class="g-step-n">'+num+'</span><span class="g-step-t">'+esc(l.title)+'</span></button>';
     }).join('');
+  }
+  function refreshStatusUI(lessonId){
+    updateProgress(); renderRoad();
+    var el=document.getElementById('lessonStatus'); if(!el)return;
+    var st=lessonStatus(lessonId)||'read';
+    el.className='g-status '+st;
+    el.innerHTML=st==='mastered'?(CHECK+' Mastered'):(st==='practised'?'Practised - get every answer right to master this lesson':'Not practised yet');
   }
 
   // ---------- exercise renderers ----------
@@ -281,7 +321,7 @@ table.g-table{width:100%;border-collapse:separate;border-spacing:0;font-size:.92
   function fb(id){return '<div class="q-fb" id="'+id+'"></div>';}
   function showFb(id,cls,txt){var e=document.getElementById(id);if(!e)return;e.className='q-fb show '+cls;e.innerHTML=txt;}
 
-  function renderExercise(ex, exNum){
+  function renderExercise(ex, exNum, lessonId, exIndex){
     exSeq++; var eid='ex'+exSeq;
     function qn(j){return '<span class="q-num">'+(j+1)+'</span>';}
     var h='<div class="g-exercise"><div class="g-ex-title"><span class="g-ex-num">'+exNum+'</span>'+esc(ex.title)+'</div>'+(ex.sub?'<div class="g-ex-sub">'+esc(ex.sub)+'</div>':'')+'<div id="'+eid+'-body">';
@@ -326,12 +366,21 @@ table.g-table{width:100%;border-collapse:separate;border-spacing:0;font-size:.92
     } else if(ex.type==='match'){
       h+='<div class="g-match-mount" id="'+eid+'-match"></div>';
     }
+    var bodyHtml=null;
     if(ex.type==='match'){
       h+='</div></div>';
     } else {
-      h+='</div><button class="chk-btn" data-check="'+eid+'" data-type="'+ex.type+'">Check answers</button><button class="chk-link" data-show="'+eid+'">Show answers</button><span class="ex-score" id="'+eid+'-score"></span></div>';
+      h+='</div><button class="chk-btn" id="'+eid+'-checkbtn" data-check="'+eid+'" data-type="'+ex.type+'">Check answers</button>'
+        +'<button class="chk-link" data-show="'+eid+'">Show answers</button>'
+        +'<button class="chk-link" data-retry="'+eid+'" id="'+eid+'-retry" style="display:none">Try again</button>'
+        +'<span class="ex-score" id="'+eid+'-score"></span></div>';
+      // Stash the exercise's pristine body markup so retryExercise() can restore it verbatim
+      // (clears every answer/disabled state/feedback without a full lesson re-render).
+      var bodyOpenTag='<div id="'+eid+'-body">', bodyStart=h.indexOf(bodyOpenTag)+bodyOpenTag.length;
+      var bodyEnd=h.indexOf('</div><button class="chk-btn"');
+      bodyHtml=h.slice(bodyStart,bodyEnd);
     }
-    return {html:h, eid:eid, ex:ex};
+    return {html:h, eid:eid, ex:ex, bodyHtml:bodyHtml, lessonId:lessonId, exIndex:exIndex};
   }
   function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t;}return a;}
 
@@ -357,14 +406,16 @@ table.g-table{width:100%;border-collapse:separate;border-spacing:0;font-size:.92
     var prac;
     if(nEx){
       prac='<div class="g-card"><div class="g-eyebrow">Practice</div><h3 class="g-lesson-title" style="font-size:1.25rem;margin:0 0 4px">Try it yourself</h3><p style="color:var(--muted);margin:0 0 20px;font-size:.92rem">'+nEx+' exercise'+(nEx>1?'s':'')+'. Type or click your answers, then check them.</p>';
-      l.exercises.forEach(function(ex,xi){var r=renderExercise(ex,xi+1);exReg[r.eid]=r;prac+=r.html;});
+      l.exercises.forEach(function(ex,xi){var r=renderExercise(ex,xi+1,l.id,xi);exReg[r.eid]=r;prac+=r.html;});
       prac+='</div>';
     } else {
       prac='<div class="g-card"><p style="color:var(--muted);margin:0">Practice for this lesson is coming soon.</p></div>';
     }
     h+='<div class="l-pane" id="pane-practice">'+prac+'</div>';
-    var isDone=!!done[l.id];
-    h+='<div class="g-foot"><button class="g-complete'+(isDone?' done':'')+'" id="markBtn">'+(isDone?CHECK+' Completed':'Mark lesson complete')+'</button>'+
+    markRead(l.id); save();
+    var st=lessonStatus(l.id)||'read';
+    var statusLabel=st==='mastered'?(CHECK+' Mastered'):(st==='practised'?'Practised - get every answer right to master this lesson':'Not practised yet');
+    h+='<div class="g-foot"><div class="g-status '+st+'" id="lessonStatus">'+statusLabel+'</div>'+
        '<button class="g-next" id="nextBtn"'+(i>=LESSONS.length-1?' disabled':'')+'>Next lesson '+ARROW+'</button></div>';
     lessonEl.innerHTML=h;
     Object.keys(exReg).forEach(function(k){var r=exReg[k];if(r.ex.type==='match'&&window.Matching){Matching.init({mount:k+'-match',data:(r.ex.pairs||[]).map(function(p){return {term:p.left,def:p.right};}),leftLabel:r.ex.leftHead||'Match',rightLabel:r.ex.rightHead||'',setSize:(r.ex.pairs||[]).length,freqChips:[]});}});
@@ -383,7 +434,6 @@ table.g-table{width:100%;border-collapse:separate;border-spacing:0;font-size:.92
       var tr=document.querySelector('.l-tabs'); if(tr)window.scrollTo({top:tr.getBoundingClientRect().top+window.pageYOffset-16,behavior:'smooth'});
       return;
     }
-    var mark=e.target.closest('#markBtn'); if(mark){var l=LESSONS[current];done[l.id]=!done[l.id];save();renderLesson(current);return;}
     var next=e.target.closest('#nextBtn'); if(next&&!next.disabled){renderLesson(Math.min(current+1,LESSONS.length-1));return;}
     var opt=e.target.closest('.opt'); if(opt&&!opt.disabled){handleOpt(opt);return;}
     var chip=e.target.closest('.word-chip'); if(chip){handleChip(chip);return;}
@@ -391,6 +441,7 @@ table.g-table{width:100%;border-collapse:separate;border-spacing:0;font-size:.92
     var drop=e.target.closest('.cat-drop'); if(drop){handleDrop(drop);return;}
     var chk=e.target.closest('[data-check]'); if(chk){checkExercise(chk.dataset.check,chk.dataset.type);return;}
     var show=e.target.closest('[data-show]'); if(show){showAnswers(show.dataset.show);return;}
+    var retry=e.target.closest('[data-retry]'); if(retry){retryExercise(retry.dataset.retry);return;}
   });
 
   function handleOpt(opt){
@@ -440,6 +491,18 @@ table.g-table{width:100%;border-collapse:separate;border-spacing:0;font-size:.92
       body.querySelectorAll('.cat-drop').forEach(function(drop){var cat=drop.dataset.cat;drop.querySelectorAll('.cat-item').forEach(function(it){total++;var ok=it.dataset.cat===cat;it.classList.add(ok?'correct':'wrong');if(ok)correct++;});});
     }
     var sc=document.getElementById(eid+'-score'); if(sc){sc.className='ex-score show';sc.textContent=correct+' / '+total;}
+    var checkBtn=document.getElementById(eid+'-checkbtn'); if(checkBtn)checkBtn.style.display='none';
+    var retryBtn=document.getElementById(eid+'-retry'); if(retryBtn)retryBtn.style.display='';
+    // Checking (not just viewing "Show answers") is what counts as real practice -
+    // this is the actual activity signal LEARN-001's completion tracking is built on.
+    if(r.lessonId!=null&&r.exIndex!=null){recordExercise(r.lessonId,r.exIndex,correct,total);refreshStatusUI(r.lessonId);}
+  }
+  function retryExercise(eid){
+    var r=exReg[eid]; if(!r)return;
+    var bodyEl=document.getElementById(eid+'-body'); if(bodyEl)bodyEl.innerHTML=r.bodyHtml;
+    var sc=document.getElementById(eid+'-score'); if(sc){sc.className='ex-score';sc.textContent='';}
+    var checkBtn=document.getElementById(eid+'-checkbtn'); if(checkBtn)checkBtn.style.display='';
+    var retryBtn=document.getElementById(eid+'-retry'); if(retryBtn)retryBtn.style.display='none';
   }
   function showAnswers(eid){
     var r=exReg[eid]; if(!r)return; var ex=r.ex, body=document.getElementById(eid+'-body');
