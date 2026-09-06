@@ -1,24 +1,35 @@
 /* Reading-test split view for johnplusenglish (shared, single source).
    Passage sits beside its questions on wide screens (passage pinned + scrolls on
-   its own); stacks on narrow screens. Reading typography is tightened inside the
-   narrower split column so the line-numbered passage reads cleanly. */
+   its own, and DRAGGABLE via .rt-resizer so a reader can size it themselves);
+   stacks on narrow screens. */
 .rt-split{display:block}
-.rt-toggle{display:none}   /* only meaningful once the split is showing (>=760px) */
+.rt-toggle{display:none}    /* only meaningful once the split is showing (>=760px) */
+.rt-resizer{display:none}  /* same — and must not be a focusable 0-height element on mobile */
 @media(min-width:760px){
-  .rt-split{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,0.88fr);gap:28px;align-items:start}
+  /* Three tracks: passage | resizer handle | questions. JS overrides the first
+     two widths on drag/load from localStorage; this is just the initial default. */
+  .rt-split{display:grid;grid-template-columns:minmax(220px,1.12fr) 14px minmax(220px,0.88fr);gap:0;align-items:start}
   .rt-split>*{min-width:0}
   /* passage column pinned + independently scrollable (Cambridge = .passage, IELTS = .test-card) */
   .rt-split>.passage:first-child,.rt-split>.test-card:first-child{position:sticky;top:8px;max-height:calc(100vh - 84px);overflow:auto}
-  /* tighter leading so the wrapped, line-numbered passage isn't sprawled */
-  .rt-split .passage{line-height:1.6}
-  .rt-split .p5-line .ln-num{line-height:1.6}
-  .rt-split .p5-line.para-start{margin-top:.55rem}
+  /* comfortable margins: room for the scrollbar on the right so text never
+     touches it, tighter leading so the wrapped, line-numbered passage reads
+     as normal prose instead of a sprawl */
+  .rt-split .passage{line-height:1.7;padding:20px 20px 6px 12px}
+  .rt-split .p5-line{margin-bottom:.15rem}
+  .rt-split .p5-line .ln-num{line-height:1.7}
+  .rt-split .p5-line.para-start{margin-top:.9rem}
+
+  /* Draggable divider between passage and questions */
+  .rt-resizer{display:block;width:14px;align-self:stretch;position:relative;cursor:col-resize;touch-action:none}
+  .rt-resizer::after{content:'';position:absolute;left:50%;top:4px;bottom:4px;width:2px;transform:translateX(-50%);background:var(--border);border-radius:2px;transition:background .15s,width .15s}
+  .rt-resizer:hover::after,.rt-resizer.rt-dragging::after{background:var(--sky);width:3px}
 
   /* Collapsed (questions hidden): the passage's own text wraps at a fixed
      character count, so stretching it edge-to-edge just leaves dead space on
      the right. Give it a normal book-width reading column instead. */
-  .rt-split.rt-collapsed{grid-template-columns:1fr}
-  .rt-split.rt-collapsed>.rt-q{display:none}
+  .rt-split.rt-collapsed{grid-template-columns:1fr!important}
+  .rt-split.rt-collapsed>.rt-q,.rt-split.rt-collapsed>.rt-resizer{display:none}
   .rt-split.rt-collapsed>.passage:first-child,.rt-split.rt-collapsed>.test-card:first-child{
     position:static;max-height:none;overflow:visible;
     max-width:700px;margin:0 auto;
