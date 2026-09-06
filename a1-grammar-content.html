@@ -231,8 +231,31 @@ table.g-table{width:100%;border-collapse:separate;border-spacing:0;font-size:.92
   function save(){try{localStorage.setItem(KEY,JSON.stringify({done:done,current:current}));}catch(e){}}
   function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
   function norm(s){return String(s).toLowerCase().replace(/\s+/g,' ').replace(/[.,!?;:"']/g,'').trim();}
+  // norm() strips the apostrophe (so "isn't" -> "isnt"), but that alone can't
+  // bridge a contraction and its full two-word form ("is not") - they're
+  // structurally different strings. Whichever one an exercise happens to key,
+  // accept both: expand every contracted spelling in a normalised string to
+  // its full form, then compare in both directions. Never invented to widen
+  // acceptance beyond genuine equivalents (e.g. "is" alone still fails "isn't").
+  var CONTRACTION_EXPAND=[
+    ['arent','are not'],['isnt','is not'],['wasnt','was not'],['werent','were not'],
+    ['dont','do not'],['doesnt','does not'],['didnt','did not'],
+    ['cant','cannot'],['couldnt','could not'],
+    ['wont','will not'],['wouldnt','would not'],['shouldnt','should not'],['mustnt','must not'],
+    ['havent','have not'],['hasnt','has not'],['hadnt','had not'],
+    ['theres','there is']
+  ];
+  function expandContractions(normed){
+    var out=normed;
+    CONTRACTION_EXPAND.forEach(function(pair){ out=out.replace(new RegExp('\\b'+pair[0]+'\\b','g'), pair[1]); });
+    return out;
+  }
   function accepts(val,answer){ // answer may hold "/" alternatives
-    var v=norm(val); return String(answer).split('/').map(norm).some(function(a){return a===v;});
+    var v=norm(val), vExp=expandContractions(v);
+    return String(answer).split('/').some(function(raw){
+      var a=norm(raw), aExp=expandContractions(a);
+      return a===v || a===vExp || aExp===v || aExp===vExp;
+    });
   }
   var CHECK='<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
   var ARROW='<svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
