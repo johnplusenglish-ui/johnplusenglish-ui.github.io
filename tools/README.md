@@ -91,6 +91,51 @@ rather than a defect. Run:
 node tools/validate-c2.mjs
 ```
 
+## `validate-vocab.mjs`
+
+Structural + content invariants for the large vocabulary tools - word formation, adjectives,
+idioms, phrasal verbs, collocations, fixed expressions, word banks, and dependent
+prepositions (`word-formation-content.html`, `adjectives-content.html`, `idioms-content.html`,
+`phrasal-verbs-content.html`, `collocations-content.html`, `fixed-expressions-content.html`,
+`word-banks-content.html`, `prepositions-content.html`). These datasets run 500-1500+ records
+each, hand-authored - the kind of mistake that's obvious in a 20-item exam page hides easily
+at that size. Run:
+
+```bash
+node tools/validate-vocab.mjs
+```
+
+Same ERROR/WARN convention as the exam validators.
+
+### What it checks
+
+- **Word formation** - every practised form must actually appear in its own example
+  (word-boundary match, trying every `/`-alternative with any trailing `(preposition)` gloss
+  stripped) - this is a permanent regression test for the WF-001/WF-002 defects (a form that
+  doesn't match its example gets silently dropped from practice, with no visible error).
+  Duplicate `pos`+`form` pairs are flagged (the same spelling legitimately serving two parts
+  of speech, e.g. verb "change" / noun "change", is NOT a duplicate).
+- **Phrasal verbs** - a headword repeated across theme categories is normal polysemy (e.g.
+  "take off" ×4), but WARNs if two of its senses have high word-overlap in their definitions -
+  a permanent regression test for the PV-001 defect class (same sense, restated under a
+  second category).
+- **Idioms** - every category tag actually exists in `ID_GROUPS` (an unregistered category is
+  unbrowsable dead weight), no duplicate idiom text, `freq`/`t` values from the known sets.
+- **Adjectives, collocations** - no duplicate headword+category pairs, `freq`/`type` values
+  from the known sets.
+- **Fixed expressions** - no duplicate expression within a category, `reg` from
+  formal/informal/neutral, `level` a real CEFR band.
+- **Word banks** - every entry is the expected 4-tuple `[word, pos, def, example]`, `pos` from
+  the declared set, no duplicate word within a tier.
+- **Dependent prepositions** - every entry is the expected 5-tuple, the example actually
+  contains a `___` gap, the answer preposition isn't empty, no duplicate combo within a
+  category.
+- **Every page** - no em dash (`—` / `&mdash;`) and no spaced en dash.
+
+Duplicate/near-duplicate checks that rely on exact structural facts (same headword+category,
+same word+pos) are `ERR`; the phrasal-verb sense-overlap check is a fuzzy heuristic and is
+`WARN` only - a human should read the flagged pair and decide, the same way the PV-001 pass did.
+
 ## `build-c1-manifest.mjs` + item analytics
 
 The C1 Use of English (Parts 1–4) and Reading (Parts 5–8) pages log **anonymous, aggregate**
@@ -127,12 +172,13 @@ default `c1a_`). B2 First Reading has only Parts 5-7 (no Part 8).
 ## `hooks/pre-commit`
 
 Optional git hook that runs the relevant validator automatically - the matching level's
-validator runs when one of its pages is staged (C1, C2, B2 or B1). Untouched levels are
-skipped, so a commit to one doesn't run the others' checks.
+validator runs when one of its pages is staged (C1, C2, B2 or B1), and `validate-vocab.mjs`
+runs when any of the 8 vocabulary pages is staged. Untouched pages are skipped, so a commit
+to one doesn't run the others' checks.
 
 ```bash
 cp tools/hooks/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
 ```
 
-Once installed, a commit that touches an exam page and fails its validator is blocked
-(override a single commit with `git commit --no-verify`).
+Once installed, a commit that touches an exam or vocabulary page and fails its validator is
+blocked (override a single commit with `git commit --no-verify`).

@@ -36,6 +36,13 @@ case "$staged" in
     ;;
 esac
 
+case "$staged" in
+  *word-formation-content.html*|*adjectives-content.html*|*idioms-content.html*|*phrasal-verbs-content.html*|*collocations-content.html*|*fixed-expressions-content.html*|*word-banks-content.html*|*prepositions-content.html*)
+    echo "Running vocabulary validation…"
+    node tools/validate-vocab.mjs || fail=1
+    ;;
+esac
+
 if [ "$fail" = "1" ]; then
   echo ""
   echo "Commit blocked: fix the errors above, or use 'git commit --no-verify' to override."
