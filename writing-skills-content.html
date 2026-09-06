@@ -142,6 +142,44 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 /* Structure template box */
 .structure{background:var(--sky-light);border:1.5px solid rgba(33,118,255,.15);border-radius:var(--radius-sm);padding:1rem 1.2rem;margin:.8rem 0}
 .structure-label{font-family:Outfit,sans-serif;font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--sky);margin-bottom:.5rem;font-weight:600}
+
+/* Plan-first gate: hides the model until the student has sketched their own
+   answer, so reading it isn't the first thing that happens. */
+.plan-gate{background:var(--sky-light);border:1.5px solid rgba(33,118,255,.15);border-radius:var(--radius-sm);padding:1.1rem 1.3rem;margin:.8rem 0}
+.plan-gate-label{font-family:Outfit,sans-serif;font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--sky);margin-bottom:.5rem;font-weight:600}
+.plan-gate p{font-size:.88rem;margin:0 0 .6rem;color:var(--ink)}
+.plan-textarea{width:100%;min-height:90px;font-family:Outfit,sans-serif;font-size:.88rem;padding:.7rem .8rem;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--card);color:var(--ink);resize:vertical;margin-bottom:.7rem}
+.plan-textarea:focus{outline:none;border-color:var(--sky)}
+.reveal-btn{font-family:Outfit,sans-serif;font-size:.85rem;font-weight:700;padding:.55rem 1.1rem;border:none;border-radius:var(--radius-sm);background:var(--sky);color:#fff;cursor:pointer;transition:background .15s}
+.reveal-btn:hover{background:#185FD6}
+.model-wrap{display:none}
+.model-wrap.show{display:block}
+
+/* "Notice this" inline annotations inside a model answer */
+.notice{background:var(--sea-tint);color:var(--sea-d);padding:.03rem .2rem;border-radius:4px;cursor:pointer;font-weight:600;border-bottom:1.5px dashed var(--sea)}
+.notice:hover,.notice.open{background:var(--sea)}
+.notice.open{color:#fff;border-bottom-color:transparent}
+.notice-note{display:none;font-family:Outfit,sans-serif;font-size:.78rem;background:var(--card);border:1.5px solid var(--sea);border-left:4px solid var(--sea);border-radius:6px;padding:.5rem .7rem;margin:.4rem 0;color:var(--ink)}
+.notice-note.show{display:block}
+.notice-note b{color:var(--sea-d)}
+
+/* Checklist the student applies to their own writing */
+.checklist{background:var(--cream);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:1rem 1.2rem;margin:.8rem 0}
+.checklist-label{font-family:Outfit,sans-serif;font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.5rem;font-weight:600}
+.checklist ul{list-style:none;padding:0;margin:0}
+.checklist li{display:flex;align-items:flex-start;gap:.55rem;font-size:.88rem;color:var(--ink);margin-bottom:.5rem;cursor:pointer}
+.checklist li:last-child{margin-bottom:0}
+.checklist input[type=checkbox]{margin-top:.2rem;width:16px;height:16px;accent-color:var(--sea-d);flex-shrink:0;cursor:pointer}
+.checklist li.checked span{color:var(--muted);text-decoration:line-through}
+
+/* Now-write task */
+.now-write{background:var(--card);border:1.5px dashed var(--border);border-radius:var(--radius-sm);padding:1.1rem 1.3rem;margin:.8rem 0}
+.now-write-label{font-family:Outfit,sans-serif;font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.5rem;font-weight:600}
+.now-write p{font-size:.88rem;margin:0 0 .6rem;color:var(--ink)}
+.now-write-textarea{width:100%;min-height:120px;font-family:Outfit,sans-serif;font-size:.88rem;padding:.7rem .8rem;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--cream);color:var(--ink);resize:vertical}
+.now-write-textarea:focus{outline:none;border-color:var(--sky)}
+.now-write-saved{font-size:.72rem;color:var(--muted);margin-top:.4rem;display:none}
+.now-write-saved.show{display:block}
 .structure ol{padding-left:1.1rem;margin:0;font-size:.88rem}
 .structure li{margin-bottom:.4rem;color:var(--ink);line-height:1.55}
 
@@ -272,13 +310,27 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
         <div class="card">
           <h3 class="section-title-sm">Model answer</h3>
           <p class="muted">Topic: Some people believe that social media does more harm than good. Do you agree?</p>
+
+          <div class="plan-gate" id="ws-gate-opinion">
+            <div class="plan-gate-label">Plan first</div>
+            <p>Before you read the model, take two minutes to note your own position and two reasons for it. You're not writing the essay yet, just the skeleton.</p>
+            <textarea class="plan-textarea" data-uid="opinion" placeholder="My position... My two reasons..."></textarea>
+            <button class="reveal-btn" onclick="revealModel('opinion')">Reveal model answer</button>
+          </div>
+
+          <div class="model-wrap" id="ws-model-opinion">
           <div class="model">
-            <div class="model-label">Model answer</div>
-            <p>In the past two decades, social media has become deeply embedded in daily life, shaping how we communicate, consume news and form opinions. While these platforms undoubtedly offer certain benefits, I believe the harm they cause - particularly to mental health and the quality of public discourse - outweighs the advantages.</p>
-            <p>The most pressing concern is the impact on wellbeing, especially among young people. Research consistently links heavy social media use to increased anxiety, depression and poor self-image. The platforms are designed to maximise engagement, not to protect users, and the resulting cycle of comparison and validation-seeking is corrosive. This is not a minor side effect; it is a structural feature of how these services operate.</p>
+            <div class="model-label">Model answer <span style="font-weight:400;text-transform:none;letter-spacing:normal;color:var(--muted)">— click a highlighted phrase for a note</span></div>
+            <p>In the past two decades, social media has become deeply embedded in daily life, shaping how we communicate, consume news and form opinions. While these platforms undoubtedly offer certain benefits, <span class="notice" data-note-id="n-opinion-1" onclick="toggleNotice(this)">I believe the harm they cause - particularly to mental health and the quality of public discourse - outweighs the advantages</span>.</p>
+            <div class="notice-note" id="n-opinion-1"><b>Notice this:</b> the thesis, one clear sentence, right in the introduction. The reader knows your exact position before a single argument has been made. Don't make them wait for it.</div>
+            <p>The most pressing concern is the impact on wellbeing, especially among young people. Research consistently links heavy social media use to increased anxiety, depression and poor self-image. The platforms are designed to maximise engagement, not to protect users, and <span class="notice" data-note-id="n-opinion-2" onclick="toggleNotice(this)">this is not a minor side effect; it is a structural feature of how these services operate</span>.</p>
+            <div class="notice-note" id="n-opinion-2"><b>Notice this:</b> a semicolon links two closely related ideas instead of starting a new sentence, and the second half reframes the point, from "this happens sometimes" to "this is built into the system." A strong way to close a paragraph.</div>
             <p>Equally troubling is the degradation of public conversation. Algorithms prioritise content that provokes strong emotional reactions, which means outrage, misinformation and polarisation are rewarded while nuance is buried. The consequences are visible in political life across the world: electorates are more divided, conspiracy theories spread faster, and trust in institutions has eroded.</p>
-            <p>Supporters argue that social media connects people across distances and gives a voice to the marginalised. This is true, but the same tools that enable connection also enable harassment, surveillance and manipulation - and the platforms have shown little willingness to address these problems unless compelled by legislation.</p>
-            <p>In conclusion, while social media is not without value, the scale of the damage it inflicts - on individual health and on the fabric of democratic society - means that, on balance, it does considerably more harm than good.</p>
+            <p><span class="notice" data-note-id="n-opinion-3" onclick="toggleNotice(this)">Supporters argue that social media connects people across distances and gives a voice to the marginalised. This is true, but</span> the same tools that enable connection also enable harassment, surveillance and manipulation - and the platforms have shown little willingness to address these problems unless compelled by legislation.</p>
+            <div class="notice-note" id="n-opinion-3"><b>Notice this:</b> the counter-argument, handled properly. State the opposing view fairly first ("this is true"), don't strawman it, then pivot with "but" to refute it. Never skip this step in an opinion essay.</div>
+            <p><span class="notice" data-note-id="n-opinion-4" onclick="toggleNotice(this)">In conclusion, while social media is not without value, the scale of the damage it inflicts - on individual health and on the fabric of democratic society - means that, on balance, it does considerably more harm than good.</span></p>
+            <div class="notice-note" id="n-opinion-4"><b>Notice this:</b> the thesis is restated in different words, not copy-pasted from the introduction, and no new argument appears. "On balance" signals a measured judgement rather than a blunt repeat.</div>
+          </div>
           </div>
         </div>
 
@@ -291,7 +343,24 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
             <li>Introducing a new argument in the conclusion.</li>
           </ul>
         </div>
-      
+
+        <div class="checklist">
+          <div class="checklist-label">Check your own answer against this</div>
+          <ul>
+            <li><input type="checkbox" data-key="opinion-1" id="c-opinion-1"><label for="c-opinion-1"><span>My position is stated clearly in the introduction, not hinted at.</span></label></li>
+            <li><input type="checkbox" data-key="opinion-2" id="c-opinion-2"><label for="c-opinion-2"><span>Each body paragraph makes one point and develops it with an example or reason, not just a list.</span></label></li>
+            <li><input type="checkbox" data-key="opinion-3" id="c-opinion-3"><label for="c-opinion-3"><span>I've acknowledged the other side fairly before refuting it.</span></label></li>
+            <li><input type="checkbox" data-key="opinion-4" id="c-opinion-4"><label for="c-opinion-4"><span>My conclusion restates my position in new words and adds no new argument.</span></label></li>
+          </ul>
+        </div>
+
+        <div class="now-write">
+          <div class="now-write-label">Now write</div>
+          <p>Using your plan from earlier, write your own opinion essay on this topic in about 250 words. Come back to the checklist above when you're done.</p>
+          <textarea class="now-write-textarea" data-uid="opinion" placeholder="Write your essay here..."></textarea>
+          <div class="now-write-saved">Saved</div>
+        </div>
+
 
       <div class="card">
         <h3 class="section-title-sm">Useful language</h3>
@@ -3050,6 +3119,69 @@ function switchLevel(btn, uid, level) {
   });
   try { localStorage.setItem('jpe-writing-skills-level-' + uid, level); } catch (e) {}
 }
+
+/* ── Active-learning kit: plan-gate, notice annotations, checklist, now-write ── */
+
+// Reveal a model answer once the student has had a go at planning their own.
+function revealModel(uid) {
+  const wrap = document.getElementById('ws-model-' + uid);
+  if (wrap) wrap.classList.add('show');
+  const gate = document.getElementById('ws-gate-' + uid);
+  if (gate) gate.style.display = 'none';
+  try { localStorage.setItem('jpe-ws-revealed-' + uid, '1'); } catch (e) {}
+}
+// Auto-save the planning notes as the student types, and restore on return.
+document.querySelectorAll('.plan-textarea[data-uid]').forEach(ta => {
+  const key = 'jpe-ws-plan-' + ta.dataset.uid;
+  try { const saved = localStorage.getItem(key); if (saved) ta.value = saved; } catch (e) {}
+  ta.addEventListener('input', () => { try { localStorage.setItem(key, ta.value); } catch (e) {} });
+});
+// If the student already revealed this model on a previous visit, skip the
+// gate straight away rather than making them plan again.
+document.querySelectorAll('.model-wrap[id^="ws-model-"]').forEach(wrap => {
+  const uid = wrap.id.replace('ws-model-', '');
+  let revealed = null;
+  try { revealed = localStorage.getItem('jpe-ws-revealed-' + uid); } catch (e) {}
+  if (revealed === '1') revealModel(uid);
+});
+
+// "Notice this" — click a highlighted phrase in a model answer to see why it
+// works. The note lives after the enclosing paragraph (not right next to the
+// inline mark), so marks link to notes by id rather than DOM adjacency.
+function toggleNotice(el) {
+  const note = document.getElementById(el.dataset.noteId);
+  if (!note) return;
+  const opening = !note.classList.contains('show');
+  const model = el.closest('.model');
+  model.querySelectorAll('.notice-note.show').forEach(n => n.classList.remove('show'));
+  model.querySelectorAll('.notice.open').forEach(m => m.classList.remove('open'));
+  if (opening) { note.classList.add('show'); el.classList.add('open'); }
+}
+
+// Checklist: ticking persists per genre item, and strikes the line through.
+document.querySelectorAll('.checklist input[type=checkbox][data-key]').forEach(cb => {
+  const key = 'jpe-ws-check-' + cb.dataset.key;
+  try { if (localStorage.getItem(key) === '1') { cb.checked = true; cb.closest('li').classList.add('checked'); } } catch (e) {}
+  cb.addEventListener('change', () => {
+    cb.closest('li').classList.toggle('checked', cb.checked);
+    try { localStorage.setItem(key, cb.checked ? '1' : '0'); } catch (e) {}
+  });
+});
+
+// Now-write: autosave the student's own attempt, with a small saved indicator.
+document.querySelectorAll('.now-write-textarea[data-uid]').forEach(ta => {
+  const key = 'jpe-ws-write-' + ta.dataset.uid;
+  const savedNote = ta.parentElement.querySelector('.now-write-saved');
+  try { const saved = localStorage.getItem(key); if (saved) { ta.value = saved; if (savedNote) savedNote.classList.add('show'); } } catch (e) {}
+  let saveTimer = null;
+  ta.addEventListener('input', () => {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => {
+      try { localStorage.setItem(key, ta.value); } catch (e) {}
+      if (savedNote) savedNote.classList.add('show');
+    }, 400);
+  });
+});
 
 // Wire up print buttons to open modal
 document.querySelectorAll('.action-btn[data-print]').forEach(btn => {
