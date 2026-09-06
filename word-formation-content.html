@@ -683,13 +683,23 @@ function buildPool() {
     f.rows.forEach(function(r) {
       var form = r.form.split('/')[0].trim();
       var ex = r.example;
-      var idx = ex.toLowerCase().indexOf(form.toLowerCase());
-      if (idx === -1) return;
-      var gapped = ex.slice(0, idx) + '___' + ex.slice(idx + form.length);
+      // Word-boundary-aware match: the form must start at a genuine word
+      // boundary (previous char, if any, is non-letter) so we never match
+      // a substring inside an unrelated word (e.g. "count" inside
+      // "discount"), and we capture any letters that continue the SAME
+      // word afterwards so an inflected surface form actually present in
+      // the sentence (e.g. "consumer" -> "Consumers") is blanked and keyed
+      // as the complete word, never leaving a stray suffix outside the gap.
+      var re = new RegExp('(^|[^a-zA-Z])(' + form.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '[a-zA-Z]*)', 'i');
+      var m = re.exec(ex);
+      if (!m) return;
+      var full = m[2];
+      var idx = m.index + m[1].length;
+      var gapped = ex.slice(0, idx) + '___' + ex.slice(idx + full.length);
       // Real Cambridge Part 3 never leaves the word unchanged: a form identical
       // to the family label is a pointless item, so keep it out of the exam pool.
       var noTransform = form.toLowerCase() === f.label.toLowerCase();
-      pool.push({ sentence: gapped, stem: stem, answer: form, exam: !!r.exam && !noTransform });
+      pool.push({ sentence: gapped, stem: stem, answer: full.toLowerCase(), exam: !!r.exam && !noTransform });
     });
   });
   return pool;
