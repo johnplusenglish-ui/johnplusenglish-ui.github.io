@@ -40,16 +40,6 @@ locally/live, set that sessionStorage key first.
 grouping study-tool links inside a content page rather than the sidebar — check that file as the
 reference if asked to add something similar elsewhere, rather than inventing a new pattern.
 
-Reading-test pages have a `.rt-split` desktop split-view (since 2026-09-06): passage sits beside its
-questions (passage sticky, own scroll), stacking below 760px. Applied only to single-passage parts
-(gapped-text/cloze parts skipped). All CSS/JS is CENTRALIZED in `/assets/reading.css` +
-`/assets/reading.js` (linked on the 6 reading pages; ielts uses `/assets/` absolute paths) — edit
-there once, do not re-inline. `reading.js` injects a "Hide/Show questions" collapse toggle above each
-split (passage reads full width when collapsed). To add a split to a new part, wrap passage+questions
-in `<div class="rt-split">` — Cambridge wraps two `.passage` divs; IELTS wraps the passage
-`.test-card` + a `.rt-questions` wrapper. The Reading Passages before/during/after workflow was
-deferred, not built.
-
 ## Read this first: shared, concurrent repo
 
 This working tree is used by multiple Claude Code sessions at once (routinely 5-9 concurrent
@@ -108,6 +98,19 @@ sky-blue timer PILL only). All 20 speaking/exam `-content` pages link both and k
 `.timer-section`/`.timer-row` container + progress bar inline. Do NOT re-inline a timer; link the
 shared files. For per-page behaviour at zero (e.g. reveal a model answer), pass a 4th arg to
 `timerInit` — the `onEnd` callback (shrink-it passes `revealModel`, hot-takes `showDiscuss`).
+
+Reading-test pages (C1/C2/B2/B1 reading tests + IELTS reading; NOT b2fs, whose test picker is
+broken by a pre-existing unrelated bug — `buildPicker`/`switchType` undefined) use the normal
+STACKED layout (passage, then questions below) — a split-view/side-by-side layout was tried and
+explicitly rejected (2026-09-07), don't reintroduce it. Instead, `/assets/reading-peek.css` +
+`/assets/reading-peek.js` add a hover/tap/keyboard-focus "peek" overlay: hovering, tapping, or
+tab-focusing any question row (anything with `[data-qi]` or `[data-n]` — covers MCQ/matching/T-F-NG
+rows) pops up a floating card showing that part's passage text, so a reader doesn't need to scroll
+back up. Pairing is structural, not ID-based: for each `.part-section`, the FIRST `.passage`-classed
+element is treated as the real passage — note the questions container also carries class="passage"
+(shared styling only) on these pages, so exclusions must check the specific passage element, not the
+class name. Bottom-sheet style below 760px. Do not re-inline; link the shared files on any reading
+page that gets this treatment.
 
 To change a category or tool row: edit `/assets/sidebar-nav.html` once — it applies to every page
 immediately, no multi-file sed needed. To change sidebar styling: edit `/assets/shell.css`. To

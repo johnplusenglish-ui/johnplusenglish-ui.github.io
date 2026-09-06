@@ -1,0 +1,25 @@
+/* Reading tests: "peek at the passage" overlay (shared, single source).
+   Layout stays the normal stacked one (passage, then questions below it).
+   Hovering, tapping, or keyboard-focusing a question surfaces the passage text
+   for that part in a floating panel, so a reader doesn't have to scroll back up.
+   Injected/positioned by reading-peek.js. */
+.rt-peek{
+  position:fixed;top:64px;right:24px;z-index:500;
+  width:min(46vw,520px);max-height:70vh;overflow:auto;
+  background:var(--card);border:1.5px solid var(--border);border-radius:14px;
+  box-shadow:var(--shadow-md);padding:18px 22px 20px;
+  font-size:.92rem;line-height:1.75;
+  opacity:0;transform:translateY(-10px);pointer-events:none;
+  transition:opacity .15s ease,transform .15s ease;
+}
+.rt-peek.show{opacity:1;transform:translateY(0);pointer-events:auto}
+.rt-peek-label{font-family:'Outfit',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.rt-peek-close{font-family:'Outfit',sans-serif;font-size:.7rem;font-weight:700;color:var(--muted);background:none;border:none;cursor:pointer;padding:2px 4px;letter-spacing:normal;text-transform:none}
+.rt-peek-close:hover{color:var(--ink)}
+.rt-peek-body .passage-title{font-weight:800;text-align:center;font-size:1rem;margin-bottom:12px}
+/* a subtle hint so it's clear a question can be hovered, without changing layout */
+[data-qi],[data-n]{cursor:pointer}
+@media(max-width:760px){
+  /* Small screens: bottom sheet instead of a right-side floating card */
+  .rt-peek{position:fixed;left:12px;right:12px;top:auto;bottom:12px;width:auto;max-height:55vh}
+}
