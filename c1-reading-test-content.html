@@ -903,11 +903,43 @@ function splitPassageLines(text, maxChars){
   if(cur) lines.push(cur);
   return lines;
 }
+/* How many characters actually fit on one line of the passage box, right now,
+   at its real rendered width, measured with the exact font the passage uses,
+   so the "line 5 / line 10" markers fill the box instead of wrapping at a
+   fixed character count tuned for one particular width.
+   NOTE: #p5Passage itself can still be display:none (its part tab not yet
+   active) when this first runs, which would read clientWidth 0, so measure
+   .wrap instead (always visible, the outer content column) and subtract the
+   known fixed padding chain down to the passage text: .wrap's own 2rem sides,
+   .test-card's 20px sides, .passage's own 4px sides. Falls back to the old
+   fixed value if measurement ever fails for some reason. */
+function passageMaxChars(){
+  try{
+    var wrap = document.querySelector('.wrap');
+    var width = (wrap && wrap.clientWidth) || 0;
+    if(!width) return 64;
+    width -= (32*2) + (20*2) + (4*2); // .wrap + .test-card + .passage padding
+    if(width<=0) return 64;
+    var el = document.getElementById('p5Passage');
+    var cs = el ? getComputedStyle(el) : null;
+    passageMaxChars._canvas = passageMaxChars._canvas || document.createElement('canvas');
+    var ctx = passageMaxChars._canvas.getContext('2d');
+    ctx.font = (cs&&cs.fontStyle||'normal')+' '+(cs&&cs.fontWeight||'400')+' '+(cs&&cs.fontSize||'15.2px')+' '+(cs&&cs.fontFamily||'Outfit, sans-serif');
+    var sample = 'The quick brown fox jumps over the lazy dog near the riverbank at dawn, watching quietly.';
+    var avgCharWidth = ctx.measureText(sample).width / sample.length;
+    if(!avgCharWidth) return 64;
+    var linePad = 1.7 * 16; // the .ln-num column + gap, roughly
+    var usable = Math.max(width - linePad, 100);
+    var chars = Math.floor(usable / avgCharWidth);
+    return Math.max(40, Math.min(160, chars));
+  }catch(e){ return 64; }
+}
 /* Build the numbered-line model for the current P5 passage. */
 function buildP5Lines(){
   const model = []; let no = 0;
+  const maxChars = passageMaxChars();
   P5.passage.forEach((para, pi) => {
-    splitPassageLines(para, 64).forEach((text, li) => {
+    splitPassageLines(para, maxChars).forEach((text, li) => {
       no++;
       model.push({ no, text, paraStart: li === 0 && pi > 0 });
     });
@@ -944,6 +976,30 @@ function renderP5(){
       <div class="mcq-opts">${q.opts.map((o,oi)=>`<button class="mcq-opt" data-oi="${oi}" onclick="pickAns('p5',${qi},${oi})"><span class="mcq-letter">${String.fromCharCode(65+oi)}</span><span>${o}</span></button>`).join('')}</div>
     </div>`;}).join('');
 }
+/* Re-flow just the passage text (never the questions/answers) if the box is
+   resized, so it keeps filling its actual width instead of staying locked to
+   whatever width it was measured at on first render. Reuses the line refs
+   already computed by renderP5(), so this never touches answer state. */
+function reflowP5Passage(){
+  var el=document.getElementById('p5Passage');
+  if(!el || !el.innerHTML) return;
+  var model=buildP5Lines();
+  var refLines=new Set();
+  P5.questions.forEach(q => { if(q.lineWord && q._line) refLines.add(q._line); });
+  var linesHtml=model.map(l => {
+    var showNum=(l.no % 5 === 0) || refLines.has(l.no);
+    var cls='ln-num' + (refLines.has(l.no) ? ' ref' : '');
+    return `<div class="p5-line${l.paraStart ? ' para-start' : ''}"><span class="${cls}">${showNum ? l.no : ''}</span><span class="ln-text">${l.text}</span></div>`;
+  }).join('');
+  el.innerHTML=`<div class="passage-title">${P5.title}</div>` + linesHtml;
+}
+(function(){
+  var t=null;
+  window.addEventListener('resize', function(){
+    clearTimeout(t);
+    t=setTimeout(reflowP5Passage, 200);
+  });
+})();
 function renderMatch(prefix, data, sectionSel){
   document.getElementById(prefix+'Title').textContent = data.title;
   document.getElementById(prefix+'Texts').innerHTML = data.texts.map(t=>`
