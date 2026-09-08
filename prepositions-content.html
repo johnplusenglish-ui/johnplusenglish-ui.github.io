@@ -93,6 +93,11 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .bar-filters{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;flex:1;min-width:0}
 .sel{font-family:inherit;font-size:.82rem;font-weight:600;background:var(--card);border:1.5px solid var(--border);border-radius:9px;padding:.5rem .6rem;color:var(--ink);cursor:pointer;min-height:38px}
 .sel:hover{border-color:var(--ink)}
+.studyset-lead{font-size:.82rem;font-weight:700;color:var(--ink)}
+.studyset-of{font-size:.82rem;color:var(--muted)}
+.studyset-browse,.studyset-back{font-family:inherit;font-size:.8rem;font-weight:700;background:transparent;border:none;color:var(--sky);cursor:pointer;padding:.45rem .3rem;margin-left:auto}
+.studyset-browse:hover,.studyset-back:hover{text-decoration:underline}
+.studyset-hint{font-size:.78rem;color:var(--muted);line-height:1.45;margin:-.35rem 0 .7rem}
 .sel:focus{outline:none;border-color:var(--accent)}
 .sel.set{border-color:var(--accent);color:var(--accent)}
 .search{position:relative;flex:1;min-width:180px;max-width:380px}
@@ -1065,6 +1070,9 @@ function depMatch(e){
   return true;
 }
 function depShown(){return depScope().filter(depMatch)}
+var depMode='sets', depSetIdx=0;
+function depStudySets(){var p=DEP_SORTED,out=[];for(var i=0;i<p.length;i+=12){out.push(p.slice(i,i+12));}return out;}
+function depIsSets(){return depCat==='all'&&depMode==='sets'&&!depQ;}
 function depRow(e){
   var ex=e.ex?e.ex.replace('___','<b>'+esc(e.an)+'</b>'):'';
   return '<div class="lr" data-row><span class="lr-h">'+esc(e.head)+'</span><span class="lr-p">'+esc(e.prep)+'<span class="w-ty">'+TYPE_LABEL[e.ty]+'</span></span>'
@@ -1088,12 +1096,27 @@ function renderDepPane(){
     ? Object.keys(dep_D).length+' categories · '+base.length.toLocaleString('en-GB')+' entries'
     : base.length+' entries · '+TYPE_ORDER.filter(function(t){return tn[t]}).map(function(t){return tn[t]+' '+(tn[t]===1?{V:'verb',N:'noun',Adj:'adjective'}[t]:TYPE_PLURAL[t].toLowerCase())}).join(', ')+(g?' · '+g.name:'');
   if(depType!=='all'&&!tn[depType]) depType='all';
+  if(depIsSets()){
+    var sets=depStudySets(); if(depSetIdx>=sets.length) depSetIdx=0;
+    document.getElementById('sub-dependent').textContent='Study sets · '+DEP_SORTED.length.toLocaleString('en-GB')+' dependent prepositions';
+    document.getElementById('body-dependent').innerHTML='<div class="bar"><div class="bar-filters">'
+      +'<span class="studyset-lead">Study set</span>'
+      +'<select class="sel set" id="depSetSel">'+sets.map(function(s,i){return '<option value="'+i+'"'+(i===depSetIdx?' selected':'')+'>Set '+(i+1)+' ('+s.length+')</option>';}).join('')+'</select>'
+      +'<span class="studyset-of">of '+sets.length+'</span>'
+      +'<button class="studyset-browse" id="depBrowseAll">Browse all</button>'
+      +'</div></div>'
+      +'<div class="studyset-hint">A short set to learn or review - about a dozen at a time. Work through the sets in order, or choose Browse all for the full A-Z list and filters.</div>'
+      +'<div class="sheet ledger" id="depSheet"></div>';
+    document.getElementById('depSetSel').addEventListener('change',function(e){depSetIdx=+e.target.value;renderDepSheet();scrollPaneIntoView('dependent');});
+    document.getElementById('depBrowseAll').addEventListener('click',function(){depMode='browse';renderDepPane();});
+    renderDepSheet(); return;
+  }
   var h='<div class="bar"><div class="bar-filters">'
     +'<select class="sel'+(depType!=='all'?' set':'')+'" id="depTypeSel"><option value="all">All types ('+base.length.toLocaleString('en-GB')+')</option>'
     +TYPE_ORDER.filter(function(t){return tn[t]}).map(function(t){return '<option value="'+t+'"'+(depType===t?' selected':'')+'>'+TYPE_PLURAL[t]+' ('+tn[t]+')</option>'}).join('')
     +'</select>'
     +'<label class="search"><input type="search" id="depSearch" placeholder="'+(isAll?'Search all 1,000+ entries…':'Search this category…')+'" value="'+esc(depQ)+'" autocomplete="off"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="20" y1="20" x2="16.5" y2="16.5"/></svg></label>'
-    +'</div></div>'
+    +(isAll?'<button class="studyset-back" id="depToSets">Study sets</button>':'')+'</div></div>'
     +'<div id="depStrip"></div><div class="sheet ledger" id="depSheet"></div>';
   document.getElementById('body-dependent').innerHTML=h;
   document.getElementById('depTypeSel').addEventListener('change',function(e){depType=e.target.value;e.target.classList.toggle('set',depType!=='all');renderDepSheet()});
@@ -1102,9 +1125,14 @@ function renderDepPane(){
     var v=e.target.value.trim().toLowerCase();
     depSearchTimer=setTimeout(function(){depQ=v;renderDepSheet()},160);
   });
+  var toSets=document.getElementById('depToSets'); if(toSets)toSets.addEventListener('click',function(){depMode='sets';depQ='';renderDepPane();});
   renderDepSheet();
 }
 function renderDepSheet(){
+  if(depIsSets()){
+    var sets=depStudySets(), cur=sets[depSetIdx]||[];
+    var sheet=document.getElementById('depSheet'); sheet.innerHTML=cur.map(depRow).join(''); depSizeLedger(sheet); return;
+  }
   var list=depShown(), h='', strip='';
   if(!list.length){
     h='<div class="nomatch">Nothing matches.</div>';

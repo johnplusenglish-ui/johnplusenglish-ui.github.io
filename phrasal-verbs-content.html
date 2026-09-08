@@ -664,6 +664,11 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .bar-filters{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;flex:1;min-width:0}
 .sel{font-family:inherit;font-size:.82rem;font-weight:600;background:var(--card);border:1.5px solid var(--border);border-radius:9px;padding:.5rem .6rem;color:var(--ink);cursor:pointer;min-height:38px}
 .sel:hover{border-color:var(--ink)}
+.studyset-lead{font-size:.82rem;font-weight:700;color:var(--ink)}
+.studyset-of{font-size:.82rem;color:var(--muted)}
+.studyset-browse,.studyset-back{font-family:inherit;font-size:.8rem;font-weight:700;background:transparent;border:none;color:var(--sky);cursor:pointer;padding:.45rem .3rem;margin-left:auto}
+.studyset-browse:hover,.studyset-back:hover{text-decoration:underline}
+.studyset-hint{font-size:.78rem;color:var(--muted);line-height:1.45;margin:-.35rem 0 .7rem}
 .sel:focus{outline:none;border-color:var(--accent)}
 .sel.set{border-color:var(--accent);color:var(--accent)}
 .search{position:relative;flex:1;min-width:180px;max-width:380px}
@@ -1527,6 +1532,10 @@ function pvMatch(e){
   return true;
 }
 function pvShown(){return pvScope().filter(pvMatch)}
+var pvMode='sets', pvSetIdx=0;
+function pvStudyPool(){return PV_SORTED.filter(function(e){return e.freq==='common';});}
+function pvStudySets(){var p=pvStudyPool(),out=[];for(var i=0;i<p.length;i+=12){out.push(p.slice(i,i+12));}return out;}
+function pvIsSets(){return pvCat==='all'&&pvMode==='sets'&&!pvQ;}
 function pvRow(e){
   return '<div class="lr" data-row><div class="lr-h">'+esc(e.pv)+'<span class="fdot '+(PV_TIER[e.freq]||'t3')+'" title="'+PV_FREQ_LABEL[e.freq]+'"></span></div>'
     +'<div class="lr-d">'+esc(e.def)+'</div><div class="lr-x">'+pvHighlight(esc(e.ex),e.pv)+'</div></div>';
@@ -1544,21 +1553,42 @@ function renderPvPane(){
   var g=groupOf(PV_GROUPS,pvCat);
   document.getElementById('sub-common-phrasal-verbs').textContent=isAll?pvData.length+' categories · '+base.length+' phrasal verbs':base.length+' phrasal verbs'+(g?' · '+g.name:'');
   if(pvCurrentFreq!=='all'&&!fn[pvCurrentFreq]) pvCurrentFreq='all';
+  if(pvIsSets()){
+    var sets=pvStudySets(); if(pvSetIdx>=sets.length) pvSetIdx=0;
+    document.getElementById('sub-common-phrasal-verbs').textContent='Study sets · '+pvStudyPool().length+' common phrasal verbs';
+    document.getElementById('body-common-phrasal-verbs').innerHTML='<div class="bar"><div class="bar-filters">'
+      +'<span class="studyset-lead">Study set</span>'
+      +'<select class="sel set" id="pvSetSel">'+sets.map(function(s,i){return '<option value="'+i+'"'+(i===pvSetIdx?' selected':'')+'>Set '+(i+1)+' ('+s.length+')</option>';}).join('')+'</select>'
+      +'<span class="studyset-of">of '+sets.length+'</span>'
+      +'<button class="studyset-browse" id="pvBrowseAll">Browse all</button>'
+      +'</div></div>'
+      +'<div class="studyset-hint">A short set to learn or review - about a dozen phrasal verbs at a time. Work through the sets in order, or choose Browse all for the full A-Z list and filters.</div>'
+      +'<div class="legend"><span><i class="fdot t1"></i>common</span><span><i class="fdot t2"></i>somewhat common</span><span><i class="fdot t3"></i>less common</span></div>'
+      +'<div class="sheet" id="pvSheet"></div>';
+    document.getElementById('pvSetSel').addEventListener('change',function(e){pvSetIdx=+e.target.value;renderPvSheet();scrollPaneIntoView('common-phrasal-verbs');});
+    document.getElementById('pvBrowseAll').addEventListener('click',function(){pvMode='browse';renderPvPane();});
+    renderPvSheet(); return;
+  }
   document.getElementById('body-common-phrasal-verbs').innerHTML='<div class="bar"><div class="bar-filters">'
     +'<select class="sel'+(pvCurrentFreq!=='all'?' set':'')+'" id="pvFreqSel"><option value="all">All frequencies ('+base.length+')</option>'
     +['common','somewhat','less'].filter(function(f){return fn[f]}).map(function(f){return '<option value="'+f+'"'+(pvCurrentFreq===f?' selected':'')+'>'+PV_FREQ_LABEL[f]+' ('+fn[f]+')</option>'}).join('')
     +'</select>'
     +'<label class="search"><input type="search" id="pvSearchBox" placeholder="'+(isAll?'Search all phrasal verbs…':'Search this category…')+'" value="'+esc(pvQ)+'" autocomplete="off"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="20" y1="20" x2="16.5" y2="16.5"/></svg></label>'
-    +'</div></div><div class="legend"><span><i class="fdot t1"></i>common</span><span><i class="fdot t2"></i>somewhat common</span><span><i class="fdot t3"></i>less common</span></div>'
+    +(isAll?'<button class="studyset-back" id="pvToSets">Study sets</button>':'')+'</div></div><div class="legend"><span><i class="fdot t1"></i>common</span><span><i class="fdot t2"></i>somewhat common</span><span><i class="fdot t3"></i>less common</span></div>'
     +'<div id="pvStrip"></div><div class="sheet" id="pvSheet"></div>';
   document.getElementById('pvFreqSel').addEventListener('change',function(e){pvCurrentFreq=e.target.value;e.target.classList.toggle('set',pvCurrentFreq!=='all');renderPvSheet()});
   document.getElementById('pvSearchBox').addEventListener('input',function(e){
     clearTimeout(pvSearchTimer); var v=e.target.value.trim().toLowerCase();
     pvSearchTimer=setTimeout(function(){pvQ=v;renderPvSheet()},160);
   });
+  var toSets=document.getElementById('pvToSets'); if(toSets)toSets.addEventListener('click',function(){pvMode='sets';pvQ='';renderPvPane();});
   renderPvSheet();
 }
 function renderPvSheet(){
+  if(pvIsSets()){
+    var sets=pvStudySets(), cur=sets[pvSetIdx]||[];
+    var sheet=document.getElementById('pvSheet'); sheet.innerHTML=cur.map(pvRow).join(''); pvSizeLedger(sheet); return;
+  }
   var list=pvShown(), h='', strip='';
   if(!list.length){h='<div class="nomatch">No phrasal verbs match.</div>'}
   else if(pvCat==='all'){

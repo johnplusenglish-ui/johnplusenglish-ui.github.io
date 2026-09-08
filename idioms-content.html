@@ -517,6 +517,11 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .bar-filters{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;flex:1;min-width:0}
 .sel{font-family:inherit;font-size:.82rem;font-weight:600;background:var(--card);border:1.5px solid var(--border);border-radius:9px;padding:.5rem .6rem;color:var(--ink);cursor:pointer;min-height:38px}
 .sel:hover{border-color:var(--ink)}
+.studyset-lead{font-size:.82rem;font-weight:700;color:var(--ink)}
+.studyset-of{font-size:.82rem;color:var(--muted)}
+.studyset-browse,.studyset-back{font-family:inherit;font-size:.8rem;font-weight:700;background:transparent;border:none;color:var(--sky);cursor:pointer;padding:.45rem .3rem;margin-left:auto}
+.studyset-browse:hover,.studyset-back:hover{text-decoration:underline}
+.studyset-hint{font-size:.78rem;color:var(--muted);line-height:1.45;margin:-.35rem 0 .7rem}
 .sel:focus{outline:none;border-color:var(--accent)}
 .sel.set{border-color:var(--accent);color:var(--accent)}
 .search{position:relative;flex:1;min-width:180px;max-width:380px}
@@ -1212,6 +1217,10 @@ function idMatch(it){
   return true;
 }
 function idShown(){return idScope().filter(idMatch)}
+var idMode='sets', idSetIdx=0;
+function idStudyPool(){return ID_SORTED.filter(function(it){return it.freq==='verycommon';});}
+function idStudySets(){var p=idStudyPool(),out=[];for(var i=0;i<p.length;i+=12){out.push(p.slice(i,i+12));}return out;}
+function idIsSets(){return idCat==='all'&&idMode==='sets'&&!idQ;}
 function idRow(it){
   // the tier dot is bound to the final word so a wrapping idiom never strands it on its own line
   var words=it.i.split(' '), last=words.pop();
@@ -1251,12 +1260,28 @@ function renderIdPane(){
     ? ALL_CATS.length+' categories · '+base.length.toLocaleString('en-GB')+' idioms'
     : base.length+' idioms'+(g?' · '+g.name:'');
   if(idFreq!=='all'&&!fn[idFreq]) idFreq='all';
+  if(idIsSets()){
+    var sets=idStudySets(); if(idSetIdx>=sets.length) idSetIdx=0;
+    document.getElementById('sub-list').textContent='Study sets · '+idStudyPool().length.toLocaleString('en-GB')+' very common idioms';
+    document.getElementById('body-list').innerHTML='<div class="bar"><div class="bar-filters">'
+      +'<span class="studyset-lead">Study set</span>'
+      +'<select class="sel set" id="idSetSel">'+sets.map(function(s,i){return '<option value="'+i+'"'+(i===idSetIdx?' selected':'')+'>Set '+(i+1)+' ('+s.length+')</option>';}).join('')+'</select>'
+      +'<span class="studyset-of">of '+sets.length+'</span>'
+      +'<button class="studyset-browse" id="idBrowseAll">Browse all</button>'
+      +'</div></div>'
+      +'<div class="studyset-hint">A short set to learn or review - about a dozen idioms at a time. Work through the sets in order, or choose Browse all for the full A-Z list and filters.</div>'
+      +'<div class="legend"><span><i class="fdot t1"></i>very common</span><span><i class="fdot t2"></i>common</span><span><i class="fdot t3"></i>less common</span></div>'
+      +'<div class="sheet" id="idSheet"></div>';
+    document.getElementById('idSetSel').addEventListener('change',function(e){idSetIdx=+e.target.value;renderIdSheet();scrollPaneIntoView('list');});
+    document.getElementById('idBrowseAll').addEventListener('click',function(){idMode='browse';renderIdPane();});
+    renderIdSheet(); return;
+  }
   var h='<div class="bar"><div class="bar-filters">'
     +'<select class="sel'+(idFreq!=='all'?' set':'')+'" id="idFreqSel"><option value="all">All frequencies ('+base.length.toLocaleString('en-GB')+')</option>'
     +['verycommon','common','less'].filter(function(f){return fn[f]}).map(function(f){return '<option value="'+f+'"'+(idFreq===f?' selected':'')+'>'+FREQ_LABEL[f]+' ('+fn[f]+')</option>'}).join('')
     +'</select>'
     +'<label class="search"><input type="search" id="idSearch" placeholder="'+(isAll?'Search all idioms…':'Search this category…')+'" value="'+esc(idQ)+'" autocomplete="off"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="20" y1="20" x2="16.5" y2="16.5"/></svg></label>'
-    +'</div></div><div class="legend"><span><i class="fdot t1"></i>very common</span><span><i class="fdot t2"></i>common</span><span><i class="fdot t3"></i>less common</span></div>'
+    +(isAll?'<button class="studyset-back" id="idToSets">Study sets</button>':'')+'</div></div><div class="legend"><span><i class="fdot t1"></i>very common</span><span><i class="fdot t2"></i>common</span><span><i class="fdot t3"></i>less common</span></div>'
     +'<div id="idStrip"></div><div class="sheet" id="idSheet"></div>';
   document.getElementById('body-list').innerHTML=h;
   document.getElementById('idFreqSel').addEventListener('change',function(e){idFreq=e.target.value;e.target.classList.toggle('set',idFreq!=='all');renderIdSheet()});
@@ -1265,9 +1290,15 @@ function renderIdPane(){
     var v=e.target.value.trim().toLowerCase();
     idSearchTimer=setTimeout(function(){idQ=v;renderIdSheet()},160);
   });
+  var toSets=document.getElementById('idToSets'); if(toSets)toSets.addEventListener('click',function(){idMode='sets';idQ='';renderIdPane();});
   renderIdSheet();
 }
 function renderIdSheet(){
+  if(idIsSets()){
+    var sets=idStudySets(), cur=sets[idSetIdx]||[];
+    document.getElementById('idSheet').innerHTML=cur.map(idRow).join('');
+    idSizeList(); return;
+  }
   var list=idShown(), h='', strip='';
   if(!list.length){
     h='<div class="nomatch">No idioms match.</div>';

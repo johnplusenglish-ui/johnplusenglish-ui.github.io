@@ -504,6 +504,11 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .bar-filters{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;flex:1;min-width:0}
 .sel{font-family:inherit;font-size:.82rem;font-weight:600;background:var(--card);border:1.5px solid var(--border);border-radius:9px;padding:.5rem .6rem;color:var(--ink);cursor:pointer;min-height:38px}
 .sel:hover{border-color:var(--ink)}
+.studyset-lead{font-size:.82rem;font-weight:700;color:var(--ink)}
+.studyset-of{font-size:.82rem;color:var(--muted)}
+.studyset-browse,.studyset-back{font-family:inherit;font-size:.8rem;font-weight:700;background:transparent;border:none;color:var(--sky);cursor:pointer;padding:.45rem .3rem;margin-left:auto}
+.studyset-browse:hover,.studyset-back:hover{text-decoration:underline}
+.studyset-hint{font-size:.78rem;color:var(--muted);line-height:1.45;margin:-.35rem 0 .7rem}
 .sel:focus{outline:none;border-color:var(--accent)}
 .sel.set{border-color:var(--accent);color:var(--accent)}
 .search{position:relative;flex:1;min-width:180px;max-width:380px}
@@ -2808,6 +2813,10 @@ function adjMatch(a){
   return true;
 }
 function adjShown(){return adjScope().filter(adjMatch)}
+var adjMode='sets', adjSetIdx=0;
+function adjStudyPool(){return ADJ_SORTED.filter(function(a){return a.freq==='common';});}
+function adjStudySets(){var p=adjStudyPool(),out=[];for(var i=0;i<p.length;i+=12){out.push(p.slice(i,i+12));}return out;}
+function adjIsSets(){return adjCat==='all'&&adjMode==='sets'&&!adjQ;}
 function adjRow(a){
   return '<div class="lr" data-row data-w="'+esc(a.word)+'"><div class="lr-h">'+esc(a.word)+'<span class="fdot '+(ADJ_TIER[a.freq]||'t3')+'" title="'+ADJ_FREQ_LABEL[a.freq]+'"></span></div>'
     +'<div class="lr-d">'+esc(a.def)+'</div><div class="lr-x">'+adjHighlight(esc(a.ex),a.word)+(a.coll?'<span class="src">collocations: <b>'+esc(a.coll)+'</b></span>':'')+(a.prep?'<span class="src">+ preposition: <b>'+esc(a.prep)+'</b></span>':'')+'</div></div>';
@@ -2843,6 +2852,22 @@ function renderAdjPane(){
   document.getElementById('sub-list').textContent=isAll?ALL_CATS.length+' categories · '+base.length.toLocaleString('en-GB')+' adjectives':base.length+' adjectives'+(g?' · '+g.name:'');
   if(adjFreq!=='all'&&!fn[adjFreq]) adjFreq='all';
   if(adjType!=='all'&&!tn[adjType]) adjType='all';
+  if(adjIsSets()){
+    var sets=adjStudySets(); if(adjSetIdx>=sets.length) adjSetIdx=0;
+    document.getElementById('sub-list').textContent='Study sets · '+adjStudyPool().length.toLocaleString('en-GB')+' common adjectives';
+    document.getElementById('body-list').innerHTML='<div class="bar"><div class="bar-filters">'
+      +'<span class="studyset-lead">Study set</span>'
+      +'<select class="sel set" id="adjSetSel">'+sets.map(function(s,i){return '<option value="'+i+'"'+(i===adjSetIdx?' selected':'')+'>Set '+(i+1)+' ('+s.length+')</option>';}).join('')+'</select>'
+      +'<span class="studyset-of">of '+sets.length+'</span>'
+      +'<button class="studyset-browse" id="adjBrowseAll">Browse all</button>'
+      +'</div></div>'
+      +'<div class="studyset-hint">A short set to learn or review - about a dozen words at a time. Work through the sets in order, or choose Browse all for the full A-Z list and filters.</div>'
+      +'<div class="legend"><span><i class="fdot t1"></i>common</span><span><i class="fdot t2"></i>somewhat common</span><span><i class="fdot t3"></i>less common</span></div>'
+      +'<div class="sheet" id="adjSheet"></div>';
+    document.getElementById('adjSetSel').addEventListener('change',function(e){adjSetIdx=+e.target.value;renderAdjSheet();scrollPaneIntoView('list');});
+    document.getElementById('adjBrowseAll').addEventListener('click',function(){adjMode='browse';renderAdjPane();});
+    renderAdjSheet(); return;
+  }
   document.getElementById('body-list').innerHTML='<div class="bar"><div class="bar-filters">'
     +'<select class="sel'+(adjFreq!=='all'?' set':'')+'" id="adjFreqSel"><option value="all">All frequencies ('+base.length.toLocaleString('en-GB')+')</option>'
     +['common','somewhat','less'].filter(function(f){return fn[f]}).map(function(f){return '<option value="'+f+'"'+(adjFreq===f?' selected':'')+'>'+ADJ_FREQ_LABEL[f]+' ('+fn[f]+')</option>'}).join('')
@@ -2851,7 +2876,7 @@ function renderAdjPane(){
     +['gradable','strong','nongrad'].filter(function(t){return tn[t]}).map(function(t){return '<option value="'+t+'"'+(adjType===t?' selected':'')+'>'+ADJ_TYPE_LABEL[t]+' ('+tn[t]+')</option>'}).join('')
     +'</select>'
     +'<label class="search"><input type="search" id="adjSearch" placeholder="'+(isAll?'Search all adjectives…':'Search this category…')+'" value="'+esc(adjQ)+'" autocomplete="off"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="20" y1="20" x2="16.5" y2="16.5"/></svg></label>'
-    +'</div></div><div class="legend"><span><i class="fdot t1"></i>common</span><span><i class="fdot t2"></i>somewhat common</span><span><i class="fdot t3"></i>less common</span></div>'
+    +(isAll?'<button class="studyset-back" id="adjToSets">Study sets</button>':'')+'</div></div><div class="legend"><span><i class="fdot t1"></i>common</span><span><i class="fdot t2"></i>somewhat common</span><span><i class="fdot t3"></i>less common</span></div>'
     +'<div id="adjStrip"></div><div class="sheet" id="adjSheet"></div>';
   document.getElementById('adjFreqSel').addEventListener('change',function(e){adjFreq=e.target.value;e.target.classList.toggle('set',adjFreq!=='all');renderAdjSheet()});
   document.getElementById('adjTypeSel').addEventListener('change',function(e){adjType=e.target.value;e.target.classList.toggle('set',adjType!=='all');renderAdjSheet()});
@@ -2859,9 +2884,15 @@ function renderAdjPane(){
     clearTimeout(adjSearchTimer); var v=e.target.value.trim().toLowerCase();
     adjSearchTimer=setTimeout(function(){adjQ=v;renderAdjSheet()},160);
   });
+  var toSets=document.getElementById('adjToSets'); if(toSets)toSets.addEventListener('click',function(){adjMode='sets';adjQ='';renderAdjPane();});
   renderAdjSheet();
 }
 function renderAdjSheet(){
+  if(adjIsSets()){
+    var sets=adjStudySets(), cur=sets[adjSetIdx]||[];
+    document.getElementById('adjSheet').innerHTML=cur.map(adjRow).join('');
+    adjSizeList(); return;
+  }
   var list=adjShown(), h='', strip='';
   if(!list.length){h='<div class="nomatch">No adjectives match.</div>'}
   else if(adjCat==='all'){
