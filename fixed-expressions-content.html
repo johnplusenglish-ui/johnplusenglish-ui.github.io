@@ -148,6 +148,9 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .oc-gap-slot.filled{color:var(--ink);border-color:var(--border)}
 .oc-gap-slot.correct{color:#0F7D71;border-color:#1DD3B0;background:rgba(29,211,176,.08)}
 .oc-gap-slot.wrong{color:#FF6B6B;border-color:#FF6B6B;background:rgba(255,107,107,.06);text-decoration:line-through}
+.oc-gap-slot.model{color:var(--ink);border-color:var(--border);background:var(--cream)}
+.oc-gap-model{font-family:'Outfit',sans-serif;font-size:.7rem;font-weight:700;color:#0F7D71;margin-left:.3em;white-space:nowrap}
+.oc-note{font-family:'Outfit',sans-serif;font-size:.82rem;color:var(--muted);margin:.5rem 0 1rem;line-height:1.45}
 .oc-bank{margin-bottom:1.5rem;padding:1rem 1.25rem;background:var(--cream);border:1.5px dashed var(--border);border-radius:12px}
 .oc-bank-label{font-family:Outfit,sans-serif;font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.75rem;font-weight:700}
 .oc-bank-chips{display:flex;flex-wrap:wrap;gap:.5rem}
@@ -600,11 +603,17 @@ function renderPassage() {
     var answer = myAnswers[g] || '';
     var slotClass = 'oc-gap-slot';
     if (answer) slotClass += ' filled';
+    var modelTag = '';
     if (isChecked && answer) {
-      slotClass += answer.toLowerCase() === p.answers[g-1].toLowerCase() ? ' correct' : ' wrong';
+      // These discourse markers often read well in more than one order, so a mismatch is
+      // NOT branded wrong (FX-001) - a match gets the green tick, and anything else shows
+      // the model answer beside it for comparison rather than a red cross.
+      var isMatch = answer.toLowerCase() === p.answers[g-1].toLowerCase();
+      slotClass += isMatch ? ' correct' : ' model';
+      if (!isMatch) modelTag = '<span class="oc-gap-model">model: ' + p.answers[g-1] + '</span>';
     }
     var display = answer || '';
-    text = text.replace('{' + g + '}', '<span class="oc-gap"><span class="oc-gap-num">(' + g + ')</span><span class="' + slotClass + '" onclick="clickGap(' + g + ')">' + display + '</span></span>');
+    text = text.replace('{' + g + '}', '<span class="oc-gap"><span class="oc-gap-num">(' + g + ')</span><span class="' + slotClass + '" onclick="clickGap(' + g + ')">' + display + '</span>' + modelTag + '</span>');
   }
 
   // Actions
@@ -620,7 +629,7 @@ function renderPassage() {
     var resClass = correct === total ? 'full' : 'partial';
     actHtml += '<button class="oc-btn" onclick="retryPassage()">Try again</button>';
     actHtml += '</div>';
-    actHtml += '<div class="oc-result show ' + resClass + '">' + correct + ' / ' + total + ' correct' + (correct === total ? ' - Perfect!' : '') + '</div>';
+    actHtml += '<div class="oc-result show ' + resClass + '">' + correct + ' / ' + total + ' match the model answer' + (correct === total ? ' - perfect!' : '') + '</div>';
   }
   if (!isChecked) actHtml += '</div>';
 
@@ -628,6 +637,7 @@ function renderPassage() {
     '<div class="oc-head"><div class="oc-title">' + p.title + '</div>'
     + '<button class="print-btn" onclick="openPrintModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>Print</button></div>'
     + '<div class="oc-meta">' + p.cat + '<span class="oc-meta-sep">&middot;</span><span class="oc-meta-gaps">' + p.answers.length + ' gaps</span></div>'
+    + '<div class="oc-note">These are natural discourse expressions, and very often more than one order reads well. Your answers are checked against a model answer, so a different but natural choice is not a mistake.</div>'
     + bankHtml
     + '<div class="oc-passage">' + text + '</div>'
     + actHtml;
