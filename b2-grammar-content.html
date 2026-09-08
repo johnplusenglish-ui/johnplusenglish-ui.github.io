@@ -115,6 +115,35 @@ table.g-table{width:100%;border-collapse:separate;border-spacing:0;font-size:.92
 .g-tip{display:flex;gap:12px;background:var(--sea-tint);border:1.5px solid var(--sea-bd);border-radius:12px;padding:15px 18px;margin:22px 0 0}
 .g-tip-label{font-size:.66rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--sea-d);margin:0 0 3px}
 .g-tip p{margin:0;font-size:.95rem;line-height:1.55}
+.g-rich{margin:6px 0 0}
+.g-rich .rich-section{margin:0 0 22px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.g-rich .rich-section:last-child{margin-bottom:0}
+.g-rich .rich-heading{font-size:.9rem;font-weight:700;color:var(--ink);margin:0 0 12px}
+.g-rich .rich-table{width:100%;border-collapse:separate;border-spacing:0;font-size:.9rem;border:1.5px solid var(--border);border-radius:12px;overflow:hidden;margin:0}
+.g-rich .rich-table th{background:var(--cream);text-align:left;font-weight:700;padding:10px 13px;border-bottom:1.5px solid var(--border);font-size:.8rem}
+.g-rich .rich-table td{padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top}
+.g-rich .rich-table tr:last-child td{border-bottom:none}
+.g-rich .rich-table em{font-style:italic;color:var(--sea-d)}
+.g-rich .certainty-scale{display:flex;flex-direction:column;gap:8px}
+.g-rich .certainty-row{display:grid;grid-template-columns:minmax(0,8.5em) minmax(0,1fr);gap:14px;align-items:start;background:var(--cream);border-radius:12px;padding:12px 16px}
+.g-rich .certainty-modal{font-weight:700;color:var(--sea-d)}
+.g-rich .certainty-meaning{font-size:.95rem;line-height:1.5}
+.g-rich .certainty-eg{font-size:.9rem;color:var(--muted);margin-top:3px}
+.g-rich .colloc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:12px}
+.g-rich .colloc-card{border:1.5px solid var(--border);border-radius:12px;padding:13px 16px;background:var(--card)}
+.g-rich .colloc-card-head{font-weight:700;color:var(--sky);font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;margin:0 0 6px}
+.g-rich .colloc-card-items{font-size:.95rem;line-height:1.55}
+.g-rich .meaning-pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:12px}
+.g-rich .meaning-box{border:1.5px solid var(--border);border-radius:12px;padding:13px 16px;background:var(--card)}
+.g-rich .meaning-box-head{font-weight:700;color:var(--ink);margin:0 0 5px}
+.g-rich .meaning-box-eg{font-style:italic;color:var(--sea-d);font-size:.95rem;margin:0 0 5px}
+.g-rich .meaning-box-note{font-size:.88rem;color:var(--muted);line-height:1.5}
+.g-rich .transform-demo{display:flex;flex-direction:column;gap:8px}
+.g-rich .transform-demo-row{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:12px;align-items:center;background:var(--cream);border-radius:12px;padding:12px 16px}
+.g-rich .transform-demo-row .tdl{color:var(--muted);font-size:.95rem}
+.g-rich .transform-demo-row .tdr{font-weight:600;font-size:.95rem}
+.g-rich .transform-demo-row .tdarrow{color:var(--sea);font-weight:700}
+@media(max-width:600px){.g-rich .transform-demo-row{grid-template-columns:1fr;gap:4px}.g-rich .transform-demo-row .tdarrow{transform:rotate(90deg);justify-self:start}.g-rich .certainty-row{grid-template-columns:1fr;gap:4px}}
 
 /* exercises */
 .g-exercise{background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:22px 24px;margin:0 0 16px}
@@ -379,7 +408,7 @@ table.g-table{width:100%;border-collapse:separate;border-spacing:0;font-size:.92
     if(l.table&&l.table.rows){learn+='<div class="g-sec-label">The forms</div><table class="g-table"><thead><tr>'+l.table.headers.map(function(x){return '<th>'+esc(x)+'</th>';}).join('')+'</tr></thead><tbody>'+l.table.rows.map(function(r){return '<tr>'+r.map(function(c){return '<td>'+esc(c)+'</td>';}).join('')+'</tr>';}).join('')+'</tbody></table>';}
     if(l.examples&&l.examples.length){learn+='<div class="g-sec-label">In action</div><div class="g-examples">'+l.examples.map(function(e){var t=e.type||'pos';var m=t==='neg'?'-':(t==='q'?'?':'+');return '<div class="g-ex '+t+'"><span class="g-ex-t">'+m+'</span><span class="g-ex-eng">'+esc(e.eng)+'</span>'+(e.note?'<div class="g-ex-note">'+esc(e.note)+'</div>':'')+'</div>';}).join('')+'</div>';}
     if(l.errors&&l.errors.length){learn+='<div class="g-sec-label">Watch out for</div><div class="g-errors">'+l.errors.map(function(e){return '<div class="g-err"><div class="g-err-line g-err-bad"><span class="mk">✗</span><span>'+esc(e.bad)+'</span></div><div class="g-err-line g-err-good"><span class="mk">✓</span><span>'+esc(e.good)+'</span></div><div class="g-err-reason">'+esc(e.reason)+'</div></div>';}).join('')+'</div>';}
-    if(l.realUse&&l.realUse.length){learn+='<div class="g-sec-label">Real use</div><ul class="g-real">'+l.realUse.map(function(r){return '<li>'+esc(r)+'</li>';}).join('')+'</ul>';}
+    if(l.realUse&&l.realUse.length){learn+='<div class="g-sec-label">Real use</div><ul class="g-real">'+l.realUse.map(function(r){return '<li>'+esc(r)+'</li>';}).join('')+'</ul>';}if(l.richContent){learn+='<div class="g-sec-label">Quick reference</div><div class="g-rich">'+l.richContent+'</div>';}
     if(l.tip){learn+='<div class="g-tip"><div><div class="g-tip-label">From John</div><p>'+l.tip+'</p></div></div>';}
     learn+='</div>';
     h+='<div class="l-pane show" id="pane-learn">'+learn+'</div>';
