@@ -88,7 +88,7 @@ P5 six 4-option MC cloze, P6 six open-cloze one-word gaps); Writing is a compuls
 **email** (~100 words, replying to a friend's email and **four** notes, one of which asks a
 question back) plus a Part 2 choice of an **article or a story** (~100 words, the story given
 as an opening sentence); Speaking Part 2 is describing **one** photo alone (not comparing two).
-The `grammar` page is a supplementary resource, so only the dash check applies to it. Run:
+(`b1-grammar-content.html` is now covered in full by `validate-grammar.mjs`, not here.) Run:
 
 ```bash
 node tools/validate-b1.mjs
@@ -178,6 +178,35 @@ are deliberately **not** checked (shared print CSS uses `font-style:italic`; cha
 story-dice use emojis by design) — this validator stays zero-false-positive so it can run on
 every commit without ever crying wolf.
 
+## `validate-grammar.mjs`
+
+Structural + answer-key checks for the five CEFR grammar pages (`a1-grammar`, `a2-grammar`,
+`b1-grammar`, `b2-grammar`, `c1-grammar`). These are copy-pasted from one template — each has its
+own `LESSONS` array plus its own `handleOpt`/`checkExercise`/`renderExercise` — so a defect (or a
+divergence between the copies) hides easily. One validator over all five is the guard.
+
+```bash
+node tools/validate-grammar.mjs
+```
+
+Each `LESSONS` entry has an `exercises` array; every exercise has a `type`, and each type keys its
+answer differently — the validator checks the key is real and answerable (the "unfair to a student"
+bug), and that `LESSONS` evals at all (the b2fs-blank failure mode):
+
+- **mc** `answer` is a string; the page's matcher accepts the **whole answer** (a combined
+  "blank1 / blank2" option) **or** any single `/`-separated alternative, so at least one option
+  must match one of those forms. (Building this caught a real bug: `handleOpt` had diverged — a1/a2
+  matched the whole string, b1/b2/c1 split on `/` — so 10 multi-blank items on b1/b2/c1 marked the
+  correct answer wrong. The matcher is now unified to accept both forms on all five pages.)
+- **gap** `answer` is a non-empty fill string.
+- **transform** `answer` must contain the `keyword`.
+- **builder** `answer` is a re-ordering of the `words` token pool (same multiset).
+- **tf** `answer` ∈ {True, False, Not given}.
+- **categorise / match** correctness is the item's placement / pairing — checked structurally.
+- **convo** dialogue with inline `[bracketed]` answers — checked for presence.
+
+Counts are WARN so lessons/exercises can be added without hard-failing a commit.
+
 ## `validate-ielts.mjs`, `validate-toefl.mjs`, `validate-oet.mjs`
 
 Structural + answer-key checks for the three non-Cambridge exam families. Unlike the Cambridge
@@ -251,7 +280,7 @@ default `c1a_`). B2 First Reading has only Parts 5-7 (no Part 8).
 
 Optional git hook that runs the relevant validator automatically - the matching level's
 validator runs when one of its pages is staged (C1, C2, B2, B2 First for Schools, B1, IELTS,
-TOEFL, or OET), and `validate-vocab.mjs` runs when any of the 8 vocabulary pages is staged. On top of that,
+TOEFL, OET, or the grammar pages), and `validate-vocab.mjs` runs when any of the 8 vocabulary pages is staged. On top of that,
 `validate-common.mjs` runs against **every** staged `*-content.html` (the site-wide dash rule),
 so a page with no level validator still gets that one check. Untouched pages are skipped, so a
 commit to one doesn't run the others' checks.
