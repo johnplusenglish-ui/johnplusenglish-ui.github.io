@@ -1,0 +1,49 @@
+name: Deploy to GitHub Pages
+
+# Publishes the site via the GitHub Actions Pages source, GATED on the content validators:
+# the deploy job `needs: validate`, so a push whose content fails validation is never published.
+# (Under the old "deploy from branch" source, every push went live regardless.)
+#
+# Requires: Settings -> Pages -> Source = "GitHub Actions". While that setting is on, this
+# workflow is the ONLY thing that publishes the site.
+#
+# No path filter on purpose: every push to main must be able to publish, not just content edits
+# (images, assets, sidebar partials and so on all need deploying too), matching how the previous
+# branch-based deploy behaved.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never let two publishes race. Don't cancel a run midway through publishing.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  # The gate. Reuses .github/workflows/validate.yml so there is one definition of the checks.
+  validate:
+    uses: ./.github/workflows/validate.yml
+
+  deploy:
+    needs: validate
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      # Uploads the repo root as the site, exactly what the branch source served. The action
+      # excludes .git and .github itself; CNAME is a tracked file so the custom domain carries over.
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+      - id: deployment
+        uses: actions/deploy-pages@v4

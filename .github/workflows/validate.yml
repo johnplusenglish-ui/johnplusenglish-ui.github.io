@@ -1,25 +1,20 @@
 name: Validate content
 
-# Runs the same tools/validate-*.mjs checks as the local pre-commit hook, but as a full gate:
-# the hook only runs the validator whose family was staged, whereas CI runs EVERY validator on
-# every push and pull request, so a defect is caught no matter which commit or which files
-# introduced it. validate-common.mjs (no args) scans all *-content.html for the dash rule.
+# The same tools/validate-*.mjs checks as the local pre-commit hook, but as a full gate: the hook
+# runs only the validator whose family was staged, whereas this runs EVERY validator, so a defect
+# is caught regardless of which files a commit touched (and `--no-verify` can't sneak one past).
+# validate-common.mjs (no args) scans all *-content.html for the dash rule.
 #
-# Note: GitHub Pages here deploys from the branch, independently of Actions, so this workflow
-# reports pass/fail on the commit but does not itself block the deploy. It is the visible signal
-# that the content checks passed.
+# This workflow is also called by deploy.yml (workflow_call) so the production deploy is gated on
+# exactly these checks — one definition, used by both PR feedback and the deploy gate.
 
 on:
-  push:
-    paths:
-      - '**/*-content.html'
-      - 'tools/**'
-      - '.github/workflows/validate.yml'
   pull_request:
     paths:
       - '**/*-content.html'
       - 'tools/**'
-      - '.github/workflows/validate.yml'
+      - '.github/workflows/*.yml'
+  workflow_call: {}
   workflow_dispatch: {}
 
 jobs:

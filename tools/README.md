@@ -294,12 +294,22 @@ cp tools/hooks/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commi
 Once installed, a commit that touches an exam or vocabulary page and fails its validator is
 blocked (override a single commit with `git commit --no-verify`).
 
-## CI (`.github/workflows/validate.yml`)
+## CI + gated deploy (`.github/workflows/`)
 
-The same checks run in GitHub Actions on every push and pull request that touches a
-`*-content.html` page or anything under `tools/`. CI is a **fuller gate than the hook**: the hook
-runs only the validator whose family was staged, while CI runs **every** `tools/validate-*.mjs`
-(so a defect is caught regardless of which files a commit touched, and `--no-verify` can't sneak
-one past). The job fails if any validator reports an ERROR. Because Pages here deploys from the
-branch independently of Actions, this is the visible pass/fail signal on the commit — it does not
-itself block the deploy.
+The same checks run in GitHub Actions, and **the deploy is gated on them**.
+
+- **`validate.yml`** runs **every** `tools/validate-*.mjs` (not just the staged family like the
+  hook, so a defect is caught regardless of which files a commit touched, and `--no-verify` can't
+  sneak one past). It runs on pull requests, and is also exposed as a reusable workflow
+  (`workflow_call`) so there is a single definition of the checks.
+- **`deploy.yml`** runs on every push to `main`. Its `deploy` job `needs: validate` (which calls
+  `validate.yml`), so **a push whose content fails validation is never published** — the site
+  simply stays on the last good deploy. It publishes the repo root via
+  `upload-pages-artifact`/`deploy-pages`; that action excludes `.git` and `.github`, and `CNAME`
+  is a tracked file so the custom domain carries over. There is deliberately no path filter: any
+  push to `main` must be able to publish (images and assets too), matching the old behaviour.
+
+**This requires Settings → Pages → Source = "GitHub Actions".** While that is set, `deploy.yml` is
+the only thing that publishes the site. Under the previous "deploy from branch" source every push
+went live regardless of whether the checks passed, which is exactly what this replaces. Note the
+Actions source does not run Jekyll — a non-change here (no `_config.yml`, no underscore files).
