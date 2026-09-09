@@ -79,8 +79,8 @@ Same ERROR/WARN convention as the others.
 
 ## `validate-b1.mjs`
 
-For the four B1 Preliminary pages (`b1-reading-test-content.html`, `b1-writing-content.html`,
-`b1-speaking-content.html`, `b1-grammar-content.html`). B1 Preliminary (PET) is a different
+For the B1 Preliminary pages (`b1-reading-test-content.html`, `b1-writing-content.html`,
+`b1-speaking-content.html`, `uoe-b1-content.html`). B1 Preliminary (PET) is a different
 exam again, confirmed against the official Cambridge B1 Preliminary 2022 sample papers:
 Reading has **six** parts (P1 five signs / 3 options, P2 match five people to eight texts,
 P3 five 4-option MC on a long text, P4 five sentences removed from a text with eight options,
@@ -88,7 +88,9 @@ P5 six 4-option MC cloze, P6 six open-cloze one-word gaps); Writing is a compuls
 **email** (~100 words, replying to a friend's email and **four** notes, one of which asks a
 question back) plus a Part 2 choice of an **article or a story** (~100 words, the story given
 as an opening sentence); Speaking Part 2 is describing **one** photo alone (not comparing two).
-(`b1-grammar-content.html` is now covered in full by `validate-grammar.mjs`, not here.) Run:
+B1 has no Use of English paper, but the site's `uoe-b1` study tool (MC cloze + open cloze, 20
+tests each) is validated here for the same answer shapes. (`b1-grammar-content.html` moved to
+`validate-grammar.mjs`.) Run:
 
 ```bash
 node tools/validate-b1.mjs

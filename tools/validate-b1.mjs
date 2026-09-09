@@ -17,8 +17,9 @@
  *  - Speaking Part 2 is a solo DESCRIBE-one-photograph long turn (not comparing two photos - that
  *    is B2); Part 3 is a collaborative discussion of a situation with picture prompts; Part 4 is a
  *    related discussion. Everything is intermediate, simple, personal language.
- *  - There is no Use of English paper at B1; the site's "grammar" page is a supplementary
- *    resource and is not validated for exam structure here (only the dash check applies to it).
+ *  - B1 Preliminary has no standalone Use of English PAPER, but the site publishes a uoe-b1 study
+ *    tool built from the exam's two cloze task types (MC cloze = Reading Part 5, open cloze =
+ *    Reading Part 6); it is validated here. The b1-grammar page moved to validate-grammar.mjs.
  *
  * To extend: add a check inside the relevant section. Keep ERROR for "this is wrong / unfair to a
  * student"; use WARN for "worth a look but not a hard failure".
@@ -164,18 +165,59 @@ function checkWriting() {
   if (n < 3) WARN(F, `only ${n} model answers found (expected 3: email, article, story)`);
 }
 
-/* ------------------------------------------------------------------ Grammar (dash check only) */
-function checkGrammar() {
-  const F = 'b1-grammar-content.html';
-  dashScan(F, read(F));
+/* ------------------------------------------------------------------ Use of English study tool */
+// B1 Preliminary has no standalone Use of English PAPER, but the site publishes a uoe-b1 study
+// tool built from the exam's two cloze task types: Part 1 = multiple-choice cloze (PET Reading
+// Part 5), Part 2 = open cloze (PET Reading Part 6). Larger practice bank (20 each) than the
+// reading test's own 5, but the same answer shapes.
+function checkUoE() {
+  const F = 'uoe-b1-content.html';
+  const src = read(F);
+  dashScan(F, src);
+  const TESTS = evalArray(src, 'TESTS');       // Part 1: MC cloze
+  const OC = evalArray(src, 'OC_TESTS');        // Part 2: open cloze
+  const joinText = (t) => Array.isArray(t.text) ? t.text.join('') : (t.text || '');
+  const placeholdersPresent = (t, F2, tag) => {
+    const s = joinText(t);
+    t.gaps.forEach((g, k) => { if (!s.includes('{' + (g.num ?? k + 1) + '}')) ERR(F2, `${tag}: missing placeholder {${g.num ?? k + 1}} in text`); });
+  };
+
+  if (TESTS.length !== 20) WARN(F, `Part 1 has ${TESTS.length} tests (expected 20)`);
+  TESTS.forEach((t, ti) => {
+    const tag = `Part 1 "${t.title}" (test ${ti + 1})`;
+    if (t.gaps.length !== 6) WARN(F, `${tag}: ${t.gaps.length} gaps (expected 6)`);
+    placeholdersPresent(t, F, tag);
+    t.gaps.forEach((g, k) => {
+      if (!Array.isArray(g.options) || g.options.length !== 4) ERR(F, `${tag} gap ${g.num ?? k + 1}: needs 4 options`);
+      if (!(Number.isInteger(g.correct) && g.correct >= 0 && g.correct < (g.options || []).length)) ERR(F, `${tag} gap ${g.num ?? k + 1}: correct index ${g.correct} out of range`);
+      if (!g.exp || !String(g.exp).trim()) WARN(F, `${tag} gap ${g.num ?? k + 1}: empty explanation`);
+    });
+  });
+
+  if (OC.length !== 20) WARN(F, `Part 2 has ${OC.length} tests (expected 20)`);
+  OC.forEach((t, ti) => {
+    const tag = `Part 2 "${t.title}" (test ${ti + 1})`;
+    if (t.gaps.length !== 6) WARN(F, `${tag}: ${t.gaps.length} gaps (expected 6)`);
+    placeholdersPresent(t, F, tag);
+    t.gaps.forEach((g, k) => {
+      const ans = String(g.answer || '').trim();
+      if (!ans) { ERR(F, `${tag} gap ${g.num ?? k + 1}: empty answer`); return; }
+      // Open-cloze answers are single words; the mark scheme may list "/"-separated alternatives.
+      ans.split('/').map((w) => w.trim()).forEach((w) => { if (w && /\s/.test(w)) ERR(F, `${tag} gap ${g.num ?? k + 1}: open-cloze answer "${w}" must be a single word`); });
+    });
+  });
 }
+
+/* ------------------------------------------------------------------ Grammar (moved out) */
+// b1-grammar-content.html is now validated in full by validate-grammar.mjs (with the other four
+// CEFR grammar pages), so it is no longer checked here.
 
 /* ------------------------------------------------------------------ run */
 const suites = [
   ['Reading', checkReading],
   ['Speaking', checkSpeaking],
   ['Writing', checkWriting],
-  ['Grammar', checkGrammar],
+  ['Use of English', checkUoE],
 ];
 for (const [name, fn] of suites) {
   try { fn(); } catch (e) { ERR(name, `check crashed: ${e.message}`); }
