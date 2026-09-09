@@ -23,6 +23,13 @@ case "$staged" in
 esac
 
 case "$staged" in
+  *b2fs-reading-test-content.html*|*uoe-b2fs-content.html*|*b2fs-writing-content.html*|*b2fs-speaking-content.html*)
+    echo "Running B2 First for Schools validation…"
+    node tools/validate-b2fs.mjs || fail=1
+    ;;
+esac
+
+case "$staged" in
   *b1-reading-test-content.html*|*b1-writing-content.html*|*b1-speaking-content.html*|*b1-grammar-content.html*)
     echo "Running B1 validation…"
     node tools/validate-b1.mjs || fail=1
@@ -42,6 +49,14 @@ case "$staged" in
     node tools/validate-vocab.mjs || fail=1
     ;;
 esac
+
+# House-rule checks (no em dash / spaced en dash) on every staged content page — the one rule
+# that applies site-wide, so it runs for any *-content.html, not just the exam/vocab families.
+staged_content=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\-content\.html$' || true)
+if [ -n "$staged_content" ]; then
+  echo "Running common house-rule checks…"
+  node tools/validate-common.mjs $staged_content || fail=1
+fi
 
 if [ "$fail" = "1" ]; then
   echo ""

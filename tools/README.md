@@ -55,6 +55,26 @@ node tools/validate-b2.mjs
 
 Same ERROR/WARN convention as `validate-c1.mjs`.
 
+## `validate-b2fs.mjs`
+
+For the four **B2 First for Schools** pages (`uoe-b2fs-content.html`,
+`b2fs-reading-test-content.html`, `b2fs-speaking-content.html`, `b2fs-writing-content.html`).
+B2 First for Schools is the **same exam format** as B2 First (same paper structure, same word
+counts, same 2–5-word Key Word Transformations, same three-part Reading, same two-photo Speaking
+Part 2) — only the topics are youth-oriented and Writing Part 2 additionally allows a **story**.
+So the rules mirror `validate-b2.mjs`, with two counts that reflect what the site actually
+built as a smaller resource (not what a live sitting draws from): **Use of English has 5 sets
+per part** (B2 First proper carries 20) and **Speaking Part 2 has 20 photo sets** (B2 First
+proper carries 10). Run:
+
+```bash
+node tools/validate-b2fs.mjs
+```
+
+This validator exists because `b2fs-reading-test-content.html` once shipped **fully broken**
+(its whole engine + guide data missing) with no check to catch it — see the 2026-09-08 audit.
+Same ERROR/WARN convention as the others.
+
 ## `validate-b1.mjs`
 
 For the four B1 Preliminary pages (`b1-reading-test-content.html`, `b1-writing-content.html`,
@@ -136,6 +156,26 @@ Duplicate/near-duplicate checks that rely on exact structural facts (same headwo
 same word+pos) are `ERR`; the phrasal-verb sense-overlap check is a fuzzy heuristic and is
 `WARN` only - a human should read the flagged pair and decide, the same way the PV-001 pass did.
 
+## `validate-common.mjs`
+
+House-rule checks that apply to **every** content page, not just the exam and vocabulary
+families the level-specific validators cover. With no arguments it scans every `*-content.html`
+in the repo root; given file paths it scans only those (that's how the pre-commit hook runs it,
+on just the staged pages).
+
+```bash
+node tools/validate-common.mjs                       # whole site
+node tools/validate-common.mjs some-content.html     # named pages only
+```
+
+The single rule that is uniform across the whole site is the **dash rule**: no em dash
+(`—` / `&mdash;`) and no spaced en dash used as punctuation. The level validators already
+enforce this on their own pages; `validate-common.mjs` closes the gap for the ~45 content pages
+no other validator touches, so an em dash can't slip onto **any** page unseen. Italics and emojis
+are deliberately **not** checked (shared print CSS uses `font-style:italic`; chat-activity and
+story-dice use emojis by design) — this validator stays zero-false-positive so it can run on
+every commit without ever crying wolf.
+
 ## `build-c1-manifest.mjs` + item analytics
 
 The C1 Use of English (Parts 1–4) and Reading (Parts 5–8) pages log **anonymous, aggregate**
@@ -172,9 +212,11 @@ default `c1a_`). B2 First Reading has only Parts 5-7 (no Part 8).
 ## `hooks/pre-commit`
 
 Optional git hook that runs the relevant validator automatically - the matching level's
-validator runs when one of its pages is staged (C1, C2, B2 or B1), and `validate-vocab.mjs`
-runs when any of the 8 vocabulary pages is staged. Untouched pages are skipped, so a commit
-to one doesn't run the others' checks.
+validator runs when one of its pages is staged (C1, C2, B2, B2 First for Schools, or B1), and
+`validate-vocab.mjs` runs when any of the 8 vocabulary pages is staged. On top of that,
+`validate-common.mjs` runs against **every** staged `*-content.html` (the site-wide dash rule),
+so a page with no level validator still gets that one check. Untouched pages are skipped, so a
+commit to one doesn't run the others' checks.
 
 ```bash
 cp tools/hooks/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
