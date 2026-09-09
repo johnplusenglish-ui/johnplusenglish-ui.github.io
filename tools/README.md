@@ -293,3 +293,13 @@ cp tools/hooks/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commi
 
 Once installed, a commit that touches an exam or vocabulary page and fails its validator is
 blocked (override a single commit with `git commit --no-verify`).
+
+## CI (`.github/workflows/validate.yml`)
+
+The same checks run in GitHub Actions on every push and pull request that touches a
+`*-content.html` page or anything under `tools/`. CI is a **fuller gate than the hook**: the hook
+runs only the validator whose family was staged, while CI runs **every** `tools/validate-*.mjs`
+(so a defect is caught regardless of which files a commit touched, and `--no-verify` can't sneak
+one past). The job fails if any validator reports an ERROR. Because Pages here deploys from the
+branch independently of Actions, this is the visible pass/fail signal on the commit — it does not
+itself block the deploy.

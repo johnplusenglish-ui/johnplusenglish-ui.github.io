@@ -1,0 +1,45 @@
+name: Validate content
+
+# Runs the same tools/validate-*.mjs checks as the local pre-commit hook, but as a full gate:
+# the hook only runs the validator whose family was staged, whereas CI runs EVERY validator on
+# every push and pull request, so a defect is caught no matter which commit or which files
+# introduced it. validate-common.mjs (no args) scans all *-content.html for the dash rule.
+#
+# Note: GitHub Pages here deploys from the branch, independently of Actions, so this workflow
+# reports pass/fail on the commit but does not itself block the deploy. It is the visible signal
+# that the content checks passed.
+
+on:
+  push:
+    paths:
+      - '**/*-content.html'
+      - 'tools/**'
+      - '.github/workflows/validate.yml'
+  pull_request:
+    paths:
+      - '**/*-content.html'
+      - 'tools/**'
+      - '.github/workflows/validate.yml'
+  workflow_dispatch: {}
+
+jobs:
+  validators:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Run all content validators
+        run: |
+          fail=0
+          for v in tools/validate-*.mjs; do
+            echo "::group::$v"
+            node "$v" || fail=1
+            echo "::endgroup::"
+          done
+          if [ "$fail" = "1" ]; then
+            echo "::error::One or more content validators reported errors"
+            exit 1
+          fi
+          echo "All content validators passed."
