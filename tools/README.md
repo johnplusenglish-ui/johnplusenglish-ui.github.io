@@ -1,8 +1,10 @@
-# Cambridge exam page tooling
+# Exam page tooling
 
-Covers both the C1 Advanced pages and the B2 First pages. The two levels have real format
-differences (see `validate-b2.mjs`'s header comment) - never assume a C1 rule carries over to
-B2 without checking the relevant handbook first.
+Validators for the exam and vocabulary pages. The Cambridge validators (C1, C2, B2, B2 First for
+Schools, B1) encode each level's real, official format — the levels have load-bearing differences
+(see `validate-b2.mjs`'s header comment), so never assume a C1 rule carries over without checking
+the relevant handbook first. The IELTS / TOEFL / OET validators guard the site's own practice
+resources, and `validate-common.mjs` enforces the one site-wide house rule on every content page.
 
 ## `validate-c1.mjs`
 
@@ -176,6 +178,42 @@ are deliberately **not** checked (shared print CSS uses `font-style:italic`; cha
 story-dice use emojis by design) — this validator stays zero-false-positive so it can run on
 every commit without ever crying wolf.
 
+## `validate-ielts.mjs`, `validate-toefl.mjs`, `validate-oet.mjs`
+
+Structural + answer-key checks for the three non-Cambridge exam families. Unlike the Cambridge
+validators (which encode a fixed official spec), these guard the site's **own** practice
+resources, so the load-bearing rules are: (1) each page's data array still exists and evals — the
+failure mode that let `b2fs-reading` ship blank; (2) every scored item's `correct` answer really
+points at a live option/letter/heading (the "unfair to a student" bug); (3) the one house rule
+(no em/spaced-en dash). Item and set counts are **WARN**, not ERROR, so a family can grow or shift
+its task mix without hard-failing a commit.
+
+```bash
+node tools/validate-ielts.mjs
+node tools/validate-toefl.mjs
+node tools/validate-oet.mjs
+```
+
+- **IELTS** (`ielts-reading`, `ielts-writing`, `ielts-speaking`). Reading is the scored page:
+  each Academic (`TESTS_A`) and General Training (`TESTS_G`) test is an object of three part
+  objects, each mixing task types with **different answer encodings** — `c3` (True/False/Not
+  Given or Yes/No/Not Given string enum), `mc` (0-based index into 4 `opts`), `matchInfo`
+  (paragraph letter), `matchEndings` (letter in `endingsOptions`), `headingCorrect` (a
+  paraLetter→heading-id map), `matchClasses` (letter in `classes`), and `fillBlanks`/`shortAnswer`
+  (non-empty accepted-answer arrays). Each of the ~120 keys per bank is range/membership-checked;
+  the 40-items-per-test total is a WARN. Speaking is productive (no keys) — only the static
+  `FULL_TESTS` and `TEST_GROUPS` are checked (`ORDERED_TESTS`/`PART2_TOPICS` are assembled at
+  runtime via `.push()`, so they can't be eval'd statically). `ielts-listening` is guide-only and
+  relies on `validate-common.mjs`.
+- **TOEFL** (all four pages). Every page shares `const SETS = [...]`. Reading and Listening are
+  MCQ-scored (`{ q|line, options:[4], correct:int, explanation }`) — options must be 4 and
+  `correct` in range. Writing/Speaking are open-ended; Writing's word-order task carries the
+  invariant that the `answer` sequence and the `words` shuffle-pool hold the same tokens.
+- **OET** (`oet-reading`, `oet-speaking`, `oet-writing`). Reading has two answer shapes: Part A is
+  text-matching (`correct` is a letter naming one of the four `texts`), Parts B/C are numeric-index
+  MCQs (3 and 4 options). Speaking is role-play prompt content and Writing is guide + phrase-bank
+  content (both presence-checked only). `oet-listening` is guide-only ("coming soon").
+
 ## `build-c1-manifest.mjs` + item analytics
 
 The C1 Use of English (Parts 1–4) and Reading (Parts 5–8) pages log **anonymous, aggregate**
@@ -212,8 +250,8 @@ default `c1a_`). B2 First Reading has only Parts 5-7 (no Part 8).
 ## `hooks/pre-commit`
 
 Optional git hook that runs the relevant validator automatically - the matching level's
-validator runs when one of its pages is staged (C1, C2, B2, B2 First for Schools, or B1), and
-`validate-vocab.mjs` runs when any of the 8 vocabulary pages is staged. On top of that,
+validator runs when one of its pages is staged (C1, C2, B2, B2 First for Schools, B1, IELTS,
+TOEFL, or OET), and `validate-vocab.mjs` runs when any of the 8 vocabulary pages is staged. On top of that,
 `validate-common.mjs` runs against **every** staged `*-content.html` (the site-wide dash rule),
 so a page with no level validator still gets that one check. Untouched pages are skipped, so a
 commit to one doesn't run the others' checks.

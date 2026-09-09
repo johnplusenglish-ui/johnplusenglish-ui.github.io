@@ -50,6 +50,27 @@ case "$staged" in
     ;;
 esac
 
+case "$staged" in
+  *ielts-reading-content.html*|*ielts-writing-content.html*|*ielts-speaking-content.html*)
+    echo "Running IELTS validation…"
+    node tools/validate-ielts.mjs || fail=1
+    ;;
+esac
+
+case "$staged" in
+  *toefl-reading-content.html*|*toefl-writing-content.html*|*toefl-speaking-content.html*|*toefl-listening-content.html*)
+    echo "Running TOEFL validation…"
+    node tools/validate-toefl.mjs || fail=1
+    ;;
+esac
+
+case "$staged" in
+  *oet-reading-content.html*|*oet-writing-content.html*|*oet-speaking-content.html*)
+    echo "Running OET validation…"
+    node tools/validate-oet.mjs || fail=1
+    ;;
+esac
+
 # House-rule checks (no em dash / spaced en dash) on every staged content page — the one rule
 # that applies site-wide, so it runs for any *-content.html, not just the exam/vocab families.
 staged_content=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\-content\.html$' || true)
