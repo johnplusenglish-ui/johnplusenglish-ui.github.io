@@ -24,8 +24,40 @@
   --up:#34d399;
   --down:#fb7185;
   --gold:#ffd166;
+  --track:rgba(255,255,255,.05);
+  --thead:#0e1428;
+  --shadow:0 18px 50px rgba(0,0,0,.4);
   --radius:18px;
   --radius-sm:12px;
+}
+:root[data-theme="light"]{
+  --bg:#f4f6fc;
+  --bg2:#eef1fa;
+  --panel:#ffffff;
+  --panel2:#f5f7fd;
+  --line:rgba(30,41,84,.12);
+  --line2:rgba(30,41,84,.2);
+  --ink:#171d33;
+  --muted:#586088;
+  --faint:#8a93b5;
+  --sci:#0e97be;
+  --read:#7a58ec;
+  --math:#d5880c;
+  --cps:#12a05a;
+  --up:#0fa268;
+  --down:#e34860;
+  --gold:#c98f00;
+  --track:rgba(30,41,84,.08);
+  --thead:#eef1fa;
+  --shadow:0 18px 50px rgba(30,41,84,.14);
+}
+:root[data-theme="light"] .stars{display:none}
+:root[data-theme="light"] .aura{
+  background:
+   radial-gradient(900px 520px at 12% -8%, rgba(14,151,190,.10), transparent 60%),
+   radial-gradient(760px 520px at 92% 4%, rgba(122,88,236,.10), transparent 60%),
+   radial-gradient(1000px 700px at 60% 108%, rgba(213,136,12,.07), transparent 60%),
+   linear-gradient(180deg,#f4f6fc 0%,#eef1fa 40%,#f4f6fc 100%);
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
@@ -60,6 +92,16 @@ h1,h2,h3{margin:0;line-height:1.12;letter-spacing:-.02em;font-weight:800}
   background-size:auto;
 }
 .page{position:relative;z-index:1}
+
+/* Theme toggle */
+.themebtn{position:fixed;top:16px;right:16px;z-index:30;width:44px;height:44px;border-radius:12px;
+  background:var(--panel);border:1px solid var(--line2);color:var(--ink);cursor:pointer;display:grid;place-items:center;
+  box-shadow:var(--shadow);transition:transform .16s,background .16s}
+.themebtn:hover{transform:translateY(-1px)}
+.themebtn svg{width:20px;height:20px}
+.themebtn .moon{display:none}
+:root[data-theme="light"] .themebtn .sun{display:none}
+:root[data-theme="light"] .themebtn .moon{display:block}
 
 /* Hero */
 .hero{padding:64px 0 34px;text-align:center}
@@ -104,7 +146,7 @@ section{padding:40px 0}
 .row{display:grid;grid-template-columns:26px 158px 1fr 52px;align-items:center;gap:12px}
 .row .rank{color:var(--faint);font-size:12.5px;text-align:right}
 .row .nm{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.row .track{height:16px;background:rgba(255,255,255,.04);border-radius:8px;overflow:hidden;position:relative}
+.row .track{height:16px;background:var(--track);border-radius:8px;overflow:hidden;position:relative}
 .row .fill{height:100%;border-radius:8px;transform-origin:left;transform:scaleX(0);transition:transform .9s cubic-bezier(.2,.7,.2,1)}
 .row .val{font-size:13px;font-weight:600;text-align:right}
 .row.you .nm{color:var(--gold);font-weight:700}
@@ -133,7 +175,7 @@ section{padding:40px 0}
 .mrow{display:flex;align-items:center;gap:12px;padding:9px 4px;border-bottom:1px solid var(--line)}
 .mrow:last-child{border-bottom:0}
 .mrow .mn{flex:1;font-size:14px;font-weight:500;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mrow .mbar{width:74px;height:8px;border-radius:5px;background:rgba(255,255,255,.05);overflow:hidden}
+.mrow .mbar{width:74px;height:8px;border-radius:5px;background:var(--track);overflow:hidden}
 .mrow .mbar i{display:block;height:100%;border-radius:5px}
 .mrow .mc{width:44px;text-align:right;font-size:13.5px;font-weight:700}
 .up .mc{color:var(--up)} .down .mc{color:var(--down)}
@@ -142,7 +184,7 @@ section{padding:40px 0}
 /* Table */
 .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--bg2)}
 table{border-collapse:collapse;width:100%;min-width:640px}
-thead th{position:sticky;top:0;background:#0e1428;z-index:2;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;
+thead th{position:sticky;top:0;background:var(--thead);z-index:2;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;
   color:var(--muted);font-weight:600;text-align:right;padding:13px 12px;border-bottom:1px solid var(--line2);cursor:pointer;user-select:none;white-space:nowrap}
 thead th.lft{text-align:left}
 thead th:hover{color:var(--ink)}
@@ -160,7 +202,7 @@ tbody tr.hi td.lft{color:var(--gold);font-weight:700}
 .chip.z{background:rgba(148,163,214,.12);color:var(--muted)}
 .chip.m{color:var(--faint)}
 .minicell{display:flex;align-items:center;gap:9px;justify-content:flex-end}
-.minibar{width:60px;height:7px;border-radius:4px;background:rgba(255,255,255,.06);overflow:hidden;flex:0 0 auto}
+.minibar{width:60px;height:7px;border-radius:4px;background:var(--track);overflow:hidden;flex:0 0 auto}
 .minibar i{display:block;height:100%}
 .searchbar{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--line2);border-radius:12px;
   padding:11px 14px;margin-bottom:14px;max-width:340px}
@@ -209,7 +251,7 @@ tbody tr.hi td.lft{color:var(--gold);font-weight:700}
 .declbars{display:flex;gap:18px;margin-top:20px;flex-wrap:wrap}
 .decl{flex:1;min-width:150px}
 .decl .dl{font-size:13px;color:var(--muted);margin-bottom:8px;display:flex;justify-content:space-between}
-.decl .dt{height:10px;border-radius:6px;background:rgba(255,255,255,.06);overflow:hidden}
+.decl .dt{height:10px;border-radius:6px;background:var(--track);overflow:hidden}
 .decl .dt i{display:block;height:100%;border-radius:6px}
 
 /* Brand line in hero */
@@ -262,6 +304,19 @@ tbody tr.hi td.lft{color:var(--gold);font-weight:700}
 </style>
 </head>
 <body>
+<script>
+(function(){
+  try{
+    var saved=localStorage.getItem('pisa-theme');
+    var t=saved||((window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches)?'light':'dark');
+    document.documentElement.setAttribute('data-theme',t);
+  }catch(e){document.documentElement.setAttribute('data-theme','dark');}
+})();
+</script>
+<button class="themebtn" id="themeBtn" onclick="toggleTheme()" aria-label="Switch between light and dark mode" title="Light / dark mode">
+  <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+  <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
+</button>
 <div class="aura"></div>
 <div class="stars"></div>
 <div class="page">
@@ -528,6 +583,14 @@ tbody tr.hi td.lft{color:var(--gold);font-weight:700}
 </div>
 
 <script>
+/* ---- Theme toggle ---- */
+function toggleTheme(){
+  var cur=document.documentElement.getAttribute('data-theme')==='light'?'light':'dark';
+  var next=cur==='light'?'dark':'light';
+  document.documentElement.setAttribute('data-theme',next);
+  try{localStorage.setItem('pisa-theme',next);}catch(e){}
+}
+
 /* ---- DATA: [name, sci, read, math, cps, dSci, dRead, dMath, top%, low%] ; null = not reported ---- */
 var OECD={sci:482,read:461,math:463,cps:500};
 var D=[
