@@ -333,6 +333,79 @@ body{
   80%{ transform:translateX(4px); }
 }
 
+/* ---- English -> Italian lookup ---- */
+.lookup-open{
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  width:100%; border:none; cursor:pointer; font-family:'Outfit',sans-serif;
+  font-size:.92rem; font-weight:700; color:var(--pink-deep);
+  background:var(--white); padding:13px 18px; border-radius:16px;
+  box-shadow:0 10px 24px -14px rgba(217,62,115,.4);
+  transition:transform .1s ease;
+}
+.lookup-open:active{ transform:scale(.97); }
+.lookup-open svg{ width:18px; height:18px; }
+
+#lookupScreen{ justify-content:flex-start; gap:16px; overflow-y:auto; padding-top:30px; padding-bottom:30px; }
+
+.lookup-bar{ width:100%; display:flex; gap:10px; }
+.lookup-bar input{
+  flex:1; min-width:0; font-family:'Outfit',sans-serif; font-size:1rem; font-weight:500;
+  color:var(--ink); background:var(--white); border:2px solid transparent;
+  border-radius:16px; padding:14px 16px; box-shadow:0 8px 20px -14px rgba(217,62,115,.4);
+}
+.lookup-bar input:focus{ outline:none; border-color:var(--pink); }
+.lookup-go{
+  flex-shrink:0; width:52px; border:none; cursor:pointer; border-radius:16px;
+  background:linear-gradient(155deg,var(--pink),var(--pink-deep)); color:var(--white);
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 8px 18px -8px rgba(217,62,115,.5); transition:transform .1s ease;
+}
+.lookup-go:active{ transform:scale(.94); }
+.lookup-go svg{ width:22px; height:22px; }
+
+.lookup-status{ font-size:.85rem; font-weight:600; color:var(--muted); min-height:18px; text-align:center; }
+
+.lookup-result{
+  width:100%; border-radius:22px; padding:24px 22px;
+  background:linear-gradient(155deg, var(--pink), var(--pink-deep));
+  color:var(--white); box-shadow:0 18px 40px -16px rgba(217,62,115,.45);
+  display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center;
+}
+.lookup-result[hidden]{ display:none; }
+.lr-en{ font-size:.9rem; font-weight:600; opacity:.85; }
+.lr-it{ font-size:1.9rem; font-weight:800; line-height:1.2; }
+.lr-pron{ font-size:1.05rem; font-weight:500; font-style:italic; opacity:.9; }
+.lr-note{ font-size:.82rem; font-weight:500; opacity:.8; }
+
+.lookup-saved{ width:100%; display:flex; flex-direction:column; gap:10px; }
+.lookup-saved-title{ font-size:.8rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--pink-deep); opacity:.75; }
+.lookup-list{ display:flex; flex-direction:column; gap:8px; }
+.lookup-empty{ font-size:.85rem; color:var(--muted); text-align:center; padding:8px 0; }
+.saved-item{
+  display:flex; align-items:center; gap:12px; width:100%;
+  background:var(--white); border:none; cursor:pointer; text-align:left;
+  border-radius:14px; padding:12px 14px; box-shadow:0 6px 16px -12px rgba(217,62,115,.4);
+  font-family:'Outfit',sans-serif; transition:transform .1s ease;
+}
+.saved-item:active{ transform:scale(.98); }
+.saved-item .si-text{ flex:1; min-width:0; }
+.saved-item .si-it{ font-weight:800; color:var(--ink); font-size:.98rem; }
+.saved-item .si-en{ font-size:.8rem; color:var(--muted); margin-top:1px; }
+.saved-item .si-play{
+  flex-shrink:0; width:34px; height:34px; border-radius:50%;
+  background:linear-gradient(155deg,var(--pink),var(--pink-deep)); color:var(--white);
+  display:flex; align-items:center; justify-content:center;
+}
+.saved-item .si-play svg{ width:16px; height:16px; }
+
+.lookup-back{
+  border:none; cursor:pointer; font-family:'Outfit',sans-serif;
+  font-size:.9rem; font-weight:700; color:var(--pink-deep);
+  background:rgba(255,255,255,.55); padding:11px 26px; border-radius:99px;
+  transition:transform .1s ease;
+}
+.lookup-back:active{ transform:scale(.95); }
+
 @media (prefers-reduced-motion: reduce){
   .card{ transition:none; }
   .polaroid.drift{ animation:none; opacity:0; }
@@ -347,11 +420,49 @@ body{
     <div class="rose" id="homeRose">🌹</div>
     <div class="eyebrow">Everyday Italian for My Baby</div>
     <div class="set-list" id="setList"></div>
+    <button class="lookup-open" id="lookupOpen">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      Look up a word
+    </button>
     <div class="completions" id="homeCompletions">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
       <span id="homeCompletionsText">0 total completions</span>
     </div>
     <div class="home-footer-emoji">❤️ 🪿</div>
+  </div>
+
+  <div class="wrap screen" id="lookupScreen" style="display:none">
+    <div class="rose">🌹</div>
+    <div class="eyebrow">Look up a word</div>
+    <div class="lookup-bar">
+      <input id="lookupInput" type="text" placeholder="Type in English…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search">
+      <button class="lookup-go" id="lookupGo" aria-label="Search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      </button>
+    </div>
+    <div class="lookup-status" id="lookupStatus"></div>
+    <div class="lookup-result" id="lookupResult" hidden>
+      <div class="lr-en" id="lrEn"></div>
+      <div class="lr-it" id="lrIt"></div>
+      <div class="lr-pron" id="lrPron"></div>
+      <div class="lr-note" id="lrNote"></div>
+      <div class="speak-row">
+        <button class="speak-btn" id="lrSpeak" aria-label="Play pronunciation">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+        </button>
+        <div class="speak-slow-wrap">
+          <button class="speak-btn" id="lrSpeakSlow" aria-label="Play pronunciation slowly">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+          </button>
+          <span class="turtle-label">🐢</span>
+        </div>
+      </div>
+    </div>
+    <div class="lookup-saved">
+      <div class="lookup-saved-title">Saved words</div>
+      <div class="lookup-list" id="lookupList"></div>
+    </div>
+    <button class="lookup-back" id="lookupBack">Back</button>
   </div>
 
   <div class="wrap screen" id="cardScreen" style="display:none">
@@ -802,11 +913,13 @@ function renderHome(){
 function showHome(){
   renderHome();
   cardScreen.style.display = "none";
+  lookupScreen.style.display = "none";
   homeScreen.style.display = "flex";
 }
 
 function showCard(){
   homeScreen.style.display = "none";
+  lookupScreen.style.display = "none";
   cardScreen.style.display = "flex";
 }
 
@@ -1289,9 +1402,119 @@ stageEl.addEventListener("touchend", function(e){
 }, {passive:true});
 
 document.addEventListener("keydown", function(e){
+  if(cardScreen.style.display === "none") return;
+  var t = e.target;
+  if(t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA")) return;
   if(e.key === "ArrowRight") next();
   else if(e.key === " "){ e.preventDefault(); toggleFlip(); }
 });
+
+// ===== English -> Italian lookup (via the johnplusdictionary server) =====
+var LOOKUP_API = "https://johnplusdictionary.com";
+var lookupScreen = document.getElementById("lookupScreen");
+var lookupOpen = document.getElementById("lookupOpen");
+var lookupInput = document.getElementById("lookupInput");
+var lookupGo = document.getElementById("lookupGo");
+var lookupStatus = document.getElementById("lookupStatus");
+var lookupResult = document.getElementById("lookupResult");
+var lrEn = document.getElementById("lrEn");
+var lrIt = document.getElementById("lrIt");
+var lrPron = document.getElementById("lrPron");
+var lrNote = document.getElementById("lrNote");
+var lrSpeak = document.getElementById("lrSpeak");
+var lrSpeakSlow = document.getElementById("lrSpeakSlow");
+var lookupList = document.getElementById("lookupList");
+var lookupBack = document.getElementById("lookupBack");
+var lookupCurrent = null;
+
+function showLookup(){
+  homeScreen.style.display = "none";
+  cardScreen.style.display = "none";
+  lookupScreen.style.display = "flex";
+  loadHistory();
+  setTimeout(function(){ lookupInput.focus(); }, 60);
+}
+
+function renderResult(d){
+  lrEn.textContent = d.en || "";
+  lrIt.textContent = d.it || "";
+  lrPron.textContent = d.pron || "";
+  lrNote.textContent = d.note || "";
+  lrNote.style.display = d.note ? "" : "none";
+  lookupResult.hidden = false;
+}
+
+function doLookup(){
+  var q = (lookupInput.value || "").trim();
+  if(!q) return;
+  stopItalian();
+  lookupGo.disabled = true;
+  lookupStatus.textContent = "Looking up…";
+  lookupResult.hidden = true;
+  fetch(LOOKUP_API + "/it-lookup?q=" + encodeURIComponent(q))
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      lookupGo.disabled = false;
+      if(!d || !d.it){ lookupStatus.textContent = "No translation found."; return; }
+      lookupStatus.textContent = "";
+      lookupCurrent = d;
+      renderResult(d);
+      if(d.audio) playItalian(d.audio);
+      loadHistory();
+    })
+    .catch(function(){
+      lookupGo.disabled = false;
+      lookupStatus.textContent = "Couldn't reach the dictionary. Check the connection and try again.";
+    });
+}
+
+function renderHistory(items){
+  lookupList.innerHTML = "";
+  if(!items.length){
+    var empty = document.createElement("div");
+    empty.className = "lookup-empty";
+    empty.textContent = "Words you look up will appear here.";
+    lookupList.appendChild(empty);
+    return;
+  }
+  items.forEach(function(it){
+    var b = document.createElement("button");
+    b.className = "saved-item";
+    var txt = document.createElement("div");
+    txt.className = "si-text";
+    var itEl = document.createElement("div");
+    itEl.className = "si-it";
+    itEl.textContent = it.it || "";
+    var enEl = document.createElement("div");
+    enEl.className = "si-en";
+    enEl.textContent = it.en || "";
+    txt.appendChild(itEl);
+    txt.appendChild(enEl);
+    var play = document.createElement("span");
+    play.className = "si-play";
+    play.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>';
+    b.appendChild(txt);
+    b.appendChild(play);
+    b.addEventListener("click", function(){ if(it.audio) playItalian(it.audio); });
+    lookupList.appendChild(b);
+  });
+}
+
+function loadHistory(){
+  fetch(LOOKUP_API + "/it-history?limit=100")
+    .then(function(r){ return r.json(); })
+    .then(function(d){ renderHistory((d && d.items) || []); })
+    .catch(function(){});
+}
+
+lookupOpen.addEventListener("click", showLookup);
+lookupBack.addEventListener("click", showHome);
+lookupGo.addEventListener("click", doLookup);
+lookupInput.addEventListener("keydown", function(e){
+  if(e.key === "Enter"){ e.preventDefault(); doLookup(); }
+});
+lrSpeak.addEventListener("click", function(){ if(lookupCurrent && lookupCurrent.audio) playItalian(lookupCurrent.audio); });
+lrSpeakSlow.addEventListener("click", function(){ if(lookupCurrent && lookupCurrent.audio_slow) playItalian(lookupCurrent.audio_slow); });
 
 showHome();
 </script>
