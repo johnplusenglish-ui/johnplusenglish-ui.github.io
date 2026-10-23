@@ -314,6 +314,15 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
       </a>
     </div>
 
+    <div class="section-t">Leave John a note</div>
+    <div class="note-box">
+      <textarea id="noteText" maxlength="300" placeholder="Something short and sweet..."></textarea>
+      <div class="note-row">
+        <button class="btn btn-reset" id="noteBtn"><svg viewBox="0 0 24 24"><path d="M22 2 11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>Send note</button>
+        <span class="note-status" id="noteStatus"></span>
+      </div>
+    </div>
+
     <div class="section-t" id="revTitle" hidden>Review your answers</div>
     <div class="rev" id="review" hidden></div>
 
@@ -1230,6 +1239,39 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     });
   });
 
+  el("noteBtn").addEventListener("click", function(){
+    if(PREVIEW_LEVEL){ el("noteStatus").textContent = "Preview mode: nothing is sent."; return; }
+    var txt = el("noteText").value.trim();
+    if(!txt){ el("noteStatus").textContent = "Write something first."; return; }
+    var btn = el("noteBtn");
+    btn.disabled = true; el("noteStatus").textContent = "Sending...";
+    fetch(SUPABASE_URL + "/rest/v1/phrasal_test_notes", {
+      method: "POST", mode: "cors", keepalive: true,
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": SUPABASE_ANON_KEY,
+        "Authorization": "Bearer " + SUPABASE_ANON_KEY,
+        "Prefer": "return=minimal"
+      },
+      body: JSON.stringify({
+        full_name: student.name, email: student.email,
+        level: (lastCard ? lastCard.level : null),
+        note: txt.slice(0, 500)
+      })
+    }).then(function(r){
+      if(r.ok){
+        el("noteText").disabled = true;
+        el("noteStatus").textContent = "Sent. Thank you!";
+      } else {
+        btn.disabled = false;
+        el("noteStatus").textContent = "Could not send just now.";
+      }
+    }).catch(function(){
+      btn.disabled = false;
+      el("noteStatus").textContent = "Could not send just now.";
+    });
+  });
+
   document.addEventListener("keydown", function(e){
     if(quiz.hidden || !st) return;
     if(!el("stageBreak").hidden) return;
@@ -1306,6 +1348,8 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     el("review").hidden = true; el("revTitle").hidden = true;
     el("mistakesBtn").hidden = true;
     el("stageBreak").hidden = true;
+    el("noteText").value = ""; el("noteText").disabled = false;
+    el("noteBtn").disabled = false; el("noteStatus").textContent = "";
     if(PREVIEW_LEVEL){
       // A retake from the preview screen is a real attempt: record it like any other.
       PREVIEW_LEVEL = null;
