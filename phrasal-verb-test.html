@@ -678,6 +678,11 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     C1:"Really impressive. Very few learners handle these with this much control.",
     C2:"Outstanding. You are using phrasal verbs the way native speakers actually do."
   };
+  var BELOW = {code:"&lt;A2", name:"Building the basics", color:"#7A7D8E", submit:"<A2",
+    desc:"This test didn't confirm A2 yet. Phrasal verbs come later than most grammar, so this is a normal place to start.",
+    focus:"The most common everyday ones first: get up, sit down, turn on, put on, look for.",
+    john:"Phrasal verbs are the last thing to click for most learners. Start with the handful you hear every day.",
+    greet:"Thanks for taking it"};
   var GREET = {A2:"Great start", B1:"Well done", B2:"Nice work", C1:"Impressive stuff", C2:"Outstanding"};
 
   var LV = {
@@ -838,7 +843,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
   }
   function failBand(){
     st.failed[ORDER[st.band]] = true;
-    if(st.band===0){ finish(0); return; }
+    if(st.band===0){ finish(0, true); return; }
     if(st.passed[ORDER[st.band-1]]){ finish(st.band-1); return; }
     st.band--;
     var nb = ORDER[st.band];
@@ -897,17 +902,20 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     }catch(e){}
   }
 
-  function finish(placedIdx){
+  function finish(placedIdx, below){
     var level = ORDER[placedIdx], meta = LV[level];
+    if(below){
+      meta = {name:BELOW.name, color:BELOW.color, desc:BELOW.desc, focus:BELOW.focus, routes:meta.routes};
+    }
     if(!PREVIEW_LEVEL){ try{ localStorage.setItem("jpe-pv-level", JSON.stringify({level:level, at:Date.now()})); }catch(e){} }
-    logHit("pv-place-"+level.toLowerCase());
+    logHit("pv-place-"+(below ? "below" : level.toLowerCase()));
 
-    el("badge").textContent = level;
+    el("badge").innerHTML = below ? BELOW.code : level;
     document.querySelector(".badge").style.setProperty("--lvl", meta.color);
     el("resName").textContent = meta.name;
     var fn = (student.name || "").trim().split(/\s+/)[0] || "there";
-    el("resGreet").textContent = (GREET[level] || "Well done") + ", " + fn + "!";
-    el("resJohn").innerHTML = "&ldquo;" + JOHN[level] + "&rdquo;&nbsp; <b>John</b>";
+    el("resGreet").textContent = (below ? BELOW.greet : (GREET[level] || "Well done")) + ", " + fn + "!";
+    el("resJohn").innerHTML = "&ldquo;" + (below ? BELOW.john : JOHN[level]) + "&rdquo;&nbsp; <b>John</b>";
     el("resDesc").textContent = meta.desc;
     el("resFocus").textContent = meta.focus;
     var setScore = function(n){
@@ -947,7 +955,8 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     }
     var qual = frac < 0.33 ? "low" : (frac < 0.66 ? "solid" : "high");
     var pos = ((placedIdx + frac) / ORDER.length) * 100;
-    submitResult(level, meta.name, pos);
+    if(below) pos = 0;
+    submitResult(below ? BELOW.submit : level, meta.name, pos);
     lastCard = {level:level, levelName:meta.name, color:meta.color, qual:qual, pos:pos,
                 correct:st.correct, total:st.before, name:student.name};
     el("mistakesBtn").hidden = (mistakesFromHistory().length === 0);
@@ -956,7 +965,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     marker.style.borderColor = meta.color;
     mLabel.style.background = meta.color;
     mLabel.style.borderTopColor = meta.color;
-    mLabel.textContent = qual + " " + level;
+    mLabel.innerHTML = below ? BELOW.code : (qual + " " + level);
     marker.style.left = "0%";
     requestAnimationFrame(function(){ requestAnimationFrame(function(){ marker.style.left = pos + "%"; }); });
 
@@ -964,7 +973,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     ORDER.forEach(function(l){
       var sp = document.createElement("span");
       sp.textContent = l;
-      if(l===level) sp.className = "on";
+      if(l===level && !below) sp.className = "on";
       labels.appendChild(sp);
     });
 

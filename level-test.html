@@ -821,6 +821,11 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     C1:"Genuinely impressive. From here it&rsquo;s precision and sounding natural.",
     C2:"Outstanding. At this level it&rsquo;s all nuance, and that&rsquo;s the fun part."
   };
+  var BELOW = {code:"&lt;A1", name:"Not yet A1", color:"#7A7D8E", submit:"<A1",
+    desc:"This test didn't confirm A1 yet. That's a normal place to start, and the basics are the fastest part to build.",
+    focus:"The present simple, common nouns and everyday phrases: my name is, I live in, I have got.",
+    john:"Everyone starts somewhere. Get the everyday phrases solid and the rest follows quickly.",
+    greet:"Thanks for taking it"};
   var GREET = {A1:"Great start", A2:"Great start", B1:"Well done", B2:"Nice work", C1:"Impressive stuff", C2:"Outstanding"};
 
   var LV = {
@@ -984,7 +989,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
   }
   function failBand(){
     st.failed[ORDER[st.band]] = true;
-    if(st.band===0){ finish(0); return; }
+    if(st.band===0){ finish(0, true); return; }
     if(st.passed[ORDER[st.band-1]]){ finish(st.band-1); return; }
     st.band--;
     var nb = ORDER[st.band];
@@ -1082,16 +1087,19 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     }
   }
 
-  function finish(placedIdx){
+  function finish(placedIdx, below){
     var level = ORDER[placedIdx], meta = LV[level];
+    if(below){
+      meta = {name:BELOW.name, color:BELOW.color, desc:BELOW.desc, focus:BELOW.focus, routes:meta.routes};
+    }
     if(!PREVIEW_LEVEL){ try{ localStorage.setItem("jpe-level", JSON.stringify({level:level, at:Date.now()})); }catch(e){} }
     logHit("lt-place-"+level.toLowerCase());
 
-    el("badge").textContent = level;
+    el("badge").innerHTML = below ? BELOW.code : level;
     document.querySelector(".badge").style.setProperty("--lvl", meta.color);
     el("resName").textContent = meta.name;
     var fn = (student.name || "").trim().split(/\s+/)[0] || "there";
-    el("resGreet").textContent = (GREET[level] || "Well done") + ", " + fn + "!";
+    el("resGreet").textContent = (below ? BELOW.greet : (GREET[level] || "Well done")) + ", " + fn + "!";
     var ylMeta = isYoungLearner ? (LV_YL[level] || {}) : {};
     el("resJohn").innerHTML = "&ldquo;" + ((isYoungLearner && JOHN_YL[level]) || JOHN[level]) + "&rdquo;&nbsp; <b>John</b>";
     setupJohnAudio(level);
@@ -1134,7 +1142,8 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     }
     var qual = frac < 0.33 ? "low" : (frac < 0.66 ? "solid" : "high");
     var pos = ((placedIdx + frac) / ORDER.length) * 100;
-    submitResult(level, meta.name, pos);
+    if(below) pos = 0;
+    submitResult(below ? BELOW.submit : level, meta.name, pos);
     lastCard = {level:level, levelName:meta.name, color:meta.color, qual:qual, pos:pos,
                 correct:st.correct, total:st.before, name:student.name};
     el("mistakesBtn").hidden = (mistakesFromHistory().length === 0);
@@ -1143,7 +1152,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     marker.style.borderColor = meta.color;
     mLabel.style.background = meta.color;
     mLabel.style.borderTopColor = meta.color;
-    mLabel.textContent = qual + " " + level;
+    mLabel.innerHTML = below ? BELOW.code : (qual + " " + level);
     marker.style.left = "0%";
     requestAnimationFrame(function(){ requestAnimationFrame(function(){ marker.style.left = pos + "%"; }); });
 
@@ -1151,7 +1160,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     ORDER.forEach(function(l){
       var sp = document.createElement("span");
       sp.textContent = l;
-      if(l===level) sp.className = "on";
+      if(l===level && !below) sp.className = "on";
       labels.appendChild(sp);
     });
 
