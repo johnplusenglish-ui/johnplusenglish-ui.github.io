@@ -146,6 +146,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
 .res-name{font-size:clamp(1.4rem,4vw,1.8rem);font-weight:900;letter-spacing:-.01em;margin:.25rem 0 .5rem}
 .res-desc{font-size:.95rem;color:var(--muted);max-width:46ch;margin:0 auto .3rem}
 .res-focus-box{display:inline-block;margin:.7rem auto 0;padding:.55rem .95rem;background:var(--sky-light);border-radius:10px;max-width:46ch}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 .res-scale-note{font-size:.82rem;color:var(--muted);max-width:50ch;margin:.9rem auto 0;line-height:1.55}
 .focus-label{display:block;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--sky);margin-bottom:.15rem}
 .res-focus-text{font-size:.85rem;color:var(--ink);font-weight:500}
@@ -287,8 +288,9 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
       </div>
       <img class="res-john-photo" src="images/john-circle.jpg" alt="John, johnplusenglish" width="72" height="72" loading="lazy">
       <p class="res-john" id="resJohn"></p>
-      <div class="res-score" id="resScore"></div>
-      <p class="res-scale-note">This band is for phrasal verbs on their own. They are the part of English that lags furthest behind, so most people land a step below their general level here. That is normal, and it is the gap worth working on.</p>
+      <div class="res-score" id="resScore" aria-hidden="true"></div>
+      <span class="sr-only" id="resScoreSR"></span>
+      <p class="res-scale-note">This band is for phrasal verbs on their own, and it measures how well you recognise them rather than how you use them in speech. They are the part of English that lags furthest behind, so most people land a step below their general level here. That is normal, and it is the gap worth working on.</p>
     </div>
 
     <div class="section-t">Your position on the scale</div>
@@ -569,7 +571,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
       {id:"pv-c2-g16", s:"The claims he made simply don&rsquo;t stack ___.", o:["out","over","in","up"], a:3, w:"Stack up means seem credible when examined."},
       {id:"pv-c2-g17", s:"The speeches eventually died ___ and the hall emptied.", o:["down","off","up","over"], a:0, w:"Die down means gradually become quieter or less intense."},
       {id:"pv-c2-g18", s:"The noise was deafening, so the head told the class to pipe ___.", o:["up","down","off","out"], a:1, w:"Pipe down means stop talking and be quiet."},
-      {id:"pv-c2-g19", s:"The government has begun to roll ___ the reforms.", o:["off","out","back","down"], a:2, w:"Roll back means reverse or reduce something previously introduced."},
+      {id:"pv-c2-g19", s:"The new government has begun to roll ___ the reforms introduced by its predecessor.", o:["off","out","back","down"], a:2, w:"Roll back means reverse or reduce something already introduced. Roll out would mean launch it."},
       {id:"pv-c2-g20", s:"We need to flesh ___ the proposal with some detail.", o:["up","over","in","out"], a:3, w:"Flesh out means add detail to something sketchy."},
       {id:"pv-c2-g21", s:"She pored ___ the documents for the best part of a day.", o:["over","about","at","into"], a:0, w:"Pore over means study something closely and at length."},
       {id:"pv-c2-g22", s:"The firm shored ___ its finances with an emergency loan.", o:["in","up","out","over"], a:1, w:"Shore up means support something that is weak."},
@@ -660,6 +662,17 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     ]
   };
 
+  function deal(list){
+    return list.map(function(it){
+      var ord = it.o.map(function(_, i){ return i; });
+      shuffle(ord);
+      var copy = {};
+      for(var k in it) if(Object.prototype.hasOwnProperty.call(it, k)) copy[k] = it[k];
+      copy.o = ord.map(function(j){ return it.o[j]; });
+      copy.a = ord.indexOf(it.a);
+      return copy;
+    });
+  }
   function bandPool(band){ return POOL[band]; }
   function bandReserve(band){ return RESERVE_POOL[band]; }
 
@@ -727,7 +740,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     var pool = bandPool(ORDER[st.band]);
     var gv = shuffle(pool.gv.slice()).slice(0,9);
     var rc = shuffle(pool.rc.slice()).slice(0,3);
-    st.items = shuffle(gv.concat(rc));
+    st.items = deal(shuffle(gv.concat(rc)));
     st.idx = 0;
     st.ans = new Array(st.items.length).fill(null);
     render();
@@ -785,7 +798,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
       // fail outright if below the floor, or if even a perfect reserve could not reach the bar
       if(c <= FAIL_CORE[b] || c + RES < PASS_TOTAL[b]){ st.per[b] = {c:c, t:CORE}; failBand(); return; }
       st.coreC = c; st.phase = "reserve";
-      st.items = shuffle(bandReserve(b).slice()).slice(0,4);
+      st.items = deal(shuffle(bandReserve(b).slice()).slice(0,4));
       st.idx = 0;
       st.ans = new Array(st.items.length).fill(null);
       stageBreak(b, "Close call. A few more <b>"+b+"</b> questions to be sure.", render); return;
@@ -921,6 +934,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
     var setScore = function(n){
       el("resScore").textContent = "You answered "+n+" of "+st.before+" correctly across "+Object.keys(st.per).length+" level checks.";
     };
+    el("resScoreSR").textContent = "You answered "+st.correct+" of "+st.before+" correctly across "+Object.keys(st.per).length+" level checks.";
     var reduced = true;
     try{ reduced = !window.performance || (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches); }catch(e){}
     if(reduced){ setScore(st.correct); }
