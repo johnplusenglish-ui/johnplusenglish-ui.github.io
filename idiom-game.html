@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Finish the Idiom - johnplusenglish</title>
+<meta name="description" content="Finish the idiom. 64 everyday English idioms with one word missing, two guesses each, a buzzer, and the meaning and an example after every answer.">
+<link rel="canonical" href="https://johnplusenglish.com/idiom-game.html">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%230b0e14'/%3E%3Cpath d='M12 5 4 9l8 4 8-4-8-4z' stroke='%23ffc53d' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M8 10.8v3c0 1 2 2 4 2s4-1 4-2v-3' stroke='%23ffc53d' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M19 9v4.5' stroke='%23ffc53d' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="johnplusenglish">
+<meta property="og:title" content="Finish the Idiom - johnplusenglish">
+<meta property="og:description" content="64 everyday English idioms with one word missing. Type it, two guesses each, buzzer included.">
+<meta property="og:url" content="https://johnplusenglish.com/idiom-game.html">
+<meta property="og:image" content="https://johnplusenglish.com/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0b0e14;
+    --ink-2:#121724;
+    --card:#161c2b;
+    --line:rgba(255,255,255,.10);
+    --text:#eef2f8;
+    --muted:#8d99b0;
+    --gold:#ffc53d;
+    --green:#35d07f;
+    --red:#ff5f5f;
+    --blue:#5aa9ff;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    background:
+      radial-gradient(1100px 620px at 50% -10%, #1b2437 0%, rgba(27,36,55,0) 60%),
+      var(--ink);
+    color:var(--text);
+    font-family:'Outfit',system-ui,-apple-system,sans-serif;
+    font-weight:400;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:28px 16px 48px;
+    min-height:100%;
+  }
+  .wrap{width:100%;max-width:760px}
+
+  /* ---------- header ---------- */
+  header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:26px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:13px;color:var(--muted)}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--gold);box-shadow:0 0 14px var(--gold)}
+  .tools{display:flex;gap:8px}
+  .chip{
+    border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--muted);
+    border-radius:999px;padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer;
+    font-family:inherit;transition:.15s;
+  }
+  .chip:hover{color:var(--text);border-color:rgba(255,255,255,.26)}
+  .chip.on{color:var(--ink);background:var(--gold);border-color:var(--gold)}
+
+  /* ---------- panels ---------- */
+  .panel{display:none}
+  .panel.show{display:block;animation:fade .3s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  /* ---------- start ---------- */
+  .hero{text-align:center;padding:30px 0 10px}
+  h1{
+    font-size:clamp(38px,8vw,68px);line-height:.98;margin:0 0 18px;
+    font-weight:800;letter-spacing:-.02em;text-transform:uppercase;
+  }
+  h1 span{color:var(--gold)}
+  .sub{color:var(--muted);font-size:17px;max-width:460px;margin:0 auto 34px;line-height:1.5}
+  .gate{display:flex;flex-direction:column;gap:12px;max-width:420px;margin:0 auto 14px;text-align:left}
+  .field label{display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  .field input{
+    width:100%;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:12px;
+    color:var(--text);font-family:inherit;font-size:16px;font-weight:500;padding:13px 15px;outline:none;transition:.15s;
+  }
+  .field input:focus{border-color:var(--gold);background:rgba(255,197,61,.07)}
+  .field input.bad{border-color:var(--red)}
+  .field input::placeholder{color:#4e5872}
+  .field-err{display:none;color:var(--red);font-size:12.5px;margin-top:5px}
+  .field-err.show{display:block}
+  .consent{max-width:420px;margin:0 auto 20px;color:var(--muted);font-size:13px;text-align:center;line-height:1.5}
+  .saved{margin-top:18px;color:var(--muted);font-size:13px;text-align:center}
+  .opts{display:flex;flex-direction:column;gap:14px;max-width:420px;margin:0 auto 30px;text-align:left}
+  .opt{display:flex;align-items:center;justify-content:space-between;gap:14px;border:1px solid var(--line);background:rgba(255,255,255,.02);border-radius:14px;padding:14px 16px}
+  .opt .lbl{font-weight:600;font-size:15px}
+  .opt .hint{color:var(--muted);font-size:13px;margin-top:2px}
+  .seg{display:flex;background:rgba(0,0,0,.3);border-radius:999px;padding:3px;gap:3px}
+  .seg button{
+    border:0;background:transparent;color:var(--muted);font-family:inherit;font-weight:600;font-size:13px;
+    padding:7px 13px;border-radius:999px;cursor:pointer;transition:.15s;white-space:nowrap;
+  }
+  .seg button.on{background:var(--gold);color:var(--ink)}
+  .big{
+    display:block;width:100%;max-width:420px;margin:0 auto;border:0;cursor:pointer;
+    background:var(--gold);color:var(--ink);font-family:inherit;font-weight:800;font-size:19px;
+    letter-spacing:.04em;text-transform:uppercase;padding:18px;border-radius:14px;transition:.15s;
+  }
+  .big:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(255,197,61,.22)}
+  .big.ghost{background:transparent;color:var(--text);border:1px solid var(--line);margin-top:12px}
+  .big.ghost:hover{box-shadow:none;border-color:rgba(255,255,255,.3)}
+
+  /* ---------- quiz ---------- */
+  .bar{height:3px;background:rgba(255,255,255,.07);border-radius:4px;overflow:hidden;margin-bottom:22px}
+  .bar i{display:block;height:100%;width:0;background:var(--gold);transition:width .35s ease}
+  .meta{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted);font-weight:600;margin-bottom:26px;letter-spacing:.06em;text-transform:uppercase}
+  .scores{display:flex;gap:18px}
+  .scores b{color:var(--text)}
+  .streak{color:var(--gold)}
+
+  .card{
+    border:1px solid var(--line);
+    background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.015));
+    border-radius:20px;padding:40px 30px;text-align:center;position:relative;
+    transition:border-color .2s, box-shadow .2s;
+  }
+  .card.good{border-color:rgba(53,208,127,.6);box-shadow:0 0 0 1px rgba(53,208,127,.25),0 18px 50px rgba(53,208,127,.10)}
+  .card.bad{border-color:rgba(255,95,95,.6);box-shadow:0 0 0 1px rgba(255,95,95,.25),0 18px 50px rgba(255,95,95,.10)}
+  .card.shake{animation:shake .4s}
+  @keyframes shake{10%,90%{transform:translateX(-2px)}30%,70%{transform:translateX(5px)}50%{transform:translateX(-5px)}}
+
+  .prompt{
+    font-size:clamp(26px,5.2vw,42px);font-weight:700;line-height:1.25;text-transform:uppercase;
+    letter-spacing:-.01em;display:flex;flex-wrap:wrap;justify-content:center;align-items:baseline;gap:.3em;
+  }
+  .blank{
+    display:inline-block;min-width:4.5em;border-bottom:3px solid var(--gold);
+    color:var(--gold);padding:0 .1em 2px;
+  }
+  .blank.filled{border-bottom-color:currentColor}
+  .blank.good{color:var(--green)}
+  .blank.bad{color:var(--red);text-decoration:line-through;text-decoration-thickness:2px}
+
+  input.gap{
+    font:inherit;font-size:inherit;font-weight:inherit;letter-spacing:inherit;text-transform:uppercase;
+    width:9ch;min-width:9ch;background:rgba(255,197,61,.07);border:0;border-bottom:3px solid var(--gold);
+    border-radius:6px 6px 0 0;color:var(--gold);text-align:center;outline:none;padding:0 .08em 2px;
+    caret-color:var(--gold);transition:background .15s;
+  }
+  input.gap:focus{background:rgba(255,197,61,.14)}
+  input.gap::placeholder{color:rgba(255,197,61,.28)}
+
+  .feedback{margin-top:26px;min-height:70px}
+  .verdict{font-weight:700;font-size:15px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px}
+  .verdict.good{color:var(--green)}
+  .verdict.bad{color:var(--red)}
+  .meaning{color:var(--muted);font-size:16px;line-height:1.55;max-width:520px;margin:0 auto}
+  .meaning b{color:var(--text);font-weight:600}
+  .example{color:#6f7b92;font-size:15px;margin-top:8px}
+
+  .retry{
+    color:var(--gold);font-weight:700;font-size:14px;letter-spacing:.14em;text-transform:uppercase;
+  }
+  .retry span{display:block;color:var(--muted);font-weight:500;letter-spacing:0;text-transform:none;font-size:15px;margin-top:6px}
+  .big.ghost{background:transparent;color:var(--text);border:1px solid var(--line)}
+  a.big{text-decoration:none;text-align:center}
+
+  /* ---------- results ---------- */
+  .score-ring{text-align:center;padding:14px 0 6px}
+  .score-big{font-size:clamp(60px,14vw,110px);font-weight:800;line-height:1;letter-spacing:-.04em}
+  .score-big small{font-size:.3em;color:var(--muted);font-weight:600;letter-spacing:0}
+  .grade{color:var(--gold);font-weight:700;letter-spacing:.16em;text-transform:uppercase;font-size:14px;margin-top:12px}
+  .review{margin:34px 0 10px;border-top:1px solid var(--line)}
+  .review h2{font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:26px 0 14px}
+  .miss{display:flex;gap:14px;align-items:flex-start;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+  .miss .idi{font-weight:700;min-width:0;flex:1}
+  .miss .mn{color:var(--muted);font-size:14px;margin-top:3px;font-weight:400}
+  .miss .tick{color:var(--green);font-weight:800}
+  .miss .cross{color:var(--red);font-weight:800}
+  footer{margin-top:40px;text-align:center;color:#4b5468;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand"><span class="dot"></span> Finish the Idiom</div>
+    <div class="tools">
+      <button class="chip on" id="soundBtn">Sound on</button>
+      <button class="chip" id="quitBtn" style="display:none">Quit</button>
+    </div>
+  </header>
+
+  <!-- START -->
+  <section class="panel show" id="startPanel">
+    <div class="hero">
+      <h1>Finish the<br><span>Idiom</span></h1>
+      <p class="sub"><span id="subCount">58</span> everyday English idioms, one missing word each. Type it into the gap and press enter.</p>
+    </div>
+    <div class="gate">
+      <div class="field">
+        <label for="gName">Your name</label>
+        <input type="text" id="gName" autocomplete="name" placeholder="e.g. Maria">
+        <div class="field-err" id="gNameErr">Please enter your name.</div>
+      </div>
+      <div class="field">
+        <label for="gEmail">Email</label>
+        <input type="email" id="gEmail" autocomplete="email" placeholder="e.g. maria@email.com">
+        <div class="field-err" id="gEmailErr">Please enter a valid email.</div>
+      </div>
+      <div class="field">
+        <label for="gCountry">Nationality</label>
+        <input type="text" id="gCountry" autocomplete="country-name" placeholder="e.g. Italian">
+        <div class="field-err" id="gCountryErr">Please enter your nationality.</div>
+      </div>
+    </div>
+    <p class="consent">Your score is saved so John can see how you did. Never shared.</p>
+
+    <div class="opts">
+      <div class="opt">
+        <div>
+          <div class="lbl">How many?</div>
+          <div class="hint">Picked at random</div>
+        </div>
+        <div class="seg" id="lenSeg">
+          <button data-len="10">10</button>
+          <button data-len="25">25</button>
+          <button data-len="58" class="on" id="allBtn">All 58</button>
+        </div>
+      </div>
+      <div class="opt">
+        <div>
+          <div class="lbl">Show the meaning?</div>
+          <div class="hint">A clue under the gap</div>
+        </div>
+        <div class="seg" id="clueSeg">
+          <button data-clue="after" class="on">After</button>
+          <button data-clue="before">Before</button>
+        </div>
+      </div>
+    </div>
+    <button class="big" id="startBtn">Start</button>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="panel" id="quizPanel">
+    <div class="bar"><i id="barFill"></i></div>
+    <div class="meta">
+      <div id="counter">Question 1 of 58</div>
+      <div class="scores">
+        <div>Score <b id="scoreOut">0</b></div>
+        <div class="streak">Streak <b id="streakOut">0</b></div>
+      </div>
+    </div>
+
+    <div class="card" id="card">
+      <div class="prompt" id="prompt"></div>
+      <div id="clueBefore" class="meaning" style="margin-top:22px;display:none"></div>
+        <div class="feedback" id="feedback"></div>
+    </div>
+
+
+  </section>
+
+  <!-- RESULTS -->
+  <section class="panel" id="endPanel">
+    <div class="score-ring">
+      <div class="score-big"><span id="finalScore">0</span><small>/<span id="finalTotal">58</span></small></div>
+      <div class="grade" id="grade"></div>
+    </div>
+    <div class="review" id="review"></div>
+    <p class="saved" id="savedNote"></p>
+    <div style="margin-top:30px">
+      <button class="big" id="againBtn">Play again</button>
+      <button class="big ghost" id="missedBtn">Retry the ones I missed</button>
+      <a class="big ghost" id="pdfBtn" href="pdfs/finish-the-idiom.pdf" target="_blank" rel="noopener">Get the PDF of all the idioms</a>
+    </div>
+  </section>
+
+  <footer>John Plus English</footer>
+</div>
+
+<script>
+/* ------------------------------------------------------------------ data */
+const IDIOMS = [
+ {p:"A blessing in ___", a:"disguise", m:"Something that seems bad at first but turns out to be good.", e:"Losing that job was a blessing in disguise."},
+ {p:"Hit the ___ on the head", a:"nail", m:"Say exactly the right thing about a problem.", e:"You've hit the nail on the head, it's a money problem."},
+ {p:"A piece of ___", a:"cake", m:"Very easy.", e:"The exam was a piece of cake."},
+ {p:"Pull someone's ___", a:"leg", m:"Joke with someone by telling them something untrue.", e:"Relax, I'm only pulling your leg."},
+ {p:"Take it with a pinch of ___", a:"salt", m:"Don't believe it completely.", e:"He exaggerates, so take it with a pinch of salt."},
+ {p:"On the ___", a:"fence", m:"Unable to decide between two sides.", e:"I'm still on the fence about moving abroad."},
+ {p:"In the long ___", a:"run", m:"Over a long period of time in the future.", e:"Walking to work saves money in the long run."},
+ {p:"Not my cup of ___", a:"tea", m:"Not something you enjoy.", e:"Horror films are not my cup of tea."},
+ {p:"Ring a ___", a:"bell", m:"Sound familiar.", e:"That name rings a bell, but I can't place her."},
+ {p:"A storm in a ___", a:"teacup", m:"A lot of fuss about something unimportant.", e:"The whole argument was a storm in a teacup."},
+ {p:"On the same ___", a:"page", m:"In agreement, understanding things the same way.", e:"Before we start, let's make sure we're on the same page."},
+ {p:"A grey ___", a:"area", m:"A situation where the rules are not clear.", e:"Working from abroad is a bit of a grey area."},
+ {p:"Better late than ___", a:"never", m:"Doing something late is better than not doing it.", e:"He apologised after a year, but better late than never."},
+ {p:"Better safe than ___", a:"sorry", m:"It is wiser to be careful than to take a risk.", e:"Take an umbrella, better safe than sorry."},
+ {p:"Actions speak louder than ___", a:"words", m:"What you do matters more than what you say.", e:"He promises a lot, but actions speak louder than words."},
+ {p:"The grass is always ___ on the other side", a:"greener", m:"Other people's situations always look better than yours.", e:"She misses her old job, but the grass is always greener."},
+ {p:"Don't put all your ___ in one basket", a:"eggs", m:"Don't risk everything on one plan.", e:"Apply to three universities, don't put all your eggs in one basket."},
+ {p:"Every cloud has a silver ___", a:"lining", m:"Every bad situation has something good in it.", e:"The flight was cancelled, but every cloud has a silver lining, we got a free hotel."},
+ {p:"You can't have your ___ and eat it", a:"cake", m:"You can't have two good things that don't go together.", e:"You want the money and the free time? You can't have your cake and eat it."},
+ {p:"You ___ what you sow", a:"reap", m:"You get the results of your own actions.", e:"He was rude to everyone for years, and you reap what you sow."},
+ {p:"There's no use crying over spilt ___", a:"milk", m:"There is no point being upset about something you can't change.", e:"The car's sold now, no use crying over spilt milk."},
+ {p:"Out of the ___", a:"blue", m:"Suddenly and unexpectedly.", e:"She called me out of the blue after ten years."},
+ {p:"On the tip of my ___", a:"tongue", m:"You almost remember a word but can't quite say it.", e:"His name is on the tip of my tongue."},
+ {p:"Touch ___", a:"wood", m:"Said to avoid bad luck after talking about good luck.", e:"I've never broken a bone, touch wood."},
+ {p:"Call it a ___", a:"day", m:"Stop working on something for now.", e:"We've done enough, let's call it a day."},
+ {p:"Throw in the ___", a:"towel", m:"Give up.", e:"After three rejections he threw in the towel."},
+ {p:"In two ___", a:"minds", m:"Undecided about something.", e:"I'm in two minds about taking the job."},
+ {p:"Put your ___ in it", a:"foot", m:"Say something embarrassing or tactless by accident.", e:"I asked about his wife, then really put my foot in it."},
+ {p:"A pain in the ___", a:"neck", m:"Something or someone annoying.", e:"Filling in these forms is a pain in the neck."},
+ {p:"Back to ___ one", a:"square", m:"Back to the beginning after a failure.", e:"The client rejected the design, so it's back to square one."},
+ {p:"Off the top of my ___", a:"head", m:"Without checking or thinking carefully.", e:"Off the top of my head, I'd say about forty people came."},
+ {p:"Practice makes ___", a:"perfect", m:"You improve at something by doing it repeatedly.", e:"Keep speaking every day, practice makes perfect."},
+ {p:"No pain, no ___", a:"gain", m:"You have to suffer a little to get results.", e:"My legs are killing me, but no pain, no gain."},
+ {p:"When it rains, it ___", a:"pours", m:"Bad things tend to happen all at once.", e:"The boiler broke, then the car died. When it rains, it pours."},
+ {p:"The early ___ catches the worm", a:"bird", m:"The person who acts first gets the advantage.", e:"Tickets go fast, so the early bird catches the worm."},
+ {p:"Don't count your ___ before they hatch", a:"chickens", m:"Don't rely on something good until it has actually happened.", e:"You haven't signed yet, so don't count your chickens."},
+ {p:"___ can't be choosers", a:"beggars", m:"If you have no choice, you take what you are given.", e:"It's a tiny flat, but beggars can't be choosers."},
+ {p:"Beat around the ___", a:"bush", m:"Avoid saying what you really mean.", e:"Stop beating around the bush and tell me the price."},
+ {p:"Cut to the ___", a:"chase", m:"Get to the important part.", e:"Let's cut to the chase, how much do you want?"},
+ {p:"The best of ___ worlds", a:"both", m:"A situation where you get the advantages of two things.", e:"Working two days at home is the best of both worlds."},
+ {p:"A slippery ___", a:"slope", m:"A small bad step that leads to much worse things.", e:"Skipping one class is a slippery slope."},
+ {p:"Get cold ___", a:"feet", m:"Become too nervous to do something you planned.", e:"He got cold feet the night before the wedding."},
+ {p:"Play it by ___", a:"ear", m:"Decide as you go, without a fixed plan.", e:"We've booked the flights, the rest we'll play by ear."},
+ {p:"Be snowed ___", a:"under", m:"Have far too much work.", e:"I'm snowed under until Friday."},
+ {p:"Get your ___ together", a:"act", m:"Start organising yourself and behaving properly.", e:"If he doesn't get his act together, he'll fail."},
+ {p:"Go down a ___ hole", a:"rabbit", m:"Get lost in something complicated for a long time.", e:"I went down a rabbit hole reading about volcanoes."},
+ {p:"Easier ___ than done", a:"said", m:"It sounds simple but it is hard in practice.", e:"Just stop worrying? Easier said than done."},
+ {p:"It takes ___ to tango", a:"two", m:"Both people are responsible, not just one.", e:"Don't blame her alone, it takes two to tango."},
+ {p:"The devil is in the ___", a:"detail", m:"The small details are where the real problems are.", e:"The contract looks fine, but the devil is in the detail."},
+ {p:"Have a lot on your ___", a:"plate", m:"Have a lot of work or problems to deal with.", e:"Ask someone else, she's got a lot on her plate."},
+ {p:"The ___ in the room", a:"elephant", m:"An obvious problem that nobody wants to talk about.", e:"Nobody mentioned the money, the elephant in the room."},
+ {p:"Stick to your ___", a:"guns", m:"Refuse to change your opinion or decision.", e:"They pushed him hard, but he stuck to his guns."},
+ {p:"Have second ___", a:"thoughts", m:"Start to doubt a decision you made.", e:"I'm having second thoughts about the flat."},
+ {p:"Go with the ___", a:"flow", m:"Accept the situation and do what others are doing.", e:"There's no plan tonight, we'll just go with the flow."},
+ {p:"A double-edged ___", a:"sword", m:"Something with a good side and a bad side.", e:"Working from home is a double-edged sword."},
+ {p:"Out of sight, out of ___", a:"mind", m:"You forget about things you cannot see.", e:"I put the biscuits in the cupboard, out of sight, out of mind."},
+ {p:"When in Rome, do as the ___ do", a:"Romans", m:"Follow the local customs when you are somewhere new.", e:"They eat at ten here, so when in Rome, do as the Romans do."},
+ {p:"Miss the ___", a:"boat", m:"Lose a chance because you were too slow.", e:"Book now or you'll miss the boat."},
+ {p:"Go ___-shaped", a:"pear", m:"Go badly wrong.", e:"The whole trip went pear-shaped on day two."},
+ {p:"Get the ___ of something", a:"hang", m:"Learn how to do something after a bit of practice.", e:"Give it a week and you'll get the hang of it."},
+ {p:"Be up in the ___", a:"air", m:"Still uncertain, not decided.", e:"Our summer plans are up in the air."},
+ {p:"Take a rain ___", a:"check", m:"Say no for now but yes another time.", e:"I'll take a rain check on dinner, I'm exhausted."},
+ {p:"Make ends ___", a:"meet", m:"Earn just enough money to pay for what you need.", e:"With two kids, they're struggling to make ends meet."},
+ {p:"Have a ___ on your shoulder", a:"chip", m:"Stay angry about something unfair that happened to you.", e:"He's had a chip on his shoulder since they passed him over."}
+];
+const ALTS = {detail:["details"], chickens:["chicken"], minds:["mind"], feet:["foot"], thoughts:["thought"], guns:["gun"], Romans:["roman"]};
+
+/* ------------------------------------------------------------------ tracking */
+// The anon key is safe here: Row Level Security only allows INSERT.
+const SUPABASE_URL = "https://uovqsqnxcgvefxpxntcj.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_VTOzRUebaH_xQAs4wngfug_jCVCeCFB";
+const TABLE = "idiom_game_results";
+let student = { name:"", email:"", country:"" };
+
+function logHit(key){
+  try{ fetch("https://abacus.jasoncameron.dev/hit/johnplusenglish/"+key, {mode:"cors", keepalive:true}).catch(()=>{}); }catch(e){}
+}
+function validEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+function markField(inputId, errId, ok){
+  $(inputId).classList.toggle('bad', !ok);
+  $(errId).classList.toggle('show', !ok);
+  return ok;
+}
+
+/* ------------------------------------------------------------------ state */
+let clueWhen='after', wantLen=IDIOMS.length;
+let deck=[], idx=0, score=0, streak=0, best=0, answered=false, soundOn=true, results=[], tries=0;
+
+const $ = id => document.getElementById(id);
+const startPanel=$('startPanel'), quizPanel=$('quizPanel'), endPanel=$('endPanel');
+
+/* ------------------------------------------------------------------ sound */
+let ac=null;
+function audio(){ if(!ac) ac = new (window.AudioContext||window.webkitAudioContext)(); return ac; }
+function tone(freq, start, dur, type, vol, slideTo){
+  const c=audio(), o=c.createOscillator(), g=c.createGain();
+  o.type=type; o.frequency.setValueAtTime(freq, c.currentTime+start);
+  if(slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, c.currentTime+start+dur);
+  g.gain.setValueAtTime(0.0001, c.currentTime+start);
+  g.gain.exponentialRampToValueAtTime(vol, c.currentTime+start+0.012);
+  g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime+start+dur);
+  o.connect(g); g.connect(c.destination);
+  o.start(c.currentTime+start); o.stop(c.currentTime+start+dur+0.03);
+}
+function ding(){ if(!soundOn) return; tone(880,0,.14,'sine',.25); tone(1318.5,.1,.3,'sine',.22); }
+function buzz(){ if(!soundOn) return; tone(170,0,.34,'square',.16,110); tone(85,0,.34,'sawtooth',.08); }
+function fanfare(){ if(!soundOn) return; [523,659,784,1046].forEach((f,i)=>tone(f,i*.11,.3,'triangle',.2)); }
+
+/* ------------------------------------------------------------------ setup */
+function segify(el, key, cb){
+  el.querySelectorAll('button').forEach(b=>b.onclick=()=>{
+    el.querySelectorAll('button').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on'); cb(b.dataset[key]);
+  });
+}
+segify($('lenSeg'),'len',v=>wantLen=+v);
+$('subCount').textContent = IDIOMS.length;
+$('allBtn').textContent = 'All '+IDIOMS.length;
+$('allBtn').dataset.len = IDIOMS.length;
+segify($('clueSeg'),'clue',v=>clueWhen=v);
+
+$('soundBtn').onclick=()=>{
+  soundOn=!soundOn;
+  $('soundBtn').classList.toggle('on',soundOn);
+  $('soundBtn').textContent = soundOn?'Sound on':'Sound off';
+  if(soundOn) ding();
+};
+$('startBtn').onclick=()=>{
+  const n=$('gName').value.trim(), e=$('gEmail').value.trim(), c=$('gCountry').value.trim();
+  const okN=markField('gName','gNameErr', n.length>1);
+  const okE=markField('gEmail','gEmailErr', validEmail(e));
+  const okC=markField('gCountry','gCountryErr', c.length>1);
+  if(!(okN&&okE&&okC)) return;
+  student={name:n, email:e, country:c};
+  logHit('idiom-game-start');
+  start(shuffle(IDIOMS.slice()).slice(0,wantLen));
+};
+$('againBtn').onclick=()=>show(startPanel);
+$('quitBtn').onclick=()=>finish();
+$('missedBtn').onclick=()=>{
+  const missed = results.filter(r=>!r.firstTry).map(r=>r.item);
+  if(missed.length) start(shuffle(missed));
+};
+
+function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+function show(p){ [startPanel,quizPanel,endPanel].forEach(x=>x.classList.remove('show')); p.classList.add('show'); window.scrollTo({top:0,behavior:'smooth'}); }
+
+function start(list){
+  deck=list; idx=0; score=0; streak=0; best=0; results=[];
+  $('quitBtn').style.display='';
+  show(quizPanel); render();
+}
+
+/* ------------------------------------------------------------------ round */
+function render(){
+  answered=false; tries=0;
+  const it=deck[idx];
+  $('counter').textContent = `Question ${idx+1} of ${deck.length}`;
+  $('scoreOut').textContent = score;
+  $('streakOut').textContent = streak;
+  $('barFill').style.width = (idx/deck.length*100)+'%';
+  $('card').className='card';
+  $('feedback').innerHTML='';
+
+  const parts = it.p.split('___');
+  $('prompt').innerHTML = esc(parts[0])
+    + '<input class="gap" id="gapInput" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="?">'
+    + esc(parts[1]||'');
+
+  const cb=$('clueBefore');
+  if(clueWhen==='before'){ cb.style.display=''; cb.innerHTML='<b>Clue.</b> '+esc(it.m); }
+  else cb.style.display='none';
+
+  setTimeout(()=>{ const g=$('gapInput'); if(g) g.focus(); },60);
+}
+function esc(s){ return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+function norm(s){ return s.toLowerCase().trim().replace(/[^a-z' ]/g,'').replace(/\s+/g,' '); }
+
+function judge(given){
+  const it=deck[idx];
+  const accepted=[it.a, ...(ALTS[it.a]||[])].map(norm);
+  const ok = given!==null && accepted.includes(norm(given));
+  tries++;
+
+  // one more go before the word is given away
+  if(!ok && given!==null && tries<2){
+    buzz();
+    const card=$('card');
+    card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');
+    const g=$('gapInput');
+    if(g){ g.value=''; g.focus(); }
+    $('feedback').innerHTML = '<div class="retry">Not that one<span>One more guess. Leave it empty if you want the answer.</span></div>';
+    return;
+  }
+
+  answered=true;
+
+  const g=$('gapInput');
+  const span=document.createElement('span');
+  span.className='blank filled '+(ok?'good':'bad');
+  span.id='blank';
+  span.textContent=it.a;
+  if(g) g.replaceWith(span);
+  $('card').classList.add(ok?'good':'bad');
+  if(!ok) $('card').classList.add('shake');
+
+  const firstTry = ok && tries===1;
+  if(ok){ if(firstTry){ score++; streak++; best=Math.max(best,streak); } else { streak=0; } ding(); }
+  else { streak=0; buzz(); }
+
+  let head = firstTry ? '<div class="verdict good">Correct</div>'
+            : ok      ? '<div class="verdict good">Right, on the second go</div>'
+            : (given===null ? '<div class="verdict bad">The answer was</div>'
+                            : '<div class="verdict bad">Not quite</div>');
+  let wrongWord = (!ok && given) ? `<div class="example">You wrote: ${esc(given)}</div>` : '';
+  $('feedback').innerHTML = head +
+    `<div class="meaning"><b>${esc(it.p.replace('___',it.a))}.</b> ${esc(it.m)}</div>` +
+    `<div class="example">${esc(it.e)}</div>` + wrongWord;
+
+  results.push({item:it, ok, firstTry, given, tries});
+  $('scoreOut').textContent=score;
+  $('streakOut').textContent=streak;
+  $('barFill').style.width=((idx+1)/deck.length*100)+'%';
+  document.activeElement && document.activeElement.blur();
+}
+
+function advance(){
+  idx++;
+  if(idx>=deck.length) finish(); else render();
+}
+
+$('card').addEventListener('click',()=>{ if(answered) advance(); });
+
+document.addEventListener('keydown',e=>{
+  if(!quizPanel.classList.contains('show')) return;
+  if(e.key!=='Enter') return;
+  e.preventDefault();
+  if(answered){ advance(); return; }
+  const g=$('gapInput');
+  const v=(g?g.value:'').trim();
+  judge(v||null);
+});
+
+/* ------------------------------------------------------------------ end */
+function finish(){
+  const total=results.length||1;
+  const pct=Math.round(score/total*100);
+  $('finalScore').textContent=score;
+  $('finalTotal').textContent=results.length;
+  const grade = pct===100 ? 'Perfect run' : pct>=85 ? 'Native-ish' : pct>=70 ? 'Strong' :
+                pct>=50 ? 'Getting there' : 'Worth another go';
+  $('grade').textContent = `${pct}% correct · best streak ${best} · ${grade}`;
+  const missed=results.filter(r=>!r.ok);
+  const second=results.filter(r=>r.ok && !r.firstTry);
+  const got=results.filter(r=>r.firstTry);
+  let html='';
+  if(missed.length){
+    html += '<h2>Learn these '+missed.length+'</h2>';
+    missed.forEach(r=>{ html += `<div class="miss"><span class="cross">x</span><div class="idi">${esc(r.item.p.replace('___',r.item.a))}<div class="mn">${esc(r.item.m)}</div></div></div>`; });
+  }
+  if(second.length){
+    html += '<h2>Second go '+second.length+'</h2>';
+    second.forEach(r=>{ html += `<div class="miss"><span class="tick" style="color:var(--gold)">~</span><div class="idi">${esc(r.item.p.replace('___',r.item.a))}<div class="mn">${esc(r.item.m)}</div></div></div>`; });
+  }
+  if(got.length){
+    html += '<h2>You knew these '+got.length+'</h2>';
+    got.forEach(r=>{ html += `<div class="miss"><span class="tick">+</span><div class="idi">${esc(r.item.p.replace('___',r.item.a))}</div></div>`; });
+  }
+  $('review').innerHTML=html;
+  $('missedBtn').style.display = (missed.length+second.length) ? '' : 'none';
+  $('quitBtn').style.display='none';
+  if(pct>=85) fanfare();
+  show(endPanel);
+  logHit('idiom-game-done');
+  submitResult(pct, grade);
+}
+
+function submitResult(pct, grade){
+  const note = $('savedNote');
+  note.textContent = 'Sending your score to John...';
+  const payload = {
+    full_name: student.name,
+    email: student.email,
+    country: student.country,
+    score: score,
+    total: results.length,
+    pct: pct,
+    band: grade,
+    first_try: results.filter(r=>r.firstTry).length,
+    second_try: results.filter(r=>r.ok && !r.firstTry).length,
+    missed: results.filter(r=>!r.ok).length,
+    best_streak: best,
+    mistakes: results.filter(r=>!r.firstTry).map(r=>({
+      idiom: r.item.p.replace('___', r.item.a),
+      answer: r.item.a,
+      given: r.given,
+      tries: r.tries,
+      meaning: r.item.m
+    }))
+  };
+  fetch(SUPABASE_URL + '/rest/v1/' + TABLE, {
+    method:'POST', mode:'cors', keepalive:true,
+    headers:{
+      'Content-Type':'application/json',
+      'apikey': SUPABASE_ANON_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+      'Prefer':'return=minimal'
+    },
+    body: JSON.stringify(payload)
+  }).then(r=>{
+    note.textContent = r.ok
+      ? 'Your score has been sent to John.'
+      : 'Your score could not be sent just now. Nothing else is affected.';
+  }).catch(()=>{
+    note.textContent = 'Your score could not be sent just now. Nothing else is affected.';
+  });
+}
+</script>
+</body>
+</html>
