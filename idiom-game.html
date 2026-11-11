@@ -155,6 +155,12 @@
   a.big{text-decoration:none;text-align:center}
 
   /* ---------- results ---------- */
+  .pdflink{
+    display:block;text-align:center;margin:14px auto 0;color:var(--muted);
+    font-size:13px;text-decoration:none;border-bottom:1px solid transparent;width:fit-content;
+  }
+  .pdflink:hover{color:var(--gold);border-bottom-color:rgba(255,197,61,.45)}
+
   .score-ring{text-align:center;padding:14px 0 6px}
   .score-big{font-size:clamp(60px,14vw,110px);font-weight:800;line-height:1;letter-spacing:-.04em}
   .score-big small{font-size:.3em;color:var(--muted);font-weight:600;letter-spacing:0}
@@ -319,6 +325,7 @@
       </div>
     </div>
     <button class="big" id="startBtn">Start</button>
+    <a class="pdflink" id="prePdf" href="pdfs/finish-the-idiom.pdf" target="_blank" rel="noopener">Or get the whole list as a PDF first</a>
   </section>
 
   <!-- QUIZ -->
@@ -368,6 +375,7 @@
     <div style="margin-top:30px">
       <button class="big" id="againBtn">Play again</button>
       <button class="big ghost" id="missedBtn">Retry the ones I missed</button>
+      <button class="big ghost" id="sheetBtn">Download this round</button>
       <a class="big ghost" id="pdfBtn" href="pdfs/finish-the-idiom.pdf" target="_blank" rel="noopener">Get the PDF of all the idioms</a>
     </div>
   </section>
@@ -433,7 +441,7 @@ const IDIOMS = [
  {p:"When it rains, it ___", a:"pours", m:"Bad things tend to happen all at once.", e:"The boiler broke, then the car died. When it rains, it pours."},
  {p:"The early ___ catches the worm", a:"bird", m:"The person who acts first gets the advantage.", e:"Tickets go fast, so the early bird catches the worm."},
  {p:"Don't count your ___ before they hatch", a:"chickens", m:"Don't rely on something good until it has actually happened.", e:"You haven't signed yet, so don't count your chickens."},
- {p:"___ can't be choosers", a:"beggars", m:"If you have no choice, you take what you are given.", e:"It's a tiny flat, but beggars can't be choosers."},
+ {p:"___ can't be choosers", a:"beggars", k:"Beggars can't be choosers", m:"If you have no choice, you take what you are given.", e:"It's a tiny flat, but beggars can't be choosers."},
  {p:"Beat around the ___", a:"bush", m:"Avoid saying what you really mean.", e:"Stop beating around the bush and tell me the price."},
  {p:"Cut to the ___", a:"chase", m:"Get to the important part.", e:"Let's cut to the chase, how much do you want?"},
  {p:"The best of ___ worlds", a:"both", m:"A situation where you get the advantages of two things.", e:"Working two days at home is the best of both worlds."},
@@ -894,6 +902,86 @@ function giveLetter(){
 }
 $('hintBtn').onclick = giveLetter;
 
+/* ------------------------------------------------ the round as a handout */
+/* jsPDF is 360KB, so it is only fetched when someone actually asks for the
+   sheet, not on every page load. */
+const JSPDF_SRC = 'https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js';
+let jspdfPending = null;
+function loadJsPDF(){
+  if(window.jspdf && window.jspdf.jsPDF) return Promise.resolve();
+  if(jspdfPending) return jspdfPending;
+  jspdfPending = new Promise((ok, no)=>{
+    const s=document.createElement('script');
+    s.src=JSPDF_SRC; s.onload=ok;
+    s.onerror=()=>{ jspdfPending=null; no(new Error('jsPDF did not load')); };
+    document.head.appendChild(s);
+  });
+  return jspdfPending;
+}
+
+function buildSheet(){
+  const doc = new window.jspdf.jsPDF({unit:'mm', format:'a4'});
+  const L=18, R=192, W=R-L, FOOT=282;
+  let y=22;
+  const room = h => { if(y+h > FOOT){ doc.addPage(); y=22; } };
+
+  doc.setFont('helvetica','bold'); doc.setFontSize(21);
+  doc.text('Finish the Idiom', L, y); y+=7.5;
+  doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(115);
+  const when = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+  doc.text(deck.length+' played, '+score+' first time.  '+when, L, y); y+=10;
+
+  const section = (title, rows) => {
+    if(!rows.length) return;
+    room(18);
+    doc.setFont('helvetica','bold'); doc.setFontSize(12.5); doc.setTextColor(0);
+    doc.text(title+'  '+rows.length, L, y); y+=2.2;
+    doc.setDrawColor(205); doc.setLineWidth(.3); doc.line(L, y, R, y); y+=7;
+    rows.forEach(r=>{
+      const it=r.item;
+      doc.setFontSize(11.5); const head=doc.splitTextToSize(label(it), W);
+      doc.setFontSize(10);   const mean=doc.splitTextToSize(it.m, W);
+      const eg=doc.splitTextToSize(it.e, W);
+      room(head.length*5.2 + mean.length*4.5 + eg.length*4.5 + 5);
+      doc.setFont('helvetica','bold'); doc.setFontSize(11.5); doc.setTextColor(0);
+      doc.text(head, L, y); y+=head.length*5.2;
+      doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(45);
+      doc.text(mean, L, y); y+=mean.length*4.5;
+      doc.setFont('helvetica','italic'); doc.setTextColor(125);
+      doc.text(eg, L, y); y+=eg.length*4.5 + 3.4;
+    });
+    y+=2;
+  };
+
+  section('Missed',         results.filter(r=>!r.ok));
+  section('Needed a nudge', results.filter(r=>r.ok && !r.firstTry));
+  section('Knew these',     results.filter(r=>r.firstTry));
+
+  const pages=doc.getNumberOfPages();
+  for(let i=1;i<=pages;i++){
+    doc.setPage(i);
+    doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(150);
+    doc.text('johnplusenglish.com', L, 288);
+    doc.text(i+' / '+pages, R, 288, {align:'right'});
+  }
+  doc.save('finish-the-idiom-'+deck.length+'.pdf');
+}
+
+async function downloadRound(){
+  const b=$('sheetBtn'), was=b.textContent;
+  b.disabled=true; b.textContent='Building the sheet';
+  try{
+    await loadJsPDF();
+    buildSheet();
+    b.textContent=was; b.disabled=false;
+  }catch(e){
+    b.textContent='Could not build it';
+    setTimeout(()=>{ b.textContent=was; b.disabled=false; }, 2400);
+  }
+}
+$('sheetBtn').onclick = downloadRound;
+$('prePdf').textContent = 'Or get all '+IDIOMS.length+' as a PDF first';
+
 /* ------------------------------------------------------------------ round */
 function render(){
   answered=false; tries=0; usedHint=false;
@@ -1038,6 +1126,7 @@ function finish(){
   $('missedBtn').style.display = missed.length ? '' : 'none';
   $('quitBtn').style.display='none';
   $('trophy').hidden = pct < 80;
+  $('sheetBtn').textContent = 'Download these '+deck.length;
   if(pct>=80){ fanfare(); setTimeout(()=>fireworks(1100), 260); }
   else if(pct>=50){ setTimeout(()=>confettiBurst($('review'), 24), 200); }
   show(endPanel);
