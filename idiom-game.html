@@ -155,11 +155,14 @@
   a.big{text-decoration:none;text-align:center}
 
   /* ---------- results ---------- */
+  .pdfrow{text-align:center;margin-top:16px}
   .pdflink{
-    display:block;text-align:center;margin:14px auto 0;color:var(--muted);
-    font-size:13px;text-decoration:none;border-bottom:1px solid transparent;width:fit-content;
+    display:inline-flex;align-items:center;gap:9px;
+    color:var(--muted);font-size:13.5px;font-weight:600;letter-spacing:.02em;text-decoration:none;
+    border:1px solid var(--line);border-radius:999px;padding:11px 20px;transition:.15s;
   }
-  .pdflink:hover{color:var(--gold);border-bottom-color:rgba(255,197,61,.45)}
+  .pdflink:hover{color:var(--gold);border-color:rgba(255,197,61,.5);background:rgba(255,197,61,.06)}
+  .pdflink svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 
   .score-ring{text-align:center;padding:14px 0 6px}
   .score-big{font-size:clamp(60px,14vw,110px);font-weight:800;line-height:1;letter-spacing:-.04em}
@@ -325,7 +328,12 @@
       </div>
     </div>
     <button class="big" id="startBtn">Start</button>
-    <a class="pdflink" id="prePdf" href="pdfs/finish-the-idiom.pdf" target="_blank" rel="noopener">Or get the whole list as a PDF first</a>
+    <div class="pdfrow">
+      <a class="pdflink" id="prePdf" href="pdfs/finish-the-idiom.pdf" download>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0 4-4m-4 4-4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+        <span id="prePdfLabel">Download the whole list as a PDF</span>
+      </a>
+    </div>
   </section>
 
   <!-- QUIZ -->
@@ -376,7 +384,7 @@
       <button class="big" id="againBtn">Play again</button>
       <button class="big ghost" id="missedBtn">Retry the ones I missed</button>
       <button class="big ghost" id="sheetBtn">Download this round</button>
-      <a class="big ghost" id="pdfBtn" href="pdfs/finish-the-idiom.pdf" target="_blank" rel="noopener">Get the PDF of all the idioms</a>
+      <a class="big ghost" id="pdfBtn" href="pdfs/finish-the-idiom.pdf" download>Download all the idioms</a>
     </div>
   </section>
 
@@ -980,7 +988,7 @@ async function downloadRound(){
   }
 }
 $('sheetBtn').onclick = downloadRound;
-$('prePdf').textContent = 'Or get all '+IDIOMS.length+' as a PDF first';
+$('prePdfLabel').textContent = 'Download all '+IDIOMS.length+' as a PDF';
 
 /* ------------------------------------------------------------------ round */
 function render(){
