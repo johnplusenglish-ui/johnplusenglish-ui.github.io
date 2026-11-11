@@ -16,7 +16,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
     --ink:#0b0e14;
@@ -46,7 +46,7 @@
     padding:28px 16px 48px;
     min-height:100%;
   }
-  .wrap{width:100%;max-width:760px}
+  .wrap{width:100%;max-width:760px;position:relative;z-index:1}
 
   /* ---------- header ---------- */
   header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:26px}
@@ -114,8 +114,9 @@
   @keyframes shake{10%,90%{transform:translateX(-2px)}30%,70%{transform:translateX(5px)}50%{transform:translateX(-5px)}}
 
   .prompt{
-    font-size:clamp(26px,5.2vw,42px);font-weight:700;line-height:1.25;text-transform:uppercase;
-    letter-spacing:-.01em;display:flex;flex-wrap:wrap;justify-content:center;align-items:baseline;gap:.3em;
+    font-family:'Anton Local','Anton',Outfit,system-ui,sans-serif;
+    font-size:clamp(30px,6vw,52px);font-weight:400;line-height:1.2;text-transform:uppercase;
+    letter-spacing:.012em;display:flex;flex-wrap:wrap;justify-content:center;align-items:baseline;gap:.3em;
     flex:0 0 auto;align-content:center;
   }
   .blank{
@@ -213,6 +214,8 @@
   .bar i::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);animation:shimmer 2.2s linear infinite}
   @keyframes shimmer{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
   #cfLayer{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:60}
+  #bg{position:fixed;inset:0;z-index:0;pointer-events:none}
+  #bg canvas{display:block}
   .cf{position:absolute;width:8px;height:13px;border-radius:2px;will-change:transform,opacity;animation:cfFly var(--t) cubic-bezier(.15,.6,.4,1) forwards}
   @keyframes cfFly{0%{transform:translate3d(0,0,0) rotate(0deg);opacity:1}100%{transform:translate3d(var(--dx),var(--dy),0) rotate(var(--rot));opacity:0}}
   @keyframes rowIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
@@ -234,6 +237,7 @@
 </style>
 </head>
 <body>
+<div id="bg" aria-hidden="true"></div>
 <div class="wrap">
 
   <header>
@@ -365,8 +369,12 @@
 
 <div id="cfLayer" aria-hidden="true"></div>
 
-<!-- canvas-confetti, with a hand-rolled fallback if it cannot be fetched (offline) -->
+<!-- canvas-confetti, party.js, Rough Notation and tsParticles. All MIT.
+     Every effect is guarded, so the game still works if any of them fails. -->
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/party-js@2.2.0/bundle/party.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/rough-notation@0.5.1/lib/rough-notation.iife.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tsparticles/slim@3.5.0/tsparticles.slim.bundle.min.js"></script>
 
 <script>
 /* ------------------------------------------------------------------ data */
@@ -596,6 +604,54 @@ function fanfare(){ if(!soundOn) return;
 /* ------------------------------------------------------------------ motion */
 const REDUCED = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const CF_COLOURS = ['#ffc53d','#35d07f','#5aa9ff','#ffffff','#ff8fab'];
+
+/* ------------------------------------------------- borrowed libraries */
+/* tsParticles, Rough Notation and party.js, all local files, all MIT.
+   Every one of them degrades to nothing if its file is missing. */
+
+function backdrop(){
+  if(REDUCED || typeof window.tsParticles === 'undefined') return;
+  try{
+    window.tsParticles.load({ id:'bg', options:{
+      fullScreen:{enable:false},
+      detectRetina:true,
+      fpsLimit:45,
+      particles:{
+        number:{value:48, density:{enable:true, area:900}},
+        color:{value:['#ffc53d','#5aa9ff','#eef2f8']},
+        opacity:{value:{min:.06,max:.24}},
+        size:{value:{min:1,max:2.6}},
+        move:{enable:true, speed:.22, direction:'top', outModes:{default:'out'}}
+      },
+      interactivity:{events:{onHover:{enable:false},onClick:{enable:false}}}
+    }});
+  }catch(e){}
+}
+
+/* A hand-drawn ring round the answer once it has spelled itself out. */
+function ringIt(el, good){
+  if(REDUCED || !el || typeof window.RoughNotation === 'undefined') return;
+  try{
+    window.RoughNotation.annotate(el, {
+      type: good ? 'circle' : 'crossed-off',
+      color: good ? '#35d07f' : '#ff5f5f',
+      strokeWidth: 2.4,
+      padding: good ? [9,11] : 4,
+      animationDuration: 720,
+      iterations: 2
+    }).show();
+    if(!good) el.style.textDecoration = 'none';   // the drawn cross replaces the CSS one
+  }catch(e){}
+}
+
+/* Sparkles out of the gap itself, not the top of the screen. */
+function sparkle(el, big){
+  if(REDUCED || !el || typeof window.party === 'undefined') return false;
+  try{
+    window.party.sparkles(el, { count: big ? 34 : 18, speed: 260 });
+    return true;
+  }catch(e){ return false; }
+}
 
 function confettiBurst(target, count){
   if(REDUCED) return;
@@ -832,6 +888,7 @@ function judge(given){
   span.id='blank';
   if(g) g.replaceWith(span);
   spellOut(span, it.a);
+  setTimeout(()=>ringIt(span, ok), REDUCED ? 0 : it.a.length*45 + 170);
   $('card').classList.add(ok?'good':'bad');
   if(!ok) $('card').classList.add('shake');
 
@@ -839,7 +896,8 @@ function judge(given){
   if(ok){
     if(firstTry){
       score++; streak++; best=Math.max(best,streak);
-      confettiBurst($('card'), streak>=5 ? 46 : streak>=3 ? 30 : 18);
+      if(!sparkle(span, streak>=3)) confettiBurst($('card'), streak>=5 ? 46 : streak>=3 ? 30 : 18);
+      else if(streak>=5) confettiBurst($('card'), 34);
     } else { streak=0; }
     ding(firstTry ? streak-1 : 0);
   }
@@ -914,6 +972,13 @@ function finish(){
   show(endPanel);
   logHit('idiom-game-done');
 }
+
+backdrop();
+// The drawn ring is positioned absolutely, so drop it rather than let it
+// drift if the window is resized or the phone is turned mid-answer.
+addEventListener('resize', ()=>{
+  document.querySelectorAll('svg.rough-annotation').forEach(el=>el.remove());
+});
 </script>
 </body>
 </html>
