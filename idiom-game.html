@@ -180,6 +180,29 @@
   .clock i{display:block;height:100%;width:100%;background:var(--gold);border-radius:99px}
   .clock[hidden]{display:none}
 
+  /* ---------- lifeline + lock-in ---------- */
+  .helprow{display:flex;justify-content:center;margin-top:18px;min-height:44px}
+  .hint-btn{
+    border:1px solid rgba(255,197,61,.45);background:rgba(255,197,61,.07);color:var(--gold);
+    font-family:inherit;font-weight:700;font-size:13.5px;letter-spacing:.06em;text-transform:uppercase;
+    padding:11px 20px;border-radius:999px;cursor:pointer;transition:.15s;
+  }
+  .hint-btn:hover:not(:disabled){background:rgba(255,197,61,.16);transform:translateY(-1px)}
+  .hint-btn:disabled{opacity:.35;cursor:default}
+  .hint-btn[hidden]{display:none}
+  .card.locking{border-color:rgba(255,197,61,.55)}
+  .card.locking .prompt{animation:lockShiver .5s ease-in-out}
+  @keyframes lockShiver{0%,100%{transform:none}25%{transform:translateX(-1.5px)}75%{transform:translateX(1.5px)}}
+  .card.locking .blank,.card.locking input.gap{box-shadow:0 10px 36px -10px rgba(255,197,61,.8)}
+
+  /* ---------- trophy ---------- */
+  .trophy{display:flex;justify-content:center;margin-bottom:6px}
+  .trophy[hidden]{display:none}
+  .trophy svg{width:92px;height:92px;animation:trophyIn .7s cubic-bezier(.2,1.4,.4,1) both}
+  @keyframes trophyIn{from{opacity:0;transform:translateY(-30px) scale(.5) rotate(-12deg)}to{opacity:1;transform:none}}
+  .trophy .shine{animation:shineSweep 2.4s ease-in-out .6s infinite}
+  @keyframes shineSweep{0%,70%,100%{opacity:0;transform:translateX(-18px)}80%{opacity:.9;transform:translateX(6px)}90%{opacity:0;transform:translateX(22px)}}
+
   /* ---------- motion ---------- */
   @keyframes qIn{from{opacity:0;transform:translateY(20px) scale(.97)}to{opacity:1;transform:none}}
   .prompt.in{animation:qIn .4s cubic-bezier(.2,.8,.3,1.2) both}
@@ -206,7 +229,7 @@
   .bar i{position:relative;overflow:hidden}
   .bar i::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);animation:shimmer 2.2s linear infinite}
   @keyframes shimmer{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
-  #confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:60}
+  #cfLayer{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:60}
   .cf{position:absolute;width:8px;height:13px;border-radius:2px;will-change:transform,opacity;animation:cfFly var(--t) cubic-bezier(.15,.6,.4,1) forwards}
   @keyframes cfFly{0%{transform:translate3d(0,0,0) rotate(0deg);opacity:1}100%{transform:translate3d(var(--dx),var(--dy),0) rotate(var(--rot));opacity:0}}
   @keyframes rowIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
@@ -321,12 +344,28 @@
         <div class="feedback" id="feedback"></div>
     </div>
 
+    <div class="helprow">
+      <button class="hint-btn" id="hintBtn">Give me a letter</button>
+    </div>
+
 
   </section>
 
   <!-- RESULTS -->
   <section class="panel" id="endPanel">
     <div class="score-ring">
+      <div class="trophy" id="trophy" hidden>
+        <svg viewBox="0 0 64 64" aria-hidden="true">
+          <defs><linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#ffe38a"/><stop offset=".5" stop-color="#ffc53d"/><stop offset="1" stop-color="#c98f14"/>
+          </linearGradient></defs>
+          <path d="M20 8h24v14a12 12 0 0 1-24 0z" fill="url(#gold)"/>
+          <path d="M20 12h-6a8 8 0 0 0 8 8M44 12h6a8 8 0 0 1-8 8" fill="none" stroke="url(#gold)" stroke-width="3" stroke-linecap="round"/>
+          <path d="M29 34h6v8h-6z" fill="#c98f14"/>
+          <path d="M22 42h20l2 8H20z" fill="url(#gold)"/>
+          <rect class="shine" x="26" y="11" width="4" height="16" rx="2" fill="#fff" opacity="0"/>
+        </svg>
+      </div>
       <div class="score-big"><span id="finalScore">0</span><small>/<span id="finalTotal">58</span></small></div>
       <div class="grade" id="grade"></div>
     </div>
@@ -342,7 +381,10 @@
   <footer>John Plus English</footer>
 </div>
 
-<div id="confetti" aria-hidden="true"></div>
+<div id="cfLayer" aria-hidden="true"></div>
+
+<!-- canvas-confetti, with a hand-rolled fallback if it cannot be fetched (offline) -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
 <script>
 /* ------------------------------------------------------------------ data */
@@ -499,13 +541,34 @@ function markField(inputId, errId, ok){
 /* ------------------------------------------------------------------ state */
 let clueWhen='after', wantLen=IDIOMS.length, playType='both', clockSecs=0, clockRAF=null;
 let deck=[], idx=0, score=0, streak=0, best=0, answered=false, soundOn=true, results=[], tries=0;
+let locking=false, usedHint=false;
 
 const $ = id => document.getElementById(id);
 const startPanel=$('startPanel'), quizPanel=$('quizPanel'), endPanel=$('endPanel');
 
-/* ------------------------------------------------------------------ sound */
-let ac=null;
-function audio(){ if(!ac) ac = new (window.AudioContext||window.webkitAudioContext)(); return ac; }
+/* ------------------------------------------------------------------ sound
+   Everything is synthesised in the browser: no audio files, so the page still
+   works with no internet and nothing to license. --------------------------- */
+let ac=null, master=null, nBuf=null;
+function audio(){
+  if(!ac){
+    ac = new (window.AudioContext||window.webkitAudioContext)();
+    master = ac.createGain(); master.gain.value = .9; master.connect(ac.destination);
+  }
+  if(ac.state === 'suspended') ac.resume();
+  return ac;
+}
+function noiseBuffer(){
+  const c = audio();
+  if(!nBuf){
+    const len = c.sampleRate * 2;
+    nBuf = c.createBuffer(1, len, c.sampleRate);
+    const d = nBuf.getChannelData(0);
+    let last = 0;
+    for(let i=0;i<len;i++){ const w = Math.random()*2-1; last = (last + .02*w)/1.02; d[i] = last*3.2; }
+  }
+  return nBuf;
+}
 function tone(freq, start, dur, type, vol, slideTo){
   const c=audio(), o=c.createOscillator(), g=c.createGain();
   o.type=type; o.frequency.setValueAtTime(freq, c.currentTime+start);
@@ -513,15 +576,63 @@ function tone(freq, start, dur, type, vol, slideTo){
   g.gain.setValueAtTime(0.0001, c.currentTime+start);
   g.gain.exponentialRampToValueAtTime(vol, c.currentTime+start+0.012);
   g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime+start+dur);
-  o.connect(g); g.connect(c.destination);
+  o.connect(g); g.connect(master);
   o.start(c.currentTime+start); o.stop(c.currentTime+start+dur+0.03);
+}
+// one filtered burst of noise: the building block for snares and claps
+function hit(at, dur, freq, q, vol){
+  const c=audio();
+  const src=c.createBufferSource(); src.buffer=noiseBuffer(); src.loop=true;
+  src.playbackRate.value = .8 + Math.random()*.4;
+  const f=c.createBiquadFilter(); f.type='bandpass'; f.frequency.value=freq; f.Q.value=q;
+  const g=c.createGain();
+  g.gain.setValueAtTime(0.0001, at);
+  g.gain.exponentialRampToValueAtTime(vol, at+.004);
+  g.gain.exponentialRampToValueAtTime(0.0001, at+dur);
+  src.connect(f); f.connect(g); g.connect(master);
+  src.start(at); src.stop(at+dur+.02);
 }
 function ding(step){ if(!soundOn) return;
   const k = Math.pow(2,(Math.min(step||0,7))/12);   // climbs a semitone per streak
   tone(880*k,0,.14,'sine',.25); tone(1318.5*k,.1,.3,'sine',.22);
 }
-function buzz(){ if(!soundOn) return; tone(170,0,.34,'square',.16,110); tone(85,0,.34,'sawtooth',.08); }
-function fanfare(){ if(!soundOn) return; [523,659,784,1046].forEach((f,i)=>tone(f,i*.11,.3,'triangle',.2)); }
+function buzz(){ if(!soundOn) return;
+  tone(170,0,.34,'square',.16,110); tone(85,0,.34,'sawtooth',.08); hit(audio().currentTime,.12,420,1.4,.07);
+}
+function pip(){ if(!soundOn) return; tone(1560,0,.07,'sine',.1); }
+// an accelerating snare roll that finishes on a crack
+function drumRoll(ms){
+  if(!soundOn) return;
+  const c=audio(), t0=c.currentTime, n=Math.max(6,Math.floor(ms/26));
+  for(let i=0;i<n;i++){
+    const k=i/n, t=t0 + i*(ms/1000/n) + Math.random()*.004;
+    hit(t,.05,1700+Math.random()*500,1.1,.035+.10*k);
+    tone(190,(t-c.currentTime),.035,'triangle',.015+.04*k,150);
+  }
+  hit(t0+ms/1000,.26,2500,.8,.26);
+  tone(220,ms/1000,.2,'triangle',.09,110);
+}
+// a short burst of applause: a filtered roar with individual claps over it
+function cheer(){
+  if(!soundOn) return;
+  const c=audio(), t0=c.currentTime;
+  const src=c.createBufferSource(); src.buffer=noiseBuffer(); src.loop=true;
+  const f=c.createBiquadFilter(); f.type='bandpass'; f.frequency.value=1500; f.Q.value=.7;
+  const g=c.createGain();
+  g.gain.setValueAtTime(0.0001,t0);
+  g.gain.exponentialRampToValueAtTime(.14,t0+.18);
+  g.gain.exponentialRampToValueAtTime(.07,t0+.95);
+  g.gain.exponentialRampToValueAtTime(.0001,t0+1.7);
+  src.connect(f); f.connect(g); g.connect(master);
+  src.start(t0); src.stop(t0+1.75);
+  for(let i=0;i<70;i++){
+    hit(t0 + Math.random()*1.35, .035, 2200+Math.random()*1900, 1.7, .025+Math.random()*.045);
+  }
+}
+function fanfare(){ if(!soundOn) return;
+  [523,659,784,1046].forEach((f,i)=>tone(f,i*.11,.32,'triangle',.2));
+  setTimeout(cheer, 380);
+}
 
 /* ------------------------------------------------------------------ motion */
 const REDUCED = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -529,9 +640,26 @@ const CF_COLOURS = ['#ffc53d','#35d07f','#5aa9ff','#ffffff','#ff8fab'];
 
 function confettiBurst(target, count){
   if(REDUCED) return;
-  const layer = $('confetti');
   const r = (target||$('card')).getBoundingClientRect();
   const x = r.left + r.width/2, y = r.top + r.height/2;
+
+  // canvas-confetti when it loaded, otherwise the hand-rolled version below
+  if(typeof window.confetti === 'function'){
+    try{
+      const origin = {x: x/window.innerWidth, y: y/window.innerHeight};
+      window.confetti({
+        particleCount: count, spread: 72, startVelocity: 42, scalar: 1.05,
+        ticks: 160, origin, colors: CF_COLOURS, disableForReducedMotion: true
+      });
+      if(count >= 40){
+        window.confetti({particleCount: Math.round(count*.5), angle: 60, spread: 60, origin:{x:0, y:.75}, colors: CF_COLOURS});
+        window.confetti({particleCount: Math.round(count*.5), angle: 120, spread: 60, origin:{x:1, y:.75}, colors: CF_COLOURS});
+      }
+      return;
+    }catch(e){ /* fall through to the built-in confetti */ }
+  }
+
+  const layer = $('cfLayer');
   for(let i=0;i<count;i++){
     const d = document.createElement('i');
     d.className = 'cf';
@@ -547,6 +675,19 @@ function confettiBurst(target, count){
     layer.appendChild(d);
     d.addEventListener('animationend', ()=>d.remove());
   }
+}
+
+function fireworks(ms){
+  if(REDUCED) return;
+  if(typeof window.confetti !== 'function'){ confettiBurst($('review'), 70); return; }
+  const end = Date.now() + ms;
+  (function frame(){
+    try{
+      window.confetti({particleCount: 5, spread: 320, startVelocity: 22, ticks: 70, scalar: .85,
+        origin: {x: .15 + Math.random()*.7, y: .15 + Math.random()*.35}, colors: CF_COLOURS});
+    }catch(e){ return; }
+    if(Date.now() < end) setTimeout(frame, 120);
+  })();
 }
 
 function spellOut(span, word){
@@ -610,7 +751,7 @@ function startClock(){
     fill.style.background = k<.25 ? 'var(--red)' : (k<.5 ? '#ffa94d' : 'var(--gold)');
     const secs=Math.ceil(left/1000);
     if(secs<=3 && secs>0 && secs!==lastTick){ lastTick=secs; if(soundOn) tone(1250,0,.05,'square',.07); }
-    if(left<=0){ stopClock(); if(!answered) judge(null); return; }
+    if(left<=0){ stopClock(); if(!answered && !locking) judge(null); return; }
     clockRAF=requestAnimationFrame(step);
   });
 }
@@ -664,9 +805,30 @@ function start(list){
   show(quizPanel); render();
 }
 
+/* ------------------------------------------------------------------ lifeline */
+function giveLetter(){
+  if(answered || locking) return;
+  const it=deck[idx], g=$('gapInput'), btn=$('hintBtn');
+  if(!g) return;
+  const word = it.a, cur = g.value;
+  let n = 0;
+  while(n < cur.length && n < word.length && cur[n].toLowerCase() === word[n].toLowerCase()) n++;
+  g.value = word.slice(0, n+1);
+  usedHint = true;
+  pip();
+  if(g.value.length >= word.length){
+    btn.disabled = true; btn.textContent = 'That is the whole word';
+  } else {
+    btn.textContent = 'Give me another letter';
+  }
+  g.focus();
+}
+$('hintBtn').onclick = giveLetter;
+
 /* ------------------------------------------------------------------ round */
 function render(){
-  answered=false; tries=0;
+  answered=false; tries=0; usedHint=false; locking=false;
+  $('hintBtn').hidden=false; $('hintBtn').disabled=false; $('hintBtn').textContent='Give me a letter';
   const it=deck[idx];
   $('counter').textContent = `Question ${idx+1} of ${deck.length}`;
   $('scoreOut').textContent = score;
@@ -710,6 +872,7 @@ function judge(given){
 
   answered=true;
   stopClock();
+  $('hintBtn').hidden=true;
 
   const g=$('gapInput');
   const span=document.createElement('span');
@@ -720,7 +883,7 @@ function judge(given){
   $('card').classList.add(ok?'good':'bad');
   if(!ok) $('card').classList.add('shake');
 
-  const firstTry = ok && tries===1;
+  const firstTry = ok && tries===1 && !usedHint;
   if(ok){
     if(firstTry){
       score++; streak++; best=Math.max(best,streak);
@@ -732,6 +895,7 @@ function judge(given){
   paintStreak();
 
   let head = firstTry ? '<div class="verdict good">Correct</div>'
+            : (ok && usedHint && tries===1) ? '<div class="verdict good">Right, with a letter</div>'
             : ok      ? '<div class="verdict good">Right, on the second go</div>'
             : (given===null ? '<div class="verdict bad">The answer was</div>'
                             : '<div class="verdict bad">Not quite</div>');
@@ -740,7 +904,7 @@ function judge(given){
     `<div class="meaning"><b>${esc(it.p.replace('___',it.a))}.</b> ${esc(it.m)}</div>` +
     `<div class="example">${esc(it.e)}</div>` + wrongWord;
 
-  results.push({item:it, ok, firstTry, given, tries});
+  results.push({item:it, ok, firstTry, given, tries, hint:usedHint});
   if($('scoreOut').textContent !== String(score)){ $('scoreOut').textContent=score; bump($('scoreOut')); }
   $('barFill').style.width=((idx+1)/deck.length*100)+'%';
   document.activeElement && document.activeElement.blur();
@@ -753,14 +917,30 @@ function advance(){
 
 $('card').addEventListener('click',()=>{ if(answered) advance(); });
 
+function lockIn(v){
+  const roll = soundOn ? 520 : 0;          // sound off means no waiting about
+  if(!roll){ judge(v); return; }
+  locking = true;
+  $('card').classList.add('locking');
+  const g=$('gapInput'); if(g) g.blur();
+  drumRoll(roll);
+  setTimeout(()=>{
+    locking = false;
+    $('card').classList.remove('locking');
+    judge(v);
+  }, roll);
+}
+
 document.addEventListener('keydown',e=>{
   if(!quizPanel.classList.contains('show')) return;
   if(e.key!=='Enter') return;
   e.preventDefault();
+  if(locking) return;
   if(answered){ advance(); return; }
   const g=$('gapInput');
   const v=(g?g.value:'').trim();
-  judge(v||null);
+  if(!v){ judge(null); return; }
+  lockIn(v);
 });
 
 /* ------------------------------------------------------------------ end */
@@ -781,7 +961,7 @@ function finish(){
     missed.forEach(r=>{ html += `<div class="miss"><span class="cross">x</span><div class="idi">${esc(r.item.p.replace('___',r.item.a))}<div class="mn">${esc(r.item.m)}</div></div></div>`; });
   }
   if(second.length){
-    html += '<h2>Second go '+second.length+'</h2>';
+    html += '<h2>Needed a nudge '+second.length+'</h2>';
     second.forEach(r=>{ html += `<div class="miss"><span class="tick" style="color:var(--gold)">~</span><div class="idi">${esc(r.item.p.replace('___',r.item.a))}<div class="mn">${esc(r.item.m)}</div></div></div>`; });
   }
   if(got.length){
@@ -792,7 +972,9 @@ function finish(){
   $('review').querySelectorAll('.miss').forEach((r,i)=>{ r.style.animationDelay = Math.min(i*35,700)+'ms'; });
   $('missedBtn').style.display = (missed.length+second.length) ? '' : 'none';
   $('quitBtn').style.display='none';
-  if(pct>=80){ fanfare(); setTimeout(()=>confettiBurst($('review'), 70), 220); }
+  $('trophy').hidden = pct < 80;
+  if(pct>=80){ fanfare(); setTimeout(()=>fireworks(1100), 260); }
+  else if(pct>=50){ setTimeout(()=>confettiBurst($('review'), 24), 200); }
   show(endPanel);
   logHit('idiom-game-done');
   submitResult(pct, grade);
@@ -818,6 +1000,7 @@ function submitResult(pct, grade){
       answer: r.item.a,
       given: r.given,
       tries: r.tries,
+      hint: !!r.hint,
       meaning: r.item.m
     }))
   };
