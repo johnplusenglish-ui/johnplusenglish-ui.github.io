@@ -119,6 +119,8 @@
     letter-spacing:.012em;display:flex;flex-wrap:wrap;justify-content:center;align-items:baseline;gap:.3em;
     flex:0 0 auto;align-content:center;
   }
+  /* the words around the idiom, dimmed so the idiom itself leads */
+  .prompt .lead{color:#9aa7bf}
   .blank{
     display:inline-block;min-width:4.5em;border-bottom:3px solid var(--gold);
     color:var(--gold);padding:0 .1em 2px;
@@ -220,6 +222,12 @@
   @keyframes cfFly{0%{transform:translate3d(0,0,0) rotate(0deg);opacity:1}100%{transform:translate3d(var(--dx),var(--dy),0) rotate(var(--rot));opacity:0}}
   @keyframes rowIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
   .miss{animation:rowIn .34s ease both}
+  /* On a phone the label and the buttons will not sit side by side. */
+  @media (max-width:620px){
+    .opt{flex-direction:column;align-items:stretch;gap:10px}
+    .opt .seg{justify-content:center}
+  }
+
   @media (prefers-reduced-motion:reduce){
     *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   }
@@ -297,6 +305,16 @@
         <div class="seg" id="clueSeg">
           <button data-clue="after" class="on">After</button>
           <button data-clue="before">Before</button>
+        </div>
+      </div>
+      <div class="opt" id="kitOpt">
+        <div>
+          <div class="lbl">Which sounds?</div>
+          <div class="hint">Recorded buzzers or the built-in bleeps</div>
+        </div>
+        <div class="seg" id="kitSeg">
+          <button data-kit="rec" class="on">Buzzers</button>
+          <button data-kit="synth">Bleeps</button>
         </div>
       </div>
     </div>
@@ -381,16 +399,16 @@
 const IDIOMS = [
  {p:"A blessing in ___", a:"disguise", m:"Something that seems bad at first but turns out to be good.", e:"Losing that job was a blessing in disguise."},
  {p:"Hit the ___ on the head", a:"nail", m:"Say exactly the right thing about a problem.", e:"You've hit the nail on the head, it's a money problem."},
- {p:"Don't worry, the test is a piece of ___", a:"cake", m:"Very easy.", e:"For her, parallel parking is a piece of cake.", k:"A piece of cake"},
- {p:"Relax, I'm only pulling your ___", a:"leg", m:"Joke with someone by telling them something untrue.", e:"She was pulling your leg about the fine.", k:"Pull someone's leg"},
+ {p:"Don't worry, the test is {a piece of ___}", a:"cake", m:"Very easy.", e:"For her, parallel parking is a piece of cake.", k:"A piece of cake"},
+ {p:"Relax, I'm only {pulling your ___}", a:"leg", m:"Joke with someone by telling them something untrue.", e:"She was pulling your leg about the fine.", k:"Pull someone's leg"},
  {p:"Take it with a pinch of ___", a:"salt", m:"Don't believe it completely.", e:"He exaggerates, so take it with a pinch of salt."},
- {p:"Still sitting on the ___ about it", a:"fence", m:"Unable to decide between two sides.", e:"Half the class is on the fence about the trip.", k:"On the fence"},
- {p:"Walking to work saves money in the long ___", a:"run", m:"Over a long period of time in the future.", e:"In the long run, honesty is cheaper.", k:"In the long run"},
+ {p:"Still {sitting on the ___} about it", a:"fence", m:"Unable to decide between two sides.", e:"Half the class is on the fence about the trip.", k:"On the fence"},
+ {p:"Walking to work saves money {in the long ___}", a:"run", m:"Over a long period of time in the future.", e:"In the long run, honesty is cheaper.", k:"In the long run"},
  {p:"Not my cup of ___", a:"tea", m:"Not something you enjoy.", e:"Horror films are not my cup of tea."},
- {p:"That name rings a ___", a:"bell", m:"Sound familiar.", e:"Does the title ring a bell?", k:"Ring a bell"},
+ {p:"That name {rings a ___}", a:"bell", m:"Sound familiar.", e:"Does the title ring a bell?", k:"Ring a bell"},
  {p:"A storm in a ___", a:"teacup", m:"A lot of fuss about something unimportant.", e:"The whole argument was a storm in a teacup."},
- {p:"Before we start, let's all be on the same ___", a:"page", m:"In agreement, understanding things the same way.", e:"The two teams were finally on the same page.", k:"On the same page"},
- {p:"The rules don't cover it, so it's a grey ___", a:"area", m:"A situation where the rules are not clear.", e:"Working from another country is a grey area.", k:"A grey area"},
+ {p:"Before we start, let's all be {on the same ___}", a:"page", m:"In agreement, understanding things the same way.", e:"The two teams were finally on the same page.", k:"On the same page"},
+ {p:"The rules don't cover it, so it's {a grey ___}", a:"area", m:"A situation where the rules are not clear.", e:"Working from another country is a grey area.", k:"A grey area"},
  {p:"Better late than ___", a:"never", m:"Doing something late is better than not doing it.", e:"He apologised after a year, but better late than never."},
  {p:"Better safe than ___", a:"sorry", m:"It is wiser to be careful than to take a risk.", e:"Take an umbrella, better safe than sorry."},
  {p:"Actions speak louder than ___", a:"words", m:"What you do matters more than what you say.", e:"He promises a lot, but actions speak louder than words."},
@@ -400,14 +418,14 @@ const IDIOMS = [
  {p:"You can't have your ___ and eat it", a:"cake", m:"You can't have two good things that don't go together.", e:"You want the money and the free time? You can't have your cake and eat it."},
  {p:"You ___ what you sow", a:"reap", m:"You get the results of your own actions.", e:"He was rude to everyone for years, and you reap what you sow."},
  {p:"There's no use crying over spilt ___", a:"milk", m:"There is no point being upset about something you can't change.", e:"The car's sold now, no use crying over spilt milk."},
- {p:"She called me out of the ___ after ten years", a:"blue", m:"Suddenly and unexpectedly.", e:"The email arrived completely out of the blue.", k:"Out of the blue"},
- {p:"His name is on the tip of my ___", a:"tongue", m:"You almost remember a word but can't quite say it.", e:"The word was on the tip of her tongue all evening.", k:"On the tip of my tongue"},
- {p:"I've never broken a bone, touch ___", a:"wood", m:"Said to avoid bad luck after talking about good luck.", e:"Touch wood, the car has never let me down.", k:"Touch wood"},
- {p:"We've done enough, let's call it a ___", a:"day", m:"Stop working on something for now.", e:"At six o'clock we called it a day.", k:"Call it a day"},
- {p:"After three rejections he threw in the ___", a:"towel", m:"Give up.", e:"Don't throw in the towel this close to the end.", k:"Throw in the towel"},
- {p:"I'm in two ___ about taking the job", a:"minds", m:"Undecided about something.", e:"She's in two minds about selling the flat.", k:"In two minds"},
+ {p:"She called me {out of the ___} after ten years", a:"blue", m:"Suddenly and unexpectedly.", e:"The email arrived completely out of the blue.", k:"Out of the blue"},
+ {p:"His name is {on the tip of my ___}", a:"tongue", m:"You almost remember a word but can't quite say it.", e:"The word was on the tip of her tongue all evening.", k:"On the tip of my tongue"},
+ {p:"I've never broken a bone, {touch ___}", a:"wood", m:"Said to avoid bad luck after talking about good luck.", e:"Touch wood, the car has never let me down.", k:"Touch wood"},
+ {p:"We've done enough, let's {call it a ___}", a:"day", m:"Stop working on something for now.", e:"At six o'clock we called it a day.", k:"Call it a day"},
+ {p:"After three rejections he {threw in the ___}", a:"towel", m:"Give up.", e:"Don't throw in the towel this close to the end.", k:"Throw in the towel"},
+ {p:"I'm {in two ___} about taking the job", a:"minds", m:"Undecided about something.", e:"She's in two minds about selling the flat.", k:"In two minds"},
  {p:"Put your ___ in it", a:"foot", m:"Say something embarrassing or tactless by accident.", e:"I asked about his wife, then really put my foot in it."},
- {p:"Filling in these forms is a pain in the ___", a:"neck", m:"Something or someone annoying.", e:"Parking round here is a pain in the neck.", k:"A pain in the neck"},
+ {p:"Filling in these forms is {a pain in the ___}", a:"neck", m:"Something or someone annoying.", e:"Parking round here is a pain in the neck.", k:"A pain in the neck"},
  {p:"Back to ___ one", a:"square", m:"Back to the beginning after a failure.", e:"The client rejected the design, so it's back to square one."},
  {p:"Off the top of my ___", a:"head", m:"Without checking or thinking carefully.", e:"Off the top of my head, I'd say about forty people came."},
  {p:"Practice makes ___", a:"perfect", m:"You improve at something by doing it repeatedly.", e:"Keep speaking every day, practice makes perfect."},
@@ -419,33 +437,33 @@ const IDIOMS = [
  {p:"Beat around the ___", a:"bush", m:"Avoid saying what you really mean.", e:"Stop beating around the bush and tell me the price."},
  {p:"Cut to the ___", a:"chase", m:"Get to the important part.", e:"Let's cut to the chase, how much do you want?"},
  {p:"The best of ___ worlds", a:"both", m:"A situation where you get the advantages of two things.", e:"Working two days at home is the best of both worlds."},
- {p:"One missed class is a slippery ___", a:"slope", m:"A small bad step that leads to much worse things.", e:"Lending him money is a slippery slope.", k:"A slippery slope"},
- {p:"He got cold ___ the night before the wedding", a:"feet", m:"Become too nervous to do something you planned.", e:"I got cold feet and cancelled the interview.", k:"Get cold feet"},
- {p:"There's no plan, we'll play it by ___", a:"ear", m:"Decide as you go, without a fixed plan.", e:"Let's play it by ear and see who turns up.", k:"Play it by ear"},
- {p:"I'm snowed ___ until Friday", a:"under", m:"Have far too much work.", e:"She's snowed under with marking.", k:"Be snowed under"},
+ {p:"One missed class is {a slippery ___}", a:"slope", m:"A small bad step that leads to much worse things.", e:"Lending him money is a slippery slope.", k:"A slippery slope"},
+ {p:"He {got cold ___} the night before the wedding", a:"feet", m:"Become too nervous to do something you planned.", e:"I got cold feet and cancelled the interview.", k:"Get cold feet"},
+ {p:"There's no plan, we'll {play it by ___}", a:"ear", m:"Decide as you go, without a fixed plan.", e:"Let's play it by ear and see who turns up.", k:"Play it by ear"},
+ {p:"I'm {snowed ___} until Friday", a:"under", m:"Have far too much work.", e:"She's snowed under with marking.", k:"Be snowed under"},
  {p:"Get your ___ together", a:"act", m:"Start organising yourself and behaving properly.", e:"If he doesn't get his act together, he'll fail."},
  {p:"Go down a ___ hole", a:"rabbit", m:"Get lost in something complicated for a long time.", e:"I went down a rabbit hole reading about volcanoes."},
  {p:"Easier ___ than done", a:"said", m:"It sounds simple but it is hard in practice.", e:"Just stop worrying? Easier said than done."},
  {p:"It takes ___ to tango", a:"two", m:"Both people are responsible, not just one.", e:"Don't blame her alone, it takes two to tango."},
  {p:"The devil is in the ___", a:"detail", m:"The small details are where the real problems are.", e:"The contract looks fine, but the devil is in the detail."},
- {p:"Ask someone else, she's got enough on her ___", a:"plate", m:"Have a lot of work or problems to deal with.", e:"He has a lot on his plate this month.", k:"Have a lot on your plate"},
+ {p:"Ask someone else, she's {got enough on her ___}", a:"plate", m:"Have a lot of work or problems to deal with.", e:"He has a lot on his plate this month.", k:"Have a lot on your plate"},
  {p:"The ___ in the room", a:"elephant", m:"An obvious problem that nobody wants to talk about.", e:"Nobody mentioned the money, the elephant in the room."},
  {p:"Stick to your ___", a:"guns", m:"Refuse to change your opinion or decision.", e:"They pushed him hard, but he stuck to his guns."},
  {p:"Have second ___", a:"thoughts", m:"Start to doubt a decision you made.", e:"I'm having second thoughts about the flat."},
  {p:"Go with the ___", a:"flow", m:"Accept the situation and do what others are doing.", e:"There's no plan tonight, we'll just go with the flow."},
  {p:"A double-edged ___", a:"sword", m:"Something with a good side and a bad side.", e:"Working from home is a double-edged sword."},
- {p:"I put the biscuits away: out of sight, out of ___", a:"mind", m:"You forget about things you cannot see.", e:"Out of sight, out of mind works for my phone too.", k:"Out of sight, out of mind"},
+ {p:"I put the biscuits away: {out of sight, out of ___}", a:"mind", m:"You forget about things you cannot see.", e:"Out of sight, out of mind works for my phone too.", k:"Out of sight, out of mind"},
  {p:"When in Rome, do as the ___ do", a:"Romans", m:"Follow the local customs when you are somewhere new.", e:"They eat at ten here, so when in Rome, do as the Romans do."},
- {p:"Book now or you'll miss the ___", a:"boat", m:"Lose a chance because you were too slow.", e:"They missed the boat on the cheap tickets.", k:"Miss the boat"},
+ {p:"Book now or you'll {miss the ___}", a:"boat", m:"Lose a chance because you were too slow.", e:"They missed the boat on the cheap tickets.", k:"Miss the boat"},
  {p:"Go ___-shaped", a:"pear", m:"Go badly wrong.", e:"The whole trip went pear-shaped on day two."},
- {p:"Give it a week and you'll get the ___ of it", a:"hang", m:"Learn how to do something after a bit of practice.", e:"She got the hang of the software in a day.", k:"Get the hang of something"},
- {p:"Our summer plans are still up in the ___", a:"air", m:"Still uncertain, not decided.", e:"The date is up in the air until he answers.", k:"Be up in the air"},
+ {p:"Give it a week and you'll {get the ___ of it}", a:"hang", m:"Learn how to do something after a bit of practice.", e:"She got the hang of the software in a day.", k:"Get the hang of something"},
+ {p:"Our summer plans are still {up in the ___}", a:"air", m:"Still uncertain, not decided.", e:"The date is up in the air until he answers.", k:"Be up in the air"},
  {p:"Take a rain ___", a:"check", m:"Say no for now but yes another time.", e:"I'll take a rain check on dinner, I'm exhausted."},
  {p:"Make ends ___", a:"meet", m:"Earn just enough money to pay for what you need.", e:"With two kids, they're struggling to make ends meet."},
  {p:"Have a ___ on your shoulder", a:"chip", m:"Stay angry about something unfair that happened to you.", e:"He's had a chip on his shoulder since they passed him over."},
  {p:"As cool as a ___", a:"cucumber", m:"Completely calm when other people would panic.", e:"She was as cool as a cucumber in the interview.", t:"simile"},
  {p:"Like a fish out of ___", a:"water", m:"Uncomfortable somewhere new or unfamiliar.", e:"At my first rugby match I felt like a fish out of water.", t:"simile"},
- {p:"The kids were as good as ___ all afternoon", a:"gold", m:"Very well behaved.", e:"He sat as good as gold through the concert.", k:"As good as gold", t:"simile"},
+ {p:"The kids were {as good as ___} all afternoon", a:"gold", m:"Very well behaved.", e:"He sat as good as gold through the concert.", k:"As good as gold", t:"simile"},
  {p:"Sleep like a ___", a:"log", m:"Sleep deeply and never move.", e:"I walked all day and slept like a log.", t:"simile"},
  {p:"Run around like a headless ___", a:"chicken", m:"Rush about in a panic with no plan.", e:"He spent the morning running around like a headless chicken.", t:"simile"},
  {p:"As right as ___", a:"rain", m:"Perfectly fine again after feeling bad.", e:"A cup of tea and I'll be as right as rain.", t:"simile"},
@@ -473,37 +491,37 @@ const IDIOMS = [
  {p:"As white as a ___", a:"sheet", m:"Pale with shock or fear.", e:"She read the message and went as white as a sheet.", t:"simile"},
  {p:"Fight like cat and ___", a:"dog", m:"Argue constantly.", e:"Those two fight like cat and dog, then go for coffee.", t:"simile"},
  {p:"As old as the ___", a:"hills", m:"Extremely old, and everyone has heard it before.", e:"That joke is as old as the hills.", t:"simile"},
- {p:"I bit the ___ and booked the dentist", a:"bullet", m:"Accept something unpleasant and get on with it.", e:"We bit the bullet and told him the truth.", k:"Bite the bullet"},
- {p:"Go on, spill the ___", a:"beans", m:"Tell a secret.", e:"He spilled the beans about the surprise.", k:"Spill the beans"},
+ {p:"I {bit the ___} and booked the dentist", a:"bullet", m:"Accept something unpleasant and get on with it.", e:"We bit the bullet and told him the truth.", k:"Bite the bullet"},
+ {p:"Go on, {spill the ___}", a:"beans", m:"Tell a secret.", e:"He spilled the beans about the surprise.", k:"Spill the beans"},
  {p:"Let the cat out of the ___", a:"bag", m:"Give away a secret by accident.", e:"He let the cat out of the bag about the party."},
  {p:"Cost an arm and a ___", a:"leg", m:"Be very expensive.", e:"Parking at the airport costs an arm and a leg."},
- {p:"I'm shattered, I'm going to hit the ___", a:"sack", m:"Go to bed.", e:"Hit the sack early, we leave at six.", k:"Hit the sack"},
- {p:"He's off work, feeling a bit under the ___", a:"weather", m:"Slightly ill.", e:"I'm a little under the weather today.", k:"Under the weather"},
- {p:"Good luck tonight, break a ___", a:"leg", m:"Good luck, said to a performer.", e:"Break a leg at the audition.", k:"Break a leg"},
+ {p:"I'm shattered, I'm going to {hit the ___}", a:"sack", m:"Go to bed.", e:"Hit the sack early, we leave at six.", k:"Hit the sack"},
+ {p:"He's off work, feeling a bit {under the ___}", a:"weather", m:"Slightly ill.", e:"I'm a little under the weather today.", k:"Under the weather"},
+ {p:"Good luck tonight, {break a ___}", a:"leg", m:"Good luck, said to a performer.", e:"Break a leg at the audition.", k:"Break a leg"},
  {p:"The ball is in your ___", a:"court", m:"It is your decision now.", e:"I've made my offer, so the ball is in your court."},
  {p:"Bark up the wrong ___", a:"tree", m:"Follow completely the wrong idea.", e:"If you think I took it, you're barking up the wrong tree."},
- {p:"She was over the ___ with her results", a:"moon", m:"Very rarely.", e:"We were over the moon when they said yes.", k:"Over the moon"},
+ {p:"She was {over the ___} with her results", a:"moon", m:"Very rarely.", e:"We were over the moon when they said yes.", k:"Over the moon"},
  {p:"Throw someone under the ___", a:"bus", m:"Blame someone else to save yourself.", e:"He threw his own team under the bus in the meeting."},
  {p:"Jump on the ___", a:"bandwagon", m:"Join something only because it has become popular.", e:"Everyone jumped on the padel bandwagon last year."},
- {p:"That last message was the final ___", a:"straw", m:"The final small thing you can take.", e:"The broken promise was the last straw for her.", k:"The last straw"},
- {p:"The missing key turned out to be a red ___", a:"herring", m:"A detail that leads you away from the truth.", e:"That whole detail was a red herring.", k:"A red herring"},
+ {p:"That last message was {the final ___}", a:"straw", m:"The final small thing you can take.", e:"The broken promise was the last straw for her.", k:"The last straw"},
+ {p:"The missing key turned out to be {a red ___}", a:"herring", m:"A detail that leads you away from the truth.", e:"That whole detail was a red herring.", k:"A red herring"},
  {p:"Saved by the ___", a:"bell", m:"Rescued at the very last second.", e:"The phone rang and I was saved by the bell."},
  {p:"Steal someone's ___", a:"thunder", m:"Take the attention that should have been theirs.", e:"She announced it first and stole his thunder."},
  {p:"The tip of the ___", a:"iceberg", m:"The small visible part of a much bigger problem.", e:"Those complaints are just the tip of the iceberg."},
  {p:"Burn the midnight ___", a:"oil", m:"Work very late into the night.", e:"I burned the midnight oil to finish the report."},
- {p:"They cut ___ and the job looks cheap", a:"corners", m:"Do something cheaply or quickly and badly.", e:"Don't cut corners on the safety checks.", k:"Cut corners"},
+ {p:"They {cut ___} and the job looks cheap", a:"corners", m:"Do something cheaply or quickly and badly.", e:"Don't cut corners on the safety checks.", k:"Cut corners"},
  {p:"Butterflies in your ___", a:"stomach", m:"Nervous excitement before something.", e:"I had butterflies in my stomach before the speech."},
  {p:"Have bigger fish to ___", a:"fry", m:"Have more important things to deal with.", e:"He won't mind, he's got bigger fish to fry."},
  {p:"Raining cats and ___", a:"dogs", m:"Raining extremely hard.", e:"Take a coat, it's raining cats and dogs."},
  {p:"Over the ___", a:"moon", m:"Absolutely delighted.", e:"She was over the moon with the result."},
  {p:"Have your head in the ___", a:"clouds", m:"Dreaming instead of dealing with real life.", e:"He's lovely, but his head is always in the clouds."},
- {p:"Two weeks off and I became a couch ___", a:"potato", m:"Someone who sits in front of the TV all day.", e:"He's a couch potato at the weekend.", k:"A couch potato"},
- {p:"He'll tidy his room when pigs ___", a:"fly", m:"Never going to happen.", e:"They'll apologise when pigs fly.", k:"When pigs fly"},
+ {p:"Two weeks off and I became {a couch ___}", a:"potato", m:"Someone who sits in front of the TV all day.", e:"He's a couch potato at the weekend.", k:"A couch potato"},
+ {p:"He'll tidy his room {when pigs ___}", a:"fly", m:"Never going to happen.", e:"They'll apologise when pigs fly.", k:"When pigs fly"},
  {p:"Like talking to a brick ___", a:"wall", m:"A completely pointless conversation.", e:"Asking him to listen is like talking to a brick wall."},
- {p:"He thinks his new phone is the bee's ___", a:"knees", m:"The very best thing there is.", e:"She thinks that cafe is the bee's knees.", k:"The bee's knees"},
- {p:"The crowd went ___ at the last goal", a:"bananas", m:"Get wildly excited or very angry.", e:"My dad went bananas when he saw the bill.", k:"Go bananas"},
+ {p:"He thinks his new phone is {the bee's ___}", a:"knees", m:"The very best thing there is.", e:"She thinks that cafe is the bee's knees.", k:"The bee's knees"},
+ {p:"The crowd {went ___} at the last goal", a:"bananas", m:"Get wildly excited or very angry.", e:"My dad went bananas when he saw the bill.", k:"Go bananas"},
  {p:"Not the sharpest tool in the ___", a:"shed", m:"Not very clever, said kindly.", e:"Lovely lad, just not the sharpest tool in the shed."},
- {p:"The old car finally kicked the ___", a:"bucket", m:"Die, or stop working, said jokingly.", e:"My phone kicked the bucket last night.", k:"Kick the bucket"},
+ {p:"The old car finally {kicked the ___}", a:"bucket", m:"Die, or stop working, said jokingly.", e:"My phone kicked the bucket last night.", k:"Kick the bucket"},
  {p:"Pull out all the ___", a:"stops", m:"Make every possible effort.", e:"They pulled out all the stops for the wedding."},
  {p:"Bend over ___", a:"backwards", m:"Try extremely hard to help someone.", e:"She bent over backwards to get us a table."},
  {p:"Hit the ___ running", a:"ground", m:"Start something fast and well.", e:"She hit the ground running in the new job."},
@@ -571,14 +589,54 @@ function hit(at, dur, freq, q, vol){
   src.connect(f); f.connect(g); g.connect(master);
   src.start(at); src.stop(at+dur+.02);
 }
+/* ------------------------------------------------------- recorded sounds */
+/* Kenney's Interface Sounds, CC0, no attribution needed. Swap any filename
+   below for another in idiom-assets/sounds if you prefer a different one.
+   Also downloaded: bong_001, error_008, question_002, click_002, switch_002. */
+const SFX_DIR = 'idiom-assets/sounds/';
+const SFX = {
+  right: 'confirmation_002.ogg',
+  wrong: 'error_006.ogg',
+  hint:  'pluck_001.ogg',
+  tick:  'tick_002.ogg'
+};
+/* Safari only learned Ogg Vorbis recently, so check before offering the kit. */
+const OGG_OK = (function(){
+  try{ return !!new Audio().canPlayType('audio/ogg; codecs="vorbis"'); }
+  catch(e){ return false; }
+})();
+let kit = OGG_OK ? 'rec' : 'synth';
+const sfxCache = {};
+/* Returns false if it could not play, so every caller can fall back to the
+   synthesised version and the game is never left silent. */
+function sfx(name, rate, vol){
+  if(!soundOn || kit !== 'rec' || !SFX[name]) return false;
+  try{
+    let base = sfxCache[name];
+    if(!base){
+      base = sfxCache[name] = new Audio(SFX_DIR + SFX[name]);
+      base.preload = 'auto';
+    }
+    if(base.error) return false;
+    const a = base.cloneNode();
+    a.volume = vol === undefined ? .6 : vol;
+    a.playbackRate = rate || 1;
+    const p = a.play();
+    if(p && p.catch) p.catch(()=>{});
+    return true;
+  }catch(e){ return false; }
+}
+
 function ding(step){ if(!soundOn) return;
   const k = Math.pow(2,(Math.min(step||0,7))/12);   // climbs a semitone per streak
+  if(sfx('right', k, .55)) return;
   tone(880*k,0,.14,'sine',.25); tone(1318.5*k,.1,.3,'sine',.22);
 }
 function buzz(){ if(!soundOn) return;
+  if(sfx('wrong', 1, .6)) return;
   tone(170,0,.34,'square',.16,110); tone(85,0,.34,'sawtooth',.08); hit(audio().currentTime,.12,420,1.4,.07);
 }
-function pip(){ if(!soundOn) return; tone(1560,0,.07,'sine',.1); }
+function pip(){ if(!soundOn) return; if(sfx('hint', 1, .5)) return; tone(1560,0,.07,'sine',.1); }
 // a short burst of applause: a filtered roar with individual claps over it
 function cheer(){
   if(!soundOn) return;
@@ -750,6 +808,10 @@ function segify(el, key, cb){
 segify($('lenSeg'),'len',v=>wantLen=+v);
 segify($('typeSeg'),'type',v=>{ playType=v; syncCounts(); });
 segify($('clueSeg'),'clue',v=>clueWhen=v);
+segify($('kitSeg'),'kit',v=>{ kit=v; ding(); });     // play the choice as you pick it
+if(!OGG_OK){                                          // no Ogg support, so no choice to offer
+  $('kitOpt').remove();
+}
 segify($('clockSeg'),'clock',v=>clockSecs=+v);
 
 function stopClock(){ if(clockRAF){ cancelAnimationFrame(clockRAF); clockRAF=null; } }
@@ -765,7 +827,7 @@ function startClock(){
     fill.style.width=(k*100)+'%';
     fill.style.background = k<.25 ? 'var(--red)' : (k<.5 ? '#ffa94d' : 'var(--gold)');
     const secs=Math.ceil(left/1000);
-    if(secs<=3 && secs>0 && secs!==lastTick){ lastTick=secs; if(soundOn) tone(1250,0,.05,'square',.07); }
+    if(secs<=3 && secs>0 && secs!==lastTick){ lastTick=secs; if(soundOn && !sfx('tick', 1, .4)) tone(1250,0,.05,'square',.07); }
     if(left<=0){ stopClock(); if(!answered) judge(null); return; }
     clockRAF=requestAnimationFrame(step);
   });
@@ -844,11 +906,8 @@ function render(){
   $('card').className='card';
   $('feedback').innerHTML='';
 
-  const parts = it.p.split('___');
   $('prompt').classList.remove('in'); void $('prompt').offsetWidth; $('prompt').classList.add('in');
-  $('prompt').innerHTML = esc(parts[0])
-    + '<input class="gap" id="gapInput" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="?">'
-    + esc(parts[1]||'');
+  $('prompt').innerHTML = promptHTML(it.p);
 
   const cb=$('clueBefore');
   if(clueWhen==='before'){ cb.style.display=''; cb.innerHTML='<b>Clue.</b> '+esc(it.m); }
@@ -857,7 +916,19 @@ function render(){
   setTimeout(()=>{ const g=$('gapInput'); if(g) g.focus(); },60);
   startClock();
 }
-function label(it){ return it.k || it.p.replace('___', it.a); }
+/* A prompt can mark the idiom inside a carrier sentence with braces, so the
+   idiom and the words around it can be told apart. "He {got cold ___} the
+   night before the wedding" dims everything outside the braces. */
+const GAP_HTML = '<input class="gap" id="gapInput" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="?">';
+function promptHTML(p){
+  const piece = t => esc(t).replace('___', GAP_HTML);
+  const m = p.match(/^([^{]*)\{([^}]*)\}([\s\S]*)$/);
+  if(!m) return piece(p);
+  const lead = t => t ? '<span class="lead">' + piece(t) + '</span>' : '';
+  return lead(m[1]) + piece(m[2]) + lead(m[3]);
+}
+function bare(s){ return s.replace(/[{}]/g, ''); }
+function label(it){ return it.k || bare(it.p).replace('___', it.a); }
 function esc(s){ return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
 function norm(s){ return s.toLowerCase().trim().replace(/[^a-z' ]/g,'').replace(/\s+/g,' '); }
 
