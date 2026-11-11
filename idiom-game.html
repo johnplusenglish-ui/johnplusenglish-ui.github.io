@@ -74,19 +74,6 @@
   }
   h1 span{color:var(--gold)}
   .sub{color:var(--muted);font-size:17px;max-width:460px;margin:0 auto 34px;line-height:1.5}
-  .gate{display:flex;flex-direction:column;gap:12px;max-width:420px;margin:0 auto 14px;text-align:left}
-  .field label{display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
-  .field input{
-    width:100%;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:12px;
-    color:var(--text);font-family:inherit;font-size:16px;font-weight:500;padding:13px 15px;outline:none;transition:.15s;
-  }
-  .field input:focus{border-color:var(--gold);background:rgba(255,197,61,.07)}
-  .field input.bad{border-color:var(--red)}
-  .field input::placeholder{color:#4e5872}
-  .field-err{display:none;color:var(--red);font-size:12.5px;margin-top:5px}
-  .field-err.show{display:block}
-  .consent{max-width:420px;margin:0 auto 20px;color:var(--muted);font-size:13px;text-align:center;line-height:1.5}
-  .saved{margin-top:18px;color:var(--muted);font-size:13px;text-align:center}
   .opts{display:flex;flex-direction:column;gap:14px;max-width:420px;margin:0 auto 30px;text-align:left}
   .opt{display:flex;align-items:center;justify-content:space-between;gap:14px;border:1px solid var(--line);background:rgba(255,255,255,.02);border-radius:14px;padding:14px 16px}
   .opt .lbl{font-weight:600;font-size:15px}
@@ -235,6 +222,15 @@
   }
 
   footer{margin-top:40px;text-align:center;color:#4b5468;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+  .social{display:flex;justify-content:center;gap:10px;margin-top:16px;flex-wrap:wrap}
+  .social a{
+    display:inline-flex;align-items:center;gap:7px;text-decoration:none;
+    border:1px solid var(--line);border-radius:999px;padding:9px 16px;
+    color:var(--muted);font-size:12.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    transition:.15s;
+  }
+  .social a:hover{color:var(--gold);border-color:rgba(255,197,61,.5);background:rgba(255,197,61,.06)}
+  .social svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 </style>
 </head>
 <body>
@@ -254,25 +250,6 @@
       <h1>Finish the<br><span>Idiom</span></h1>
       <p class="sub"><span id="subCount">129</span> everyday idioms and similes, one missing word each. Type it into the gap and press enter.</p>
     </div>
-    <div class="gate">
-      <div class="field">
-        <label for="gName">Your name</label>
-        <input type="text" id="gName" autocomplete="name" placeholder="e.g. Maria">
-        <div class="field-err" id="gNameErr">Please enter your name.</div>
-      </div>
-      <div class="field">
-        <label for="gEmail">Email</label>
-        <input type="email" id="gEmail" autocomplete="email" placeholder="e.g. maria@email.com">
-        <div class="field-err" id="gEmailErr">Please enter a valid email.</div>
-      </div>
-      <div class="field">
-        <label for="gCountry">Nationality</label>
-        <input type="text" id="gCountry" autocomplete="country-name" placeholder="e.g. Italian">
-        <div class="field-err" id="gCountryErr">Please enter your nationality.</div>
-      </div>
-    </div>
-    <p class="consent">Your score is saved so John can see how you did. Never shared.</p>
-
     <div class="opts">
       <div class="opt">
         <div>
@@ -366,7 +343,6 @@
       <div class="grade" id="grade"></div>
     </div>
     <div class="review" id="review"></div>
-    <p class="saved" id="savedNote"></p>
     <div style="margin-top:30px">
       <button class="big" id="againBtn">Play again</button>
       <button class="big ghost" id="missedBtn">Retry the ones I missed</button>
@@ -374,6 +350,16 @@
     </div>
   </section>
 
+  <div class="social">
+    <a href="https://www.instagram.com/johnplusenglish" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+      Instagram
+    </a>
+    <a href="https://t.me/johnplusenglishchannel" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m22 2-20 7.5 8 4M22 2l-4 19-8-6.5M22 2l-14 12.5"/></svg>
+      Telegram
+    </a>
+  </div>
   <footer>John Plus English</footer>
 </div>
 
@@ -517,21 +503,10 @@ const IDIOMS = [
 ];
 const ALTS = {day:["night"], detail:["details"], chickens:["chicken"], minds:["mind"], feet:["foot"], thoughts:["thought"], guns:["gun"], Romans:["roman"], cats:["cat"], dogs:["dog"], beans:["bean"], knees:["knee"], hills:["hill"], clouds:["cloud"], corners:["corner"], stops:["stop"], headlights:["headlight"], peas:["pea"]};
 
-/* ------------------------------------------------------------------ tracking */
-// The anon key is safe here: Row Level Security only allows INSERT.
-const SUPABASE_URL = "https://uovqsqnxcgvefxpxntcj.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_VTOzRUebaH_xQAs4wngfug_jCVCeCFB";
-const TABLE = "idiom_game_results";
-let student = { name:"", email:"", country:"" };
-
+/* ------------------------------------------------------------------ counter */
+// Anonymous hit counter, no cookies and no personal data.
 function logHit(key){
   try{ fetch("https://abacus.jasoncameron.dev/hit/johnplusenglish/"+key, {mode:"cors", keepalive:true}).catch(()=>{}); }catch(e){}
-}
-function validEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
-function markField(inputId, errId, ok){
-  $(inputId).classList.toggle('bad', !ok);
-  $(errId).classList.toggle('show', !ok);
-  return ok;
 }
 
 /* ------------------------------------------------------------------ state */
@@ -763,16 +738,7 @@ $('soundBtn').onclick=()=>{
   $('soundBtn').textContent = soundOn?'Sound on':'Sound off';
   if(soundOn) ding();
 };
-$('startBtn').onclick=()=>{
-  const n=$('gName').value.trim(), e=$('gEmail').value.trim(), c=$('gCountry').value.trim();
-  const okN=markField('gName','gNameErr', n.length>1);
-  const okE=markField('gEmail','gEmailErr', validEmail(e));
-  const okC=markField('gCountry','gCountryErr', c.length>1);
-  if(!(okN&&okE&&okC)) return;
-  student={name:n, email:e, country:c};
-  logHit('idiom-game-start');
-  start(shuffle(pool()).slice(0,Math.min(wantLen,pool().length)));
-};
+$('startBtn').onclick=()=>start(shuffle(pool()).slice(0,Math.min(wantLen,pool().length)));
 $('againBtn').onclick=()=>show(startPanel);
 $('quitBtn').onclick=()=>{ stopClock(); finish(); };
 $('missedBtn').onclick=()=>{
@@ -784,6 +750,7 @@ function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.rando
 function show(p){ [startPanel,quizPanel,endPanel].forEach(x=>x.classList.remove('show')); p.classList.add('show'); window.scrollTo({top:0,behavior:'smooth'}); }
 
 function start(list){
+  logHit('idiom-game-start');
   deck=list; idx=0; score=0; streak=0; best=0; results=[];
   $('quitBtn').style.display='';
   show(quizPanel); render();
@@ -939,56 +906,13 @@ function finish(){
   }
   $('review').innerHTML=html;
   $('review').querySelectorAll('.miss').forEach((r,i)=>{ r.style.animationDelay = Math.min(i*35,700)+'ms'; });
-  $('missedBtn').style.display = (missed.length+second.length) ? '' : 'none';
+  $('missedBtn').style.display = missed.length ? '' : 'none';
   $('quitBtn').style.display='none';
   $('trophy').hidden = pct < 80;
   if(pct>=80){ fanfare(); setTimeout(()=>fireworks(1100), 260); }
   else if(pct>=50){ setTimeout(()=>confettiBurst($('review'), 24), 200); }
   show(endPanel);
   logHit('idiom-game-done');
-  submitResult(pct, grade);
-}
-
-function submitResult(pct, grade){
-  const note = $('savedNote');
-  note.textContent = 'Sending your score to John...';
-  const payload = {
-    full_name: student.name,
-    email: student.email,
-    country: student.country,
-    score: score,
-    total: results.length,
-    pct: pct,
-    band: grade,
-    first_try: results.filter(r=>r.firstTry).length,
-    second_try: results.filter(r=>r.ok && !r.firstTry).length,
-    missed: results.filter(r=>!r.ok).length,
-    best_streak: best,
-    mistakes: results.filter(r=>!r.firstTry).map(r=>({
-      idiom: label(r.item),
-      answer: r.item.a,
-      given: r.given,
-      tries: r.tries,
-      hint: !!r.hint,
-      meaning: r.item.m
-    }))
-  };
-  fetch(SUPABASE_URL + '/rest/v1/' + TABLE, {
-    method:'POST', mode:'cors', keepalive:true,
-    headers:{
-      'Content-Type':'application/json',
-      'apikey': SUPABASE_ANON_KEY,
-      'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
-      'Prefer':'return=minimal'
-    },
-    body: JSON.stringify(payload)
-  }).then(r=>{
-    note.textContent = r.ok
-      ? 'Your score has been sent to John.'
-      : 'Your score could not be sent just now. Nothing else is affected.';
-  }).catch(()=>{
-    note.textContent = 'Your score could not be sent just now. Nothing else is affected.';
-  });
 }
 </script>
 </body>
