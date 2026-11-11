@@ -190,10 +190,6 @@
   .hint-btn:hover:not(:disabled){background:rgba(255,197,61,.16);transform:translateY(-1px)}
   .hint-btn:disabled{opacity:.35;cursor:default}
   .hint-btn[hidden]{display:none}
-  .card.locking{border-color:rgba(255,197,61,.55)}
-  .card.locking .prompt{animation:lockShiver .5s ease-in-out}
-  @keyframes lockShiver{0%,100%{transform:none}25%{transform:translateX(-1.5px)}75%{transform:translateX(1.5px)}}
-  .card.locking .blank,.card.locking input.gap{box-shadow:0 10px 36px -10px rgba(255,197,61,.8)}
 
   /* ---------- trophy ---------- */
   .trophy{display:flex;justify-content:center;margin-bottom:6px}
@@ -541,7 +537,7 @@ function markField(inputId, errId, ok){
 /* ------------------------------------------------------------------ state */
 let clueWhen='after', wantLen=IDIOMS.length, playType='both', clockSecs=0, clockRAF=null;
 let deck=[], idx=0, score=0, streak=0, best=0, answered=false, soundOn=true, results=[], tries=0;
-let locking=false, usedHint=false;
+let usedHint=false;
 
 const $ = id => document.getElementById(id);
 const startPanel=$('startPanel'), quizPanel=$('quizPanel'), endPanel=$('endPanel');
@@ -600,18 +596,6 @@ function buzz(){ if(!soundOn) return;
   tone(170,0,.34,'square',.16,110); tone(85,0,.34,'sawtooth',.08); hit(audio().currentTime,.12,420,1.4,.07);
 }
 function pip(){ if(!soundOn) return; tone(1560,0,.07,'sine',.1); }
-// an accelerating snare roll that finishes on a crack
-function drumRoll(ms){
-  if(!soundOn) return;
-  const c=audio(), t0=c.currentTime, n=Math.max(6,Math.floor(ms/26));
-  for(let i=0;i<n;i++){
-    const k=i/n, t=t0 + i*(ms/1000/n) + Math.random()*.004;
-    hit(t,.05,1700+Math.random()*500,1.1,.035+.10*k);
-    tone(190,(t-c.currentTime),.035,'triangle',.015+.04*k,150);
-  }
-  hit(t0+ms/1000,.26,2500,.8,.26);
-  tone(220,ms/1000,.2,'triangle',.09,110);
-}
 // a short burst of applause: a filtered roar with individual claps over it
 function cheer(){
   if(!soundOn) return;
@@ -751,7 +735,7 @@ function startClock(){
     fill.style.background = k<.25 ? 'var(--red)' : (k<.5 ? '#ffa94d' : 'var(--gold)');
     const secs=Math.ceil(left/1000);
     if(secs<=3 && secs>0 && secs!==lastTick){ lastTick=secs; if(soundOn) tone(1250,0,.05,'square',.07); }
-    if(left<=0){ stopClock(); if(!answered && !locking) judge(null); return; }
+    if(left<=0){ stopClock(); if(!answered) judge(null); return; }
     clockRAF=requestAnimationFrame(step);
   });
 }
@@ -807,7 +791,7 @@ function start(list){
 
 /* ------------------------------------------------------------------ lifeline */
 function giveLetter(){
-  if(answered || locking) return;
+  if(answered) return;
   const it=deck[idx], g=$('gapInput'), btn=$('hintBtn');
   if(!g) return;
   const word = it.a, cur = g.value;
@@ -827,7 +811,7 @@ $('hintBtn').onclick = giveLetter;
 
 /* ------------------------------------------------------------------ round */
 function render(){
-  answered=false; tries=0; usedHint=false; locking=false;
+  answered=false; tries=0; usedHint=false;
   $('hintBtn').hidden=false; $('hintBtn').disabled=false; $('hintBtn').textContent='Give me a letter';
   const it=deck[idx];
   $('counter').textContent = `Question ${idx+1} of ${deck.length}`;
@@ -917,30 +901,14 @@ function advance(){
 
 $('card').addEventListener('click',()=>{ if(answered) advance(); });
 
-function lockIn(v){
-  const roll = soundOn ? 520 : 0;          // sound off means no waiting about
-  if(!roll){ judge(v); return; }
-  locking = true;
-  $('card').classList.add('locking');
-  const g=$('gapInput'); if(g) g.blur();
-  drumRoll(roll);
-  setTimeout(()=>{
-    locking = false;
-    $('card').classList.remove('locking');
-    judge(v);
-  }, roll);
-}
-
 document.addEventListener('keydown',e=>{
   if(!quizPanel.classList.contains('show')) return;
   if(e.key!=='Enter') return;
   e.preventDefault();
-  if(locking) return;
   if(answered){ advance(); return; }
   const g=$('gapInput');
   const v=(g?g.value:'').trim();
-  if(!v){ judge(null); return; }
-  lockIn(v);
+  judge(v||null);
 });
 
 /* ------------------------------------------------------------------ end */
