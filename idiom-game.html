@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Finish the Idiom - johnplusenglish</title>
-<meta name="description" content="Finish the idiom. 64 everyday English idioms with one word missing, two guesses each, a buzzer, and the meaning and an example after every answer.">
+<meta name="description" content="Finish the idiom. 129 everyday English idioms and similes with one word missing, two guesses each, a buzzer, and the meaning and an example after every answer.">
 <link rel="canonical" href="https://johnplusenglish.com/idiom-game.html">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%230b0e14'/%3E%3Cpath d='M12 5 4 9l8 4 8-4-8-4z' stroke='%23ffc53d' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M8 10.8v3c0 1 2 2 4 2s4-1 4-2v-3' stroke='%23ffc53d' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M19 9v4.5' stroke='%23ffc53d' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="johnplusenglish">
 <meta property="og:title" content="Finish the Idiom - johnplusenglish">
-<meta property="og:description" content="64 everyday English idioms with one word missing. Type it, two guesses each, buzzer included.">
+<meta property="og:description" content="129 idioms and similes with one word missing. Type it, two guesses each, buzzer included.">
 <meta property="og:url" content="https://johnplusenglish.com/idiom-game.html">
 <meta property="og:image" content="https://johnplusenglish.com/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
@@ -176,6 +176,45 @@
   .miss .mn{color:var(--muted);font-size:14px;margin-top:3px;font-weight:400}
   .miss .tick{color:var(--green);font-weight:800}
   .miss .cross{color:var(--red);font-weight:800}
+  .clock{position:absolute;left:20px;right:20px;top:14px;height:4px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden}
+  .clock i{display:block;height:100%;width:100%;background:var(--gold);border-radius:99px}
+  .clock[hidden]{display:none}
+
+  /* ---------- motion ---------- */
+  @keyframes qIn{from{opacity:0;transform:translateY(20px) scale(.97)}to{opacity:1;transform:none}}
+  .prompt.in{animation:qIn .4s cubic-bezier(.2,.8,.3,1.2) both}
+  @keyframes letterDrop{from{opacity:0;transform:translateY(-18px) scale(1.35)}to{opacity:1;transform:none}}
+  .blank .ch{display:inline-block;animation:letterDrop .34s cubic-bezier(.2,.8,.3,1.5) both}
+  @keyframes gapGlow{0%,100%{box-shadow:0 4px 0 -2px rgba(255,197,61,0)}50%{box-shadow:0 10px 26px -8px rgba(255,197,61,.55)}}
+  input.gap:focus{animation:gapGlow 2s ease-in-out infinite}
+  @keyframes cardGood{0%{box-shadow:0 0 0 0 rgba(53,208,127,0)}30%{box-shadow:0 0 0 2px rgba(53,208,127,.45),0 18px 70px rgba(53,208,127,.20)}100%{box-shadow:0 0 0 0 rgba(53,208,127,0)}}
+  @keyframes cardBad{0%{box-shadow:0 0 0 0 rgba(255,95,95,0)}30%{box-shadow:0 0 0 2px rgba(255,95,95,.45),0 18px 70px rgba(255,95,95,.18)}100%{box-shadow:0 0 0 0 rgba(255,95,95,0)}}
+  .card.good{animation:cardGood 1s ease}
+  .card.bad{animation:cardBad .7s ease}
+  @keyframes bump{0%{transform:scale(1)}40%{transform:scale(1.5)}100%{transform:scale(1)}}
+  .bump{display:inline-block;animation:bump .38s cubic-bezier(.3,1.4,.5,1)}
+  @keyframes fbIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .feedback > *{animation:fbIn .34s ease both}
+  .feedback > *:nth-child(2){animation-delay:.07s}
+  .feedback > *:nth-child(3){animation-delay:.13s}
+  .feedback > *:nth-child(4){animation-delay:.19s}
+  .streak{transition:transform .2s}
+  .streak.hot{color:#ffd76a}
+  .streak.hot b{text-shadow:0 0 14px rgba(255,197,61,.9)}
+  @keyframes fire{0%,100%{transform:scale(1)}50%{transform:scale(1.14)}}
+  .streak.fire{animation:fire 1s ease-in-out infinite}
+  .bar i{position:relative;overflow:hidden}
+  .bar i::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);animation:shimmer 2.2s linear infinite}
+  @keyframes shimmer{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+  #confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:60}
+  .cf{position:absolute;width:8px;height:13px;border-radius:2px;will-change:transform,opacity;animation:cfFly var(--t) cubic-bezier(.15,.6,.4,1) forwards}
+  @keyframes cfFly{0%{transform:translate3d(0,0,0) rotate(0deg);opacity:1}100%{transform:translate3d(var(--dx),var(--dy),0) rotate(var(--rot));opacity:0}}
+  @keyframes rowIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+  .miss{animation:rowIn .34s ease both}
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+  }
+
   footer{margin-top:40px;text-align:center;color:#4b5468;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
 </style>
 </head>
@@ -194,7 +233,7 @@
   <section class="panel show" id="startPanel">
     <div class="hero">
       <h1>Finish the<br><span>Idiom</span></h1>
-      <p class="sub"><span id="subCount">58</span> everyday English idioms, one missing word each. Type it into the gap and press enter.</p>
+      <p class="sub"><span id="subCount">129</span> everyday idioms and similes, one missing word each. Type it into the gap and press enter.</p>
     </div>
     <div class="gate">
       <div class="field">
@@ -218,6 +257,17 @@
     <div class="opts">
       <div class="opt">
         <div>
+          <div class="lbl">What are we playing?</div>
+          <div class="hint">Idioms, similes or the lot</div>
+        </div>
+        <div class="seg" id="typeSeg">
+          <button data-type="both" class="on">Both</button>
+          <button data-type="idiom">Idioms</button>
+          <button data-type="simile">Similes</button>
+        </div>
+      </div>
+      <div class="opt">
+        <div>
           <div class="lbl">How many?</div>
           <div class="hint">Picked at random</div>
         </div>
@@ -226,6 +276,17 @@
           <button data-len="25">25</button>
           <button data-len="35">35</button>
           <button data-len="64" class="on" id="allBtn">All 64</button>
+        </div>
+      </div>
+      <div class="opt">
+        <div>
+          <div class="lbl">Against the clock?</div>
+          <div class="hint">Run out and the word is revealed</div>
+        </div>
+        <div class="seg" id="clockSeg">
+          <button data-clock="0" class="on">Off</button>
+          <button data-clock="20">20s</button>
+          <button data-clock="10">10s</button>
         </div>
       </div>
       <div class="opt">
@@ -249,11 +310,12 @@
       <div id="counter">Question 1 of 58</div>
       <div class="scores">
         <div>Score <b id="scoreOut">0</b></div>
-        <div class="streak">Streak <b id="streakOut">0</b></div>
+        <div class="streak" id="streakPill">Streak <b id="streakOut">0</b></div>
       </div>
     </div>
 
     <div class="card" id="card">
+      <div class="clock" id="clock" hidden><i id="clockFill"></i></div>
       <div class="prompt" id="prompt"></div>
       <div id="clueBefore" class="meaning" style="margin-top:22px;display:none"></div>
         <div class="feedback" id="feedback"></div>
@@ -279,6 +341,8 @@
 
   <footer>John Plus English</footer>
 </div>
+
+<div id="confetti" aria-hidden="true"></div>
 
 <script>
 /* ------------------------------------------------------------------ data */
@@ -346,9 +410,74 @@ const IDIOMS = [
  {p:"Be up in the ___", a:"air", m:"Still uncertain, not decided.", e:"Our summer plans are up in the air."},
  {p:"Take a rain ___", a:"check", m:"Say no for now but yes another time.", e:"I'll take a rain check on dinner, I'm exhausted."},
  {p:"Make ends ___", a:"meet", m:"Earn just enough money to pay for what you need.", e:"With two kids, they're struggling to make ends meet."},
- {p:"Have a ___ on your shoulder", a:"chip", m:"Stay angry about something unfair that happened to you.", e:"He's had a chip on his shoulder since they passed him over."}
+ {p:"Have a ___ on your shoulder", a:"chip", m:"Stay angry about something unfair that happened to you.", e:"He's had a chip on his shoulder since they passed him over."},
+ {p:"As cool as a ___", a:"cucumber", m:"Completely calm when other people would panic.", e:"She was as cool as a cucumber in the interview.", t:"simile"},
+ {p:"Like a fish out of ___", a:"water", m:"Uncomfortable somewhere new or unfamiliar.", e:"At my first rugby match I felt like a fish out of water.", t:"simile"},
+ {p:"As good as ___", a:"gold", m:"Very well behaved.", e:"The kids were as good as gold all afternoon.", t:"simile"},
+ {p:"Sleep like a ___", a:"log", m:"Sleep deeply and never move.", e:"I walked all day and slept like a log.", t:"simile"},
+ {p:"Run around like a headless ___", a:"chicken", m:"Rush about in a panic with no plan.", e:"He spent the morning running around like a headless chicken.", t:"simile"},
+ {p:"As right as ___", a:"rain", m:"Perfectly fine again after feeling bad.", e:"A cup of tea and I'll be as right as rain.", t:"simile"},
+ {p:"Like two peas in a ___", a:"pod", m:"Two people who are very alike.", e:"Those two are like two peas in a pod.", t:"simile"},
+ {p:"As blind as a ___", a:"bat", m:"Can hardly see anything.", e:"Without my glasses I'm as blind as a bat.", t:"simile"},
+ {p:"As mad as a ___", a:"hatter", m:"Completely crazy, in a harmless funny way.", e:"Her uncle is as mad as a hatter and we love him for it.", t:"simile"},
+ {p:"Eat like a ___", a:"horse", m:"Eat a huge amount.", e:"He's skinny, but he eats like a horse.", t:"simile"},
+ {p:"As light as a ___", a:"feather", m:"Weighing almost nothing.", e:"Pick it up, it's as light as a feather.", t:"simile"},
+ {p:"As stubborn as a ___", a:"mule", m:"Refusing to change your mind.", e:"Don't argue with him, he's as stubborn as a mule.", t:"simile"},
+ {p:"Like a broken ___", a:"record", m:"Saying the same thing over and over.", e:"I sound like a broken record, but please lock the door.", t:"simile"},
+ {p:"As clear as ___", a:"mud", m:"Not clear at all.", e:"His explanation was as clear as mud.", t:"simile"},
+ {p:"As sick as a ___", a:"dog", m:"Very ill indeed.", e:"I was as sick as a dog all weekend.", t:"simile"},
+ {p:"As fit as a ___", a:"fiddle", m:"In excellent health.", e:"At seventy he's still as fit as a fiddle.", t:"simile"},
+ {p:"Like watching paint ___", a:"dry", m:"Unbelievably boring.", e:"That meeting was like watching paint dry.", t:"simile"},
+ {p:"As quiet as a ___", a:"mouse", m:"Making no sound at all.", e:"She sat as quiet as a mouse at the back.", t:"simile"},
+ {p:"As busy as a ___", a:"bee", m:"Working non-stop.", e:"He's been as busy as a bee since the baby arrived.", t:"simile"},
+ {p:"Like a deer in the ___", a:"headlights", m:"Frozen, with no idea what to do.", e:"When they asked him a question he looked like a deer in the headlights.", t:"simile"},
+ {p:"Spread like ___", a:"wildfire", m:"Travel incredibly fast, usually news.", e:"The rumour spread like wildfire.", t:"simile"},
+ {p:"Go down like a lead ___", a:"balloon", m:"Be received really badly.", e:"My joke went down like a lead balloon.", t:"simile"},
+ {p:"As happy as ___", a:"Larry", m:"Perfectly content with very little.", e:"Give him a sandwich and he's as happy as Larry.", t:"simile"},
+ {p:"As dry as a ___", a:"bone", m:"Completely dry.", e:"The garden is as dry as a bone.", t:"simile"},
+ {p:"Like herding ___", a:"cats", m:"Impossible to organise.", e:"Teaching them on a Friday is like herding cats.", t:"simile"},
+ {p:"As easy as ___", a:"pie", m:"Very easy once you know how.", e:"After the second time it's as easy as pie.", t:"simile"},
+ {p:"Like a bull in a ___ shop", a:"china", m:"Clumsy and careless with delicate things.", e:"He came in like a bull in a china shop.", t:"simile"},
+ {p:"As white as a ___", a:"sheet", m:"Pale with shock or fear.", e:"She read the message and went as white as a sheet.", t:"simile"},
+ {p:"Fight like cat and ___", a:"dog", m:"Argue constantly.", e:"Those two fight like cat and dog, then go for coffee.", t:"simile"},
+ {p:"As old as the ___", a:"hills", m:"Extremely old, and everyone has heard it before.", e:"That joke is as old as the hills.", t:"simile"},
+ {p:"Bite the ___", a:"bullet", m:"Accept something unpleasant and get on with it.", e:"I bit the bullet and booked the dentist."},
+ {p:"Spill the ___", a:"beans", m:"Tell a secret.", e:"Come on, spill the beans, what did she say?"},
+ {p:"Let the cat out of the ___", a:"bag", m:"Give away a secret by accident.", e:"He let the cat out of the bag about the party."},
+ {p:"Cost an arm and a ___", a:"leg", m:"Be very expensive.", e:"Parking at the airport costs an arm and a leg."},
+ {p:"Hit the ___ (go to bed)", a:"sack", m:"Go to bed.", e:"I'm shattered, I'm going to hit the sack."},
+ {p:"Under the ___", a:"weather", m:"Slightly ill.", e:"She's a bit under the weather today."},
+ {p:"Break a ___", a:"leg", m:"Good luck, said to a performer.", e:"Break a leg out there tonight."},
+ {p:"The ball is in your ___", a:"court", m:"It is your decision now.", e:"I've made my offer, so the ball is in your court."},
+ {p:"Bark up the wrong ___", a:"tree", m:"Follow completely the wrong idea.", e:"If you think I took it, you're barking up the wrong tree."},
+ {p:"Once in a blue ___", a:"moon", m:"Very rarely.", e:"We see each other once in a blue moon."},
+ {p:"Throw someone under the ___", a:"bus", m:"Blame someone else to save yourself.", e:"He threw his own team under the bus in the meeting."},
+ {p:"Jump on the ___", a:"bandwagon", m:"Join something only because it has become popular.", e:"Everyone jumped on the padel bandwagon last year."},
+ {p:"The last ___", a:"straw", m:"The final small thing you can take.", e:"The late message was the last straw."},
+ {p:"A red ___", a:"herring", m:"A detail that leads you away from the truth.", e:"The missing key turned out to be a red herring."},
+ {p:"Saved by the ___", a:"bell", m:"Rescued at the very last second.", e:"The phone rang and I was saved by the bell."},
+ {p:"Steal someone's ___", a:"thunder", m:"Take the attention that should have been theirs.", e:"She announced it first and stole his thunder."},
+ {p:"The tip of the ___", a:"iceberg", m:"The small visible part of a much bigger problem.", e:"Those complaints are just the tip of the iceberg."},
+ {p:"Burn the midnight ___", a:"oil", m:"Work very late into the night.", e:"I burned the midnight oil to finish the report."},
+ {p:"Cut ___", a:"corners", m:"Do something cheaply or quickly and badly.", e:"They cut corners on the wiring and it shows."},
+ {p:"Butterflies in your ___", a:"stomach", m:"Nervous excitement before something.", e:"I had butterflies in my stomach before the speech."},
+ {p:"Have bigger fish to ___", a:"fry", m:"Have more important things to deal with.", e:"He won't mind, he's got bigger fish to fry."},
+ {p:"Raining cats and ___", a:"dogs", m:"Raining extremely hard.", e:"Take a coat, it's raining cats and dogs."},
+ {p:"Over the ___", a:"moon", m:"Absolutely delighted.", e:"She was over the moon with the result."},
+ {p:"Have your head in the ___", a:"clouds", m:"Dreaming instead of dealing with real life.", e:"He's lovely, but his head is always in the clouds."},
+ {p:"A couch ___", a:"potato", m:"Someone who sits in front of the TV all day.", e:"Two weeks off and I turned into a complete couch potato."},
+ {p:"When pigs ___", a:"fly", m:"Never going to happen.", e:"He'll tidy his room when pigs fly."},
+ {p:"Like talking to a brick ___", a:"wall", m:"A completely pointless conversation.", e:"Asking him to listen is like talking to a brick wall."},
+ {p:"The bee's ___", a:"knees", m:"The very best thing there is.", e:"He thinks his new phone is the bee's knees."},
+ {p:"Go ___ (lose control)", a:"bananas", m:"Get wildly excited or very angry.", e:"The crowd went bananas at the last goal."},
+ {p:"Not the sharpest tool in the ___", a:"shed", m:"Not very clever, said kindly.", e:"Lovely lad, just not the sharpest tool in the shed."},
+ {p:"Kick the ___", a:"bucket", m:"Die, or stop working, said jokingly.", e:"The old car finally kicked the bucket."},
+ {p:"Pull out all the ___", a:"stops", m:"Make every possible effort.", e:"They pulled out all the stops for the wedding."},
+ {p:"Bend over ___", a:"backwards", m:"Try extremely hard to help someone.", e:"She bent over backwards to get us a table."},
+ {p:"Hit the ___ running", a:"ground", m:"Start something fast and well.", e:"She hit the ground running in the new job."},
+ {p:"Through thick and ___", a:"thin", m:"In good times and bad.", e:"They have stayed together through thick and thin."}
 ];
-const ALTS = {detail:["details"], chickens:["chicken"], minds:["mind"], feet:["foot"], thoughts:["thought"], guns:["gun"], Romans:["roman"]};
+const ALTS = {detail:["details"], chickens:["chicken"], minds:["mind"], feet:["foot"], thoughts:["thought"], guns:["gun"], Romans:["roman"], cats:["cat"], dogs:["dog"], beans:["bean"], knees:["knee"], hills:["hill"], clouds:["cloud"], corners:["corner"], stops:["stop"], headlights:["headlight"], peas:["pea"]};
 
 /* ------------------------------------------------------------------ tracking */
 // The anon key is safe here: Row Level Security only allows INSERT.
@@ -368,7 +497,7 @@ function markField(inputId, errId, ok){
 }
 
 /* ------------------------------------------------------------------ state */
-let clueWhen='after', wantLen=IDIOMS.length;
+let clueWhen='after', wantLen=IDIOMS.length, playType='both', clockSecs=0, clockRAF=null;
 let deck=[], idx=0, score=0, streak=0, best=0, answered=false, soundOn=true, results=[], tries=0;
 
 const $ = id => document.getElementById(id);
@@ -387,9 +516,73 @@ function tone(freq, start, dur, type, vol, slideTo){
   o.connect(g); g.connect(c.destination);
   o.start(c.currentTime+start); o.stop(c.currentTime+start+dur+0.03);
 }
-function ding(){ if(!soundOn) return; tone(880,0,.14,'sine',.25); tone(1318.5,.1,.3,'sine',.22); }
+function ding(step){ if(!soundOn) return;
+  const k = Math.pow(2,(Math.min(step||0,7))/12);   // climbs a semitone per streak
+  tone(880*k,0,.14,'sine',.25); tone(1318.5*k,.1,.3,'sine',.22);
+}
 function buzz(){ if(!soundOn) return; tone(170,0,.34,'square',.16,110); tone(85,0,.34,'sawtooth',.08); }
 function fanfare(){ if(!soundOn) return; [523,659,784,1046].forEach((f,i)=>tone(f,i*.11,.3,'triangle',.2)); }
+
+/* ------------------------------------------------------------------ motion */
+const REDUCED = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const CF_COLOURS = ['#ffc53d','#35d07f','#5aa9ff','#ffffff','#ff8fab'];
+
+function confettiBurst(target, count){
+  if(REDUCED) return;
+  const layer = $('confetti');
+  const r = (target||$('card')).getBoundingClientRect();
+  const x = r.left + r.width/2, y = r.top + r.height/2;
+  for(let i=0;i<count;i++){
+    const d = document.createElement('i');
+    d.className = 'cf';
+    const angle = (Math.random()*Math.PI) - Math.PI/2;      // upward fan
+    const dist = 90 + Math.random()*260;
+    d.style.left = (x + (Math.random()*40-20)) + 'px';
+    d.style.top  = (y + (Math.random()*20-10)) + 'px';
+    d.style.background = CF_COLOURS[(Math.random()*CF_COLOURS.length)|0];
+    d.style.setProperty('--dx', Math.sin(angle)*dist + 'px');
+    d.style.setProperty('--dy', (Math.cos(angle)*-dist*0.6 + 160 + Math.random()*120) + 'px');
+    d.style.setProperty('--rot', (Math.random()*900-450) + 'deg');
+    d.style.setProperty('--t', (900 + Math.random()*700) + 'ms');
+    layer.appendChild(d);
+    d.addEventListener('animationend', ()=>d.remove());
+  }
+}
+
+function spellOut(span, word){
+  span.textContent = '';
+  if(REDUCED){ span.textContent = word; return; }
+  [...word].forEach((ch,i)=>{
+    const c = document.createElement('span');
+    c.className='ch';
+    c.textContent = ch;
+    c.style.animationDelay = (i*45)+'ms';
+    span.appendChild(c);
+  });
+}
+
+function bump(el){
+  if(REDUCED) return;
+  el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump');
+}
+
+function countTo(el, to, ms){
+  if(REDUCED){ el.textContent = to; return; }
+  const from = 0, t0 = performance.now();
+  (function step(now){
+    const k = Math.min(1,(now-t0)/ms);
+    el.textContent = Math.round(from + (to-from) * (1-Math.pow(1-k,3)));
+    if(k<1) requestAnimationFrame(step);
+  })(t0);
+}
+
+function paintStreak(){
+  const pill = $('streakPill');
+  $('streakOut').textContent = streak;
+  pill.classList.toggle('hot', streak>=3);
+  pill.classList.toggle('fire', streak>=5);
+  if(streak>=2) bump($('streakOut'));
+}
 
 /* ------------------------------------------------------------------ setup */
 function segify(el, key, cb){
@@ -399,10 +592,45 @@ function segify(el, key, cb){
   });
 }
 segify($('lenSeg'),'len',v=>wantLen=+v);
-$('subCount').textContent = IDIOMS.length;
-$('allBtn').textContent = 'All '+IDIOMS.length;
-$('allBtn').dataset.len = IDIOMS.length;
+segify($('typeSeg'),'type',v=>{ playType=v; syncCounts(); });
 segify($('clueSeg'),'clue',v=>clueWhen=v);
+segify($('clockSeg'),'clock',v=>clockSecs=+v);
+
+function stopClock(){ if(clockRAF){ cancelAnimationFrame(clockRAF); clockRAF=null; } }
+function startClock(){
+  stopClock();
+  const bar=$('clock'), fill=$('clockFill');
+  if(!clockSecs){ bar.hidden=true; return; }
+  bar.hidden=false; fill.style.width='100%'; fill.style.background='var(--gold)';
+  const total=clockSecs*1000, t0=performance.now();
+  let lastTick=clockSecs+1;
+  clockRAF=requestAnimationFrame(function step(now){
+    const left=Math.max(0,total-(now-t0)), k=left/total;
+    fill.style.width=(k*100)+'%';
+    fill.style.background = k<.25 ? 'var(--red)' : (k<.5 ? '#ffa94d' : 'var(--gold)');
+    const secs=Math.ceil(left/1000);
+    if(secs<=3 && secs>0 && secs!==lastTick){ lastTick=secs; if(soundOn) tone(1250,0,.05,'square',.07); }
+    if(left<=0){ stopClock(); if(!answered) judge(null); return; }
+    clockRAF=requestAnimationFrame(step);
+  });
+}
+
+function pool(){
+  return IDIOMS.filter(i => playType==='both' || (i.t||'idiom')===playType);
+}
+function syncCounts(){
+  const n = pool().length;
+  $('subCount').textContent = IDIOMS.length;
+  $('allBtn').textContent = 'All '+n;
+  $('allBtn').dataset.len = n;
+  if($('allBtn').classList.contains('on')) wantLen = n;
+  $('lenSeg').querySelectorAll('button').forEach(b=>{
+    const v = +b.dataset.len;
+    b.disabled = (b.id!=='allBtn' && v > n);
+    b.style.opacity = b.disabled ? .35 : '';
+  });
+}
+syncCounts();
 
 $('soundBtn').onclick=()=>{
   soundOn=!soundOn;
@@ -418,10 +646,10 @@ $('startBtn').onclick=()=>{
   if(!(okN&&okE&&okC)) return;
   student={name:n, email:e, country:c};
   logHit('idiom-game-start');
-  start(shuffle(IDIOMS.slice()).slice(0,wantLen));
+  start(shuffle(pool()).slice(0,Math.min(wantLen,pool().length)));
 };
 $('againBtn').onclick=()=>show(startPanel);
-$('quitBtn').onclick=()=>finish();
+$('quitBtn').onclick=()=>{ stopClock(); finish(); };
 $('missedBtn').onclick=()=>{
   const missed = results.filter(r=>!r.firstTry).map(r=>r.item);
   if(missed.length) start(shuffle(missed));
@@ -442,12 +670,13 @@ function render(){
   const it=deck[idx];
   $('counter').textContent = `Question ${idx+1} of ${deck.length}`;
   $('scoreOut').textContent = score;
-  $('streakOut').textContent = streak;
+  paintStreak();
   $('barFill').style.width = (idx/deck.length*100)+'%';
   $('card').className='card';
   $('feedback').innerHTML='';
 
   const parts = it.p.split('___');
+  $('prompt').classList.remove('in'); void $('prompt').offsetWidth; $('prompt').classList.add('in');
   $('prompt').innerHTML = esc(parts[0])
     + '<input class="gap" id="gapInput" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="?">'
     + esc(parts[1]||'');
@@ -457,6 +686,7 @@ function render(){
   else cb.style.display='none';
 
   setTimeout(()=>{ const g=$('gapInput'); if(g) g.focus(); },60);
+  startClock();
 }
 function esc(s){ return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
 function norm(s){ return s.toLowerCase().trim().replace(/[^a-z' ]/g,'').replace(/\s+/g,' '); }
@@ -479,19 +709,27 @@ function judge(given){
   }
 
   answered=true;
+  stopClock();
 
   const g=$('gapInput');
   const span=document.createElement('span');
   span.className='blank filled '+(ok?'good':'bad');
   span.id='blank';
-  span.textContent=it.a;
   if(g) g.replaceWith(span);
+  spellOut(span, it.a);
   $('card').classList.add(ok?'good':'bad');
   if(!ok) $('card').classList.add('shake');
 
   const firstTry = ok && tries===1;
-  if(ok){ if(firstTry){ score++; streak++; best=Math.max(best,streak); } else { streak=0; } ding(); }
+  if(ok){
+    if(firstTry){
+      score++; streak++; best=Math.max(best,streak);
+      confettiBurst($('card'), streak>=5 ? 46 : streak>=3 ? 30 : 18);
+    } else { streak=0; }
+    ding(firstTry ? streak-1 : 0);
+  }
   else { streak=0; buzz(); }
+  paintStreak();
 
   let head = firstTry ? '<div class="verdict good">Correct</div>'
             : ok      ? '<div class="verdict good">Right, on the second go</div>'
@@ -503,8 +741,7 @@ function judge(given){
     `<div class="example">${esc(it.e)}</div>` + wrongWord;
 
   results.push({item:it, ok, firstTry, given, tries});
-  $('scoreOut').textContent=score;
-  $('streakOut').textContent=streak;
+  if($('scoreOut').textContent !== String(score)){ $('scoreOut').textContent=score; bump($('scoreOut')); }
   $('barFill').style.width=((idx+1)/deck.length*100)+'%';
   document.activeElement && document.activeElement.blur();
 }
@@ -530,7 +767,7 @@ document.addEventListener('keydown',e=>{
 function finish(){
   const total=results.length||1;
   const pct=Math.round(score/total*100);
-  $('finalScore').textContent=score;
+  countTo($('finalScore'), score, 900);
   $('finalTotal').textContent=results.length;
   const grade = pct===100 ? 'Perfect run' : pct>=85 ? 'Native-ish' : pct>=70 ? 'Strong' :
                 pct>=50 ? 'Getting there' : 'Worth another go';
@@ -552,9 +789,10 @@ function finish(){
     got.forEach(r=>{ html += `<div class="miss"><span class="tick">+</span><div class="idi">${esc(r.item.p.replace('___',r.item.a))}</div></div>`; });
   }
   $('review').innerHTML=html;
+  $('review').querySelectorAll('.miss').forEach((r,i)=>{ r.style.animationDelay = Math.min(i*35,700)+'ms'; });
   $('missedBtn').style.display = (missed.length+second.length) ? '' : 'none';
   $('quitBtn').style.display='none';
-  if(pct>=85) fanfare();
+  if(pct>=80){ fanfare(); setTimeout(()=>confettiBurst($('review'), 70), 220); }
   show(endPanel);
   logHit('idiom-game-done');
   submitResult(pct, grade);
