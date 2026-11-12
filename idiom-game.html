@@ -133,7 +133,7 @@
 
   input.gap{
     font:inherit;font-size:inherit;font-weight:inherit;letter-spacing:inherit;text-transform:uppercase;
-    width:10ch;min-width:10ch;background:rgba(255,197,61,.07);border:0;border-bottom:3px solid var(--gold);
+    width:5ch;min-width:0;max-width:100%;transition:width .12s ease;background:rgba(255,197,61,.07);border:0;border-bottom:3px solid var(--gold);
     border-radius:6px 6px 0 0;color:var(--gold);text-align:center;outline:none;padding:0 .08em 2px;
     caret-color:var(--gold);transition:background .15s;
   }
@@ -936,6 +936,7 @@ function giveLetter(){
   let n = 0;
   while(n < cur.length && n < word.length && cur[n].toLowerCase() === word[n].toLowerCase()) n++;
   g.value = word.slice(0, n+1);
+  sizeGap('');
   usedHint = true;
   pip();
   if(g.value.length >= word.length){
@@ -1128,6 +1129,42 @@ function render(){
    short prompt looking lost or breaks a long one over four ragged lines. Find
    the biggest size that still sits inside three lines, by halving the range and
    counting the lines the browser actually drew; text-wrap:balance evens them. */
+/* The answers run from three letters to ten, and the average is five, so a box
+   built for the longest leaves most words floating in an empty slab. Size the
+   box to what has actually been typed instead, up from a fixed minimum: the
+   minimum never changes, so an empty gap says nothing about the answer, and a
+   long word is never squeezed. */
+const GAP_MIN_CH = 5;
+let gapRuler = null;
+function gapTextWidth(el, text){
+  if(!gapRuler){
+    gapRuler = document.createElement('span');
+    gapRuler.style.cssText = 'position:absolute;left:-9999px;top:0;visibility:hidden;white-space:pre';
+    document.body.appendChild(gapRuler);
+  }
+  const cs = getComputedStyle(el);
+  gapRuler.style.fontFamily = cs.fontFamily;
+  gapRuler.style.fontSize = cs.fontSize;
+  gapRuler.style.fontWeight = cs.fontWeight;
+  gapRuler.style.letterSpacing = cs.letterSpacing;
+  gapRuler.style.textTransform = cs.textTransform;
+  gapRuler.textContent = text || '';
+  return gapRuler.offsetWidth;
+}
+/* Pass the answer as reserveText to hold the box open at the width it will
+   reach. The prompt is measured that way, so typing the answer cannot re-wrap
+   the sentence under the student's hands. Counting in '0' widths is not enough:
+   uppercase Anton is wider than its digits, so eight real letters overflowed a
+   ten-digit reserve. */
+function sizeGap(reserveText){
+  const g = $('gapInput'); if(!g) return;
+  const unit = gapTextWidth(g, '0') || 10;          // room for the caret
+  const floor = Math.max(unit * GAP_MIN_CH,
+                         reserveText ? gapTextWidth(g, reserveText) + unit : 0);
+  const typed = gapTextWidth(g, g.value) + unit;
+  g.style.width = Math.round(Math.max(floor, typed)) + 'px';
+}
+
 const PROMPT_MAX = 50, PROMPT_MIN = 24, PROMPT_COMFY = 27;
 function promptLineCount(el){
   const r = document.createRange(); r.selectNodeContents(el);
@@ -1142,7 +1179,11 @@ function promptLineCount(el){
 function fitPrompt(){
   const el = $('prompt'); if(!el || !el.clientWidth) return;
   const biggest = max => {
-    const fits = px => { el.style.fontSize = px.toFixed(1) + 'px'; return promptLineCount(el) <= max; };
+    const fits = px => {
+      el.style.fontSize = px.toFixed(1) + 'px';
+      sizeGap(deck[idx] ? deck[idx].a : '');
+      return promptLineCount(el) <= max;
+    };
     if(fits(PROMPT_MAX)) return PROMPT_MAX;
     let lo = PROMPT_MIN, hi = PROMPT_MAX;
     for(let i = 0; i < 7; i++){ const mid = (lo + hi) / 2; if(fits(mid)) lo = mid; else hi = mid; }
@@ -1153,6 +1194,7 @@ function fitPrompt(){
   let fs = biggest(3);
   if(fs < PROMPT_COMFY) fs = Math.max(fs, biggest(4));
   el.style.fontSize = fs.toFixed(1) + 'px';
+  sizeGap('');
 }
 
 const GAP_HTML = '<input class="gap" id="gapInput" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="?">';
@@ -1180,7 +1222,7 @@ function judge(given){
     const card=$('card');
     card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');
     const g=$('gapInput');
-    if(g){ g.value=''; g.focus(); }
+    if(g){ g.value=''; sizeGap(''); g.focus(); }
     $('feedback').innerHTML = '<div class="retry">Not that one<span>One more guess. Leave it empty if you want the answer.</span></div>';
     return;
   }
@@ -1232,6 +1274,7 @@ function advance(){
   if(idx>=deck.length) finish(); else render();
 }
 
+$('card').addEventListener('input', e => { if(e.target.id === 'gapInput') sizeGap(''); });
 $('card').addEventListener('click',()=>{ if(answered) advance(); });
 
 document.addEventListener('keydown',e=>{
