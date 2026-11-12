@@ -382,7 +382,7 @@
     <div class="review" id="review"></div>
     <div style="margin-top:30px">
       <button class="big" id="againBtn">Play again</button>
-      <button class="big ghost" id="sheetBtn">Get this round as a PDF</button>
+      <button class="big ghost" id="sheetBtn">Download this round</button>
       <button class="big ghost" id="missedBtn">Retry the ones I missed</button>
       <a class="big ghost" id="pdfBtn" href="pdfs/finish-the-idiom.pdf" download>Download all the idioms</a>
     </div>
@@ -911,94 +911,152 @@ function giveLetter(){
 $('hintBtn').onclick = giveLetter;
 
 /* ------------------------------------------------ the round as a handout */
-/* Same look as the full PDF: Outfit and Lora, two columns, gold numbers and
-   numbered entries. It opens a print-ready page, so choose Save as PDF there.
-   The page title becomes the suggested filename. */
-const SHEET_CSS = `
-  @page{size:A4;margin:16mm 14mm 14mm}
-  *{box-sizing:border-box}
-  body{margin:0;font-family:'Outfit',system-ui,sans-serif;color:#15181f;font-size:9.4pt;line-height:1.35}
-  .head{border-bottom:2px solid #15181f;padding-bottom:9px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:flex-end}
-  h1{font-size:19pt;margin:0;font-weight:800;letter-spacing:-.01em;text-transform:uppercase}
-  h1 span{color:#c08a00}
-  .kick{font-size:8.2pt;letter-spacing:.18em;text-transform:uppercase;color:#7b8292;font-weight:600;text-align:right}
-  .grid{column-count:2;column-gap:9mm}
-  .sec{font-size:11pt;font-weight:800;letter-spacing:.14em;text-transform:uppercase;margin:4px 0 9px;padding-bottom:5px;border-bottom:1.5px solid #15181f;break-after:avoid}
-  .sec span{color:#c08a00}
-  .sec + .grid{margin-bottom:14px}
-  .item{break-inside:avoid;display:flex;gap:7px;padding:0 0 8.5px;margin-bottom:8.5px;border-bottom:1px solid #e7e9ee}
-  .n{font-size:7.6pt;font-weight:700;color:#c08a00;min-width:15px;padding-top:1.5px}
-  .body{flex:1;min-width:0}
-  .idiom{font-weight:700;font-size:10.2pt;letter-spacing:-.005em}
-  .mean{color:#3f4654;margin-top:1px}
-  .ex{font-family:'Lora',Georgia,serif;font-style:italic;color:#7b8292;margin-top:2px;font-size:9pt}
-  .foot{margin-top:8px;padding-top:8px;border-top:1px solid #e7e9ee;font-size:7.6pt;letter-spacing:.16em;text-transform:uppercase;color:#9aa1b0;text-align:center}
-`;
+/* Same look as the full PDF: Outfit and Lora, two columns, gold accents and
+   numbered entries. jsPDF plus the subset fonts is about 470KB, so neither is
+   fetched until someone actually asks for the sheet. */
+const SHEET_LIBS = ['https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js', 'idiom-assets/sheet-fonts.js'];
+let sheetPending = null;
+function loadSheetLibs(){
+  if(window.jspdf && window.jspdf.jsPDF && window.SHEET_FONTS) return Promise.resolve();
+  if(sheetPending) return sheetPending;
+  sheetPending = Promise.all(SHEET_LIBS.map(src => new Promise((ok, no) => {
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload = ok;
+    s.onerror = () => { sheetPending = null; no(new Error('could not load ' + src)); };
+    document.head.appendChild(s);
+  }))).then(() => {});
+  return sheetPending;
+}
 
-function sheetDoc(){
-  const asset = f => new URL('idiom-assets/' + f, location.href).href;
-  const groups = [
-    ['Missed',         results.filter(r => !r.ok)],
-    ['Needed a nudge', results.filter(r => r.ok && !r.firstTry)],
-    ['Knew these',     results.filter(r => r.firstTry)]
-  ];
-  let body = '';
-  groups.forEach(g => {
-    const title = g[0], list = g[1];
-    if(!list.length) return;
-    body += '<div class="sec">' + esc(title) + ' <span>' + list.length + '</span></div><div class="grid">';
-    list.forEach((r, i) => {
-      const it = r.item;
-      body += '<div class="item"><div class="n">' + (i+1) + '</div><div class="body">'
-            + '<div class="idiom">' + esc(label(it)) + '</div>'
-            + '<div class="mean">' + esc(it.m) + '</div>'
-            + '<div class="ex">' + esc(it.e) + '</div></div></div>';
-    });
-    body += '</div>';
-  });
+/* the handout's palette */
+const INK='#15181f', GOLD='#c08a00', MEAN='#3f4654', SOFT='#7b8292', HAIR='#e7e9ee', FOOT='#9aa1b0';
+
+function buildSheet(){
+  const doc = new window.jspdf.jsPDF({unit:'mm', format:'a4'});
+  const F = window.SHEET_FONTS;
+  doc.addFileToVFS('Outfit-400.ttf',  F['Outfit-400']);  doc.addFont('Outfit-400.ttf',  'Outfit', 'normal');
+  doc.addFileToVFS('Outfit-700.ttf',  F['Outfit-700']);  doc.addFont('Outfit-700.ttf',  'Outfit', 'bold');
+  doc.addFileToVFS('Outfit-800.ttf',  F['Outfit-800']);  doc.addFont('Outfit-800.ttf',  'OutfitHeavy', 'normal');
+  doc.addFileToVFS('Lora-Italic.ttf', F['Lora-Italic']); doc.addFont('Lora-Italic.ttf', 'Lora', 'italic');
+
+  const L=14, R=196, TOP=16, BOT=281, GAP=9;
+  const COLW=(R-L-GAP)/2, NUMW=5, TW=COLW-NUMW;
+  let y = TOP + 6;
+
+  /* ---- masthead */
+  doc.setFont('OutfitHeavy','normal'); doc.setFontSize(19); doc.setTextColor(INK);
+  doc.text('FINISH THE ', L, y);
+  doc.setTextColor(GOLD);
+  doc.text('IDIOM', L + doc.getTextWidth('FINISH THE '), y);
   const when = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
-  return '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">'
-    + '<title>finish-the-idiom-' + results.length + '</title>'
-    + '<style>'
-    + "@font-face{font-family:'Outfit';src:url('" + asset('outfit-latin.woff2') + "') format('woff2');font-weight:400 800;font-display:swap}"
-    + "@font-face{font-family:'Lora';src:url('" + asset('lora-italic-latin.woff2') + "') format('woff2');font-style:italic;font-display:swap}"
-    + SHEET_CSS + '</style></head><body>'
-    + '<div class="head"><h1>Finish the <span>Idiom</span></h1>'
-    + '<div class="kick">' + results.length + ' idioms you played<br>' + esc(when) + '</div></div>'
-    + body
-    + '<div class="foot">John Plus English</div></body></html>';
+  doc.setFont('Outfit','bold'); doc.setFontSize(8.2); doc.setTextColor(SOFT); doc.setCharSpace(0.42);
+  doc.text((results.length + ' idioms you played').toUpperCase(), R, y - 3.4, {align:'right'});
+  doc.text(when.toUpperCase(), R, y, {align:'right'});
+  doc.setCharSpace(0);
+  y += 3.2;
+  doc.setDrawColor(INK); doc.setLineWidth(0.7); doc.line(L, y, R, y);
+  y += 7;
+
+  const page = () => { doc.addPage(); y = TOP + 4; };
+
+  function sectionHead(title, n){
+    if(y + 16 > BOT) page();
+    const t = title.toUpperCase();
+    doc.setFont('OutfitHeavy','normal'); doc.setFontSize(11); doc.setCharSpace(0.42);
+    doc.setTextColor(INK); doc.text(t, L, y);
+    const w = doc.getTextWidth(t) + t.length * 0.42;
+    doc.setTextColor(GOLD); doc.text(String(n), L + w + 2.4, y);
+    doc.setCharSpace(0);
+    y += 2.2;
+    doc.setDrawColor(INK); doc.setLineWidth(0.5); doc.line(L, y, R, y);
+    y += 6;
+  }
+
+  function measure(it){
+    doc.setFont('Outfit','bold');   doc.setFontSize(10.2); const a = doc.splitTextToSize(label(it), TW);
+    doc.setFont('Outfit','normal'); doc.setFontSize(9.4);  const b = doc.splitTextToSize(it.m, TW);
+    doc.setFont('Lora','italic');   doc.setFontSize(9);    const c = doc.splitTextToSize(it.e, TW);
+    return {a:a, b:b, c:c, h: a.length*4.5 + b.length*4.3 + c.length*4.2 + 5};
+  }
+
+  function drawItem(m, n, x, top){
+    doc.setFont('Outfit','bold'); doc.setFontSize(7.6); doc.setTextColor(GOLD);
+    doc.text(String(n), x, top);
+    let t = top;
+    doc.setFont('Outfit','bold');   doc.setFontSize(10.2); doc.setTextColor(INK);
+    doc.text(m.a, x+NUMW, t); t += m.a.length*4.5;
+    doc.setFont('Outfit','normal'); doc.setFontSize(9.4);  doc.setTextColor(MEAN);
+    doc.text(m.b, x+NUMW, t); t += m.b.length*4.3;
+    doc.setFont('Lora','italic');   doc.setFontSize(9);    doc.setTextColor(SOFT);
+    doc.text(m.c, x+NUMW, t); t += m.c.length*4.2;
+    doc.setDrawColor(HAIR); doc.setLineWidth(0.25);
+    doc.line(x, t - 1.4, x + COLW - 2, t - 1.4);
+  }
+
+  /* two columns, balanced when the rest of a section fits on the page */
+  function layout(list){
+    let i = 0;
+    while(i < list.length){
+      const rest = list.slice(i).map(r => measure(r.item));
+      const avail = BOT - y;
+      let fit = 0, h = 0;
+      while(fit < rest.length && h + rest[fit].h <= avail){ h += rest[fit].h; fit++; }
+      if(fit === 0) fit = 1;                       // an item taller than a column
+      let take, split;
+      if(fit >= rest.length){
+        const total = rest.reduce((s,m) => s + m.h, 0);
+        let acc = 0, k = 0;
+        while(k < rest.length - 1 && acc + rest[k].h <= total/2){ acc += rest[k].h; k++; }
+        split = Math.max(1, k); take = rest.length;
+      } else {
+        let h2 = 0, fit2 = 0;
+        while(fit + fit2 < rest.length && h2 + rest[fit+fit2].h <= avail){ h2 += rest[fit+fit2].h; fit2++; }
+        split = fit; take = fit + fit2;
+      }
+      let yA = y, yB = y;
+      for(let j = 0; j < take; j++){
+        const m = rest[j];
+        if(j < split){ drawItem(m, i+j+1, L, yA); yA += m.h; }
+        else { drawItem(m, i+j+1, L+COLW+GAP, yB); yB += m.h; }
+      }
+      i += take;
+      y = Math.max(yA, yB);
+      if(i < list.length) page();
+    }
+    y += 5;
+  }
+
+  [['Missed',         results.filter(r => !r.ok)],
+   ['Needed a nudge', results.filter(r => r.ok && !r.firstTry)],
+   ['Knew these',     results.filter(r => r.firstTry)]].forEach(g => {
+    if(!g[1].length) return;
+    sectionHead(g[0], g[1].length);
+    layout(g[1]);
+  });
+
+  const pages = doc.getNumberOfPages();
+  for(let i = 1; i <= pages; i++){
+    doc.setPage(i);
+    doc.setDrawColor(HAIR); doc.setLineWidth(0.25); doc.line(L, 286, R, 286);
+    doc.setFont('Outfit','normal'); doc.setFontSize(7.6); doc.setTextColor(FOOT); doc.setCharSpace(0.4);
+    doc.text('JOHN PLUS ENGLISH', (L+R)/2, 290, {align:'center'});
+    doc.setCharSpace(0);
+  }
+  doc.save('finish-the-idiom-' + results.length + '.pdf');
 }
 
-function openSheet(){
-  /* A hidden iframe rather than a new window: pop-up blockers never see it.
-     The print dialog takes its suggested filename from this page's title, so
-     borrow it for a second. */
-  const wasTitle = document.title;
-  const old = document.getElementById('sheetFrame');
-  if(old) old.remove();
-  const fr = document.createElement('iframe');
-  fr.id = 'sheetFrame';
-  fr.setAttribute('aria-hidden', 'true');
-  fr.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;opacity:0';
-  document.body.appendChild(fr);
-  const d = fr.contentWindow.document;
-  d.open(); d.write(sheetDoc()); d.close();
-  const go = () => {
-    document.title = 'finish-the-idiom-' + results.length;
-    try{ fr.contentWindow.focus(); fr.contentWindow.print(); }catch(e){}
-    setTimeout(() => { document.title = wasTitle; }, 1200);
-  };
-  if(d.fonts && d.fonts.ready) d.fonts.ready.then(() => setTimeout(go, 200));
-  else setTimeout(go, 800);
-  return true;
-}
-
-function downloadRound(){
+async function downloadRound(){
   const b = $('sheetBtn'), was = b.textContent;
-  b.disabled = true;
-  openSheet();
-  b.textContent = 'Choose Save as PDF';
-  setTimeout(() => { b.textContent = was; b.disabled = results.length === 0; }, 3400);
+  b.disabled = true; b.textContent = 'Building the sheet';
+  try{
+    await loadSheetLibs();
+    buildSheet();
+    b.textContent = 'Saved to your downloads';
+  }catch(e){
+    b.textContent = 'Could not build it';
+  }
+  setTimeout(() => { b.textContent = was; b.disabled = results.length === 0; }, 2800);
 }
 $('sheetBtn').onclick = downloadRound;
 $('prePdfLabel').textContent = 'Download all ' + IDIOMS.length + ' as a PDF';
@@ -1147,7 +1205,7 @@ function finish(){
   $('missedBtn').style.display = missed.length ? '' : 'none';
   $('quitBtn').style.display='none';
   $('trophy').hidden = pct < 80;
-  $('sheetBtn').textContent = 'Get these '+results.length+' as a PDF';
+  $('sheetBtn').textContent = 'Download these '+results.length;
   $('sheetBtn').disabled = results.length === 0;
   if(pct>=80){ fanfare(); setTimeout(()=>fireworks(1100), 260); }
   else if(pct>=50){ setTimeout(()=>confettiBurst($('review'), 24), 200); }
