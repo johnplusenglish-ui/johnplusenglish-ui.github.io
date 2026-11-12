@@ -115,10 +115,12 @@
 
   .prompt{
     font-family:'Anton Local','Anton',Outfit,system-ui,sans-serif;
-    font-size:clamp(30px,6vw,52px);font-weight:400;line-height:1.2;text-transform:uppercase;
-    letter-spacing:.012em;display:flex;flex-wrap:wrap;justify-content:center;align-items:baseline;gap:.3em;
-    flex:0 0 auto;align-content:center;
+    /* fitPrompt() sets the size; this is the fallback before it runs */
+    font-size:clamp(26px,5vw,46px);font-weight:400;line-height:1.08;text-transform:uppercase;
+    letter-spacing:.012em;text-align:center;text-wrap:balance;text-wrap:pretty;
+    flex:0 0 auto;max-width:100%;margin-inline:auto;
   }
+  @supports (text-wrap:balance){ .prompt{text-wrap:balance} }
   /* the words around the idiom, dimmed so the idiom itself leads */
   .prompt .lead{color:#9aa7bf}
   .blank{
@@ -131,7 +133,7 @@
 
   input.gap{
     font:inherit;font-size:inherit;font-weight:inherit;letter-spacing:inherit;text-transform:uppercase;
-    width:9ch;min-width:9ch;background:rgba(255,197,61,.07);border:0;border-bottom:3px solid var(--gold);
+    width:10ch;min-width:10ch;background:rgba(255,197,61,.07);border:0;border-bottom:3px solid var(--gold);
     border-radius:6px 6px 0 0;color:var(--gold);text-align:center;outline:none;padding:0 .08em 2px;
     caret-color:var(--gold);transition:background .15s;
   }
@@ -235,6 +237,8 @@
   @media (max-width:620px){
     .opt{flex-direction:column;align-items:stretch;gap:10px}
     .opt .seg{justify-content:center}
+    /* give the sentence back the width the card padding was taking */
+    .card{padding:30px 16px;min-height:clamp(230px,34vh,320px)}
   }
 
   @media (prefers-reduced-motion:reduce){
@@ -1075,6 +1079,7 @@ function render(){
 
   $('prompt').classList.remove('in'); void $('prompt').offsetWidth; $('prompt').classList.add('in');
   $('prompt').innerHTML = promptHTML(it.p);
+  fitPrompt();
 
   const cb=$('clueBefore');
   if(clueWhen==='before'){ cb.style.display=''; cb.innerHTML='<b>Clue.</b> '+esc(it.m); }
@@ -1086,6 +1091,37 @@ function render(){
 /* A prompt can mark the idiom inside a carrier sentence with braces, so the
    idiom and the words around it can be told apart. "He {got cold ___} the
    night before the wedding" dims everything outside the braces. */
+/* The sentences run from 20 to 82 characters, so one fixed size either leaves a
+   short prompt looking lost or breaks a long one over four ragged lines. Find
+   the biggest size that still sits inside three lines, by halving the range and
+   counting the lines the browser actually drew; text-wrap:balance evens them. */
+const PROMPT_MAX = 50, PROMPT_MIN = 24, PROMPT_COMFY = 27;
+function promptLineCount(el){
+  const r = document.createRange(); r.selectNodeContents(el);
+  const lh = parseFloat(getComputedStyle(el).lineHeight) || 20;
+  /* the gap box sits a pixel or two off the text baseline, so group the rects
+     rather than counting distinct tops, or every card reads one line too many */
+  const tops = [...r.getClientRects()].filter(x => x.height > 2).map(x => x.top).sort((a,b) => a-b);
+  let lines = 0, last = -1e9;
+  for(const t of tops){ if(t - last > lh * 0.55){ lines++; last = t; } }
+  return lines || 1;
+}
+function fitPrompt(){
+  const el = $('prompt'); if(!el || !el.clientWidth) return;
+  const biggest = max => {
+    const fits = px => { el.style.fontSize = px.toFixed(1) + 'px'; return promptLineCount(el) <= max; };
+    if(fits(PROMPT_MAX)) return PROMPT_MAX;
+    let lo = PROMPT_MIN, hi = PROMPT_MAX;
+    for(let i = 0; i < 7; i++){ const mid = (lo + hi) / 2; if(fits(mid)) lo = mid; else hi = mid; }
+    return lo;
+  };
+  /* three lines is the tidy shape, but on a narrow phone holding to three would
+     shrink the longest sentences to nothing, so there a fourth line is kinder */
+  let fs = biggest(3);
+  if(fs < PROMPT_COMFY) fs = Math.max(fs, biggest(4));
+  el.style.fontSize = fs.toFixed(1) + 'px';
+}
+
 const GAP_HTML = '<input class="gap" id="gapInput" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="?">';
 function promptHTML(p){
   const piece = t => esc(t).replace('___', GAP_HTML);
@@ -1218,6 +1254,7 @@ backdrop();
 // drift if the window is resized or the phone is turned mid-answer.
 addEventListener('resize', ()=>{
   document.querySelectorAll('svg.rough-annotation').forEach(el=>el.remove());
+  fitPrompt();
 });
 </script>
 </body>
