@@ -786,7 +786,14 @@ const SFX = {
   wrong: ['error_006.ogg', 'error_008.ogg'],
   hint:  ['pluck_001.ogg'],
   tick:  ['tick_002.ogg'],
-  low:   ['bong_001.ogg']
+  low:   ['bong_001.ogg'],
+  /* Real hands. Synthesised applause never sounded like hands, however much
+     noise you filter. These are CC0 recordings, cut and normalised; see
+     APPLAUSE-CREDITS.txt beside them. AAC rather than Ogg, so they play
+     everywhere and do not depend on the Ogg check below. */
+  clapShort: ['applause-short.m4a'],
+  clapMid:   ['applause-mid.m4a'],
+  clapLong:  ['applause-long.m4a']
 };
 const sfxLast = {};
 function pickSfx(name){
@@ -807,9 +814,11 @@ const sfxCache = {};
 /* Returns false if it could not play, so every caller can fall back to the
    synthesised version and the game is never left silent. */
 function sfx(name, rate, vol){
-  if(!soundOn || kit !== 'rec' || !SFX[name]) return false;
+  if(!soundOn || !SFX[name]) return false;
   try{
     const file = pickSfx(name);
+    // the beeps follow the Buzzers/Bleeps switch; the applause always plays
+    if(!/\.(m4a|mp3)$/.test(file) && kit !== 'rec') return false;
     let base = sfxCache[file];
     if(!base){
       base = sfxCache[file] = new Audio(SFX_DIR + file);
@@ -837,12 +846,16 @@ function maybe(p){ return Math.random() < p; }
 /* A pair of hands. One clap is a short burst of noise through a bandpass with
    a hard attack; the randomness in pitch and timing is what stops three of
    them sounding like one sound played three times. */
-function claps(n, gap, vol){
+function claps(size, vol){
   if(!soundOn) return;
-  const c = audio(), t0 = c.currentTime;
+  const which = size === 'long' ? 'clapLong' : size === 'mid' ? 'clapMid' : 'clapShort';
+  // a touch of pitch either way, so the same recording is not obviously the same
+  if(sfx(which, .97 + Math.random()*.06, vol === undefined ? .7 : vol)) return;
+  const c = audio(), t0 = c.currentTime;         // only if the file will not play
+  const n = size === 'long' ? 14 : size === 'mid' ? 8 : 5;
   for(let i = 0; i < n; i++){
-    hit(t0 + i*gap + Math.random()*.018, .055 + Math.random()*.03,
-        1400 + Math.random()*900, 1.1 + Math.random()*.6, (vol||.2) * (.8 + Math.random()*.4));
+    hit(t0 + i*.11 + Math.random()*.018, .055 + Math.random()*.03,
+        1400 + Math.random()*900, 1.1 + Math.random()*.6, .2 * (.8 + Math.random()*.4));
   }
 }
 
@@ -952,7 +965,7 @@ function whistle(at){
 function ding(step){ if(!soundOn) return;
   const k = Math.pow(2,(Math.min(step||0,7))/12);   // climbs a semitone per streak
   // roughly one in five gets a short round of applause over the top of it
-  if(maybe(.2)) setTimeout(()=>claps(3 + ((Math.random()*3)|0), .125, .17), 90);
+  if(maybe(.22)) setTimeout(()=>claps('short', .72), 90);
   if(sfx('right', k, .55)){
     // from the third in a row, a low note lands under it and gives it weight
     if(step >= 2) setTimeout(()=>sfx('low', 0.8 + step*0.04, .3), 18);
@@ -991,7 +1004,7 @@ function cheer(size){
   const src=c.createBufferSource(); src.buffer=noiseBuffer(); src.loop=true;
   const f=c.createBiquadFilter(); f.type='bandpass';
   f.frequency.value = 1250 + Math.random()*520; f.Q.value = .6 + Math.random()*.35;
-  const g=c.createGain(), peak = .17 * big;
+  const g=c.createGain(), peak = .13 * big;
   g.gain.setValueAtTime(0.0001,t0);
   g.gain.exponentialRampToValueAtTime(peak, t0 + .14 + Math.random()*.1);
   g.gain.exponentialRampToValueAtTime(peak*.5, t0 + len*.6);
@@ -1559,8 +1572,13 @@ function judge(given){
       score++; streak++; best=Math.max(best,streak);
       confettiBurst(span, streak>=5 ? 42 : streak>=3 ? 28 : 18);
       // every fifth in a row earns a small crowd, so it stays an event
-      if(streak === 10 || streak === 20){ setTimeout(jackpot, 120); setTimeout(()=>cheer(.85), 300); }
-      else if(streak % 5 === 0){ setTimeout(()=>cheer(.6), 140); setTimeout(()=>claps(6, .11, .2), 180); }
+      if(streak === 10 || streak === 20){
+        setTimeout(jackpot, 120);
+        setTimeout(()=>claps('long', .85), 280); setTimeout(()=>cheer(.5), 300);
+      }
+      else if(streak % 5 === 0){
+        setTimeout(()=>claps('mid', .8), 150); setTimeout(()=>cheer(.4), 190);
+      }
     } else { streak=0; }
     ding(firstTry ? streak-1 : 0);
   }
@@ -1634,11 +1652,11 @@ function finish(){
   $('sheetBtn').textContent = 'Download these '+results.length;
   $('sheetBtn').disabled = results.length === 0;
   if(pct===100){
-    fanfare(); setTimeout(()=>claps(14, .1, .22), 420);
+    fanfare(); setTimeout(()=>claps('long', .9), 400);
     setTimeout(()=>whistle(0), 700); setTimeout(()=>whistle(0), 1150);
     setTimeout(()=>fireworks(1400), 260);
   }
-  else if(pct>=80){ fanfare(); setTimeout(()=>claps(9, .12, .2), 420); setTimeout(()=>fireworks(1100), 260); }
+  else if(pct>=80){ fanfare(); setTimeout(()=>claps('mid', .85), 400); setTimeout(()=>fireworks(1100), 260); }
   else if(pct < 35){ setTimeout(trombone, 260); }   // it has to be said
   else if(pct>=50){ setTimeout(()=>confettiBurst($('review'), 24), 200); }
   show(endPanel);
