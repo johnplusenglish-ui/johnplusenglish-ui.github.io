@@ -353,16 +353,6 @@
           <button data-clue="before">Before</button>
         </div>
       </div>
-      <div class="opt" id="kitOpt">
-        <div>
-          <div class="lbl">Which sounds?</div>
-          <div class="hint">Recorded buzzers or the built-in bleeps</div>
-        </div>
-        <div class="seg" id="kitSeg">
-          <button data-kit="rec" class="on">Buzzers</button>
-          <button data-kit="synth">Bleeps</button>
-        </div>
-      </div>
     </div>
     <button class="big" id="startBtn">Start</button>
     <div class="pdfrow">
@@ -814,6 +804,8 @@ const OGG_OK = (function(){
   try{ return !!new Audio().canPlayType('audio/ogg; codecs="vorbis"'); }
   catch(e){ return false; }
 })();
+/* No longer a choice on the start screen, just a quiet fallback: a browser that
+   cannot play Ogg gets the synthesised versions instead of silence. */
 let kit = OGG_OK ? 'rec' : 'synth';
 const sfxCache = {};
 /* Returns false if it could not play, so every caller can fall back to the
@@ -1144,10 +1136,6 @@ $('lenInput').addEventListener('keydown', e=>{
 });
 segify($('typeSeg'),'type',v=>{ playType=v; syncCounts(); });
 segify($('clueSeg'),'clue',v=>clueWhen=v);
-segify($('kitSeg'),'kit',v=>{ kit=v; ding(); });     // play the choice as you pick it
-if(!OGG_OK){                                          // no Ogg support, so no choice to offer
-  $('kitOpt').remove();
-}
 segify($('clockSeg'),'clock',v=>clockSecs=+v);
 
 function stopClock(){ if(clockRAF){ cancelAnimationFrame(clockRAF); clockRAF=null; } }
