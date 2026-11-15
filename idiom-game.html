@@ -1097,7 +1097,7 @@ function countTo(el, to, ms){
   if(REDUCED){ el.textContent = to; return; }
   const from = 0, t0 = performance.now();
   (function step(now){
-    const k = Math.min(1,(now-t0)/ms);
+    const k = Math.min(1, Math.max(0, (now-t0)/ms));   // a frame stamped before t0 sent this negative
     el.textContent = Math.round(from + (to-from) * (1-Math.pow(1-k,3)));
     if(k<1) requestAnimationFrame(step);
   })(t0);
