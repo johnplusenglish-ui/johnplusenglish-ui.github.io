@@ -204,6 +204,20 @@
   .clock[hidden]{display:none}
 
   /* ---------- lifeline + lock-in ---------- */
+  /* On a phone, reaching for the keyboard's enter key is awkward, so there is
+     a button tucked just under the card's bottom right corner. It submits the
+     answer, then moves to the next question, exactly as enter does. */
+  .go-btn{
+    display:none;position:absolute;right:14px;bottom:-26px;
+    width:56px;height:56px;border-radius:50%;border:0;cursor:pointer;
+    background:var(--green);color:#06251a;
+    align-items:center;justify-content:center;
+    box-shadow:0 10px 24px rgba(53,208,127,.34),0 2px 0 rgba(0,0,0,.25);
+    transition:transform .14s cubic-bezier(.2,.7,.3,1), box-shadow .14s;
+  }
+  .go-btn:active{transform:translateY(2px) scale(.97);box-shadow:0 5px 14px rgba(53,208,127,.3)}
+  .go-btn svg{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:3;
+              stroke-linecap:round;stroke-linejoin:round}
   .helprow{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:18px;min-height:44px}
   .hint-btn[hidden]{display:none}
   .hint-btn{
@@ -279,6 +293,8 @@
     .opt .seg{justify-content:center;margin-left:0}
     /* give the sentence back the width the card padding was taking */
     .card{padding:30px 16px;min-height:clamp(190px,26vh,250px)}
+    .go-btn{display:flex}
+    .helprow{margin-top:46px}
   }
 
   @media (prefers-reduced-motion:reduce){
@@ -386,6 +402,9 @@
       <div class="prompt" id="prompt"></div>
       <div id="clueBefore" class="meaning" style="margin-top:22px;display:none"></div>
         <div class="feedback" id="feedback"></div>
+      <button class="go-btn" id="goBtn" type="button" aria-label="Enter your answer">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M12 5l7 7-7 7"/></svg>
+      </button>
     </div>
 
     <div class="helprow">
@@ -1587,14 +1606,24 @@ function advance(){
 $('card').addEventListener('input', e => { if(e.target.id === 'gapInput') sizeGap(''); });
 $('card').addEventListener('click',()=>{ if(answered) advance(); });
 
+/* Enter on a keyboard and the green button on a phone do the same thing:
+   answer the question, or move on once it has been answered. */
+function submitOrAdvance(){
+  if(answered){ advance(); return; }
+  const g = $('gapInput');
+  judge((g ? g.value : '').trim() || null);
+}
 document.addEventListener('keydown',e=>{
   if(!quizPanel.classList.contains('show')) return;
   if(e.key!=='Enter') return;
   e.preventDefault();
-  if(answered){ advance(); return; }
-  const g=$('gapInput');
-  const v=(g?g.value:'').trim();
-  judge(v||null);
+  submitOrAdvance();
+});
+$('goBtn').addEventListener('click', e=>{
+  e.preventDefault();
+  submitOrAdvance();
+  const g = $('gapInput');
+  if(g) g.focus();          // keep the keyboard up for the next one
 });
 
 /* ------------------------------------------------------------------ end */
