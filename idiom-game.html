@@ -334,13 +334,12 @@
       <div class="opt">
         <div>
           <div class="lbl">Against the clock?</div>
-          <div class="hint">Run out and the word is revealed</div>
+          <div class="hint">Leave it blank for no clock</div>
         </div>
-        <div class="seg" id="clockSeg">
-          <button data-clock="0" class="on">Off</button>
-          <button data-clock="25">25s</button>
-          <button data-clock="20">20s</button>
-          <button data-clock="15">15s</button>
+        <div class="seg lenbox">
+          <input id="clockInput" type="number" inputmode="numeric" min="3" step="1"
+                 placeholder="off" aria-label="Seconds for each question">
+          <span class="of">seconds</span>
         </div>
       </div>
       <div class="opt">
@@ -453,7 +452,7 @@ const IDIOMS = [
  {p:"The rules don't cover it, so it's {a grey ___}", a:"area", m:"A situation where the rules are not clear.", e:"Working from another country is a grey area.", k:"A grey area"},
  {p:"He sent it three weeks on, but {better late than ___}", k:"Better late than never", a:"never", m:"Doing something late is better than not doing it.", e:"He apologised after a year, but better late than never.", t:"proverb"},
  {p:"Take the earlier train, {better safe than ___}", k:"Better safe than sorry", a:"sorry", m:"It is wiser to be careful than to take a risk.", e:"Take an umbrella, better safe than sorry.", t:"proverb"},
- {p:"She keeps promising and never turns up: {actions speak louder than ___}", k:"Actions speak louder than words", a:"words", m:"What you do matters more than what you say.", e:"He promises a lot, but actions speak louder than words.", t:"proverb"},
+ {p:"She keeps promising and she never turns up, so {actions speak louder than ___}", k:"Actions speak louder than words", a:"words", m:"What you do matters more than what you say.", e:"He promises a lot, but actions speak louder than words.", t:"proverb"},
  {p:"He left for more money and regretted it, {the grass is always ___ on the other side}", k:"The grass is always greener on the other side", a:"greener", m:"Other people's situations always look better than yours.", e:"She misses her old job, but the grass is always greener.", t:"proverb"},
  {p:"Send it to a few agents, {do not put all your ___ in one basket}", k:"Don't put all your eggs in one basket", a:"eggs", m:"Don't risk everything on one plan.", e:"Apply to three universities, don't put all your eggs in one basket.", t:"proverb"},
  {p:"We missed the ferry and found a better beach, so {every cloud has a silver ___}", k:"Every cloud has a silver lining", a:"lining", m:"Every bad situation has something good in it.", e:"The flight was cancelled, but every cloud has a silver lining, we got a free hotel.", t:"proverb"},
@@ -466,12 +465,12 @@ const IDIOMS = [
  {p:"We've done enough, let's {call it a ___}", a:"day", m:"Stop working on something for now.", e:"At six o'clock we called it a day.", k:"Call it a day"},
  {p:"After three rejections he {threw in the ___}", a:"towel", m:"Give up.", e:"Don't throw in the towel this close to the end.", k:"Throw in the towel"},
  {p:"I'm {in two ___} about taking the job", a:"minds", m:"Undecided about something.", e:"She's in two minds about selling the flat.", k:"In two minds"},
- {p:"I asked her when the baby was due. She is not pregnant. I really {put my ___ in it}", k:"Put your foot in it", a:"foot", m:"Say something embarrassing or tactless by accident.", e:"I asked about his wife, then really put my foot in it."},
+ {p:"I asked when the baby was due and she is not pregnant. I {put my ___ in it}", k:"Put your foot in it", a:"foot", m:"Say something embarrassing or tactless by accident.", e:"I asked about his wife, then really put my foot in it."},
  {p:"Filling in these forms is {a pain in the ___}", a:"neck", m:"Something or someone annoying.", e:"Parking round here is a pain in the neck.", k:"A pain in the neck"},
  {p:"They turned the whole plan down, so we are {back to ___ one}", k:"Back to square one", a:"square", m:"Back to the beginning after a failure.", e:"The client rejected the design, so it's back to square one."},
  {p:"{Off the top of my ___}, I would say about thirty euro", k:"Off the top of my head", a:"head", m:"Without checking or thinking carefully.", e:"Off the top of my head, I'd say about forty people came."},
- {p:"Ten minutes a day and you will hear the difference: {practice makes ___}", k:"Practice makes perfect", a:"perfect", m:"You improve at something by doing it repeatedly.", e:"Keep speaking every day, practice makes perfect.", t:"proverb"},
- {p:"My shoulders are wrecked this morning, but {no pain, no ___}", k:"No pain, no gain", a:"gain", m:"You have to suffer a little to get results.", e:"My legs are killing me, but no pain, no gain.", t:"proverb"},
+ {p:"Ten minutes every day will do it, because {practice makes ___}", k:"Practice makes perfect", a:"perfect", m:"You improve at something by doing it repeatedly.", e:"Keep speaking every day, practice makes perfect.", t:"proverb"},
+ {p:"My shoulders really hurt this morning, but {no pain, no ___}", k:"No pain, no gain", a:"gain", m:"You have to suffer a little to get results.", e:"My legs are killing me, but no pain, no gain.", t:"proverb"},
  {p:"The laptop died, then the bike was stolen. {When it rains, it ___}", k:"When it rains, it pours", a:"pours", m:"Bad things tend to happen all at once.", e:"The boiler broke, then the car died. When it rains, it pours.", t:"proverb"},
  {p:"Get there before nine, {the early ___ catches the worm}", k:"The early bird catches the worm", a:"bird", m:"The person who acts first gets the advantage.", e:"Tickets go fast, so the early bird catches the worm.", t:"proverb"},
  {p:"Nothing is signed yet, so {do not count your ___ before they hatch}", k:"Don't count your chickens before they hatch", a:"chickens", m:"Don't rely on something good until it has actually happened.", e:"You haven't signed yet, so don't count your chickens.", t:"proverb"},
@@ -517,7 +516,7 @@ const IDIOMS = [
  {p:"There is no talking to him, he is {as stubborn as a ___}", k:"As stubborn as a mule", a:"mule", m:"Refusing to change your mind.", e:"Don't argue with him, he's as stubborn as a mule.", t:"simile"},
  {p:"I know I sound {like a broken ___}, but close the window", k:"Like a broken record", a:"record", m:"Saying the same thing over and over.", e:"I sound like a broken record, but please lock the door.", t:"simile"},
  {p:"He explained it twice and it was still {as clear as ___}", k:"As clear as mud", a:"mud", m:"Not clear at all.", e:"His explanation was as clear as mud.", t:"simile"},
- {p:"Something I ate, and I was {as sick as a ___} all night", k:"As sick as a dog", a:"dog", m:"Very ill indeed.", e:"I was as sick as a dog all weekend.", t:"simile"},
+ {p:"It must have been the fish, I was {as sick as a ___} all night", k:"As sick as a dog", a:"dog", m:"Very ill indeed.", e:"I was as sick as a dog all weekend.", t:"simile"},
  {p:"He swims every morning at seventy-two, {as fit as a ___}", k:"As fit as a fiddle", a:"fiddle", m:"In excellent health.", e:"At seventy he's still as fit as a fiddle.", t:"simile"},
  {p:"Three hours of slides, {like watching paint ___}", k:"Like watching paint dry", a:"dry", m:"Unbelievably boring.", e:"That meeting was like watching paint dry.", t:"simile"},
  {p:"She sat at the back {as quiet as a ___}", k:"As quiet as a mouse", a:"mouse", m:"Making no sound at all.", e:"She sat as quiet as a mouse at the back.", t:"simile"},
@@ -573,13 +572,13 @@ const IDIOMS = [
  {p:"The website redesign is {on the back ___} until September", a:"burner", k:"On the back burner", m:"Left aside to deal with later.", e:"We've put the move on the back burner for now."},
  {p:"Two days at home a week has been a {game ___} for me", a:"changer", k:"A game changer", m:"Something that changes a situation completely.", e:"The new software has been a game changer for the team."},
  {p:"Before we decide, let us do a {deep ___} into the numbers", a:"dive", k:"A deep dive", m:"A detailed examination of something.", e:"She did a deep dive into why the costs went up."},
- {p:"The obvious answers are gone, so we need to {think outside the ___}", a:"box", k:"Think outside the box", m:"Think in a new and original way.", e:"They want someone who can think outside the box."},
- {p:"Argue about the details all you like, but {the bottom ___} is we cannot afford it", a:"line", k:"The bottom line", m:"The one fact that matters once everything else is stripped away.", e:"The bottom line is that nobody wants to pay for it."},
+ {p:"The easy answers have not worked, so we need to {think outside the ___}", a:"box", k:"Think outside the box", m:"Think in a new and original way.", e:"They want someone who can think outside the box."},
+ {p:"We can talk about the details, but {the bottom ___} is we cannot afford it", a:"line", k:"The bottom line", m:"The one fact that matters once everything else is stripped away.", e:"The bottom line is that nobody wants to pay for it."},
  {p:"I do not need it exact, just give me a {ballpark ___}", a:"figure", k:"A ballpark figure", m:"A rough estimate, usually of a number or a cost.", e:"At a ballpark figure, about three thousand."},
  {p:"He spent the whole date talking about his ex, which is a {red ___}", a:"flag", k:"A red flag", m:"A clear warning sign about a person or a situation.", e:"Asking for the money upfront was a red flag."},
  {p:"Seeing the northern lights has been on my {___ list} for years", a:"bucket", k:"A bucket list", m:"The things you want to do before you die.", e:"Iceland is right at the top of my bucket list."},
- {p:"Good light, near the station and cheap, the flat {ticks all the ___}", a:"boxes", k:"Tick all the boxes", m:"Meet every requirement.", e:"On paper he ticks all the boxes."},
- {p:"The idea is simple, it is the {___ tape} that takes a year", a:"red", k:"Red tape", m:"Official rules and paperwork that slow everything down.", e:"There's so much red tape involved in registering a company."},
+ {p:"It is bright, cheap and near the station, so the flat {ticks all the ___}", a:"boxes", k:"Tick all the boxes", m:"Meet every requirement.", e:"On paper he ticks all the boxes."},
+ {p:"The idea is simple, but the {___ tape} takes a whole year", a:"red", k:"Red tape", m:"Official rules and paperwork that slow everything down.", e:"There's so much red tape involved in registering a company."},
  {p:"They sold up, moved to the coast and left {the rat ___}", a:"race", k:"The rat race", m:"The exhausting competition of ordinary working life.", e:"He got out of the rat race at forty."},
  {p:"He wants work that is not the usual {nine-to-___}", a:"five", k:"Nine to five", m:"The standard working day, and the routine that comes with it.", e:"I'm not built for a nine-to-five."},
  {p:"She was the first woman on the board, so she broke {the glass ___}", a:"ceiling", k:"The glass ceiling", m:"The invisible barrier that stops women reaching the top jobs.", e:"They talk about diversity, but the glass ceiling is still there."},
@@ -589,7 +588,7 @@ const IDIOMS = [
  {p:"Two jobs and a mortgage, she is just {keeping her head above ___}", a:"water", k:"Keep your head above water", m:"Just manage to cope, usually with money or work.", e:"Since the rent went up we have barely kept our heads above water."},
  {p:"His father's heart attack at fifty was a {wake-up ___}", a:"call", k:"A wake-up call", m:"A shock that makes you change how you live or work.", e:"The failed inspection was a wake-up call for the team."},
  {p:"She never answered any of it and simply {gave him the cold ___}", a:"shoulder", k:"Give someone the cold shoulder", m:"Deliberately ignore someone you know.", e:"I said hello and got the cold shoulder."},
- {p:"The less he sleeps the worse he works, and that is a {vicious ___}", a:"circle", k:"A vicious circle", m:"A situation where each problem makes the next one worse.", e:"Debt and overtime turned into a vicious circle."},
+ {p:"He sleeps badly, so he works badly, and then sleeps worse. A {vicious ___}", a:"circle", k:"A vicious circle", m:"A situation where each problem makes the next one worse.", e:"Debt and overtime turned into a vicious circle."},
  {p:"One more missed deadline and you are {on thin ___}", a:"ice", k:"On thin ice", m:"In a risky position where one more mistake brings trouble.", e:"He has been on thin ice since the complaint."},
  {p:"We agreed the budget in March and now they have {moved the ___}", a:"goalposts", k:"Move the goalposts", m:"Change the rules or the target after the work has started.", e:"Every time we finish something, they move the goalposts."},
  /* ---- John's picks from the 200, added 2026-11-13 ---- */
@@ -597,7 +596,7 @@ const IDIOMS = [
  {p:"Nobody invites him because he is such {a wet ___}", a:"blanket", k:"A wet blanket", m:"Someone who spoils other people's fun.", e:"Don't be a wet blanket, come and dance."},
  {p:"He speaks four languages and never mentioned it, {a dark ___}", a:"horse", k:"A dark horse", m:"Someone with a surprising talent nobody knew about.", e:"She won the quiz, the dark horse."},
  {p:"One player ruined it for the whole team, {a bad ___}", a:"apple", k:"A bad apple", m:"The one person who spoils a good group.", e:"Every office has one bad apple."},
- {p:"They are both impossible, and {birds of a ___ flock together}", a:"feather", k:"Birds of a feather flock together", m:"Similar people choose each other's company.", e:"Those two are never apart, birds of a feather flock together.", t:"proverb"},
+ {p:"Those two are both just as rude, and {birds of a ___ flock together}", a:"feather", k:"Birds of a feather flock together", m:"Similar people choose each other's company.", e:"Those two are never apart, birds of a feather flock together.", t:"proverb"},
  {p:"He lent his brother the money because {blood is ___ than water}", a:"thicker", k:"Blood is thicker than water", m:"Family matters more than other relationships.", e:"She took her sister's side, blood is thicker than water.", t:"proverb"},
  {p:"They met in March and now they {get on like a house on ___}", a:"fire", k:"Get on like a house on fire", m:"Get along extremely well, straight away.", e:"The two of them got on like a house on fire.", t:"simile"},
  {p:"After ten years of silence they finally {buried the ___}", a:"hatchet", k:"Bury the hatchet", m:"Agree to stop arguing and move on.", e:"It's time to bury the hatchet and talk."},
@@ -628,7 +627,7 @@ const IDIOMS = [
  {p:"Lending him that much again is {playing with ___}", a:"fire", k:"Play with fire", m:"Do something dangerously risky.", e:"You're playing with fire talking to the press."},
  {p:"The train was moving and we made it {by the skin of our ___}", a:"teeth", k:"By the skin of your teeth", m:"Only just, with nothing to spare.", e:"He passed by the skin of his teeth."},
  {p:"I called her by my sister's name, just {a slip of the ___}", a:"tongue", k:"A slip of the tongue", m:"A small mistake in what you said.", e:"It was a slip of the tongue, nothing more."},
- {p:"She thought I was leaving, she had {the wrong end of the ___}", a:"stick", k:"Get the wrong end of the stick", m:"Misunderstand completely.", e:"You've got the wrong end of the stick."},
+ {p:"She thought I was leaving, so she had {the wrong end of the ___}", a:"stick", k:"Get the wrong end of the stick", m:"Misunderstand completely.", e:"You've got the wrong end of the stick."},
  {p:"No advertising at all, it grew by {word of ___}", a:"mouth", k:"Word of mouth", m:"News passed from person to person.", e:"The shop filled up purely by word of mouth."},
  {p:"Nobody told me officially, I heard it {through the ___}", a:"grapevine", k:"Through the grapevine", m:"Heard unofficially, from other people.", e:"I heard through the grapevine that she's leaving."},
  {p:"People have said it for years, and {there is no ___ without fire}", a:"smoke", k:"There's no smoke without fire", m:"Rumours usually have some truth in them.", e:"I'd check it, there's no smoke without fire.", t:"proverb"},
@@ -658,9 +657,9 @@ const IDIOMS = [
  /* ---- John's picks from the second 200, added 2026-11-13 ---- */
  {p:"They cut everyone's hours, so we are all {in the same ___}", a:"boat", k:"In the same boat", m:"In the same difficult situation as someone else.", e:"Don't worry, we're all in the same boat."},
  {p:"It is working, so please do not {rock the ___}", a:"boat", k:"Rock the boat", m:"Upset a situation that is working perfectly well.", e:"She kept quiet rather than rock the boat."},
- {p:"No training, no handover, just {___ or swim}", a:"sink", k:"Sink or swim", m:"Succeed or fail with nobody helping you.", e:"They threw him in, sink or swim."},
+ {p:"They gave him no training at all, so it was {___ or swim}", a:"sink", k:"Sink or swim", m:"Succeed or fail with nobody helping you.", e:"They threw him in, sink or swim."},
  {p:"There is a promotion in this if you {play your ___ right}", a:"cards", k:"Play your cards right", m:"Act cleverly and get what you want.", e:"Play your cards right and the job is yours."},
- {p:"A summer wedding is {on the ___}, apparently", a:"cards", k:"On the cards", m:"Likely to happen.", e:"Another price rise is on the cards."},
+ {p:"Apparently a summer wedding is {on the ___}", a:"cards", k:"On the cards", m:"Likely to happen.", e:"Another price rise is on the cards."},
  {p:"He is still arguing about it, {fighting a losing ___}", a:"battle", k:"Fight a losing battle", m:"Keep trying when you cannot possibly win.", e:"I'm fighting a losing battle with this garden."},
  {p:"She did not want to come, so we had to {twist her ___}", a:"arm", k:"Twist someone's arm", m:"Persuade someone who did not want to.", e:"It didn't take much to twist his arm."},
  {p:"He agreed in the meeting and then {stabbed me in the ___}", a:"back", k:"Stab someone in the back", m:"Betray someone who trusted you.", e:"She stabbed her own team in the back."},
@@ -670,17 +669,17 @@ const IDIOMS = [
  {p:"He will not decide anything alone, he is {under her ___}", a:"thumb", k:"Under someone's thumb", m:"Completely controlled by them.", e:"He's been under his brother's thumb for years."},
  {p:"The second singer was {head and ___ above} the rest", a:"shoulders", k:"Head and shoulders above", m:"Far better than all the rest.", e:"Her essay was head and shoulders above the others."},
  {p:"The bills are piling up and he is {burying his head in the ___}", a:"sand", k:"Bury your head in the sand", m:"Refuse to face a problem.", e:"You can't bury your head in the sand forever."},
- {p:"Three doctors and one drummer, so he is {the black ___}", a:"sheep", k:"The black sheep", m:"The family member who does not fit.", e:"He's always been the black sheep."},
+ {p:"His brothers are doctors and he plays in a band, so he is {the black ___}", a:"sheep", k:"The black sheep", m:"The family member who does not fit.", e:"He's always been the black sheep."},
  {p:"She came back with photos and we were all {___ with envy}", a:"green", k:"Green with envy", m:"Extremely jealous.", e:"I was green with envy when I heard."},
  {p:"He swims in the sea every morning, {come ___ or shine}", a:"rain", k:"Come rain or shine", m:"Whatever happens, without fail.", e:"She walks the dog, come rain or shine."},
  {p:"Put a little by each month and {save for a ___ day}", a:"rainy", k:"Save for a rainy day", m:"Keep money back for when you need it.", e:"That's our rainy day money."},
- {p:"The weather is good and the work is there, so {make ___ while the sun shines}", a:"hay", k:"Make hay while the sun shines", m:"Use the chance while you still have it.", e:"Business is booming, so make hay while the sun shines.", t:"proverb"},
+ {p:"Business is very good right now, so {make ___ while the sun shines}", a:"hay", k:"Make hay while the sun shines", m:"Use the chance while you still have it.", e:"Business is booming, so make hay while the sun shines.", t:"proverb"},
  {p:"Weddings are his {___ and butter}, the rest is extra", a:"bread", k:"Bread and butter", m:"Your main and most reliable income.", e:"Repairs are the bread and butter of the business."},
  {p:"Four of them cooking in one kitchen is {a ___ for disaster}", a:"recipe", k:"A recipe for disaster", m:"Certain to go badly wrong.", e:"Lending friends money is a recipe for disaster."},
  {p:"He said he never wanted it anyway, which is pure {sour ___}", a:"grapes", k:"Sour grapes", m:"Criticising what you failed to get.", e:"That's just sour grapes because she got the part."},
  {p:"They would do anything for anyone, {the ___ of the earth}", a:"salt", k:"The salt of the earth", m:"Thoroughly decent, ordinary people.", e:"Her neighbours are the salt of the earth."},
  {p:"The two brothers are {___ and cheese}", a:"chalk", k:"Chalk and cheese", m:"Completely different from each other.", e:"As sisters go, they're chalk and cheese."},
- {p:"Three puddings and he is still going, he does {have a sweet ___}", a:"tooth", k:"Have a sweet tooth", m:"Love sugary food.", e:"I've got a terrible sweet tooth."},
+ {p:"He had three puddings, so he really does {have a sweet ___}", a:"tooth", k:"Have a sweet tooth", m:"Love sugary food.", e:"I've got a terrible sweet tooth."},
  {p:"They shout at him and it is {water off a ___'s back}", a:"duck", k:"Water off a duck's back", m:"Criticism that does not affect you at all.", e:"The reviews were water off a duck's back."},
  {p:"First lesson and she is away, {taking to it like a duck to ___}", a:"water", k:"Take to it like a duck to water", m:"Learn it naturally and fast.", e:"He took to teaching like a duck to water.", t:"simile"},
  {p:"Before you ring them, {get your ___ in a row}", a:"ducks", k:"Get your ducks in a row", m:"Get everything organised before you start.", e:"She got her ducks in a row before the meeting."},
@@ -692,11 +691,11 @@ const IDIOMS = [
  {p:"Sorry, give me a second, I have {a ___ in my throat}", a:"frog", k:"A frog in your throat", m:"A voice that has gone croaky.", e:"He had a frog in his throat all through the speech."},
  {p:"He mentions it in every meeting, really {blowing his own ___}", a:"trumpet", k:"Blow your own trumpet", m:"Praise yourself to everyone.", e:"I don't like to blow my own trumpet, but I did win."},
  {p:"He says forty is {over the ___} and he is joking, mostly", a:"hill", k:"Over the hill", m:"Past your best because of your age.", e:"They told him he was over the hill at thirty-five."},
- {p:"He shouted and she said nothing, choosing to {turn the other ___}", a:"cheek", k:"Turn the other cheek", m:"Refuse to answer an insult with another.", e:"It's hard to turn the other cheek."},
+ {p:"He shouted at her and she said nothing. She decided to {turn the other ___}", a:"cheek", k:"Turn the other cheek", m:"Refuse to answer an insult with another.", e:"It's hard to turn the other cheek."},
  {p:"Say yes once and that is it, {give them an ___ and they'll take a mile}", a:"inch", k:"Give them an inch and they'll take a mile", m:"Small concessions get taken advantage of.", e:"Give him an inch and he'll take a mile.", t:"proverb"},
- {p:"He lectures everyone about tidiness, so he should {practise what he ___}", a:"preaches", k:"Practise what you preach", m:"Do yourself what you tell others to do.", e:"If you want them to read, practise what you preach.", t:"proverb"},
+ {p:"He tells everyone else to tidy up, so he should {practise what he ___}", a:"preaches", k:"Practise what you preach", m:"Do yourself what you tell others to do.", e:"If you want them to read, practise what you preach.", t:"proverb"},
  {p:"Two buttons and a dial, {it's not ___ science}", a:"rocket", k:"It's not rocket science", m:"It is not difficult to understand.", e:"Come on, it's not rocket science."},
- {p:"The swelling has gone down, but she is not {out of the ___} yet", a:"woods", k:"Out of the woods", m:"Past the dangerous part at last.", e:"Another month and we'll be out of the woods."},
+ {p:"She is much better, but the doctor says she is not {out of the ___} yet", a:"woods", k:"Out of the woods", m:"Past the dangerous part at last.", e:"Another month and we'll be out of the woods."},
  {p:"Nobody had told me anything, so it was {a ___ in the dark}", a:"shot", k:"A shot in the dark", m:"A guess with nothing to go on.", e:"It was a shot in the dark and it worked."},
 ];
 const ALTS = {day:["night"], detail:["details"], chickens:["chicken"], minds:["mind"], feet:["foot"], thoughts:["thought"], guns:["gun"], Romans:["roman"], cats:["cat"], dogs:["dog"], beans:["bean"], knees:["knee"], clouds:["cloud"], stops:["stop"], headlights:["headlight"], peas:["pea"], bridges:["bridge"], boxes:["box"], goalposts:["goalpost"], burnout:["burn out","burned out","burnt out"], belts:["belt"], colours:["colors"], brains:["brain"], horns:["horn"], socks:["sock"], sleeves:["sleeve"], worms:["worm"], spots:["spot"], horses:["horse"], birds:["bird"], teeth:["tooth"], fingers:["finger"], ducks:["duck"], cows:["cow"], grapes:["grape"], ants:["ant"], woods:["wood"], shoulders:["shoulder"], cards:["card"], preaches:["preach"]};
@@ -1136,7 +1135,19 @@ $('lenInput').addEventListener('keydown', e=>{
 });
 segify($('typeSeg'),'type',v=>{ playType=v; syncCounts(); });
 segify($('clueSeg'),'clue',v=>clueWhen=v);
-segify($('clockSeg'),'clock',v=>clockSecs=+v);
+/* The clock is typed too. Blank means no clock at all. */
+function askedClock(){
+  const v = parseInt($('clockInput').value, 10);
+  return (!v || v < 3) ? 0 : Math.min(v, 300);
+}
+$('clockInput').addEventListener('input', ()=>{ clockSecs = askedClock(); });
+$('clockInput').addEventListener('blur', ()=>{
+  clockSecs = askedClock();
+  $('clockInput').value = clockSecs ? clockSecs : '';
+});
+$('clockInput').addEventListener('keydown', e=>{
+  if(e.key === 'Enter'){ e.preventDefault(); $('clockInput').blur(); $('startBtn').click(); }
+});
 
 function stopClock(){ if(clockRAF){ cancelAnimationFrame(clockRAF); clockRAF=null; } }
 function startClock(){
@@ -1177,7 +1188,7 @@ $('soundBtn').onclick=()=>{
   $('soundBtn').textContent = soundOn?'Sound on':'Sound off';
   if(soundOn) ding();
 };
-$('startBtn').onclick=()=>start(shuffle(pool()).slice(0, askedLength()));
+$('startBtn').onclick=()=>{ clockSecs = askedClock(); start(shuffle(pool()).slice(0, askedLength())); };
 $('againBtn').onclick=()=>show(startPanel);
 $('quitBtn').onclick=()=>{ stopClock(); finish(); };
 $('missedBtn').onclick=()=>{
