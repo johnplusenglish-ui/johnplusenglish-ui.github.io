@@ -121,7 +121,7 @@
     border:1px solid var(--line);
     background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.015));
     border-radius:20px;padding:40px 30px;text-align:center;position:relative;
-    min-height:clamp(260px,40vh,360px);display:flex;flex-direction:column;justify-content:center;
+    min-height:clamp(210px,30vh,280px);display:flex;flex-direction:column;justify-content:center;
     transition:border-color .2s, box-shadow .2s;
   }
   .card.good{border-color:rgba(53,208,127,.6);box-shadow:0 0 0 1px rgba(53,208,127,.25),0 18px 50px rgba(53,208,127,.10)}
@@ -140,7 +140,7 @@
   /* the words around the idiom, dimmed so the idiom itself leads */
   .prompt .lead{color:#9aa7bf}
   .blank{
-    display:inline-block;min-width:4.5em;border-bottom:3px solid var(--gold);
+    display:inline-block;border-bottom:3px solid var(--gold);
     color:var(--gold);padding:0 .1em 2px;
   }
   .blank.filled{border-bottom-color:currentColor}
@@ -198,7 +198,8 @@
   .clock[hidden]{display:none}
 
   /* ---------- lifeline + lock-in ---------- */
-  .helprow{display:flex;justify-content:center;margin-top:18px;min-height:44px}
+  .helprow{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:18px;min-height:44px}
+  .hint-btn[hidden]{display:none}
   .hint-btn{
     border:1px solid rgba(255,197,61,.45);background:rgba(255,197,61,.07);color:var(--gold);
     font-family:inherit;font-weight:700;font-size:13.5px;letter-spacing:.06em;text-transform:uppercase;
@@ -270,7 +271,7 @@
     .opt > div:first-child{flex:0 0 auto}
     .opt .seg{justify-content:center;margin-left:0}
     /* give the sentence back the width the card padding was taking */
-    .card{padding:30px 16px;min-height:clamp(230px,34vh,320px)}
+    .card{padding:30px 16px;min-height:clamp(190px,26vh,250px)}
   }
 
   @media (prefers-reduced-motion:reduce){
@@ -382,6 +383,7 @@
 
     <div class="helprow">
       <button class="hint-btn" id="hintBtn">Give me a letter</button>
+      <button class="hint-btn" id="clueBtn">Give me a clue</button>
     </div>
 
 
@@ -1227,6 +1229,20 @@ function giveLetter(){
 }
 $('hintBtn').onclick = giveLetter;
 
+/* The clue is the meaning. It costs the same as a letter: you still get it
+   right, it just stops counting as a clean first go. */
+function giveClue(){
+  if(answered) return;
+  const cb = $('clueBefore');
+  cb.style.display = '';
+  cb.innerHTML = '<b>Clue.</b> ' + esc(deck[idx].m);
+  $('clueBtn').hidden = true;
+  usedHint = true;
+  pip();
+  const g = $('gapInput'); if(g) g.focus();
+}
+$('clueBtn').onclick = giveClue;
+
 /* ------------------------------------------------ the round as a handout */
 /* Same look as the full PDF: Outfit and Lora, two columns, gold accents and
    numbered entries. jsPDF plus the subset fonts is about 470KB, so neither is
@@ -1382,6 +1398,7 @@ $('prePdfLabel').textContent = 'Download all ' + IDIOMS.length + ' as a PDF';
 function render(){
   answered=false; tries=0; usedHint=false;
   $('hintBtn').hidden=false; $('hintBtn').disabled=false; $('hintBtn').textContent='Give me a letter';
+  $('clueBtn').hidden = (clueWhen === 'before');   // nothing to ask for if it is already showing
   const it=deck[idx];
   $('counter').textContent = `Question ${idx+1} of ${deck.length}`;
   $('scoreOut').textContent = score;
@@ -1444,7 +1461,10 @@ function sizeGap(reserveText){
   g.style.width = Math.round(Math.max(floor, typed)) + 'px';
 }
 
-const PROMPT_MAX = 50, PROMPT_MIN = 24, PROMPT_COMFY = 27;
+/* 56 measured out best across the set: 224 of 255 idioms sit on one line and
+   only 4 change line count as the answer is typed. 64 looks punchier on a short
+   one but puts 56 of them on two lines and trebles the jumping. */
+const PROMPT_MAX = 56, PROMPT_MIN = 26, PROMPT_COMFY = 30;
 function promptLineCount(el){
   const r = document.createRange(); r.selectNodeContents(el);
   const lh = parseFloat(getComputedStyle(el).lineHeight) || 20;
@@ -1477,12 +1497,13 @@ function fitPrompt(){
 }
 
 const GAP_HTML = '<input class="gap" id="gapInput" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="?">';
+/* Only the idiom goes on the card. The sentence round it used to be there to
+   give context, but it made every card a different length, so the type resized
+   and the whole line jumped about as soon as a word was typed into the gap.
+   The clue and the letter do the job the sentence was doing. */
 function promptHTML(p){
-  const piece = t => esc(t).replace('___', GAP_HTML);
   const m = p.match(/^([^{]*)\{([^}]*)\}([\s\S]*)$/);
-  if(!m) return piece(p);
-  const lead = t => t ? '<span class="lead">' + piece(t) + '</span>' : '';
-  return lead(m[1]) + piece(m[2]) + lead(m[3]);
+  return esc(m ? m[2] : p).replace('___', GAP_HTML);
 }
 function bare(s){ return s.replace(/[{}]/g, ''); }
 function label(it){ return it.k || bare(it.p).replace('___', it.a); }
@@ -1509,6 +1530,7 @@ function judge(given){
   answered=true;
   stopClock();
   $('hintBtn').hidden=true;
+  $('clueBtn').hidden=true;
 
   const g=$('gapInput');
   const span=document.createElement('span');
