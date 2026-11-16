@@ -9,8 +9,21 @@
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{
-  --shadow-sm:0 1px 3px rgba(45,48,71,.06);
-  --shadow-md:0 10px 34px rgba(45,48,71,.09);
+  /* the same three curves the game uses, so both move in one language */
+  --e-out:cubic-bezier(.16,1,.3,1);
+  --e-soft:cubic-bezier(.22,1,.36,1);
+  --e-press:cubic-bezier(.2,.7,.3,1);
+  /* A lit top edge, a tight contact shadow, then one long soft one. Three
+     shadows in that order is what makes a card read as an object sitting on
+     the page rather than a rectangle drawn on it. */
+  --shadow-sm:
+    inset 0 1px 0 rgba(255,255,255,.9),
+    0 1px 2px rgba(45,48,71,.05),
+    0 8px 20px -12px rgba(45,48,71,.18);
+  --shadow-md:
+    inset 0 1px 0 rgba(255,255,255,1),
+    0 2px 4px rgba(45,48,71,.06),
+    0 22px 48px -20px rgba(45,48,71,.30);
   --c-level:#F5A524;
   --c-phrasal:#2176FF;
   --c-prep:#F26A1B;
@@ -22,7 +35,21 @@ body{
   margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
   background:var(--cream);font-family:Outfit,sans-serif;color:var(--ink);
   padding:3.5rem 1.5rem;
-  background-image:radial-gradient(var(--border) .5px,transparent .5px);background-size:14px 14px;
+  background-image:
+    radial-gradient(900px 520px at 50% -8%, rgba(33,118,255,.07) 0%, transparent 62%),
+    radial-gradient(700px 480px at 92% 102%, rgba(242,106,27,.05) 0%, transparent 60%);
+  background-attachment:fixed;
+}
+
+/* The same grain as the game, lighter, and multiplied rather than overlaid
+   because this page is cream. It is what stops a flat tint reading as a
+   screenshot of a flat tint. */
+.atmos{position:fixed;inset:0;pointer-events:none;z-index:3}
+.atmos::before{
+  content:"";position:absolute;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:180px 180px;
+  opacity:.035;mix-blend-mode:multiply;
 }
 .wrap{max-width:430px;width:100%;text-align:center}
 
@@ -38,19 +65,34 @@ body{
 .link{
   display:flex;align-items:center;justify-content:space-between;gap:1rem;
   padding:1.35rem 1.5rem;border-radius:16px;
-  background:var(--card);border:1.5px solid var(--border);box-shadow:var(--shadow-sm);
+  background:linear-gradient(180deg,#fff 0%,#fdfcfa 100%);
+  border:1.5px solid var(--border);box-shadow:var(--shadow-sm);
   color:var(--ink);font-size:1.08rem;font-weight:600;text-decoration:none;
-  transition:transform .16s cubic-bezier(.2,.7,.3,1),box-shadow .16s,border-color .16s;
+  position:relative;overflow:hidden;isolation:isolate;
+  transition:transform .3s var(--e-out),box-shadow .3s var(--e-soft),border-color .3s;
 }
+/* The card's own colour, washed across it from wherever the pointer is. Each
+   link already owns an accent; this is that accent catching the light. */
+.link::before{
+  content:"";position:absolute;inset:0;z-index:-1;
+  background:radial-gradient(260px circle at var(--mx,50%) var(--my,50%),
+             var(--dot),transparent 70%);
+  opacity:0;transition:opacity .35s var(--e-soft);
+}
+.link:hover::before,.link:focus-visible::before{opacity:.09}
 .link:hover,.link:focus-visible{
-  transform:translateY(-2px);box-shadow:var(--shadow-md);border-color:transparent;outline:none;
+  transform:translateY(-3px);box-shadow:var(--shadow-md);border-color:transparent;outline:none;
 }
+.link:active{transform:translateY(-1px);transition-duration:.08s}
 .link .go{
   width:34px;height:34px;border-radius:50%;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
-  background:var(--dot);color:#fff;transition:transform .16s;
+  background:var(--dot);color:#fff;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.45), 0 4px 10px -4px var(--dot);
+  transition:transform .3s var(--e-out), box-shadow .3s var(--e-soft);
 }
-.link:hover .go{transform:translateX(3px)}
+.link:hover .go{transform:translateX(4px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.55), 0 8px 18px -5px var(--dot)}
 .link .go svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.6;
               stroke-linecap:round;stroke-linejoin:round}
 .link-level  {--dot:var(--c-level)}
@@ -65,9 +107,11 @@ body{
   padding:.6rem 1.05rem;border-radius:999px;
   border:1.5px solid var(--border);background:var(--card);
   color:var(--muted);font-size:.85rem;font-weight:500;text-decoration:none;
-  transition:color .16s,border-color .16s;
+  box-shadow:0 1px 2px rgba(45,48,71,.04);
+  transition:color .25s,border-color .25s,transform .25s var(--e-out),box-shadow .25s;
 }
-.social a:hover{color:var(--sky);border-color:var(--sky)}
+.social a:hover{color:var(--sky);border-color:var(--sky);transform:translateY(-2px);
+  box-shadow:0 10px 22px -12px rgba(33,118,255,.55)}
 .social svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.9;
             stroke-linecap:round;stroke-linejoin:round}
 
@@ -96,6 +140,7 @@ body{
 </style>
 </head>
 <body>
+<div class="atmos" aria-hidden="true"></div>
 <div class="wrap">
   <div class="logo">
     <svg class="logo-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 8l10 5 10-5-10-5z"></path><path d="M6 10.5v4.5c0 1.5 3 3 6 3s6-1.5 6-3v-4.5"></path><path d="M22 8v6"></path></svg>
@@ -139,7 +184,51 @@ body{
     <button onclick="tryUnlock()">Enter</button>
   </div>
 </div>
+<!-- GSAP, self-hosted, the same copy the idiom game uses. Deferred, and every
+     use of it is guarded: with the file missing the page is simply static. -->
+<script src="assets/vendor/gsap.min.js" defer></script>
 <script>
+/* ------------------------------------------------------------- motion */
+/* Nobody who has asked their device for less movement gets any of this, and
+   nothing here loops. The page is complete before it runs. */
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduce) return;
+
+  /* The accent wash follows the pointer. Mouse only: on a phone there is no
+     pointer to follow and a tap would leave a smear behind. */
+  if(!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches)){
+    [].forEach.call(document.querySelectorAll('.link'), function(el){
+      el.addEventListener('pointermove', function(e){
+        var r = el.getBoundingClientRect();
+        el.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100) + '%');
+        el.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100) + '%');
+      });
+    });
+  }
+
+  /* The arrival. gsap.from() hides its targets first, so if anything stops the
+     tween the page keeps the hidden state for ever: on this page that would
+     mean four invisible links. The timer below is not a nicety, it is what
+     makes using from() safe at all. */
+  addEventListener('DOMContentLoaded', function(){
+    var g = window.gsap;
+    var nodes = [].slice.call(document.querySelectorAll('.logo, .link, .social, .login-toggle'));
+    function rest(){
+      /* Stop the tween before clearing, or a tween still in flight writes its
+         values again straight afterwards and the links keep the offset. */
+      if(g){ try{ g.killTweensOf(nodes); }catch(e){} }
+      nodes.forEach(function(el){ el.style.opacity=''; el.style.transform=''; });
+    }
+    if(!g){ rest(); return; }
+    try{
+      g.from(nodes, {y:20, opacity:0, duration:.8, ease:'power3.out', stagger:.07,
+                     clearProps:'transform,opacity', onComplete:rest, onInterrupt:rest});
+    }catch(e){ rest(); return; }
+    setTimeout(rest, 1800);
+  });
+})();
+
 var PASS = 'projecthailmary1985';
 function tryUnlock(){
   var v = document.getElementById('pw').value;
