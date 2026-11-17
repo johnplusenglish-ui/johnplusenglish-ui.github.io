@@ -16,41 +16,65 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
   :root{
-    /* One set of curves for the whole page. These are the GSAP curves written
-       as beziers, so the CSS and the JS move in the same language. */
-    --e-out:cubic-bezier(.16,1,.3,1);          /* expo.out: arrives and settles */
-    --e-soft:cubic-bezier(.22,1,.36,1);        /* quart.out: for width and colour */
-    --e-press:cubic-bezier(.2,.7,.3,1);        /* short, for anything clicked */
-    --ink:#0b0e14;
-    --ink-2:#121724;
-    --card:#161c2b;
-    --line:rgba(255,255,255,.10);
-    --text:#eef2f8;
-    --muted:#8d99b0;
-    --gold:#ffc53d;
-    --green:#35d07f;
-    --red:#ff5f5f;
-    --blue:#5aa9ff;
+    /* One set of curves for the whole page, so the CSS and the GSAP move in
+       the same language. */
+    --e-out:cubic-bezier(.16,1,.3,1);          /* arrives and settles */
+    --e-soft:cubic-bezier(.22,1,.36,1);        /* width and colour */
+    --e-press:cubic-bezier(.2,.7,.3,1);        /* anything clicked */
+    --e-bounce:cubic-bezier(.3,1.5,.5,1);      /* the one springy curve */
+
+    /* Warm paper, warm ink. Nothing on this page is pure white or pure black:
+       a true #000 on a true #fff is the single thing that makes a friendly
+       layout feel clinical. */
+    --paper:#FFF7EE;
+    --card:#FFFFFF;
+    --ink:#3E342E;
+    --ink-soft:#8A7C73;
+    --line:#F2E4D6;
+    --line-soft:#F8EFE6;
+
+    --accent:#FF9D3D;          /* honey, the one lead colour */
+    --accent-deep:#F0851C;
+    --accent-wash:#FFF1DF;
+    --green:#1FB573;
+    --green-wash:#E4F7EE;
+    --red:#F2685F;
+    --red-wash:#FFEDEA;
+    --blue:#5B9EF7;
+    --lilac:#A78BFA;
+
+    /* Soft, warm, and always more spread than drop. A tight dark shadow is
+       what makes a light card look like a dialog box. */
+    --lift-1:0 1px 2px rgba(120,80,40,.05), 0 6px 16px -8px rgba(120,80,40,.18);
+    --lift-2:0 2px 4px rgba(120,80,40,.06), 0 16px 34px -14px rgba(120,80,40,.26);
+    --lift-3:0 3px 6px rgba(120,80,40,.07), 0 30px 60px -22px rgba(120,80,40,.30);
+
+    --r-card:28px;
+    --r-ctl:18px;
+
+    /* the build script's footer links read these two */
+    --muted:var(--ink-soft);
+    --gold:var(--accent);
   }
   *{box-sizing:border-box}
   html,body{height:100%}
   html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
   body{
     margin:0;
+    /* Three wide, pale washes in the corners. They give the cream somewhere to
+       go without ever reading as a pattern. */
     background:
-      /* vignette first, so it sits over the lamps and under everything else */
-      radial-gradient(135% 95% at 50% 0%, rgba(3,5,10,0) 38%, rgba(3,5,10,.62) 100%),
-      radial-gradient(1150px 650px at 50% -12%, #223049 0%, rgba(27,36,55,0) 62%),
-      radial-gradient(760px 520px at 8% 4%, rgba(255,197,61,.075) 0%, transparent 58%),
-      radial-gradient(900px 620px at 95% 26%, rgba(90,169,255,.06) 0%, transparent 60%),
-      var(--ink);
+      radial-gradient(900px 620px at 10% -6%, rgba(255,198,133,.40) 0%, transparent 58%),
+      radial-gradient(820px 560px at 94% 6%,  rgba(150,190,255,.30) 0%, transparent 56%),
+      radial-gradient(780px 640px at 50% 106%, rgba(255,176,190,.26) 0%, transparent 58%),
+      var(--paper);
     background-attachment:fixed;
-    color:var(--text);
-    font-family:'Outfit',system-ui,-apple-system,sans-serif;
-    font-weight:400;
+    color:var(--ink);
+    font-family:'Nunito','Outfit',system-ui,-apple-system,sans-serif;
+    font-weight:600;
     display:flex;
     flex-direction:column;
     align-items:center;
@@ -59,29 +83,32 @@
   }
   .wrap{width:100%;max-width:760px;position:relative;z-index:1}
 
-  /* Grain sits over the page, under the confetti, and takes no clicks. At this
-     strength it is invisible as texture and obvious as quality: it breaks up
-     the gradient banding that makes a dark page look cheap. */
+  /* The same grain as before, far lighter and multiplied rather than overlaid,
+     because this page is paper now. It stops the washes banding. */
   .atmos{position:fixed;inset:0;pointer-events:none;z-index:3}
   .atmos::before{
     content:"";position:absolute;inset:0;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
     background-size:180px 180px;
-    opacity:.05;mix-blend-mode:overlay;
+    opacity:.028;mix-blend-mode:multiply;
   }
 
   /* ---------- header ---------- */
   header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:26px}
-  .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:13px;color:var(--muted)}
-  .dot{width:9px;height:9px;border-radius:50%;background:var(--gold);box-shadow:0 0 14px var(--gold)}
+  .brand{display:flex;align-items:center;gap:9px;font-family:'Fredoka','Outfit',sans-serif;
+         font-weight:600;font-size:16px;color:var(--ink)}
+  .dot{width:10px;height:10px;border-radius:50%;background:var(--accent);
+       box-shadow:0 0 0 4px var(--accent-wash)}
   .tools{display:flex;gap:8px}
   .chip{
-    border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--muted);
-    border-radius:999px;padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer;
-    font-family:inherit;transition:.15s;
+    border:1.5px solid var(--line);background:var(--card);color:var(--ink-soft);
+    border-radius:999px;padding:8px 15px;font-size:13.5px;font-weight:700;cursor:pointer;
+    font-family:inherit;box-shadow:var(--lift-1);
+    transition:transform .2s var(--e-out), box-shadow .2s var(--e-soft), color .2s, border-color .2s;
   }
-  .chip:hover{color:var(--text);border-color:rgba(255,255,255,.26)}
-  .chip.on{color:var(--ink);background:var(--gold);border-color:var(--gold)}
+  .chip:hover{color:var(--ink);transform:translateY(-1px);box-shadow:var(--lift-2)}
+  .chip.on{color:#fff;background:var(--accent);border-color:var(--accent)}
+  .chip:active{transform:translateY(1px);transition-duration:.07s}
 
   /* ---------- panels ---------- */
   .panel{display:none}
@@ -89,262 +116,286 @@
   @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
   /* ---------- start ---------- */
-  .hero{text-align:center;padding:30px 0 10px}
+  .hero{text-align:center;padding:26px 0 10px}
   h1{
-    font-family:'Anton Local','Anton',Outfit,system-ui,sans-serif;
-    font-size:clamp(44px,10.5vw,92px);line-height:.9;margin:0 0 20px;
-    font-weight:400;letter-spacing:.004em;text-transform:uppercase;
-    /* SplitText takes the lines out of flow; this holds them together */
+    font-family:'Fredoka','Outfit',system-ui,sans-serif;
+    font-size:clamp(42px,9vw,78px);line-height:1.02;margin:0 0 18px;
+    font-weight:600;letter-spacing:-.01em;
     -webkit-font-smoothing:antialiased;
   }
-  /* A gradient tight enough to read as gold leaf rather than as a gradient.
-     colour comes first, so if background-clip is unsupported the word is
-     simply gold. */
+  /* colour first, so the word is simply honey where background-clip is not
+     supported */
   h1 span{
-    color:var(--gold);
-    background:linear-gradient(176deg,#ffe9a8 0%,#ffc53d 44%,#d79713 100%);
+    color:var(--accent);
+    background:linear-gradient(170deg,#FFC178 0%,#FF9D3D 46%,#F0851C 100%);
     -webkit-background-clip:text;background-clip:text;
     -webkit-text-fill-color:transparent;
   }
   h1 .ln{overflow:hidden;padding-bottom:.06em}
-  .sub{color:var(--muted);font-size:17px;max-width:460px;margin:0 auto 34px;line-height:1.5}
-  .opts{display:flex;flex-direction:column;gap:14px;max-width:420px;margin:0 auto 30px;text-align:left}
+  .sub{color:var(--ink-soft);font-size:17px;font-weight:600;max-width:470px;
+       margin:0 auto 34px;line-height:1.55}
+  .opts{display:flex;flex-direction:column;gap:12px;max-width:430px;margin:0 auto 28px;text-align:left}
   .opt{
     display:flex;align-items:center;justify-content:space-between;gap:14px;
-    border:1px solid var(--line);border-radius:15px;padding:14px 16px;
-    background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.008));
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.055),0 10px 26px -20px rgba(0,0,0,.9);
+    border:1.5px solid var(--line);border-radius:var(--r-ctl);padding:14px 16px;
+    background:var(--card);box-shadow:var(--lift-1);
     transition:border-color .25s var(--e-soft), box-shadow .25s var(--e-soft), transform .25s var(--e-out);
   }
-  .opt:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.17);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 16px 34px -20px rgba(0,0,0,.95)}
-  .opt:focus-within{border-color:rgba(255,197,61,.42);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 3px rgba(255,197,61,.10)}
-  /* the fourth button squeezed the label into a four-line column, the usual
-     flex story: let the text take the room and hold the buttons at their size */
+  .opt:hover{transform:translateY(-2px);box-shadow:var(--lift-2)}
+  .opt:focus-within{border-color:var(--accent);box-shadow:var(--lift-2),0 0 0 4px var(--accent-wash)}
+  /* let the label take the room and hold the buttons at their size */
   .opt{flex-wrap:wrap}
   .opt > div:first-child{flex:1 1 170px;min-width:0}
   .opt .seg{flex:0 0 auto;margin-left:auto}
-  .opt .lbl{font-weight:600;font-size:15px}
-  .opt .hint{color:var(--muted);font-size:13px;margin-top:2px}
-  .seg{display:flex;background:rgba(0,0,0,.3);border-radius:999px;padding:3px;gap:3px}
-  .lenbox{align-items:center;gap:9px;padding:3px 12px 3px 3px}
+  .opt .lbl{font-weight:800;font-size:15.5px;color:var(--ink)}
+  .opt .hint{color:var(--ink-soft);font-size:13px;margin-top:2px;font-weight:600}
+  .seg{display:flex;background:var(--line-soft);border-radius:999px;padding:4px;gap:3px}
+  .lenbox{align-items:center;gap:9px;padding:4px 12px 4px 4px}
   .lenbox input{
-    width:5.5ch;font:inherit;font-weight:700;font-size:15px;text-align:center;
-    background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:999px;
-    color:var(--gold);padding:6px 6px;outline:none;-moz-appearance:textfield;
+    width:5.5ch;font:inherit;font-weight:800;font-size:15px;text-align:center;
+    background:var(--accent-wash);border:1.5px solid transparent;border-radius:999px;
+    color:var(--accent-deep);padding:6px;outline:none;-moz-appearance:textfield;
   }
   .lenbox input::-webkit-outer-spin-button,
   .lenbox input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-  .lenbox input:focus{border-color:var(--gold);background:rgba(255,197,61,.13)}
-  .lenbox .of{font-size:13px;color:var(--muted);white-space:nowrap}
-  .lenbox .of b{color:#cbd3e1;font-weight:600}
+  .lenbox input:focus{border-color:var(--accent)}
+  .lenbox .of{font-size:13px;color:var(--ink-soft);white-space:nowrap;font-weight:600}
+  .lenbox .of b{color:var(--ink);font-weight:800}
   .seg button{
-    border:0;background:transparent;color:var(--muted);font-family:inherit;font-weight:600;font-size:13px;
-    padding:7px 13px;border-radius:999px;cursor:pointer;transition:.15s;white-space:nowrap;
+    border:0;background:transparent;color:var(--ink-soft);font-family:inherit;font-weight:700;font-size:13.5px;
+    padding:8px 14px;border-radius:999px;cursor:pointer;white-space:nowrap;
+    transition:color .2s, background .2s var(--e-soft);
   }
-  .seg button.on{background:var(--gold);color:var(--ink)}
+  .seg button:hover{color:var(--ink)}
+  .seg button.on{background:var(--card);color:var(--accent-deep);box-shadow:var(--lift-1)}
+
   .big{
-    display:block;width:100%;max-width:420px;margin:0 auto;border:0;cursor:pointer;
-    background:linear-gradient(180deg,#ffdc85 0%,#ffc53d 44%,#eca81c 100%);
-    color:#2a1d00;font-family:inherit;font-weight:800;font-size:19px;
-    letter-spacing:.04em;text-transform:uppercase;padding:18px;border-radius:15px;
+    display:block;width:100%;max-width:430px;margin:0 auto;border:0;cursor:pointer;
+    background:linear-gradient(180deg,#FFB05C 0%,#FF9D3D 50%,#F58A20 100%);
+    color:#fff;font-family:'Fredoka','Outfit',sans-serif;font-weight:600;font-size:21px;
+    letter-spacing:.01em;padding:18px;border-radius:var(--r-ctl);
     position:relative;overflow:hidden;isolation:isolate;
     transition:transform .2s var(--e-press), box-shadow .25s var(--e-soft);
-    /* a lit top edge and a dark bottom one: the button has a thickness */
+    /* a lit top edge and a warm glow under it: the button has a thickness */
     box-shadow:
-      inset 0 1px 0 rgba(255,255,255,.62),
-      inset 0 -1px 0 rgba(104,66,0,.38),
-      0 1px 2px rgba(0,0,0,.35),
-      0 14px 30px -12px rgba(255,197,61,.45);
+      inset 0 1.5px 0 rgba(255,255,255,.55),
+      inset 0 -2px 0 rgba(190,100,10,.22),
+      0 2px 3px rgba(190,110,30,.16),
+      0 16px 30px -12px rgba(255,157,61,.60);
   }
   .big::after{
     content:"";position:absolute;inset:0;z-index:-1;
     background:radial-gradient(200px circle at var(--mx,50%) var(--my,50%),
-               rgba(255,255,255,.55),transparent 62%);
+               rgba(255,255,255,.45),transparent 62%);
     opacity:0;transition:opacity .3s var(--e-soft);
   }
   .big:hover{transform:translateY(-2px);box-shadow:
-      inset 0 1px 0 rgba(255,255,255,.7),
-      inset 0 -1px 0 rgba(104,66,0,.38),
-      0 2px 4px rgba(0,0,0,.35),
-      0 22px 44px -14px rgba(255,197,61,.55)}
+      inset 0 1.5px 0 rgba(255,255,255,.62),
+      inset 0 -2px 0 rgba(190,100,10,.22),
+      0 3px 5px rgba(190,110,30,.16),
+      0 24px 44px -14px rgba(255,157,61,.70)}
   .big:hover::after{opacity:1}
-  .big:active{transform:translateY(1px) scale(.994);transition-duration:.07s}
+  .big:active{transform:translateY(2px) scale(.992);transition-duration:.07s}
   .big.ghost{
-    background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.015));
-    color:var(--text);border:1px solid var(--line);margin-top:12px;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 10px 26px -16px rgba(0,0,0,.9);
+    background:var(--card);color:var(--ink);border:1.5px solid var(--line);margin-top:12px;
+    font-size:17px;box-shadow:var(--lift-1);
   }
-  .big.ghost:hover{border-color:rgba(255,255,255,.28);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 16px 34px -16px rgba(0,0,0,.95)}
+  .big.ghost:hover{border-color:var(--accent);box-shadow:var(--lift-2)}
   .big.ghost::after{display:none}
 
   /* ---------- quiz ---------- */
   .bar{
-    height:4px;background:rgba(255,255,255,.05);border-radius:4px;overflow:hidden;margin-bottom:22px;
-    box-shadow:inset 0 0 0 1px rgba(255,255,255,.035);
+    height:10px;background:var(--line-soft);border-radius:999px;overflow:hidden;margin-bottom:20px;
   }
   .bar i{
-    display:block;height:100%;width:0;border-radius:4px;
-    background:linear-gradient(90deg,#d99a18,#ffc53d 60%,#ffe9a8);
-    box-shadow:0 0 14px rgba(255,197,61,.45);
+    display:block;height:100%;width:0;border-radius:999px;
+    background:linear-gradient(90deg,#FFC178,#FF9D3D 70%,#F0851C);
     transition:width .55s var(--e-soft);
   }
-  .meta{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted);font-weight:600;margin-bottom:26px;letter-spacing:.06em;text-transform:uppercase}
+  .meta{display:flex;justify-content:space-between;align-items:center;font-size:14px;
+        color:var(--ink-soft);font-weight:700;margin-bottom:18px}
   .scores{display:flex;gap:18px}
-  .scores b{color:var(--text)}
-  .streak{color:var(--gold)}
+  .scores b{color:var(--ink);font-weight:800}
+  .streak{color:var(--accent-deep)}
 
   .card{
-    border:1px solid rgba(255,255,255,.085);
-    background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.012));
-    border-radius:22px;padding:40px 30px;text-align:center;position:relative;
-    min-height:clamp(210px,30vh,280px);display:flex;flex-direction:column;justify-content:center;
+    border:1.5px solid var(--line);
+    background:var(--card);
+    border-radius:var(--r-card);padding:34px 30px;text-align:center;position:relative;
+    display:flex;flex-direction:column;justify-content:center;gap:4px;
     transition:border-color .25s var(--e-soft), box-shadow .25s var(--e-soft);
-    /* lit top edge, contact shadow, then the long one */
-    box-shadow:
-      inset 0 1px 0 rgba(255,255,255,.10),
-      0 1px 2px rgba(0,0,0,.40),
-      0 28px 64px -28px rgba(0,0,0,.90);
-    backdrop-filter:blur(10px) saturate(118%);
-    -webkit-backdrop-filter:blur(10px) saturate(118%);
+    box-shadow:var(--lift-3);
     isolation:isolate;
   }
-  /* A warm highlight that follows the pointer across the glass. It is the one
-     effect added here, it only exists while a mouse is over the card, and it
-     is the detail that makes the surface feel like a surface. */
+  /* A warm wash that follows the pointer across the card. Mouse only, and the
+     one effect on the card that is purely for the feel of it. */
   .card::before{
     content:"";position:absolute;inset:0;border-radius:inherit;z-index:-1;
     background:radial-gradient(460px circle at var(--mx,50%) var(--my,0%),
-               rgba(255,197,61,.10),rgba(255,197,61,.03) 42%,transparent 66%);
+               rgba(255,157,61,.10),rgba(255,157,61,.03) 42%,transparent 66%);
     opacity:0;transition:opacity .4s var(--e-soft);
   }
   .card.lit::before{opacity:1}
-  .card.good{border-color:rgba(53,208,127,.6);box-shadow:0 0 0 1px rgba(53,208,127,.25),0 18px 50px rgba(53,208,127,.10)}
-  .card.bad{border-color:rgba(255,95,95,.6);box-shadow:0 0 0 1px rgba(255,95,95,.25),0 18px 50px rgba(255,95,95,.10)}
+  .card.good{border-color:var(--green)}
+  .card.bad{border-color:var(--red)}
   .card.shake{animation:shake .4s}
   @keyframes shake{10%,90%{transform:translateX(-2px)}30%,70%{transform:translateX(5px)}50%{transform:translateX(-5px)}}
 
+  /* The little label that says what kind of thing this is. It gives the card
+     a bit of colour and tells a learner what they are looking at. */
+  .typechip{
+    align-self:center;display:inline-flex;align-items:center;gap:6px;
+    font-size:12px;font-weight:800;letter-spacing:.03em;
+    padding:5px 13px;border-radius:999px;margin-bottom:14px;
+    background:var(--accent-wash);color:var(--accent-deep);
+  }
+  .typechip.proverb{background:#EFEAFE;color:#7C5CE6}
+  .typechip.simile{background:#E6F1FE;color:#3A7FD5}
+
   .prompt{
-    font-family:'Anton Local','Anton',Outfit,system-ui,sans-serif;
-    /* fitPrompt() sets the size; this is the fallback before it runs */
-    font-size:clamp(26px,5vw,46px);font-weight:400;line-height:1.08;text-transform:uppercase;
-    letter-spacing:.012em;text-align:center;text-wrap:balance;text-wrap:pretty;
-    flex:0 0 auto;max-width:100%;margin-inline:auto;
+    font-family:'Nunito','Outfit',system-ui,sans-serif;
+    /* A sentence, read at a reading size. The old 46px headline was there
+       because only the idiom was on the card. */
+    font-size:clamp(19px,3.3vw,26px);font-weight:800;line-height:1.5;
+    letter-spacing:0;text-align:center;text-wrap:pretty;
+    color:var(--ink);
+    max-width:100%;margin-inline:auto;
   }
   @supports (text-wrap:balance){ .prompt{text-wrap:balance} }
-  /* the words around the idiom, dimmed so the idiom itself leads */
-  .prompt .lead{color:#9aa7bf}
+  /* the words around the idiom: present, lighter, not competing */
+  .prompt .lead{color:var(--ink-soft);font-weight:600}
   .blank{
-    display:inline-block;border-bottom:3px solid var(--gold);
-    color:var(--gold);padding:0 .1em 2px;
-    /* The answer must stay exactly the size of the words round it. Saying so
-       outright stops a browser that inflates text for readability from
-       growing the sentence and leaving the answer behind, which is the one
-       way this can end up looking smaller than everything else. */
+    display:inline-block;border-bottom:3px solid var(--accent);
+    color:var(--accent-deep);padding:0 .14em 1px;
     font:inherit;font-size:inherit;line-height:inherit;vertical-align:baseline;
   }
   .blank.filled{border-bottom-color:currentColor}
-  .blank.good{color:var(--green)}
-  .blank.bad{color:var(--red);text-decoration:line-through;text-decoration-thickness:2px}
+  .blank.good{color:var(--green);border-bottom-color:var(--green)}
+  .blank.bad{color:var(--red);border-bottom-color:var(--red);
+             text-decoration:line-through;text-decoration-thickness:2px}
 
   input.gap{
-    font:inherit;font-size:inherit;font-weight:inherit;letter-spacing:inherit;text-transform:uppercase;
-    width:5ch;min-width:0;max-width:100%;transition:width .12s ease;background:rgba(255,197,61,.07);border:0;border-bottom:3px solid var(--gold);
-    border-radius:6px 6px 0 0;color:var(--gold);text-align:center;outline:none;padding:0 .08em 2px;
-    caret-color:var(--gold);transition:background .15s;
+    font:inherit;font-size:inherit;font-weight:inherit;letter-spacing:inherit;
+    width:6.5ch;min-width:0;max-width:100%;
+    background:#FFF4E6;border:0;border-bottom:3px solid var(--accent);
+    border-radius:8px 8px 0 0;color:var(--accent-deep);text-align:center;outline:none;
+    padding:0 .15em 1px;caret-color:var(--accent);
+    transition:background .18s var(--e-soft), box-shadow .18s var(--e-soft);
   }
-  input.gap:focus{background:rgba(255,197,61,.14)}
-  input.gap::placeholder{color:rgba(255,197,61,.28)}
+  input.gap:focus{background:#FFE9CE;box-shadow:0 8px 18px -10px rgba(255,157,61,.8)}
+  input.gap::placeholder{color:rgba(240,133,28,.34)}
+  /* The gap is focused the moment a question appears, so the caret lands in
+     the middle of the centred placeholder and draws a line straight through
+     the question mark. Once somebody is in the box they do not need to be
+     told it is a box. */
+  input.gap:focus::placeholder{color:transparent}
 
-  .feedback{margin-top:26px;min-height:0;flex:0 0 auto}
+  .feedback{margin-top:20px;min-height:0;flex:0 0 auto}
   .feedback:empty{margin-top:0}
-  .verdict{font-weight:700;font-size:15px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px}
+  .verdict{font-family:'Fredoka','Outfit',sans-serif;font-weight:600;font-size:21px;margin-bottom:8px}
   .verdict.good{color:var(--green)}
   .verdict.bad{color:var(--red)}
-  .meaning{color:var(--muted);font-size:16px;line-height:1.55;max-width:520px;margin:0 auto}
-  .meaning b{color:var(--text);font-weight:600}
-  .example{color:#6f7b92;font-size:15px;margin-top:8px}
+  .meaning{color:var(--ink-soft);font-size:16px;font-weight:600;line-height:1.6;
+           max-width:520px;margin:0 auto}
+  .meaning b{color:var(--ink);font-weight:800}
+  .example{color:var(--ink-soft);font-size:15px;margin-top:10px;font-weight:600;
+           background:var(--line-soft);border-radius:12px;padding:10px 14px;
+           display:inline-block;max-width:520px}
 
-  .retry{
-    color:var(--gold);font-weight:700;font-size:14px;letter-spacing:.14em;text-transform:uppercase;
-  }
-  .retry span{display:block;color:var(--muted);font-weight:500;letter-spacing:0;text-transform:none;font-size:15px;margin-top:6px}
-  .big.ghost{background:transparent;color:var(--text);border:1px solid var(--line)}
+  .retry{color:var(--accent-deep);font-family:'Fredoka','Outfit',sans-serif;
+         font-weight:600;font-size:18px}
+  .retry span{display:block;color:var(--ink-soft);font-family:'Nunito','Outfit',sans-serif;
+              font-weight:600;font-size:15px;margin-top:6px}
   a.big{text-decoration:none;text-align:center}
 
   /* ---------- results ---------- */
   .pdfrow{text-align:center;margin-top:16px}
   .pdflink{
     display:inline-flex;align-items:center;gap:9px;
-    color:var(--muted);font-size:13.5px;font-weight:600;letter-spacing:.02em;text-decoration:none;
-    border:1px solid var(--line);border-radius:999px;padding:11px 20px;transition:.15s;
+    color:var(--ink-soft);font-size:14px;font-weight:700;text-decoration:none;
+    border:1.5px solid var(--line);background:var(--card);
+    border-radius:999px;padding:11px 20px;box-shadow:var(--lift-1);
+    transition:transform .2s var(--e-out), box-shadow .2s, color .2s, border-color .2s;
   }
-  .pdflink:hover{color:var(--gold);border-color:rgba(255,197,61,.5);background:rgba(255,197,61,.06)}
-  .pdflink svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  .pdflink:hover{color:var(--accent-deep);border-color:var(--accent);
+                 transform:translateY(-2px);box-shadow:var(--lift-2)}
+  .pdflink svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 
-  .score-ring{text-align:center;padding:14px 0 6px}
-  .score-big{font-size:clamp(60px,14vw,110px);font-weight:800;line-height:1;letter-spacing:-.04em}
-  .score-big small{font-size:.3em;color:var(--muted);font-weight:600;letter-spacing:0}
-  .grade{color:var(--gold);font-weight:700;letter-spacing:.16em;text-transform:uppercase;font-size:14px;margin-top:12px}
-  .review{margin:34px 0 10px;border-top:1px solid var(--line)}
-  .review h2{font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:26px 0 14px}
-  .miss{display:flex;gap:14px;align-items:flex-start;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.05)}
-  .miss .idi{font-weight:700;min-width:0;flex:1}
-  .miss .mn{color:var(--muted);font-size:14px;margin-top:3px;font-weight:400}
-  .miss .tick{color:var(--green);font-weight:800}
-  .miss .cross{color:var(--red);font-weight:800}
-  .clock{position:absolute;left:20px;right:20px;top:14px;height:4px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden}
-  .clock i{display:block;height:100%;width:100%;background:var(--gold);border-radius:99px}
+  /* the score, on its own card, so the round ends on something rather than on
+     a number floating over the page */
+  .score-ring{
+    text-align:center;padding:26px 20px 22px;background:var(--card);
+    border:1.5px solid var(--line);border-radius:var(--r-card);box-shadow:var(--lift-3);
+  }
+  .score-big{font-family:'Fredoka','Outfit',sans-serif;
+             font-size:clamp(54px,12vw,92px);font-weight:600;line-height:1;
+             letter-spacing:-.02em;color:var(--accent-deep)}
+  .score-big small{font-size:.32em;color:var(--ink-soft);font-weight:600;letter-spacing:0}
+  .grade{font-family:'Fredoka','Outfit',sans-serif;color:var(--ink);
+         font-weight:600;font-size:22px;margin-top:10px}
+  .grade-sub{color:var(--ink-soft);font-size:15px;font-weight:600;margin-top:6px}
+  .review{margin:30px 0 10px}
+  .review h2{font-family:'Fredoka','Outfit',sans-serif;font-size:19px;font-weight:600;
+             color:var(--ink);margin:26px 0 14px}
+  .miss{display:flex;gap:13px;align-items:flex-start;padding:14px 16px;margin-bottom:8px;
+        background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-ctl);
+        box-shadow:var(--lift-1)}
+  .miss .idi{font-weight:800;min-width:0;flex:1;color:var(--ink)}
+  .miss .mn{color:var(--ink-soft);font-size:14.5px;margin-top:3px;font-weight:600}
+  .miss .tick{color:var(--green);font-weight:900}
+  .miss .cross{color:var(--red);font-weight:900}
+
+  .clock{position:absolute;left:22px;right:22px;top:14px;height:6px;
+         background:var(--line-soft);border-radius:999px;overflow:hidden}
+  .clock i{display:block;height:100%;width:100%;background:var(--accent);border-radius:999px}
   .clock[hidden]{display:none}
 
   /* ---------- lifeline + lock-in ---------- */
   /* On a phone, reaching for the keyboard's enter key is awkward, so there is
-     a button tucked just under the card's bottom right corner. It submits the
-     answer, then moves to the next question, exactly as enter does. */
+     a button tucked just under the card's bottom right corner. */
   .go-btn{
-    display:none;position:absolute;right:14px;bottom:-26px;
-    width:56px;height:56px;border-radius:50%;border:0;cursor:pointer;
-    background:var(--green);color:#06251a;
+    display:none;position:absolute;right:16px;bottom:-26px;
+    width:58px;height:58px;border-radius:50%;border:0;cursor:pointer;
+    background:var(--green);color:#fff;
     align-items:center;justify-content:center;
-    box-shadow:0 10px 24px rgba(53,208,127,.34),0 2px 0 rgba(0,0,0,.25);
-    transition:transform .14s cubic-bezier(.2,.7,.3,1), box-shadow .14s;
+    box-shadow:0 10px 22px -6px rgba(31,181,115,.55), inset 0 -2px 0 rgba(0,90,55,.22);
+    transition:transform .18s var(--e-bounce), box-shadow .18s;
   }
-  .go-btn:active{transform:translateY(2px) scale(.97);box-shadow:0 5px 14px rgba(53,208,127,.3)}
+  .go-btn:active{transform:translateY(2px) scale(.95)}
   .go-btn svg{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:3;
               stroke-linecap:round;stroke-linejoin:round}
   .helprow{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:18px;min-height:44px}
   .hint-btn[hidden]{display:none}
   .hint-btn{
-    border:1px solid rgba(255,197,61,.45);background:rgba(255,197,61,.07);color:var(--gold);
-    font-family:inherit;font-weight:700;font-size:13.5px;letter-spacing:.06em;text-transform:uppercase;
-    padding:11px 20px;border-radius:999px;cursor:pointer;transition:.15s;
+    border:1.5px solid var(--line);background:var(--card);color:var(--ink-soft);
+    font-family:inherit;font-weight:700;font-size:14px;
+    padding:11px 20px;border-radius:999px;cursor:pointer;box-shadow:var(--lift-1);
+    transition:transform .2s var(--e-out), box-shadow .2s, color .2s, border-color .2s;
   }
-  .hint-btn:hover:not(:disabled){background:rgba(255,197,61,.16);transform:translateY(-1px)}
-  .hint-btn:disabled{opacity:.35;cursor:default}
-  .hint-btn[hidden]{display:none}
+  .hint-btn:hover:not(:disabled){color:var(--accent-deep);border-color:var(--accent);
+    transform:translateY(-2px);box-shadow:var(--lift-2)}
+  .hint-btn:disabled{opacity:.4;cursor:default}
 
   /* ---------- trophy ---------- */
   .trophy{display:flex;justify-content:center;margin-bottom:6px}
   .trophy[hidden]{display:none}
-  .trophy svg{width:92px;height:92px;animation:trophyIn .7s cubic-bezier(.2,1.4,.4,1) both}
+  .trophy svg{width:92px;height:92px;animation:trophyIn .7s var(--e-bounce) both}
   @keyframes trophyIn{from{opacity:0;transform:translateY(-30px) scale(.5) rotate(-12deg)}to{opacity:1;transform:none}}
   /* Three passes and done. A trophy may celebrate; it may not fidget. */
   .trophy .shine{animation:shineSweep 2.4s ease-in-out .6s 3}
   @keyframes shineSweep{0%,70%,100%{opacity:0;transform:translateX(-18px)}80%{opacity:.9;transform:translateX(6px)}90%{opacity:0;transform:translateX(22px)}}
 
   /* ---------- motion ---------- */
-  @keyframes qIn{from{opacity:0;transform:translateY(20px) scale(.97)}to{opacity:1;transform:none}}
-  /* A single soft light behind the answer. One of these says more than
-     another forty pieces of confetti, and it leaves nothing on the screen. */
+  @keyframes qIn{from{opacity:0;transform:translateY(16px) scale(.98)}to{opacity:1;transform:none}}
+  /* A single soft light behind the answer. On paper it tints rather than
+     glows, so it multiplies instead of screening. */
   .bloom{
     position:fixed;width:230px;height:230px;margin:-115px 0 0 -115px;border-radius:50%;
-    pointer-events:none;z-index:55;mix-blend-mode:screen;
-    background:radial-gradient(circle,rgba(255,197,61,.40),rgba(255,197,61,.10) 44%,transparent 68%);
+    pointer-events:none;z-index:55;mix-blend-mode:multiply;
+    background:radial-gradient(circle,rgba(255,157,61,.34),rgba(255,157,61,.10) 44%,transparent 68%);
     animation:bloomOut .95s cubic-bezier(.17,.72,.3,1) forwards;
   }
-  .bloom.bad{background:radial-gradient(circle,rgba(255,95,95,.30),rgba(255,95,95,.08) 44%,transparent 68%)}
+  .bloom.bad{background:radial-gradient(circle,rgba(242,104,95,.26),rgba(242,104,95,.07) 44%,transparent 68%)}
   @keyframes bloomOut{
     0%{transform:scale(.3);opacity:0}
     28%{opacity:1}
@@ -353,27 +404,22 @@
   .prompt.in{animation:qIn .4s cubic-bezier(.2,.8,.3,1.2) both}
   @keyframes letterDrop{from{opacity:0;transform:translateY(-18px) scale(1.35)}to{opacity:1;transform:none}}
   .blank .ch{display:inline-block;font-size:inherit;line-height:inherit;vertical-align:baseline;
-              animation:letterDrop .34s cubic-bezier(.2,.8,.3,1.5) both}
-  /* A steady lamp under the gap, instead of one that breathed for ever. */
-  input.gap:focus{box-shadow:0 10px 26px -10px rgba(255,197,61,.55)}
-  @keyframes cardGood{0%{box-shadow:0 0 0 0 rgba(53,208,127,0)}30%{box-shadow:0 0 0 2px rgba(53,208,127,.45),0 18px 70px rgba(53,208,127,.20)}100%{box-shadow:0 0 0 0 rgba(53,208,127,0)}}
-  @keyframes cardBad{0%{box-shadow:0 0 0 0 rgba(255,95,95,0)}30%{box-shadow:0 0 0 2px rgba(255,95,95,.45),0 18px 70px rgba(255,95,95,.18)}100%{box-shadow:0 0 0 0 rgba(255,95,95,0)}}
+              animation:letterDrop .34s var(--e-bounce) both}
+  @keyframes cardGood{0%{box-shadow:var(--lift-3)}30%{box-shadow:var(--lift-3),0 0 0 5px var(--green-wash)}100%{box-shadow:var(--lift-3)}}
+  @keyframes cardBad{0%{box-shadow:var(--lift-3)}30%{box-shadow:var(--lift-3),0 0 0 5px var(--red-wash)}100%{box-shadow:var(--lift-3)}}
   .card.good{animation:cardGood 1s ease}
   .card.bad{animation:cardBad .7s ease}
   @keyframes bump{0%{transform:scale(1)}40%{transform:scale(1.5)}100%{transform:scale(1)}}
-  .bump{display:inline-block;animation:bump .38s cubic-bezier(.3,1.4,.5,1)}
+  .bump{display:inline-block;animation:bump .38s var(--e-bounce)}
   @keyframes fbIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
   .feedback > *{animation:fbIn .34s ease both}
   .feedback > *:nth-child(2){animation-delay:.07s}
   .feedback > *:nth-child(3){animation-delay:.13s}
   .feedback > *:nth-child(4){animation-delay:.19s}
   .streak{transition:transform .2s}
-  .streak.hot{color:#ffd76a}
-  .streak.hot b{text-shadow:0 0 14px rgba(255,197,61,.9)}
-  /* The pulse that used to run here never stopped, right next to the question
-     somebody was reading. A hot streak now shows as heat, not as movement. */
-  .streak.hot b{text-shadow:0 0 16px rgba(255,197,61,.85)}
-  .streak.fire b{color:#ffe9a8;text-shadow:0 0 20px rgba(255,197,61,1)}
+  /* A hot streak shows as heat, not as movement. */
+  .streak.hot b{color:var(--accent-deep)}
+  .streak.fire b{color:#E8690C}
   #cfLayer{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:60}
   #bg{position:fixed;inset:0;z-index:0;pointer-events:none}
   #bg canvas{display:block}
@@ -381,6 +427,7 @@
   @keyframes cfFly{0%{transform:translate3d(0,0,0) rotate(0deg);opacity:1}100%{transform:translate3d(var(--dx),var(--dy),0) rotate(var(--rot));opacity:0}}
   @keyframes rowIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
   .miss{animation:rowIn .34s ease both}
+
   /* On a phone the label and the buttons will not sit side by side. */
   @media (max-width:620px){
     .opt{flex-direction:column;align-items:stretch;gap:10px}
@@ -388,25 +435,27 @@
     .opt > div:first-child{flex:0 0 auto}
     .opt .seg{justify-content:center;margin-left:0}
     /* give the sentence back the width the card padding was taking */
-    .card{padding:30px 16px;min-height:clamp(190px,26vh,250px)}
+    .card{padding:26px 18px}
     .go-btn{display:flex}
     .helprow{margin-top:46px}
+    .score-ring{padding:22px 14px 18px}
   }
 
   @media (prefers-reduced-motion:reduce){
     *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   }
 
-  footer{margin-top:40px;text-align:center;color:#4b5468;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
-  .social{display:flex;justify-content:center;gap:10px;margin-top:16px;flex-wrap:wrap}
+  footer{margin-top:40px;text-align:center;color:var(--ink-soft);font-size:13px;font-weight:700}
+  .social{display:flex;justify-content:center;gap:10px;margin-top:18px;flex-wrap:wrap}
   .social a{
     display:inline-flex;align-items:center;gap:7px;text-decoration:none;
-    border:1px solid var(--line);border-radius:999px;padding:9px 16px;
-    color:var(--muted);font-size:12.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
-    transition:.15s;
+    border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:10px 18px;
+    color:var(--ink-soft);font-size:13.5px;font-weight:700;box-shadow:var(--lift-1);
+    transition:transform .2s var(--e-out), box-shadow .2s, color .2s, border-color .2s;
   }
-  .social a:hover{color:var(--gold);border-color:rgba(255,197,61,.5);background:rgba(255,197,61,.06)}
-  .social svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  .social a:hover{color:var(--accent-deep);border-color:var(--accent);
+    transform:translateY(-2px);box-shadow:var(--lift-2)}
+  .social svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 </style>
 </head>
 <body>
@@ -496,6 +545,7 @@
 
     <div class="card" id="card">
       <div class="clock" id="clock" hidden><i id="clockFill"></i></div>
+      <div class="typechip" id="typeChip">Idiom</div>
       <div class="prompt" id="prompt"></div>
       <div id="clueBefore" class="meaning" style="margin-top:22px;display:none"></div>
         <div class="feedback" id="feedback"></div>
@@ -529,6 +579,7 @@
       </div>
       <div class="score-big"><span id="finalScore">0</span><small>/<span id="finalTotal">58</span></small></div>
       <div class="grade" id="grade"></div>
+      <div class="grade-sub" id="gradeSub"></div>
     </div>
     <div class="review" id="review"></div>
     <div style="margin-top:30px">
@@ -905,95 +956,154 @@ function hit(at, dur, freq, q, vol){
   src.connect(f); f.connect(g); g.connect(master);
   src.start(at); src.stop(at+dur+.02);
 }
-/* ------------------------------------------------------- recorded sounds */
-/* Kenney's Interface Sounds, CC0, no attribution needed. Swap any filename
-   below for another in idiom-assets/sounds if you prefer a different one.
-   Also downloaded: bong_001, error_008, question_002, click_002, switch_002. */
-const SFX_DIR = 'idiom-assets/sounds/';
-/* Several files per event, picked at random but never the same twice running,
-   so a long round does not turn into the same blip 150 times. bong_001 is too
-   dark to reward anything on its own, so it plays underneath as a bass note. */
-const SFX = {
-  right: ['confirmation_002.ogg', 'question_002.ogg'],
-  wrong: ['error_006.ogg', 'error_008.ogg'],
-  hint:  ['pluck_001.ogg'],
-  tick:  ['tick_002.ogg'],
-  low:   ['bong_001.ogg']
-};
-const sfxLast = {};
-function pickSfx(name){
-  const list = SFX[name];
-  if(!list) return null;
-  if(list.length === 1) return list[0];
-  let f;
-  do { f = list[(Math.random()*list.length)|0]; } while(f === sfxLast[name]);
-  return (sfxLast[name] = f);
-}
-/* Safari only learned Ogg Vorbis recently, so check before offering the kit. */
-const OGG_OK = (function(){
-  try{ return !!new Audio().canPlayType('audio/ogg; codecs="vorbis"'); }
-  catch(e){ return false; }
-})();
-/* No longer a choice on the start screen, just a quiet fallback: a browser that
-   cannot play Ogg gets the synthesised versions instead of silence. */
-let kit = OGG_OK ? 'rec' : 'synth';
-const sfxCache = {};
-/* Returns false if it could not play, so every caller can fall back to the
-   synthesised version and the game is never left silent. */
-function sfx(name, rate, vol){
-  if(!soundOn || kit !== 'rec' || !SFX[name]) return false;
-  try{
-    const file = pickSfx(name);
-    let base = sfxCache[file];
-    if(!base){
-      base = sfxCache[file] = new Audio(SFX_DIR + file);
-      base.preload = 'auto';
+/* --------------------------------------------------------------- the room
+   One short, dark room that everything is sent a little of. This is the
+   single biggest difference between a synthesised kit that sounds cheap and
+   one that does not: a dry sound has no size, and the ear reads no size as
+   no money. The impulse is generated, so there is still nothing to license
+   and nothing to download. */
+let verb = null, verbIn = null;
+function room(){
+  const c = audio();
+  if(!verb){
+    const len = Math.floor(c.sampleRate * 1.15);
+    const ir = c.createBuffer(2, len, c.sampleRate);
+    for(let ch = 0; ch < 2; ch++){
+      const d = ir.getChannelData(ch);
+      for(let i = 0; i < len; i++){
+        /* noise under an exponential fall. The power sets how quickly the
+           tail dies: 2.6 is a small bright room rather than a cathedral. */
+        d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.6);
+      }
     }
-    if(base.error) return false;
-    const a = base.cloneNode();
-    a.volume = vol === undefined ? .6 : vol;
-    a.playbackRate = rate || 1;
-    const p = a.play();
-    if(p && p.catch) p.catch(()=>{});
-    return true;
-  }catch(e){ return false; }
+    verb = c.createConvolver(); verb.buffer = ir;
+    /* a real room eats the top end before it eats the bottom */
+    const damp = c.createBiquadFilter();
+    damp.type = 'lowpass'; damp.frequency.value = 3600;
+    verbIn = c.createGain(); verbIn.gain.value = 1;
+    verbIn.connect(damp); damp.connect(verb); verb.connect(master);
+  }
+  return verbIn;
+}
+/* dry to the speakers, and a measured amount of the same signal to the room */
+function out(node, wet){
+  const c = audio();
+  node.connect(master);
+  if(wet > 0){
+    const sendGain = c.createGain();
+    sendGain.gain.value = wet;
+    node.connect(sendGain); sendGain.connect(room());
+  }
 }
 
-/* ------------------------------------------------- the rest of the band
-   Everything above this point is a beep. These are the sounds that are not:
-   hands, a crowd, and the two or three jokes a game show lives on. All of it
-   is built here out of oscillators and noise, so there is nothing to license
-   and nothing to download. The jokes are deliberately occasional: a sad
-   trombone every single time stops being funny before the end of the round. */
+/* ----------------------------------------------------------------- voices */
 
-function maybe(p){ return Math.random() < p; }
+/* A bell. The partials of a struck bar are not whole multiples of the note,
+   which is the whole reason a bell sounds like a bell and a sine sounds like
+   a test tone, and the high ones have to die first or it rings like an
+   alarm. The noise burst on the front is the hammer hitting it. */
+function bell(f0, t0, gain, dur){
+  const c = audio();
+  [[1, 1, 1], [2.76, .54, .60], [5.40, .26, .36], [8.93, .12, .20]].forEach(function(p){
+    const ratio = p[0], amp = p[1], decay = p[2];
+    const o = c.createOscillator(), g = c.createGain();
+    o.type = 'sine'; o.frequency.value = f0 * ratio;
+    const d = dur * decay;
+    g.gain.setValueAtTime(.0001, t0);
+    g.gain.exponentialRampToValueAtTime(gain * amp, t0 + .004);
+    g.gain.exponentialRampToValueAtTime(.0001, t0 + d);
+    o.connect(g); out(g, .34);
+    o.start(t0); o.stop(t0 + d + .05);
+  });
+  hit(t0, .03, f0 * 4.2, 1.2, gain * .42);
+}
 
-/* The sad trombone. Three short notes falling a semitone each and a fourth
-   that slides away underneath them, each one opening and closing a lowpass
-   so it says wah rather than beep. */
+/* Brass. A sawtooth on its own is a buzz; what makes it a horn is the filter
+   opening fast on the attack and closing as the note sits. Two saws a few
+   cents apart give it width, and the triangle an octave down gives it a body
+   to stand on. */
+function brass(f, t, d, gain){
+  const c = audio();
+  const lp = c.createBiquadFilter();
+  lp.type = 'lowpass'; lp.Q.value = 1.2;
+  lp.frequency.setValueAtTime(420, t);
+  lp.frequency.exponentialRampToValueAtTime(Math.min(f * 5.5, 9000), t + .07);
+  lp.frequency.exponentialRampToValueAtTime(Math.min(f * 2.2, 6000), t + d);
+  const g = c.createGain();
+  g.gain.setValueAtTime(.0001, t);
+  g.gain.exponentialRampToValueAtTime(gain, t + .05);
+  g.gain.setValueAtTime(gain, t + d * .62);
+  g.gain.exponentialRampToValueAtTime(.0001, t + d);
+  [[1, 'sawtooth'], [1.006, 'sawtooth'], [.5, 'triangle']].forEach(function(v){
+    const o = c.createOscillator();
+    o.type = v[1]; o.frequency.value = f * v[0];
+    o.connect(lp); o.start(t); o.stop(t + d + .06);
+  });
+  lp.connect(g); out(g, .42);
+}
+
+/* ------------------------------------------------------------- the pieces */
+
+/* The ding. A bell climbing a semitone for each answer in a row, with a
+   second bell a fifth above it once the streak is worth marking. */
+function ding(step){
+  if(!soundOn) return;
+  const c = audio(), t0 = c.currentTime;
+  const k = Math.pow(2, Math.min(step || 0, 7) / 12);
+  bell(880 * k, t0, .30, .9);
+  if(step >= 2) bell(1318.5 * k, t0 + .055, .16, .7);
+  if(step >= 5) bell(1760 * k, t0 + .105, .10, .6);
+}
+
+/* The buzzer. Two saws a hair apart through a lowpass, with a square an
+   octave down under them, and no fade at either end: a buzzer is a switch
+   being thrown, so the envelope is square or it is not a buzzer. */
+function buzzer(){
+  const c = audio(), t0 = c.currentTime, d = .44;
+  const lp = c.createBiquadFilter();
+  lp.type = 'lowpass'; lp.frequency.value = 820; lp.Q.value = 3.2;
+  const g = c.createGain();
+  g.gain.setValueAtTime(.0001, t0);
+  g.gain.linearRampToValueAtTime(.20, t0 + .008);
+  g.gain.setValueAtTime(.20, t0 + d - .025);
+  g.gain.linearRampToValueAtTime(.0001, t0 + d);
+  [[110, 'sawtooth'], [110.9, 'sawtooth'], [55, 'square']].forEach(function(v){
+    const o = c.createOscillator();
+    o.type = v[1]; o.frequency.value = v[0];
+    o.connect(lp); o.start(t0); o.stop(t0 + d + .03);
+  });
+  lp.connect(g); out(g, .24);
+}
+
+/* The sad trombone. Three notes falling a semitone each and a fourth sliding
+   away underneath, each one opening and closing a lowpass so it says wah
+   rather than beep. Two saws a few cents apart, because one is a kazoo. */
 function trombone(){
   if(!soundOn) return;
   const c = audio();
-  const notes = [[233.1,.24],[220,.24],[207.7,.24],[185,.75]];
+  const notes = [[233.1, .24], [220, .24], [207.7, .24], [185, .78]];
   let t = c.currentTime;
-  notes.forEach(([f,d],i)=>{
-    const last = i === notes.length-1;
-    const o=c.createOscillator(), g=c.createGain(), lp=c.createBiquadFilter();
-    o.type='sawtooth';
-    o.frequency.setValueAtTime(f*1.04, t);
-    o.frequency.exponentialRampToValueAtTime(f, t+d*.45);
-    if(last) o.frequency.exponentialRampToValueAtTime(f*.84, t+d);
-    lp.type='lowpass'; lp.Q.value=7;
-    lp.frequency.setValueAtTime(640, t);
-    lp.frequency.exponentialRampToValueAtTime(1600, t+d*.3);
-    lp.frequency.exponentialRampToValueAtTime(480, t+d);
+  notes.forEach(function(n, i){
+    const f = n[0], d = n[1], last = i === notes.length - 1;
+    const g = c.createGain(), lp = c.createBiquadFilter();
+    lp.type = 'lowpass'; lp.Q.value = 6;
+    lp.frequency.setValueAtTime(600, t);
+    lp.frequency.exponentialRampToValueAtTime(1700, t + d * .3);
+    lp.frequency.exponentialRampToValueAtTime(460, t + d);
     g.gain.setValueAtTime(.0001, t);
-    g.gain.exponentialRampToValueAtTime(.15, t+.035);
-    g.gain.setValueAtTime(.15, t+d*.6);
-    g.gain.exponentialRampToValueAtTime(.0001, t+d);
-    o.connect(lp); lp.connect(g); g.connect(master);
-    o.start(t); o.stop(t+d+.05);
-    t += d*.9;
+    g.gain.exponentialRampToValueAtTime(.17, t + .035);
+    g.gain.setValueAtTime(.17, t + d * .6);
+    g.gain.exponentialRampToValueAtTime(.0001, t + d);
+    [1, 1.007].forEach(function(m){
+      const o = c.createOscillator();
+      o.type = 'sawtooth';
+      o.frequency.setValueAtTime(f * 1.04 * m, t);
+      o.frequency.exponentialRampToValueAtTime(f * m, t + d * .45);
+      if(last) o.frequency.exponentialRampToValueAtTime(f * .84 * m, t + d);
+      o.connect(lp); o.start(t); o.stop(t + d + .06);
+    });
+    lp.connect(g); out(g, .3);
+    t += d * .9;
   });
 }
 
@@ -1001,68 +1111,98 @@ function trombone(){
    down and shrinks. */
 function boing(){
   if(!soundOn) return;
-  const c=audio(), t0=c.currentTime, o=c.createOscillator(), g=c.createGain();
-  const lfo=c.createOscillator(), lg=c.createGain();
-  o.type='sine';
+  const c = audio(), t0 = c.currentTime, o = c.createOscillator(), g = c.createGain();
+  const lfo = c.createOscillator(), lg = c.createGain();
+  o.type = 'sine';
   o.frequency.setValueAtTime(720, t0);
-  o.frequency.exponentialRampToValueAtTime(140, t0+.42);
-  lfo.type='sine';
+  o.frequency.exponentialRampToValueAtTime(140, t0 + .42);
+  lfo.type = 'sine';
   lfo.frequency.setValueAtTime(23, t0);
-  lfo.frequency.exponentialRampToValueAtTime(6, t0+.42);
+  lfo.frequency.exponentialRampToValueAtTime(6, t0 + .42);
   lg.gain.setValueAtTime(165, t0);
-  lg.gain.exponentialRampToValueAtTime(6, t0+.42);
+  lg.gain.exponentialRampToValueAtTime(6, t0 + .42);
   lfo.connect(lg); lg.connect(o.frequency);
-  g.gain.setValueAtTime(.0001,t0);
-  g.gain.exponentialRampToValueAtTime(.3, t0+.012);
-  g.gain.setValueAtTime(.3, t0+.16);
-  g.gain.exponentialRampToValueAtTime(.0001, t0+.58);
-  o.connect(g); g.connect(master);
-  o.start(t0); lfo.start(t0); o.stop(t0+.62); lfo.stop(t0+.62);
+  g.gain.setValueAtTime(.0001, t0);
+  g.gain.exponentialRampToValueAtTime(.3, t0 + .012);
+  g.gain.setValueAtTime(.3, t0 + .16);
+  g.gain.exponentialRampToValueAtTime(.0001, t0 + .58);
+  o.connect(g); out(g, .3);
+  o.start(t0); lfo.start(t0); o.stop(t0 + .62); lfo.stop(t0 + .62);
 }
 
-/* Ba-dum-tss. Two toms and a cymbal, the oldest joke in sound. */
+/* Ba-dum-tss. Two toms and a cymbal. The crack on the snare is a noise burst
+   and not a tone: that is the part a sine cannot do, and the part that makes
+   the joke land. */
 function rimshot(){
   if(!soundOn) return;
-  const c=audio(), t0=c.currentTime;
-  [[0,190],[.135,140]].forEach(([at,f])=>{
-    const o=c.createOscillator(), g=c.createGain();
-    o.type='sine';
-    o.frequency.setValueAtTime(f*2, t0+at);
-    o.frequency.exponentialRampToValueAtTime(f*.7, t0+at+.16);
-    g.gain.setValueAtTime(.0001, t0+at);
-    g.gain.exponentialRampToValueAtTime(.26, t0+at+.006);
-    g.gain.exponentialRampToValueAtTime(.0001, t0+at+.19);
-    o.connect(g); g.connect(master); o.start(t0+at); o.stop(t0+at+.21);
+  const c = audio(), t0 = c.currentTime;
+  [[0, 190], [.135, 140]].forEach(function(v){
+    const at = v[0], f = v[1];
+    const o = c.createOscillator(), g = c.createGain();
+    o.type = 'triangle';
+    o.frequency.setValueAtTime(f * 2, t0 + at);
+    o.frequency.exponentialRampToValueAtTime(f * .7, t0 + at + .16);
+    g.gain.setValueAtTime(.0001, t0 + at);
+    g.gain.exponentialRampToValueAtTime(.26, t0 + at + .005);
+    g.gain.exponentialRampToValueAtTime(.0001, t0 + at + .19);
+    o.connect(g); out(g, .22);
+    o.start(t0 + at); o.stop(t0 + at + .21);
+    hit(t0 + at, .045, 1900, .8, .11);          // the stick on the rim
   });
-  const src=c.createBufferSource(); src.buffer=whiteBuffer(); src.loop=true;
-  const hp=c.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=5400;
-  const g=c.createGain();
-  g.gain.setValueAtTime(.0001, t0+.265);
-  g.gain.exponentialRampToValueAtTime(.18, t0+.28);
-  g.gain.exponentialRampToValueAtTime(.0001, t0+1.0);
-  src.connect(hp); hp.connect(g); g.connect(master);
-  src.start(t0+.265); src.stop(t0+1.05);
+  /* the cymbal: bright noise, long, and sent further into the room than
+     anything else, because that is where a crash lives */
+  const src = c.createBufferSource(); src.buffer = whiteBuffer(); src.loop = true;
+  const hp = c.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 5200;
+  const g = c.createGain();
+  g.gain.setValueAtTime(.0001, t0 + .27);
+  g.gain.exponentialRampToValueAtTime(.16, t0 + .283);
+  g.gain.exponentialRampToValueAtTime(.0001, t0 + .95);
+  src.connect(hp); hp.connect(g); out(g, .5);
+  src.start(t0 + .27); src.stop(t0 + 1);
 }
 
-/* Ding ding ding: the bell on a fairground stall, for a long streak. */
+/* Ten in a row. Three bells climbing in whole tones, the oldest "you have won
+   something" sound there is. */
 function jackpot(){
   if(!soundOn) return;
-  [0,.135,.27].forEach((at,i)=>{
-    const k = Math.pow(2, i*2/12);
-    tone(1046.5*k, at, .34, 'triangle', .17);
-    tone(2093*k,  at, .2,  'sine', .06);
+  const c = audio(), t0 = c.currentTime;
+  [0, .135, .27].forEach(function(at, i){
+    const k = Math.pow(2, i * 2 / 12);
+    bell(1046.5 * k, t0 + at, .20, .8);
   });
 }
 
-function ding(step){ if(!soundOn) return;
-  const k = Math.pow(2,(Math.min(step||0,7))/12);   // climbs a semitone per streak
-  if(sfx('right', k, .55)){
-    // from the third in a row, a low note lands under it and gives it weight
-    if(step >= 2) setTimeout(()=>sfx('low', 0.8 + step*0.04, .3), 18);
-    return;
-  }
-  tone(880*k,0,.14,'sine',.25); tone(1318.5*k,.1,.3,'sine',.22);
+/* The end of a round. C E G C on brass, which is the shape every fanfare
+   that has ever been written takes. */
+function fanfare(){
+  if(!soundOn) return;
+  const c = audio(), t0 = c.currentTime;
+  [[523.25, 0, .26], [659.25, .125, .26], [783.99, .25, .26], [1046.5, .375, .9]]
+    .forEach(function(n){ brass(n[0], t0 + n[1], n[2], .12); });
 }
+
+/* Hands. Filtered noise cannot be a crowd on its own, so this is a few dozen
+   separate claps scattered across a second and a half, which is what a crowd
+   actually is. Only for a round worth clapping. */
+function applause(){
+  if(!soundOn) return;
+  const c = audio(), t0 = c.currentTime;
+  for(let i = 0; i < 46; i++){
+    const at = t0 + Math.pow(Math.random(), .6) * 1.5;
+    hit(at, .035 + Math.random() * .03, 1200 + Math.random() * 2200, .7, .035 + Math.random() * .03);
+  }
+  /* the room underneath them, which is what turns claps into a hall */
+  const src = c.createBufferSource(); src.buffer = whiteBuffer(); src.loop = true;
+  const bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 1500; bp.Q.value = .7;
+  const g = c.createGain();
+  g.gain.setValueAtTime(.0001, t0);
+  g.gain.exponentialRampToValueAtTime(.03, t0 + .25);
+  g.gain.setValueAtTime(.03, t0 + .9);
+  g.gain.exponentialRampToValueAtTime(.0001, t0 + 1.7);
+  src.connect(bp); bp.connect(g); out(g, .6);
+  src.start(t0); src.stop(t0 + 1.8);
+}
+
 /* `given` is true when the word has just been handed over, which is the moment
    the trombone is for. A first wrong guess still has a go left in it, so that
    one mostly stays a buzzer with the occasional ba-dum-tss. */
@@ -1072,26 +1212,44 @@ function buzz(given){
   const jokes = given ? ['trombone','trombone','boing','buzzer','buzzer']
                       : ['buzzer','buzzer','buzzer','buzzer','rimshot','boing'];
   let pick;
-  do { pick = jokes[(Math.random()*jokes.length)|0]; }
+  do { pick = jokes[(Math.random() * jokes.length) | 0]; }
   while(pick !== 'buzzer' && pick === lastJoke);     // never the same gag twice running
   lastJoke = pick;
   if(pick === 'trombone'){ trombone(); return; }
   if(pick === 'boing'){ boing(); return; }
   if(pick === 'rimshot'){ rimshot(); return; }
-  if(sfx('wrong', .96 + Math.random()*.08, .6)) return;
-  tone(170,0,.34,'square',.16,110); tone(85,0,.34,'sawtooth',.08); hit(audio().currentTime,.12,420,1.4,.07);
+  buzzer();
 }
-function pip(){ if(!soundOn) return; if(sfx('hint', 1, .5)) return; tone(1560,0,.07,'sine',.1); }
-function fanfare(){ if(!soundOn) return;
-  [523,659,784,1046].forEach((f,i)=>tone(f,i*.11,.32,'triangle',.2));
+
+/* The last three seconds on the clock. A dry wooden knock. */
+function tick(){
+  if(!soundOn) return;
+  const c = audio(), t0 = c.currentTime, o = c.createOscillator(), g = c.createGain();
+  o.type = 'triangle';
+  o.frequency.setValueAtTime(1100, t0);
+  o.frequency.exponentialRampToValueAtTime(820, t0 + .05);
+  g.gain.setValueAtTime(.0001, t0);
+  g.gain.exponentialRampToValueAtTime(.12, t0 + .003);
+  g.gain.exponentialRampToValueAtTime(.0001, t0 + .07);
+  o.connect(g); out(g, .18);
+  o.start(t0); o.stop(t0 + .09);
+  hit(t0, .02, 2600, 1.4, .05);
+}
+
+/* The letter and the clue. A short wooden pluck, not a beep. */
+function pip(){
+  if(!soundOn) return;
+  const c = audio(), t0 = c.currentTime;
+  bell(1174.7, t0, .13, .34);
 }
 
 /* ------------------------------------------------------------------ motion */
 const REDUCED = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-/* Gold, two warm whites and one green. The old set had pink and blue in it and
-   read as a party popper; a narrow palette is what makes it look paid for. */
-const CF_COLOURS = ['#ffc53d','#f6e7bf','#ffffff','#e0a92b','#35d07f'];
-const CF_GOLD    = ['#ffc53d','#f6e7bf','#ffffff','#e0a92b'];
+/* The page is cream now, so the white and the pale gold that used to read as
+   confetti on near-black are invisible on it. These are the page's own
+   colours at full strength, which is what shows up on paper. */
+const CF_COLOURS = ['#FF9D3D','#1FB573','#5B9EF7','#A78BFA','#F2685F','#FFC178'];
+const CF_GOLD    = ['#FF9D3D','#F0851C','#FFC178','#FFB05C'];
 
 /* ------------------------------------------------- borrowed libraries */
 /* tsParticles, Rough Notation and canvas-confetti, all local files, all MIT.
@@ -1106,7 +1264,7 @@ function backdrop(){
       fpsLimit:45,
       particles:{
         number:{value:34, density:{enable:true, area:1100}},
-        color:{value:['#ffc53d','#f3e6c8','#ffffff']},
+        color:{value:['#FF9D3D','#FFC178','#A78BFA']},
         opacity:{value:{min:.04,max:.15}, animation:{enable:true, speed:.25, sync:false, minimumValue:.03}},
         size:{value:{min:.8,max:2}},
         move:{enable:true, speed:.13, direction:'top', straight:false,
@@ -1224,6 +1382,11 @@ function bump(el){
 
 function countTo(el, to, ms){
   if(REDUCED){ el.textContent = to; return; }
+  /* However the count goes, the number has to end up being the score. A tween
+     that is killed, or a tab that stops being given frames part way through,
+     would otherwise leave somebody reading the wrong result for good. Same
+     reasoning as the net under the entrance animations. */
+  setTimeout(function(){ el.textContent = to; }, (ms || 900) + 350);
   const g = G();
   if(g){
     /* expo.out spends its time near the end, so the number lands on the final
@@ -1363,7 +1526,7 @@ function panelIn(p){
         setTimeout(back, 1400);
       }catch(e){ back(); }
     }
-    riseIn(p.querySelectorAll('.score-big, .grade'), {y:18, duration:.7, stagger:.07, delay:.1});
+    riseIn(p.querySelectorAll('.score-big, .grade, .grade-sub'), {y:18, duration:.7, stagger:.07, delay:.1});
   }
 }
 
@@ -1462,7 +1625,7 @@ function startClock(){
     fill.style.width=(k*100)+'%';
     fill.style.background = k<.25 ? 'var(--red)' : (k<.5 ? '#ffa94d' : 'var(--gold)');
     const secs=Math.ceil(left/1000);
-    if(secs<=3 && secs>0 && secs!==lastTick){ lastTick=secs; if(soundOn && !sfx('tick', 1, .4)) tone(1250,0,.05,'square',.07); }
+    if(secs<=3 && secs>0 && secs!==lastTick){ lastTick=secs; if(soundOn) tick(); }
     if(left<=0){ stopClock(); if(!answered) judge(null); return; }
     clockRAF=requestAnimationFrame(step);
   });
@@ -1522,7 +1685,7 @@ function giveLetter(){
   let n = 0;
   while(n < cur.length && n < word.length && cur[n].toLowerCase() === word[n].toLowerCase()) n++;
   g.value = word.slice(0, n+1);
-  sizeGap('');
+  sizeGap();
   usedHint = true;
   pip();
   if(g.value.length >= word.length){
@@ -1712,6 +1875,13 @@ function render(){
   $('card').className='card';
   $('feedback').innerHTML='';
 
+  /* Idiom, proverb or simile. A learner should be told which of the three
+     they are looking at, and it gives the card a bit of colour. */
+  const kind = it.t || 'idiom';
+  const chip = $('typeChip');
+  chip.className = 'typechip ' + kind;
+  chip.textContent = kind.charAt(0).toUpperCase() + kind.slice(1);
+
   $('prompt').innerHTML = promptHTML(it.p);
   fitPrompt();
   promptIn($('prompt'));
@@ -1723,9 +1893,10 @@ function render(){
   setTimeout(()=>{ const g=$('gapInput'); if(g) g.focus(); },60);
   startClock();
 }
-/* A prompt can mark the idiom inside a carrier sentence with braces, so the
-   idiom and the words around it can be told apart. "He {got cold ___} the
-   night before the wedding" dims everything outside the braces. */
+/* A prompt marks the idiom inside its sentence with braces. Everything
+   outside them is the context, dimmed so the idiom still leads. All 255 of
+   them carry one, and showing it is the difference between "deep ___" and
+   "let us do a deep ___ into the numbers". */
 /* The sentences run from 20 to 82 characters, so one fixed size either leaves a
    short prompt looking lost or breaks a long one over four ragged lines. Find
    the biggest size that still sits inside three lines, by halving the range and
@@ -1735,7 +1906,7 @@ function render(){
    box to what has actually been typed instead, up from a fixed minimum: the
    minimum never changes, so an empty gap says nothing about the answer, and a
    long word is never squeezed. */
-const GAP_MIN_CH = 5;
+const GAP_FIXED_CH = 7;
 let gapRuler = null;
 function gapTextWidth(el, text){
   if(!gapRuler){
@@ -1752,63 +1923,33 @@ function gapTextWidth(el, text){
   gapRuler.textContent = text || '';
   return gapRuler.offsetWidth;
 }
-/* Pass the answer as reserveText to hold the box open at the width it will
-   reach. The prompt is measured that way, so typing the answer cannot re-wrap
-   the sentence under the student's hands. Counting in '0' widths is not enough:
-   uppercase Anton is wider than its digits, so eight real letters overflowed a
-   ten-digit reserve. */
-function sizeGap(reserveText){
+/* One width on every question. 239 of the 255 answers fit inside it, so the
+   sentence almost never reflows while somebody types, and because the width
+   never changes with the question it says nothing about the answer. The 16
+   long ones push it wider rather than being squeezed. */
+function sizeGap(){
   const g = $('gapInput'); if(!g) return;
   const unit = gapTextWidth(g, '0') || 10;          // room for the caret
-  const floor = Math.max(unit * GAP_MIN_CH,
-                         reserveText ? gapTextWidth(g, reserveText) + unit : 0);
+  const floor = unit * GAP_FIXED_CH;
   const typed = gapTextWidth(g, g.value) + unit;
   g.style.width = Math.round(Math.max(floor, typed)) + 'px';
 }
 
-/* 56 measured out best across the set: 224 of 255 idioms sit on one line and
-   only 4 change line count as the answer is typed. 64 looks punchier on a short
-   one but puts 56 of them on two lines and trebles the jumping. */
-const PROMPT_MAX = 56, PROMPT_MIN = 26, PROMPT_COMFY = 30;
-function promptLineCount(el){
-  const r = document.createRange(); r.selectNodeContents(el);
-  const lh = parseFloat(getComputedStyle(el).lineHeight) || 20;
-  /* the gap box sits a pixel or two off the text baseline, so group the rects
-     rather than counting distinct tops, or every card reads one line too many */
-  const tops = [...r.getClientRects()].filter(x => x.height > 2).map(x => x.top).sort((a,b) => a-b);
-  let lines = 0, last = -1e9;
-  for(const t of tops){ if(t - last > lh * 0.55){ lines++; last = t; } }
-  return lines || 1;
-}
-function fitPrompt(){
-  const el = $('prompt'); if(!el || !el.clientWidth) return;
-  const biggest = max => {
-    const fits = px => {
-      el.style.fontSize = px.toFixed(1) + 'px';
-      sizeGap(deck[idx] ? deck[idx].a : '');
-      return promptLineCount(el) <= max;
-    };
-    if(fits(PROMPT_MAX)) return PROMPT_MAX;
-    let lo = PROMPT_MIN, hi = PROMPT_MAX;
-    for(let i = 0; i < 7; i++){ const mid = (lo + hi) / 2; if(fits(mid)) lo = mid; else hi = mid; }
-    return lo;
-  };
-  /* three lines is the tidy shape, but on a narrow phone holding to three would
-     shrink the longest sentences to nothing, so there a fourth line is kinder */
-  let fs = biggest(3);
-  if(fs < PROMPT_COMFY) fs = Math.max(fs, biggest(4));
-  el.style.fontSize = fs.toFixed(1) + 'px';
-  sizeGap('');
-}
+/* The prompt is no longer refitted to the card. It is a sentence set at a
+   reading size by a clamp in the sheet, and it wraps like a sentence. The
+   measuring that used to happen here is what made the card jump, and a
+   headline size is the wrong size for something you are meant to read. */
+function fitPrompt(){ sizeGap(); }
 
 const GAP_HTML = '<input class="gap" id="gapInput" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="?">';
-/* Only the idiom goes on the card. The sentence round it used to be there to
-   give context, but it made every card a different length, so the type resized
-   and the whole line jumped about as soon as a word was typed into the gap.
-   The clue and the letter do the job the sentence was doing. */
+/* The whole sentence goes on the card. The idiom is in full ink, the words
+   around it are lighter: enough to make the answer gettable and to show the
+   idiom being used, without taking the eye off the gap. */
 function promptHTML(p){
   const m = p.match(/^([^{]*)\{([^}]*)\}([\s\S]*)$/);
-  return esc(m ? m[2] : p).replace('___', GAP_HTML);
+  if(!m) return esc(p).replace('___', GAP_HTML);
+  const dim = t => t ? '<span class="lead">' + esc(t) + '</span>' : '';
+  return dim(m[1]) + esc(m[2]).replace('___', GAP_HTML) + dim(m[3]);
 }
 function bare(s){ return s.replace(/[{}]/g, ''); }
 function label(it){ return it.k || bare(it.p).replace('___', it.a); }
@@ -1827,7 +1968,7 @@ function judge(given){
     const card=$('card');
     card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');
     const g=$('gapInput');
-    if(g){ g.value=''; sizeGap(''); g.focus(); }
+    if(g){ g.value=''; sizeGap(); g.focus(); }
     $('feedback').innerHTML = '<div class="retry">Not that one<span>One more guess. Leave it empty if you want the answer.</span></div>';
     return;
   }
@@ -1882,7 +2023,7 @@ function advance(){
   if(idx>=deck.length) finish(); else render();
 }
 
-$('card').addEventListener('input', e => { if(e.target.id === 'gapInput') sizeGap(''); });
+$('card').addEventListener('input', e => { if(e.target.id === 'gapInput') sizeGap(); });
 $('card').addEventListener('click',()=>{ if(answered) advance(); });
 
 /* Enter on a keyboard and the green button on a phone do the same thing:
@@ -1911,9 +2052,12 @@ function finish(){
   const pct=Math.round(score/total*100);
   countTo($('finalScore'), score, 900);
   $('finalTotal').textContent=results.length;
-  const grade = pct===100 ? 'Perfect run' : pct>=85 ? 'Native-ish' : pct>=70 ? 'Strong' :
-                pct>=50 ? 'Getting there' : 'Worth another go';
-  $('grade').textContent = `${pct}% correct · best streak ${best} · ${grade}`;
+  /* The friendly line leads and the numbers sit under it. The other way round
+     is a scoreboard, and nobody wants to be read their statistics. */
+  const grade = pct===100 ? 'Perfect run!' : pct>=85 ? 'Brilliant' : pct>=70 ? 'Really good' :
+                pct>=50 ? 'Getting there' : 'Good start';
+  $('grade').textContent = grade;
+  $('gradeSub').textContent = `${pct}% correct, best streak ${best}`;
   const missed=results.filter(r=>!r.ok);
   const second=results.filter(r=>r.ok && !r.firstTry);
   const got=results.filter(r=>r.firstTry);
@@ -1938,9 +2082,9 @@ function finish(){
   $('sheetBtn').textContent = 'Download these '+results.length;
   $('sheetBtn').disabled = results.length === 0;
   if(pct===100){
-    fanfare(); setTimeout(()=>fireworks(1400), 260);
+    fanfare(); setTimeout(applause, 520); setTimeout(()=>fireworks(1400), 260);
   }
-  else if(pct>=80){ fanfare(); setTimeout(()=>fireworks(1100), 260); }
+  else if(pct>=80){ fanfare(); setTimeout(applause, 520); setTimeout(()=>fireworks(1100), 260); }
   else if(pct < 35){ setTimeout(trombone, 260); }   // it has to be said
   else if(pct>=50){ setTimeout(()=>confettiBurst($('review'), 24), 200); }
   show(endPanel);
