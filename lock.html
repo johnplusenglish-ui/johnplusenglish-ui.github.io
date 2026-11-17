@@ -32,6 +32,7 @@
   --c-office:#1E6F8C;
   --c-gym:#4A7C2F;
   --c-shop:#8A5A2B;
+  --c-rooms:#6B5BA6;
 }
 *{box-sizing:border-box}
 html,body{height:100%}
@@ -107,6 +108,26 @@ body{
 .link-office {--dot:var(--c-office)}
 .link-gym    {--dot:var(--c-gym)}
 .link-shop   {--dot:var(--c-shop)}
+/* ---------- Word Rooms: one card that opens into its four places ----------
+   The drawer is a 0fr to 1fr grid row, so it animates to the height of whatever
+   is inside it without anybody having to measure anything. */
+.group{display:flex;flex-direction:column}
+.link-toggle{width:100%;text-align:left;font-family:inherit;cursor:pointer}
+.link-toggle .go svg{transition:transform .35s var(--e-soft)}
+.group.open .link-toggle .go svg{transform:rotate(180deg)}
+.sublinks{display:grid;grid-template-rows:0fr;transition:grid-template-rows .35s var(--e-soft)}
+.group.open .sublinks{grid-template-rows:1fr}
+.sublinks > .inner{overflow:hidden;display:flex;flex-direction:column;gap:.6rem}
+.group.open .sublinks > .inner{padding-top:.6rem}
+.sublinks > .inner{transition:padding-top .35s var(--e-soft)}
+.link.sub{margin-left:1.6rem;padding:.95rem 1.25rem;font-size:.98rem;border-radius:13px}
+.link.sub .go{width:28px;height:28px}
+.link.sub .go svg{width:14px;height:14px}
+@media (max-width:520px){.link.sub{margin-left:.9rem}}
+@media (prefers-reduced-motion: reduce){
+  .sublinks,.sublinks > .inner,.link-toggle .go svg{transition:none}
+}
+.link-rooms  {--dot:var(--c-rooms)}
 
 /* ---------- socials ---------- */
 .social{display:flex;justify-content:center;gap:.6rem;margin-top:3.4rem}
@@ -172,22 +193,32 @@ body{
       Idiom Game
       <span class="go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
     </a>
-    <a class="link link-rome" href="rome-flat.html">
-      Rome Flat
-      <span class="go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
-    </a>
-    <a class="link link-office" href="office.html">
-      The Office
-      <span class="go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
-    </a>
-    <a class="link link-gym" href="gym.html">
-      The Gym
-      <span class="go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
-    </a>
-    <a class="link link-shop" href="shop.html">
-      The Shop
-      <span class="go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
-    </a>
+    <div class="group" id="rooms-group">
+      <button class="link link-toggle link-rooms" type="button" aria-expanded="false" aria-controls="rooms-list">
+        Word Rooms
+        <span class="go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></span>
+      </button>
+      <div class="sublinks" id="rooms-list">
+        <div class="inner">
+          <a class="link sub link-rome" href="rome-flat.html">
+            Rome Flat
+            <span class="go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+          </a>
+          <a class="link sub link-office" href="office.html">
+            The Office
+            <span class="go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+          </a>
+          <a class="link sub link-gym" href="gym.html">
+            The Gym
+            <span class="go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+          </a>
+          <a class="link sub link-shop" href="shop.html">
+            The Shop
+            <span class="go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+          </a>
+        </div>
+      </div>
+    </div>
   </nav>
 
   <div class="social">
@@ -210,6 +241,21 @@ body{
 </div>
 <!-- GSAP, self-hosted, the same copy the idiom game uses. Deferred, and every
      use of it is guarded: with the file missing the page is simply static. -->
+<script>
+/* Word Rooms opens and closes. This is behaviour, not decoration, so it sits
+   outside the motion block and works whatever the device has been asked for.
+   The drawer's own animation is CSS, and that CSS turns itself off for
+   reduced motion, so the card still opens, just without the slide. */
+(function(){
+  var g = document.getElementById('rooms-group');
+  if(!g) return;
+  var btn = g.querySelector('.link-toggle');
+  btn.addEventListener('click', function(){
+    var open = g.classList.toggle('open');
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+})();
+</script>
 <script src="assets/vendor/gsap.min.js" defer></script>
 <script>
 /* ------------------------------------------------------------- motion */
@@ -237,7 +283,7 @@ body{
      makes using from() safe at all. */
   addEventListener('DOMContentLoaded', function(){
     var g = window.gsap;
-    var nodes = [].slice.call(document.querySelectorAll('.logo, .link, .social, .login-toggle'));
+    var nodes = [].slice.call(document.querySelectorAll('.logo, .link:not(.sub), .social, .login-toggle'));
     function rest(){
       /* Stop the tween before clearing, or a tween still in flight writes its
          values again straight afterwards and the links keep the offset. */
