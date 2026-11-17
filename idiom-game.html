@@ -375,6 +375,17 @@
   .hint-btn:hover:not(:disabled){color:var(--accent-deep);border-color:var(--accent);
     transform:translateY(-2px);box-shadow:var(--lift-2)}
   .hint-btn:disabled{opacity:.4;cursor:default}
+  /* The next step, once a question has been answered. It takes the place of
+     the two hint buttons, which have nothing left to offer by then, so the
+     row neither grows nor empties. */
+  .next-btn{
+    background:linear-gradient(180deg,#FFB05C 0%,#FF9D3D 50%,#F58A20 100%);
+    border-color:transparent;color:#fff;font-size:14.5px;padding:12px 26px;
+    box-shadow:inset 0 1.5px 0 rgba(255,255,255,.5), 0 10px 22px -10px rgba(255,157,61,.7);
+  }
+  .next-btn:hover:not(:disabled){color:#fff;border-color:transparent;
+    box-shadow:inset 0 1.5px 0 rgba(255,255,255,.55), 0 16px 30px -12px rgba(255,157,61,.8)}
+  .next-btn[hidden]{display:none}
 
   /* ---------- trophy ---------- */
   .trophy{display:flex;justify-content:center;margin-bottom:6px}
@@ -557,6 +568,7 @@
     <div class="helprow">
       <button class="hint-btn" id="hintBtn">Give me a letter</button>
       <button class="hint-btn" id="clueBtn">Give me a clue</button>
+      <button class="hint-btn next-btn" id="nextBtn" hidden>Next question</button>
     </div>
 
 
@@ -1866,6 +1878,7 @@ $('prePdfLabel').textContent = 'Download all ' + IDIOMS.length + ' as a PDF';
 function render(){
   answered=false; tries=0; usedHint=false;
   $('hintBtn').hidden=false; $('hintBtn').disabled=false; $('hintBtn').textContent='Give me a letter';
+  $('nextBtn').hidden=true;
   $('clueBtn').hidden = (clueWhen === 'before');   // nothing to ask for if it is already showing
   const it=deck[idx];
   $('counter').textContent = `Question ${idx+1} of ${deck.length}`;
@@ -1974,9 +1987,12 @@ function judge(given){
   }
 
   answered=true;
+  answeredAt=Date.now();
   stopClock();
   $('hintBtn').hidden=true;
   $('clueBtn').hidden=true;
+  /* the hint buttons have nothing left to give; the next step takes their place */
+  $('nextBtn').hidden=false;
 
   const g=$('gapInput');
   const span=document.createElement('span');
@@ -2018,13 +2034,24 @@ function judge(given){
   document.activeElement && document.activeElement.blur();
 }
 
+/* Nothing may move the round on for this long after an answer. The meaning
+   and the example appear at the moment answered becomes true, and without
+   this a key still held down, or the second half of a double tap, carries
+   them off the screen before they have been read. */
+const READ_PAUSE = 800;
+let answeredAt = 0;
 function advance(){
+  if(answered && Date.now() - answeredAt < READ_PAUSE) return;
   idx++;
   if(idx>=deck.length) finish(); else render();
 }
 
 $('card').addEventListener('input', e => { if(e.target.id === 'gapInput') sizeGap(); });
-$('card').addEventListener('click',()=>{ if(answered) advance(); });
+/* The card used to advance when it was tapped anywhere. Together with the
+   green button sitting inside it, that is what made one tap answer the
+   question and skip the answer in the same breath. Moving on is a choice
+   now, and there are three deliberate ways to make it. */
+$('nextBtn').addEventListener('click', e => { e.preventDefault(); advance(); });
 
 /* Enter on a keyboard and the green button on a phone do the same thing:
    answer the question, or move on once it has been answered. */
@@ -2041,6 +2068,7 @@ document.addEventListener('keydown',e=>{
 });
 $('goBtn').addEventListener('click', e=>{
   e.preventDefault();
+  e.stopPropagation();        // never let one tap answer and then advance
   submitOrAdvance();
   const g = $('gapInput');
   if(g) g.focus();          // keep the keyboard up for the next one
