@@ -116,7 +116,7 @@ h1{font-size:26px;line-height:1.1;margin:0;font-weight:700;letter-spacing:-.01em
 .pin{position:absolute;z-index:5;width:max-content}
 .pin.glide{transition:margin .38s var(--soft)}
 .pin.leaving{pointer-events:none}
-.pill{position:relative;display:block;padding:4px 9px;border-radius:7px;white-space:nowrap;font-size:13px;font-weight:600;line-height:1.2;color:#0e1013;
+.pill{position:relative;display:block;padding:4px 9px;border-radius:7px;white-space:nowrap;font-size:13px;font-weight:600;line-height:1.2;color:#0e1013;text-align:center;
   background:rgba(255,255,255,.56);backdrop-filter:blur(14px) saturate(180%);-webkit-backdrop-filter:blur(14px) saturate(180%);
   border:1px solid rgba(255,255,255,.75);box-shadow:0 6px 18px rgba(10,12,16,.26),inset 0 1px 0 rgba(255,255,255,.85);
   cursor:pointer;will-change:transform,opacity;transition:background .3s,box-shadow .3s}
@@ -151,15 +151,16 @@ h1{font-size:26px;line-height:1.1;margin:0;font-weight:700;letter-spacing:-.01em
    A teacher picks what the class works with. A word switched off loses its dot
    and its label together, and drops out of Explore, out of Find it and out of
    the count. The picture never changes: only what is named on it. */
-/* ---------- phonetics ----------
-   Two buttons, one job each: whether the sounds are shown at all, and which
-   English they are the sounds of. The second only appears once the first is on.
-   On a narrow screen the first says IPA, because the row has to stay one row. */
-.phonbtn .short,.accbtn .eg{display:none}
+/* ---------- phonetics, and saving the picture ----------
+   Two buttons for the phonetics, one job each: whether the sounds are shown at
+   all, and which English they are the sounds of. The second only appears once
+   the first is on. A button with two labels wears the short one on a narrow
+   screen, because the row of buttons has to stay one row. */
+.twolab .short,.accbtn .eg{display:none}
 .accbtn{font-family:var(--ipa)}
 .accbtn .eg{font-size:11px;opacity:.6;margin-left:6px}
 @media (min-width:860px){.accbtn .eg{display:inline}}
-@media (max-width:640px){.phonbtn .long{display:none}.phonbtn .short{display:inline}}
+@media (max-width:640px){.twolab .long{display:none}.twolab .short{display:inline}}
 .wordsbtn .n{font-family:var(--mono);font-size:11px;margin-left:6px;opacity:.55}
 .wordsbtn[data-some="1"]{background:var(--accent);color:#fff;border-color:var(--accent)}
 .wordsbtn[data-some="1"] .n{opacity:.85}
@@ -356,8 +357,9 @@ body.presenting{overflow:hidden}
       <button data-mode="find" aria-pressed="false">Find it</button>
     </div>
     <button class="btn wordsbtn" id="words">Words<span class="n" id="wordsn"></span></button>
-    <button class="btn phonbtn" id="phon" aria-pressed="false"><span class="long">Phonetics</span><span class="short">IPA</span></button>
+    <button class="btn twolab" id="phon" aria-pressed="false"><span class="long">Phonetics</span><span class="short">IPA</span></button>
     <button class="btn accbtn" id="acc" hidden><span class="nm">British</span><span class="eg" id="accheg"></span></button>
+    <button class="btn twolab" id="png"><span class="long">Save PNG</span><span class="short">PNG</span></button>
     <span class="spacer"></span>
     <button class="btn" id="dots" aria-pressed="true">Dots</button>
     <button class="btn" id="all">Show all</button>
@@ -809,7 +811,7 @@ function renderForm(){
 function status(){
   var n=inPlay().length, f=Object.keys(found).filter(function(id){var s=byId(id);return s&&live(s);}).length;
   drawWordsBtn();
-  if(mode==='explore'){countEl.innerHTML='<b>'+f+'</b> of '+n+' words opened';sub.textContent='Click anything in the picture to see what it is called.';foot.innerHTML='<b>Tip:</b> press Hide all for a clean picture, then see how many things you can name before you click. <b>Words</b> picks the set the class works with, and <b>Phonetics</b> shows how each one is said.';}
+  if(mode==='explore'){countEl.innerHTML='<b>'+f+'</b> of '+n+' words opened';sub.textContent='Click anything in the picture to see what it is called.';foot.innerHTML='<b>Tip:</b> press Hide all for a clean picture, then see how many things you can name before you click. <b>Words</b> picks the set the class works with, <b>Phonetics</b> shows how each one is said, and <b>Save PNG</b> writes the picture out with every word on it.';}
   else if(mode==='find'){sub.textContent='Read the word, then click that thing in the picture.';foot.textContent='';}
   else{countEl.innerHTML='<b>'+n+'</b> hotspots';sub.textContent='Click the picture to add a word. Drag a dot to move it. Click a dot to change the word or where its label sits.';foot.innerHTML='Changes are saved in this browser. <b>Copy data</b> gives the list to paste back to Claude so it becomes the built-in set.';}
 }
@@ -1029,6 +1031,105 @@ task.addEventListener('click',function(e){
     if(e.target.dataset.sure){try{localStorage.removeItem(KEY);}catch(err){}spots=JSON.parse(JSON.stringify(BUILT_IN));sel=null;drawTask('Back to the built-in set.','good');render();}
     else{e.target.dataset.sure='1';e.target.textContent='Click again to reset';}
   }
+});
+
+/* ---------------- the picture with the words on it ----------------
+   A room, labelled, as one PNG: a handout, a slide, something to print and put
+   on the wall. The labels are not worked out again for the file, they are read
+   off the page, so what is saved is exactly what the class was looking at,
+   including whether the phonetics are showing. The file is the size of the
+   original photograph, not of the screen, so it stays sharp when printed.
+   One thing cannot survive the trip: frosted glass needs to blur what is behind
+   it, and a flat picture has no behind. The labels are drawn more solid instead,
+   which is what makes them readable on paper anyway. */
+function slugOf(s){return (String(s||'room').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''))||'room';}
+function roundPath(c,x,y,w,h,r){
+  if(c.roundRect){c.beginPath();c.roundRect(x,y,w,h,r);return;}
+  c.beginPath();c.moveTo(x+r,y);
+  c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();
+}
+/* white at .56 behind a blur reads as white at about .9 without one */
+function solid(col){
+  var m=/^rgba?\(([^)]+)\)/.exec(col||''); if(!m)return 'rgba(255,255,255,.9)';
+  var p=m[1].split(',').map(function(v){return parseFloat(v);});
+  var a=p.length>3?p[3]:1;
+  return 'rgba('+p[0]+','+p[1]+','+p[2]+','+Math.max(a,0.9)+')';
+}
+function savePng(btn){
+  var say=function(t){btn.querySelector('.long').textContent=t;btn.querySelector('.short').textContent=t;};
+  var back=function(){setTimeout(function(){say('Save PNG');btn.querySelector('.short').textContent='PNG';},1800);};
+  if(!photo.naturalWidth){say('No picture');back();return;}
+  var wasOpen=open, wasSel=sel, wasW=stage.style.width;
+  /* The file must not depend on the size of the window it was asked for. A
+     narrow window packs the labels tight and the picture would be saved that
+     way, so the picture is laid out at a fixed width first: wide enough that
+     sixty labels come apart, narrow enough that the words are still a readable
+     size once they are scaled up to the size of the photograph. Nothing is
+     painted between here and putting the width back, so none of this is seen. */
+  stage.style.width='1000px';
+  /* every word in play, open, laid out by the same code that lays out the page */
+  open={}; sel=null;
+  inPlay().forEach(function(s){if(s.w)open[s.id]=++seq;});
+  render();
+  /* a label still flying out of its dot is measured where it is going, not
+     where it has got to, so the animations are jumped to their end first */
+  try{if(stage.getAnimations)stage.getAnimations({subtree:true}).forEach(function(a){a.finish();});}catch(e){}
+  var sr=stage.getBoundingClientRect();
+  var cv=document.createElement('canvas');
+  cv.width=photo.naturalWidth; cv.height=photo.naturalHeight;
+  var c=cv.getContext('2d'), k=cv.width/sr.width;
+  c.drawImage(photo,0,0,cv.width,cv.height);
+  Object.keys(pillEls).forEach(function(id){
+    var pin=pillEls[id], p=pin.firstChild, s=byId(id);
+    if(!s||!s.w)return;
+    var b=pin.getBoundingClientRect(), cs=getComputedStyle(p);
+    var x=(b.left-sr.left)*k, y=(b.top-sr.top)*k, w=b.width*k, h=b.height*k;
+    var r=parseFloat(cs.borderTopLeftRadius)*k||6*k;
+    c.save();
+    c.shadowColor='rgba(10,12,16,.22)'; c.shadowBlur=10*k; c.shadowOffsetY=3*k;
+    roundPath(c,x,y,w,h,r); c.fillStyle=solid(cs.backgroundColor); c.fill();
+    c.restore();
+    c.save();
+    roundPath(c,x,y,w,h,r); c.lineWidth=Math.max(1,k); c.strokeStyle='rgba(255,255,255,.9)'; c.stroke();
+    c.restore();
+    /* the two lines are centred in the boxes the browser gave them, so nothing
+       here has to guess where a baseline falls */
+    var ipaEl=p.querySelector('.ipa'), ib=ipaEl?ipaEl.getBoundingClientRect():null;
+    var top=y+parseFloat(cs.paddingTop)*k, bot=y+h-parseFloat(cs.paddingBottom)*k;
+    var wordBot=ib?(ib.top-sr.top)*k:bot;
+    c.textAlign='center'; c.textBaseline='middle';
+    c.fillStyle=cs.color;
+    c.font=cs.fontWeight+' '+(parseFloat(cs.fontSize)*k)+'px '+cs.fontFamily;
+    c.fillText(s.w,x+w/2,(top+wordBot)/2);
+    if(ipaEl){
+      var ics=getComputedStyle(ipaEl);
+      c.globalAlpha=parseFloat(ics.opacity)||1;
+      c.fillStyle=ics.color;
+      c.font=ics.fontWeight+' '+(parseFloat(ics.fontSize)*k)+'px '+ics.fontFamily;
+      c.fillText(ipaEl.textContent,x+w/2,((ib.top-sr.top)*k+(ib.bottom-sr.top)*k)/2);
+      c.globalAlpha=1;
+    }
+  });
+  stage.style.width=wasW;                  /* and the page goes back to what it was */
+  open=wasOpen; sel=wasSel; render();
+  var name=slugOf(room().title)+'-words'+(ipaOn?'-'+ipaAcc:'')+'.png';
+  var done=function(blob){
+    if(!blob){say('Could not save');back();return;}
+    var u=URL.createObjectURL(blob), a=document.createElement('a');
+    a.href=u;a.download=name;document.body.appendChild(a);a.click();
+    setTimeout(function(){URL.revokeObjectURL(u);a.remove();},2000);
+    say('Saved');back();
+  };
+  /* a picture from another site would poison the canvas; ours never is, but a
+     failure here must not take the page down with it */
+  try{ if(cv.toBlob)cv.toBlob(done,'image/png'); else done(null); }
+  catch(err){ say('Could not save'); back(); }
+}
+document.getElementById('png').addEventListener('click',function(){
+  var b=this;
+  /* the real font has to be in before anything is measured or drawn */
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){savePng(b);});
+  else savePng(b);
 });
 
 /* ---------------- the word picker ----------------
