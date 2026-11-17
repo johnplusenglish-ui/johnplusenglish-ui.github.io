@@ -137,6 +137,52 @@ h1{font-size:26px;line-height:1.1;margin:0;font-weight:700;letter-spacing:-.01em
 .form .pos button{border-radius:8px;border:1px solid #cfccc5;background:#fff;padding:6px 0;font-size:12.5px;font-weight:500;transition:background .2s,color .2s,border-color .2s}
 .form .pos button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
 
+/* ---------- choosing the words ----------
+   A teacher picks what the class works with. A word switched off loses its dot
+   and its label together, and drops out of Explore, out of Find it and out of
+   the count. The picture never changes: only what is named on it. */
+.wordsbtn .n{font-family:var(--mono);font-size:11px;margin-left:6px;opacity:.55}
+.wordsbtn[data-some="1"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+.wordsbtn[data-some="1"] .n{opacity:.85}
+.sel{position:fixed;inset:0;z-index:600;display:none;place-items:center;padding:16px}
+.sel.open{display:grid}
+.sel .veil{position:absolute;inset:0;background:rgba(20,22,26,.45)}
+.sel-card{position:relative;z-index:1;background:var(--card);border:1px solid var(--line);border-radius:18px;
+  width:min(780px,100%);max-height:min(88vh,760px);display:flex;flex-direction:column;overflow:hidden;
+  box-shadow:0 30px 80px rgba(10,12,16,.38);animation:selin .34s var(--soft)}
+@keyframes selin{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
+.sel-head{display:flex;align-items:baseline;gap:10px;padding:16px 16px 10px}
+.sel-head h2{margin:0;font-size:19px;font-weight:700}
+.sel-head p{margin:0;font-family:var(--mono);font-size:12px;color:var(--ink-3)}
+.sel-head .x{margin-left:auto;border:0;background:transparent;color:var(--ink-3);font-size:24px;line-height:1;padding:0 4px;border-radius:8px}
+.sel-head .x:hover{color:var(--ink)}
+.sel-rooms{display:flex;gap:6px;overflow-x:auto;padding:0 16px 10px;scrollbar-width:none}
+.sel-rooms::-webkit-scrollbar{display:none}
+.sel-rooms button{flex:none;border:1px solid var(--line);background:var(--card);border-radius:9px;padding:6px 11px;
+  font-size:13px;font-weight:500;white-space:nowrap;transition:background .2s,color .2s,border-color .2s}
+.sel-rooms button .n{font-family:var(--mono);font-size:10.5px;opacity:.55;margin-left:6px}
+.sel-rooms button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.sel-tools{display:flex;gap:8px;align-items:center;padding:0 16px 12px}
+.sel-tools input{flex:1 1 auto;min-width:0;font:inherit;font-size:14px;padding:8px 12px;border-radius:10px;
+  border:1px solid var(--line);background:var(--bg);color:inherit}
+.sel-list{flex:1 1 auto;min-height:0;overflow:auto;padding:0 16px 14px;display:flex;flex-wrap:wrap;gap:7px;align-content:flex-start}
+.sel-list .grp{flex:1 0 100%;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink-3);margin:8px 0 0}
+.sel-list .wd{border:1px solid var(--line);background:var(--bg);color:var(--ink-3);border-radius:999px;
+  padding:6px 12px;font-size:13.5px;font-weight:500;
+  transition:background .2s,color .2s,border-color .2s,scale .3s var(--spring)}
+.sel-list .wd:hover{border-color:#c9c6bf}
+.sel-list .wd:active{scale:.94}
+.sel-list .wd[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.sel-list .none{flex:1 0 100%;color:var(--ink-3);font-size:14px;padding:10px 0}
+.sel-foot{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:12px 16px;border-top:1px solid var(--line);background:var(--bg)}
+.sel-foot .hint{flex:1 1 180px;min-width:0;font-size:12.5px;color:var(--ink-3)}
+.sel-foot .pri{background:var(--ink);color:#fff;border-color:var(--ink)}
+@media (max-width:640px){
+  .sel{padding:0;place-items:end center}
+  .sel-card{width:100%;max-height:92vh;border-radius:18px 18px 0 0}
+}
+
 .foot{margin-top:12px;color:var(--ink-3);font-size:13.5px}
 .foot b{color:var(--ink-2);font-weight:500}
 .build{margin:6px 0 0;font-family:var(--mono);font-size:10.5px;color:#b3b0a9}
@@ -286,6 +332,7 @@ body.presenting{overflow:hidden}
       <button data-mode="explore" aria-pressed="true">Explore</button>
       <button data-mode="find" aria-pressed="false">Find it</button>
     </div>
+    <button class="btn wordsbtn" id="words">Words<span class="n" id="wordsn"></span></button>
     <span class="spacer"></span>
     <button class="btn" id="dots" aria-pressed="true">Dots</button>
     <button class="btn" id="all">Show all</button>
@@ -299,6 +346,31 @@ body.presenting{overflow:hidden}
   </div>
 
   <p class="foot" id="foot"></p>
+</div>
+
+<div class="sel" id="pickwrap" role="dialog" aria-modal="true" aria-label="Choose the words">
+  <div class="veil" data-close="1"></div>
+  <div class="sel-card">
+    <div class="sel-head">
+      <h2>Choose the words</h2>
+      <p id="pickcount"></p>
+      <button class="x" data-close="1" aria-label="Close">&#215;</button>
+    </div>
+    <div class="sel-rooms" id="pickrooms" aria-label="Rooms"></div>
+    <div class="sel-tools">
+      <input id="picksearch" type="search" placeholder="Search every room" autocomplete="off" aria-label="Search every room">
+      <button class="btn" id="pickall">All</button>
+      <button class="btn" id="picknone">None</button>
+    </div>
+    <div class="sel-list" id="picklist"></div>
+    <div class="sel-foot">
+      <span class="hint" id="pickhint"></span>
+      <button class="btn" id="picklink">Copy a link to this set</button>
+      <button class="btn pri" data-close="1">Done</button>
+    </div>
+  </div>
+</div>
+
 <div class="sheet" id="sheet">
   <div class="sheet-card">
     <div class="sheet-head">
@@ -355,6 +427,47 @@ function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return
 function uid(){return 's'+Date.now().toString(36)+Math.floor(Math.random()*1e4).toString(36);}
 function byId(id){for(var i=0;i<spots.length;i++)if(spots[i].id===id)return spots[i];return null;}
 
+/* ---------- which words are in play ----------
+   A teacher chooses the set the class works with, and the rest are simply not
+   there: no dot, no label, not in Find it, not in the count. The choice is kept
+   apart from the words themselves, by the word rather than by a number, so it
+   survives a rebuild and never ends up in the data John publishes. One set per
+   room, because a lesson is usually one room. */
+var off={};                                  /* the words switched off in this room */
+var OFF={};                                  /* and the same for every room, by index */
+function offKeyOf(i){var r=ROOMS[i]||{};return (r.key||('rome_vocab_'+i))+'_off';}
+function readOff(i){
+  var o={};
+  try{var s=localStorage.getItem(offKeyOf(i));
+      if(s){var a=JSON.parse(s);if(Array.isArray(a))a.forEach(function(w){if(w)o[w]=1;});}}catch(e){}
+  return o;
+}
+function writeOff(i,o){
+  try{var k=Object.keys(o);
+      if(k.length)localStorage.setItem(offKeyOf(i),JSON.stringify(k));
+      else localStorage.removeItem(offKeyOf(i));}catch(e){}
+}
+/* Held in memory as well as in the browser's store, so a teacher can set up all
+   seven rooms before the lesson even where the store is turned off, and so that
+   drawing the picker does not go back to the store for every word. */
+function offOf(i){ if(!OFF[i])OFF[i]=readOff(i); return OFF[i]; }
+function setOffOf(i,o){ OFF[i]=o; if(i===ri)off=o; writeOff(i,o); }
+/* the words of any room: the ones on screen for the room we are in, and for the
+   others whatever is saved in this browser, falling back to the built-in set */
+function wordsOf(i){
+  if(i===ri)return spots.map(function(s){return s.w;}).filter(function(w){return !!w;});
+  var r=ROOMS[i]||{};
+  try{var s=localStorage.getItem(r.key||('rome_vocab_'+i));
+      if(s){var a=JSON.parse(s);
+        if(Array.isArray(a)&&a.length)return a.map(function(x){return x.w;}).filter(function(w){return !!w;});}}catch(e){}
+  return (r.words||[]).map(function(w){return w.w;}).filter(function(w){return !!w;});
+}
+function countIn(i){var o=offOf(i),n=0;wordsOf(i).forEach(function(w){if(!o[w])n++;});return n;}
+function live(s){return !(s.w&&off[s.w]);}
+function inPlay(){return spots.filter(live);}
+/* Edit is about the data, not about a lesson, so everything shows there. */
+function onStage(){return mode==='edit'?spots:inPlay();}
+
 /* ---------- motion ----------
    Motion (motion.dev) drives this when it loads: real springs, and an animation
    that is interrupted mid-flight keeps its speed instead of snapping.
@@ -409,7 +522,7 @@ function place(pin,s){
 var SIDES={above:['above','below','right','left'],below:['below','above','right','left'],
            left:['left','right','above','below'],right:['right','left','above','below']};
 function chooseSides(items,box,sr,g){
-  var dots=spots.map(function(s){return {id:s.id,x:sr.left+s.x/100*sr.width,y:sr.top+s.y/100*sr.height};});
+  var dots=onStage().map(function(s){return {id:s.id,x:sr.left+s.x/100*sr.width,y:sr.top+s.y/100*sr.height};});
   var placed=[], room=13;
   items.forEach(function(it){
     var s=it.s, ax=sr.left+s.x/100*sr.width, ay=sr.top+s.y/100*sr.height;
@@ -520,7 +633,7 @@ function render(o){
   stage.className='stage'+(mode==='find'?' find':'')+(mode==='edit'?' edit':'')+(dotsOn?'':' nodots')+
     (many?' many':'')+(tight?' tight':'');
   var seen={};
-  spots.forEach(function(s){
+  onStage().forEach(function(s){
     var b=spotEls[s.id];
     if(!b){
       b=document.createElement('button');b.dataset.id=s.id;b.innerHTML='<i></i>';stage.appendChild(b);spotEls[s.id]=b;
@@ -545,7 +658,7 @@ function render(o){
 function renderPills(o){
   o=o||{};
   var want=mode==='edit'?spots.filter(function(s){return s.w;}):
-    spots.filter(function(s){return open[s.id];}).sort(function(a,b){return open[a.id]-open[b.id];});
+    inPlay().filter(function(s){return open[s.id];}).sort(function(a,b){return open[a.id]-open[b.id];});
   var ids={}, fresh=[];
   var wave=want.slice().sort(function(a,b){return (a.x+a.y*.4)-(b.x+b.y*.4);});
   want.forEach(function(s,i){
@@ -615,8 +728,9 @@ function renderForm(){
   }
 }
 function status(){
-  var n=spots.length, f=Object.keys(found).filter(function(id){return byId(id);}).length;
-  if(mode==='explore'){countEl.innerHTML='<b>'+f+'</b> of '+n+' words opened';sub.textContent='Click anything in the picture to see what it is called.';foot.innerHTML='<b>Tip:</b> press Hide all for a clean picture, then see how many things you can name before you click.';}
+  var n=inPlay().length, f=Object.keys(found).filter(function(id){var s=byId(id);return s&&live(s);}).length;
+  drawWordsBtn();
+  if(mode==='explore'){countEl.innerHTML='<b>'+f+'</b> of '+n+' words opened';sub.textContent='Click anything in the picture to see what it is called.';foot.innerHTML='<b>Tip:</b> press Hide all for a clean picture, then see how many things you can name before you click. <b>Words</b> picks the set the class works with.';}
   else if(mode==='find'){sub.textContent='Read the word, then click that thing in the picture.';foot.textContent='';}
   else{countEl.innerHTML='<b>'+n+'</b> hotspots';sub.textContent='Click the picture to add a word. Drag a dot to move it. Click a dot to change the word or where its label sits.';foot.innerHTML='Changes are saved in this browser. <b>Copy data</b> gives the list to paste back to Claude so it becomes the built-in set.';}
 }
@@ -640,7 +754,9 @@ function status(){
    this: the big surfaces were the ones nobody could press. */
 var REACH_MIN=.030, REACH_MAX=.082, REACH_OF_GAP=.70;   /* of the picture's width */
 function measure(rect){
-  var P=spots.map(function(s){return {s:s,x:s.x/100*rect.width,y:s.y/100*rect.height};});
+  /* only the words in play divide the picture up, so switching one off hands its
+     patch to whatever is next to it rather than leaving a hole */
+  var P=onStage().map(function(s){return {s:s,x:s.x/100*rect.width,y:s.y/100*rect.height};});
   var W=rect.width||1;
   for(var i=0;i<P.length;i++){
     var a=P[i], gap=1e9, j, dx, dy, d;
@@ -674,7 +790,7 @@ function hit(px,py,rect){
 
 /* ---------- explore ---------- */
 function toggle(id){
-  var s=byId(id); if(!s)return;
+  var s=byId(id); if(!s||!live(s))return;
   if(open[id]){delete open[id];}
   else{if(stage.clientWidth<640)open={};open[id]=++seq;found[id]=1;ring(s.x,s.y);}
   render();
@@ -683,13 +799,17 @@ function setDots(on){dotsOn=on;document.getElementById('dots').setAttribute('ari
 
 /* ---------- find it ---------- */
 function startQuiz(){
-  var order=spots.map(function(s){return s.id;});
+  var order=inPlay().map(function(s){return s.id;});
   for(var i=order.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=order[i];order[i]=order[j];order[j]=t;}
   quiz={order:order,i:0,first:0,tries:0};open={};drawTask(null,null,true);render();
 }
 function drawTask(msg,cls,fresh){
   if(mode==='find'){
     task.hidden=false;
+    if(!quiz.order.length){            /* every word in this room is switched off */
+      task.innerHTML='<span class="word">No words chosen.</span><span class="msg">Press Words and pick the ones for this lesson.</span>';
+      countEl.innerHTML='';return;
+    }
     if(quiz.i>=quiz.order.length){
       task.innerHTML='<span class="word new">All found.</span><span class="msg">'+quiz.first+' of '+quiz.order.length+' at the first click.</span><span class="spacer"></span><button class="btn" id="again">Play again</button>';
       countEl.innerHTML='<b>'+quiz.order.length+'</b> of '+quiz.order.length;return;
@@ -809,7 +929,7 @@ function setMode(m){
 }
 document.querySelector('.seg').addEventListener('click',function(e){var b=e.target.closest('button');if(b&&b.dataset.mode!=='edit')setMode(b.dataset.mode);});
 document.getElementById('dots').addEventListener('click',function(){setDots(!dotsOn);render();});
-document.getElementById('all').addEventListener('click',function(){spots.forEach(function(s){if(!open[s.id])open[s.id]=++seq;found[s.id]=1;});render({wave:true});});
+document.getElementById('all').addEventListener('click',function(){inPlay().forEach(function(s){if(!open[s.id])open[s.id]=++seq;found[s.id]=1;});render({wave:true});});
 document.getElementById('none').addEventListener('click',function(){open={};setDots(false);render({wave:true});});
 task.addEventListener('click',function(e){
   var id=e.target.id;
@@ -826,7 +946,172 @@ task.addEventListener('click',function(e){
     else{e.target.dataset.sure='1';e.target.textContent='Click again to reset';}
   }
 });
-document.addEventListener('keydown',function(e){if(e.key==='Escape'&&mode==='explore'){open={};render({wave:true});}});
+
+/* ---------------- the word picker ----------------
+   One room at a time, because a lesson usually is, with a search that reaches
+   every room when a teacher wants the same word wherever it appears. The choice
+   is kept in this browser, so it is still there next lesson, and the link button
+   writes the whole flat's choice into the address: that is how a teacher hands
+   the set to a class, or to another teacher, without anyone signing in. */
+var selWrap=document.getElementById('pickwrap'), pickRoom=0, pickQ='';
+function pickerOn(){return selWrap.classList.contains('open');}
+function drawWordsBtn(){
+  var b=document.getElementById('words'); if(!b)return;
+  var all=spots.filter(function(s){return !!s.w;}).length, n=inPlay().filter(function(s){return !!s.w;}).length;
+  document.getElementById('wordsn').textContent=(n===all?String(all):n+'/'+all);
+  b.setAttribute('data-some',n===all?'0':'1');
+  b.setAttribute('aria-label',n===all?('Choose the words. All '+all+' are in play.')
+                                     :('Choose the words. '+n+' of '+all+' are in play.'));
+}
+function wordChips(i,ws){
+  var o=offOf(i);
+  return ws.map(function(w){
+    return '<button class="wd" data-i="'+i+'" data-w="'+esc(w)+'" aria-pressed="'+(o[w]?'false':'true')+'">'+esc(w)+'</button>';
+  }).join('');
+}
+function drawPick(){
+  var rooms=document.getElementById('pickrooms'), list=document.getElementById('picklist'), i;
+  rooms.hidden=ROOMS.length<2;
+  if(ROOMS.length>1){
+    rooms.innerHTML=ROOMS.map(function(r,k){
+      var ws=wordsOf(k), o=offOf(k), on=0;
+      ws.forEach(function(w){if(!o[w])on++;});
+      return '<button data-i="'+k+'" aria-pressed="'+(k===pickRoom)+'">'+esc(r.title)+
+        '<span class="n">'+on+'/'+ws.length+'</span></button>';
+    }).join('');
+  }
+  var q=pickQ.trim().toLowerCase(), html='', any=false, ws;
+  if(q){
+    for(i=0;i<ROOMS.length;i++){
+      ws=wordsOf(i).filter(function(w){return w.toLowerCase().indexOf(q)>=0;});
+      if(!ws.length)continue;
+      any=true;
+      html+=(ROOMS.length>1?'<p class="grp">'+esc(ROOMS[i].title)+'</p>':'')+wordChips(i,ws);
+    }
+    if(!any)html='<p class="none">Nothing matches that.</p>';
+  } else {
+    ws=wordsOf(pickRoom);
+    html=ws.length?wordChips(pickRoom,ws):'<p class="none">This room has no words yet.</p>';
+  }
+  list.innerHTML=html;
+  var on=0, total=0;
+  for(i=0;i<ROOMS.length;i++){
+    var o=offOf(i);
+    wordsOf(i).forEach(function(w){total++;if(!o[w])on++;});
+  }
+  document.getElementById('pickcount').textContent=on+' of '+total+' chosen';
+  document.getElementById('pickhint').textContent=(on===total)?'Every word is in play.'
+    :(total-on)+' put away: no dot, no label, not in Find it.';
+}
+/* a change in this room has to show on the picture straight away */
+function pickChanged(touchedHere){
+  if(touchedHere){
+    spots.forEach(function(s){if(!live(s))delete open[s.id];});
+    if(mode==='find'){startQuiz();}else{render();}
+  }
+  drawStrip(); drawPick(); drawWordsBtn();
+}
+function showPick(on){
+  selWrap.classList.toggle('open',on);
+  if(!on)return;
+  pickRoom=ri; pickQ='';
+  var s=document.getElementById('picksearch'); if(s)s.value='';
+  drawPick();
+  var f=selWrap.querySelector('#pickrooms button[aria-pressed="true"]')||document.getElementById('picksearch');
+  if(f)setTimeout(function(){f.focus();},40);
+}
+document.getElementById('words').addEventListener('click',function(){showPick(true);});
+selWrap.addEventListener('click',function(e){
+  if(e.target.closest('[data-close]')){showPick(false);return;}
+});
+document.getElementById('pickrooms').addEventListener('click',function(e){
+  var b=e.target.closest('button'); if(!b)return;
+  pickRoom=+b.dataset.i;
+  pickQ=''; document.getElementById('picksearch').value='';
+  drawPick();
+});
+document.getElementById('picksearch').addEventListener('input',function(){pickQ=this.value;drawPick();});
+document.getElementById('picklist').addEventListener('click',function(e){
+  var b=e.target.closest('.wd'); if(!b)return;
+  var i=+b.dataset.i, w=b.dataset.w, o=offOf(i);
+  if(o[w])delete o[w]; else o[w]=1;
+  setOffOf(i,o);
+  pickChanged(i===ri);
+});
+/* All and None act on exactly what is listed: one room, or every match of a search */
+function pickBulk(on){
+  var by={}, touched=false;
+  [].forEach.call(document.querySelectorAll('#picklist .wd'),function(b){
+    var i=+b.dataset.i; (by[i]=by[i]||[]).push(b.dataset.w);
+  });
+  Object.keys(by).forEach(function(k){
+    var i=+k, o=offOf(i);
+    by[k].forEach(function(w){ if(on)delete o[w]; else o[w]=1; });
+    setOffOf(i,o);
+    if(i===ri)touched=true;
+  });
+  pickChanged(touched);
+}
+document.getElementById('pickall').addEventListener('click',function(){pickBulk(true);});
+document.getElementById('picknone').addEventListener('click',function(){pickBulk(false);});
+
+/* The whole flat's choice as one short code: a bit per word, in the order the
+   page was built, six bits to a character. The number in front is how many words
+   the code was made for, so a code made before the word list changed is ignored
+   rather than putting ticks against the wrong words. */
+var A64='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+function builtWords(i){return ((ROOMS[i]||{}).words||[]).map(function(w){return w.w;}).filter(function(w){return !!w;});}
+function packSet(){
+  var bits=[], i, out='', b=0, n=0;
+  for(i=0;i<ROOMS.length;i++){
+    var o=offOf(i);
+    builtWords(i).forEach(function(w){bits.push(o[w]?0:1);});
+  }
+  for(i=0;i<bits.length;i++){
+    b=(b<<1)|bits[i]; n++;
+    if(n===6){out+=A64.charAt(b);b=0;n=0;}
+  }
+  if(n)out+=A64.charAt(b<<(6-n));
+  return bits.length+'.'+out;
+}
+function applySet(code){
+  var m=/^(\d+)\.([A-Za-z0-9_-]*)$/.exec(code||''); if(!m)return false;
+  var total=+m[1], s=m[2], bits=[], i, v, all=0;
+  for(i=0;i<ROOMS.length;i++)all+=builtWords(i).length;
+  if(all!==total)return false;                 /* not the list this code was made for */
+  for(i=0;i<s.length;i++){
+    v=A64.indexOf(s.charAt(i)); if(v<0)return false;
+    bits.push((v>>5)&1,(v>>4)&1,(v>>3)&1,(v>>2)&1,(v>>1)&1,v&1);
+  }
+  if(bits.length<total)return false;
+  var k=0;
+  for(i=0;i<ROOMS.length;i++){
+    var o={}, ws=builtWords(i), j;
+    for(j=0;j<ws.length;j++){if(!bits[k+j])o[ws[j]]=1;}
+    k+=ws.length;
+    setOffOf(i,o);
+  }
+  return true;
+}
+document.getElementById('picklink').addEventListener('click',function(){
+  var url=location.href.split('#')[0]+'#set='+packSet(), b=this, back=function(){b.textContent='Copy a link to this set';};
+  var ok=function(){b.textContent='Link copied';setTimeout(back,1800);};
+  var fall=function(){
+    var ta=document.createElement('textarea');ta.value=url;
+    ta.style.cssText='position:fixed;top:0;left:0;opacity:0';document.body.appendChild(ta);ta.select();
+    try{document.execCommand('copy');ok();}catch(err){b.textContent='Could not copy';setTimeout(back,1800);}
+    document.body.removeChild(ta);
+  };
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(url).then(ok,fall);else fall();
+});
+document.addEventListener('keydown',function(e){
+  /* Escape closes the picker and does nothing else: the page it is sitting over
+     has Escape of its own (clearing the labels, leaving present mode), and both
+     listen on the document, so the rest of them are stopped here rather than
+     left to fire on a dialog that has just gone */
+  if(e.key==='Escape'&&pickerOn()){e.stopImmediatePropagation();showPick(false);return;}
+  if(e.key==='Escape'&&mode==='explore'){open={};render({wave:true});}
+});
 window.addEventListener('resize',moveThumb);
 /* the picture changed size, or the real font arrived: the labels' sizes moved, so lay them out again */
 var relayTimer=null;
@@ -862,8 +1147,10 @@ function drawStrip(){
   if(ROOMS.length<2){strip.hidden=true;return;}
   strip.hidden=false;
   strip.innerHTML=ROOMS.map(function(r,i){
+    /* the number is how many words are in play there, not how many exist, so a
+       teacher who has picked a set can see it room by room */
     return '<button class="rm" data-i="'+i+'" aria-current="'+(i===ri)+'">'+esc(r.title)+
-      '<span class="n">'+((r.words&&r.words.length)||0)+'</span></button>';
+      '<span class="n">'+countIn(i)+'</span></button>';
   }).join('');
 }
 strip.addEventListener('click',function(e){
@@ -876,7 +1163,7 @@ function setRoom(i,first){
   photo.alt=r.alt||r.title||'';
 
 
-  spots=load(); open={}; found={}; sel=null; quiz=null; seq=0;
+  spots=load(); off=offOf(i); open={}; found={}; sel=null; quiz=null; seq=0;
   spotEls={}; pillEls={}; formEl=null; formFor=null;
   stage.querySelectorAll('.spot,.pin,.form,.ring').forEach(function(n){n.remove();});
   /* Changing room in the middle of a game starts the game again in the new
@@ -993,6 +1280,10 @@ function goRoom(i){
 /* start */
 document.querySelectorAll('.seg button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.mode==='explore'?'true':'false');});
 ['dots','all','none'].forEach(function(id){document.getElementById(id).hidden=false;});
+/* a link carrying a set of words: it is applied before the first room is drawn,
+   so the class sees the teacher's set from the first frame */
+var setInLink=/[#&]set=(\d+\.[A-Za-z0-9_-]*)/.exec(location.hash||'');
+if(setInLink)applySet(setInLink[1]);
 setRoom(0,true); moveThumb();
 requestAnimationFrame(function(){requestAnimationFrame(function(){thumb.classList.remove('still');});});
 
@@ -1074,6 +1365,9 @@ setMode=function(m){ wasSetMode(m); wrap.classList.toggle('quiz',wrap.classList.
 
 document.addEventListener('keydown',function(e){
   if(e.target&&/^(INPUT|TEXTAREA)$/.test(e.target.tagName))return;
+  /* while the word picker is open it has the keyboard: Escape closes it and
+     nothing else moves the room underneath it */
+  if(typeof pickerOn==='function'&&pickerOn())return;
   if(e.key==='ArrowLeft')step(-1);
   else if(e.key==='ArrowRight')step(1);
   else if(e.key==='Escape'&&sheet.classList.contains('open'))showPlan(false);
