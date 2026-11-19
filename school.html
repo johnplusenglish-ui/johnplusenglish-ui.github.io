@@ -76,6 +76,10 @@ h1{font-size:26px;line-height:1.1;margin:0;font-weight:700;letter-spacing:-.01em
 /* Promoted to its own layer only while it is actually moving, and let go again
    afterwards: a layer left standing costs memory for nothing. */
 .stage img.ghost,.stage img.shifting{will-change:transform,opacity}
+/* smooth-word-rooms */
+/* A CSS transition outranks a Web Animation, so a picture being moved must have none, or the
+   transition drives its scale instead of the move and it settles with a jolt at the end. */
+.stage img.shifting{transition:none}
 /* and a doorway passes over the picture: the edges darken for a moment as the
    camera goes through, the way they do when you walk from room to room */
 .thru{position:absolute;inset:0;z-index:4;pointer-events:none;opacity:0;
@@ -750,7 +754,7 @@ function render(o){
       if(o.intro&&!CALM){
         var w=LAST_WAY, lead=s.x;
         if(w)lead=(Math.abs(w.x)>=Math.abs(w.y))?(w.x>=0?s.x:100-s.x):(w.y>=0?s.y:100-s.y);
-        b.firstChild.style.animationDelay=(230+lead*6)+'ms';b.dataset.intro='1';
+        b.firstChild.style.animationDelay=(480+lead*4)+'ms';b.dataset.intro='1';
       }
     }
     b.className='spot'+(open[s.id]?' open':'')+(sel===s.id?' sel':'')+(b.dataset.intro?' intro':'');
@@ -1432,7 +1436,6 @@ function travel(way,next,i){
   photo.style.translate=way.x+'% '+way.y+'%';
   photo.style.scale='1.05';
   photo.classList.add('on','shifting');
-  setRoom(i,false);                               /* dots and labels for the new room */
 
   /* Both pictures move on the same curve for the same length of time, so they
      travel as one piece, the way the wall of a room does when you walk past it.
@@ -1446,6 +1449,17 @@ function travel(way,next,i){
      blurred both pictures as they travelled, and a blur radius is repainted
      every frame over the whole picture, which is the one thing certain to cost
      frames at this size. The scale and the doorway do that job for nothing. */
+  /* Both pictures are decoded before anything moves (the old room covers the stage in the
+     meantime), so neither appears a moment late. A slow decoder gets 250 ms, no more. */
+  var begun=false;
+  var decoded=Promise.all([ghost,photo].map(function(im){
+    return im.decode?im.decode().catch(function(){}):0; }));
+  Promise.race([decoded,new Promise(function(r){setTimeout(r,250);})]).then(function(){
+    if(begun)return; begun=true; moveNow(); });
+  function moveNow(){
+  /* the new room's dots and labels are drawn as its picture starts to arrive, never on top
+     of the room being left, and their wave begins as the picture settles */
+  setRoom(i,false);
   var EASE='cubic-bezier(.33,.02,.15,1)', MS=760;
   var out=play(ghost,[{translate:'0% 0%',scale:1,opacity:1},
                       {opacity:1,offset:.5},
@@ -1454,6 +1468,9 @@ function travel(way,next,i){
   play(photo,[{translate:way.x+'% '+way.y+'%',scale:1.05},
               {translate:'0% 0%',scale:1}],
        {duration:MS,easing:EASE});
+  /* the animation owns the picture now: take the start values off, so that when it ends the
+     picture is already at rest where it stops, instead of snapping back to them for a frame */
+  photo.style.translate=''; photo.style.scale='';
 
   var thru=document.createElement('div');thru.className='thru';stage.appendChild(thru);
   var pass=play(thru,[{opacity:0,scale:1.3},{opacity:.82,scale:1,offset:.42},{opacity:0,scale:1}],
@@ -1467,6 +1484,7 @@ function travel(way,next,i){
     moving=false; clearTimeout(movingTimer);
     if(pending!==null){var p=pending; pending=null; goRoom(p);}
   },MS+240);
+  }
 }
 var moving=false, movingTimer=null, pending=null;
 function goRoom(i){
@@ -1480,13 +1498,22 @@ function goRoom(i){
   /* whatever happens next, the buttons come back: a stuck flag would wedge the page */
   clearTimeout(movingTimer);
   movingTimer=setTimeout(function(){moving=false;},2500);
-  var way=wayFrom(ri,i), next=ROOMS[i].img, pre=new Image(), once=false;
-  var swap=function(){
-    if(once)return; once=true;                    /* a cached picture fires both paths */
-    travel(way,next,i);
-  };
-  pre.onload=swap; pre.onerror=swap; pre.src=next;
-  if(pre.complete)swap();
+  var way=wayFrom(ri,i), next=ROOMS[i].img;
+  ready(next).then(function(){ travel(way,next,i); });
+}
+/* Every picture is fetched and decoded once, through one promise, whether it was asked for
+   by a move or fetched ahead in the background, so a move never waits for a download that
+   is already happening and never fetches a picture twice. The images are kept, so the
+   browser keeps them. */
+var READY={}, KEPT=[];
+function ready(u){
+  if(!READY[u])READY[u]=new Promise(function(res){
+    var im=new Image(); im.decoding='async'; KEPT.push(im);
+    im.onload=function(){            /* decoded if the browser manages it quickly, never waited on longer */
+      Promise.race([im.decode?im.decode():0,new Promise(function(r){setTimeout(r,300);})]).then(res,res); };
+    im.onerror=res; im.src=u;
+  });
+  return READY[u];
 }
 
 /* start */
@@ -1590,17 +1617,19 @@ document.addEventListener('keydown',function(e){
 room_changed();
 
 /* Once the room on screen has arrived and the browser is idle, quietly fetch
-   the next one, so the commonest move shows a picture at once. Only the next
-   one, and not at all on a metered or slow connection: a visitor on a phone
-   abroad should pay for the room they are looking at and no more. Any other
-   room is fetched when it is asked for. */
+   the other rooms one at a time, nearest in the strip first, so any move, from
+   the arrows, the strip or the plan, shows its picture at once. Not at all on a
+   metered or slow connection: a visitor on a phone abroad should pay for the
+   room they are looking at and no more, and gets each room when they ask. */
 (function(){
   var c=navigator.connection||{};
   if(c.saveData||/^(slow-2g|2g|3g)$/.test(c.effectiveType||''))return;
   var got={};
   function ahead(){
-    var u=ROOMS[(ri+1)%ROOMS.length];
-    u=u&&u.img; if(!u||got[u])return; got[u]=1; new Image().src=u;
+    for(var k=1;k<ROOMS.length;k++){
+      var u=ROOMS[(ri+k)%ROOMS.length]; u=u&&u.img;
+      if(u&&!got[u]){ got[u]=1; ready(u).then(soon); return; }
+    }
   }
   function soon(){ (window.requestIdleCallback||function(f){setTimeout(f,1200);})(ahead,{timeout:2500}); }
   if(photo.complete)soon(); else photo.addEventListener('load',soon,{once:true});
