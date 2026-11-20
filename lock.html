@@ -39,12 +39,14 @@
   --c-house:#B5577A;
   --c-hospital:#C27C0E;
   --c-airport:#3A7CA5;
-  --c-rooms:#6B5BA6;
 }
 *{box-sizing:border-box}
-html,body{height:100%}
+html{height:100%}
+/* min-height, not height: the page is taller than a phone screen now, and a
+   fixed-height flex column centred its overflow off the top where no scroll
+   could reach the logo. */
 body{
-  margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:100%;margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
   background:var(--cream);font-family:Outfit,sans-serif;color:var(--ink);
   padding:3.5rem 1.5rem;
   background-image:
@@ -63,11 +65,11 @@ body{
   background-size:180px 180px;
   opacity:.035;mix-blend-mode:multiply;
 }
-.wrap{max-width:430px;width:100%;text-align:center}
+.wrap{max-width:440px;width:100%;text-align:center}
 
 /* ---------- logo ---------- */
 .logo{display:inline-flex;align-items:center;justify-content:center;gap:.45rem;
-      font-weight:900;font-size:1.15rem;margin-bottom:3.4rem;letter-spacing:-.01em}
+      font-weight:900;font-size:1.15rem;margin-bottom:2.8rem;letter-spacing:-.01em}
 .logo-icon{width:22px;height:22px;stroke:var(--sky);stroke-width:1.9;fill:none;
            stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
 .logo-text span{color:var(--sky)}
@@ -122,29 +124,52 @@ body{
 .link-house  {--dot:var(--c-house)}
 .link-hospital{--dot:var(--c-hospital)}
 .link-airport{--dot:var(--c-airport)}
-/* ---------- Word Rooms: one card that opens into its places ----------
-   The drawer is a 0fr to 1fr grid row, so it animates to the height of whatever
-   is inside it without anybody having to measure anything. */
-.group{display:flex;flex-direction:column}
-.link-toggle{width:100%;text-align:left;font-family:inherit;cursor:pointer}
-.link-toggle .go svg{transition:transform .35s var(--e-soft)}
-.group.open .link-toggle .go svg{transform:rotate(180deg)}
-.sublinks{display:grid;grid-template-rows:0fr;transition:grid-template-rows .35s var(--e-soft)}
-.group.open .sublinks{grid-template-rows:1fr}
-.sublinks > .inner{overflow:hidden;display:flex;flex-direction:column;gap:.6rem}
-.group.open .sublinks > .inner{padding-top:.6rem}
-.sublinks > .inner{transition:padding-top .35s var(--e-soft)}
-.link.sub{margin-left:1.6rem;padding:.95rem 1.25rem;font-size:.98rem;border-radius:13px}
-.link.sub .go{width:28px;height:28px}
-.link.sub .go svg{width:14px;height:14px}
-@media (max-width:520px){.link.sub{margin-left:.9rem}}
-@media (prefers-reduced-motion: reduce){
-  .sublinks,.sublinks > .inner,.link-toggle .go svg{transition:none}
+/* ---------- sections: Tests, Games, Vocabulary ----------
+   A small label on the left, the count on the right. Vocabulary's label is a
+   button that folds its board away; the board is a 0fr to 1fr grid row, so it
+   animates to its own height with nothing measured in JavaScript. */
+.sec{margin-top:2.1rem}
+.sec:first-child{margin-top:0}
+.sec-head{display:flex;align-items:center;justify-content:space-between;padding:0 .35rem .6rem;
+  font-size:.7rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.sec-head .n{font-variant-numeric:tabular-nums;letter-spacing:.04em;font-weight:600}
+button.sec-head{width:100%;background:none;border:0;font-family:inherit;cursor:pointer;text-align:left}
+button.sec-head:hover,button.sec-head:focus-visible{color:var(--ink);outline:none}
+.chev{display:inline-block;width:14px;height:14px;margin-left:.5rem;vertical-align:-3px;transition:transform .35s var(--e-soft)}
+.chev path{fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.sec.shut .chev{transform:rotate(-90deg)}
+.rows{display:flex;flex-direction:column;gap:.6rem}
+.rows .link{padding:1.05rem 1.3rem;font-size:1.04rem;border-radius:15px}
+.rows .link .go{width:32px;height:32px}
+.rows .link .go svg{width:15px;height:15px}
+
+/* Word rooms as a 3 by 3 board, so the whole vocabulary section is in view at once */
+.drawer{display:grid;grid-template-rows:1fr;transition:grid-template-rows .35s var(--e-soft)}
+.drawer > div{overflow:hidden}
+.sec.shut .drawer{grid-template-rows:0fr}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem}
+.tile{
+  display:flex;flex-direction:column;justify-content:space-between;gap:.9rem;min-height:84px;
+  padding:.85rem .9rem .8rem;border-radius:15px;
+  background:linear-gradient(180deg,#fff 0%,#fdfcfa 100%);
+  border:1.5px solid var(--border);box-shadow:var(--shadow-sm);
+  color:var(--ink);text-decoration:none;font-size:.86rem;font-weight:600;line-height:1.2;
+  text-align:left;
+  position:relative;overflow:hidden;isolation:isolate;
+  transition:transform .3s var(--e-out),box-shadow .3s var(--e-soft),border-color .3s;
 }
-.link-rooms  {--dot:var(--c-rooms)}
+.tile::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--dot);opacity:0;
+  transition:opacity .35s var(--e-soft)}
+.tile:hover,.tile:focus-visible{transform:translateY(-3px);box-shadow:var(--shadow-md);border-color:transparent;outline:none}
+.tile:hover::before,.tile:focus-visible::before{opacity:.09}
+.tile:active{transform:translateY(-1px);transition-duration:.08s}
+.dot{width:12px;height:12px;border-radius:50%;background:var(--dot);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 3px 8px -3px var(--dot)}
+@media (max-width:420px){.grid{gap:.5rem}.tile{padding:.75rem .75rem .7rem;font-size:.82rem}}
+@media (prefers-reduced-motion: reduce){.drawer,.chev{transition:none}}
 
 /* ---------- socials ---------- */
-.social{display:flex;justify-content:center;gap:.6rem;margin-top:3.4rem}
+.social{display:flex;justify-content:center;gap:.6rem;margin-top:2.8rem}
 .social a{
   display:inline-flex;align-items:center;gap:.45rem;
   padding:.6rem 1.05rem;border-radius:999px;
@@ -177,7 +202,7 @@ body{
 @media (max-width:420px){
   body{padding:2.5rem 1.1rem}
   .logo{margin-bottom:2.6rem}
-  .link{padding:1.15rem 1.2rem;font-size:1rem}
+  .rows .link{padding:1rem 1.15rem;font-size:1rem}
   .social,.login-toggle{margin-top:2.6rem}
 }
 </style>
@@ -190,77 +215,59 @@ body{
     <span class="logo-text">john<span>plus</span>english</span>
   </div>
 
-  <nav class="links">
-    <a class="link link-level" href="level-test.html">
-      English Level Test
-      <span class="go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
-    </a>
-    <a class="link link-phrasal" href="phrasal-verb-test.html">
-      Phrasal Verb Test
-      <span class="go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
-    </a>
-    <a class="link link-prep" href="preposition-test.html">
-      Prepositions Test
-      <span class="go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
-    </a>
-    <a class="link link-idiom" href="idiom-game.html">
-      Idiom Game
-      <span class="go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
-    </a>
-    <a class="link link-prepgame" href="preposition-game.html">
-      Preposition Game
-      <span class="go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
-    </a>
-    <a class="link link-linkers" href="linkers-game.html">
-      Linkers Game
-      <span class="go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
-    </a>
-    <div class="group" id="rooms-group">
-      <button class="link link-toggle link-rooms" type="button" aria-expanded="false" aria-controls="rooms-list">
-        Word Rooms
-        <span class="go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></span>
-      </button>
-      <div class="sublinks" id="rooms-list">
-        <div class="inner">
-          <a class="link sub link-rome" href="rome-flat.html">
-            Rome Flat
-            <span class="go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
-          </a>
-          <a class="link sub link-office" href="office.html">
-            The Office
-            <span class="go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
-          </a>
-          <a class="link sub link-gym" href="gym.html">
-            The Gym
-            <span class="go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
-          </a>
-          <a class="link sub link-shop" href="shop.html">
-            The Shop
-            <span class="go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
-          </a>
-          <a class="link sub link-street" href="high-street.html">
-            The High Street
-            <span class="go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
-          </a>
-          <a class="link sub link-school" href="school.html">
-            The School
-            <span class="go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
-          </a>
-          <a class="link sub link-house" href="house.html">
-            The House
-            <span class="go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
-          </a>
-          <a class="link sub link-hospital" href="hospital.html">
-            The Hospital
-            <span class="go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
-          </a>
-          <a class="link sub link-airport" href="airport.html">
-            The Airport
-            <span class="go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
-          </a>
-        </div>
+  <nav class="links" aria-label="Tests, games and vocabulary">
+    <section class="sec">
+      <div class="sec-head"><span>Tests</span><span class="n">3</span></div>
+      <div class="rows">
+      <a class="link link-level" href="level-test.html">
+        English Level Test
+        <span class="go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+      </a>
+      <a class="link link-phrasal" href="phrasal-verb-test.html">
+        Phrasal Verb Test
+        <span class="go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+      </a>
+      <a class="link link-prep" href="preposition-test.html">
+        Prepositions Test
+        <span class="go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+      </a>
       </div>
-    </div>
+    </section>
+    <section class="sec">
+      <div class="sec-head"><span>Games</span><span class="n">3</span></div>
+      <div class="rows">
+      <a class="link link-idiom" href="idiom-game.html">
+        Idiom Game
+        <span class="go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+      </a>
+      <a class="link link-prepgame" href="preposition-game.html">
+        Preposition Game
+        <span class="go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+      </a>
+      <a class="link link-linkers" href="linkers-game.html">
+        Linkers Game
+        <span class="go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+      </a>
+      </div>
+    </section>
+    <section class="sec" id="vocab">
+      <button class="sec-head" type="button" aria-expanded="true" aria-controls="vocab-board">
+        <span>Vocabulary <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></span><span class="n">9 word rooms</span>
+      </button>
+      <div class="drawer" id="vocab-board"><div>
+        <div class="grid">
+          <a class="tile link-rome" href="rome-flat.html"><span class="dot"></span>Rome Flat</a>
+          <a class="tile link-office" href="office.html"><span class="dot"></span>The Office</a>
+          <a class="tile link-gym" href="gym.html"><span class="dot"></span>The Gym</a>
+          <a class="tile link-shop" href="shop.html"><span class="dot"></span>The Shop</a>
+          <a class="tile link-street" href="high-street.html"><span class="dot"></span>The High Street</a>
+          <a class="tile link-school" href="school.html"><span class="dot"></span>The School</a>
+          <a class="tile link-house" href="house.html"><span class="dot"></span>The House</a>
+          <a class="tile link-hospital" href="hospital.html"><span class="dot"></span>The Hospital</a>
+          <a class="tile link-airport" href="airport.html"><span class="dot"></span>The Airport</a>
+        </div>
+      </div></div>
+    </section>
   </nav>
 
   <div class="social">
@@ -284,17 +291,17 @@ body{
 <!-- GSAP, self-hosted, the same copy the idiom game uses. Deferred, and every
      use of it is guarded: with the file missing the page is simply static. -->
 <script>
-/* Word Rooms opens and closes. This is behaviour, not decoration, so it sits
-   outside the motion block and works whatever the device has been asked for.
-   The drawer's own animation is CSS, and that CSS turns itself off for
-   reduced motion, so the card still opens, just without the slide. */
+/* Vocabulary folds away. This is behaviour, not decoration, so it sits outside
+   the motion block and works whatever the device has been asked for. The slide
+   is CSS, and that CSS turns itself off for reduced motion, so the board still
+   opens and closes, just without the slide. */
 (function(){
-  var g = document.getElementById('rooms-group');
-  if(!g) return;
-  var btn = g.querySelector('.link-toggle');
+  var s = document.getElementById('vocab');
+  if(!s) return;
+  var btn = s.querySelector('button.sec-head');
   btn.addEventListener('click', function(){
-    var open = g.classList.toggle('open');
-    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    var shut = s.classList.toggle('shut');
+    btn.setAttribute('aria-expanded', shut ? 'false' : 'true');
   });
 })();
 </script>
@@ -321,11 +328,11 @@ body{
 
   /* The arrival. gsap.from() hides its targets first, so if anything stops the
      tween the page keeps the hidden state for ever: on this page that would
-     mean four invisible links. The timer below is not a nicety, it is what
+     mean invisible sections. The timer below is not a nicety, it is what
      makes using from() safe at all. */
   addEventListener('DOMContentLoaded', function(){
     var g = window.gsap;
-    var nodes = [].slice.call(document.querySelectorAll('.logo, .link:not(.sub), .social, .login-toggle'));
+    var nodes = [].slice.call(document.querySelectorAll('.logo, .sec, .social, .login-toggle'));
     function rest(){
       /* Stop the tween before clearing, or a tween still in flight writes its
          values again straight afterwards and the links keep the offset. */
