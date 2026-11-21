@@ -130,6 +130,18 @@ h1{font-size:26px;line-height:1.1;margin:0;font-weight:700;letter-spacing:-.01em
    so a student reads the two together and the label still points at one thing */
 .pill .ipa{display:block;margin-top:1px;font-family:var(--ipa);font-size:.8em;font-weight:400;
   letter-spacing:0;color:#2b2f36;opacity:.74}
+/* hear-word-rooms */
+/* a speaker after the word: it plays the word and leaves the label open */
+.hear{all:unset;display:inline-grid;place-items:center;width:1.25em;height:1.25em;margin:-.2em -.25em -.2em .3em;
+  vertical-align:-.22em;border-radius:50%;cursor:pointer;color:#2b2f36;opacity:.62;transition:opacity .15s,background .15s,color .15s}
+.hear svg{width:.95em;height:.95em;fill:currentColor}
+.hear svg .w{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
+.hear:hover,.hear:focus-visible{opacity:1;background:rgba(255,255,255,.7)}
+.hear:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.hear.on{opacity:1;color:var(--accent)}
+#task .hear{width:1.6em;height:1.6em;margin:0 0 0 .1em;opacity:.75}
+.stage.snap .hear,.stage.edit .hear,.stage.tight .hear{display:none}
+@media (prefers-reduced-motion:reduce){.hear{transition:none}}
 .stage.many .pill{font-size:11.5px;padding:3px 7px;border-radius:6px;letter-spacing:-.005em}
 /* a small window with a lot of labels open: smaller still, so they all fit */
 .stage.tight .pill{font-size:10.5px;padding:2px 6px;border-radius:5px;letter-spacing:-.01em}
@@ -610,7 +622,7 @@ function place(pin,s){
   var k=(ipaOn?ipaAcc:'-')+'|'+(s.w||'');
   if(p.dataset.k!==k){
     var t=ipaOn?ipaOf(s.w):'';
-    p.innerHTML=esc(s.w||'')+(t?'<span class="ipa">'+esc(t)+'</span>':'');
+    p.innerHTML=esc(s.w||'')+hearBtn(s.w)+(t?'<span class="ipa">'+esc(t)+'</span>':'');
     p.dataset.k=k;
   }
   return g;
@@ -918,7 +930,7 @@ function drawTask(msg,cls,fresh){
     }
     var s=byId(quiz.order[quiz.i]);
     var t=ipaOn?ipaOf(s.w):'';      /* read the word, and see how to say it */
-    task.innerHTML='<span class="lab">Find</span><span class="word'+(fresh?' new':'')+'">'+esc(s.w)+'</span>'+
+    task.innerHTML='<span class="lab">Find</span><span class="word'+(fresh?' new':'')+'">'+esc(s.w)+'</span>'+hearBtn(s.w)+
       (t?'<span class="tipa">'+esc(t)+'</span>':'')+
       '<span class="msg '+(cls||'')+'">'+(msg||'')+'</span><span class="spacer"></span><button class="btn" id="skip">Skip</button>';
     countEl.innerHTML='<b>'+quiz.i+'</b> of '+quiz.order.length+' found';
@@ -996,6 +1008,28 @@ stage.addEventListener('pointermove',function(e){
   if(pillEls[s.id])place(pillEls[s.id],s);
 });
 stage.addEventListener('pointerup',function(){ if(drag&&drag.moved){save();drag.justMoved=true;setTimeout(function(){drag=null;},0);} else drag=null; });
+/* Every word with a recording can be heard: British English, one clip per word,
+   fetched only when its speaker is pressed. */
+var HEAR_ICON='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.2L12 5.5v13l-4.8-4H4z"/><path class="w" d="M15.5 9a4.2 4.2 0 0 1 0 6M18.2 6.5a7.8 7.8 0 0 1 0 11"/></svg>', hearAudio=null, hearOn=null;
+function hearSlug(w){return String(w).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
+function hearBtn(w){
+  if(!w||!IPA[w])return '';
+  return '<button type="button" class="hear" data-hear="'+esc(w)+'" aria-label="Hear '+esc(w)+'">'+HEAR_ICON+'</button>';
+}
+function hearWord(btn){
+  var w=btn.getAttribute('data-hear');
+  try{ if(hearAudio){hearAudio.pause();} }catch(e){}
+  if(hearOn)hearOn.classList.remove('on');
+  hearOn=btn; btn.classList.add('on');
+  hearAudio=new Audio('audio/words/'+hearSlug(w)+'.mp3');
+  var off=function(){btn.classList.remove('on');};
+  hearAudio.addEventListener('ended',off); hearAudio.addEventListener('error',off);
+  var p=hearAudio.play(); if(p&&p.catch)p.catch(off);
+}
+document.addEventListener('click',function(e){
+  var b=e.target.closest&&e.target.closest('.hear'); if(!b)return;
+  e.stopPropagation(); e.preventDefault(); hearWord(b);
+},true);
 stage.addEventListener('click',function(e){
   var r=stage.getBoundingClientRect(), px=e.clientX-r.left, py=e.clientY-r.top;
   if(mode==='find'){ if(!e.target.closest('.pill')) quizClick(px,py,r); return; }
@@ -1087,7 +1121,7 @@ function savePng(btn){
      sixty labels come apart, narrow enough that the words are still a readable
      size once they are scaled up to the size of the photograph. Nothing is
      painted between here and putting the width back, so none of this is seen. */
-  stage.style.width='1000px';
+  stage.style.width='1000px'; stage.classList.add('snap');
   /* every word in play, open, laid out by the same code that lays out the page */
   open={}; sel=null;
   inPlay().forEach(function(s){if(s.w)open[s.id]=++seq;});
@@ -1131,7 +1165,7 @@ function savePng(btn){
       c.globalAlpha=1;
     }
   });
-  stage.style.width=wasW;                  /* and the page goes back to what it was */
+  stage.style.width=wasW; stage.classList.remove('snap');                  /* and the page goes back to what it was */
   open=wasOpen; sel=wasSel; render();
   var name=slugOf(room().title)+'-words'+(ipaOn?'-'+ipaAcc:'')+'.png';
   var done=function(blob){
