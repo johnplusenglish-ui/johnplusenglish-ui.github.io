@@ -1,0 +1,112 @@
+/* Word Rooms: the shared look for every place (2026-11-21).
+   Loaded after each page's own styles, so a rule here wins over the page's
+   rule of the same weight. The picture is the hero; everything round it is a
+   quiet rounded rectangle, and the two ways of moving (between places, between
+   the views of one place) are pictures rather than words. */
+
+:root{--wr-r:10px;--wr-r-lg:14px;--wr-ease:cubic-bezier(.22,.8,.26,1)}
+
+/* ---------- the header ---------- */
+.family{text-transform:none;letter-spacing:0;font-size:13.5px;font-weight:600;opacity:1;color:var(--muted,#7b818c);margin:0 0 2px}
+h1{font-size:34px;line-height:1.05;letter-spacing:-.025em}
+.wr-title{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px}
+.sub{margin-top:8px}
+
+/* the places button: a little fan of the other places' pictures */
+.placesbtn{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;gap:10px;
+  height:40px;padding:0 12px 0 8px;border-radius:12px;background:var(--card,#fff);border:1.5px solid var(--border,#e3e1dc);
+  font:600 14px/1 'Outfit',sans-serif;color:var(--ink);transition:border-color .2s,box-shadow .2s}
+.placesbtn:hover{border-color:var(--ink-3,#7b818c);box-shadow:0 6px 18px -10px rgba(20,22,26,.4)}
+.placesbtn:focus-visible{outline:2px solid var(--sky,#2176ff);outline-offset:2px}
+.placesbtn .fan{position:relative;width:46px;height:28px;flex:none}
+.placesbtn .fan img{position:absolute;top:2px;left:0;width:32px;height:22px;border-radius:5px;object-fit:cover;
+  box-shadow:0 0 0 1.5px var(--card,#fff),0 2px 6px rgba(20,22,26,.22);transition:transform .35s var(--wr-ease)}
+.placesbtn .fan img:nth-child(1){transform:translateX(0) rotate(-7deg)}
+.placesbtn .fan img:nth-child(2){transform:translateX(7px) rotate(0deg)}
+.placesbtn .fan img:nth-child(3){transform:translateX(14px) rotate(7deg)}
+.placesbtn:hover .fan img:nth-child(1){transform:translateX(-2px) rotate(-12deg)}
+.placesbtn:hover .fan img:nth-child(3){transform:translateX(16px) rotate(12deg)}
+.placesbtn .ct{font:500 11.5px/1 var(--mono);color:var(--ink-3,#7b818c)}
+.placesbtn svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;color:var(--ink-3,#7b818c)}
+/* with the script running, the plain row of links is replaced by the button */
+.wr-js .places{display:none}
+
+/* ---------- the places directory ---------- */
+.wr-dir{position:fixed;inset:0;z-index:650;display:grid;place-items:center;padding:20px}
+.wr-dir[hidden]{display:none!important}
+.wr-dir .veil{position:absolute;inset:0;background:rgba(20,22,26,.5);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);animation:wrfade .25s var(--wr-ease)}
+.wr-dir .card{position:relative;width:min(1000px,100%);max-height:min(90vh,820px);overflow:auto;overscroll-behavior:contain;
+  background:var(--card,#fff);border-radius:20px;padding:20px 20px 22px;box-shadow:0 30px 90px rgba(10,12,16,.45);animation:wrrise .32s var(--wr-ease)}
+@keyframes wrfade{from{opacity:0}}
+@keyframes wrrise{from{opacity:0;transform:translateY(14px) scale(.985)}}
+.wr-dir .head{display:flex;align-items:baseline;gap:12px;margin:0 0 16px}
+.wr-dir h2{margin:0;font-size:22px;font-weight:800;letter-spacing:-.02em}
+.wr-dir .head p{margin:0;font-size:14px;color:var(--muted,#7b818c)}
+.wr-dir .x{all:unset;cursor:pointer;margin-left:auto;align-self:center;width:36px;height:36px;border-radius:10px;display:grid;place-items:center;color:var(--ink-3,#7b818c)}
+.wr-dir .x:hover{background:var(--cream,#f6f5f2);color:var(--ink)}
+.wr-dir .x:focus-visible{outline:2px solid var(--sky,#2176ff)}
+.wr-dir .x svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
+.wr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,200px),1fr));gap:14px}
+.wr-pc{display:block;min-width:0;text-decoration:none;color:var(--ink);border-radius:var(--wr-r-lg);outline:none}
+.wr-pc .ph{position:relative;display:block;aspect-ratio:3/2;border-radius:var(--wr-r-lg);overflow:hidden;background:#e7e4de}
+.wr-pc img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s var(--wr-ease)}
+.wr-pc:hover img,.wr-pc:focus-visible img{transform:scale(1.05)}
+.wr-pc .nm{display:block;margin-top:8px;font-size:16px;font-weight:700;letter-spacing:-.01em}
+.wr-pc .mt{display:block;margin-top:1px;font-size:13px;color:var(--muted,#7b818c)}
+.wr-pc:focus-visible .ph{outline:3px solid var(--sky,#2176ff);outline-offset:2px}
+.wr-pc[aria-current="page"] .ph{box-shadow:0 0 0 3px var(--card,#fff),0 0 0 5px var(--ink)}
+.wr-pc .here{position:absolute;left:8px;top:8px;padding:4px 8px;border-radius:7px;background:var(--ink);color:#fff;font-size:12px;font-weight:600}
+
+/* ---------- the views of this place: a filmstrip ---------- */
+.rooms{flex-wrap:nowrap;overflow-x:auto;gap:8px;padding:2px 2px 14px;margin:0 -2px;scroll-padding:0 24px}
+.rooms .rm{flex:1 1 0;min-width:104px;max-width:164px;display:flex;flex-direction:column;align-items:stretch;gap:0;
+  padding:4px;border-radius:var(--wr-r-lg);border:1.5px solid var(--border,#e3e1dc);background:var(--card,#fff);text-align:left;
+  transition:border-color .2s,box-shadow .2s,background .2s}
+.rooms .rm:hover{border-color:var(--ink-3,#7b818c)}
+.rooms .rm:focus-visible{outline:2px solid var(--sky,#2176ff);outline-offset:2px}
+.rooms .rm .rt{display:block;width:100%;height:auto;aspect-ratio:3/2;object-fit:cover;border-radius:10px;background:#e7e4de;
+  filter:saturate(.85);opacity:.9;transition:filter .25s,opacity .25s}
+.rooms .rm:hover .rt{filter:none;opacity:1}
+.rooms .rm .rc{display:flex;align-items:baseline;justify-content:space-between;gap:6px;padding:7px 5px 3px;min-width:0;
+  font-size:13px;font-weight:600;line-height:1.2;color:var(--ink)}
+.rooms .rm .t{min-width:0;overflow-wrap:anywhere;hyphens:auto}
+.rooms .rm .n{flex:none;font-family:var(--mono);font-size:11px;font-weight:400;opacity:.6}
+.rooms .rm[aria-current="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.rooms .rm[aria-current="true"] .rc{color:#fff}
+.rooms .rm[aria-current="true"] .rt{filter:none;opacity:1}
+/* before the script has added the pictures the strip still reads as tabs */
+.rooms .rm:not(:has(.rt)){flex:none;min-width:0;padding:8px 13px;border-radius:var(--wr-r)}
+.rooms{scrollbar-width:none}
+
+/* ---------- every button a rounded rectangle ---------- */
+.btn,.planbtn{border-radius:var(--wr-r)}
+.arrow{border-radius:12px}
+.seg{border-radius:12px}
+.seg .thumb,.seg button{border-radius:9px}
+.places .place{border-radius:var(--wr-r)}
+.sel-list .wd{border-radius:9px}
+.wrap.present .nav,.wrap.present .bar{border-radius:16px}
+.task{border-radius:var(--wr-r-lg)}
+.stage{border-radius:18px}
+
+/* ---------- phones ---------- */
+@media (max-width:700px){
+  h1{font-size:27px}
+  .wr-title{gap:8px 12px}
+  .placesbtn{height:36px;padding:0 10px 0 6px;font-size:13px;gap:8px}
+  .placesbtn .ct{display:none}
+  /* the filmstrip comes back on a phone: pictures are easier to tap than names */
+  .rooms{display:flex;padding-bottom:10px}
+  .rooms .rm{flex:none;width:112px;min-width:0}
+  .rooms .rm .rc{font-size:12.5px;padding:6px 4px 2px}
+  .wr-dir{padding:0;place-items:end center}
+  .wr-dir .card{border-radius:20px 20px 0 0;max-height:88vh;padding:16px 14px calc(18px + env(safe-area-inset-bottom,0px))}
+  .wr-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .wr-pc .nm{font-size:14.5px}
+  .wr-pc .mt{font-size:12px}
+}
+.wrap.present .rooms{display:none}
+@media (prefers-reduced-motion:reduce){
+  .placesbtn .fan img,.wr-pc img,.rooms .rm .rt{transition:none}
+  .wr-dir .veil,.wr-dir .card{animation:none}
+}
