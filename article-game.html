@@ -1984,6 +1984,9 @@ const END={title:'Your map',sub:'How you did on each kind of question',groups:{g
       const r = document.createElement('div'); r.className = 'er ring';
       r.innerHTML = '<svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" fill="none" stroke="#EEF1F8" stroke-width="12"/><circle id="erArc" cx="60" cy="60" r="52" fill="none" stroke="currentColor" stroke-width="12" stroke-linecap="round" stroke-dasharray="' + C + '" stroke-dashoffset="' + (C * (1 - pct)) + '" transform="rotate(-90 60 60)"/></svg><div class="num"><b>' + sc + '</b><span>out of ' + total + '</span></div>';
       ring.prepend(r);
+      /* best streak, only when it is worth showing */
+      const sub = document.getElementById('gradeSub');
+      if(sub){ sub.textContent = sub.textContent.replace(/[,.]?\s*(best streak|Best streak).*$/i,'').replace(/\s+$/,''); if(typeof best !== 'undefined' && best >= 3) sub.textContent += (sub.textContent.endsWith('.') ? ' ' : '. ') + 'Best streak: ' + best + ' in a row.'; }
       const by = {};
       results.forEach(x => { const k = END.key(x); by[k] = by[k] || [0, 0]; by[k][1]++; if(END.ok(x)) by[k][0]++; });
       const keys = Object.keys(by).sort((a, b) => by[a][0] / by[a][1] - by[b][0] / by[b][1]);
