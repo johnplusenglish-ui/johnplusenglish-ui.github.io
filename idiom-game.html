@@ -1114,6 +1114,14 @@ input.gap:focus{border-bottom-color:#D6336C!important}
 #pStart .hero{row-gap:6px}
 #stk > svg{display:none!important}
 
+/* real clay mascots */
+.fun-mascot.fun-pic{width:68px;height:68px;object-fit:contain;filter:drop-shadow(0 6px 10px rgba(40,40,90,.18))}
+.fun-mascot.fun-pic{width:auto!important;height:70px!important;max-width:160px}
+.hero h1{gap:0!important}
+.hero h1 .fun-mascot{margin-right:16px}
+.hero h1 span{margin-left:.24em!important}
+@media (max-width:620px){.fun-mascot.fun-pic{height:52px!important}.hero h1 .fun-mascot{margin-right:10px}}
+
 </style></head>
 <body>
 <div id="bg" aria-hidden="true"></div>
@@ -2839,6 +2847,7 @@ window.FunKit = (function(){
   function mascot(c1, c2, inner){
     return '<svg class="fun-mascot" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="fmg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="' + c1 + '"/><stop offset="1" stop-color="' + c2 + '"/></linearGradient><radialGradient id="fmh" cx=".3" cy=".25" r=".6"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs><rect x="4" y="6" width="56" height="52" rx="18" fill="url(#fmg)"/><rect x="4" y="6" width="56" height="52" rx="18" fill="url(#fmh)"/><path d="M14 52 l-2 9 l11-7z" fill="' + c2 + '"/>' + inner + '</svg>';
   }
+  function pic(name, alt){ return '<img class="fun-mascot fun-pic" src="images/mascots/' + name + '.png" alt="" width="64" height="64">'; }
   function txt(t, size){ return '<text x="32" y="41" text-anchor="middle" font-family="Outfit,sans-serif" font-weight="800" font-size="' + (size || 25) + '" fill="#fff">' + t + '</text>'; }
   function hero(heroEl, cards){
     const box = document.createElement('div'); box.className = 'fun-hero';
@@ -2861,7 +2870,7 @@ window.FunKit = (function(){
   }
   function word(p){ return p === 1 ? 'Perfect' : p >= .85 ? 'Sharp' : p >= .7 ? 'Really good' : p >= .5 ? 'Getting there' : 'Good start'; }
   const LINES = ['Spot on', 'Nailed it', 'Yes!', 'Sharp', 'Lovely', 'You got it'];
-  return {mascot, txt, hero, sparks, chip, word, LINES};
+  return {mascot, pic, txt, hero, sparks, chip, word, LINES};
 })();
 /* fun layer for Finish the Idiom */
 (function(){
@@ -2870,7 +2879,7 @@ window.FunKit = (function(){
     const hero = document.querySelector('#startPanel .hero');
     const pick = [IDIOMS[3], IDIOMS.find(x => x.t === 'simile'), IDIOMS.find(x => x.t === 'proverb')].filter(Boolean);
     K.hero(hero, pick.map(it => '<div class="fi-card"><span class="tc">' + (it.t || 'idiom') + '</span><div class="tx">' + esc(it.p.replace(/[{}]/g, '')).replace('___', '<span class="fgap"></span>') + '</div></div>'));
-    hero.querySelector('h1').insertAdjacentHTML('afterbegin', K.mascot('#F06A9A', '#B02757', K.txt('&#8220;&#8221;', 34)));
+    hero.querySelector('h1').insertAdjacentHTML('afterbegin', K.pic('idiom'));
   }catch(e){ console.error(e); }
   const _ps = paintStreak;
   paintStreak = function(){ _ps(); K.chip(document.getElementById('streakPill'), document.getElementById('streakOut'), streak); };

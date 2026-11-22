@@ -630,6 +630,14 @@ header{background:#fff;border-bottom:0!important;box-shadow:0 0 0 100vmax #fff,0
 #pStart .hero{row-gap:6px}
 #stk > svg{display:none!important}
 
+/* real clay mascots */
+.fun-mascot.fun-pic{width:68px;height:68px;object-fit:contain;filter:drop-shadow(0 6px 10px rgba(40,40,90,.18))}
+.fun-mascot.fun-pic{width:auto!important;height:70px!important;max-width:160px}
+.hero h1{gap:0!important}
+.hero h1 .fun-mascot{margin-right:16px}
+.hero h1 span{margin-left:.24em!important}
+@media (max-width:620px){.fun-mascot.fun-pic{height:52px!important}.hero h1 .fun-mascot{margin-right:10px}}
+
 </style></head>
 <body>
 <div class="wrap">
@@ -1005,6 +1013,7 @@ window.FunKit = (function(){
   function mascot(c1, c2, inner){
     return '<svg class="fun-mascot" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="fmg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="' + c1 + '"/><stop offset="1" stop-color="' + c2 + '"/></linearGradient><radialGradient id="fmh" cx=".3" cy=".25" r=".6"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs><rect x="4" y="6" width="56" height="52" rx="18" fill="url(#fmg)"/><rect x="4" y="6" width="56" height="52" rx="18" fill="url(#fmh)"/><path d="M14 52 l-2 9 l11-7z" fill="' + c2 + '"/>' + inner + '</svg>';
   }
+  function pic(name, alt){ return '<img class="fun-mascot fun-pic" src="images/mascots/' + name + '.png" alt="" width="64" height="64">'; }
   function txt(t, size){ return '<text x="32" y="41" text-anchor="middle" font-family="Outfit,sans-serif" font-weight="800" font-size="' + (size || 25) + '" fill="#fff">' + t + '</text>'; }
   function hero(heroEl, cards){
     const box = document.createElement('div'); box.className = 'fun-hero';
@@ -1027,7 +1036,7 @@ window.FunKit = (function(){
   }
   function word(p){ return p === 1 ? 'Perfect' : p >= .85 ? 'Sharp' : p >= .7 ? 'Really good' : p >= .5 ? 'Getting there' : 'Good start'; }
   const LINES = ['Spot on', 'Nailed it', 'Yes!', 'Sharp', 'Lovely', 'You got it'];
-  return {mascot, txt, hero, sparks, chip, word, LINES};
+  return {mascot, pic, txt, hero, sparks, chip, word, LINES};
 })();
 /* fun layer for The Missing Link */
 (function(){
@@ -1038,7 +1047,7 @@ window.FunKit = (function(){
     K.hero(hero, [by('sign'), by('email'), by('chat')].filter(Boolean).map(card));
     hero.querySelectorAll('.fun-hero .gap').forEach(g => { g.textContent = ''; });
     const chainIn = '<g fill="none" stroke="#fff" stroke-width="4.4" stroke-linecap="round" transform="translate(9 5) scale(.72)"><path d="M26 38l12-12"/><path d="M21 30l-6.5 6.5a9.2 9.2 0 0013 13L34 43"/><path d="M43 34l6.5-6.5a9.2 9.2 0 00-13-13L30 21"/></g>';
-    hero.querySelector('h1').insertAdjacentHTML('afterbegin', K.mascot('#5B9BF0', '#1F5FBF', chainIn));
+    hero.querySelector('h1').insertAdjacentHTML('afterbegin', K.pic('linkers'));
   }catch(e){ console.error(e); }
   const _ss = setStreak;
   setStreak = function(v, p){ _ss(v, p); const s = document.getElementById('stk'); K.chip(s, document.getElementById('sk'), v); };
