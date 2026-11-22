@@ -234,7 +234,7 @@ body{font-family:Inter,'Outfit',system-ui,sans-serif;background:#F4F5F8}
 .badge{box-shadow:0 14px 34px -14px rgba(30,40,80,.5),inset 0 0 0 1px rgba(255,255,255,.3)!important}
 .res-focus-box,.route,.rev-item,.note-box textarea{background:rgba(255,255,255,.75)!important;border:1px solid rgba(30,40,80,.08)!important;border-radius:12px!important}
 .site-foot{color:#7A8090}
-</style><!-- /premium -->
+.gap.filled{color:var(--ink);font-weight:700;border-bottom-color:var(--ink)!important;padding:0 .15em}</style><!-- /premium -->
 </head>
 <body>
 
@@ -936,7 +936,7 @@ body{font-family:Inter,'Outfit',system-ui,sans-serif;background:#F4F5F8}
     var q = st.items[st.idx];
     qNow.textContent = st.before + st.idx + 1;
     qStage.textContent = "· checking " + ORDER[st.band];
-    backBtn.hidden = (st.idx===0);
+    backBtn.hidden = true;   /* no going back */
     stem.innerHTML = q.s.replace("___", '<span class="gap">&nbsp;</span>')
       + (q.h ? '<span class="q-hint">' + q.h + '</span>' : '');
     opts.innerHTML = "";
@@ -957,11 +957,12 @@ body{font-family:Inter,'Outfit',system-ui,sans-serif;background:#F4F5F8}
     st.ans[st.idx] = i;
     var kids = opts.children;
     for(var k=0;k<kids.length;k++) kids[k].classList.toggle("chosen", k===i);
+    /* fill the gap */ var g = stem.querySelector(".gap"); if(g){ g.textContent = kids[i].lastChild.textContent; g.classList.add("filled"); }
     setTimeout(function(){
       lock = false;
       if(st.idx < st.items.length-1){ st.idx++; render(); }
       else evaluate();
-    }, 180);
+    }, 650);
   }
 
   function goBack(){ if(st.idx>0){ st.idx--; render(); } }
