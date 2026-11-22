@@ -395,6 +395,282 @@
     *,*::before,*::after{animation-duration:.001s!important;transition-duration:.001s!important}
   }
 </style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Calm theme for Mind the Article: same game, same real-world cards,
+   quieter wrapping. Loaded after the main stylesheet and overrides it. */
+:root{
+  --paper:#F6F5F2;
+  --card:#FFFFFF;
+  --ink:#1F2328;
+  --ink-soft:#6B7079;
+  --line:#E3E0DA;
+  --line-soft:#F0EEEA;
+  --accent:#6D4AE0;
+  --accent-deep:#5A38CC;
+  --accent-wash:#F1EDFD;
+  --green:#2E7D4F;
+  --green-deep:#24653F;
+  --green-wash:#EAF4EE;
+  --red:#C2413A;
+  --red-wash:#FBEDEB;
+  --lift-1:none;
+  --lift-2:none;
+  --lift-3:0 1px 2px rgba(20,25,35,.05);
+  --r-card:14px;
+  --r-ctl:10px;
+}
+body{background:var(--paper);font-family:Inter,system-ui,sans-serif;font-weight:400;color:var(--ink)}
+#cfLayer,.bloom{display:none!important}
+
+/* header */
+header{border-bottom:1px solid var(--line);padding-bottom:14px}
+.brand{font-family:Outfit,sans-serif;font-weight:600;font-size:16px}
+.dot{border-radius:3px;box-shadow:none;width:9px;height:9px}
+.chip{font-weight:600;border-width:1px;border-radius:8px;box-shadow:none}
+.chip:hover{transform:none;box-shadow:none}
+.chip.on{background:#fff;color:var(--ink-soft);border-color:var(--line)}
+
+/* start */
+.hero{text-align:left;padding:10px 0 0}
+h1{font-family:Outfit,sans-serif;font-weight:600;font-size:clamp(34px,6vw,46px);letter-spacing:-.015em;margin:0 0 10px}
+h1 span{background:none;-webkit-text-fill-color:currentColor;color:var(--accent)}
+.sub{font-weight:400;font-size:16px;margin:0 0 20px;max-width:520px}
+.teasers{justify-content:flex-start;margin:0 0 28px;max-width:none}
+.teaser{border-width:1px;box-shadow:none;font-weight:600;border-radius:7px;background:transparent}
+.teaser svg{stroke:var(--ink-soft)}
+.opts{max-width:none;gap:0;border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden}
+.opt{border:0;border-radius:0;box-shadow:none;background:transparent;padding:16px 18px}
+.opt + .opt{border-top:1px solid var(--line)}
+.opt:hover{transform:none;box-shadow:none}
+.opt:focus-within{box-shadow:none}
+.opt .lbl{font-weight:600;font-size:15px}
+.opt .hint{font-weight:400}
+.seg{border-radius:8px}
+.seg button{font-weight:500;border-radius:6px}
+.seg button.on{box-shadow:0 0 0 1px var(--line);color:var(--ink);font-weight:600}
+.lenbox{border-radius:8px}
+.lenbox input{border-radius:6px;font-weight:600}
+.big{background:var(--ink);font-family:Inter,sans-serif;font-weight:600;font-size:17px;padding:15px;border-radius:10px;box-shadow:none;max-width:none}
+.big::after{display:none}
+.big:hover{transform:none;box-shadow:none;background:#000}
+.big:active{transform:none}
+.big.ghost{box-shadow:none;border-width:1px}
+.pdfl{max-width:none;justify-content:flex-start;font-weight:600}
+.foot{text-align:left;font-weight:500}
+
+/* quiz */
+.bar{height:4px;border-radius:2px;margin-bottom:14px}
+.bar i{background:var(--ink);border-radius:2px}
+.meta{font-weight:500}
+.scores b,.meta b{font-weight:700}
+.card{border-width:1px;border-radius:14px;box-shadow:var(--lift-3)}
+.card::before{display:none}
+.card.good,.card.bad{animation:none;border-color:var(--line)}
+.frame{font-weight:600;letter-spacing:0}
+.frame svg{stroke:var(--ink-soft)}
+.lvl{border-radius:6px;font-weight:700}
+.stage{min-height:150px;padding:10px 0}
+.sent{font-weight:500;font-size:clamp(18px,2.8vw,21px)}
+.blank{background:transparent;border-bottom:2px solid var(--ink);border-radius:0;color:var(--accent-deep);font-weight:700}
+.blank.good{background:transparent;border-bottom-color:var(--green);color:var(--green)}
+.blank.bad{background:transparent}
+.blank .ch{animation:none}
+.sent .pw{font-weight:700;color:inherit}
+
+/* text message: a real phone thread */
+.chat{max-width:400px;background:#fff;border:1px solid var(--line);border-radius:22px;padding:0 0 18px;overflow:hidden}
+.chat .who{flex-direction:column;gap:4px;margin:0 0 14px;padding:12px 0 10px;background:#F7F7F8;border-bottom:1px solid #ECECEE;font-size:12px;font-weight:500;color:var(--ink)}
+.ava{font-family:Inter,sans-serif;font-weight:600;width:34px;height:34px;font-size:14px}
+.bubble{margin:0 16px;display:block;background:#E9E9EB;border-radius:18px 18px 18px 5px;box-shadow:none;padding:9px 14px 10px;max-width:86%}
+.bubble .sent{font-size:17px;line-height:1.42;font-weight:400}
+.bubble .time{position:static;display:block;margin:5px 0 0;text-align:right;font-weight:500}
+.bubble .blank{border-bottom-color:#8E8E93}
+
+/* other frames: same shapes, plainer type */
+.mail{border-width:1px;border-radius:10px}
+.mail .mh{border-bottom-width:1px;font-weight:400}
+.mail .mh b{font-weight:600}
+.sign{border-radius:6px;box-shadow:inset 0 0 0 3px #1F3B66, inset 0 0 0 5px rgba(255,255,255,.9)}
+.sign .sent{font-family:Inter,sans-serif;font-weight:600}
+.sign .blank{background:transparent}
+.sign .blank.good{background:transparent;color:#FFD25E;border-bottom-color:#FFD25E}
+.rev,.post{border-width:1px;border-radius:10px}
+.post .ph,.post .ph small,.post .acts,.rev .src{font-weight:500}
+.heard .q{font-family:Georgia,serif}
+.tag{border-radius:8px;border-width:1.5px}
+.tag .tt{font-family:Inter,sans-serif;font-weight:600}
+.paper .mast span{font-family:Inter,sans-serif;font-weight:500}
+
+/* tiles */
+.tiles{gap:10px}
+.tile{font-family:Inter,sans-serif;font-weight:500;font-size:19px;border-width:1px;border-radius:10px;min-height:58px;box-shadow:none}
+.tile .k{font-family:Inter,sans-serif;font-weight:500;color:#B5B8BE}
+.tile small{font-family:Inter,sans-serif;font-weight:500;letter-spacing:0}
+.tile:hover:not(:disabled){transform:none;border-color:var(--ink);box-shadow:none}
+.tile:active:not(:disabled){transform:none;box-shadow:none}
+.tile.right{background:var(--green);border-color:var(--green);box-shadow:none}
+.tile.wrong{background:var(--red-wash);border-color:var(--red);box-shadow:none}
+.tile.pop,.tile.nope{animation:none}
+.tile.dim{opacity:.4}
+
+/* feedback */
+.verdict{font-family:Outfit,sans-serif;font-weight:600;font-size:19px}
+.ex{border-width:1px;border-radius:10px}
+.ex .lk{font-family:Inter,sans-serif;font-weight:600;border-radius:6px;font-size:15px}
+.ex .mean,.ex .r{font-weight:400}
+.ex .nh{font-weight:700}
+.ex .not{border-radius:6px}
+.ex .not + .not{border-top-width:1px}
+.ix{font-weight:600}
+.l1row,.lc{font-weight:500}
+.lc{border-width:1px;border-radius:6px}
+.feedback > *{animation:none}
+.clue,.rule{font-weight:400}
+.hint-btn{border-width:1px;box-shadow:none;font-weight:600;border-radius:8px}
+.hint-btn:hover:not(:disabled){transform:none;box-shadow:none;color:var(--ink);border-color:var(--ink)}
+.next-btn{background:var(--ink);box-shadow:none}
+.next-btn:hover:not(:disabled){background:#000}
+.keys kbd{border-width:1px;border-bottom-width:2px}
+
+/* end */
+.score-ring{border-width:1px;border-radius:14px;box-shadow:var(--lift-3)}
+.score-big,.grade,.stat b,.review h2{font-family:Outfit,sans-serif}
+.stat{border-radius:8px}
+.miss{border-width:1px;border-radius:10px;box-shadow:none;animation:none}
+.pull{border-radius:8px;font-weight:500}
+.next-btn:focus-visible,.big:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+/* Why not the others: pills sit right, next to their reason */
+.ex .xo{justify-content:flex-end}
+.ex .not{grid-template-columns:minmax(0,130px) minmax(0,1fr)}
+@media (max-width:620px){ .ex .xo{justify-content:flex-start} .ex .not{grid-template-columns:minmax(0,1fr)} }
+/* no "In your language?" row */
+.l1wrap{display:none!important}
+
+/* ---------- signs: one look per kind of place ---------- */
+.sg{width:100%;max-width:500px;text-align:left;border-radius:8px;overflow:hidden;position:relative}
+.sg-h{display:flex;align-items:center;gap:10px;padding:11px 18px;font-size:12.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.sg-i{width:22px;height:22px;flex:none;display:grid;place-items:center}
+.sg-i svg{width:22px;height:22px}
+.sg-b{padding:16px 20px 20px}
+.sg .sent{font-size:clamp(18px,2.6vw,21px);line-height:1.5;font-weight:600}
+.sg .blank{background:transparent;border-radius:0}
+.sg .blank.good{background:transparent}
+.sg .blank.bad{background:transparent}
+.sg .sent .pw{color:inherit;font-weight:800}
+
+/* clinic: white board, teal band */
+.sg-clinic{background:#fff;border:1px solid #D5E3E1;color:#16302D}
+.sg-clinic .sg-h{background:#0F766E;color:#fff}
+.sg-clinic .blank{border-bottom-color:#0F766E;color:#0F766E}
+
+/* visitor: brown attraction board */
+.sg-visitor{background:#5B3A29;color:#FFF7EC;box-shadow:inset 0 0 0 3px #5B3A29,inset 0 0 0 5px rgba(255,247,236,.85)}
+.sg-visitor .sg-h{color:#FFF7EC;border-bottom:1.5px solid rgba(255,247,236,.35);margin:0 10px}
+.sg-visitor .blank{border-bottom-color:#FFD9A0;color:#FFD9A0}
+.sg-visitor .blank.good{color:#FFD9A0}
+
+/* transport: navy with yellow */
+.sg-transport{background:#14284B;color:#fff}
+.sg-transport .sg-h{background:#FFD24D;color:#14284B}
+.sg-transport .blank{border-bottom-color:#FFD24D;color:#FFD24D}
+.sg-transport .blank.good{color:#FFD24D}
+
+/* airport: charcoal with amber */
+.sg-airport{background:#1D1F23;color:#F2F2F2}
+.sg-airport .sg-h{color:#FFC233;border-bottom:1px solid #34373D}
+.sg-airport .blank{border-bottom-color:#FFC233;color:#FFC233}
+.sg-airport .blank.good{color:#FFC233}
+
+/* notice: printed sheet taped to a wall */
+.sg-notice{background:#fff;color:#1F2328;border:1px solid #E3E0DA;border-top:6px solid #C2413A;overflow:visible;box-shadow:0 1px 2px rgba(0,0,0,.06)}
+.sg-notice .sg-h{color:#C2413A;font-size:14px}
+.sg-notice .sg-b{padding-top:2px}
+.sg-notice::before,.sg-notice::after{content:"";position:absolute;top:-14px;width:58px;height:20px;background:rgba(236,228,206,.85);box-shadow:0 1px 1px rgba(0,0,0,.05)}
+.sg-notice::before{left:-14px;transform:rotate(-30deg)}
+.sg-notice::after{right:-14px;transform:rotate(30deg)}
+.sg-notice .blank{border-bottom-color:#1F2328;color:#C2413A}
+.sg-notice .blank.good{color:var(--green)}
+
+/* door: chalkboard */
+.sg-door{background:#2A2F2D;color:#F4F1EA;border:8px solid #8A6A4A;border-radius:6px}
+.sg-door .sg-h{color:#F4F1EA;justify-content:center;letter-spacing:.14em}
+.sg-door .sg-b{text-align:center}
+.sg-door .blank{border-bottom:2px dashed #F4F1EA;color:#FCE8A6}
+.sg-door .blank.good{color:#FCE8A6}
+
+/* wood: painted board */
+.sg-wood{background:repeating-linear-gradient(180deg,#9A6B43 0 34px,#8F623C 34px 36px);color:#FFF8EE;border-radius:4px}
+.sg-wood .sg-h{color:#FFF8EE;font-size:15px}
+.sg-wood .blank{border-bottom-color:#FFF8EE;color:#FFE3A8}
+.sg-wood .blank.good{color:#FFE3A8}
+.sg .blank.bad{color:#FF8A80}
+.sg-clinic .blank.bad,.sg-notice .blank.bad{color:var(--red)}
+.sg .sent{color:inherit}
+.sg .blank.empty{color:transparent!important}
+
+/* ---------- overheard: a speech bubble with where it was heard ---------- */
+.oh{width:100%;max-width:500px;display:flex;flex-direction:column;align-items:flex-start}
+.oh-b{position:relative;background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px 18px;box-shadow:0 1px 2px rgba(20,25,35,.04)}
+.oh-b::after{content:"";position:absolute;left:28px;bottom:-9px;width:16px;height:16px;background:#fff;border-right:1px solid var(--line);border-bottom:1px solid var(--line);transform:rotate(45deg)}
+.oh .sent{font-size:clamp(18px,2.6vw,21px);font-weight:500;text-align:left}
+.oh-w{display:flex;align-items:center;gap:6px;margin:16px 0 0 18px;font-size:13px;font-weight:500;color:var(--ink-soft)}
+.oh-w svg{width:15px;height:15px}
+
+/* ---------- post: a feed card ---------- */
+.ps{width:100%;max-width:500px;text-align:left;background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px 10px}
+.ps-h{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.ps-n{display:flex;flex-direction:column;line-height:1.25}
+.ps-n b{font-weight:600;font-size:15px}
+.ps-n span{font-size:13px;color:var(--ink-soft)}
+.ps .sent{font-size:17px;font-weight:400;line-height:1.5}
+.ps-a{display:flex;gap:26px;margin-top:12px;padding-top:10px;border-top:1px solid var(--line-soft);font-size:13px;color:var(--ink-soft)}
+.ps-a span{display:inline-flex;align-items:center;gap:6px}
+.ps-a svg{width:16px;height:16px}
+
+/* ---------- email: an open message ---------- */
+.em{width:100%;max-width:520px;text-align:left;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.em-s{font-family:Outfit,sans-serif;font-weight:600;font-size:19px;padding:16px 18px 12px}
+.em-f{display:flex;align-items:center;gap:10px;padding:0 18px 12px;border-bottom:1px solid var(--line-soft)}
+.em-n{display:flex;flex-direction:column;line-height:1.25;flex:1;min-width:0}
+.em-n b{font-weight:600;font-size:14px}
+.em-n span{font-size:12.5px;color:var(--ink-soft)}
+.em-t{font-size:12.5px;color:var(--ink-soft)}
+.em-b{padding:16px 18px 20px}
+.em .sent{font-size:17px;font-weight:400;line-height:1.55}
+
+/* ---------- review: a rating card ---------- */
+.rv{width:100%;max-width:500px;text-align:left;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px 12px}
+.rv-p{font-family:Outfit,sans-serif;font-weight:600;font-size:16px;margin-bottom:6px}
+.rv-r{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--ink-soft);margin-bottom:10px}
+.rv-s{display:flex;gap:1px}
+.rv-s svg{width:16px;height:16px}
+.rv .sent{font-size:17px;font-weight:400;line-height:1.55}
+.rv-f{display:flex;align-items:center;gap:6px;margin-top:12px;padding-top:10px;border-top:1px solid var(--line-soft);font-size:12.5px;color:var(--ink-soft)}
+.rv-f svg{width:14px;height:14px}
+
+/* ---------- headline: a newspaper clipping ---------- */
+.np{width:100%;max-width:520px;text-align:left;background:#FBF8F1;padding:16px 22px 26px;transform:rotate(-.8deg);box-shadow:0 1px 2px rgba(0,0,0,.08),0 10px 24px -14px rgba(0,0,0,.25);
+  clip-path:polygon(0 0,100% 0,100% 94%,96% 97%,92% 94.5%,87% 98%,82% 95%,77% 97.5%,71% 94%,66% 97%,60% 95%,55% 98%,49% 94.5%,44% 97%,38% 95%,33% 98%,27% 94%,22% 97%,16% 95%,11% 98%,6% 94.5%,0 97%)}
+.np-m{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid #2A241C;padding-bottom:6px;margin-bottom:12px;font-family:Newsreader,Georgia,serif;font-weight:700;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#2A241C}
+.np-m span + span{font-family:Inter,sans-serif;font-weight:500;letter-spacing:.04em;text-transform:none;color:#7A6F5F;font-size:11.5px}
+.np .sent{font-family:Newsreader,Georgia,serif;font-weight:700;font-size:clamp(23px,3.6vw,29px);line-height:1.18;letter-spacing:-.005em;color:#1E1A15}
+.np .blank{border-bottom-color:#1E1A15;font-family:Newsreader,Georgia,serif}
+.np-x{display:grid;grid-template-columns:1fr 1fr;gap:6px 18px;margin-top:14px}
+.np-x i{display:block;height:6px;border-radius:2px;background:#E4DCCB}
+.np-x i:nth-child(2n){width:80%}
+
+/* site footer links, flat */
+.social a{border-width:1px;border-radius:8px;box-shadow:none;font-weight:600}
+.social a:hover{transform:none;box-shadow:none;color:var(--ink);border-color:var(--ink)}
+.social{justify-content:flex-start}
+
+/* results: no "traps dodged" stat (confusing at lower levels) */
+.stat:has(#stTraps){display:none}
+.stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+
+</style>
 </head>
 <body>
 <div id="cfLayer"></div>
@@ -1346,6 +1622,89 @@ document.addEventListener('keydown', e => {
   sheen($('card')); sheen($('startBtn'));
   introIn();
 })();
+</script>
+<script>
+/* calm demo: sound starts off unless the player turned it on */
+try{ if(JSON.parse(localStorage.getItem(KEY) || '{}').soundOn !== true){ soundOn = false; const b = $('soundBtn'); b.classList.remove('on'); b.textContent = 'Sound off'; b.setAttribute('aria-pressed', false); } }catch(e){}
+</script><script>
+/* calm demo: every sign gets a look that fits its place. Icons: Lucide (ISC) and Tabler (MIT). */
+const SGI = {
+  clinic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 2v2M5 2v2m0-1H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1"/><path d="M8 15a6 6 0 0 0 12 0v-3"/><circle cx="20" cy="10" r="2"/></svg>',
+  visitor:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="20" cy="16" r="2"/><path d="M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045q-.64-2.065-2.7-2.705A3.5 3.5 0 0 1 5.5 10Z"/></svg>',
+  transport:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93l4.24 4.24m5.66 0l4.24-4.24m-4.24 9.9l4.24 4.24m-9.9-4.24l-4.24 4.24"/><circle cx="12" cy="12" r="4"/></svg>',
+  notice:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1z"/><path d="m10 10l2-2l2 2m-4 4l2 2l2-2"/></svg>',
+  door:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2M7 2v20m14-7V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2zm0 0v7"/></svg>',
+  wood:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3l4-3l2 3h2"/></svg>',
+  airport:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 22h20M6.36 17.4L4 17l-2-4l1.1-.55a2 2 0 0 1 1.8 0l.17.1a2 2 0 0 0 1.8 0L8 12L5 6l.9-.45a2 2 0 0 1 2.09.2l4.02 3a2 2 0 0 0 2.1.2l4.19-2.06a2.4 2.4 0 0 1 1.73-.17L21 7a1.4 1.4 0 0 1 .87 1.99l-.38.76c-.23.46-.6.84-1.07 1.08L7.58 17.2a2 2 0 0 1-1.22.18Z"/></svg>'
+};
+const SGL = {clinic:'Patient information', visitor:'Visitor information', transport:'Passenger information', notice:'Notice', door:'Please note', wood:'Bike hire', airport:'Passenger notice'};
+function signKind(w){
+  w = String(w || '').toLowerCase();
+  if(/surgery|clinic|hospital|pharmacy|dental/.test(w)) return 'clinic';
+  if(/zoo|enclosure|museum|gallery|park|castle/.test(w)) return 'visitor';
+  if(/airport|check-in|terminal/.test(w)) return 'airport';
+  if(/ferry|deck|train|station|platform|bus|coach/.test(w)) return 'transport';
+  if(/restaurant|caf|bar|door|shop/.test(w)) return 'door';
+  if(/hire|shed|lake|beach|campsite/.test(w)) return 'wood';
+  return 'notice';
+}
+const _stageHTML = stageHTML;
+stageHTML = function(it){
+  const c = it.ctx || {};
+  if(c.t !== 'sign') return _stageHTML(it);
+  const k = signKind(c.where);
+  return '<div class="sg sg-' + k + '"><div class="sg-h"><span class="sg-i">' + SGI[k] + '</span><span>' + SGL[k] + '</span></div><div class="sg-b">' + sentHTML(it) + '</div></div>';
+};
+</script><script>
+/* Calm theme: more realistic overheard, post, email, review and headline frames.
+   Icons: Lucide (ISC). Loaded after the game script; wraps stageHTML. */
+const FI = {
+  pin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>',
+  heart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676a.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5"/></svg>',
+  msg:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092a10 10 0 1 0-4.777-4.719"/></svg>',
+  rep:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2 9l3-3l3 3"/><path d="M13 18H7a2 2 0 0 1-2-2V6m17 9l-3 3l-3-3"/><path d="M11 6h6a2 2 0 0 1 2 2v10"/></svg>',
+  thumb:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5.88L14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88M7 10v12"/></svg>'
+};
+function nameOf(handle){
+  const first = String(handle || '').replace(/^@/, '').split(/[_.]/)[0] || 'Someone';
+  return first.charAt(0).toUpperCase() + first.slice(1);
+}
+const _stageFrames = stageHTML;
+stageHTML = function(it){
+  const c = it.ctx || {}, t = c.t, S = sentHTML(it), h = hash(it.id);
+  if(t === 'overheard'){
+    return '<div class="oh"><div class="oh-b">' + S + '</div>' +
+      '<div class="oh-w">' + FI.pin + '<span>Overheard' + (c.where ? ' &middot; ' + esc(c.where) : '') + '</span></div></div>';
+  }
+  if(t === 'post'){
+    const hd = c.handle || '@someone', col = AVA[hash(hd) % AVA.length];
+    return '<div class="ps"><div class="ps-h"><span class="ava" style="background:' + col + '">' + esc(nameOf(hd).charAt(0)) + '</span>' +
+      '<div class="ps-n"><b>' + esc(nameOf(hd)) + '</b><span>' + esc(hd) + ' &middot; ' + (1 + h % 9) + 'h</span></div></div>' +
+      '<div class="ps-t">' + S + '</div>' +
+      '<div class="ps-a"><span>' + FI.msg + (2 + h % 40) + '</span><span>' + FI.rep + (1 + h % 25) + '</span><span>' + FI.heart + (12 + hash(it.s) % 400) + '</span></div></div>';
+  }
+  if(t === 'email'){
+    const from = c.from || 'Work';
+    return '<div class="em"><div class="em-s">' + esc(c.subj || '(no subject)') + '</div>' +
+      '<div class="em-f"><span class="ava" style="background:' + AVA[hash(from) % AVA.length] + '">' + esc(from.charAt(0).toUpperCase()) + '</span>' +
+      '<div class="em-n"><b>' + esc(from) + '</b><span>to me</span></div><span class="em-t">' + clockTime(it) + '</span></div>' +
+      '<div class="em-b">' + S + '</div></div>';
+  }
+  if(t === 'review'){
+    const n = Math.max(1, Math.min(5, +c.stars || 4));
+    let st = ''; for(let i = 1; i <= 5; i++) st += star(i <= n);
+    return '<div class="rv"><div class="rv-p">' + esc(c.where || 'A place') + '</div>' +
+      '<div class="rv-r"><span class="rv-s">' + st + '</span><span>' + n + ' out of 5 &middot; ' + (1 + h % 6) + ' weeks ago</span></div>' +
+      '<div class="rv-t">' + S + '</div>' +
+      '<div class="rv-f">' + FI.thumb + 'Helpful (' + (h % 30) + ')</div></div>';
+  }
+  if(t === 'headline'){
+    return '<div class="np"><div class="np-m"><span>' + esc(c.pub || 'The Daily') + '</span><span>Tuesday</span></div>' +
+      '<div class="np-h">' + S + '</div><div class="np-x"><i></i><i></i><i></i><i></i></div></div>';
+  }
+  return _stageFrames(it);
+};
+
 </script>
 </body>
 </html>
