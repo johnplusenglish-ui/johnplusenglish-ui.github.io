@@ -15,7 +15,8 @@
     ['hospital','The Hospital','the-entrance',9,269],
     ['airport','The Airport','the-drop-off',9,202],
     ['hotel','The Hotel','the-entrance',8,218],
-    ['restaurant','The Restaurant','outside',6,183]
+    ['restaurant','The Restaurant','outside',6,183],
+    ['car','The Car','the-driveway',8,194]
   ];
   document.documentElement.classList.add('wr-js');
   function cover(p){return 'images/'+p[0]+'/thumbs/'+p[2]+'.webp';}

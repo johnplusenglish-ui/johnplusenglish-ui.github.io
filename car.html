@@ -1,0 +1,1703 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Car: click and learn</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="assets/theme.css">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<meta name="description" content="Walk round a family car, get in, open the boot and the bonnet, fill up and take it out on the road, and learn the English name of everything you see: 194 words across eight views, with a game to test yourself.">
+<link rel="canonical" href="https://johnplusenglish.com/car.html">
+<style>
+:root{--ink:#14161a;--ink-2:#4a4f58;--ink-3:#7b818c;--line:#e3e1dc;--bg:#f6f5f2;--card:#fff;--accent:#1d4e89;--good:#1f7a4d;--bad:#b3382c;
+  --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;
+  /* Phonetics need a font that actually holds ʃ ʒ ð θ ŋ ɪ ə ɒ ɑː: the page font
+     does not, and a missing symbol falls back one glyph at a time, which reads
+     as a ransom note. These are the faces already on a Mac, a PC and a phone
+     that have the whole of IPA, so nothing extra is downloaded. */
+  --ipa:'Lucida Grande','Lucida Sans Unicode','Charis SIL','Gentium Plus','DejaVu Sans','Segoe UI',system-ui,sans-serif;
+  --spring:cubic-bezier(.2,.9,.3,1.2);--soft:cubic-bezier(.22,.8,.26,1)}
+@supports (transition-timing-function:linear(0,1)){:root{--spring:linear(0,0.021,0.075,0.153,0.245,0.345,0.446,0.544,0.636,0.72,0.795,0.859,0.913,0.957,0.992,1.019,1.039,1.052,1.06,1.063,1.063,1.061,1.057,1.051,1.045,1.039,1.032,1.026,1.021,1.016,1.011,1.007,1.004,1.002,1,0.998,0.997,0.996,0.996,0.996,0.996,0.996,0.997,0.997,1)}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:'Outfit',system-ui,sans-serif;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer}
+.wrap{max-width:1320px;margin:0 auto;padding:18px 16px 40px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 20px;margin-bottom:12px}
+h1{font-size:26px;line-height:1.1;margin:0;font-weight:700;letter-spacing:-.01em}
+.sub{color:var(--ink-2);font-size:15px;margin:4px 0 0}
+.count{margin-left:auto;font-family:var(--mono);font-size:13px;color:var(--ink-2);white-space:nowrap}
+.count b{color:var(--ink);font-weight:500}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:12px}
+.seg{position:relative;display:inline-flex;background:#eceae5;border-radius:999px;padding:3px}
+.seg .thumb{position:absolute;top:3px;bottom:3px;left:3px;width:0;border-radius:999px;background:var(--card);box-shadow:0 1px 2px rgba(0,0,0,.14),0 3px 10px rgba(0,0,0,.06);transition:left .5s var(--spring),width .5s var(--spring)}
+.seg .thumb.still{transition:none}
+.seg button{position:relative;z-index:1;border:0;background:transparent;padding:7px 16px;border-radius:999px;font-weight:500;font-size:14px;color:var(--ink-2);transition:color .25s}
+.seg button[aria-pressed="true"]{color:var(--ink)}
+.btn{border:1px solid var(--line);background:var(--card);padding:7px 14px;border-radius:999px;font-size:14px;font-weight:500;transition:background .25s,color .25s,border-color .25s,scale .35s var(--spring)}
+.btn:hover{border-color:#c9c6bf}
+.btn:active{scale:.95}
+.btn[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.spacer{flex:1 1 0;min-width:0}
+[hidden]{display:none!important}
+
+/* one button per room, shown only when the page holds more than one */
+.rooms{display:flex;gap:6px;overflow-x:auto;padding:0 0 12px;scrollbar-width:none}
+.rooms::-webkit-scrollbar{display:none}
+.rm{flex:none;display:inline-flex;align-items:baseline;gap:7px;border:1px solid var(--line);background:var(--card);
+  padding:7px 13px;border-radius:10px;font-size:14px;font-weight:500;white-space:nowrap;
+  transition:background .25s,color .25s,border-color .25s,scale .35s var(--spring)}
+.rm:hover{border-color:#c9c6bf}
+.rm:active{scale:.96}
+.rm[aria-current="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.rm .n{font-family:var(--mono);font-size:11px;opacity:.55}
+
+/* task strip for Find it and Edit */
+.task{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 14px;margin-bottom:12px;min-height:52px;animation:rise .4s var(--soft)}
+@keyframes rise{from{opacity:0;translate:0 -6px}to{opacity:1;translate:0 0}}
+.task .lab{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+.task .word{font-size:22px;font-weight:600;display:inline-block}
+.task .word.new{animation:wordin .45s var(--soft)}
+@keyframes wordin{from{opacity:0;translate:0 8px}to{opacity:1;translate:0 0}}
+.task .tipa{font-family:var(--ipa);font-size:17px;color:var(--ink-3);white-space:nowrap}
+.task .msg{font-size:15px;color:var(--ink-2)}
+.task .msg.good{color:var(--good)}.task .msg.bad{color:var(--bad)}
+
+/* the picture */
+.stage{position:relative;width:100%;aspect-ratio:3/2;border-radius:16px;overflow:hidden;background:#ddd;box-shadow:0 10px 40px rgba(20,22,26,.16);user-select:none;-webkit-user-select:none;touch-action:manipulation;container-type:inline-size}
+.stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;opacity:0;scale:1.02;transition:opacity .45s var(--soft),scale .7s var(--soft)}
+.stage img.on{opacity:1;scale:1}
+/* The room you are leaving is kept on screen as a ghost while it is pushed out
+   of the way. It sits above the new one, so a frame of empty picture never
+   shows through underneath. */
+.stage img.ghost{opacity:1;scale:1;z-index:1;transition:none}
+/* Promoted to its own layer only while it is actually moving, and let go again
+   afterwards: a layer left standing costs memory for nothing. */
+.stage img.ghost,.stage img.shifting{will-change:transform,opacity}
+/* smooth-word-rooms */
+/* A CSS transition outranks a Web Animation, so a picture being moved must have none, or the
+   transition drives its scale instead of the move and it settles with a jolt at the end. */
+.stage img.shifting{transition:none}
+/* and a doorway passes over the picture: the edges darken for a moment as the
+   camera goes through, the way they do when you walk from room to room */
+.thru{position:absolute;inset:0;z-index:4;pointer-events:none;opacity:0;
+  background:radial-gradient(ellipse 72% 72% at 50% 50%,rgba(8,9,12,0) 40%,rgba(8,9,12,.62) 100%)}
+.stage.find,.stage.edit{cursor:crosshair}
+
+.spot{position:absolute;width:5.2cqw;height:5.2cqw;min-width:30px;min-height:30px;transform:translate(-50%,-50%);border:0;background:transparent;border-radius:50%;padding:0;display:grid;place-items:center;z-index:2}
+.spot i{display:block;width:13px;height:13px;border-radius:50%;background:rgba(255,255,255,.55);border:1.5px solid rgba(255,255,255,.95);
+  box-shadow:0 0 0 1px rgba(20,22,26,.25),0 2px 8px rgba(0,0,0,.35),0 0 0 0 rgba(255,255,255,0);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  transition:scale .5s var(--spring),background .25s,opacity .3s,box-shadow .35s var(--soft)}
+.spot:hover i,.spot:focus-visible i{scale:1.4;background:rgba(255,255,255,.92);box-shadow:0 0 0 1px rgba(20,22,26,.25),0 2px 8px rgba(0,0,0,.35),0 0 0 7px rgba(255,255,255,.22)}
+.spot:active i{scale:.85}
+.spot:focus-visible{outline:2px solid #fff;outline-offset:-4px}
+/* the dot gets out of the way smartly, so the pill is the only thing growing */
+.spot.open i{opacity:0;scale:.35;transition:opacity .16s var(--soft),scale .22s var(--soft)}
+/* the dots arrive in CSS, not through the library: an animation library leaves its
+   last values on the element as inline styles, and those would beat the rule above */
+@keyframes dotin{from{opacity:0;scale:0}to{opacity:1;scale:1}}
+.spot.intro i{animation:dotin .7s var(--spring) backwards}
+.stage.nodots .spot:not(.open) i{opacity:0}
+.stage.nodots .spot:hover:not(.open) i,.stage.nodots .spot:focus-visible:not(.open) i{opacity:.9}
+.stage.find .spot{pointer-events:none}
+.stage.find .spot i{opacity:0}
+.stage.find .spot.open i{opacity:0}
+.stage.edit .spot i{background:var(--accent);border-color:#fff;opacity:1;scale:1;transition:scale .3s var(--spring),background .2s}
+.stage.edit .spot{cursor:grab}
+.stage.edit .spot.sel i{background:#e0a11b;scale:1.4}
+
+/* ring that spreads from a clicked object */
+.ring{position:absolute;z-index:3;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;border:1.5px solid rgba(255,255,255,.95);background:rgba(255,255,255,.18);pointer-events:none}
+.ring.good{border-color:#aef0c9;background:rgba(123,224,166,.25)}
+.ring.bad{border-color:#fff;background:rgba(179,56,44,.4)}
+
+/* the glass pill.
+   The pin does the positioning, the pill inside it does the moving. They are kept
+   apart on purpose: an animation library owns the transform of whatever it animates,
+   so anything positioned with a transform of its own would be overwritten. */
+.pin{position:absolute;z-index:5;width:max-content}
+.pin.glide{transition:margin .38s var(--soft)}
+.pin.leaving{pointer-events:none}
+.pill{position:relative;display:block;padding:4px 9px;border-radius:7px;white-space:nowrap;font-size:13px;font-weight:600;line-height:1.2;color:#0e1013;text-align:center;
+  background:rgba(255,255,255,.56);backdrop-filter:blur(14px) saturate(180%);-webkit-backdrop-filter:blur(14px) saturate(180%);
+  border:1px solid rgba(255,255,255,.75);box-shadow:0 6px 18px rgba(10,12,16,.26),inset 0 1px 0 rgba(255,255,255,.85);
+  cursor:pointer;will-change:transform,opacity;transition:background .3s,box-shadow .3s}
+.pill:hover{background:rgba(255,255,255,.74);box-shadow:0 8px 22px rgba(10,12,16,.3),inset 0 1px 0 rgba(255,255,255,.9)}
+.pill.good{background:rgba(214,246,226,.74)}
+/* how a word is said, under the word itself: a second line in the same label,
+   so a student reads the two together and the label still points at one thing */
+.pill .ipa{display:block;margin-top:1px;font-family:var(--ipa);font-size:.8em;font-weight:400;
+  letter-spacing:0;color:#2b2f36;opacity:.74}
+/* hear-word-rooms */
+/* a speaker after the word: it plays the word and leaves the label open */
+.hear{all:unset;display:inline-grid;place-items:center;width:1.25em;height:1.25em;margin:-.2em -.25em -.2em .3em;
+  vertical-align:-.22em;border-radius:50%;cursor:pointer;color:#2b2f36;opacity:.62;transition:opacity .15s,background .15s,color .15s}
+.hear svg{width:.95em;height:.95em;fill:currentColor}
+.hear svg .w{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
+.hear:hover,.hear:focus-visible{opacity:1;background:rgba(255,255,255,.7)}
+.hear:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.hear.on{opacity:1;color:var(--accent)}
+#task .hear{width:1.6em;height:1.6em;margin:0 0 0 .1em;opacity:.75}
+.stage.snap .hear,.stage.edit .hear,.stage.tight .hear{display:none}
+@media (prefers-reduced-motion:reduce){.hear{transition:none}}
+.stage.many .pill{font-size:11.5px;padding:3px 7px;border-radius:6px;letter-spacing:-.005em}
+/* a small window with a lot of labels open: smaller still, so they all fit */
+.stage.tight .pill{font-size:10.5px;padding:2px 6px;border-radius:5px;letter-spacing:-.01em}
+.stage.edit .pill{pointer-events:none;opacity:.8}
+.stage.edit .pill.sel{opacity:1;background:rgba(255,236,190,.85)}
+@media (max-width:640px){.pill{font-size:11.5px;padding:3px 7px;border-radius:6px}.spot{min-width:44px;min-height:44px}.spot i{width:11px;height:11px}h1{font-size:22px}}
+
+/* editor form */
+.form{position:absolute;z-index:8;left:12px;bottom:12px;width:min(300px,calc(100% - 24px));padding:12px;border-radius:16px;background:rgba(255,255,255,.72);backdrop-filter:blur(18px) saturate(180%);-webkit-backdrop-filter:blur(18px) saturate(180%);border:1px solid rgba(255,255,255,.8);box-shadow:0 10px 30px rgba(10,12,16,.3);display:grid;gap:7px;cursor:default;animation:formin .4s var(--spring)}
+@keyframes formin{from{opacity:0;scale:.94;translate:0 8px}to{opacity:1;scale:1;translate:0 0}}
+.form.rt{left:auto;right:12px}
+.form label{font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-2)}
+.form input{font:inherit;font-size:15px;padding:7px 10px;border-radius:9px;border:1px solid #cfccc5;background:rgba(255,255,255,.9);width:100%;min-width:0}
+.form .row{display:flex;gap:6px;margin-top:4px}
+.form .row button{flex:1 1 0;border-radius:9px;border:1px solid #cfccc5;background:#fff;padding:7px 8px;font-size:14px;font-weight:500}
+.form .row .pri{background:var(--ink);color:#fff;border-color:var(--ink)}
+.form .row .del{color:var(--bad)}
+.form .pos{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+.form .pos button{border-radius:8px;border:1px solid #cfccc5;background:#fff;padding:6px 0;font-size:12.5px;font-weight:500;transition:background .2s,color .2s,border-color .2s}
+.form .pos button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+/* ---------- choosing the words ----------
+   A teacher picks what the class works with. A word switched off loses its dot
+   and its label together, and drops out of Explore, out of Find it and out of
+   the count. The picture never changes: only what is named on it. */
+/* ---------- phonetics, and saving the picture ----------
+   Two buttons for the phonetics, one job each: whether the sounds are shown at
+   all, and which English they are the sounds of. The second only appears once
+   the first is on. A button with two labels wears the short one on a narrow
+   screen, because the row of buttons has to stay one row. */
+.twolab .short,.accbtn .eg{display:none}
+.accbtn{font-family:var(--ipa)}
+.accbtn .eg{font-size:11px;opacity:.6;margin-left:6px}
+@media (min-width:860px){.accbtn .eg{display:inline}}
+@media (max-width:640px){.twolab .long{display:none}.twolab .short{display:inline}}
+.wordsbtn .n{font-family:var(--mono);font-size:11px;margin-left:6px;opacity:.55}
+.wordsbtn[data-some="1"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+.wordsbtn[data-some="1"] .n{opacity:.85}
+.sel{position:fixed;inset:0;z-index:600;display:none;place-items:center;padding:16px}
+.sel.open{display:grid}
+.sel .veil{position:absolute;inset:0;background:rgba(20,22,26,.45)}
+.sel-card{position:relative;z-index:1;background:var(--card);border:1px solid var(--line);border-radius:18px;
+  width:min(780px,100%);max-height:min(88vh,760px);display:flex;flex-direction:column;overflow:hidden;
+  box-shadow:0 30px 80px rgba(10,12,16,.38);animation:selin .34s var(--soft)}
+@keyframes selin{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
+.sel-head{display:flex;align-items:baseline;gap:10px;padding:16px 16px 10px}
+.sel-head h2{margin:0;font-size:19px;font-weight:700}
+.sel-head p{margin:0;font-family:var(--mono);font-size:12px;color:var(--ink-3)}
+.sel-head .x{margin-left:auto;border:0;background:transparent;color:var(--ink-3);font-size:24px;line-height:1;padding:0 4px;border-radius:8px}
+.sel-head .x:hover{color:var(--ink)}
+.sel-rooms{display:flex;gap:6px;overflow-x:auto;padding:0 16px 10px;scrollbar-width:none}
+.sel-rooms::-webkit-scrollbar{display:none}
+.sel-rooms button{flex:none;border:1px solid var(--line);background:var(--card);border-radius:9px;padding:6px 11px;
+  font-size:13px;font-weight:500;white-space:nowrap;transition:background .2s,color .2s,border-color .2s}
+.sel-rooms button .n{font-family:var(--mono);font-size:10.5px;opacity:.55;margin-left:6px}
+.sel-rooms button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.sel-tools{display:flex;gap:8px;align-items:center;padding:0 16px 12px}
+.sel-tools input{flex:1 1 auto;min-width:0;font:inherit;font-size:14px;padding:8px 12px;border-radius:10px;
+  border:1px solid var(--line);background:var(--bg);color:inherit}
+.sel-list{flex:1 1 auto;min-height:0;overflow:auto;padding:0 16px 14px;display:flex;flex-wrap:wrap;gap:7px;align-content:flex-start}
+.sel-list .grp{flex:1 0 100%;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink-3);margin:8px 0 0}
+.sel-list .wd{border:1px solid var(--line);background:var(--bg);color:var(--ink-3);border-radius:999px;
+  padding:6px 12px;font-size:13.5px;font-weight:500;
+  transition:background .2s,color .2s,border-color .2s,scale .3s var(--spring)}
+.sel-list .wd:hover{border-color:#c9c6bf}
+.sel-list .wd:active{scale:.94}
+.sel-list .wd[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.sel-list .none{flex:1 0 100%;color:var(--ink-3);font-size:14px;padding:10px 0}
+.sel-foot{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:12px 16px;border-top:1px solid var(--line);background:var(--bg)}
+.sel-foot .hint{flex:1 1 180px;min-width:0;font-size:12.5px;color:var(--ink-3)}
+.sel-foot .pri{background:var(--ink);color:#fff;border-color:var(--ink)}
+@media (max-width:640px){
+  .sel{padding:0;place-items:end center}
+  .sel-card{width:100%;max-height:92vh;border-radius:18px 18px 0 0}
+}
+
+.foot{margin-top:12px;color:var(--ink-3);font-size:13.5px}
+.foot b{color:var(--ink-2);font-weight:500}
+.build{margin:6px 0 0;font-family:var(--mono);font-size:10.5px;color:#b3b0a9}
+/* when the motion library is driving, CSS gets out of its way */
+.has-motion .form{animation:none}
+.has-motion .seg .thumb{transition:none}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ---------- the site's own chrome ---------- */
+body{background:var(--cream);color:var(--ink);font-family:'Outfit',sans-serif}
+.topnav{position:sticky;top:0;z-index:300;height:52px;background:rgba(247,246,243,.9);backdrop-filter:blur(16px);
+  border-bottom:1.5px solid var(--border);padding:0 1.5rem;display:flex;align-items:center;gap:1rem}
+.nav-logo{display:inline-flex;align-items:center;gap:.4rem;font-size:1.15rem;font-weight:800;letter-spacing:-.02em;color:var(--ink);text-decoration:none}
+.nav-logo svg{width:20px;height:20px;stroke:var(--sky);stroke-width:1.9;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.nav-logo span span{color:var(--sky)}
+.topnav .back{margin-left:auto;font-size:.8rem;font-weight:600;color:var(--muted);text-decoration:none}
+.topnav .back:hover{color:var(--sky)}
+
+.wrap{max-width:1320px;margin:0 auto;padding:22px 16px 48px}
+header{margin-bottom:14px}
+h1{font-size:30px;font-weight:800;letter-spacing:-.02em;margin:0;color:var(--ink)}
+.sub{color:var(--muted);font-size:15px;margin:5px 0 0}
+
+/* ---------- moving between the rooms ---------- */
+.rooms{display:flex;gap:6px;overflow-x:auto;padding:0 0 12px;scrollbar-width:none}
+.nav{display:flex;align-items:center;gap:10px;margin:0 0 12px}
+.arrow{width:44px;height:44px;flex:none;border-radius:50%;border:1.5px solid var(--border);background:var(--card);
+  display:grid;place-items:center;box-shadow:0 1px 2px rgba(45,48,71,.05);
+  transition:border-color .25s,color .25s,transform .3s var(--spring),box-shadow .25s}
+.arrow svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.arrow:hover{border-color:var(--sky);color:var(--sky);box-shadow:0 8px 20px -10px rgba(33,118,255,.5)}
+.arrow:active{scale:.93}
+.where{flex:1 1 auto;min-width:0;text-align:center}
+.where .now{font-size:19px;font-weight:700;letter-spacing:-.01em;display:block;line-height:1.2}
+.where .of{font-family:var(--mono);font-size:11.5px;color:var(--muted);letter-spacing:.06em}
+/* the name of the room comes in with the room itself */
+@keyframes namein{from{opacity:0;translate:0 7px;filter:blur(3px)}to{opacity:1;translate:0 0;filter:blur(0)}}
+.where .now.new{animation:namein .52s var(--soft) both}
+@media (prefers-reduced-motion:reduce){.where .now.new{animation:none}}
+.planbtn{flex:none;display:inline-flex;align-items:center;gap:7px;border:1.5px solid var(--border);background:var(--card);
+  border-radius:999px;padding:9px 15px;font-size:13.5px;font-weight:600;color:var(--ink);
+  box-shadow:0 1px 2px rgba(45,48,71,.05);transition:border-color .25s,color .25s,box-shadow .25s}
+.planbtn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.9}
+.planbtn:hover{border-color:var(--sky);color:var(--sky)}
+
+/* ---------- present mode ----------
+   The picture, as big as the screen will take it, and nothing else. It is keyed
+   off a class rather than :fullscreen so that it still works where the
+   Fullscreen API does not (an iPad, mainly); real fullscreen is asked for as
+   well, and simply adds the browser chrome going away. */
+body.presenting{overflow:hidden}
+.wrap.present{position:fixed;inset:0;z-index:500;max-width:none;width:100vw;height:100vh;
+  margin:0;padding:0;background:#0d0e11;display:grid;place-items:center;overflow:hidden}
+.wrap.present header,.wrap.present .rooms,.wrap.present .foot,.wrap.present .task{display:none}
+.wrap.present .stage{width:min(100vw,calc(100vh * 1.5));max-height:100vh;border-radius:0;box-shadow:none}
+.wrap.present.quiz .task{display:flex;position:fixed;left:50%;translate:-50% 0;top:74px;z-index:60;
+  width:auto;max-width:92vw;margin:0;border:0;background:rgba(247,246,243,.9);backdrop-filter:blur(16px)}
+/* the two control rows become floating bars, light so every colour in them still works */
+.wrap.present .nav,.wrap.present .bar{position:fixed;left:50%;translate:-50% 0;z-index:60;margin:0;
+  width:auto;max-width:94vw;flex-wrap:nowrap;background:rgba(247,246,243,.88);backdrop-filter:blur(16px);
+  border-radius:999px;padding:8px 14px;box-shadow:0 12px 34px rgba(0,0,0,.4);
+  transition:opacity .4s var(--soft),translate .4s var(--soft)}
+.wrap.present .nav{bottom:20px}
+.wrap.present .bar{top:16px}
+.wrap.present .where{flex:0 1 auto;padding:0 4px}
+.wrap.present .bar .spacer{display:none}
+.wrap.present .count{display:none}
+/* out of the way while nobody is touching it, back the moment they do */
+.wrap.present.idle .nav{opacity:0;translate:-50% 14px;pointer-events:none}
+.wrap.present.idle .bar{opacity:0;translate:-50% -14px;pointer-events:none}
+@media (prefers-reduced-motion:reduce){.wrap.present .nav,.wrap.present .bar{transition:none}}
+
+/* ---------- the floor plan ---------- */
+.sheet{position:fixed;inset:0;z-index:400;display:none;place-items:center;padding:20px;
+  background:rgba(45,48,71,.42);backdrop-filter:blur(4px)}
+.sheet.open{display:grid}
+.sheet-card{background:var(--card);border-radius:20px;padding:20px;max-width:min(680px,94vw);width:100%;
+  box-shadow:0 30px 80px rgba(45,48,71,.33);animation:sheetin .32s var(--soft)}
+@keyframes sheetin{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
+.sheet-head{display:flex;align-items:baseline;gap:10px;margin-bottom:12px}
+.sheet-head h2{margin:0;font-size:19px;font-weight:700}
+.sheet-head p{margin:0;color:var(--muted);font-size:13.5px}
+.sheet-head button{margin-left:auto;border:0;background:transparent;color:var(--muted);font-size:24px;line-height:1;padding:0 4px;border-radius:8px}
+.sheet-head button:hover{color:var(--ink)}
+.plan{width:100%;height:auto;display:block}
+.plan .proom{fill:#F2F0EB}
+.plan .terr{fill:#EEF3E9;stroke:#C9C5BC;stroke-width:2;stroke-dasharray:6 5}
+.plan .wall-in{fill:none;stroke:#BFBAB0;stroke-width:3}
+.plan .wall-out{fill:none;stroke:#8E8A82;stroke-width:7}
+.plan .win{stroke:var(--sky);stroke-width:5}
+.plan .front{stroke:#8a5a2b;stroke-width:6}
+.plan .door{stroke:#C9C5BC;stroke-width:2.5;fill:none}
+.plan .lbl{font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;fill:var(--ink);text-anchor:middle;pointer-events:none}
+.plan .dim{font-family:'Outfit',sans-serif;font-size:11px;fill:var(--muted);text-anchor:middle;pointer-events:none}
+.plan .hit rect{fill:transparent;stroke:transparent;stroke-width:3;transition:fill .2s,stroke .2s;cursor:pointer}
+.plan .hit:hover rect,.plan .hit:focus rect{fill:rgba(33,118,255,.14);stroke:var(--sky);outline:none}
+.plan .hit.here rect{fill:rgba(33,118,255,.1);stroke:var(--sky);stroke-dasharray:5 4}
+
+@media (max-width:700px){
+  .wrap{padding:14px 12px 32px}
+  h1{font-size:25px}
+  .sub{font-size:14px}
+  /* on a phone the arrows and the plan are the way round, so the strip of room
+     names goes: it was a second way of doing the same thing, costing a whole row */
+  .rooms{display:none}
+  .nav{gap:8px;margin-bottom:10px}
+  .arrow{width:40px;height:40px}
+  .where .now{font-size:16px}
+  .where .of{font-size:10.5px}
+  .planbtn{padding:9px 12px;font-size:12.5px}
+  .planbtn span{display:none}
+  /* and the row under it has to stay one row. It is wider than a phone, so the
+     row itself slides sideways: before this it pushed the whole page wider, and
+     the picture went with it. */
+  .bar{gap:6px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .bar::-webkit-scrollbar{display:none}
+  .bar>*{flex:none}
+  .seg button{padding:7px 12px;font-size:13px}
+  .btn{padding:7px 10px;font-size:12.5px}
+  .count{font-size:12px}
+  .foot{font-size:12.5px}
+}
+
+/* Word Rooms: one place is one page, and these two links move between them.
+   Pills rather than tabs, because they are links to another page, not a mode. */
+.places{display:flex;gap:7px;margin-top:10px}
+.places .place{display:inline-flex;align-items:center;border:1.5px solid var(--border);
+  background:var(--card);border-radius:999px;padding:6px 13px;font-size:13px;font-weight:600;
+  color:var(--ink-2,var(--ink));text-decoration:none;line-height:1.2}
+.places .place:hover{border-color:var(--ink-3,var(--border))}
+.places .place.on{background:var(--ink);border-color:var(--ink);color:#fff;cursor:default}
+@media (max-width:640px){.places .place{padding:5px 11px;font-size:12.5px}}
+
+/* The family these pages belong to, said once above the place name. */
+.family{margin:0 0 4px;font-size:11.5px;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-3,var(--ink-2,var(--ink)));opacity:.75}
+/* places wrap */
+.places{flex-wrap:wrap;row-gap:6px}
+.places .place{white-space:nowrap}
+
+/* The car plan: the car from above, front to the left, the driver's door on its right-hand
+   side, and the three outdoor views as tiles underneath. */
+.plan .lbl{font-size:13px}
+.plan .lbl.small{font-size:11.5px}
+.plan .wheel{fill:#3a3f47}
+.plan .door{fill:#e9eef7;stroke:#3A7CA5;stroke-width:2}
+.plan .cshaft{stroke:var(--sky);stroke-width:2.5;pointer-events:none}
+.plan .chead{fill:var(--sky);pointer-events:none}
+.plan .cam{fill:var(--sky);pointer-events:none}
+.rooms,.sel-rooms{flex-wrap:wrap;overflow-x:visible;row-gap:6px}
+</style>
+<link rel="stylesheet" href="assets/word-rooms.css">
+<script src="assets/word-rooms.js" defer></script>
+</head>
+<body>
+<nav class="topnav">
+  <a class="nav-logo" href="index.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 8l10 5 10-5-10-5z"/><path d="M6 10.5v4.5c0 1.5 3 3 6 3s6-1.5 6-3v-4.5"/><path d="M22 8v6"/></svg><span>john<span>plus</span>english</span></a>
+  <a class="back" href="index.html">All tools</a>
+</nav>
+<div class="wrap">
+  <header>
+    <div>
+      <p class="family">Word Rooms</p><h1>The Car</h1><nav class="places" aria-label="Places"><a class="place" href="rome-flat.html">Rome Flat</a><a class="place" href="office.html">The Office</a><a class="place" href="gym.html">The Gym</a><a class="place" href="shop.html">The Shop</a><a class="place" href="high-street.html">The High Street</a><a class="place" href="school.html">The School</a><a class="place" href="house.html">The House</a><a class="place" href="hospital.html">The Hospital</a><a class="place" href="airport.html">The Airport</a><a class="place" href="hotel.html">The Hotel</a><a class="place" href="restaurant.html">The Restaurant</a><a class="place on" href="car.html">The Car</a></nav>
+      <p class="sub" id="sub">Click anything in the picture to see what it is called.</p>
+    </div>
+    <div class="count" id="count"></div>
+  </header>
+
+  <nav class="rooms" id="roomstrip" aria-label="Rooms" hidden></nav>
+  <div class="nav">
+    <button class="arrow" id="prev" aria-label="Previous room"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <span class="where"><span class="now" id="now"></span><span class="of" id="of"></span></span>
+    <button class="arrow" id="next" aria-label="Next room"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
+    <button class="planbtn" id="planbtn"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 10h18M10 3v18"/></svg><span>Floor plan</span></button>
+    <button class="planbtn" id="presentbtn" aria-pressed="false"><svg viewBox="0 0 24 24" id="presenticon"><path d="M4 9V5a1 1 0 0 1 1-1h4M20 9V5a1 1 0 0 0-1-1h-4M4 15v4a1 1 0 0 0 1 1h4M20 15v4a1 1 0 0 1-1 1h-4"/></svg><span id="presentlabel">Present</span></button>
+  </div>
+
+  <div class="bar">
+    <div class="seg" role="group" aria-label="Mode">
+      <span class="thumb still" aria-hidden="true"></span>
+      <button data-mode="explore" aria-pressed="true">Explore</button>
+      <button data-mode="find" aria-pressed="false">Find it</button>
+    </div>
+    <button class="btn wordsbtn" id="words">Words<span class="n" id="wordsn"></span></button>
+    <button class="btn twolab" id="phon" aria-pressed="false"><span class="long">Phonetics</span><span class="short">IPA</span></button>
+    <button class="btn accbtn" id="acc" hidden><span class="nm">British</span><span class="eg" id="accheg"></span></button>
+    <button class="btn twolab" id="png"><span class="long">Save PNG</span><span class="short">PNG</span></button>
+    <span class="spacer"></span>
+    <button class="btn" id="dots" aria-pressed="true">Dots</button>
+    <button class="btn" id="all">Show all</button>
+    <button class="btn" id="none">Hide all</button>
+  </div>
+
+  <div class="task" id="task" hidden></div>
+
+  <div class="stage" id="stage">
+    <img id="photo" alt="" src="">
+  </div>
+
+  <p class="foot" id="foot"></p>
+</div>
+
+<div class="sel" id="pickwrap" role="dialog" aria-modal="true" aria-label="Choose the words">
+  <div class="veil" data-close="1"></div>
+  <div class="sel-card">
+    <div class="sel-head">
+      <h2>Choose the words</h2>
+      <p id="pickcount"></p>
+      <button class="x" data-close="1" aria-label="Close">&#215;</button>
+    </div>
+    <div class="sel-rooms" id="pickrooms" aria-label="Rooms"></div>
+    <div class="sel-tools">
+      <input id="picksearch" type="search" placeholder="Search every room" autocomplete="off" aria-label="Search every room">
+      <button class="btn" id="pickall">All</button>
+      <button class="btn" id="picknone">None</button>
+    </div>
+    <div class="sel-list" id="picklist"></div>
+    <div class="sel-foot">
+      <span class="hint" id="pickhint"></span>
+      <button class="btn" id="picklink">Copy a link to this set</button>
+      <button class="btn pri" data-close="1">Done</button>
+    </div>
+  </div>
+</div>
+
+<div class="sheet" id="sheet">
+  <div class="sheet-card">
+    <div class="sheet-head">
+      <h2>The car</h2><p>Pick a room</p>
+      <button id="sheetclose" aria-label="Close">&#215;</button>
+    </div>
+    <svg viewBox="0 0 652 476" class="plan" role="img" aria-label="The car seen from above, front to the left: the bonnet, the front seats, the back seat and the boot, with the driver's door on the top side, and below it the driveway, the petrol station and the road. Each arrow shows which way the picture of that part looks.">
+  <rect class="wheel" x="156" y="60" width="56" height="24" rx="6"/>
+  <rect class="wheel" x="156" y="256" width="56" height="24" rx="6"/>
+  <rect class="wheel" x="446" y="60" width="56" height="24" rx="6"/>
+  <rect class="wheel" x="446" y="256" width="56" height="24" rx="6"/>
+  <rect class="proom" x="96" y="70" width="460" height="200" rx="46"/>
+  <rect class="terr" x="40" y="326" width="180" height="110" rx="8"/>
+  <rect class="door" x="206" y="22" width="96" height="44" rx="8"/>
+  <rect class="wall-in" x="206" y="78" width="96" height="184" rx="4"/>
+  <rect class="wall-in" x="302" y="78" width="120" height="184" rx="4"/>
+  <rect class="wall-in" x="422" y="78" width="126" height="184" rx="4"/>
+  <rect class="wall-in" x="104" y="78" width="102" height="184" rx="4"/>
+  <rect class="terr" x="236" y="326" width="180" height="110" rx="8"/>
+  <rect class="terr" x="432" y="326" width="180" height="110" rx="8"/>
+  <line class="win" x1="206" y1="92" x2="206" y2="248"/>
+  <line class="win" x1="548" y1="100" x2="548" y2="240"/>
+  <rect class="wall-out" x="96" y="70" width="460" height="200" rx="46"/>
+  <text class="lbl" x="130" y="360">Driveway</text>
+  <line class="cshaft" x1="130" y1="410" x2="130" y2="397"/><path class="chead" d="M130 386L136.5 397L123.5 397Z"/><circle class="cam" cx="130" cy="410" r="3.5"/>
+  <text class="lbl small" x="254" y="49">Driver's door</text>
+  <line class="cshaft" x1="254" y1="12" x2="254" y2="25"/><path class="chead" d="M254 36L247.5 25L260.5 25Z"/><circle class="cam" cx="254" cy="12" r="3.5"/>
+  <text class="lbl" x="254" y="160.28">Dashboard</text>
+  <line class="cshaft" x1="322" y1="212" x2="309" y2="212"/><path class="chead" d="M298 212L309 205.5L309 218.5Z"/><circle class="cam" cx="322" cy="212" r="3.5"/>
+  <text class="lbl" x="362" y="160.28">Back seat</text>
+  <line class="cshaft" x1="282" y1="128" x2="295" y2="128"/><path class="chead" d="M306 128L295 134.5L295 121.5Z"/><circle class="cam" cx="282" cy="128" r="3.5"/>
+  <text class="lbl" x="485" y="160.28">Boot</text>
+  <line class="cshaft" x1="576" y1="170" x2="563" y2="170"/><path class="chead" d="M552 170L563 163.5L563 176.5Z"/><circle class="cam" cx="576" cy="170" r="3.5"/>
+  <text class="lbl" x="155" y="152.28"><tspan x="155" dy="0">Under the</tspan><tspan x="155" dy="16">bonnet</tspan></text>
+  <line class="cshaft" x1="76" y1="170" x2="89" y2="170"/><path class="chead" d="M100 170L89 176.5L89 163.5Z"/><circle class="cam" cx="76" cy="170" r="3.5"/>
+  <text class="lbl" x="326" y="360">Petrol station</text>
+  <line class="cshaft" x1="326" y1="410" x2="326" y2="397"/><path class="chead" d="M326 386L332.5 397L319.5 397Z"/><circle class="cam" cx="326" cy="410" r="3.5"/>
+  <text class="lbl" x="522" y="360">The road</text>
+  <line class="cshaft" x1="522" y1="410" x2="522" y2="397"/><path class="chead" d="M522 386L528.5 397L515.5 397Z"/><circle class="cam" cx="522" cy="410" r="3.5"/>
+  <text class="dim" x="76" y="240">front</text>
+  <text class="dim" x="326" y="470">the arrow in each part shows which way its picture looks</text>
+  <a class="hit" data-i="0" role="button" tabindex="0" aria-label="Driveway"><rect x="40" y="326" width="180" height="110" rx="3"/></a>
+  <a class="hit" data-i="1" role="button" tabindex="0" aria-label="Driver's door"><rect x="206" y="22" width="96" height="44" rx="3"/></a>
+  <a class="hit" data-i="2" role="button" tabindex="0" aria-label="Dashboard"><rect x="206" y="78" width="96" height="184" rx="3"/></a>
+  <a class="hit" data-i="3" role="button" tabindex="0" aria-label="Back seat"><rect x="302" y="78" width="120" height="184" rx="3"/></a>
+  <a class="hit" data-i="4" role="button" tabindex="0" aria-label="Boot"><rect x="422" y="78" width="126" height="184" rx="3"/></a>
+  <a class="hit" data-i="5" role="button" tabindex="0" aria-label="Under the bonnet"><rect x="104" y="78" width="102" height="184" rx="3"/></a>
+  <a class="hit" data-i="6" role="button" tabindex="0" aria-label="Petrol station"><rect x="236" y="326" width="180" height="110" rx="3"/></a>
+  <a class="hit" data-i="7" role="button" tabindex="0" aria-label="The road"><rect x="432" y="326" width="180" height="110" rx="3"/></a>
+  </svg>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/motion@14.9.0/dist/motion.js" integrity="sha384-mzhnnVPTOvuHjQX0cuFH5wg2l5YcbPcpPqOoHFowMkg6VYQBWwZKGH+EAVZsi6zJ" crossorigin="anonymous"></script>
+<script>
+/* One room or the whole flat: ROOMS is the only difference between them. */
+var ROOMS=[{"title": "The driveway", "alt": "A blue family estate car on a driveway in front of a brick house", "key": "car_vocab_the_driveway_v1", "img": "images/car/the-driveway.webp", "at": [0.199, 0.851], "words": [{"x": 16.0, "y": 2.5, "w": "roof tiles"}, {"x": 25.0, "y": 6.0, "w": "gutter"}, {"x": 10.5, "y": 18.0, "w": "bay window"}, {"x": 15.5, "y": 22.5, "w": "hydrangea"}, {"x": 42.9, "y": 12.0, "w": "porch light"}, {"x": 45.0, "y": 22.0, "w": "shrub"}, {"x": 92.0, "y": 12.0, "w": "up-and-over door"}, {"x": 56.0, "y": 18.7, "w": "roof rack"}, {"x": 65.0, "y": 18.8, "w": "pigeon"}, {"x": 78.0, "y": 16.5, "w": "aerial"}, {"x": 47.0, "y": 31.0, "w": "windscreen"}, {"x": 43.0, "y": 39.2, "w": "windscreen wiper"}, {"x": 38.0, "y": 49.0, "w": "bonnet"}, {"x": 30.6, "y": 59.0, "w": "radiator grille"}, {"x": 16.8, "y": 72.8, "w": "fog light"}, {"x": 52.0, "y": 69.0, "w": "front bumper"}, {"x": 63.0, "y": 71.6, "w": "alloy wheel"}, {"x": 73.0, "y": 48.8, "w": "passenger door"}, {"x": 92.5, "y": 50.0, "w": "estate car"}, {"x": 91.5, "y": 39.5, "w": "petrol cap"}, {"x": 59.8, "y": 87.9, "w": "car shampoo"}, {"x": 72.0, "y": 82.3, "w": "soapy water"}, {"x": 81.1, "y": 88.7, "w": "chamois leather"}, {"x": 93.1, "y": 75.1, "w": "spray gun"}, {"x": 92.6, "y": 86.4, "w": "hose reel"}]}, {"title": "The driver's door", "alt": "The driver's seat and pedals seen through the open driver's door", "key": "car_vocab_the_drivers_door_v1", "img": "images/car/the-drivers-door.webp", "at": [0.39, 0.113], "words": [{"x": 17.0, "y": 40.0, "w": "driver's seat"}, {"x": 15.0, "y": 66.9, "w": "recline knob"}, {"x": 33.1, "y": 83.4, "w": "seat lever"}, {"x": 28.1, "y": 57.1, "w": "seatbelt buckle"}, {"x": 69.6, "y": 57.7, "w": "bonnet release"}, {"x": 60.9, "y": 65.4, "w": "clutch"}, {"x": 65.3, "y": 67.6, "w": "brake pedal"}, {"x": 69.0, "y": 70.2, "w": "accelerator"}, {"x": 60.0, "y": 81.1, "w": "flip flops"}, {"x": 50.5, "y": 84.5, "w": "floor mat"}, {"x": 40.0, "y": 96.8, "w": "door sill"}, {"x": 95.6, "y": 23.3, "w": "lock button"}, {"x": 92.5, "y": 46.0, "w": "door panel"}, {"x": 82.5, "y": 40.5, "w": "door handle"}, {"x": 78.7, "y": 51.8, "w": "mirror control"}, {"x": 85.6, "y": 56.7, "w": "window switch"}, {"x": 79.6, "y": 75.1, "w": "road map"}, {"x": 85.1, "y": 72.1, "w": "ice scraper"}, {"x": 88.4, "y": 87.9, "w": "packet of tissues"}, {"x": 83.0, "y": 94.0, "w": "door pocket"}, {"x": 76.0, "y": 92.0, "w": "speaker grille"}, {"x": 97.4, "y": 78.5, "w": "door latch"}]}, {"title": "The dashboard", "alt": "The dashboard, steering wheel and gearstick seen from the back seat", "key": "car_vocab_the_dashboard_v1", "img": "images/car/the-dashboard.webp", "at": [0.39, 0.442], "words": [{"x": 52.0, "y": 6.0, "w": "rear-view mirror"}, {"x": 51.6, "y": 21.5, "w": "fluffy dice"}, {"x": 78.0, "y": 7.0, "w": "sun visor"}, {"x": 18.5, "y": 9.0, "w": "vanity mirror"}, {"x": 42.6, "y": 38.0, "w": "air freshener"}, {"x": 49.5, "y": 31.5, "w": "phone holder"}, {"x": 25.0, "y": 32.5, "w": "dashboard"}, {"x": 22.0, "y": 56.0, "w": "glovebox"}, {"x": 47.0, "y": 49.5, "w": "touch screen"}, {"x": 42.5, "y": 59.0, "w": "temperature control"}, {"x": 47.6, "y": 64.0, "w": "hazard lights button"}, {"x": 66.0, "y": 62.0, "w": "steering wheel"}, {"x": 72.5, "y": 51.0, "w": "horn"}, {"x": 77.0, "y": 39.0, "w": "speedometer"}, {"x": 66.0, "y": 39.0, "w": "rev counter"}, {"x": 71.6, "y": 40.6, "w": "warning light"}, {"x": 83.0, "y": 43.0, "w": "indicator stalk"}, {"x": 58.0, "y": 42.7, "w": "wiper stalk"}, {"x": 58.6, "y": 54.8, "w": "start button"}, {"x": 50.1, "y": 70.0, "w": "gearstick"}, {"x": 56.3, "y": 83.0, "w": "handbrake"}, {"x": 42.5, "y": 86.0, "w": "takeaway coffee"}, {"x": 49.6, "y": 87.0, "w": "cup holder"}, {"x": 50.5, "y": 96.0, "w": "coins"}, {"x": 7.0, "y": 85.0, "w": "colouring book"}, {"x": 23.5, "y": 94.0, "w": "seat pocket"}, {"x": 15.0, "y": 60.0, "w": "passenger seat"}, {"x": 34.0, "y": 70.0, "w": "footwell"}]}, {"title": "The back seat", "alt": "The back seat with a child seat, a booster cushion and a nodding dog", "key": "car_vocab_the_back_seat_v1", "img": "images/car/the-back-seat.webp", "at": [0.555, 0.442], "words": [{"x": 53.5, "y": 19.5, "w": "nodding dog"}, {"x": 59.0, "y": 25.5, "w": "parcel shelf"}, {"x": 68.0, "y": 14.0, "w": "rear window"}, {"x": 50.0, "y": 4.0, "w": "roof lining"}, {"x": 14.0, "y": 2.8, "w": "grab handle"}, {"x": 13.8, "y": 28.0, "w": "sun shade"}, {"x": 1.2, "y": 48.0, "w": "child lock"}, {"x": 10.0, "y": 68.0, "w": "rear door"}, {"x": 4.5, "y": 78.0, "w": "packet of crisps"}, {"x": 37.5, "y": 68.0, "w": "child seat"}, {"x": 27.5, "y": 47.0, "w": "harness"}, {"x": 35.8, "y": 54.5, "w": "soft toy"}, {"x": 46.7, "y": 58.5, "w": "juice carton"}, {"x": 71.5, "y": 76.0, "w": "booster cushion"}, {"x": 68.5, "y": 67.0, "w": "travel pillow"}, {"x": 79.0, "y": 30.0, "w": "rain jacket"}, {"x": 50.0, "y": 80.0, "w": "back seat"}, {"x": 28.5, "y": 93.0, "w": "trainers"}, {"x": 59.0, "y": 94.0, "w": "picture book"}, {"x": 50.0, "y": 28.5, "w": "headrest"}, {"x": 58.5, "y": 45.0, "w": "seatbelt"}, {"x": 52.0, "y": 64.5, "w": "armrest"}]}, {"title": "The boot", "alt": "The open boot with the spare tyre, a jack and bags for the beach", "key": "car_vocab_the_boot_v1", "img": "images/car/the-boot.webp", "at": [0.744, 0.442], "words": [{"x": 30.0, "y": 6.0, "w": "tailgate"}, {"x": 20.0, "y": 10.0, "w": "gas strut"}, {"x": 74.5, "y": 21.2, "w": "boot light"}, {"x": 45.0, "y": 33.0, "w": "boot floor"}, {"x": 70.0, "y": 33.0, "w": "windbreak"}, {"x": 23.0, "y": 47.0, "w": "warning triangle"}, {"x": 28.5, "y": 51.5, "w": "jump leads"}, {"x": 27.0, "y": 61.5, "w": "tyre inflator"}, {"x": 34.0, "y": 53.5, "w": "spare tyre"}, {"x": 56.0, "y": 48.3, "w": "swimming ring"}, {"x": 42.0, "y": 63.5, "w": "car jack"}, {"x": 57.0, "y": 63.0, "w": "wheel brace"}, {"x": 70.5, "y": 44.0, "w": "bucket and spade"}, {"x": 77.0, "y": 44.3, "w": "beach towel"}, {"x": 67.3, "y": 54.0, "w": "bag for life"}, {"x": 73.5, "y": 57.0, "w": "tote bag"}, {"x": 8.0, "y": 52.0, "w": "buggy"}, {"x": 30.0, "y": 82.0, "w": "back bumper"}, {"x": 50.0, "y": 74.7, "w": "reversing camera"}, {"x": 25.4, "y": 75.5, "w": "parking sensor"}, {"x": 40.0, "y": 79.6, "w": "number plate"}, {"x": 50.1, "y": 86.0, "w": "tow bar"}, {"x": 74.6, "y": 87.5, "w": "exhaust pipe"}, {"x": 90.5, "y": 78.0, "w": "cool box"}, {"x": 86.7, "y": 92.5, "w": "sandals"}, {"x": 60.0, "y": 96.0, "w": "block paving"}]}, {"title": "Under the bonnet", "alt": "The engine under the open bonnet, with the battery, dipstick and coolant", "key": "car_vocab_under_the_bonnet_v1", "img": "images/car/under-the-bonnet.webp", "at": [0.238, 0.442], "words": [{"x": 7.8, "y": 29.3, "w": "bonnet stay"}, {"x": 44.0, "y": 33.8, "w": "air filter"}, {"x": 71.2, "y": 35.5, "w": "brake fluid"}, {"x": 26.2, "y": 45.0, "w": "fuse box"}, {"x": 47.5, "y": 45.0, "w": "hot water bottle"}, {"x": 8.5, "y": 48.3, "w": "positive terminal"}, {"x": 17.5, "y": 47.5, "w": "negative terminal"}, {"x": 8.5, "y": 56.0, "w": "battery"}, {"x": 42.3, "y": 54.8, "w": "oil cap"}, {"x": 49.0, "y": 57.6, "w": "dipstick"}, {"x": 60.0, "y": 54.0, "w": "engine cover"}, {"x": 79.5, "y": 54.8, "w": "coolant"}, {"x": 84.8, "y": 57.9, "w": "screenwash"}, {"x": 90.0, "y": 53.0, "w": "inner wing"}, {"x": 35.0, "y": 72.0, "w": "radiator"}, {"x": 49.5, "y": 70.0, "w": "bonnet catch"}, {"x": 15.0, "y": 71.0, "w": "engine oil"}, {"x": 23.5, "y": 75.1, "w": "funnel"}, {"x": 68.0, "y": 78.1, "w": "work gloves"}, {"x": 84.0, "y": 78.9, "w": "duster"}]}, {"title": "The petrol station", "alt": "The car filling up at a petrol station, with the car wash and the shop behind", "key": "car_vocab_the_petrol_station_v1", "img": "images/car/the-petrol-station.webp", "at": [0.5, 0.851], "words": [{"x": 53.3, "y": 2.0, "w": "canopy light"}, {"x": 3.5, "y": 28.0, "w": "car wash"}, {"x": 21.5, "y": 37.0, "w": "ice cream freezer"}, {"x": 30.0, "y": 32.0, "w": "bag of logs"}, {"x": 30.0, "y": 40.6, "w": "pallet"}, {"x": 48.5, "y": 27.0, "w": "cut flowers"}, {"x": 59.0, "y": 31.0, "w": "gas bottles"}, {"x": 61.5, "y": 36.5, "w": "hatchback"}, {"x": 75.0, "y": 17.5, "w": "pump number"}, {"x": 75.2, "y": 32.5, "w": "keypad"}, {"x": 75.0, "y": 45.0, "w": "petrol pump"}, {"x": 72.0, "y": 56.3, "w": "nozzle"}, {"x": 77.0, "y": 67.3, "w": "pump hose"}, {"x": 86.0, "y": 60.0, "w": "pump island"}, {"x": 17.3, "y": 47.5, "w": "crash barrier"}, {"x": 93.2, "y": 10.5, "w": "chimney"}, {"x": 92.5, "y": 28.5, "w": "EV charger"}, {"x": 92.8, "y": 38.5, "w": "charging cable"}, {"x": 96.0, "y": 47.5, "w": "charging bay"}, {"x": 7.5, "y": 47.0, "w": "air and water machine"}, {"x": 4.8, "y": 50.5, "w": "pressure gauge"}, {"x": 5.2, "y": 72.0, "w": "air hose"}, {"x": 9.9, "y": 62.0, "w": "water hose"}, {"x": 14.0, "y": 87.0, "w": "beach ball"}, {"x": 85.0, "y": 74.5, "w": "squeegee"}, {"x": 92.5, "y": 70.0, "w": "paper towels"}, {"x": 55.0, "y": 90.0, "w": "forecourt"}]}, {"title": "The road", "alt": "A zebra crossing with ducks crossing and the car waiting", "key": "car_vocab_the_road_v1", "img": "images/car/the-road.webp", "at": [0.801, 0.851], "words": [{"x": 10.0, "y": 18.0, "w": "shopfront"}, {"x": 18.0, "y": 19.5, "w": "Belisha beacon"}, {"x": 25.8, "y": 19.5, "w": "traffic lights"}, {"x": 26.35, "y": 36.5, "w": "crossing button"}, {"x": 35.5, "y": 23.5, "w": "speed limit sign"}, {"x": 41.0, "y": 28.0, "w": "bus shelter"}, {"x": 53.5, "y": 25.0, "w": "cycle sign"}, {"x": 56.0, "y": 9.0, "w": "lamp post"}, {"x": 74.0, "y": 34.0, "w": "tree trunk"}, {"x": 92.0, "y": 27.0, "w": "double-decker bus"}, {"x": 10.0, "y": 48.0, "w": "cycle lane"}, {"x": 8.0, "y": 57.0, "w": "speed bump"}, {"x": 30.4, "y": 60.3, "w": "zigzag lines"}, {"x": 13.0, "y": 71.5, "w": "double yellow lines"}, {"x": 46.0, "y": 51.5, "w": "duck"}, {"x": 46.5, "y": 68.5, "w": "duckling"}, {"x": 57.0, "y": 69.0, "w": "zebra crossing"}, {"x": 64.0, "y": 75.5, "w": "drain"}, {"x": 29.5, "y": 70.7, "w": "handlebars"}, {"x": 22.0, "y": 76.1, "w": "saddle"}, {"x": 13.7, "y": 86.3, "w": "cycle rack"}, {"x": 83.5, "y": 81.0, "w": "postbox"}, {"x": 94.5, "y": 64.0, "w": "parking meter"}, {"x": 60.0, "y": 90.0, "w": "paving slab"}]}];
+var ri=0, KEY='';
+/* How every word is said. Kept by the word rather than by the room, because a
+   cushion is a cushion in all seven, and kept apart from the hotspots so a list
+   somebody saved in Edit still gets its phonetics. Each entry is
+   [British, every r sounded], and where the two are the same only one is kept.
+   It sits below ROOMS, never between ROOMS and the line after it: that pair of
+   lines is the anchor the builders use to read the words back out of a page. */
+var IPA={"Belisha beacon": ["bəˌliːʃə ˈbiːkən"], "EV charger": ["ˌiː ˌviː ˈtʃɑːdʒə", "ˌiː ˌviː ˈtʃɑːrdʒər"], "accelerator": ["əkˈseləreɪtə", "əkˈseləreɪtər"], "aerial": ["ˈeəriəl"], "air and water machine": ["ˌeə ənd ˈwɔːtə məˌʃiːn", "ˌeːr ənd ˈwɔːtər məˌʃiːn"], "air filter": ["ˈeə ˌfɪltə", "ˈeːr ˌfɪltər"], "air freshener": ["ˈeə ˌfreʃnə", "ˈeːr ˌfreʃnər"], "air hose": ["ˈeə həʊz", "ˈeːr həʊz"], "alloy wheel": ["ˈælɔɪ wiːl"], "armrest": ["ˈɑːmrest", "ˈɑːrmrest"], "back bumper": ["ˌbæk ˈbʌmpə", "ˌbæk ˈbʌmpər"], "back seat": ["ˌbæk ˈsiːt"], "bag for life": ["ˌbæɡ fə ˈlaɪf", "ˌbæɡ fər ˈlaɪf"], "bag of logs": ["ˌbæɡ əv ˈlɒɡz"], "battery": ["ˈbætəri"], "bay window": ["ˌbeɪ ˈwɪndəʊ"], "beach ball": ["ˈbiːtʃ bɔːl"], "beach towel": ["ˈbiːtʃ ˌtaʊəl"], "block paving": ["ˌblɒk ˈpeɪvɪŋ"], "bonnet": ["ˈbɒnɪt"], "bonnet catch": ["ˈbɒnɪt kætʃ"], "bonnet release": ["ˈbɒnɪt rɪˌliːs"], "bonnet stay": ["ˈbɒnɪt steɪ"], "booster cushion": ["ˈbuːstə ˌkʊʃn", "ˈbuːstər ˌkʊʃn"], "boot floor": ["ˌbuːt ˈflɔː", "ˌbuːt ˈflɔːr"], "boot light": ["ˈbuːt laɪt"], "brake fluid": ["ˈbreɪk ˌfluːɪd"], "brake pedal": ["ˈbreɪk ˌpedl"], "bucket and spade": ["ˌbʌkɪt ən ˈspeɪd"], "buggy": ["ˈbʌɡi"], "bus shelter": ["ˈbʌs ˌʃeltə", "ˈbʌs ˌʃeltər"], "canopy light": ["ˈkænəpi laɪt"], "car jack": ["ˈkɑː dʒæk", "ˈkɑːr dʒæk"], "car shampoo": ["ˈkɑː ʃæmˌpuː", "ˈkɑːr ʃæmˌpuː"], "car wash": ["ˈkɑː wɒʃ", "ˈkɑːr wɒʃ"], "chamois leather": ["ˈʃæmi ˌleðə", "ˈʃæmi ˌleðər"], "charging bay": ["ˈtʃɑːdʒɪŋ beɪ", "ˈtʃɑːrdʒɪŋ beɪ"], "charging cable": ["ˈtʃɑːdʒɪŋ ˌkeɪbl", "ˈtʃɑːrdʒɪŋ ˌkeɪbl"], "child lock": ["ˈtʃaɪld lɒk"], "child seat": ["ˈtʃaɪld siːt"], "chimney": ["ˈtʃɪmni"], "clutch": ["klʌtʃ"], "coins": ["kɔɪnz"], "colouring book": ["ˈkʌlərɪŋ bʊk"], "cool box": ["ˈkuːl bɒks"], "coolant": ["ˈkuːlənt"], "crash barrier": ["ˈkræʃ ˌbæriə", "ˈkræʃ ˌbæriər"], "crossing button": ["ˈkrɒsɪŋ ˌbʌtn"], "cup holder": ["ˈkʌp ˌhəʊldə", "ˈkʌp ˌhəʊldər"], "cut flowers": ["ˌkʌt ˈflaʊəz", "ˌkʌt ˈflaʊərz"], "cycle lane": ["ˈsaɪkl leɪn"], "cycle rack": ["ˈsaɪkl ræk"], "cycle sign": ["ˈsaɪkl saɪn"], "dashboard": ["ˈdæʃbɔːd", "ˈdæʃbɔːrd"], "dipstick": ["ˈdɪpstɪk"], "door handle": ["ˈdɔː ˌhændl", "ˈdɔːr ˌhændl"], "door latch": ["ˈdɔː lætʃ", "ˈdɔːr lætʃ"], "door panel": ["ˈdɔː ˌpænl", "ˈdɔːr ˌpænl"], "door pocket": ["ˈdɔː ˌpɒkɪt", "ˈdɔːr ˌpɒkɪt"], "door sill": ["ˈdɔː sɪl", "ˈdɔːr sɪl"], "double yellow lines": ["ˌdʌbl ˌjeləʊ ˈlaɪnz"], "double-decker bus": ["ˌdʌbl ˈdekə bʌs", "ˌdʌbl ˈdekər bʌs"], "drain": ["dreɪn"], "driver's seat": ["ˈdraɪvəz ˌsiːt", "ˈdraɪvərz ˌsiːt"], "duck": ["dʌk"], "duckling": ["ˈdʌklɪŋ"], "duster": ["ˈdʌstə", "ˈdʌstər"], "engine cover": ["ˈendʒɪn ˌkʌvə", "ˈendʒɪn ˌkʌvər"], "engine oil": ["ˌendʒɪn ˈɔɪl"], "estate car": ["ɪˈsteɪt kɑː", "ɪˈsteɪt kɑːr"], "exhaust pipe": ["ɪɡˈzɔːst paɪp"], "flip flops": ["ˈflɪp flɒps"], "floor mat": ["ˈflɔː mæt", "ˈflɔːr mæt"], "fluffy dice": ["ˌflʌfi ˈdaɪs"], "fog light": ["ˈfɒɡ laɪt"], "footwell": ["ˈfʊtwel"], "forecourt": ["ˈfɔːkɔːt", "ˈfɔːrkɔːrt"], "front bumper": ["ˌfrʌnt ˈbʌmpə", "ˌfrʌnt ˈbʌmpər"], "funnel": ["ˈfʌnl"], "fuse box": ["ˈfjuːz bɒks"], "gas bottles": ["ˈɡæs ˌbɒtlz"], "gas strut": ["ˈɡæs strʌt"], "gearstick": ["ˈɡɪəstɪk", "ˈɡɪərstɪk"], "glovebox": ["ˈɡlʌvbɒks"], "grab handle": ["ˈɡræb ˌhændl"], "gutter": ["ˈɡʌtə", "ˈɡʌtər"], "handbrake": ["ˈhændbreɪk"], "handlebars": ["ˈhændlbɑːz", "ˈhændlbɑːrz"], "harness": ["ˈhɑːnəs", "ˈhɑːrnəs"], "hatchback": ["ˈhætʃbæk"], "hazard lights button": ["ˈhæzəd laɪts ˌbʌtn", "ˈhæzərd laɪts ˌbʌtn"], "headrest": ["ˈhedrest"], "horn": ["hɔːn", "hɔːrn"], "hose reel": ["ˈhəʊz riːl"], "hot water bottle": ["ˌhɒt ˈwɔːtə ˌbɒtl", "ˌhɒt ˈwɔːtər ˌbɒtl"], "hydrangea": ["haɪˈdreɪndʒə"], "ice cream freezer": ["ˌaɪs kriːm ˈfriːzə", "ˌaɪs kriːm ˈfriːzər"], "ice scraper": ["ˈaɪs ˌskreɪpə", "ˈaɪs ˌskreɪpər"], "indicator stalk": ["ˈɪndɪkeɪtə stɔːk", "ˈɪndɪkeɪtər stɔːk"], "inner wing": ["ˌɪnə ˈwɪŋ", "ˌɪnər ˈwɪŋ"], "juice carton": ["ˈdʒuːs ˌkɑːtn", "ˈdʒuːs ˌkɑːrtn"], "jump leads": ["ˈdʒʌmp liːdz"], "keypad": ["ˈkiːpæd"], "lamp post": ["ˈlæmp pəʊst"], "lock button": ["ˈlɒk ˌbʌtn"], "mirror control": ["ˈmɪrə kənˌtrəʊl", "ˈmɪrər kənˌtrəʊl"], "negative terminal": ["ˌneɡətɪv ˈtɜːmɪnl", "ˌneɡətɪv ˈtɜːrmɪnl"], "nodding dog": ["ˌnɒdɪŋ ˈdɒɡ"], "nozzle": ["ˈnɒzl"], "number plate": ["ˈnʌmbə pleɪt", "ˈnʌmbər pleɪt"], "oil cap": ["ˈɔɪl kæp"], "packet of crisps": ["ˌpækɪt əv ˈkrɪsps"], "packet of tissues": ["ˌpækɪt əv ˈtɪʃuːz"], "pallet": ["ˈpælɪt"], "paper towels": ["ˌpeɪpə ˈtaʊəlz", "ˌpeɪpər ˈtaʊəlz"], "parcel shelf": ["ˈpɑːsl ʃelf", "ˈpɑːrsl ʃelf"], "parking meter": ["ˈpɑːkɪŋ ˌmiːtə", "ˈpɑːrkɪŋ ˌmiːtər"], "parking sensor": ["ˈpɑːkɪŋ ˌsensə", "ˈpɑːrkɪŋ ˌsensər"], "passenger door": ["ˈpæsɪndʒə ˌdɔː", "ˈpæsɪndʒər ˌdɔːr"], "passenger seat": ["ˈpæsɪndʒə siːt", "ˈpæsɪndʒər siːt"], "paving slab": ["ˈpeɪvɪŋ slæb"], "petrol cap": ["ˈpetrəl kæp"], "petrol pump": ["ˈpetrəl pʌmp"], "phone holder": ["ˈfəʊn ˌhəʊldə", "ˈfəʊn ˌhəʊldər"], "picture book": ["ˈpɪktʃə bʊk", "ˈpɪktʃər bʊk"], "pigeon": ["ˈpɪdʒɪn"], "porch light": ["ˈpɔːtʃ laɪt", "ˈpɔːrtʃ laɪt"], "positive terminal": ["ˌpɒzətɪv ˈtɜːmɪnl", "ˌpɒzətɪv ˈtɜːrmɪnl"], "postbox": ["ˈpəʊstbɒks"], "pressure gauge": ["ˈpreʃə ɡeɪdʒ", "ˈpreʃər ɡeɪdʒ"], "pump hose": ["ˈpʌmp həʊz"], "pump island": ["ˈpʌmp ˌaɪlənd"], "pump number": ["ˈpʌmp ˌnʌmbə", "ˈpʌmp ˌnʌmbər"], "radiator": ["ˈreɪdieɪtə", "ˈreɪdieɪtər"], "radiator grille": ["ˈreɪdieɪtə ˌɡrɪl", "ˈreɪdieɪtər ˌɡrɪl"], "rain jacket": ["ˈreɪn ˌdʒækɪt"], "rear door": ["ˌrɪə ˈdɔː", "ˌrɪər ˈdɔːr"], "rear window": ["ˌrɪə ˈwɪndəʊ", "ˌrɪər ˈwɪndəʊ"], "rear-view mirror": ["ˌrɪə vjuː ˈmɪrə", "ˌrɪər vjuː ˈmɪrər"], "recline knob": ["rɪˈklaɪn nɒb"], "rev counter": ["ˈrev ˌkaʊntə", "ˈrev ˌkaʊntər"], "reversing camera": ["rɪˈvɜːsɪŋ ˌkæmərə", "rɪˈvɜːrsɪŋ ˌkæmərə"], "road map": ["ˈrəʊd mæp"], "roof lining": ["ˈruːf ˌlaɪnɪŋ"], "roof rack": ["ˈruːf ræk"], "roof tiles": ["ˈruːf taɪlz"], "saddle": ["ˈsædl"], "sandals": ["ˈsændlz"], "screenwash": ["ˈskriːnwɒʃ"], "seat lever": ["ˈsiːt ˌliːvə", "ˈsiːt ˌliːvər"], "seat pocket": ["ˈsiːt ˌpɒkɪt"], "seatbelt": ["ˈsiːtbelt"], "seatbelt buckle": ["ˈsiːtbelt ˌbʌkl"], "shopfront": ["ˈʃɒpfrʌnt"], "shrub": ["ʃrʌb"], "soapy water": ["ˌsəʊpi ˈwɔːtə", "ˌsəʊpi ˈwɔːtər"], "soft toy": ["ˌsɒft ˈtɔɪ"], "spare tyre": ["ˌspeə ˈtaɪə", "ˌspeːr ˈtaɪər"], "speaker grille": ["ˈspiːkə ˌɡrɪl", "ˈspiːkər ˌɡrɪl"], "speed bump": ["ˈspiːd bʌmp"], "speed limit sign": ["ˈspiːd lɪmɪt saɪn"], "speedometer": ["spiːˈdɒmɪtə", "spiːˈdɒmɪtər"], "spray gun": ["ˈspreɪ ɡʌn"], "squeegee": ["ˈskwiːdʒiː"], "start button": ["ˈstɑːt ˌbʌtn", "ˈstɑːrt ˌbʌtn"], "steering wheel": ["ˈstɪərɪŋ wiːl"], "sun shade": ["ˈsʌn ʃeɪd"], "sun visor": ["ˈsʌn ˌvaɪzə", "ˈsʌn ˌvaɪzər"], "swimming ring": ["ˈswɪmɪŋ rɪŋ"], "tailgate": ["ˈteɪlɡeɪt"], "takeaway coffee": ["ˌteɪkəweɪ ˈkɒfi"], "temperature control": ["ˈtemprətʃə kənˌtrəʊl", "ˈtemprətʃər kənˌtrəʊl"], "tote bag": ["ˈtəʊt bæɡ"], "touch screen": ["ˈtʌtʃ skriːn"], "tow bar": ["ˈtəʊ bɑː", "ˈtəʊ bɑːr"], "traffic lights": ["ˈtræfɪk laɪts"], "trainers": ["ˈtreɪnəz", "ˈtreɪnərz"], "travel pillow": ["ˈtrævl ˌpɪləʊ"], "tree trunk": ["ˈtriː trʌŋk"], "tyre inflator": ["ˈtaɪə ɪnˌfleɪtə", "ˈtaɪər ɪnˌfleɪtər"], "up-and-over door": ["ˌʌp ənd ˈəʊvə ˌdɔː", "ˌʌp ənd ˈəʊvər ˌdɔːr"], "vanity mirror": ["ˈvænəti ˌmɪrə", "ˈvænəti ˌmɪrər"], "warning light": ["ˈwɔːnɪŋ laɪt", "ˈwɔːrnɪŋ laɪt"], "warning triangle": ["ˈwɔːnɪŋ ˌtraɪæŋɡl", "ˈwɔːrnɪŋ ˌtraɪæŋɡl"], "water hose": ["ˈwɔːtə həʊz", "ˈwɔːtər həʊz"], "wheel brace": ["ˈwiːl breɪs"], "windbreak": ["ˈwɪndbreɪk"], "window switch": ["ˈwɪndəʊ ˌswɪtʃ"], "windscreen": ["ˈwɪndskriːn"], "windscreen wiper": ["ˈwɪndskriːn ˌwaɪpə", "ˈwɪndskriːn ˌwaɪpər"], "wiper stalk": ["ˈwaɪpə stɔːk", "ˈwaɪpər stɔːk"], "work gloves": ["ˈwɜːk ɡlʌvz", "ˈwɜːrk ɡlʌvz"], "zebra crossing": ["ˌzebrə ˈkrɒsɪŋ"], "zigzag lines": ["ˈzɪɡzæɡ laɪnz"]};
+var stage=document.getElementById('stage'), task=document.getElementById('task'), countEl=document.getElementById('count'),
+    sub=document.getElementById('sub'), foot=document.getElementById('foot'), photo=document.getElementById('photo'),
+    strip=document.getElementById('roomstrip');
+var spots=[], mode='explore', open={}, found={}, sel=null, quiz=null, seq=0, dotsOn=true;
+var spotEls={}, pillEls={}, formEl=null, formFor=null;
+
+function room(){return ROOMS[ri]||{title:'',img:'',words:[]};}
+function load(){
+  KEY=room().key||('car_vocab_'+ri);
+  try{var s=localStorage.getItem(KEY);if(s){var a=JSON.parse(s);if(Array.isArray(a)&&a.length)return a;}}catch(e){}
+  return (room().words||[]).map(function(w,i){
+    var o={id:'w'+(i+1),x:w.x,y:w.y,w:w.w}; if(w.pos)o.pos=w.pos; if(w.box)o.box=w.box; return o;
+  });
+}
+function data(){return spots.map(function(s){var o={x:s.x,y:s.y,w:s.w};if(s.pos)o.pos=s.pos;if(s.box)o.box=s.box;return o;});}
+/* when this page is open inside the publisher, hand the words back up on every change */
+function announce(){try{if(window.parent!==window)parent.postMessage({vocab:'spots',room:ri,words:data()},'*');}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(spots));}catch(e){}announce();}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function uid(){return 's'+Date.now().toString(36)+Math.floor(Math.random()*1e4).toString(36);}
+function byId(id){for(var i=0;i<spots.length;i++)if(spots[i].id===id)return spots[i];return null;}
+
+/* ---------- which words are in play ----------
+   A teacher chooses the set the class works with, and the rest are simply not
+   there: no dot, no label, not in Find it, not in the count. The choice is kept
+   apart from the words themselves, by the word rather than by a number, so it
+   survives a rebuild and never ends up in the data John publishes. One set per
+   room, because a lesson is usually one room. */
+var off={};                                  /* the words switched off in this room */
+var OFF={};                                  /* and the same for every room, by index */
+function offKeyOf(i){var r=ROOMS[i]||{};return (r.key||('car_vocab_'+i))+'_off';}
+function readOff(i){
+  var o={};
+  try{var s=localStorage.getItem(offKeyOf(i));
+      if(s){var a=JSON.parse(s);if(Array.isArray(a))a.forEach(function(w){if(w)o[w]=1;});}}catch(e){}
+  return o;
+}
+function writeOff(i,o){
+  try{var k=Object.keys(o);
+      if(k.length)localStorage.setItem(offKeyOf(i),JSON.stringify(k));
+      else localStorage.removeItem(offKeyOf(i));}catch(e){}
+}
+/* Held in memory as well as in the browser's store, so a teacher can set up all
+   seven rooms before the lesson even where the store is turned off, and so that
+   drawing the picker does not go back to the store for every word. */
+function offOf(i){ if(!OFF[i])OFF[i]=readOff(i); return OFF[i]; }
+function setOffOf(i,o){ OFF[i]=o; if(i===ri)off=o; writeOff(i,o); }
+/* the words of any room: the ones on screen for the room we are in, and for the
+   others whatever is saved in this browser, falling back to the built-in set */
+function wordsOf(i){
+  if(i===ri)return spots.map(function(s){return s.w;}).filter(function(w){return !!w;});
+  var r=ROOMS[i]||{};
+  try{var s=localStorage.getItem(r.key||('car_vocab_'+i));
+      if(s){var a=JSON.parse(s);
+        if(Array.isArray(a)&&a.length)return a.map(function(x){return x.w;}).filter(function(w){return !!w;});}}catch(e){}
+  return (r.words||[]).map(function(w){return w.w;}).filter(function(w){return !!w;});
+}
+function countIn(i){var o=offOf(i),n=0;wordsOf(i).forEach(function(w){if(!o[w])n++;});return n;}
+function live(s){return !(s.w&&off[s.w]);}
+function inPlay(){return spots.filter(live);}
+/* Edit is about the data, not about a lesson, so everything shows there. */
+function onStage(){return mode==='edit'?spots:inPlay();}
+
+/* ---------- how the words are said ----------
+   Off to begin with: the picture with the words on it is the first lesson, and
+   how they are said is the second. Two accents, because a written r before a
+   consonant is silent in British English and sounded in Irish English and in
+   most of Europe, and a class whose teacher says marble floor with both r's in
+   it should not be shown only the British line. The choice belongs to whoever
+   is teaching, not to a room, so it is one setting for the whole flat. */
+var ipaOn=false, ipaAcc='gb', IPA_KEY='car_ipa';
+var ACCENTS={gb:{name:'British',eg:'/ˌmɑːbl ˈflɔː/'},
+             r: {name:'Neutral', eg:'/ˌmɑːrbl ˈflɔːr/'}};
+function ipaOf(w){
+  var a=w&&IPA[w]; if(!a)return '';
+  return '/'+(ipaAcc==='r'&&a.length>1?a[1]:a[0])+'/';
+}
+function readIpa(){
+  try{var s=localStorage.getItem(IPA_KEY);
+      if(s==='gb'||s==='r'){ipaOn=true;ipaAcc=s;}else if(s==='off'){ipaOn=false;}}catch(e){}
+}
+function writeIpa(){try{localStorage.setItem(IPA_KEY,ipaOn?ipaAcc:'off');}catch(e){}}
+function drawIpaBtns(){
+  var b=document.getElementById('phon'), a=document.getElementById('acc'); if(!b||!a)return;
+  var acc=ACCENTS[ipaAcc]||ACCENTS.gb;
+  b.setAttribute('aria-pressed',ipaOn?'true':'false');
+  b.setAttribute('aria-label',ipaOn?'Hide how the words are said':'Show how the words are said');
+  a.hidden=!ipaOn;
+  a.querySelector('.nm').textContent=acc.name;
+  a.querySelector('.eg').textContent=acc.eg;
+  a.setAttribute('aria-label',acc.name+' English. Click for the other one.');
+}
+function setIpa(on,acc){
+  ipaOn=on; if(acc)ipaAcc=acc;
+  writeIpa(); drawIpaBtns();
+  /* a label is a different size with a second line in it, so every one of them
+     is written again and the whole lot laid out from scratch */
+  if(mode==='find'&&quiz)drawTask();
+  render();
+}
+
+/* ---------- motion ----------
+   Motion (motion.dev) drives this when it loads: real springs, and an animation
+   that is interrupted mid-flight keeps its speed instead of snapping.
+   If the library does not load, the browser's own animation does the same job. */
+var M=(window.Motion&&typeof window.Motion.animate==='function')?window.Motion:null;
+var CALM=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+var SPRING=(window.CSS&&CSS.supports&&CSS.supports('transition-timing-function','linear(0,1)'))?'linear(0,0.021,0.075,0.153,0.245,0.345,0.446,0.544,0.636,0.72,0.795,0.859,0.913,0.957,0.992,1.019,1.039,1.052,1.06,1.063,1.063,1.061,1.057,1.051,1.045,1.039,1.032,1.026,1.021,1.016,1.011,1.007,1.004,1.002,1,0.998,0.997,0.996,0.996,0.996,0.996,0.996,0.997,0.997,1)':'cubic-bezier(.2,.9,.3,1.2)';
+var POP={type:'spring',stiffness:430,damping:27,mass:.9};
+if(M&&!CALM)document.documentElement.classList.add('has-motion');
+function play(el,frames,o){
+  if(CALM||!el.animate)return null;
+  try{return el.animate(frames,o);}catch(e){try{o.easing='ease-out';return el.animate(frames,o);}catch(e2){return null;}}
+}
+/* run fn once the animation ends, however it ends, with a timer as the backstop */
+function done(a,fn,ms){
+  var called=false, go=function(){if(!called){called=true;fn();}};
+  if(a&&a.finished&&a.finished.then){a.finished.then(go,go);}
+  else if(a){a.onfinish=go;}
+  setTimeout(go,ms);
+}
+function ring(x,y,cls){
+  if(CALM)return;
+  var r=document.createElement('div');r.className='ring'+(cls?' '+cls:'');r.style.left=x+'%';r.style.top=y+'%';stage.appendChild(r);
+  var a=M?M.animate(r,{scale:[1,5.5],opacity:[.95,0]},{duration:.7,ease:[.16,.8,.3,1]})
+        :play(r,[{scale:1,opacity:.95},{scale:5.5,opacity:0}],{duration:700,easing:'cubic-bezier(.16,.8,.3,1)',fill:'forwards'});
+  done(a,function(){r.remove();},900);
+}
+/* where a label sits beside its dot, and the direction it grows from */
+function geom(s){
+  var pos=s.pos||'auto', gap=(mode!=='edit'&&Object.keys(open).length>8)?'9px':'12px';
+  if(pos==='auto')pos=s.y<10?'below':'above';
+  var nx=(pos==='left'||pos==='right')?null:(s.x<8?14:s.x>92?86:50);
+  return {
+    tx:pos==='left'?'calc(-100% - '+gap+')':pos==='right'?gap:'-'+nx+'%',
+    ty:pos==='above'?'calc(-100% - '+gap+')':pos==='below'?gap:'-50%',
+    origin:'50% 50%'
+  };
+}
+function place(pin,s){
+  var g=geom(s), p=pin.firstChild;
+  pin.style.left=s.x+'%';pin.style.top=s.y+'%';pin.style.transform='translate('+g.tx+','+g.ty+')';
+  p.className='pill'+(mode==='find'?' good':'')+(mode==='edit'&&sel===s.id?' sel':'');
+  /* the word, and under it how it is said. What is written in the label is kept
+     on the label, so it is only rewritten when the word or the accent changes:
+     writing it every time would throw away the browser's own text layout on
+     every click. */
+  var k=(ipaOn?ipaAcc:'-')+'|'+(s.w||'');
+  if(p.dataset.k!==k){
+    var t=ipaOn?ipaOf(s.w):'';
+    p.innerHTML=esc(s.w||'')+hearBtn(s.w)+(t?'<span class="ipa">'+esc(t)+'</span>':'');
+    p.dataset.k=k;
+  }
+  return g;
+}
+/* Each label opens on the side it was given, unless that side is taken: then it
+   opens on another side of its dot instead. Labels are placed in the order they
+   were opened, so the ones already on screen keep their places and the newcomer
+   is the one that looks for room. A side costs more if it sits on another label,
+   covers a dot that could be clicked, or would have to be pushed back into the
+   picture. Boxes only: nothing here touches the page. */
+var SIDES={above:['above','below','right','left'],below:['below','above','right','left'],
+           left:['left','right','above','below'],right:['right','left','above','below']};
+function chooseSides(items,box,sr,g){
+  var dots=onStage().map(function(s){return {id:s.id,x:sr.left+s.x/100*sr.width,y:sr.top+s.y/100*sr.height};});
+  var placed=[], room=13;
+  items.forEach(function(it){
+    var s=it.s, ax=sr.left+s.x/100*sr.width, ay=sr.top+s.y/100*sr.height;
+    var pref=s.pos||'auto'; if(pref==='auto')pref=s.y<10?'below':'above';
+    var best=null;
+    SIDES[pref].forEach(function(side,rank){
+      var x=side==='left'?ax-it.w-g:side==='right'?ax+g:ax-it.w/2;
+      var y=side==='above'?ay-it.h-g:side==='below'?ay+g:ay-it.h/2;
+      var cx=Math.min(Math.max(x,box.l),Math.max(box.l,box.r-it.w));
+      var cy=Math.min(Math.max(y,box.t),Math.max(box.t,box.b-it.h));
+      var cost=rank*1.2+(Math.abs(cx-x)+Math.abs(cy-y))/5, i, q, ox, oy, d;
+      for(i=0;i<placed.length;i++){
+        q=placed[i];
+        ox=Math.min(cx+it.w,q.x+q.w)-Math.max(cx,q.x)+room;
+        oy=Math.min(cy+it.h,q.y+q.h)-Math.max(cy,q.y)+room;
+        if(ox>0&&oy>0)cost+=12+20*Math.min(1,(ox*oy)/(it.w*it.h));
+      }
+      for(i=0;i<dots.length;i++){
+        d=dots[i];
+        if(d.x>cx-6&&d.x<cx+it.w+6&&d.y>cy-6&&d.y<cy+it.h+6)cost+=(d.id===s.id?8:3);
+      }
+      if(!best||cost<best.cost)best={x:cx,y:cy,cost:cost};
+    });
+    it.x=best.x; it.y=best.y; it.ax=best.x; it.ay=best.y;   /* where this label would rather be */
+    placed.push(it);
+  });
+}
+
+/* Push overlapping labels apart. First with a gentle pull that keeps each one
+   near the thing it names, then with no pull at all until nothing touches, so
+   the last word always goes to "no overlap". Boxes only: nothing here touches
+   the page. */
+function declutter(items,box){
+  var n=items.length, gap=13, pass, i;
+  function hold(a){
+    a.x=Math.min(Math.max(a.x,box.l),Math.max(box.l,box.r-a.w));
+    a.y=Math.min(Math.max(a.y,box.t),Math.max(box.t,box.b-a.h));
+  }
+  function separate(){
+    var hit=false, i, j, a, b, ox, oy, s;
+    for(i=0;i<n;i++){
+      a=items[i];
+      for(j=i+1;j<n;j++){
+        b=items[j];
+        ox=Math.min(a.x+a.w,b.x+b.w)-Math.max(a.x,b.x)+gap;
+        oy=Math.min(a.y+a.h,b.y+b.h)-Math.max(a.y,b.y)+gap;
+        if(ox<=0||oy<=0)continue;
+        hit=true;
+        if(oy<=ox){                      /* stacking reads better than side by side */
+          s=((a.y+a.h/2)<=(b.y+b.h/2)?-1:1)*(oy/2+.5); a.y+=s; b.y-=s;
+        } else {
+          s=((a.x+a.w/2)<=(b.x+b.w/2)?-1:1)*(ox/2+.5); a.x+=s; b.x-=s;
+        }
+      }
+    }
+    for(i=0;i<n;i++)hold(items[i]);
+    return hit;
+  }
+  for(pass=0;pass<30;pass++){
+    if(!separate())return;
+    for(i=0;i<n;i++){                    /* drift back towards its object */
+      items[i].x+=(items[i].ax-items[i].x)*0.05;
+      items[i].y+=(items[i].ay-items[i].y)*0.05;
+      hold(items[i]);
+    }
+  }
+  for(pass=0;pass<120;pass++){ if(!separate())return; }
+}
+
+/* how far the pill has to travel for its middle to sit on the dot */
+function toDot(pin,s){
+  var r=stage.getBoundingClientRect(), b=pin.getBoundingClientRect();
+  if(!b.width)return {x:0,y:0};
+  return {x:Math.round(r.left+s.x/100*r.width-(b.left+b.width/2)),
+          y:Math.round(r.top+s.y/100*r.height-(b.top+b.height/2))};
+}
+/* the pill grows out of the dot, and the dot gives way to it (CSS hides .spot.open) */
+function enter(pin,s,delay,from){
+  if(CALM)return;
+  var p=pin.firstChild; from=from||toDot(pin,s);
+  if(M){
+    var o={delay:(delay||0)/1000};
+    for(var k in POP)o[k]=POP[k];
+    M.animate(p,{opacity:[0,1],scale:[.3,1],x:[from.x,0],y:[from.y,0]},o);
+  } else {
+    play(p,[{opacity:0,scale:.3,translate:from.x+'px '+from.y+'px'},{opacity:1,scale:1,translate:'0px 0px'}],
+         {duration:620,easing:SPRING,delay:delay||0,fill:'backwards'});
+  }
+}
+/* and folds back into it, so the dot can reappear where it was */
+function leave(pin,s,delay,to){
+  pin.classList.add('leaving');
+  if(CALM||!s){pin.remove();return;}
+  var p=pin.firstChild; to=to||toDot(pin,s);
+  var a=M?M.animate(p,{opacity:0,scale:.3,x:to.x,y:to.y},{duration:.24,ease:[.4,0,.7,1],delay:(delay||0)/1000})
+        :play(p,[{opacity:1,scale:1,translate:'0px 0px'},{opacity:0,scale:.3,translate:to.x+'px '+to.y+'px'}],
+              {duration:230,easing:'ease-in',delay:delay||0,fill:'forwards'});
+  done(a,function(){pin.remove();},(delay||0)+560);
+}
+
+/* ---------- drawing: elements are kept and updated, so nothing flickers ---------- */
+function render(o){
+  o=o||{};
+  var showing=mode==='edit'?spots.length:Object.keys(open).length;
+  var many=mode!=='edit'&&showing>8;
+  /* room for roughly one label per 11000 square pixels before it has to shrink */
+  var tight=many&&showing*11000>stage.clientWidth*stage.clientHeight;
+  stage.className='stage'+(mode==='find'?' find':'')+(mode==='edit'?' edit':'')+(dotsOn?'':' nodots')+
+    (many?' many':'')+(tight?' tight':'');
+  var seen={};
+  onStage().forEach(function(s){
+    var b=spotEls[s.id];
+    if(!b){
+      b=document.createElement('button');b.dataset.id=s.id;b.innerHTML='<i></i>';stage.appendChild(b);spotEls[s.id]=b;
+      /* the dots arrive in a wave that runs the same way the room did, so the
+         eye carries on in the direction it was already travelling */
+      if(o.intro&&!CALM){
+        var w=LAST_WAY, lead=s.x;
+        if(w)lead=(Math.abs(w.x)>=Math.abs(w.y))?(w.x>=0?s.x:100-s.x):(w.y>=0?s.y:100-s.y);
+        b.firstChild.style.animationDelay=(480+lead*4)+'ms';b.dataset.intro='1';
+      }
+    }
+    b.className='spot'+(open[s.id]?' open':'')+(sel===s.id?' sel':'')+(b.dataset.intro?' intro':'');
+    b.style.left=s.x+'%';b.style.top=s.y+'%';
+    b.setAttribute('aria-label',mode==='find'?'Something in the picture':(s.w||'New word'));
+    seen[s.id]=1;
+  });
+  Object.keys(spotEls).forEach(function(id){if(!seen[id]){spotEls[id].remove();delete spotEls[id];}});
+  renderPills(o);
+  renderForm();
+  status();
+}
+function renderPills(o){
+  o=o||{};
+  var want=mode==='edit'?spots.filter(function(s){return s.w;}):
+    inPlay().filter(function(s){return open[s.id];}).sort(function(a,b){return open[a.id]-open[b.id];});
+  var ids={}, fresh=[];
+  var wave=want.slice().sort(function(a,b){return (a.x+a.y*.4)-(b.x+b.y*.4);});
+  want.forEach(function(s,i){
+    ids[s.id]=1;
+    var pin=pillEls[s.id], isNew=!pin;
+    if(isNew){
+      pin=document.createElement('div');pin.className='pin';
+      var inner=document.createElement('div');inner.dataset.id=s.id;pin.appendChild(inner);
+      pillEls[s.id]=pin;
+    }
+    place(pin,s);pin.style.zIndex=5+i;
+    if(isNew){stage.appendChild(pin); if(mode!=='edit')fresh.push({p:pin,s:s});}
+  });
+  var gone=[];
+  Object.keys(pillEls).forEach(function(id){
+    if(ids[id])return;
+    var p=pillEls[id];delete pillEls[id];
+    if(mode==='edit'){p.remove();}else{gone.push({p:p,s:byId(id)});}
+  });
+  /* Keep every label inside the picture and clear of the others. Labels are
+     measured once, shuffled as plain numbers, then written back in one go, so
+     opening all sixty at once costs a single layout rather than sixty.
+     The nudge goes on the margin: the pin's transform is its position and the
+     pill's belongs to the animation. In Edit the labels stay exactly where they
+     are put, because that is the thing being adjusted. */
+  var shown=want.map(function(s){return pillEls[s.id];});
+  var sr=stage.getBoundingClientRect(), edge=6;
+  var box={l:sr.left+edge,t:sr.top+edge,r:sr.right-edge,b:sr.bottom-edge};
+  var items=shown.map(function(p,k){
+    /* where the label would sit with no nudge at all: its box now, less the nudge
+       it carries now. That holds even while an earlier nudge is still gliding. */
+    var b=p.getBoundingClientRect(), cs=getComputedStyle(p);
+    var x=b.left-(parseFloat(cs.marginLeft)||0), y=b.top-(parseFloat(cs.marginTop)||0);
+    return {p:p,s:want[k],w:Math.ceil(b.width),h:Math.ceil(b.height),x0:x,y0:y,x:x,y:y,ax:0,ay:0};
+  });
+  if(mode==='edit'){
+    items.forEach(function(it){
+      it.x=Math.min(Math.max(it.x,box.l),Math.max(box.l,box.r-it.w));
+      it.y=Math.min(Math.max(it.y,box.t),Math.max(box.t,box.b-it.h));
+    });
+  } else {
+    chooseSides(items,box,sr,Object.keys(open).length>8?9:12);    /* first, each label picks a side with room */
+    if(items.length>1)declutter(items,box); /* then anything still touching is eased apart */
+  }
+  items.forEach(function(it){
+    it.p.style.marginLeft=Math.round(it.x-it.x0)+'px';
+    it.p.style.marginTop=Math.round(it.y-it.y0)+'px';
+  });
+  /* a new label takes its place at once; from then on it glides when moved */
+  var newcomers=fresh.map(function(f){return f.p;});
+  if(newcomers.length)requestAnimationFrame(function(){requestAnimationFrame(function(){
+    newcomers.forEach(function(p){p.classList.add('glide');});
+  });});
+
+  /* measure everything first, then animate, so one click never forces layout over and over */
+  fresh.forEach(function(f){f.from=toDot(f.p,f.s);});
+  gone.forEach(function(g){if(g.s)g.to=toDot(g.p,g.s);});
+  fresh.forEach(function(f){enter(f.p,f.s,o.wave?wave.indexOf(f.s)*16:0,f.from);});
+  gone.forEach(function(g,i){leave(g.p,g.s,o.wave?i*7:0,g.to);});
+}
+function renderForm(){
+  var want=(mode==='edit'&&sel&&byId(sel))?sel:null;
+  if(formEl&&formFor!==want){formEl.remove();formEl=null;formFor=null;}
+  if(want&&!formEl){
+    formEl=form(byId(want));formFor=want;stage.appendChild(formEl);
+    if(M&&!CALM)M.animate(formEl,{opacity:[0,1],scale:[.94,1],y:[10,0]},{type:'spring',stiffness:400,damping:30});
+  }
+}
+function status(){
+  var n=inPlay().length, f=Object.keys(found).filter(function(id){var s=byId(id);return s&&live(s);}).length;
+  drawWordsBtn();
+  if(mode==='explore'){countEl.innerHTML='<b>'+f+'</b> of '+n+' words opened';sub.textContent='Click anything in the picture to see what it is called.';foot.innerHTML='<b>Tip:</b> press Hide all for a clean picture, then see how many things you can name before you click. <b>Words</b> picks the set the class works with, <b>Phonetics</b> shows how each one is said, and <b>Save PNG</b> writes the picture out with every word on it.';}
+  else if(mode==='find'){sub.textContent='Read the word, then click that thing in the picture.';foot.textContent='';}
+  else{countEl.innerHTML='<b>'+n+'</b> hotspots';sub.textContent='Click the picture to add a word. Drag a dot to move it. Click a dot to change the word or where its label sits.';foot.innerHTML='Changes are saved in this browser. <b>Copy data</b> gives the list to paste back to Claude so it becomes the built-in set.';}
+}
+
+/* ---------- what did that click mean? ----------
+   A dot is a pin in a thing, not the size of it, so asking for a click within a
+   few pixels of the pin was asking a student to guess, and half of every picture
+   meant nothing at all. Now the whole picture is divided up, in two goes.
+
+   The objects go first. Each one reaches about as far as the gap to its nearest
+   neighbour, so a toothbrush in a crowded row keeps its own small patch while a
+   bath standing on its own gets a wide one, and the nearest object that reaches
+   the click takes it. No regions to draw: how close together the words are is
+   itself the measure of how big the things are.
+
+   If no object claims the click it belongs to a surface: the floor, a rug, a run
+   of wall tiles, the rooftops beyond the terrace. A surface is the background
+   everything else sits on and a pin in the middle of a floor cannot speak for
+   its corners, so a surface carries the patch of picture it covers instead, and
+   the click goes to the smallest patch it is inside. That is the whole point of
+   this: the big surfaces were the ones nobody could press. */
+var REACH_MIN=.030, REACH_MAX=.082, REACH_OF_GAP=.70;   /* of the picture's width */
+function measure(rect){
+  /* only the words in play divide the picture up, so switching one off hands its
+     patch to whatever is next to it rather than leaving a hole */
+  var P=onStage().map(function(s){return {s:s,x:s.x/100*rect.width,y:s.y/100*rect.height};});
+  var W=rect.width||1;
+  for(var i=0;i<P.length;i++){
+    var a=P[i], gap=1e9, j, dx, dy, d;
+    for(j=0;j<P.length;j++){
+      if(j===i)continue;
+      dx=P[j].x-a.x; dy=P[j].y-a.y; d=Math.sqrt(dx*dx+dy*dy);
+      if(d<gap)gap=d;
+    }
+    a.reach=Math.max(W*REACH_MIN,Math.min(W*REACH_MAX,gap*REACH_OF_GAP));
+  }
+  return P;
+}
+function hit(px,py,rect){
+  var P=measure(rect), best=null, i, a, dx, dy, d;
+  for(i=0;i<P.length;i++){                       /* the objects, each within its reach */
+    a=P[i]; if(a.s.box)continue;
+    dx=a.x-px; dy=a.y-py; d=Math.sqrt(dx*dx+dy*dy);
+    if(d<=a.reach&&(!best||d/a.reach<best.score))best={s:a.s,d:d,score:d/a.reach};
+  }
+  if(best)return best;
+  var small=1e9;
+  for(i=0;i<P.length;i++){                       /* else the surface it is lying on */
+    var b=P[i].s.box; if(!b)continue;
+    if(px<b[0]/100*rect.width||px>b[2]/100*rect.width)continue;
+    if(py<b[1]/100*rect.height||py>b[3]/100*rect.height)continue;
+    var area=(b[2]-b[0])*(b[3]-b[1]);            /* a rug lying on a floor wins */
+    if(area<small){small=area;best={s:P[i].s,d:0,score:1};}
+  }
+  return best;
+}
+
+/* ---------- explore ---------- */
+function toggle(id){
+  var s=byId(id); if(!s||!live(s))return;
+  if(open[id]){delete open[id];}
+  else{if(stage.clientWidth<640)open={};open[id]=++seq;found[id]=1;ring(s.x,s.y);}
+  render();
+}
+function setDots(on){dotsOn=on;document.getElementById('dots').setAttribute('aria-pressed',on?'true':'false');}
+
+/* ---------- find it ---------- */
+function startQuiz(){
+  var order=inPlay().map(function(s){return s.id;});
+  for(var i=order.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=order[i];order[i]=order[j];order[j]=t;}
+  quiz={order:order,i:0,first:0,tries:0};open={};drawTask(null,null,true);render();
+}
+function drawTask(msg,cls,fresh){
+  if(mode==='find'){
+    task.hidden=false;
+    if(!quiz.order.length){            /* every word in this room is switched off */
+      task.innerHTML='<span class="word">No words chosen.</span><span class="msg">Press Words and pick the ones for this lesson.</span>';
+      countEl.innerHTML='';return;
+    }
+    if(quiz.i>=quiz.order.length){
+      task.innerHTML='<span class="word new">All found.</span><span class="msg">'+quiz.first+' of '+quiz.order.length+' at the first click.</span><span class="spacer"></span><button class="btn" id="again">Play again</button>';
+      countEl.innerHTML='<b>'+quiz.order.length+'</b> of '+quiz.order.length;return;
+    }
+    var s=byId(quiz.order[quiz.i]);
+    var t=ipaOn?ipaOf(s.w):'';      /* read the word, and see how to say it */
+    task.innerHTML='<span class="lab">Find</span><span class="word'+(fresh?' new':'')+'">'+esc(s.w)+'</span>'+hearBtn(s.w)+
+      (t?'<span class="tipa">'+esc(t)+'</span>':'')+
+      '<span class="msg '+(cls||'')+'">'+(msg||'')+'</span><span class="spacer"></span><button class="btn" id="skip">Skip</button>';
+    countEl.innerHTML='<b>'+quiz.i+'</b> of '+quiz.order.length+' found';
+  } else if(mode==='edit'){
+    task.hidden=false;
+    task.innerHTML='<span class="lab">Edit</span><span class="msg '+(cls||'')+'">'+(msg||'Click an empty place in the picture to add a word.')+'</span><span class="spacer"></span><button class="btn" id="copy">Copy data</button><button class="btn" id="reset">Reset to built-in</button>';
+  } else { task.hidden=true; task.innerHTML=''; }
+}
+function nextQuiz(){quiz.i++;quiz.tries=0;drawTask(null,null,true);}
+function quizClick(px,py,rect){
+  if(!quiz||quiz.i>=quiz.order.length)return;
+  var s=byId(quiz.order[quiz.i]);
+  var dx=(s.x/100*rect.width)-px, dy=(s.y/100*rect.height)-py, d=Math.sqrt(dx*dx+dy*dy);
+  /* right on the pin always counts, however crowded the shelf; otherwise the
+     click counts if this word is the nearest thing to it */
+  var n=hit(px,py,rect), sure=Math.max(38,rect.width*.042);
+  if(d<=sure||(n&&n.s.id===s.id)){
+    if(quiz.tries===0)quiz.first++;
+    open[s.id]=1;found[s.id]=1;ring(s.x,s.y,'good');render();
+    var done=quiz.i+1>=quiz.order.length;
+    drawTask('Yes.','good');
+    setTimeout(function(){ if(mode==='find'){ if(!done){delete open[s.id];} nextQuiz(); render(); } },1100);
+  } else {
+    quiz.tries++;
+    ring(px/rect.width*100,py/rect.height*100,'bad');
+    /* say what they did click: a wrong answer teaches a word too */
+    var what=(n&&n.s.w)?' You clicked the '+esc(n.s.w)+'.':'';
+    drawTask('Not there.'+what+(quiz.tries>=3?' Press Skip to see it.':' Try again.'),'bad');
+  }
+}
+
+/* ---------- edit ---------- */
+var POS=[['auto','Auto'],['above','Above'],['below','Below'],['left','Left'],['right','Right']];
+function form(s){
+  var f=document.createElement('div');f.className='form'+(s.x<50&&s.y>45?' rt':'');
+  var cur=s.pos||'auto';
+  f.innerHTML='<label for="fw">Word</label><input id="fw" value="'+esc(s.w)+'" autocomplete="off">'+
+   '<label>Label position</label><div class="pos">'+POS.map(function(p){return '<button data-p="'+p[0]+'" aria-pressed="'+(cur===p[0]?'true':'false')+'">'+p[1]+'</button>';}).join('')+'</div>'+
+   '<div class="row"><button class="pri" data-a="ok">Done</button><button class="del" data-a="del">Delete</button></div>';
+  f.addEventListener('pointerdown',function(e){e.stopPropagation();});
+  f.addEventListener('click',function(e){
+    e.stopPropagation();
+    var d=e.target.dataset||{};
+    if(d.p){
+      s.w=f.querySelector('#fw').value.trim();if(d.p==='auto'){delete s.pos;}else{s.pos=d.p;}save();
+      f.querySelectorAll('.pos button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.p===d.p?'true':'false');});
+      renderPills();return;
+    }
+    if(!d.a)return;
+    if(d.a==='del'){spots=spots.filter(function(x){return x.id!==s.id;});}
+    else{s.w=f.querySelector('#fw').value.trim(); if(!s.w){spots=spots.filter(function(x){return x.id!==s.id;});}}
+    sel=null;save();render();
+  });
+  f.addEventListener('input',function(){s.w=f.querySelector('#fw').value.trim();save();renderPills();});
+  f.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();f.querySelector('[data-a=ok]').click();}});
+  return f;
+}
+
+/* ---------- pointer handling on the picture ---------- */
+var drag=null;
+stage.addEventListener('pointerdown',function(e){
+  if(mode!=='edit')return;
+  var b=e.target.closest('.spot'); if(!b)return;
+  drag={id:b.dataset.id,el:b,moved:false,x0:e.clientX,y0:e.clientY};
+  b.setPointerCapture(e.pointerId);
+});
+stage.addEventListener('pointermove',function(e){
+  if(!drag)return;
+  if(Math.abs(e.clientX-drag.x0)+Math.abs(e.clientY-drag.y0)>4)drag.moved=true;
+  if(!drag.moved)return;
+  var r=stage.getBoundingClientRect(), s=byId(drag.id);
+  s.x=Math.round(Math.min(99,Math.max(1,(e.clientX-r.left)/r.width*100))*10)/10;
+  s.y=Math.round(Math.min(99,Math.max(1,(e.clientY-r.top)/r.height*100))*10)/10;
+  drag.el.style.left=s.x+'%';drag.el.style.top=s.y+'%';
+  if(pillEls[s.id])place(pillEls[s.id],s);
+});
+stage.addEventListener('pointerup',function(){ if(drag&&drag.moved){save();drag.justMoved=true;setTimeout(function(){drag=null;},0);} else drag=null; });
+/* Every word with a recording can be heard: British English, one clip per word,
+   fetched only when its speaker is pressed. */
+var HEAR_ICON='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.2L12 5.5v13l-4.8-4H4z"/><path class="w" d="M15.5 9a4.2 4.2 0 0 1 0 6M18.2 6.5a7.8 7.8 0 0 1 0 11"/></svg>', hearAudio=null, hearOn=null;
+function hearSlug(w){return String(w).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
+function hearBtn(w){
+  if(!w||!IPA[w])return '';
+  return '<button type="button" class="hear" data-hear="'+esc(w)+'" aria-label="Hear '+esc(w)+'">'+HEAR_ICON+'</button>';
+}
+function hearWord(btn){
+  var w=btn.getAttribute('data-hear');
+  try{ if(hearAudio){hearAudio.pause();} }catch(e){}
+  if(hearOn)hearOn.classList.remove('on');
+  hearOn=btn; btn.classList.add('on');
+  hearAudio=new Audio('audio/words/'+hearSlug(w)+'.mp3');
+  var off=function(){btn.classList.remove('on');};
+  hearAudio.addEventListener('ended',off); hearAudio.addEventListener('error',off);
+  var p=hearAudio.play(); if(p&&p.catch)p.catch(off);
+}
+document.addEventListener('click',function(e){
+  var b=e.target.closest&&e.target.closest('.hear'); if(!b)return;
+  e.stopPropagation(); e.preventDefault(); hearWord(b);
+},true);
+stage.addEventListener('click',function(e){
+  var r=stage.getBoundingClientRect(), px=e.clientX-r.left, py=e.clientY-r.top;
+  if(mode==='find'){ if(!e.target.closest('.pill')) quizClick(px,py,r); return; }
+  var b=e.target.closest('.spot');
+  if(mode==='explore'){
+    /* the heading says click anything, so anything has to work: every click is
+       weighed up the same way Find it weighs one, whichever dot it landed on.
+       A dot reached by the keyboard has no coordinates, so that one goes by id. */
+    if(b&&!e.detail){toggle(b.dataset.id);}
+    else if(e.target.closest('.pill')){toggle(e.target.closest('.pill').dataset.id);}
+    else{var n=hit(px,py,r); if(n)toggle(n.s.id);}
+    return;
+  }
+  /* edit */
+  if(drag&&drag.justMoved)return;
+  if(b){sel=b.dataset.id;render();var i=stage.querySelector('#fw');if(i)i.focus();return;}
+  if(sel){var cur=byId(sel); if(cur&&!cur.w){spots=spots.filter(function(x){return x.id!==sel;});} }
+  var s={id:uid(),x:Math.round(px/r.width*1000)/10,y:Math.round(py/r.height*1000)/10,w:''};
+  spots.push(s);sel=s.id;save();render();var inp=stage.querySelector('#fw');if(inp)inp.focus();
+});
+
+/* ---------- controls ---------- */
+var thumb=document.querySelector('.seg .thumb');
+function moveThumb(){
+  var b=document.querySelector('.seg button[aria-pressed="true"]');if(!b)return;
+  var L=b.offsetLeft+'px', W=b.offsetWidth+'px';
+  if(M&&!CALM&&!thumb.classList.contains('still')){M.animate(thumb,{left:L,width:W},{type:'spring',stiffness:520,damping:34});}
+  else {thumb.style.left=L;thumb.style.width=W;}
+}
+function setMode(m){
+  mode=m;sel=null;open={};
+  document.querySelectorAll('.seg button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.mode===m?'true':'false');});
+  moveThumb();
+  ['dots','all','none'].forEach(function(id){document.getElementById(id).hidden=(m!=='explore');});
+  if(m==='find'){startQuiz();} else {quiz=null;drawTask();render();}
+}
+document.querySelector('.seg').addEventListener('click',function(e){var b=e.target.closest('button');if(b&&b.dataset.mode!=='edit')setMode(b.dataset.mode);});
+document.getElementById('dots').addEventListener('click',function(){setDots(!dotsOn);render();});
+document.getElementById('phon').addEventListener('click',function(){setIpa(!ipaOn);});
+document.getElementById('acc').addEventListener('click',function(){setIpa(true,ipaAcc==='gb'?'r':'gb');});
+document.getElementById('all').addEventListener('click',function(){inPlay().forEach(function(s){if(!open[s.id])open[s.id]=++seq;found[s.id]=1;});render({wave:true});});
+document.getElementById('none').addEventListener('click',function(){open={};setDots(false);render({wave:true});});
+task.addEventListener('click',function(e){
+  var id=e.target.id;
+  if(id==='skip'){var s=byId(quiz.order[quiz.i]);open[s.id]=1;ring(s.x,s.y);render();drawTask('Here it is.','');setTimeout(function(){if(mode==='find'){delete open[s.id];nextQuiz();render();}},1500);}
+  else if(id==='again'){startQuiz();}
+  else if(id==='copy'){
+    var txt=JSON.stringify(data(),null,1);
+    var done=function(){drawTask('Copied '+spots.length+' hotspots.','good');};
+    var fall=function(){var ta=document.createElement('textarea');ta.value=txt;ta.style.cssText='position:fixed;top:0;left:0;opacity:0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done();}catch(err){drawTask('Could not copy.','bad');}document.body.removeChild(ta);};
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(done,fall);}else{fall();}
+  }
+  else if(id==='reset'){
+    if(e.target.dataset.sure){try{localStorage.removeItem(KEY);}catch(err){}spots=JSON.parse(JSON.stringify(BUILT_IN));sel=null;drawTask('Back to the built-in set.','good');render();}
+    else{e.target.dataset.sure='1';e.target.textContent='Click again to reset';}
+  }
+});
+
+/* ---------------- the picture with the words on it ----------------
+   A room, labelled, as one PNG: a handout, a slide, something to print and put
+   on the wall. The labels are not worked out again for the file, they are read
+   off the page, so what is saved is exactly what the class was looking at,
+   including whether the phonetics are showing. The file is the size of the
+   original photograph, not of the screen, so it stays sharp when printed.
+   One thing cannot survive the trip: frosted glass needs to blur what is behind
+   it, and a flat picture has no behind. The labels are drawn more solid instead,
+   which is what makes them readable on paper anyway. */
+function slugOf(s){return (String(s||'room').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''))||'room';}
+function roundPath(c,x,y,w,h,r){
+  if(c.roundRect){c.beginPath();c.roundRect(x,y,w,h,r);return;}
+  c.beginPath();c.moveTo(x+r,y);
+  c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();
+}
+/* white at .56 behind a blur reads as white at about .9 without one */
+function solid(col){
+  var m=/^rgba?\(([^)]+)\)/.exec(col||''); if(!m)return 'rgba(255,255,255,.9)';
+  var p=m[1].split(',').map(function(v){return parseFloat(v);});
+  var a=p.length>3?p[3]:1;
+  return 'rgba('+p[0]+','+p[1]+','+p[2]+','+Math.max(a,0.9)+')';
+}
+function savePng(btn){
+  var say=function(t){btn.querySelector('.long').textContent=t;btn.querySelector('.short').textContent=t;};
+  var back=function(){setTimeout(function(){say('Save PNG');btn.querySelector('.short').textContent='PNG';},1800);};
+  if(!photo.naturalWidth){say('No picture');back();return;}
+  var wasOpen=open, wasSel=sel, wasW=stage.style.width;
+  /* The file must not depend on the size of the window it was asked for. A
+     narrow window packs the labels tight and the picture would be saved that
+     way, so the picture is laid out at a fixed width first: wide enough that
+     sixty labels come apart, narrow enough that the words are still a readable
+     size once they are scaled up to the size of the photograph. Nothing is
+     painted between here and putting the width back, so none of this is seen. */
+  stage.style.width='1000px'; stage.classList.add('snap');
+  /* every word in play, open, laid out by the same code that lays out the page */
+  open={}; sel=null;
+  inPlay().forEach(function(s){if(s.w)open[s.id]=++seq;});
+  render();
+  /* a label still flying out of its dot is measured where it is going, not
+     where it has got to, so the animations are jumped to their end first */
+  try{if(stage.getAnimations)stage.getAnimations({subtree:true}).forEach(function(a){a.finish();});}catch(e){}
+  var sr=stage.getBoundingClientRect();
+  var cv=document.createElement('canvas');
+  cv.width=photo.naturalWidth; cv.height=photo.naturalHeight;
+  var c=cv.getContext('2d'), k=cv.width/sr.width;
+  c.drawImage(photo,0,0,cv.width,cv.height);
+  Object.keys(pillEls).forEach(function(id){
+    var pin=pillEls[id], p=pin.firstChild, s=byId(id);
+    if(!s||!s.w)return;
+    var b=pin.getBoundingClientRect(), cs=getComputedStyle(p);
+    var x=(b.left-sr.left)*k, y=(b.top-sr.top)*k, w=b.width*k, h=b.height*k;
+    var r=parseFloat(cs.borderTopLeftRadius)*k||6*k;
+    c.save();
+    c.shadowColor='rgba(10,12,16,.22)'; c.shadowBlur=10*k; c.shadowOffsetY=3*k;
+    roundPath(c,x,y,w,h,r); c.fillStyle=solid(cs.backgroundColor); c.fill();
+    c.restore();
+    c.save();
+    roundPath(c,x,y,w,h,r); c.lineWidth=Math.max(1,k); c.strokeStyle='rgba(255,255,255,.9)'; c.stroke();
+    c.restore();
+    /* the two lines are centred in the boxes the browser gave them, so nothing
+       here has to guess where a baseline falls */
+    var ipaEl=p.querySelector('.ipa'), ib=ipaEl?ipaEl.getBoundingClientRect():null;
+    var top=y+parseFloat(cs.paddingTop)*k, bot=y+h-parseFloat(cs.paddingBottom)*k;
+    var wordBot=ib?(ib.top-sr.top)*k:bot;
+    c.textAlign='center'; c.textBaseline='middle';
+    c.fillStyle=cs.color;
+    c.font=cs.fontWeight+' '+(parseFloat(cs.fontSize)*k)+'px '+cs.fontFamily;
+    c.fillText(s.w,x+w/2,(top+wordBot)/2);
+    if(ipaEl){
+      var ics=getComputedStyle(ipaEl);
+      c.globalAlpha=parseFloat(ics.opacity)||1;
+      c.fillStyle=ics.color;
+      c.font=ics.fontWeight+' '+(parseFloat(ics.fontSize)*k)+'px '+ics.fontFamily;
+      c.fillText(ipaEl.textContent,x+w/2,((ib.top-sr.top)*k+(ib.bottom-sr.top)*k)/2);
+      c.globalAlpha=1;
+    }
+  });
+  stage.style.width=wasW; stage.classList.remove('snap');                  /* and the page goes back to what it was */
+  open=wasOpen; sel=wasSel; render();
+  var name=slugOf(room().title)+'-words'+(ipaOn?'-'+ipaAcc:'')+'.png';
+  var done=function(blob){
+    if(!blob){say('Could not save');back();return;}
+    var u=URL.createObjectURL(blob), a=document.createElement('a');
+    a.href=u;a.download=name;document.body.appendChild(a);a.click();
+    setTimeout(function(){URL.revokeObjectURL(u);a.remove();},2000);
+    say('Saved');back();
+  };
+  /* a picture from another site would poison the canvas; ours never is, but a
+     failure here must not take the page down with it */
+  try{ if(cv.toBlob)cv.toBlob(done,'image/png'); else done(null); }
+  catch(err){ say('Could not save'); back(); }
+}
+document.getElementById('png').addEventListener('click',function(){
+  var b=this;
+  /* the real font has to be in before anything is measured or drawn */
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){savePng(b);});
+  else savePng(b);
+});
+
+/* ---------------- the word picker ----------------
+   One room at a time, because a lesson usually is, with a search that reaches
+   every room when a teacher wants the same word wherever it appears. The choice
+   is kept in this browser, so it is still there next lesson, and the link button
+   writes the whole flat's choice into the address: that is how a teacher hands
+   the set to a class, or to another teacher, without anyone signing in. */
+var selWrap=document.getElementById('pickwrap'), pickRoom=0, pickQ='';
+function pickerOn(){return selWrap.classList.contains('open');}
+function drawWordsBtn(){
+  var b=document.getElementById('words'); if(!b)return;
+  var all=spots.filter(function(s){return !!s.w;}).length, n=inPlay().filter(function(s){return !!s.w;}).length;
+  document.getElementById('wordsn').textContent=(n===all?String(all):n+'/'+all);
+  b.setAttribute('data-some',n===all?'0':'1');
+  b.setAttribute('aria-label',n===all?('Choose the words. All '+all+' are in play.')
+                                     :('Choose the words. '+n+' of '+all+' are in play.'));
+}
+function wordChips(i,ws){
+  var o=offOf(i);
+  return ws.map(function(w){
+    return '<button class="wd" data-i="'+i+'" data-w="'+esc(w)+'" aria-pressed="'+(o[w]?'false':'true')+'">'+esc(w)+'</button>';
+  }).join('');
+}
+function drawPick(){
+  var rooms=document.getElementById('pickrooms'), list=document.getElementById('picklist'), i;
+  rooms.hidden=ROOMS.length<2;
+  if(ROOMS.length>1){
+    rooms.innerHTML=ROOMS.map(function(r,k){
+      var ws=wordsOf(k), o=offOf(k), on=0;
+      ws.forEach(function(w){if(!o[w])on++;});
+      return '<button data-i="'+k+'" aria-pressed="'+(k===pickRoom)+'">'+esc(r.title)+
+        '<span class="n">'+on+'/'+ws.length+'</span></button>';
+    }).join('');
+  }
+  var q=pickQ.trim().toLowerCase(), html='', any=false, ws;
+  if(q){
+    for(i=0;i<ROOMS.length;i++){
+      ws=wordsOf(i).filter(function(w){return w.toLowerCase().indexOf(q)>=0;});
+      if(!ws.length)continue;
+      any=true;
+      html+=(ROOMS.length>1?'<p class="grp">'+esc(ROOMS[i].title)+'</p>':'')+wordChips(i,ws);
+    }
+    if(!any)html='<p class="none">Nothing matches that.</p>';
+  } else {
+    ws=wordsOf(pickRoom);
+    html=ws.length?wordChips(pickRoom,ws):'<p class="none">This room has no words yet.</p>';
+  }
+  list.innerHTML=html;
+  var on=0, total=0;
+  for(i=0;i<ROOMS.length;i++){
+    var o=offOf(i);
+    wordsOf(i).forEach(function(w){total++;if(!o[w])on++;});
+  }
+  document.getElementById('pickcount').textContent=on+' of '+total+' chosen';
+  document.getElementById('pickhint').textContent=(on===total)?'Every word is in play.'
+    :(total-on)+' put away: no dot, no label, not in Find it.';
+}
+/* a change in this room has to show on the picture straight away */
+function pickChanged(touchedHere){
+  if(touchedHere){
+    spots.forEach(function(s){if(!live(s))delete open[s.id];});
+    if(mode==='find'){startQuiz();}else{render();}
+  }
+  drawStrip(); drawPick(); drawWordsBtn();
+}
+function showPick(on){
+  selWrap.classList.toggle('open',on);
+  if(!on)return;
+  pickRoom=ri; pickQ='';
+  var s=document.getElementById('picksearch'); if(s)s.value='';
+  drawPick();
+  var f=selWrap.querySelector('#pickrooms button[aria-pressed="true"]')||document.getElementById('picksearch');
+  if(f)setTimeout(function(){f.focus();},40);
+}
+document.getElementById('words').addEventListener('click',function(){showPick(true);});
+selWrap.addEventListener('click',function(e){
+  if(e.target.closest('[data-close]')){showPick(false);return;}
+});
+document.getElementById('pickrooms').addEventListener('click',function(e){
+  var b=e.target.closest('button'); if(!b)return;
+  pickRoom=+b.dataset.i;
+  pickQ=''; document.getElementById('picksearch').value='';
+  drawPick();
+});
+document.getElementById('picksearch').addEventListener('input',function(){pickQ=this.value;drawPick();});
+document.getElementById('picklist').addEventListener('click',function(e){
+  var b=e.target.closest('.wd'); if(!b)return;
+  var i=+b.dataset.i, w=b.dataset.w, o=offOf(i);
+  if(o[w])delete o[w]; else o[w]=1;
+  setOffOf(i,o);
+  pickChanged(i===ri);
+});
+/* All and None act on exactly what is listed: one room, or every match of a search */
+function pickBulk(on){
+  var by={}, touched=false;
+  [].forEach.call(document.querySelectorAll('#picklist .wd'),function(b){
+    var i=+b.dataset.i; (by[i]=by[i]||[]).push(b.dataset.w);
+  });
+  Object.keys(by).forEach(function(k){
+    var i=+k, o=offOf(i);
+    by[k].forEach(function(w){ if(on)delete o[w]; else o[w]=1; });
+    setOffOf(i,o);
+    if(i===ri)touched=true;
+  });
+  pickChanged(touched);
+}
+document.getElementById('pickall').addEventListener('click',function(){pickBulk(true);});
+document.getElementById('picknone').addEventListener('click',function(){pickBulk(false);});
+
+/* The whole flat's choice as one short code: a bit per word, in the order the
+   page was built, six bits to a character. The number in front is how many words
+   the code was made for, so a code made before the word list changed is ignored
+   rather than putting ticks against the wrong words. */
+var A64='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+function builtWords(i){return ((ROOMS[i]||{}).words||[]).map(function(w){return w.w;}).filter(function(w){return !!w;});}
+function packSet(){
+  var bits=[], i, out='', b=0, n=0;
+  for(i=0;i<ROOMS.length;i++){
+    var o=offOf(i);
+    builtWords(i).forEach(function(w){bits.push(o[w]?0:1);});
+  }
+  for(i=0;i<bits.length;i++){
+    b=(b<<1)|bits[i]; n++;
+    if(n===6){out+=A64.charAt(b);b=0;n=0;}
+  }
+  if(n)out+=A64.charAt(b<<(6-n));
+  return bits.length+'.'+out;
+}
+function applySet(code){
+  var m=/^(\d+)\.([A-Za-z0-9_-]*)$/.exec(code||''); if(!m)return false;
+  var total=+m[1], s=m[2], bits=[], i, v, all=0;
+  for(i=0;i<ROOMS.length;i++)all+=builtWords(i).length;
+  if(all!==total)return false;                 /* not the list this code was made for */
+  for(i=0;i<s.length;i++){
+    v=A64.indexOf(s.charAt(i)); if(v<0)return false;
+    bits.push((v>>5)&1,(v>>4)&1,(v>>3)&1,(v>>2)&1,(v>>1)&1,v&1);
+  }
+  if(bits.length<total)return false;
+  var k=0;
+  for(i=0;i<ROOMS.length;i++){
+    var o={}, ws=builtWords(i), j;
+    for(j=0;j<ws.length;j++){if(!bits[k+j])o[ws[j]]=1;}
+    k+=ws.length;
+    setOffOf(i,o);
+  }
+  return true;
+}
+document.getElementById('picklink').addEventListener('click',function(){
+  var url=location.href.split('#')[0]+'#set='+packSet(), b=this, back=function(){b.textContent='Copy a link to this set';};
+  var ok=function(){b.textContent='Link copied';setTimeout(back,1800);};
+  var fall=function(){
+    var ta=document.createElement('textarea');ta.value=url;
+    ta.style.cssText='position:fixed;top:0;left:0;opacity:0';document.body.appendChild(ta);ta.select();
+    try{document.execCommand('copy');ok();}catch(err){b.textContent='Could not copy';setTimeout(back,1800);}
+    document.body.removeChild(ta);
+  };
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(url).then(ok,fall);else fall();
+});
+document.addEventListener('keydown',function(e){
+  /* Escape closes the picker and does nothing else: the page it is sitting over
+     has Escape of its own (clearing the labels, leaving present mode), and both
+     listen on the document, so the rest of them are stopped here rather than
+     left to fire on a dialog that has just gone */
+  if(e.key==='Escape'&&pickerOn()){e.stopImmediatePropagation();showPick(false);return;}
+  if(e.key==='Escape'&&mode==='explore'){open={};render({wave:true});}
+});
+window.addEventListener('resize',moveThumb);
+/* the picture changed size, or the real font arrived: the labels' sizes moved, so lay them out again */
+var relayTimer=null;
+function relayout(){
+  clearTimeout(relayTimer);
+  relayTimer=setTimeout(function(){
+    if(drag)return;
+    render();
+    /* once more on the next frame: the first pass can read sizes the browser is still settling */
+    requestAnimationFrame(function(){if(!drag)render();});
+  },110);
+}
+window.addEventListener('resize',relayout);                 /* the window itself */
+window.addEventListener('orientationchange',relayout);
+if(window.ResizeObserver)new ResizeObserver(relayout).observe(stage);   /* and the picture, however it changed */
+if(document.fonts&&document.fonts.ready){document.fonts.ready.then(relayout);}
+/* Events are not always delivered: a background tab throttles them, and some
+   embeddings never send them at all. So the picture is simply watched. One
+   measurement every half second costs nothing and cannot be missed. */
+var lastW=0,lastH=0;
+setInterval(function(){
+  var w=stage.clientWidth, h=stage.clientHeight;
+  if(!w||!h)return;
+  if(Math.abs(w-lastW)>1||Math.abs(h-lastH)>1){
+    var first=!lastW; lastW=w; lastH=h;
+    if(!first&&!drag)relayout();
+  }
+},500);
+if(document.fonts&&document.fonts.ready){document.fonts.ready.then(moveThumb);}
+
+/* ---------------- moving from room to room ---------------- */
+function drawStrip(){
+  if(ROOMS.length<2){strip.hidden=true;return;}
+  strip.hidden=false;
+  strip.innerHTML=ROOMS.map(function(r,i){
+    /* the number is how many words are in play there, not how many exist, so a
+       teacher who has picked a set can see it room by room */
+    return '<button class="rm" data-i="'+i+'" aria-current="'+(i===ri)+'">'+esc(r.title)+
+      '<span class="n">'+countIn(i)+'</span></button>';
+  }).join('');
+}
+strip.addEventListener('click',function(e){
+  var b=e.target.closest('.rm'); if(b)goRoom(+b.dataset.i);
+});
+function showPhoto(){photo.classList.add('on');}
+function setRoom(i,first){
+  ri=i;
+  var r=room();
+  photo.alt=r.alt||r.title||'';
+
+
+  spots=load(); off=offOf(i); open={}; found={}; sel=null; quiz=null; seq=0;
+  spotEls={}; pillEls={}; formEl=null; formFor=null;
+  stage.querySelectorAll('.spot,.pin,.form,.ring').forEach(function(n){n.remove();});
+  /* Changing room in the middle of a game starts the game again in the new
+     room. It used to throw instead, because the task strip was redrawn after
+     the game it describes had been cleared, which left the strip dead. */
+  drawStrip(); if(mode==='find'){startQuiz();}else{drawTask();} render({intro:true});
+  if(window.room_changed)room_changed();
+  if(first){
+    photo.src=r.img;
+    if(photo.complete)requestAnimationFrame(showPhoto); else photo.addEventListener('load',showPhoto);
+    photo.addEventListener('error',showPhoto);
+    setTimeout(showPhoto,1500);
+  }
+}
+/* ---------------- travelling between rooms ----------------
+   A room change is a move through a flat, not a slideshow, so it goes the way
+   you would really walk. Each room carries `at`, its place on the floor plan,
+   and the move is simply the line from one to the other: the terrace is east of
+   everything, so going there slides east, and the bedroom is at the far south
+   end, so coming from the bathroom travels the length of the flat. The further
+   apart two rooms are, the further the picture travels.
+   Without `at` (one room, or a page built before this) it falls back to the
+   order of the room buttons, which still reads as left and right. */
+function placeOf(i){
+  var r=ROOMS[i];
+  if(r&&r.at&&r.at.length===2)return r.at;
+  return [ROOMS.length>1?i/(ROOMS.length-1):0.5, 0.5];
+}
+function wayFrom(a,b){
+  var p=placeOf(a), q=placeOf(b), dx=q[0]-p[0], dy=q[1]-p[1];
+  var len=Math.sqrt(dx*dx+dy*dy);
+  if(!len)return {x:14,y:0,len:0};
+  return {x:dx/len*Math.min(30,17+len*18), y:dy/len*Math.min(30,17+len*18), len:len};
+}
+var LAST_WAY=null;
+/* the push itself: the old room is shoved out of the way and blurs as it goes,
+   the new one arrives from the direction of travel and settles sharp */
+function travel(way,next,i){
+  LAST_WAY=way;
+  if(CALM){                         /* someone who asked for no motion just arrives */
+    photo.src=next; setRoom(i,false); showPhoto();
+    moving=false; clearTimeout(movingTimer);
+    if(pending!==null){var p=pending; pending=null; goRoom(p);}
+    return;
+  }
+  var ghost=photo.cloneNode(false);
+  ghost.className='on ghost';
+  ghost.removeAttribute('id');
+  stage.insertBefore(ghost,photo);
+
+  photo.src=next;
+  /* the start of the move is written on the element, so the new room is never
+     standing in its final place for even one frame before the move begins */
+  photo.style.translate=way.x+'% '+way.y+'%';
+  photo.style.scale='1.05';
+  photo.classList.add('on','shifting');
+
+  /* Both pictures move on the same curve for the same length of time, so they
+     travel as one piece, the way the wall of a room does when you walk past it.
+     Give them different easings and the new room lands while the old one is
+     still drifting over the top of it, which reads as two slides, not a move.
+     Only the fading is the ghost's own: it holds, then goes near the end.
+     The curve is a camera, not a spring: it leans into the move and settles out
+     of it. A front-loaded ease puts the whole journey into the first fifth of
+     the time and leaves a long crawl, which looks like a slide that got stuck.
+     Nothing here animates anything but transform and opacity. The first version
+     blurred both pictures as they travelled, and a blur radius is repainted
+     every frame over the whole picture, which is the one thing certain to cost
+     frames at this size. The scale and the doorway do that job for nothing. */
+  /* Both pictures are decoded before anything moves (the old room covers the stage in the
+     meantime), so neither appears a moment late. A slow decoder gets 250 ms, no more. */
+  var begun=false;
+  var decoded=Promise.all([ghost,photo].map(function(im){
+    return im.decode?im.decode().catch(function(){}):0; }));
+  Promise.race([decoded,new Promise(function(r){setTimeout(r,250);})]).then(function(){
+    if(begun)return; begun=true; moveNow(); });
+  function moveNow(){
+  /* the new room's dots and labels are drawn as its picture starts to arrive, never on top
+     of the room being left, and their wave begins as the picture settles */
+  setRoom(i,false);
+  var EASE='cubic-bezier(.33,.02,.15,1)', MS=760;
+  var out=play(ghost,[{translate:'0% 0%',scale:1,opacity:1},
+                      {opacity:1,offset:.5},
+                      {translate:(-way.x)+'% '+(-way.y)+'%',scale:1.08,opacity:0}],
+               {duration:MS,easing:EASE,fill:'forwards'});
+  play(photo,[{translate:way.x+'% '+way.y+'%',scale:1.05},
+              {translate:'0% 0%',scale:1}],
+       {duration:MS,easing:EASE});
+  /* the animation owns the picture now: take the start values off, so that when it ends the
+     picture is already at rest where it stops, instead of snapping back to them for a frame */
+  photo.style.translate=''; photo.style.scale='';
+
+  var thru=document.createElement('div');thru.className='thru';stage.appendChild(thru);
+  var pass=play(thru,[{opacity:0,scale:1.3},{opacity:.82,scale:1,offset:.42},{opacity:0,scale:1}],
+                {duration:MS,easing:'ease-out'});
+  done(pass,function(){thru.remove();},MS+260);
+
+  done(out,function(){
+    ghost.remove();
+    photo.classList.remove('shifting');               /* give the layer back */
+    photo.style.translate='';photo.style.scale='';    /* back to what the CSS says */
+    moving=false; clearTimeout(movingTimer);
+    if(pending!==null){var p=pending; pending=null; goRoom(p);}
+  },MS+240);
+  }
+}
+var moving=false, movingTimer=null, pending=null;
+function goRoom(i){
+  if(!ROOMS[i]||i===ri)return;
+  /* A press during a move is not thrown away, it is remembered and taken as
+     soon as the room lands, so holding the arrow walks through the flat one
+     room at a time instead of ignoring every second press. Only the last one
+     is kept: pressing five times goes where the fifth press pointed. */
+  if(moving){pending=i;return;}
+  moving=true; pending=null;
+  /* whatever happens next, the buttons come back: a stuck flag would wedge the page */
+  clearTimeout(movingTimer);
+  movingTimer=setTimeout(function(){moving=false;},2500);
+  var way=wayFrom(ri,i), next=ROOMS[i].img;
+  ready(next).then(function(){ travel(way,next,i); });
+}
+/* Every picture is fetched and decoded once, through one promise, whether it was asked for
+   by a move or fetched ahead in the background, so a move never waits for a download that
+   is already happening and never fetches a picture twice. The images are kept, so the
+   browser keeps them. */
+var READY={}, KEPT=[];
+function ready(u){
+  if(!READY[u])READY[u]=new Promise(function(res){
+    var im=new Image(); im.decoding='async'; KEPT.push(im);
+    im.onload=function(){            /* decoded if the browser manages it quickly, never waited on longer */
+      Promise.race([im.decode?im.decode():0,new Promise(function(r){setTimeout(r,300);})]).then(res,res); };
+    im.onerror=res; im.src=u;
+  });
+  return READY[u];
+}
+
+/* start */
+document.querySelectorAll('.seg button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.mode==='explore'?'true':'false');});
+['dots','all','none'].forEach(function(id){document.getElementById(id).hidden=false;});
+readIpa(); drawIpaBtns();      /* whatever was chosen last lesson */
+/* a link carrying a set of words: it is applied before the first room is drawn,
+   so the class sees the teacher's set from the first frame */
+var setInLink=/[#&]set=(\d+\.[A-Za-z0-9_-]*)/.exec(location.hash||'');
+if(setInLink)applySet(setInLink[1]);
+setRoom(0,true); moveThumb();
+requestAnimationFrame(function(){requestAnimationFrame(function(){thumb.classList.remove('still');});});
+
+/* ---------------- the site page: arrows, the plan, the keyboard ---------------- */
+function room_changed(){
+  var r=room(), now=document.getElementById('now');
+  now.textContent=r.title||'';
+  /* replay the little entrance: taking the class off and reading a layout value
+     is what makes the browser start the animation again */
+  now.classList.remove('new'); void now.offsetWidth; now.classList.add('new');
+  document.getElementById('of').textContent=(ri+1)+' of '+ROOMS.length;
+  document.title='The Car: '+(r.title||'')+' | johnplusenglish';
+  [].forEach.call(document.querySelectorAll('#sheet .hit'),function(a){
+    a.classList.toggle('here',+a.dataset.i===ri);
+  });
+}
+function step(d){ goRoom((ri+d+ROOMS.length)%ROOMS.length); }
+document.getElementById('prev').addEventListener('click',function(){step(-1);});
+document.getElementById('next').addEventListener('click',function(){step(1);});
+var sheet=document.getElementById('sheet');
+function showPlan(on){ sheet.classList.toggle('open',on); }
+document.getElementById('planbtn').addEventListener('click',function(){showPlan(true);});
+document.getElementById('sheetclose').addEventListener('click',function(){showPlan(false);});
+sheet.addEventListener('click',function(e){ if(e.target===sheet)showPlan(false); });
+[].forEach.call(document.querySelectorAll('#sheet .hit'),function(a){
+  function go(){ showPlan(false); goRoom(+a.dataset.i); }
+  a.addEventListener('click',go);
+  a.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){e.preventDefault();go();} });
+});
+/* ---------------- present mode ----------------
+   For putting the room on the board in front of a class: the picture as large
+   as the screen will take it, the controls floating over it, and everything
+   else gone. Real fullscreen is asked for as well, so the browser's own chrome
+   goes too, but the mode does not depend on getting it. */
+var wrap=document.querySelector('.wrap'), idleTimer=null, stirred=0;
+function fsEl(){return document.fullscreenElement||document.webkitFullscreenElement||null;}
+/* every mouse move calls this, so it does as little as it can get away with:
+   the timer is only reset a few times a second */
+function stir(){
+  if(wrap.classList.contains('idle'))wrap.classList.remove('idle');
+  var now=Date.now(); if(now-stirred<200)return; stirred=now;
+  clearTimeout(idleTimer);
+  if(wrap.classList.contains('present'))idleTimer=setTimeout(function(){wrap.classList.add('idle');},2800);
+}
+function setPresent(on){
+  wrap.classList.toggle('present',on);
+  document.body.classList.toggle('presenting',on);
+  wrap.classList.toggle('quiz',on&&mode==='find');
+  document.getElementById('presentbtn').setAttribute('aria-pressed',on?'true':'false');
+  document.getElementById('presentlabel').textContent=on?'Close':'Present';
+  if(on){stir();}else{clearTimeout(idleTimer);wrap.classList.remove('idle');}
+  /* the picture changed size, so the labels are laid out again */
+  if(window.relayout)relayout();
+}
+function present(on){
+  if(on){
+    setPresent(true);
+    var ask=wrap.requestFullscreen||wrap.webkitRequestFullscreen;
+    if(ask){try{var p=ask.call(wrap);if(p&&p.catch)p.catch(function(){});}catch(e){}}
+  } else {
+    setPresent(false);
+    if(fsEl()){var go=document.exitFullscreen||document.webkitExitFullscreen;
+      if(go){try{go.call(document);}catch(e){}}}
+  }
+}
+document.getElementById('presentbtn').addEventListener('click',function(){
+  present(!wrap.classList.contains('present'));
+});
+/* leaving fullscreen by any other route (Escape, F11, the system) leaves it too */
+['fullscreenchange','webkitfullscreenchange'].forEach(function(ev){
+  document.addEventListener(ev,function(){ if(!fsEl()&&wrap.classList.contains('present'))setPresent(false); });
+});
+['pointermove','pointerdown','keydown','wheel'].forEach(function(ev){
+  document.addEventListener(ev,stir,{passive:true});
+});
+/* the mode switch decides whether the word to find is shown over the picture */
+var wasSetMode=setMode;
+setMode=function(m){ wasSetMode(m); wrap.classList.toggle('quiz',wrap.classList.contains('present')&&m==='find'); };
+
+document.addEventListener('keydown',function(e){
+  if(e.target&&/^(INPUT|TEXTAREA)$/.test(e.target.tagName))return;
+  /* while the word picker is open it has the keyboard: Escape closes it and
+     nothing else moves the room underneath it */
+  if(typeof pickerOn==='function'&&pickerOn())return;
+  if(e.key==='ArrowLeft')step(-1);
+  else if(e.key==='ArrowRight')step(1);
+  else if(e.key==='Escape'&&sheet.classList.contains('open'))showPlan(false);
+  else if(e.key==='Escape'&&wrap.classList.contains('present'))present(false);
+  else if(e.key==='p'||e.key==='P')present(!wrap.classList.contains('present'));
+});
+room_changed();
+
+/* Once the room on screen has arrived and the browser is idle, quietly fetch
+   the other rooms one at a time, nearest in the strip first, so any move, from
+   the arrows, the strip or the plan, shows its picture at once. Not at all on a
+   metered or slow connection: a visitor on a phone abroad should pay for the
+   room they are looking at and no more, and gets each room when they ask. */
+(function(){
+  var c=navigator.connection||{};
+  if(c.saveData||/^(slow-2g|2g|3g)$/.test(c.effectiveType||''))return;
+  var got={};
+  function ahead(){
+    for(var k=1;k<ROOMS.length;k++){
+      var u=ROOMS[(ri+k)%ROOMS.length]; u=u&&u.img;
+      if(u&&!got[u]){ got[u]=1; ready(u).then(soon); return; }
+    }
+  }
+  function soon(){ (window.requestIdleCallback||function(f){setTimeout(f,1200);})(ahead,{timeout:2500}); }
+  if(photo.complete)soon(); else photo.addEventListener('load',soon,{once:true});
+  var was=goRoom;
+  goRoom=function(i){ was(i); setTimeout(soon,1200); };
+})();
+
+</script>
+</body>
+</html>
