@@ -291,6 +291,29 @@
   input.gap:focus::placeholder{color:transparent}
 
   .feedback{margin-top:20px;min-height:0;flex:0 0 auto}
+  /* the explanation, same layout as The Missing Link: the idiom as a pill with its kind,
+     the meaning, then a white band with the example and, after a miss, what was typed */
+  .ex{border:1.5px solid var(--line);border-radius:18px;overflow:hidden;background:var(--card);text-align:left;
+      max-width:560px;margin:4px auto 0}
+  .ex .top{background:var(--green-wash);padding:14px 16px 13px}
+  .ex .use{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+  .lk{display:inline-flex;align-items:center;gap:5px;border-radius:10px;padding:4px 11px;font-family:'Fredoka','Outfit',sans-serif;
+      font-weight:600;font-size:16px;line-height:1.3}
+  .lk.ok{background:var(--green);color:#fff}
+  .lk.no{background:var(--red-wash);color:#D2473E;font-size:15px;padding:3px 10px;white-space:nowrap}
+  .lk.no svg{width:12px;height:12px;flex:none}
+  .pat{font-weight:800;font-size:14px;color:#13985D;background:#fff;border:1.5px solid rgba(31,181,115,.35);
+       border-radius:99px;padding:3px 11px;line-height:1.3}
+  .ex .mean{margin:9px 0 0;color:var(--ink);font-size:15.5px;font-weight:600;line-height:1.55}
+  .ex .nots{padding:12px 16px 13px}
+  .ex .nh{font-size:11.5px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin:0 0 5px}
+  .ex .eg{margin:0;color:var(--ink);font-size:15.5px;font-weight:600;line-height:1.55}
+  .ex .eg b{color:#13985D;font-weight:800}
+  .not{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;padding:8px 10px;border-radius:12px;margin:10px -6px 0;background:var(--red-wash)}
+  .not .lk.no{background:var(--red);color:#fff}
+  .you{font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#D2473E}
+  .not .r{color:var(--ink);font-size:14.5px;font-weight:600;line-height:1.5}
+  .ix{background:var(--green-wash);color:#13985D;border-radius:6px;padding:0 5px;font-weight:800;white-space:nowrap}
   .feedback:empty{margin-top:0}
   .verdict{font-family:'Fredoka','Outfit',sans-serif;font-weight:600;font-size:21px;margin-bottom:8px}
   .verdict.good{color:var(--green)}
@@ -637,7 +660,7 @@ const IDIOMS = [
  {p:"Don't worry, the test is {a piece of ___}", a:"cake", m:"Very easy.", e:"For her, parking in a small space is a piece of cake.", k:"A piece of cake"},
  {p:"Relax, I'm only {pulling your ___}", a:"leg", m:"Joke with someone by telling them something untrue.", e:"She was pulling your leg about the fine.", k:"Pull someone's leg"},
  {p:"He does love a story, so {take it with a pinch of ___}", k:"Take it with a pinch of salt", a:"salt", m:"Don't believe it completely.", e:"He always makes things sound bigger, so take it with a pinch of salt."},
- {p:"Still {___ on the fence} about it", a:"sitting", m:"Unable to decide between two sides.", e:"Half the class is on the fence about the trip.", k:"Sit on the fence"},
+ {p:"Still {___ on the fence} about it", a:"sitting", m:"Unable to decide between two sides.", e:"Half the class is sitting on the fence about the trip.", k:"Sit on the fence"},
  {p:"Walking to work saves money {in the long ___}", a:"run", m:"Over a long period of time in the future.", e:"In the long run, honesty is cheaper.", k:"In the long run"},
  {p:"Opera is lovely, but it is {not my cup of ___}", k:"Not my cup of tea", a:"tea", m:"Not something you enjoy.", e:"Horror films are not my cup of tea."},
  {p:"That name {rings a ___}", a:"bell", m:"Sound familiar.", e:"Does the title ring a bell?", k:"Ring a bell"},
@@ -867,7 +890,7 @@ const IDIOMS = [
  {p:"She came back with photos and we were all {___ with envy}", a:"green", k:"Green with envy", m:"Extremely jealous.", e:"I was green with envy when I heard."},
  {p:"He swims in the sea every morning, {come ___ or shine}", a:"rain", k:"Come rain or shine", m:"Whatever happens, without fail.", e:"She walks the dog, come rain or shine."},
  {p:"Put a little by each month and {save for a ___ day}", a:"rainy", k:"Save for a rainy day", m:"Keep money back for when you need it.", e:"That's our rainy day money."},
- {p:"Business is very good right now, so {make ___ while the sun shines}", a:"hay", k:"Make hay while the sun shines", m:"Use the chance while you still have it.", e:"Business is very good right now, so make hay while the sun shines.", t:"proverb"},
+ {p:"Business is very good right now, so {make ___ while the sun shines}", a:"hay", k:"Make hay while the sun shines", m:"Use the chance while you still have it.", e:"The shop is only busy in summer, so we make hay while the sun shines.", t:"proverb"},
  {p:"Weddings are his {___ and butter}, the rest is extra", a:"bread", k:"Bread and butter", m:"Your main and most reliable income.", e:"Repairs are the bread and butter of the business."},
  {p:"Four of them cooking in one kitchen is {a ___ for disaster}", a:"recipe", k:"A recipe for disaster", m:"Certain to go badly wrong.", e:"Lending friends money is a recipe for disaster."},
  {p:"He said he never wanted it anyway, which is pure {sour ___}", a:"grapes", k:"Sour grapes", m:"Criticising what you failed to get.", e:"That's just sour grapes because she got the part."},
@@ -2027,10 +2050,17 @@ function judge(given){
             : ok      ? '<div class="verdict good">Right, on the second go</div>'
             : (given===null ? '<div class="verdict bad">The answer was</div>'
                             : '<div class="verdict bad">Not quite</div>');
-  let wrongWord = (!ok && given) ? `<div class="example">You wrote: ${esc(given)}</div>` : '';
+  const XS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+  /* the missing word goes green in the example; startsWith catches leg/legs, pull/pulling */
+  const hit = w => new RegExp('\\b(' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\w*)', 'i');
+  const stem = it.a.replace(/(es|s|ing|ed)$/i, '');
+  const eg = esc(it.e).replace(hit(it.a).test(it.e) ? hit(it.a) : hit(stem), '<b>$1</b>');
+  const wrongWord = (!ok && given)
+    ? `<div class="not"><span class="lk no">${XS}${esc(given)}</span><span class="you">You wrote</span><span class="r">the missing word was <span class="ix">${esc(it.a)}</span></span></div>` : '';
   $('feedback').innerHTML = head +
-    `<div class="meaning"><b>${esc(label(it))}.</b> ${esc(it.m)}</div>` +
-    `<div class="example">${esc(it.e)}</div>` + wrongWord;
+    `<div class="ex"><div class="top"><div class="use"><span class="lk ok">${esc(label(it))}</span></div>` +
+    `<p class="mean">${esc(it.m)}</p></div>` +
+    `<div class="nots"><div class="nh">In a sentence</div><p class="eg">${eg}</p>${wrongWord}</div></div>`;
 
   results.push({item:it, ok, firstTry, given, tries, hint:usedHint});
   if($('scoreOut').textContent !== String(score)){ $('scoreOut').textContent=score; bump($('scoreOut')); }
