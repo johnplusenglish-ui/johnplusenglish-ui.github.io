@@ -688,6 +688,23 @@ html{scrollbar-gutter:stable}
 .hero .sub{display:none}
 h1{margin-bottom:18px}
 
+/* phones: Next sits pinned at the bottom once you've answered, so no scrolling to find it */
+@media (max-width:620px){
+  .helprow .next-btn:not([hidden]){position:fixed;left:16px;right:16px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:40;
+    padding:16px;font-size:17px;border-radius:12px;box-shadow:0 8px 24px rgba(20,25,35,.22)}
+  #quizPanel{padding-bottom:88px}
+  .helprow{min-height:0}
+  .keys{display:none}
+  .card{padding:16px 14px 18px}
+  .cardtop{margin-bottom:10px}
+  .stage{min-height:0;padding:4px 0}
+  .tiles{margin-top:14px;gap:8px}
+  .tile{min-height:52px;font-size:18px}
+  .feedback{margin-top:14px}
+  .verdict{font-size:17px;margin-bottom:4px}
+}
+@media (max-width:620px){.helprow .next-btn:focus-visible{outline:none}}
+
 </style>
 </head>
 <body>
@@ -1643,6 +1660,8 @@ document.addEventListener('keydown', e => {
 })();
 </script>
 <script>
+/* calm: each new question starts at the top of the page */
+const _renderTop = render; render = function(){ _renderTop(); if(window.scrollY > 0) window.scrollTo(0, 0); };
 /* calm: always Mixed (the focus row is hidden) */
 try{ focus = 'all'; setSeg($('focusSeg'), 'all'); syncCounts(); }catch(e){}
 /* calm demo: sound starts off unless the player turned it on */
