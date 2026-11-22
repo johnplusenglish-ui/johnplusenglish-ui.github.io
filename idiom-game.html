@@ -1124,6 +1124,34 @@ input.gap:focus{border-bottom-color:#D6336C!important}
 /* breathing room under the johnplusenglish footer (John: it was cut at the bottom of the screen) */
 .foot.wm,footer.foot.wm{margin-bottom:calc(64px + env(safe-area-inset-bottom,0px))!important;padding-bottom:0}
 @media (max-width:620px){.foot.wm,footer.foot.wm{margin-bottom:calc(96px + env(safe-area-inset-bottom,0px))!important}}
+/* Finish the Idiom: real-life frames around the sentence (option B) */
+.prompt:has(.fr){text-align:left!important;text-wrap:pretty!important;width:100%;max-width:100%}
+.fr{font-size:clamp(19px,2.6vw,22px);line-height:1.55;text-align:left;margin-top:4px}
+.fr .fr-av{width:32px;height:32px;flex:0 0 32px;border-radius:50%;color:#fff;display:grid;place-items:center;font-family:Inter,sans-serif;font-weight:700;font-size:14px;line-height:1}
+.fr b,.fr small,.fr em,.fr-tm,.fr-mh,.fr-nl,.fr-acts{font-family:Inter,sans-serif}
+/* chat */
+.fr-chat{background:#EEF6F3;border-radius:16px;padding:12px}
+.fr-who{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:14px;line-height:1.2}
+.fr-who b{font-weight:600!important}.fr-who em{font-style:normal;font-size:12px;color:#16A34A;font-weight:500}
+.fr-bub{background:#fff;border-radius:4px 16px 16px 16px;padding:12px 14px 8px;box-shadow:0 1px 1px rgba(0,0,0,.06)}
+.fr-tm{display:block;text-align:right;font-size:11px;line-height:1.2;color:#8A9099;font-weight:400;margin-top:2px}
+/* post */
+.fr-post{border:1px solid #E6E8EE;border-radius:16px;padding:14px 16px}
+.fr-ph{display:flex;align-items:center;gap:10px;margin-bottom:8px;line-height:1.25}
+.fr-ph b{display:block;font-size:15px;font-weight:600!important}.fr-ph small{display:block;font-size:13px;color:#6B7280;font-weight:400}
+.fr-acts{display:flex;gap:20px;color:#6B7280;font-size:13px;line-height:1;margin-top:12px;font-weight:400}
+.fr-acts span{display:inline-flex;align-items:center;gap:6px}
+.fr svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
+/* email */
+.fr-mail{border:1px solid #E6E8EE;border-radius:16px;overflow:hidden}
+.fr-mh{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px;background:#F7F8FA;padding:10px 16px;font-size:13px;line-height:1.3;color:#6B7280;border-bottom:1px solid #E6E8EE;font-weight:400}
+.fr-mh b{color:#1F2328;font-weight:600!important}
+.fr-mail .fr-tx{padding:14px 16px}
+/* note */
+.fr-note{background:#FFF7D6;border-radius:8px;padding:14px 18px 18px;transform:rotate(-.8deg);box-shadow:0 8px 18px -10px rgba(120,90,0,.4)}
+.fr-nl{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#9A7B12;line-height:1.2;margin-bottom:8px}
+@media(max-width:520px){.fr-chat{padding:10px}.fr-post,.fr-mail .fr-tx{padding-left:12px;padding-right:12px}.fr-note{transform:none}}
+@media(prefers-reduced-motion:reduce){.fr-note{transform:none}}
 
 </style></head>
 <body>
@@ -2812,6 +2840,52 @@ addEventListener('resize', ()=>{
   '<span class="pc-t"><b>Every idiom, with meaning and example</b><span>All 255 idioms, proverbs and similes. Great for revision.</span>' +
   '<i><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Download the PDF</i></span>'; })();
 </script><script>
+/* Finish the Idiom: every sentence sits in a real-life setting, like the other games
+   (John 2026-11-22, option B). The setting is picked from the sentence itself, so the
+   same idiom always gets the same chat, post, email or note. Icons: Lucide (ISC). */
+(function(){
+  const NAMES = [['Sofia','#EC4899'],['Dan','#3B82F6'],['Aisha','#10B981'],['Marco','#F59E0B'],['Yuki','#8B5CF6'],['Tom','#06B6D4'],['Priya','#FF5A5F'],['Leo','#3B82F6'],['Grace','#10B981'],['Omar','#8B5CF6'],['Nina','#EC4899'],['Ben','#F59E0B']];
+  const PAGES = [['City Life','@citylife'],['Morning News','@morningnews'],['Weekend Chat','@weekendchat'],['Daily Stories','@dailystories'],['Work Talk','@worktalk'],['The Local','@thelocal']];
+  const MAIL = [['Karen, Events','Friday'],['James, Sales','Quick update'],['Lena, HR','Re: next week'],['Sam, Projects','The plan'],['Rachel, Finance','Re: budget'],['Chris, Team lead','Monday']];
+  const NOTE = ['Fridge note','Note on the desk','Sticky note','Note'];
+  const IC = {
+    reply:'<svg viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/></svg>',
+    repost:'<svg viewBox="0 0 24 24"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg>',
+    like:'<svg viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>',
+    mail:'<svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>'
+  };
+  function hash(s){ let h = 2166136261; for(let i = 0; i < s.length; i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+  function pick(a, h){ return a[h % a.length]; }
+  /* proverbs read like advice, so they lean to notes and chats; the rest spread over all four */
+  function kindOf(it, h){
+    const t = it.t || 'idiom';
+    if(t === 'proverb') return pick(['note','chat','note','email'], h);
+    return pick(['chat','post','email','chat','note','post'], h);
+  }
+  function frame(it, inner){
+    const h = hash(it.p), k = kindOf(it, hash(it.p + '|kind') % 9973), hh = h >>> 7;
+    if(k === 'chat'){
+      const [n, c] = pick(NAMES, hh), t = (8 + hh % 14) + ':' + String(hh % 60).padStart(2, '0');
+      return '<div class="fr fr-chat"><div class="fr-who"><span class="fr-av" style="background:' + c + '">' + n[0] + '</span><b>' + n + '</b><em>online</em></div>' +
+             '<div class="fr-bub">' + inner + '<span class="fr-tm">' + t + '</span></div></div>';
+    }
+    if(k === 'post'){
+      const [n, at] = pick(PAGES, hh), [, c] = pick(NAMES, hh >>> 2);
+      return '<div class="fr fr-post"><div class="fr-ph"><span class="fr-av" style="background:' + c + '">' + n[0] + '</span><div><b>' + n + '</b><small>' + at + ' &middot; ' + (1 + hh % 9) + 'h</small></div></div>' +
+             '<div class="fr-tx">' + inner + '</div><div class="fr-acts"><span>' + IC.reply + (2 + hh % 40) + '</span><span>' + IC.repost + (hh % 12) + '</span><span>' + IC.like + (10 + hh % 90) + '</span></div></div>';
+    }
+    if(k === 'email'){
+      const [from, sub] = pick(MAIL, hh);
+      return '<div class="fr fr-mail"><div class="fr-mh">' + IC.mail + '<span><b>From:</b> ' + from + '</span><span><b>Subject:</b> ' + sub + '</span></div><div class="fr-tx">' + inner + '</div></div>';
+    }
+    return '<div class="fr fr-note"><div class="fr-nl">' + pick(NOTE, hh) + '</div><div class="fr-tx">' + inner + '</div></div>';
+  }
+  const _promptHTML = promptHTML;
+  promptHTML = function(p){
+    const inner = _promptHTML(p), it = deck[idx];
+    return (it && it.p === p) ? frame(it, inner) : inner;
+  };
+})();
 const END={title:'Your map',sub:'How you did on each kind',groups:{idiom:['Idioms','Idioms'],proverb:['Proverbs','Proverbs'],simile:['Similes','Similes']},key:r=>r.item.t||'idiom',ok:r=>r.firstTry};/* End screen: the Missing Link's score ring and per-group bars, for the other games.
    Needs END = {groups:{key:[long,short]}, key:r=>group key, ok:r=>bool, label:'...'} defined before. */
 (function(){
