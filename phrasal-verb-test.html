@@ -238,7 +238,7 @@ body{font-family:Inter,'Outfit',system-ui,sans-serif;background:#F4F5F8}
 @media (max-width:620px){ .rc-ctx{font-size:16px!important;padding:14px 15px!important} }
 /* the chosen answer sits centred in the gap */
 .gap{text-align:center!important}
-.gap.filled{color:var(--ink);font-weight:700;border-bottom-color:var(--ink)!important;padding:0 .15em}</style><!-- /premium -->
+.gap.filled{color:var(--ink);font-weight:700;border-bottom-color:var(--ink)!important;padding:0 .15em}.badge-wrap{position:relative;display:flex;justify-content:center;margin:.2rem auto 1rem}.badge-wrap.has-pic{width:max-content;max-width:100%}.badge-pic{display:block;height:150px;width:auto;max-width:100%;animation:pop .5s cubic-bezier(.34,1.56,.64,1) both}.badge-wrap.has-pic .badge{position:absolute;right:-14px;bottom:-4px;width:58px;height:58px;margin:0;border-radius:16px;font-size:1.35rem;border:3px solid #fff;animation-delay:.18s}@media(max-width:480px){.badge-pic{height:120px}.badge-wrap.has-pic .badge{width:50px;height:50px;font-size:1.15rem;right:-10px}}@media(prefers-reduced-motion:reduce){.badge-pic{animation:none}}</style><!-- /premium -->
 </head>
 <body>
 
@@ -318,7 +318,7 @@ body{font-family:Inter,'Outfit',system-ui,sans-serif;background:#F4F5F8}
   <section id="result" class="panel" hidden>
     <div class="res-top">
       <div class="res-greet" id="resGreet"></div>
-      <div class="badge" id="badge">B2</div>
+      <div class="badge-wrap" id="badgeWrap"><img class="badge-pic" id="badgePic" alt="" width="200" height="200" hidden><div class="badge" id="badge">B2</div></div>
       <div class="res-label">Your estimated level</div>
       <div class="res-name" id="resName">Upper-Intermediate</div>
       <p class="res-desc" id="resDesc"></p>
@@ -965,6 +965,7 @@ body{font-family:Inter,'Outfit',system-ui,sans-serif;background:#F4F5F8}
     logHit("pv-place-"+(below ? "below" : level.toLowerCase()));
 
     el("badge").innerHTML = below ? BELOW.code : level;
+    /* level badge picture */ var bp = el("badgePic"); if(below){ bp.hidden = true; bp.removeAttribute("src"); } else { bp.src = "images/levels/" + level + ".png"; bp.alt = level + " level badge"; bp.hidden = false; } el("badgeWrap").classList.toggle("has-pic", !below);
     document.querySelector(".badge").style.setProperty("--lvl", meta.color);
     el("resName").textContent = meta.name;
     var fn = (student.name || "").trim().split(/\s+/)[0] || "there";
