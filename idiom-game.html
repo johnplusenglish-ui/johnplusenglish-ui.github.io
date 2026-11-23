@@ -271,8 +271,10 @@
   }
   .blank.filled{border-bottom-color:currentColor}
   .blank.good{color:var(--green);border-bottom-color:var(--green)}
-  .blank.bad{color:var(--red);border-bottom-color:var(--red);
-             text-decoration:line-through;text-decoration-thickness:2px}
+  .blank.bad{color:var(--red);border-bottom-color:var(--red)}
+  .blank .mark{fill:none;stroke-linecap:round;stroke-width:3}
+  .blank .mark.ok{stroke:#22A760}
+  .blank .mark.no{stroke:#E5484D;stroke-width:2.6}
 
   input.gap{
     font:inherit;font-size:inherit;font-weight:inherit;letter-spacing:inherit;
@@ -1982,19 +1984,40 @@ function backdrop(){
   }catch(e){}
 }
 
-/* A hand-drawn ring round the answer once it has spelled itself out. */
+/* The mark on the answer (John 2026-11-23): a clean ellipse drawn in one smooth stroke when it is
+   right; a neat X over what they wrote when it is wrong. Plain SVG, the same every time. */
 function ringIt(el, good){
-  if(REDUCED || !el || typeof window.RoughNotation === 'undefined') return;
+  if(!el) return;
   try{
-    window.RoughNotation.annotate(el, {
-      type: good ? 'circle' : 'crossed-off',
-      color: good ? '#35d07f' : '#ff5f5f',
-      strokeWidth: 1.9,
-      padding: good ? [10,13] : 4,
-      animationDuration: 620,
-      iterations: 1
-    }).show();
-    if(!good) el.style.textDecoration = 'none';   // the drawn cross replaces the CSS one
+    const NS='http://www.w3.org/2000/svg', w=el.offsetWidth, h=el.offsetHeight;
+    el.style.position='relative';
+    const svg=document.createElementNS(NS,'svg');
+    svg.setAttribute('class','mark '+(good?'ok':'no'));
+    svg.setAttribute('aria-hidden','true');
+    function stroke(node, len, delay){
+      node.setAttribute('pathLength','1');
+      node.style.strokeDasharray='1'; node.style.strokeDashoffset=REDUCED?'0':'1';
+      if(!REDUCED){ node.getBoundingClientRect(); node.style.transition='stroke-dashoffset '+len+'ms cubic-bezier(.45,.05,.25,1) '+delay+'ms'; requestAnimationFrame(()=>requestAnimationFrame(()=>{ node.style.strokeDashoffset='0'; })); }
+    }
+    if(good){
+      const px=Math.max(11,w*.1), py=Math.max(10,h*.4), W=w+px*2, H=h+py*2;
+      svg.setAttribute('viewBox','0 0 '+W+' '+H);
+      svg.style.cssText='position:absolute;left:'+(-px)+'px;top:'+(-py)+'px;width:'+W+'px;height:'+H+'px;overflow:visible;pointer-events:none';
+      const e=document.createElementNS(NS,'ellipse');
+      e.setAttribute('cx',W/2); e.setAttribute('cy',H/2); e.setAttribute('rx',W/2-3); e.setAttribute('ry',H/2-3);
+      e.setAttribute('transform','rotate(-90 '+W/2+' '+H/2+')');
+      svg.appendChild(e); el.appendChild(svg); stroke(e,650,0);
+    } else {
+      const px=6, py=Math.max(2,h*.04), W=w+px*2, H=h+py*2;
+      svg.setAttribute('viewBox','0 0 '+W+' '+H);
+      svg.style.cssText='position:absolute;left:'+(-px)+'px;top:'+(-py)+'px;width:'+W+'px;height:'+H+'px;overflow:visible;pointer-events:none';
+      [[3,3,W-3,H-3,0],[W-3,3,3,H-3,170]].forEach(([x1,y1,x2,y2,d])=>{
+        const l=document.createElementNS(NS,'line');
+        l.setAttribute('x1',x1); l.setAttribute('y1',y1); l.setAttribute('x2',x2); l.setAttribute('y2',y2);
+        svg.appendChild(l); stroke(l,300,d);
+      });
+      el.appendChild(svg);
+    }
   }catch(e){}
 }
 
@@ -2698,8 +2721,10 @@ function judge(given){
   span.className='blank filled '+(ok?'good':'bad');
   span.id='blank';
   if(g) g.replaceWith(span);
-  spellOut(span, it.a);
-  setTimeout(()=>ringIt(span, ok), REDUCED ? 0 : it.a.length*45 + 170);
+  /* right: the answer spells itself out. Wrong: what they wrote stays in the gap, crossed out. */
+  const shownWord = ok ? it.a : ((given && String(given).trim()) ? String(given).trim() : it.a);
+  spellOut(span, shownWord);
+  setTimeout(()=>ringIt(span, ok), REDUCED ? 0 : shownWord.length*45 + 170);
   $('card').classList.add(ok?'good':'bad');
   if(!ok) $('card').classList.add('shake');
 
