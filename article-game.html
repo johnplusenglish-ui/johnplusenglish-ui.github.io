@@ -2277,59 +2277,70 @@ window.GT_GAME='article';
   ['show', 'advance', 'next'].forEach(smooth);
 })();
 
-/* Real sounds (John 2026-11-23): recorded claps, a "woo-hoo", a crowd "aww", cheers and a
-   sad trombone replace the synthetic tones. All CC0 recordings from Freesound via Openverse.
-   The little UI sounds (hint pluck, clock tick, button click) stay as they were. */
+/* Game sounds (John 2026-11-23, simplified): three soft sounds and nothing else.
+   right = a warm, pleasant "bung" with a tiny tick; wrong = a muted two-note "boop-bloop";
+   the end of a round = a short fanfare. Made with the browser's audio, so no files to load.
+   The hint pluck, clock tick and clicks keep their own sounds. */
 (function(){
   const G = window.GT_GAME; if(!G) return;
-  const SRC = {right: 0.75, woohoo: 0.9, aww: 0.8, yay: 0.9, cheer: 0.9, wahwah: 0.85};
-  const A = {};
-  Object.keys(SRC).forEach(k => { try { const a = new Audio('audio/games/' + k + '.mp3'); a.preload = 'auto'; A[k] = a; } catch(e){} });
   const on = () => { try { return G === 'linkers' ? !!prefs.snd : !!soundOn; } catch(e){ return true; } };
-  let lastWoo = 0, ending = false;
-  function play(k, vol){
-    if(!on() || !A[k]) return;
-    try { const a = A[k].cloneNode(); a.volume = Math.min(1, (vol || 1) * SRC[k]); a.play().catch(() => {}); } catch(e){}
+  let ctx = null;
+  function ac(){
+    if(!ctx){ try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e){ return null; } }
+    if(ctx.state === 'suspended') ctx.resume();
+    return ctx;
   }
-  function woo(){ const t = performance.now(); if(t - lastWoo < 1500) return; lastWoo = t; setTimeout(() => play('woohoo'), 350); }
-
-  /* the end of a round: the game's own end sounds are muted and one real one plays */
-  function endSound(pct){
-    if(pct >= 100) play('cheer');
-    else if(pct >= (G === 'idiom' ? 80 : G === 'linkers' ? 85 : 70)) play('yay');
-    else if(pct < 35) play('wahwah');
+  /* one soft note: sine (or triangle) through a gentle low-pass, quick fade in, smooth fade out */
+  function note(c, freq, t, dur, vol, type, cutoff){
+    const o = c.createOscillator(), g = c.createGain(), f = c.createBiquadFilter();
+    o.type = type || 'sine'; o.frequency.setValueAtTime(freq, t);
+    f.type = 'lowpass'; f.frequency.value = cutoff || 3200;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol, t + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(f); f.connect(g); g.connect(c.destination);
+    o.start(t); o.stop(t + dur + 0.05);
   }
-  const _finish = window.finish;
-  if(typeof _finish === 'function') window.finish = function(){
-    ending = true;
-    let r; try { r = _finish.apply(this, arguments); } finally { ending = false; }
-    try {
-      const n = G === 'linkers' ? R.length : G === 'idiom' ? results.length : deck.length;
-      if(n) endSound(Math.round(score / n * 100));
-    } catch(e){}
-    return r;
-  };
+  function right(){
+    if(!on()) return; const c = ac(); if(!c) return; const t = c.currentTime;
+    note(c, 1568, t, 0.05, 0.05, 'triangle', 4000);        /* the tiny tick */
+    note(c, 784, t, 0.42, 0.20, 'sine');                     /* the warm "bung" */
+    note(c, 1176, t + 0.01, 0.30, 0.06, 'sine');             /* a soft fifth on top */
+  }
+  function wrong(){
+    if(!on()) return; const c = ac(); if(!c) return; const t = c.currentTime;
+    note(c, 262, t, 0.17, 0.20, 'sine', 900);                /* boop */
+    note(c, 208, t + 0.15, 0.26, 0.20, 'sine', 800);         /* bloop, lower */
+  }
+  function fanfare(){
+    if(!on()) return; const c = ac(); if(!c) return; const t = c.currentTime;
+    [[523, 0], [659, 0.13], [784, 0.26], [1047, 0.42]].forEach(([f, d], i) => {
+      const last = i === 3, len = last ? 0.9 : 0.2;
+      note(c, f, t + d, len, last ? 0.17 : 0.13, 'triangle', 2600);
+      note(c, f / 2, t + d, len, 0.06, 'sine', 1200);
+    });
+    note(c, 1319, t + 0.42, 0.9, 0.06, 'sine', 3000);
+  }
 
+  /* silence the old tones and play ours */
+  window.ding = function(){ right(); };
+  window.buzz = function(){ wrong(); };
+  ['jackpot', 'trombone', 'boing', 'rimshot', 'fanfare', 'applause'].forEach(n => { if(typeof window[n] === 'function') window[n] = function(){}; });
   if(G === 'linkers'){
     const _play = window.play;
     window.play = function(n){
-      if(n === 'confirmation_002'){ play('right'); return; }
-      if(n === 'error_006'){ play('aww'); return; }
-      if(n === 'bong_001'){ if(!ending) woo(); return; }
+      if(n === 'confirmation_002'){ right(); return; }
+      if(n === 'error_006'){ wrong(); return; }
+      if(n === 'bong_001') return;
       return _play.apply(this, arguments);
     };
-    return;
   }
-  /* prepositions, articles, idioms */
-  const quiet = () => {};
-  window.ding = function(){
-    if(ending) return;
-    play('right');
-    try { if(streak > 0 && streak % 5 === 0) woo(); } catch(e){}
+  const _finish = window.finish;
+  if(typeof _finish === 'function') window.finish = function(){
+    const r = _finish.apply(this, arguments);
+    setTimeout(fanfare, 250);
+    return r;
   };
-  window.buzz = function(final){ if(!ending) play('aww', final === false ? 0.6 : 1); };
-  window.jackpot = function(){ if(!ending) woo(); };
-  ['trombone', 'boing', 'rimshot', 'fanfare', 'applause'].forEach(n => { if(typeof window[n] === 'function') window[n] = quiet; });
 })();
 </script>
 </body>
