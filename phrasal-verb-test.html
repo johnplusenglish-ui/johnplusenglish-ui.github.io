@@ -250,7 +250,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--ink);li
 :focus-visible{outline:2.5px solid var(--sky);outline-offset:2px}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
-<!-- premium --><style id="premium">/* ===== premium layer (John 2026-11-22: "a more premium feel but keeping much of what's there") =====
+<!-- premium --><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"><style id="premium">/* ===== premium layer (John 2026-11-22: "a more premium feel but keeping much of what's there") =====
    Same layout, words and colours. Plain calm background and solid white cards (John: no gradient or glass, unlike the games). Inter for text. */
 body{font-family:Inter,'Outfit',system-ui,sans-serif;background:#F4F5F8}
 .page-header h1,.badge,.res-name,.stem,.btn,.section-t,.qcount,.res-greet,.focus-label,.lvl-pill{font-family:'Outfit',sans-serif}
@@ -1474,6 +1474,35 @@ body{font-family:Inter,'Outfit',system-ui,sans-serif;background:#F4F5F8}
     }
     window.scrollTo({top:0, behavior:"smooth"});
   });
+})();
+</script>
+<script>
+/* Back goes home (John 2026-11-23): when a game or test is the first page someone sees (a Telegram or
+   Instagram link, a search result), Back used to close the tab on Android. Now the first Back after
+   that goes to the site's home page, and the next one leaves as normal. Pages reached from our own
+   site are left alone. The extra history step is added on the first tap, because Chrome ignores
+   steps added before the person has touched the page. */
+(function(){
+  try {
+    var ref = document.referrer, same = false;
+    if(ref){ try { same = new URL(ref).origin === location.origin; } catch(e){} }
+    if(same) return;
+    if(history.state && history.state.jpeTop) return;          /* a reload of an already armed page */
+    var armed = false;
+    function arm(){
+      if(armed) return; armed = true;
+      ['pointerdown', 'keydown', 'touchstart'].forEach(function(ev){ removeEventListener(ev, arm, true); });
+      try {
+        history.replaceState(Object.assign({}, history.state, {jpeEntry: 1}), '');
+        history.pushState(Object.assign({}, history.state, {jpeTop: 1}), '');
+      } catch(e){}
+    }
+    ['pointerdown', 'keydown', 'touchstart'].forEach(function(ev){ addEventListener(ev, arm, {capture: true, passive: true}); });
+    addEventListener('popstate', function(){
+      var s = history.state;
+      if(s && s.jpeEntry && !s.jpeTop) location.replace('lock.html');
+    });
+  } catch(e){}
 })();
 </script>
 </body>

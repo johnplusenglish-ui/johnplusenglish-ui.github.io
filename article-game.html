@@ -2331,6 +2331,34 @@ window.GT_GAME='article';
   });
 })();
 
+/* Back goes home (John 2026-11-23): when a game or test is the first page someone sees (a Telegram or
+   Instagram link, a search result), Back used to close the tab on Android. Now the first Back after
+   that goes to the site's home page, and the next one leaves as normal. Pages reached from our own
+   site are left alone. The extra history step is added on the first tap, because Chrome ignores
+   steps added before the person has touched the page. */
+(function(){
+  try {
+    var ref = document.referrer, same = false;
+    if(ref){ try { same = new URL(ref).origin === location.origin; } catch(e){} }
+    if(same) return;
+    if(history.state && history.state.jpeTop) return;          /* a reload of an already armed page */
+    var armed = false;
+    function arm(){
+      if(armed) return; armed = true;
+      ['pointerdown', 'keydown', 'touchstart'].forEach(function(ev){ removeEventListener(ev, arm, true); });
+      try {
+        history.replaceState(Object.assign({}, history.state, {jpeEntry: 1}), '');
+        history.pushState(Object.assign({}, history.state, {jpeTop: 1}), '');
+      } catch(e){}
+    }
+    ['pointerdown', 'keydown', 'touchstart'].forEach(function(ev){ addEventListener(ev, arm, {capture: true, passive: true}); });
+    addEventListener('popstate', function(){
+      var s = history.state;
+      if(s && s.jpeEntry && !s.jpeTop) location.replace('lock.html');
+    });
+  } catch(e){}
+})();
+
 /* Game sounds (John 2026-11-23, simplified): three soft sounds and nothing else.
    right = a warm, pleasant "bung" with a tiny tick; wrong = a muted two-note "boop-bloop";
    the end of a round = a short fanfare. Made with the browser's audio, so no files to load.
