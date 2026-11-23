@@ -2284,6 +2284,46 @@ window.GT_GAME='article';
   ['show', 'advance', 'next'].forEach(smooth);
 })();
 
+/* Back button (John 2026-11-23): in a game, Back steps from a round or the results to the start
+   screen, instead of leaving the game (which closes the tab on Android when the player came
+   from a Telegram or Instagram link). On the start screen, Back leaves as normal. */
+(function(){
+  const G = window.GT_GAME; if(!G) return;
+  const START = G === 'linkers' ? 'pStart' : 'startPanel';
+  const KEY = 'jpeRound';
+  const _show = window.show;
+  if(typeof _show !== 'function') return;
+  let fromPop = false;
+  const inRound = () => { try { return !!(history.state && history.state[KEY]); } catch(e){ return false; } };
+
+  window.show = function(p){
+    const r = _show.apply(this, arguments);
+    try {
+      if(p !== START && !inRound()){
+        history.pushState(Object.assign({}, history.state, {[KEY]: 1}), '');
+      } else if(p === START && inRound() && !fromPop){
+        /* Quit or Home pressed: drop the extra entry, so Back still leaves the game from the start screen */
+        fromPop = true; history.back();
+      }
+    } catch(e){}
+    return r;
+  };
+
+  addEventListener('popstate', function(){
+    if(fromPop){ fromPop = false; return; }
+    const open = document.querySelector('.panel.show');
+    if(open && open.id !== START){
+      fromPop = true;
+      try { _show.call(window, START); } catch(e){}
+      try { fromPop = false; } catch(e){}
+      try { if(typeof syncCounts === 'function') syncCounts(); } catch(e){}
+      try { if(typeof showBest === 'function') showBest(); } catch(e){}
+      try { if(typeof stopClock === 'function') stopClock(); } catch(e){}
+      window.scrollTo(0, 0);
+    }
+  });
+})();
+
 /* Game sounds (John 2026-11-23, simplified): three soft sounds and nothing else.
    right = a warm, pleasant "bung" with a tiny tick; wrong = a muted two-note "boop-bloop";
    the end of a round = a short fanfare. Made with the browser's audio, so no files to load.
