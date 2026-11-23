@@ -1006,8 +1006,15 @@ header{background:#fff;margin:-28px 0 26px;padding:14px 0;border-bottom:0!import
 .foot.wm,footer.foot.wm{margin-bottom:calc(64px + env(safe-area-inset-bottom,0px))!important;padding-bottom:0}
 @media (max-width:620px){.foot.wm,footer.foot.wm{margin-bottom:calc(96px + env(safe-area-inset-bottom,0px))!important}}
 
+/* one title box beside the mascot: wraps as text, never as two columns */
+.hero h1 span.fun-ttl{display:block;min-width:0;flex:1 1 auto;text-wrap:balance;color:inherit!important;margin:0!important;padding:0!important;background:none!important;font:inherit!important;letter-spacing:inherit!important}
+.hero h1 .fun-ttl span{display:inline!important;margin-left:0!important}
+
+/* nothing may poke past the screen edge on a phone, or the page wobbles sideways */
+html,body{overflow-x:clip}
+
 </style>
-<style>.social a.kofi{background:#FFD95A!important;border-color:#F2C230!important;color:#3A2C00!important;font-weight:700!important;box-shadow:0 8px 18px -10px rgba(200,150,0,.75)!important}.social a.kofi:hover{background:#FFCF33!important;border-color:#E0AE14!important;color:#2A1F00!important}.social a.kofi svg{stroke:#3A2C00!important}</style></head>
+<style>@view-transition{navigation:auto}::view-transition-old(root),::view-transition-new(root){animation-duration:.24s;animation-timing-function:cubic-bezier(.2,.7,.3,1)}@supports (view-transition-name:none){.panel.show{animation:none!important}}@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}</style><style>.social a.kofi{background:#FFD95A!important;border-color:#F2C230!important;color:#3A2C00!important;font-weight:700!important;box-shadow:0 8px 18px -10px rgba(200,150,0,.75)!important}.social a.kofi:hover{background:#FFCF33!important;border-color:#E0AE14!important;color:#2A1F00!important}.social a.kofi svg{stroke:#3A2C00!important}</style></head>
 <body>
 <div id="cfLayer"></div>
 <div class="wrap">
@@ -2095,7 +2102,19 @@ window.FunKit = (function(){
   }
   function word(p){ return p === 1 ? 'Perfect' : p >= .85 ? 'Sharp' : p >= .7 ? 'Really good' : p >= .5 ? 'Getting there' : 'Good start'; }
   const LINES = ['Spot on', 'Nailed it', 'Yes!', 'Sharp', 'Lovely', 'You got it'];
-  return {mascot, pic, txt, hero, sparks, chip, word, LINES};
+  /* the title next to the mascot is one box, so on a phone it wraps as one line of text
+     instead of splitting into two columns (John 2026-11-23) */
+  function titled(h1, html){
+    h1.insertAdjacentHTML('afterbegin', html);
+    const t = document.createElement('span'); t.className = 'fun-ttl';
+    [...h1.childNodes].slice(1).forEach(n => t.appendChild(n));
+    h1.appendChild(t);
+    /* a space before the coloured word, which some titles leave out */
+    t.querySelectorAll('br').forEach(br => br.replaceWith(' '));   /* let it wrap naturally */
+    const w = t.querySelector('span'), b = w && w.previousSibling;
+    if(b && b.nodeType === 3 && !/\s$/.test(b.nodeValue)) b.nodeValue += ' ';
+  }
+  return {mascot, pic, txt, hero, sparks, chip, word, LINES, titled};
 })();
 /* fun layer for the article and preposition games: needs FUN_CFG = {c1, c2, inner} */
 (function(){
@@ -2105,7 +2124,7 @@ window.FunKit = (function(){
     const by = t => ITEMS.find(x => x.ctx && x.ctx.t === t);
     K.hero(hero, [by('sign'), by('email'), by('text')].filter(Boolean).map(stageHTML));
     hero.querySelectorAll('.fun-hero .blank').forEach(b => { b.textContent = ''; });
-    hero.querySelector('h1').insertAdjacentHTML('afterbegin', K.pic(FUN_CFG.pic));
+    K.titled(hero.querySelector('h1'), K.pic(FUN_CFG.pic));
   }catch(e){ console.error(e); }
   const _ch = choose;
   choose = function(word, btn){
@@ -2227,6 +2246,29 @@ window.GT_GAME='preposition';
   window[startName] = function(){ t0 = Date.now(); sent = false; return _start.apply(this, arguments); };
   const _finish = window.finish;
   window.finish = function(){ send(); return _finish.apply(this, arguments); };
+})();
+
+/* Smooth (John 2026-11-23): screen changes and the next question cross-fade instead of
+   cutting, and the jump back to the top happens inside the fade, so it is never seen.
+   Uses the browser's View Transitions; where it isn't supported, nothing changes. */
+(function(){
+  if(!document.startViewTransition) return;
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  let busy = false;
+  function smooth(name){
+    const f = window[name];
+    if(typeof f !== 'function') return;
+    window[name] = function(){
+      if(busy) return f.apply(this, arguments);
+      const self = this, args = arguments;
+      busy = true;
+      let t;
+      try { t = document.startViewTransition(() => f.apply(self, args)); }
+      catch(e){ busy = false; return f.apply(self, args); }
+      t.finished.finally(() => { busy = false; });
+    };
+  }
+  ['show', 'advance', 'next'].forEach(smooth);
 })();
 </script>
 </body>
