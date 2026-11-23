@@ -574,6 +574,9 @@ header{background:#fff;border-bottom:0!important;box-shadow:0 0 0 100vmax #fff,0
 .choice{white-space:normal!important;overflow:visible!important;min-width:0!important;text-overflow:clip!important;line-height:1.25!important;word-break:normal}
 .choice > *{flex-shrink:0}
 .choice .key{position:static!important;transform:none!important}
+
+/* one column when an option is too long for three */
+.choices.stack{grid-template-columns:1fr!important}
 /* ===== fun layer (mock-up): live preview, mascot, rewards, end moment ===== */
 /* 1. start screen preview: three real question cards, fanned */
 .fun-hero{position:relative;height:210px;margin:6px 0 26px}
@@ -998,6 +1001,18 @@ card = function(q){
   }
   return _cardOld(q);
 };
+/* a long option (notwithstanding) gets squashed in three columns: if any option
+   doesn't fit, that question shows its options in one column (John 2026-11-23) */
+(function(){
+  function fit(){
+    const c = $('choices'); if(!c) return;
+    c.classList.remove('stack');
+    if([...c.children].some(b => b.scrollWidth > b.clientWidth + 1)) c.classList.add('stack');
+  }
+  const _ask = ask;
+  ask = function(){ _ask.apply(this, arguments); fit(); };
+  addEventListener('resize', fit);
+})();
 
 /* each new question starts at the top of the page */
 const _askTop = ask; ask = function(){ _askTop(); if(window.scrollY > 0) window.scrollTo(0, 0); };
