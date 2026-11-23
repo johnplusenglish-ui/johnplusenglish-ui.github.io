@@ -272,9 +272,9 @@
   .blank.filled{border-bottom-color:currentColor}
   .blank.good{color:var(--green);border-bottom-color:var(--green)}
   .blank.bad{color:var(--red);border-bottom-color:var(--red)}
-  .blank .mark{fill:none;stroke-linecap:round;stroke-width:3}
-  .blank .mark.ok{stroke:#22A760}
-  .blank .mark.no{stroke:#E5484D;stroke-width:2.6}
+  .blank.good::after,.blank.bad::after{content:"";display:inline-block;width:.6em;height:.6em;margin-left:.3em;vertical-align:baseline}
+  .blank.good::after{background:linear-gradient(135deg,#3B82F6,#06B6D4);-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center/contain no-repeat}
+  .blank.bad::after{background:#D9483F;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='M6.5 6.5l11 11M17.5 6.5l-11 11'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='M6.5 6.5l11 11M17.5 6.5l-11 11'/%3E%3C/svg%3E") center/contain no-repeat}
 
   input.gap{
     font:inherit;font-size:inherit;font-weight:inherit;letter-spacing:inherit;
@@ -1986,39 +1986,7 @@ function backdrop(){
 
 /* The mark on the answer (John 2026-11-23): a clean ellipse drawn in one smooth stroke when it is
    right; a neat X over what they wrote when it is wrong. Plain SVG, the same every time. */
-function ringIt(el, good){
-  if(!el) return;
-  try{
-    const NS='http://www.w3.org/2000/svg', w=el.offsetWidth, h=el.offsetHeight;
-    el.style.position='relative';
-    const svg=document.createElementNS(NS,'svg');
-    svg.setAttribute('class','mark '+(good?'ok':'no'));
-    svg.setAttribute('aria-hidden','true');
-    function stroke(node, len, delay){
-      node.setAttribute('pathLength','1');
-      node.style.strokeDasharray='1'; node.style.strokeDashoffset=REDUCED?'0':'1';
-      if(!REDUCED){ node.getBoundingClientRect(); node.style.transition='stroke-dashoffset '+len+'ms cubic-bezier(.45,.05,.25,1) '+delay+'ms'; requestAnimationFrame(()=>requestAnimationFrame(()=>{ node.style.strokeDashoffset='0'; })); }
-    }
-    if(good){
-      const px=Math.max(20,w*.32), py=Math.max(5,h*.2), W=w+px*2, H=h+py*2;
-      svg.setAttribute('viewBox','0 0 '+W+' '+H);
-      svg.style.cssText='position:absolute;left:'+(-px)+'px;top:'+(-py)+'px;width:'+W+'px;height:'+H+'px;overflow:visible;pointer-events:none';
-      const e=document.createElementNS(NS,'ellipse');
-      e.setAttribute('cx',W/2); e.setAttribute('cy',H/2); e.setAttribute('rx',W/2-3); e.setAttribute('ry',H/2-3);
-      svg.appendChild(e); el.appendChild(svg); stroke(e,650,0);
-    } else {
-      const px=6, py=Math.max(2,h*.04), W=w+px*2, H=h+py*2;
-      svg.setAttribute('viewBox','0 0 '+W+' '+H);
-      svg.style.cssText='position:absolute;left:'+(-px)+'px;top:'+(-py)+'px;width:'+W+'px;height:'+H+'px;overflow:visible;pointer-events:none';
-      [[3,3,W-3,H-3,0],[W-3,3,3,H-3,170]].forEach(([x1,y1,x2,y2,d])=>{
-        const l=document.createElementNS(NS,'line');
-        l.setAttribute('x1',x1); l.setAttribute('y1',y1); l.setAttribute('x2',x2); l.setAttribute('y2',y2);
-        svg.appendChild(l); stroke(l,300,d);
-      });
-      el.appendChild(svg);
-    }
-  }catch(e){}
-}
+function ringIt(el, good){ /* no drawn marks: the tick or cross icon is CSS, like the other games */ }
 
 function bloom(el, good){
   if(REDUCED || !el) return;
