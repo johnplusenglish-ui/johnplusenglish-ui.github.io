@@ -5,18 +5,18 @@
    Thumbnails live in images/<place>/thumbs/ (360px wide, about 10 KB each). */
 (function(){
   var PLACES=[
-    ['rome-flat','Rome Flat','the-entrance-hall',7,303],
-    ['office','The Office','the-office',3,144],
-    ['gym','The Gym','the-cardio-floor',4,84],
-    ['shop','The Shop','the-shelves',5,140],
-    ['high-street','The High Street','the-hair-salon',8,190],
-    ['school','The School','the-classroom',5,200],
-    ['house','The House','the-front-garden',11,352],
-    ['hospital','The Hospital','the-entrance',9,269],
-    ['airport','The Airport','the-drop-off',9,202],
-    ['hotel','The Hotel','the-entrance',8,218],
+    ['rome-flat','Rome Flat','the-entrance-hall',7,268],
+    ['office','The Office','the-office',3,119],
+    ['gym','The Gym','the-cardio-floor',4,68],
+    ['shop','The Shop','the-shelves',5,131],
+    ['high-street','The High Street','the-hair-salon',8,164],
+    ['school','The School','the-classroom',5,160],
+    ['house','The House','the-front-garden',11,333],
+    ['hospital','The Hospital','the-entrance',9,192],
+    ['airport','The Airport','the-drop-off',9,154],
+    ['hotel','The Hotel','the-entrance',8,216],
     ['restaurant','The Restaurant','outside',6,183],
-    ['car','The Car','the-driveway',8,194]
+    ['car','The Car','the-driveway',8,192]
   ];
   document.documentElement.classList.add('wr-js');
   function cover(p){return 'images/'+p[0]+'/thumbs/'+p[2]+'.webp';}
