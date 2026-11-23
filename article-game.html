@@ -2276,6 +2276,61 @@ window.GT_GAME='article';
   }
   ['show', 'advance', 'next'].forEach(smooth);
 })();
+
+/* Real sounds (John 2026-11-23): recorded claps, a "woo-hoo", a crowd "aww", cheers and a
+   sad trombone replace the synthetic tones. All CC0 recordings from Freesound via Openverse.
+   The little UI sounds (hint pluck, clock tick, button click) stay as they were. */
+(function(){
+  const G = window.GT_GAME; if(!G) return;
+  const SRC = {right: 0.75, woohoo: 0.9, aww: 0.8, yay: 0.9, cheer: 0.9, wahwah: 0.85};
+  const A = {};
+  Object.keys(SRC).forEach(k => { try { const a = new Audio('audio/games/' + k + '.mp3'); a.preload = 'auto'; A[k] = a; } catch(e){} });
+  const on = () => { try { return G === 'linkers' ? !!prefs.snd : !!soundOn; } catch(e){ return true; } };
+  let lastWoo = 0, ending = false;
+  function play(k, vol){
+    if(!on() || !A[k]) return;
+    try { const a = A[k].cloneNode(); a.volume = Math.min(1, (vol || 1) * SRC[k]); a.play().catch(() => {}); } catch(e){}
+  }
+  function woo(){ const t = performance.now(); if(t - lastWoo < 1500) return; lastWoo = t; setTimeout(() => play('woohoo'), 350); }
+
+  /* the end of a round: the game's own end sounds are muted and one real one plays */
+  function endSound(pct){
+    if(pct >= 100) play('cheer');
+    else if(pct >= (G === 'idiom' ? 80 : G === 'linkers' ? 85 : 70)) play('yay');
+    else if(pct < 35) play('wahwah');
+  }
+  const _finish = window.finish;
+  if(typeof _finish === 'function') window.finish = function(){
+    ending = true;
+    let r; try { r = _finish.apply(this, arguments); } finally { ending = false; }
+    try {
+      const n = G === 'linkers' ? R.length : G === 'idiom' ? results.length : deck.length;
+      if(n) endSound(Math.round(score / n * 100));
+    } catch(e){}
+    return r;
+  };
+
+  if(G === 'linkers'){
+    const _play = window.play;
+    window.play = function(n){
+      if(n === 'confirmation_002'){ play('right'); return; }
+      if(n === 'error_006'){ play('aww'); return; }
+      if(n === 'bong_001'){ if(!ending) woo(); return; }
+      return _play.apply(this, arguments);
+    };
+    return;
+  }
+  /* prepositions, articles, idioms */
+  const quiet = () => {};
+  window.ding = function(){
+    if(ending) return;
+    play('right');
+    try { if(streak > 0 && streak % 5 === 0) woo(); } catch(e){}
+  };
+  window.buzz = function(final){ if(!ending) play('aww', final === false ? 0.6 : 1); };
+  window.jackpot = function(){ if(!ending) woo(); };
+  ['trombone', 'boing', 'rimshot', 'fanfare', 'applause'].forEach(n => { if(typeof window[n] === 'function') window[n] = quiet; });
+})();
 </script>
 </body>
 </html>
