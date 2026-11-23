@@ -2179,5 +2179,55 @@ window.XV={"b1-001":{"m":"We say {at home} for being in the place where you live
   };
 })();
 </script>
+<script>
+window.GT_GAME='preposition';
+/* Games tracker (John 2026-11-23): when a round finishes, send one anonymous row to
+   Supabase game_rounds: game, level, questions, score, seconds, and the questions missed
+   with the wrong answer picked. No name, no email, nothing stored in the browser.
+   Only sends from johnplusenglish.com, so local testing never adds rows. */
+(function(){
+  const G = window.GT_GAME; if(!G) return;
+  const URL_ = 'https://uovqsqnxcgvefxpxntcj.supabase.co/rest/v1/game_rounds';
+  const KEY = 'sb_publishable_VTOzRUebaH_xQAs4wngfug_jCVCeCFB';
+  const live = /(^|\.)johnplusenglish\.com$/.test(location.hostname);
+  const cut = (s, n) => String(s == null ? '' : s).slice(0, n);
+  let t0 = 0, sent = false;
+
+  function round(){
+    if(G === 'preposition' || G === 'article'){
+      return {level: level === 'all' ? 'Mix' : level, n: results.length, score: results.filter(r => r.good).length,
+        misses: results.filter(r => !r.good).map(r => ({q: cut(r.it.s, 200), a: cut(r.it.a, 40), p: cut(r.given, 40)}))};
+    }
+    if(G === 'linkers'){
+      return {level: prefs.lv === 'mix' ? 'Mix' : prefs.lv, n: log.length, score: log.filter(r => r.ok).length,
+        misses: log.filter(r => !r.ok).map(r => ({q: cut(r.q.t, 200), a: cut(r.q.a, 40), p: cut(r.pick, 40)}))};
+    }
+    if(G === 'idiom'){
+      return {level: playType === 'both' ? 'Mix' : playType, n: results.length, score: results.filter(r => r.ok).length,
+        misses: results.filter(r => !r.ok).map(r => ({q: cut(r.item.p, 200), a: cut(r.item.a, 40), p: cut(r.given, 40)}))};
+    }
+  }
+  function send(){
+    if(sent) return; sent = true;
+    let row; try { row = round(); } catch(e){ return; }
+    if(!row || !row.n) return;
+    row.game = G; row.level = cut(row.level, 12);
+    row.secs = t0 ? Math.min(86400, Math.round((Date.now() - t0) / 1000)) : null;
+    window.GT_LAST = row;                        /* for checking in the console */
+    if(!live) return;
+    try {
+      fetch(URL_, {method: 'POST', keepalive: true,
+        headers: {'apikey': KEY, 'Authorization': 'Bearer ' + KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal'},
+        body: JSON.stringify(row)}).catch(() => {});
+    } catch(e){}
+  }
+  /* a round starts in begin() (prepositions, articles) or start() (linkers, idioms) */
+  const startName = (G === 'preposition' || G === 'article') ? 'begin' : 'start';
+  const _start = window[startName];
+  window[startName] = function(){ t0 = Date.now(); sent = false; return _start.apply(this, arguments); };
+  const _finish = window.finish;
+  window.finish = function(){ send(); return _finish.apply(this, arguments); };
+})();
+</script>
 </body>
 </html>
