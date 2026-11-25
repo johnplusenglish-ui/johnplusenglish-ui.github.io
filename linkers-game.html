@@ -1236,7 +1236,7 @@ window.XV={"___ it was raining, we still went for a walk on the beach.":{"m":"{A
 window.GT_GAME='linkers';
 /* Games tracker (John 2026-11-23): when a round finishes, send one anonymous row to
    Supabase game_rounds: game, level, questions, score, seconds, and the questions missed
-   with the wrong answer picked. No name, no email, nothing stored in the browser.
+   with the wrong answer picked, plus each missed question's level and headword (2026-11-25). No name, no email, nothing stored in the browser.
    Only sends from johnplusenglish.com, so local testing never adds rows. */
 (function(){
   const G = window.GT_GAME; if(!G) return;
@@ -1249,11 +1249,11 @@ window.GT_GAME='linkers';
   function round(){
     if(G === 'preposition' || G === 'article' || G === 'phrasal'){
       return {level: level === 'all' ? 'Mix' : level, n: results.length, score: results.filter(r => r.good).length,
-        misses: results.filter(r => !r.good).map(r => ({q: cut(r.it.s, 200), a: cut(r.it.a, 40), p: cut(r.given, 40)}))};
+        misses: results.filter(r => !r.good).map(r => ({q: cut(r.it.s, 200), a: cut(r.it.a, 40), p: cut(r.given, 40), k: cut(r.it.k, 60), l: cut(r.it.lv, 2)}))};
     }
     if(G === 'linkers'){
       return {level: prefs.lv === 'mix' ? 'Mix' : prefs.lv, n: log.length, score: log.filter(r => r.ok).length,
-        misses: log.filter(r => !r.ok).map(r => ({q: cut(r.q.t, 200), a: cut(r.q.a, 40), p: cut(r.pick, 40)}))};
+        misses: log.filter(r => !r.ok).map(r => ({q: cut(r.q.t, 200), a: cut(r.q.a, 40), p: cut(r.pick, 40), l: cut(r.q.lv, 2)}))};
     }
     if(G === 'idiom'){
       return {level: playType === 'both' ? 'Mix' : playType, n: results.length, score: results.filter(r => r.ok).length,
