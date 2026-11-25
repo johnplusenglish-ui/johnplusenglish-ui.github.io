@@ -1124,6 +1124,52 @@ window.FunKit = (function(){
     const N = R.length || 1; document.getElementById('grade').innerHTML = K.word(score / N) + '! <span>' + score + ' out of ' + N + '</span>';
   }catch(e){ console.error(e); } };
 })();
+
+/* levels can be combined (John 2026-11-25): tap C1 and C2 to play both. "Mix" clears the choice.
+   prefs.lv stays one string, "C1+C2", so saved choices, best scores and the tracker need no change. */
+(function(){
+  try{
+    const el = document.getElementById('segLv');
+    if(!el) return;
+    const ALL = ['B1','B2','C1','C2'], vals = LEVELS.map(l => l[0]);
+    const setOf = v => v === 'mix' ? null : String(v).split('+');
+    lvCount = function(v){ const s = setOf(v); return s ? Q.filter(q => s.indexOf(q.lv) > -1).length : Q.length; };
+    buildRound = function(source){
+      const s = setOf(prefs.lv);
+      let pool = source ? source.slice() : (s ? Q.filter(q => s.indexOf(q.lv) > -1) : Q.slice());
+      shuffle(pool);
+      const n = source ? pool.length : (prefs.n ? Math.min(prefs.n, pool.length) : pool.length);
+      const pick = pool.slice(0, n);
+      if((!s || s.length > 1) && !source) pick.sort((a, b) => ORDER[a.lv] - ORDER[b.lv]);
+      return pick;
+    };
+    const paint = () => [...el.children].forEach((c, i) => {
+      const v = vals[i], s = setOf(prefs.lv), on = v === 'mix' ? !s : !!s && s.indexOf(v) > -1;
+      c.classList.toggle('on', on); c.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    [...el.children].forEach((c, i) => {
+      c.onclick = () => {
+        const v = vals[i];
+        let s = setOf(prefs.lv) || [];
+        if(v === 'mix') s = [];
+        else if(s.indexOf(v) > -1) s = s.filter(x => x !== v);
+        else s.push(v);
+        s = ALL.filter(x => s.indexOf(x) > -1);
+        prefs.lv = (!s.length || s.length === ALL.length) ? 'mix' : s.join('+');
+        store.set('jpt_missinglink_prefs', prefs); play('click_002');
+        paint(); showBest();
+      };
+    });
+    const lbl = el.parentNode.querySelector('.lbl');
+    if(lbl && !lbl.querySelector('.more')){
+      const m = document.createElement('span'); m.className = 'more'; m.textContent = ' · tap one or more';
+      m.style.cssText = 'font-weight:500;opacity:.55;font-size:.86em'; lbl.appendChild(m);
+    }
+    const len = document.getElementById('lenInput');
+    if(len && !(parseInt(len.value, 10) > 0)) len.value = Math.min(prefs.n > 0 ? prefs.n : 20, lvCount(prefs.lv));
+    paint(); showBest();
+  }catch(e){ console.error(e); }
+})();
 </script><style>
 :root{--xv:#1F5FBF;--xv-w:#E8F0FC}
 /* Richer answer card: example and "goes with" chips (John 2026-11-23). --xv and --xv-w come from each game. */
@@ -1201,7 +1247,7 @@ window.GT_GAME='linkers';
   let t0 = 0, sent = false;
 
   function round(){
-    if(G === 'preposition' || G === 'article'){
+    if(G === 'preposition' || G === 'article' || G === 'phrasal'){
       return {level: level === 'all' ? 'Mix' : level, n: results.length, score: results.filter(r => r.good).length,
         misses: results.filter(r => !r.good).map(r => ({q: cut(r.it.s, 200), a: cut(r.it.a, 40), p: cut(r.given, 40)}))};
     }
@@ -1229,7 +1275,7 @@ window.GT_GAME='linkers';
     } catch(e){}
   }
   /* a round starts in begin() (prepositions, articles) or start() (linkers, idioms) */
-  const startName = (G === 'preposition' || G === 'article') ? 'begin' : 'start';
+  const startName = (G === 'preposition' || G === 'article' || G === 'phrasal') ? 'begin' : 'start';
   const _start = window[startName];
   window[startName] = function(){ t0 = Date.now(); sent = false; return _start.apply(this, arguments); };
   const _finish = window.finish;

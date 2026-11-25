@@ -2153,6 +2153,53 @@ window.FunKit = (function(){
     h.innerHTML = K.word(sc / total) + '! <span>' + sc + ' out of ' + total + '</span>';
   }catch(e){ console.error(e); } };
 })();
+
+/* levels can be combined (John 2026-11-25): tap C1 and C2 to play both, or B2, C1 and C2. "All" clears the choice.
+   The chosen levels are kept as one string, "C1+C2", so saving and the games tracker need no change. */
+(function(){
+  try{
+    const ORDER = ['B1','B2','C1','C2'];
+    const seg = document.getElementById('levelSeg');
+    if(!seg) return;
+    const _pool = pool;
+    pool = function(lv, fc){
+      lv = lv || level;
+      if(lv === 'all' || String(lv).indexOf('+') < 0) return _pool(lv, fc);
+      return lv.split('+').reduce((a, x) => a.concat(_pool(x, fc)), []);
+    };
+    const paint = () => seg.querySelectorAll('button').forEach(b => {
+      const on = b.dataset.v === 'all' ? level === 'all' : (level !== 'all' && level.split('+').indexOf(b.dataset.v) > -1);
+      b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    seg.querySelectorAll('button').forEach(old => {
+      const b = old.cloneNode(true); old.replaceWith(b);          /* drops the one-at-a-time click handler */
+      b.addEventListener('click', () => {
+        if(b.disabled) return;
+        const v = b.dataset.v;
+        let set = level === 'all' ? [] : level.split('+');
+        if(v === 'all') set = [];
+        else if(set.indexOf(v) > -1) set = set.filter(x => x !== v);
+        else set.push(v);
+        set = ORDER.filter(x => set.indexOf(x) > -1);
+        level = (!set.length || set.length === ORDER.length) ? 'all' : set.join('+');
+        paint(); syncCounts(); save();
+      });
+    });
+    const lbl = seg.parentNode.querySelector('.lbl'), hint = seg.parentNode.querySelector('.hint');
+    if(hint) hint.textContent = 'Tap one or more';
+    if(lbl && !lbl.querySelector('.more')){            /* the hint is hidden on phones, so say it in the label too */
+      const m = document.createElement('span'); m.className = 'more'; m.textContent = ' · tap one or more';
+      m.style.cssText = 'font-weight:500;opacity:.55;font-size:.86em'; lbl.appendChild(m);
+    }
+    /* the page set itself up before this ran, so a saved "C1+C2" looked empty and the round length fell to 0 */
+    const len = document.getElementById('lenInput');
+    if(len && !(parseInt(len.value, 10) > 0)){
+      let want = 20; try{ want = parseInt(load().n, 10) || 20; }catch(e){}
+      len.value = Math.min(want, pool().length);
+    }
+    paint(); syncCounts();
+  }catch(e){ console.error(e); }
+})();
 </script>
 <style>
 :root{--xv:#5B4BA8;--xv-w:#EFECFA}
@@ -2231,7 +2278,7 @@ window.GT_GAME='article';
   let t0 = 0, sent = false;
 
   function round(){
-    if(G === 'preposition' || G === 'article'){
+    if(G === 'preposition' || G === 'article' || G === 'phrasal'){
       return {level: level === 'all' ? 'Mix' : level, n: results.length, score: results.filter(r => r.good).length,
         misses: results.filter(r => !r.good).map(r => ({q: cut(r.it.s, 200), a: cut(r.it.a, 40), p: cut(r.given, 40)}))};
     }
@@ -2259,7 +2306,7 @@ window.GT_GAME='article';
     } catch(e){}
   }
   /* a round starts in begin() (prepositions, articles) or start() (linkers, idioms) */
-  const startName = (G === 'preposition' || G === 'article') ? 'begin' : 'start';
+  const startName = (G === 'preposition' || G === 'article' || G === 'phrasal') ? 'begin' : 'start';
   const _start = window[startName];
   window[startName] = function(){ t0 = Date.now(); sent = false; return _start.apply(this, arguments); };
   const _finish = window.finish;
