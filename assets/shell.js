@@ -41,6 +41,7 @@ var JPE_TITLES = {
   "reading.html": "Reading · johnplusenglish",
   "resources.html": "Resources - johnplusenglish",
   "role-play-cards.html": "Role Play Cards - johnplusenglish",
+  "shadowing.html": "Shadowing - johnplusenglish",
   "shrink-it.html": "Shrink It - johnplusenglish",
   "speaking-by-grammar.html": "Speaking by Grammar - johnplusenglish",
   "speaking-questions.html": "Speaking Topics - johnplusenglish",
